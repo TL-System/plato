@@ -29,9 +29,9 @@ class fedReIdClient(simple.Client):
             return self.sampler.num_samples()
         dis = []
         # option II
-        # self.load_payload(old_weights)
+        # self._load_payload(old_weights)
         # old_feature = self.trainer.test_output(Config().trainer._asdict(), self.datasource.get_test_set())
-        # self.load_payload(new_weights)
+        # self._load_payload(new_weights)
         # new_feature = self.trainer.test_output(Config().trainer._asdict(), self.datasource.get_test_set())
 
         # for i in range(len(old_feature)):

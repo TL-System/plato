@@ -44,7 +44,7 @@ class Client(simple.Client):
     def load_data(self) -> None:
         """The edge client does not need to train models using local data."""
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """The edge client loads the model from the central server."""
         self.server.algorithm.load_weights(server_payload)
 

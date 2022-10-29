@@ -110,7 +110,7 @@ class Client(base.Client):
                     self.datasource, self.client_id, testing=True
                 )
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loads the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 

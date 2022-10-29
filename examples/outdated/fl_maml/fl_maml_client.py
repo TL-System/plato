@@ -36,7 +36,7 @@ class Client(simple.Client):
 
     async def _start_training(self):
         """Complete one round of training on this client."""
-        self.load_payload(self.server_payload)
+        self._load_payload(self.server_payload)
         self.server_payload = None
 
         if self.do_personalization_test:

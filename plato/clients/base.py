@@ -320,7 +320,7 @@ class Client:
 
     async def _start_training(self, inbound_payload):
         """Complete one round of training on this client."""
-        self.load_payload(inbound_payload)
+        self._load_payload(inbound_payload)
 
         report, outbound_payload = await self._train()
 
@@ -422,7 +422,7 @@ class Client:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loading the payload onto this client."""
 
     def process_server_response(self, server_response) -> None:

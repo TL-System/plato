@@ -151,7 +151,7 @@ class Client(simple.Client):
             #   we want to save the space
             self.model.assing_weights(module_name=module_nm, weights=merged_module_wt)
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
 
         # In general, we only need to get the previous local model by:

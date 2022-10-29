@@ -14,7 +14,7 @@ class Client(simple.Client):
     Frequency.
     """
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loading the server model onto this client."""
         self.algorithm.load_weights(server_payload[0])
         if server_payload[1]:

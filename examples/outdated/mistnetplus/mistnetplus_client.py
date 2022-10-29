@@ -29,7 +29,7 @@ class MistnetplusClient(simple.Client):
         self.model_received = False
         self.gradient_received = False
 
-    def load_payload(self, server_payload):
+    def _load_payload(self, server_payload):
         """Loading the server model onto this client."""
         if self.model_received == True and self.gradient_received == True:
             self.model_received = False
