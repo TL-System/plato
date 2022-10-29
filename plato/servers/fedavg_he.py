@@ -31,7 +31,9 @@ class Server(fedavg.Server):
     def configure(self):
         """Configure the model information like weight shapes and parameter numbers."""
         super().configure()
+
         extract_model = self.trainer.model.cpu().state_dict()
+
         for key in extract_model.keys():
             self.weight_shapes[key] = extract_model[key].size()
             self.para_nums[key] = reduce(lambda a, b: a * b, self.weight_shapes[key])
