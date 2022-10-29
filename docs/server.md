@@ -4,6 +4,34 @@
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
+````{admonition} **configure(self)**
+Override this method to implement additional tasks for initializing and configuring the server. Make sure that `super().configure()` is called first.
+
+**Example:**
+
+```py
+def configure(self):
+    """Configure the model information like weight shapes and parameter numbers."""
+    super().configure()
+
+    self.total_rounds = Config().trainer.rounds
+```
+````
+
+````{admonition} **init_trainer(self)**
+Override this method to implement additional tasks for initializing and configuring the trainer. Make sure that `super().init_trainer()` is called first.
+
+**Example** (from `examples/knot/knot_server.py`):
+
+```py
+def init_trainer(self):
+    """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
+    super().init_trainer()
+
+    self.algorithm.init_clusters(self.clusters)
+```
+````
+
 ```{admonition} **choose_clients(self, clients_pool, clients_count)**
 Override this method to implement a customized client selection algorithm, choosing a subset of clients from the client pool.
 
@@ -53,7 +81,7 @@ Override this method to complete additional tasks after aggregating weights.
 `updates` the client updates received at the server.
 ````
 
-````{admonition} **customize_server_response(self, server_response: dict, client_id)**
+````{admonition} **customize_server_response(self, server_response: dict, client_id) -> dict**
 Override this method to return a customize server response with any additional information.
 
 `server_response` key-value pairs (from a string to an instance) for the server response before customization.
@@ -76,12 +104,30 @@ def customize_server_response(self, server_response: dict, client_id) -> dict:
 Override this method to customize the server payload before sending it to the clients.
 ```
 
+```{admonition} **clients_selected(self, selected_clients) -> None**
+Override this method to complete additional tasks after clients have been selected in each round.
+
+`selected_clients` a list of client IDs that have just been selected by the server.
+```
+
 ```{admonition} **clients_processed(self)**
 Override this method to complete additional tasks after all client reports have been processed.
 ```
 
+```{admonition} **save_to_checkpoint(self)**
+Override this method to save additional information when the server saves checkpoints at the end of each around.
+```
+
 ```{admonition} **training_will_start(self)**
 Override this method to complete additional tasks before selecting clients for the first round of training.
+```
+
+```{admonition} **periodic_task(self) -> None**
+Override this async method to perform periodic tasks in asynchronous mode, where this method will be called periodically.
+```
+
+```{admonition} **wrap_up(self)**
+Override this method to complete additional tasks at the end of each round.
 ```
 
 ```{admonition} **server_will_close(self)**
@@ -115,6 +161,12 @@ def on_weights_aggregated(self, server, updates):
 ```
 ````
 
+```{admonition} **on_clients_selected(self, server, selected_clients)**
+Override this method to complete additional tasks after clients have been selected in each round.
+
+`selected_clients` a list of client IDs that have just been selected by the server.
+```
+
 ```{admonition} **on_clients_processed(self, server)**
 Override this method to complete additional tasks after all client reports have been processed.
 ```
@@ -133,4 +185,3 @@ def on_server_will_close(self, server):
     logging.info("[Server #%s] Closing the server.", os.getpid())
 ```
 ````
-
