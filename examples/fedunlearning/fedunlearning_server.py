@@ -55,7 +55,7 @@ class Server(fedavg.Server):
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
-    def training_will_start(self):
+    def training_will_start(self) -> None:
         """Additional tasks before selecting clients for the first round of training."""
         super().training_will_start()
 

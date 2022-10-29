@@ -49,7 +49,7 @@ class Server(fedavg.Server):
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
-    def training_will_start(self):
+    def training_will_start(self) -> None:
         """Additional tasks before selecting clients for the first round of training."""
         super().training_will_start()
 
@@ -80,7 +80,7 @@ class Server(fedavg.Server):
 
         return await super().aggregate_deltas(recent_updates, recent_deltas_received)
 
-    def clients_processed(self):
+    def clients_processed(self) -> None:
         """Enters the retraining phase if a specific set of conditions are satisfied."""
         super().clients_processed()
 

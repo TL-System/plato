@@ -365,7 +365,7 @@ class Server(fedunlearning_server.Server):
 
         return server_response
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         logged_items = super().get_logged_items()
 
@@ -380,7 +380,7 @@ class Server(fedunlearning_server.Server):
 
         return logged_items
 
-    def save_to_checkpoint(self):
+    def save_to_checkpoint(self) -> None:
         """Save a checkpoint for resuming the training session."""
         super().save_to_checkpoint()
 
@@ -402,7 +402,7 @@ class Server(fedunlearning_server.Server):
             )
             self._save_model(cluster_id, filename, checkpoint_path)
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 

@@ -330,7 +330,7 @@ class Server(fedavg.Server):
                 self.current_round = 0
                 self.current_global_round += 1
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         logged_items = super().get_logged_items()
 
@@ -346,7 +346,7 @@ class Server(fedavg.Server):
 
         return logged_items
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         if Config().is_central_server():
             await super().wrap_up()

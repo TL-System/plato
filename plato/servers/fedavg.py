@@ -221,10 +221,10 @@ class Server(base.Server):
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
 
-    def clients_processed(self):
+    def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         return {
             "round": self.current_round,

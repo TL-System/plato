@@ -24,7 +24,7 @@ class Server(fedavg_cs.Server):
             if "pruning_amount" not in self.recorded_items:
                 self.recorded_items = self.recorded_items + ["pruning_amount"]
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         logged_items = super().get_logged_items()
         logged_items["pruning_amount"] = Config().clients.pruning_amount

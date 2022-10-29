@@ -1158,7 +1158,7 @@ class Server:
                         await self.wrap_up()
                         await self._select_clients()
 
-    def save_to_checkpoint(self):
+    def save_to_checkpoint(self) -> None:
         """Save a checkpoint for resuming the training session."""
         checkpoint_path = Config.params["checkpoint_path"]
 
@@ -1236,7 +1236,7 @@ class Server:
         np.random.set_state(numpy_prng_state)
         random.setstate(self.prng_state)
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 
@@ -1293,12 +1293,15 @@ class Server:
         """
         Method called after clients have been selected in each round."""
 
-    def training_will_start(self):
+    def clients_processed(self) -> None:
+        """Additional work to be performed after client reports have been processed."""
+
+    def training_will_start(self) -> None:
         """
         Method called before selecting clients for the first round of training.
         """
 
-    def server_will_close(self):
+    def server_will_close(self) -> None:
         """
         Method called before closing the server.
         """

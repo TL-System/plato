@@ -101,7 +101,7 @@ class Server(fedavg.Server):
                 update.client_id: update.report.avg_update for update in updates
             }
 
-    def server_will_close(self):
+    def server_will_close(self) -> None:
         """Method called at the start of closing the server."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]

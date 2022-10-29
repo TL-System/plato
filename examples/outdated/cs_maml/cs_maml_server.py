@@ -70,7 +70,7 @@ class Server(fedavg_cs.Server):
             self.personalization_test_updates
         )
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         return {
             "global_round": self.current_global_round,
