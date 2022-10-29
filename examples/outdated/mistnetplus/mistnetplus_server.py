@@ -102,7 +102,7 @@ class MistnetplusServer(fedavg.Server):
             )
             await self._process_reports()
             await self.wrap_up()
-            await self.select_clients()
+            await self._select_clients()
 
     def load_gradients(self):
         """Loading gradients from a file."""

@@ -46,7 +46,7 @@ class Server(fedavg_cs.Server):
         if Config().is_central_server():
             self.comm_overhead = 0
 
-    async def send(self, sid, payload, client_id) -> None:
+    async def _send(self, sid, payload, client_id) -> None:
         """Sending a new data payload to the client using either S3 or socket.io."""
         # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
@@ -64,12 +64,12 @@ class Server(fedavg_cs.Server):
             if isinstance(payload, list):
                 for data in payload:
                     _data = pickle.dumps(data)
-                    await self.send_in_chunks(_data, sid, client_id)
+                    await self._send_in_chunks(_data, sid, client_id)
                     data_size += sys.getsizeof(_data)
 
             else:
                 _data = pickle.dumps(payload)
-                await self.send_in_chunks(_data, sid, client_id)
+                await self._send_in_chunks(_data, sid, client_id)
                 data_size = sys.getsizeof(_data)
 
         await self.sio.emit("payload_done", metadata, room=sid)

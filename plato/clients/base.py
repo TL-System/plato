@@ -223,7 +223,7 @@ class Client:
         )
 
         # Sending the client training payload to the server
-        await self.send(processed_outbound_payload)
+        await self._send(processed_outbound_payload)
 
     def inbound_received(self, inbound_processor):
         """
@@ -335,7 +335,7 @@ class Client:
 
         return report, outbound_payload
 
-    async def send_in_chunks(self, data) -> None:
+    async def _send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
         step = 1024 ^ 2
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
@@ -345,7 +345,7 @@ class Client:
 
         await self.sio.emit("client_payload", {"id": self.client_id})
 
-    async def send(self, payload) -> None:
+    async def _send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
         if self.comm_simulation:
             # If we are using the filesystem to simulate communication over a network
@@ -384,11 +384,11 @@ class Client:
 
                     for data in payload:
                         _data = pickle.dumps(data)
-                        await self.send_in_chunks(_data)
+                        await self._send_in_chunks(_data)
                         data_size += sys.getsizeof(_data)
                 else:
                     _data = pickle.dumps(payload)
-                    await self.send_in_chunks(_data)
+                    await self._send_in_chunks(_data)
                     data_size = sys.getsizeof(_data)
 
             await self.sio.emit("client_payload_done", metadata)

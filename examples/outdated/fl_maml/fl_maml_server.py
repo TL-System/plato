@@ -36,7 +36,7 @@ class Server(fedavg.Server):
         logging.info("\n[%s] Starting testing personalization.", self)
 
         self.current_round -= 1
-        await super().select_clients()
+        await super()._select_clients()
 
         if len(self.selected_clients) > 0:
             logging.info(
@@ -110,7 +110,7 @@ class Server(fedavg.Server):
         else:
             await super().process_client_info(client_id, sid)
 
-    async def process_clients(self, client_info):
+    async def _process_clients(self, client_info):
         """Process client reports."""
 
         if self.do_personalization_test:
@@ -154,4 +154,4 @@ class Server(fedavg.Server):
             self.personalization_test_updates = []
 
             # Start a new round of FL training
-            await self.select_clients()
+            await self._select_clients()
