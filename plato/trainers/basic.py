@@ -407,7 +407,7 @@ class Trainer(base.Trainer):
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
                 filename,
             )
 
@@ -427,6 +427,7 @@ class Trainer(base.Trainer):
             if model_training_time > requested_time:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
 
+                print(model_path)
                 pretrained = None
                 if torch.cuda.is_available():
                     pretrained = torch.load(model_path)

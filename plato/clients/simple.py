@@ -184,6 +184,7 @@ class Client(base.Client):
         model = self.trainer.obtain_model_update(client_id, requested_time)
         weights = self.algorithm.extract_weights(model)
         self._report.comm_time = time.time()
+        self._report.client_id = client_id
         self._report.update_response = True
 
         return self._report, weights

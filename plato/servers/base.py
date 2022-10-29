@@ -861,6 +861,11 @@ class Server:
         else:
             self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
 
+        if hasattr(self.reports[sid], "client_id"):
+            # When the client is responding to an urgent request for an update, it will
+            # store its client ID in its report
+            client_id = self.reports[sid].client_id
+
         start_time = self.training_clients[client_id]["start_time"]
         finish_time = (
             self.reports[sid].training_time + self.reports[sid].comm_time + start_time
