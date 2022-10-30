@@ -92,7 +92,7 @@ class RLServer(fedavg.Server):
         self.agent.new_state = self.prep_state()
         self.agent.process_env_update()
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 
@@ -100,7 +100,7 @@ class RLServer(fedavg.Server):
             self.agent.reset_env = False
             self.reset()
         if self.agent.finished:
-            await self.close()
+            await self._close()
 
     @abstractmethod
     def prep_state(self):
