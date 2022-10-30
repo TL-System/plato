@@ -44,7 +44,7 @@ class Client(simple.Client):
     def load_data(self) -> None:
         """The edge client does not need to train models using local data."""
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """The edge client loads the model from the central server."""
         self.server.algorithm.load_weights(server_payload)
 
@@ -53,7 +53,7 @@ class Client(simple.Client):
         if "current_global_round" in server_response:
             self.server.current_global_round = server_response["current_global_round"]
 
-    async def train(self):
+    async def _train(self):
         """The aggregation workload on an edge client."""
         training_start_time = time.perf_counter()
         # Signal edge server to select clients to start a new round of local aggregation

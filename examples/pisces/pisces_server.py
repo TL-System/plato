@@ -58,7 +58,7 @@ class Server(fedavg.Server):
         }
         self.detected_corrupted_clients = []
 
-    def configure(self):
+    def configure(self) -> None:
         """Initialize necessary variables."""
         super().configure()
 

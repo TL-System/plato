@@ -18,7 +18,7 @@ from plato.clients import simple
 class Client(simple.Client):
     """A federated learning client for MistNet."""
 
-    async def train(self):
+    async def _train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
         logging.info("Training on MistNet client #%d", self.client_id)
 

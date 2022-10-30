@@ -69,7 +69,7 @@ class Client(base.Client):
             "Client", client_id=self.client_id, trainer=self.trainer
         )
 
-    def load_data(self) -> None:
+    def _load_data(self) -> None:
         """Generates data and loads them onto this client."""
         logging.info("[%s] Loading its data source...", self)
 
@@ -110,11 +110,11 @@ class Client(base.Client):
                     self.datasource, self.client_id, testing=True
                 )
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loads the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 
-    async def train(self):
+    async def _train(self):
         """The machine learning training workload on a client."""
         logging.info(
             fonts.colourize(
@@ -179,22 +179,15 @@ class Client(base.Client):
 
         return self._report, weights
 
-    async def obtain_model_update(self, wall_time):
+    async def _obtain_model_update(self, client_id, requested_time):
         """Retrieves a model update corresponding to a particular wall clock time."""
-        model = self.trainer.obtain_model_update(wall_time)
+        model = self.trainer.obtain_model_update(client_id, requested_time)
         weights = self.algorithm.extract_weights(model)
         self._report.comm_time = time.time()
+        self._report.client_id = client_id
         self._report.update_response = True
 
         return self._report, weights
-
-    def save_model(self, model_checkpoint):
-        """Saves the model to a model checkpoint."""
-        self.trainer.save_model(model_checkpoint)
-
-    def load_model(self, model_checkpoint):
-        """Loads the model from a model checkpoint."""
-        self.trainer.load_model(model_checkpoint)
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with any additional information."""

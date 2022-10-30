@@ -40,7 +40,7 @@ class Client(simple.Client):
 
         self.client_control_variate = None
 
-    def configure(self):
+    def configure(self) -> None:
         """Initialize the server control variate and client control variate for the trainer."""
         super().configure()
 

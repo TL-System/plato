@@ -33,6 +33,8 @@ class InnerProductModel(torch.nn.Module):
 
 
 async def test_fedavg_aggregation(self):
+    """Testing the federated averaging implementation."""
+
     print("\nTesting federated averaging.")
     updates = []
     model = copy.deepcopy(self.model)

@@ -73,7 +73,7 @@ class Server(fedavg.Server):
             else 10
         )
 
-    def configure(self):
+    def configure(self) -> None:
         """Initialize necessary variables."""
         super().configure()
 
