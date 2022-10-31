@@ -18,7 +18,7 @@ from plato.callbacks.client import LogProgressCallback
 from plato.config import Config
 from plato.utils import s3
 
-
+# pylint: disable=unused-argument, protected-access
 class ClientEvents(socketio.AsyncClientNamespace):
     """A custom namespace for socketio.AsyncServer."""
 
@@ -27,18 +27,16 @@ class ClientEvents(socketio.AsyncClientNamespace):
         self.plato_client = plato_client
         self.client_id = plato_client.client_id
 
-    # pylint: disable=unused-argument
     async def on_connect(self):
         """Upon a new connection to the server."""
         logging.info("[Client #%d] Connected to the server.", self.client_id)
 
-    # pylint: disable=protected-access
     async def on_disconnect(self):
         """Upon a disconnection event."""
         logging.info(
             "[Client #%d] The server disconnected the connection.", self.client_id
         )
-        self.plato_client.clear_checkpoint_files()
+        self.plato_client._clear_checkpoint_files()
         os._exit(0)
 
     async def on_connect_error(self, data):
@@ -49,26 +47,26 @@ class ClientEvents(socketio.AsyncClientNamespace):
 
     async def on_payload_to_arrive(self, data):
         """New payload is about to arrive from the server."""
-        await self.plato_client.payload_to_arrive(data["response"])
+        await self.plato_client._payload_to_arrive(data["response"])
 
     async def on_request_update(self, data):
         """The server is requesting an urgent model update."""
-        await self.plato_client.request_update(data)
+        await self.plato_client._request_update(data)
 
     async def on_chunk(self, data):
         """A chunk of data from the server arrived."""
-        await self.plato_client.chunk_arrived(data["data"])
+        await self.plato_client._chunk_arrived(data["data"])
 
     async def on_payload(self, data):
         """A portion of the new payload from the server arrived."""
-        await self.plato_client.payload_arrived(data["id"])
+        await self.plato_client._payload_arrived(data["id"])
 
     async def on_payload_done(self, data):
         """All of the new payload sent from the server arrived."""
         if "s3_key" in data:
-            await self.plato_client.payload_done(data["id"], s3_key=data["s3_key"])
+            await self.plato_client._payload_done(data["id"], s3_key=data["s3_key"])
         else:
-            await self.plato_client.payload_done(data["id"])
+            await self.plato_client._payload_done(data["id"])
 
 
 class Client:
@@ -162,7 +160,7 @@ class Client:
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
 
-    async def payload_to_arrive(self, response) -> None:
+    async def _payload_to_arrive(self, response) -> None:
         """Upon receiving a response from the server."""
         self.current_round = response["current_round"]
 
@@ -176,7 +174,7 @@ class Client:
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
         if not hasattr(Config().data, "reload_data") or Config().data.reload_data:
-            self.load_data()
+            self._load_data()
 
         if self.comm_simulation:
             payload_filename = response["payload_filename"]
@@ -191,9 +189,9 @@ class Client:
                 payload_size / 1024**2,
             )
 
-            await self.handle_payload(self.server_payload)
+            await self._handle_payload(self.server_payload)
 
-    async def handle_payload(self, inbound_payload):
+    async def _handle_payload(self, inbound_payload):
         """Handles the inbound payload upon receiving it from the server."""
         self.inbound_received(self.inbound_processor)
         self.callback_handler.call_event(
@@ -223,7 +221,7 @@ class Client:
         )
 
         # Sending the client training payload to the server
-        await self.send(processed_outbound_payload)
+        await self._send(processed_outbound_payload)
 
     def inbound_received(self, inbound_processor):
         """
@@ -236,7 +234,7 @@ class Client:
         Override this method to conduct customized operations to generate a client's response to
         the server when inbound payload from the server has been processed.
         """
-        report, outbound_payload = await self.start_training(processed_inbound_payload)
+        report, outbound_payload = await self._start_training(processed_inbound_payload)
         return report, outbound_payload
 
     def outbound_ready(self, report, outbound_processor):
@@ -245,19 +243,22 @@ class Client:
         to process the data to be sent to the server.
         """
 
-    async def chunk_arrived(self, data) -> None:
+    async def _chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
         self.chunks.append(data)
 
-    async def request_update(self, data) -> None:
+    async def _request_update(self, data) -> None:
         """Upon receiving a request for an urgent model update."""
         logging.info(
             "[Client #%s] Urgent request received for model update at time %s.",
-            self.client_id,
+            data["client_id"],
             data["time"],
         )
 
-        report, payload = await self.obtain_model_update(data["time"])
+        report, payload = await self._obtain_model_update(
+            client_id=data["client_id"],
+            requested_time=data["time"],
+        )
 
         # Process outbound data when necessary
         self.callback_handler.call_event(
@@ -274,7 +275,7 @@ class Client:
         # Sending the client training payload to the server
         await self.send(payload)
 
-    async def payload_arrived(self, client_id) -> None:
+    async def _payload_arrived(self, client_id) -> None:
         """Upon receiving a portion of the new payload from the server."""
         assert client_id == self.client_id
 
@@ -290,7 +291,7 @@ class Client:
             self.server_payload = [self.server_payload]
             self.server_payload.append(_data)
 
-    async def payload_done(self, client_id, s3_key=None) -> None:
+    async def _payload_done(self, client_id, s3_key=None) -> None:
         """Upon receiving all the new payload from the server."""
         payload_size = 0
 
@@ -315,13 +316,13 @@ class Client:
             payload_size / 1024**2,
         )
 
-        await self.handle_payload(self.server_payload)
+        await self._handle_payload(self.server_payload)
 
-    async def start_training(self, inbound_payload):
+    async def _start_training(self, inbound_payload):
         """Complete one round of training on this client."""
-        self.load_payload(inbound_payload)
+        self._load_payload(inbound_payload)
 
-        report, outbound_payload = await self.train()
+        report, outbound_payload = await self._train()
 
         if Config().is_edge_server():
             logging.info(
@@ -332,7 +333,7 @@ class Client:
 
         return report, outbound_payload
 
-    async def send_in_chunks(self, data) -> None:
+    async def _send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
         step = 1024 ^ 2
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
@@ -342,7 +343,7 @@ class Client:
 
         await self.sio.emit("client_payload", {"id": self.client_id})
 
-    async def send(self, payload) -> None:
+    async def _send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
         if self.comm_simulation:
             # If we are using the filesystem to simulate communication over a network
@@ -381,11 +382,11 @@ class Client:
 
                     for data in payload:
                         _data = pickle.dumps(data)
-                        await self.send_in_chunks(_data)
+                        await self._send_in_chunks(_data)
                         data_size += sys.getsizeof(_data)
                 else:
                     _data = pickle.dumps(payload)
-                    await self.send_in_chunks(_data)
+                    await self._send_in_chunks(_data)
                     data_size = sys.getsizeof(_data)
 
             await self.sio.emit("client_payload_done", metadata)
@@ -396,51 +397,37 @@ class Client:
                 data_size / 1024**2,
             )
 
-    def process_server_response(self, server_response) -> None:
-        """Additional client-specific processing on the server response."""
-
-    def clear_checkpoint_files(self):
+    def _clear_checkpoint_files(self):
         """Delete all the temporary checkpoint files created by the client."""
-        if (
-            hasattr(Config().server, "request_update")
-            and Config().server.request_update
-        ):
-            model_path = Config().params["model_path"]
-            for filename in os.listdir(model_path):
-                split = re.match(
-                    r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
-                    filename,
-                )
-                if split is not None and self.client_id == int(
-                    split.group("client_id")
-                ):
-                    file_path = f"{model_path}/{filename}"
-                    os.remove(file_path)
+        model_path = Config().params["model_path"]
+        for filename in os.listdir(model_path):
+            split = re.match(
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                filename,
+            )
+            if split is not None:
+                file_path = f"{model_path}/{filename}"
+                os.remove(file_path)
+
+    @abstractmethod
+    async def _train(self):
+        """The machine learning training workload on a client."""
 
     @abstractmethod
     def configure(self) -> None:
         """Prepare this client for training."""
 
     @abstractmethod
-    def load_data(self) -> None:
+    def _load_data(self) -> None:
         """Generating data and loading them onto this client."""
 
     @abstractmethod
-    def save_model(self, model_checkpoint) -> None:
-        """Saving the model to a model checkpoint."""
-
-    @abstractmethod
-    def load_model(self, model_checkpoint) -> None:
-        """Loading the model from a model checkpoint."""
-
-    @abstractmethod
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loading the payload onto this client."""
 
-    @abstractmethod
-    async def train(self):
-        """The machine learning training workload on a client."""
+    def process_server_response(self, server_response) -> None:
+        """Additional client-specific processing on the server response."""
 
     @abstractmethod
-    async def obtain_model_update(self, wall_time):
+    async def _obtain_model_update(self, client_id, requested_time):
         """Retrieving a model update corrsponding to a particular wall clock time."""

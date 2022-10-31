@@ -13,7 +13,7 @@ from plato.processors import registry as processor_registry
 from plato.samplers import registry as samplers_registry
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
-from plato.utils import csv_processor
+from plato.utils import fonts
 
 
 class Server(fedavg.Server):
@@ -115,7 +115,7 @@ class Server(fedavg.Server):
                 self.total_clients,
             )
 
-    def configure(self):
+    def configure(self) -> None:
         """
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
@@ -162,7 +162,7 @@ class Server(fedavg.Server):
                             self.datasource, testing=True
                         )
 
-    async def select_clients(self, for_next_batch=False):
+    async def _select_clients(self, for_next_batch=False):
         if Config().is_edge_server() and not for_next_batch:
             if self.current_round == 0:
                 # Wait until this edge server is selected by the central server
@@ -171,7 +171,7 @@ class Server(fedavg.Server):
                 await self.new_global_round_begins.wait()
                 self.new_global_round_begins.clear()
 
-        await super().select_clients(for_next_batch=for_next_batch)
+        await super()._select_clients(for_next_batch=for_next_batch)
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
@@ -183,6 +183,7 @@ class Server(fedavg.Server):
         """Process the client reports by aggregating their weights."""
         # To pass the client_id == 0 assertion during aggregation
         self.trainer.set_client_id(0)
+
         weights_received = [update.payload for update in self.updates]
 
         weights_received = self.weights_received(weights_received)
@@ -197,7 +198,8 @@ class Server(fedavg.Server):
                 "[Server #%d] Aggregating model weights directly rather than weight deltas.",
                 os.getpid(),
             )
-            updated_weights = self.aggregate_weights(
+
+            updated_weights = await self.aggregate_weights(
                 self.updates, baseline_weights, weights_received
             )
 
@@ -209,15 +211,12 @@ class Server(fedavg.Server):
             deltas_received = self.algorithm.compute_weight_deltas(
                 baseline_weights, weights_received
             )
-
             # Runs a framework-agnostic server aggregation algorithm, such as
             # the federated averaging algorithm
             logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
-
             # Updates the existing model weights from the provided deltas
             updated_weights = self.algorithm.update_weights(deltas)
-
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
 
@@ -264,15 +263,21 @@ class Server(fedavg.Server):
             and hasattr(Config().server, "do_test")
             and Config().server.do_test
         ):
-            # Test the updated model directly at the central server
+            # Testing the updated model directly at the server
+            logging.info("[%s] Started model testing.", self)
             self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
+
             if hasattr(Config().trainer, "target_perplexity"):
                 logging.info(
-                    "[%s] Global model perplexity: %.2f\n", self, self.accuracy
+                    fonts.colourize(
+                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
+                    )
                 )
             else:
                 logging.info(
-                    "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
+                    fonts.colourize(
+                        f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
+                    )
                 )
         elif (
             Config().is_edge_server()
@@ -280,21 +285,26 @@ class Server(fedavg.Server):
             and Config().server.edge_do_test
         ):
             # Test the aggregated model directly at the edge server
+            logging.info("[%s] Started model testing.", self)
             self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
+
             if hasattr(Config().trainer, "target_perplexity"):
                 logging.info(
-                    "[%s] Aggregated model perplexity: %.2f\n", self, self.accuracy
+                    fonts.colourize(
+                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
+                    )
                 )
             else:
                 logging.info(
-                    "[%s] Aggregated model accuracy: %.2f%%\n",
-                    self,
-                    100 * self.accuracy,
+                    fonts.colourize(
+                        f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
+                    )
                 )
         else:
             self.accuracy = self.average_accuracy
 
         self.clients_processed()
+        self.callback_handler.call_event("on_clients_processed", self)
 
     def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""
@@ -320,7 +330,7 @@ class Server(fedavg.Server):
                 self.current_round = 0
                 self.current_global_round += 1
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         logged_items = super().get_logged_items()
 
@@ -336,7 +346,7 @@ class Server(fedavg.Server):
 
         return logged_items
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         if Config().is_central_server():
             await super().wrap_up()
