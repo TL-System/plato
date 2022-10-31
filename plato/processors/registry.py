@@ -6,7 +6,6 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 import logging
-from collections import OrderedDict
 from typing import Tuple
 
 from plato.config import Config
@@ -39,34 +38,45 @@ if not (
         unstructured_pruning,
     )
 
-    registered_processors = OrderedDict(
-        [
-            ("base", base.Processor),
-            ("compress", compress.Processor),
-            ("decompress", decompress.Processor),
-            ("feature_randomized_response", feature_randomized_response.Processor),
-            ("feature_gaussian", feature_gaussian.Processor),
-            ("feature_laplace", feature_laplace.Processor),
-            ("feature_quantize", feature_quantize.Processor),
-            ("feature_dequantize", feature_dequantize.Processor),
-            ("feature_unbatch", feature_unbatch.Processor),
-            ("inbound_feature_tensors", inbound_feature_tensors.Processor),
-            ("outbound_feature_ndarrays", outbound_feature_ndarrays.Processor),
-            ("model_deepcopy", model_deepcopy.Processor),
-            ("model_quantize", model_quantize.Processor),
-            ("model_dequantize", model_dequantize.Processor),
-            ("model_compress", model_compress.Processor),
-            ("model_decompress", model_decompress.Processor),
-            ("model_randomized_response", model_randomized_response.Processor),
-            ("send_mask", send_mask.Processor),
-            ("structured_pruning", structured_pruning.Processor),
-            ("unstructured_pruning", unstructured_pruning.Processor),
-        ]
+    registered_processors = {
+        "base": base.Processor,
+        "compress": compress.Processor,
+        "decompress": decompress.Processor,
+        "feature_randomized_response": feature_randomized_response.Processor,
+        "feature_gaussian": feature_gaussian.Processor,
+        "feature_laplace": feature_laplace.Processor,
+        "feature_quantize": feature_quantize.Processor,
+        "feature_dequantize": feature_dequantize.Processor,
+        "feature_unbatch": feature_unbatch.Processor,
+        "inbound_feature_tensors": inbound_feature_tensors.Processor,
+        "outbound_feature_ndarrays": outbound_feature_ndarrays.Processor,
+        "model_deepcopy": model_deepcopy.Processor,
+        "model_quantize": model_quantize.Processor,
+        "model_dequantize": model_dequantize.Processor,
+        "model_compress": model_compress.Processor,
+        "model_decompress": model_decompress.Processor,
+        "model_randomized_response": model_randomized_response.Processor,
+        "send_mask": send_mask.Processor,
+        "structured_pruning": structured_pruning.Processor,
+        "unstructured_pruning": unstructured_pruning.Processor,
+    }
+
+
+if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
+    # FedAvg server with homomorphic encryption needs to import tenseal, which is not available on
+    # all platforms such as macOS
+    from plato.processors import model_encrypt, model_decrypt
+
+    registered_processors.update(
+        {
+            "model_encrypt": model_encrypt.Processor,
+            "model_decrypt": model_decrypt.Processor,
+        }
     )
 
 
 def get(
-    user: str, processor_kwargs={}, **kwargs
+    user: str, processor_kwargs=None, **kwargs
 ) -> Tuple[pipeline.Processor, pipeline.Processor]:
     """Get an instance of the processor."""
     outbound_processors = []
@@ -95,12 +105,12 @@ def get(
         logging.info("%s: Using Processor for receiving payload: %s", user, processor)
 
     def map_f(name):
-        if name in processor_kwargs:
+        if processor_kwargs is not None and name in processor_kwargs:
             this_kwargs = {**kwargs, **(processor_kwargs[name])}
         else:
             this_kwargs = kwargs
 
-        return registered_processors[name](**this_kwargs)
+        return registered_processors[name](name=name, **this_kwargs)
 
     outbound_processors = list(map(map_f, outbound_processors))
     inbound_processors = list(map(map_f, inbound_processors))

@@ -31,6 +31,13 @@ class TrainerCallback(ABC):
         Event called at the beginning of a training epoch.
         """
 
+    def on_train_step_start(self, trainer, config, batch, **kwargs):
+        """
+        Event called at the beginning of a training step.
+
+        :param batch: the current batch of training data.
+        """
+
     def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         """
         Event called at the end of a training step.
@@ -45,7 +52,7 @@ class TrainerCallback(ABC):
         """
 
 
-class PrintProgressCallback(TrainerCallback):
+class LogProgressCallback(TrainerCallback):
     """
     A callback which prints a message at the start of each epoch, and at the end of each step.
     """
@@ -86,7 +93,7 @@ class PrintProgressCallback(TrainerCallback):
 
     def on_train_step_end(self, trainer, config, batch=None, loss=None, **kwargs):
         """
-        Method called at the end of a training step.
+        Event called at the end of a training step.
 
         :param batch: the current batch of training data.
         :param loss: the loss computed in the current batch.

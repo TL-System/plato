@@ -1,5 +1,12 @@
-"""The training loop that takes place on clients of Oort."""
+"""
+A federated learning trainer using Oort.
 
+Reference:
+
+F. Lai, X. Zhu, H. V. Madhyastha and M. Chowdhury, "Oort: Efficient Federated Learning via
+Guided Participant Selection," in USENIX Symposium on Operating Systems Design and Implementation
+(OSDI 2021), July 2021.
+"""
 
 import numpy as np
 import torch

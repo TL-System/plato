@@ -75,6 +75,98 @@ H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighti
 ```
 ````
 
+````{admonition} **Federated Unlearning**
+Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/fedunlearning/fedunlearning_server.py` and `examples/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
+
+```shell
+python examples/fedunlearning/fedunlearning.py -c examples/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.yml
+```
+
+```{note}
+If the AdaHessian optimizer is used as in the example configuration file, it will reflect what the following paper proposed:
+
+Liu et al., &ldquo;[The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining](https://arxiv.org/abs/2203.07320),&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
+````{admonition} **Gradient leakage attacks and defenses**
+Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/dlg/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations.
+
+```shell
+python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
+```
+````
+
+````{admonition} **SCAFFOLD**
+SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
+
+```shell
+python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.yml
+```
+
+```{note}
+Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federated Learning](http://proceedings.mlr.press/v119/karimireddy20a.html), &rdquo; in Proc. International Conference on Machine Learning (ICML), 2020.
+```
+````
+
+````{admonition} **Pisces**
+Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, a client running the Pisces algorithm calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for the next communication round. The algorithm also attempts to detect outliers via DBSCAN for better robustness.
+
+```shell
+python examples/pisces/pisces.py -c examples/pisces/pisces_MNIST_lenet5.yml
+```
+
+```{note}
+Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
+&rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
+```
+````
+
+````{admonition} **Split Learning**
+Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In this example, the training process is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. This example uses client processors extensively for applying different processing mechanisms on inbound payload received from the server in different phases.
+
+```shell
+python examples/split_learning/split_learning.py -c examples/split_learning/split_learning_MNIST_lenet5.yml
+```
+
+```{note}
+Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. AI for Social Good Workshop, affiliated with the International Conference on Learning Representations (ICLR), 2018.
+```
+````
+
+````{admonition} **FedRLNAS**
+FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
+
+```shell
+python examples/fedrlnas/fedrlnas.py -c examples/fedrlnas/FedRLNAS_MNIST_DARTS.yml
+```
+
+```{note}
+Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
+```
+````
+
+````{admonition} **Oort**
+Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
+
+```shell
+python examples/oort/oort.py -c examples/oort/oort_MNIST_lenet5.yml
+```
+
+```{note}
+Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
+```
+````
+
+````{admonition} **MaskCrypt**
+MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
+
+```shell
+python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_lenet5.yml
+```
+````
+
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
@@ -87,4 +179,3 @@ With the recent redesign of the Plato API, the following list is outdated and wi
 |[MistNet](https://github.com/TL-System/plato/blob/main/docs/papers/MistNet.pdf) with separate client and server implementations | Change directory to `examples/dist_mistnet` and run `python custom_server.py -c ./mistnet_lenet5_server.yml`, then run `python custom_client.py -c ./mistnet_lenet5_client.yml -i 1`. | Yes |
 |[FedNova](https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html) | Change directory to `examples/fednova` and run `python fednova.py -c <configuration file>`. | Yes |
 |[FedSarah](https://arxiv.org/pdf/1703.00102.pdf)                             | Change directory to `examples/fedsarah` and run `python fedsarah.py -c <configuration file>`. | Yes |
-|[SCAFFOLD](https://arxiv.org/pdf/1910.06378.pdf)                             | Change directory to `examples/scaffold` and run `python scaffold.py -c <configuration file>`. | Not yet |

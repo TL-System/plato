@@ -12,7 +12,7 @@ import time
 
 import torch
 from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.trainer import PrintProgressCallback
+from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import base, loss_criterion, lr_schedulers, optimizers, tracking
@@ -26,17 +26,16 @@ class Trainer(base.Trainer):
 
         Arguments:
         model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
+        callbacks: The callbacks that this trainer uses.
         """
         super().__init__()
 
         self.training_start_time = time.time()
-        self.models_per_epoch = {}
         self.model_state_dict = None
         self.current_round = 0
 
         # Starting from the default trainer callback class, add all supplied trainer callbacks
-        self.callbacks = [PrintProgressCallback]
+        self.callbacks = [LogProgressCallback]
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
@@ -52,6 +51,8 @@ class Trainer(base.Trainer):
 
         self.train_loader = None
         self.sampler = None
+        self._loss_criterion = None
+        self.optimizer = None
         self.lr_scheduler = None
         self.current_epoch = 0
 
@@ -161,6 +162,32 @@ class Trainer(base.Trainer):
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
             self.save_model(filename)
 
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform the forward and backward passes of the training loop.
+
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
+
+        Returns: loss values after the current batch has been processed.
+        """
+        self.optimizer.zero_grad()
+
+        outputs = self.model(examples)
+
+        loss = self._loss_criterion(outputs, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
+
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop when a custom training loop is not supplied."""
@@ -173,15 +200,15 @@ class Trainer(base.Trainer):
         self.train_run_start(config)
         self.callback_handler.call_event("on_train_run_start", self, config)
 
-        self.train_loader = Trainer.get_train_loader(batch_size, trainset, sampler)
+        self.train_loader = self.get_train_loader(batch_size, trainset, sampler)
 
         # Initializing the loss criterion
-        _loss_criterion = self.get_loss_criterion()
+        self._loss_criterion = self.get_loss_criterion()
 
         # Initializing the optimizer
-        optimizer = self.get_optimizer(self.model)
-        self.lr_scheduler = self.get_lr_scheduler(config, optimizer)
-        optimizer = self._adjust_lr(config, self.lr_scheduler, optimizer)
+        self.optimizer = self.get_optimizer(self.model)
+        self.lr_scheduler = self.get_lr_scheduler(config, self.optimizer)
+        self.optimizer = self._adjust_lr(config, self.lr_scheduler, self.optimizer)
 
         self.model.to(self.device)
         self.model.train()
@@ -194,20 +221,16 @@ class Trainer(base.Trainer):
             self.callback_handler.call_event("on_train_epoch_start", self, config)
 
             for batch_id, (examples, labels) in enumerate(self.train_loader):
+                self.train_step_start(config, batch=batch_id)
+                self.callback_handler.call_event(
+                    "on_train_step_start", self, config, batch=batch_id
+                )
+
                 examples, labels = examples.to(self.device), labels.to(self.device)
-                optimizer.zero_grad()
 
-                outputs = self.model(examples)
-
-                loss = _loss_criterion(outputs, labels)
-                self._loss_tracker.update(loss, labels.size(0))
-
-                if "create_graph" in config:
-                    loss.backward(create_graph=config["create_graph"])
-                else:
-                    loss.backward()
-
-                optimizer.step()
+                loss = self.perform_forward_and_backward_passes(
+                    config, examples, labels
+                )
 
                 self.train_step_end(config, batch=batch_id, loss=loss)
                 self.callback_handler.call_event(
@@ -216,8 +239,8 @@ class Trainer(base.Trainer):
 
             self.lr_scheduler_step()
 
-            if hasattr(optimizer, "params_state_update"):
-                optimizer.params_state_update()
+            if hasattr(self.optimizer, "params_state_update"):
+                self.optimizer.params_state_update()
 
             # Simulate client's speed
             if (
@@ -374,54 +397,71 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    def obtain_model_update(self, wall_time):
+    def obtain_model_update(self, client_id, requested_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
         wall clock time is reached.
         """
         # Constructing a list of epochs and training times
-        self.models_per_epoch = {}
+        models_per_epoch = {}
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
                 filename,
             )
 
             if split is not None:
                 epoch = split.group("epoch")
                 training_time = split.group("training_time")
-                if self.client_id == int(split.group("client_id")):
-                    self.models_per_epoch[epoch] = {
+                if client_id == int(split.group("client_id")):
+                    models_per_epoch[epoch] = {
                         "training_time": float(training_time),
                         "model_checkpoint": filename,
                     }
         # Locate the model at a specific wall clock time
-        for epoch in sorted(self.models_per_epoch):
-            training_time = self.models_per_epoch[epoch]["training_time"]
-            model_checkpoint = self.models_per_epoch[epoch]["model_checkpoint"]
-            if training_time + self.training_start_time > wall_time:
-                self.load_model(model_checkpoint)
+        for epoch in sorted(models_per_epoch, reverse=True):
+            model_training_time = models_per_epoch[epoch]["training_time"]
+            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
+
+            if model_training_time < requested_time:
+                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+
+                print(model_path)
+                pretrained = None
+                if torch.cuda.is_available():
+                    pretrained = torch.load(model_path)
+                else:
+                    pretrained = torch.load(
+                        model_path, map_location=torch.device("cpu")
+                    )
+
+                model = models_registry.get()
+                model.load_state_dict(pretrained, strict=True)
+
                 logging.info(
                     "[Client #%s] Responding to the server with the model after "
                     "epoch %s finished, at time %s.",
-                    self.client_id,
+                    client_id,
                     epoch,
-                    training_time + self.training_start_time,
+                    model_training_time,
                 )
-                return self.model
 
-        return self.model
+                return model
+
+        raise ValueError(
+            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
+        )
 
     # pylint: disable=unused-argument
-    @staticmethod
-    def get_train_loader(batch_size, trainset, sampler, **kwargs):
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """
         Creates an instance of the trainloader.
 
-        :param batch_size: the batch size.
-        :param trainset: the training dataset.
-        :param sampler: the sampler for the trainloader to use.
+        Arguments:
+        batch_size: the batch size.
+        trainset: the training dataset.
+        sampler: the sampler for the trainloader to use.
         """
         return torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -432,10 +472,10 @@ class Trainer(base.Trainer):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
-        :param testset: the test dataset.
-        :param sampler: the test sampler.
-        :param kwargs (optional): Additional keyword arguments.
-
+        Auguments:
+        testset: the test dataset.
+        sampler: the test sampler. The default is None.
+        kwargs (optional): Additional keyword arguments.
         """
         batch_size = config["batch_size"]
 
@@ -452,6 +492,8 @@ class Trainer(base.Trainer):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
                 outputs = self.model(examples)
+
+                outputs = self.process_outputs(outputs)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -513,6 +555,9 @@ class Trainer(base.Trainer):
     def train_epoch_end(self, config):
         """Method called at the end of a training epoch."""
 
+    def train_step_start(self, config, batch=None):
+        """Method called at the beginning of a training step."""
+
     def train_step_end(self, config, batch=None, loss=None):
         """
         Method called at the end of a training step.
@@ -520,6 +565,13 @@ class Trainer(base.Trainer):
         :param batch: the current batch of training data.
         :param loss: the loss computed in the current batch.
         """
+
+    @staticmethod
+    def process_outputs(outputs):
+        """
+        Method called after the model updates have been generated.
+        """
+        return outputs
 
 
 class TrainerWithTimmScheduler(Trainer):
@@ -532,19 +584,43 @@ class TrainerWithTimmScheduler(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.num_updates = None
+        self.past_epochs = None
 
     def train_epoch_start(self, config):
         """Method called at the beginning of a training epoch."""
         super().train_epoch_start(config)
+
         self.num_updates = self.current_epoch * len(self.train_loader)
+
+        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+            self.num_updates += self.past_epochs * len(self.train_loader)
 
     def lr_scheduler_step(self):
         self.num_updates += 1
+
         if self.lr_scheduler is not None:
             self.lr_scheduler.step_update(num_updates=self.num_updates)
 
     def train_epoch_end(self, config):
         """Method called at the end of a training epoch."""
         super().train_epoch_end(config)
+
         if self.lr_scheduler is not None:
-            self.lr_scheduler.step(self.current_epoch + 1)
+            if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+                self.lr_scheduler.step(self.past_epochs + self.current_epoch + 1)
+            else:
+                self.lr_scheduler.step(self.current_epoch + 1)
+
+    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
+        """Returns an optimizer with an initial learning rate that has been
+        adjusted according to the current round, so that learning rate
+        schedulers can be effective throughout the communication rounds."""
+
+        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+            past_epochs = (self.current_round - 1) * Config().trainer.epochs
+            self.past_epochs = past_epochs
+
+            lr_scheduler.step(past_epochs)
+            lr_scheduler.step_update(past_epochs * len(self.train_loader))
+
+        return optimizer

@@ -1,62 +1,109 @@
 """
-A split learning client.
+A federated learning client using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split learning for health: Distributed deep learning without sharing
+raw patient data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
 """
 
 import logging
-from dataclasses import dataclass
+import time
+from types import SimpleNamespace
 
 from plato.clients import simple
 from plato.config import Config
 
 
-@dataclass
-class Report:
-    """Client report sent to the split learning server."""
-
-    num_samples: int
-    phase: str
-
-
 class Client(simple.Client):
     """A split learning client."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
         super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
+        assert not Config().clients.do_test
 
         self.model_received = False
         self.gradient_received = False
+        self.contexts = {}
 
-    def load_payload(self, server_payload):
-        """Loading the server model onto this client."""
-        if self.model_received and self.gradient_received:
-            self.model_received = False
-            self.gradient_received = False
+    async def inbound_processed(self, processed_inbound_payload):
+        """Extract features or complete the training using split learning."""
+        server_payload, info = processed_inbound_payload
 
-        if not self.model_received:
-            self.model_received = True
-            self.algorithm.load_weights(server_payload)
-        elif not self.gradient_received:
-            self.gradient_received = True
-            self.algorithm.receive_gradients(server_payload)
+        # Preparing the client response
+        report, payload = None, None
 
-    async def train(self):
-        """A split learning client only uses the first several layers in a forward pass."""
-        logging.info("Training on split learning client #%d", self.client_id)
+        if info == "weights":
+            # server sends the global model, i.e., feature extraction
+            report, payload = self._extract_features(server_payload)
+            self._save_context()
+        elif info == "gradients":
+            # server sends the gradients of the features, i.e., complete training
+            self._load_context()
+            report, payload = self._complete_training(server_payload)
 
-        assert not Config().clients.do_test
+        return report, payload
 
-        if not self.gradient_received:
-            # Perform a forward pass till the cut layer in the model
-            features = self.algorithm.extract_features(self.trainset, self.sampler)
+    def _extract_features(self, payload):
+        """Extract the feature till the cut layer."""
+        self.algorithm.load_weights(payload)
+        # Perform a forward pass till the cut layer in the model
+        logging.info("[%s] Performing a forward pass till the cut layer.", self)
 
-            # Generate a report for the server, performing model testing if applicable
-            return Report(self.sampler.num_samples(), "features"), features
-        else:
-            # Perform a complete training with gradients received
-            config = Config().trainer._asdict()
-            self.algorithm.complete_train(config, self.trainset, self.sampler)
-            weights = self.algorithm.extract_weights()
-            # Generate a report, signal the end of train
-            return Report(self.sampler.num_samples(), "weights"), weights
+        features, training_time = self.algorithm.extract_features(
+            self.trainset, self.sampler
+        )
+        logging.info("[%s] Finished extracting features.", self)
+        # Generate a report for the server, performing model testing if applicable
+        report = SimpleNamespace(
+            num_samples=self.sampler.num_samples(),
+            accuracy=0,
+            training_time=training_time,
+            comm_time=time.time(),
+            update_response=False,
+            phase="features",
+        )
+        return report, features
+
+    def _complete_training(self, payload):
+        """Complete the training based on the gradients from server."""
+        self.algorithm.receive_gradients(payload)
+        # Perform a complete training with gradients received
+        config = Config().trainer._asdict()
+        training_time = self.algorithm.complete_train(
+            config, self.trainset, self.sampler
+        )
+        weights = self.algorithm.extract_weights()
+        # Generate a report, signal the end of train
+        report = SimpleNamespace(
+            num_samples=self.sampler.num_samples(),
+            accuracy=0,
+            training_time=training_time,
+            comm_time=time.time(),
+            update_response=False,
+            phase="weights",
+        )
+        return report, weights
+
+    def _save_context(self):
+        """Save the context of current client to accommodate simulated clients."""
+        self.contexts[self.client_id] = self.algorithm.extract_weights()
+
+    def _load_context(self):
+        """Load context to complete the training."""
+        self.algorithm.load_weights(self.contexts.pop(self.client_id))

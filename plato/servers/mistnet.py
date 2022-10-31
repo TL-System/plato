@@ -18,13 +18,21 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """The MistNet server for federated learning."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         # MistNet requires one round of client-server communication
         assert Config().trainer.rounds == 1
 
-    def init_trainer(self):
+    def init_trainer(self) -> None:
         """Setting up a pre-trained model to be loaded on the server."""
         super().init_trainer()
 
@@ -56,4 +64,4 @@ class Server(fedavg.Server):
                 "[%s] Global model accuracy: %.2f%%\n", self, 100 * self.accuracy
             )
 
-        await self.wrap_up_processing_reports()
+        self.clients_processed()
