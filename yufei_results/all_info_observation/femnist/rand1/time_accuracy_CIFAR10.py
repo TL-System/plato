@@ -89,7 +89,7 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Pro_biga1",
+        label="Pro_biga_point1",
     )
     ax.plot(
         x_value4,
@@ -119,7 +119,7 @@ def main():
     result_csv_file2 = "./oort_femnist.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./async_pro_femnist_biga1.csv"
+    result_csv_file3 = "./async_pro_femnist_point1.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
     result_csv_file4 = "./async_pro_femnist_bigahalf.csv"

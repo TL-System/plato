@@ -98,7 +98,7 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_pro_zipf_bigahalf",
+        label="Async_pro_zipf_bigapoint1",
     )
     ax.legend(loc="lower right")
     ax.set(xlabel=x_label, ylabel=y_label)
@@ -122,7 +122,7 @@ def main():
     result_csv_file3 = "./async_pro_cifar_biga1_cifar10.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_pro_bigahalf_vifar.csv"
+    result_csv_file4 = "./async_pro_cifar_point1.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     # x_item = 'round'
     x_label = "Elapsed Time"
