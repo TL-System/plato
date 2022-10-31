@@ -55,11 +55,15 @@ def plot(
     x_value2,
     x_value3,
     x_value4,
+    x_value5,
+    x_value6,
     y_label,
     y_value1,
     y_value2,
     y_value3,
     y_value4,
+    y_value5,
+    y_value6,
     figure_file_name,
 ):
     """Plot a figure."""
@@ -71,7 +75,7 @@ def plot(
         linewidth=1.5,
         linestyle="--",
         # marker='o',
-        label="Pisces",
+        label="Pisces_500",
     )
     ax.plot(
         x_value2,
@@ -80,7 +84,7 @@ def plot(
         linewidth=1.5,
         linestyle="-.",
         # marker='v',
-        label="Oort",
+        label="Pisces_800",
     )
     ax.plot(
         x_value3,
@@ -89,7 +93,7 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Fedbuff",
+        label="Oort_500",
     )
     ax.plot(
         x_value4,
@@ -98,7 +102,25 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_selection",
+        label="Oort_800",
+    )
+    ax.plot(
+        x_value5,
+        y_value5,
+        color="pink",
+        linewidth=1.5,
+        linestyle=":",
+        # marker='s',
+        label="Oort_1000",
+    )
+    ax.plot(
+        x_value6,
+        y_value6,
+        color="black",
+        linewidth=1.5,
+        linestyle=":",
+        # marker='s',
+        label="Pisces_1000",
     )
     ax.legend(loc="lower right")
     ax.set(xlabel=x_label, ylabel=y_label)
@@ -113,23 +135,32 @@ def main():
     x_item = "elapsed_time"
     y_item = "accuracy"
 
-    result_csv_file1 = "./pisces_cifar.csv"  #'./fedavg_rand1.csv'
+    result_csv_file1 = "./pisces_cifar_500.csv"  #'./fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = "./oort_cifar.csv"
+    result_csv_file2 = "./pisces_cifar_800.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./fedbuff_cifar10.csv"
+    result_csv_file3 = "./oort_cifar_500.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_cifar.csv"
+    result_csv_file4 = "./oort_cifar_800.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
+
+    result_csv_file5 = "./oort_cifar_sample1000.csv"
+    result_dict5 = read_csv_to_dict(result_csv_file5, x_item, y_item)
+
+    result_csv_file6 = "./pisces_cifar_sample1000.csv"
+    result_dict6 = read_csv_to_dict(result_csv_file6, x_item, y_item)
+
     # x_item = 'round'
     x_label = "Elapsed Time"
     x_value1 = result_dict1[x_item]
     x_value2 = result_dict2[x_item]
     x_value3 = result_dict3[x_item]
     x_value4 = result_dict4[x_item]
+    x_value5 = result_dict5[x_item]
+    x_value6 = result_dict6[x_item]
 
     # y_item = 'accuracy'
     y_label = "Accuracy (%)"
@@ -137,8 +168,10 @@ def main():
     y_value2 = result_dict2[y_item]
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
+    y_value5 = result_dict5[y_item]
+    y_value6 = result_dict6[y_item]
 
-    figure_file_name = "./cifar10_rand1_concen1.pdf"
+    figure_file_name = "./cifar10_rand1_concen1_500_800.pdf"
 
     plot(
         x_label,
@@ -146,11 +179,15 @@ def main():
         x_value2,
         x_value3,
         x_value4,
+        x_value5,
+        x_value6,
         y_label,
         y_value1,
         y_value2,
         y_value3,
         y_value4,
+        y_value5,
+        y_value6,
         figure_file_name,
     )
 
