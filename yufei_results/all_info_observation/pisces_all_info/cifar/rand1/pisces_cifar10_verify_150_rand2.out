@@ -1,0 +1,194 @@
+The configuration filename is: ./pisces_CIFAR10_resnet18.yml
+ 
+clients:
+# Type
+type: simple
+
+# The total number of clients
+total_clients: 200
+
+# The number of clients selected in each round
+per_round: 20
+
+# Should the clients compute test accuracy locally?
+do_test: false
+
+# Whether client heterogeneity should be simulated
+speed_simulation: true
+
+# The distribution of client speeds
+simulation_distribution:
+distribution: zipf # zipf is used.
+s: 1.2
+
+# The maximum amount of time for clients to sleep after each epoch
+#max_sleep_time: 10
+
+# Should clients really go to sleep, or should we just simulate the sleep times?
+sleep_simulation: true
+
+# If we are simulating client training times, what is the average training time?
+avg_training_time: 10
+
+random_seed: 1
+
+server:
+address: 127.0.0.1
+port: 7999
+do_test: true
+random_seed: 1
+#step_window: 2
+
+# Should we operate in sychronous mode?
+synchronous: false
+
+# Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+simulate_wall_time: true
+
+# What is the minimum number of clients that need to report before aggregation begins?
+minimum_clients_aggregated: 10
+
+# What is the staleness bound, beyond which the server should wait for stale clients?
+staleness_bound: 10
+#penalty: 2
+exploration_factor: 0.9
+staleness_factor: 0.5
+exploration_decaying_factor: 0.98
+min_explore_factor: 0.3
+staleness_penalty_factor: 0.5
+checkpoint_path: results/test/checkpoint
+model_path: results/test/model
+
+data:
+# The training and testing dataset
+datasource: CIFAR10
+
+# Number of samples in each partition
+partition_size: 1000
+
+# IID or non-IID?
+sampler: noniid
+
+concentration: 1
+
+#testset_size: 1000
+
+# The random seed for sampling data
+random_seed: 2
+
+trainer:
+# The type of the trainer
+type: basic
+
+# The maximum number of training rounds
+rounds: 150
+
+# The maximum number of clients running concurrently
+max_concurrency: 4
+
+# The target accuracy
+target_accuracy: 1.0
+
+# Number of epoches for local training in each communication round
+epochs: 1
+batch_size: 128
+optimizer: SGD
+
+# The machine learning model
+model_name: resnet_18
+
+algorithm:
+# Aggregation algorithm
+type: fedavg
+
+results:
+# Write the following parameter(s) into a CSV
+types: round, accuracy, elapsed_time, comm_time, round_time
+result_path: /data/ykang/plato/results/Pisces/CIFAR10/verify
+parameters:
+optimizer:
+lr: 0.01
+momentum: 0.9
+weight_decay: 0.0001
+learning_rate:
+sched: LambdaLR
+gamma: 0.1
+milestone_steps: 80ep,120ep
+
+[INFO][15:22:55]: [93m[1m[3805699] Logging runtime results to: /data/ykang/plato/results/Pisces/CIFAR10/verify/3805699.csv.[0m
+[INFO][15:22:55]: [Server #3805699] Started training on 200 clients with 20 per round.
+[INFO][15:22:55]: [Server #3805699] Configuring the server...
+[INFO][15:22:55]: Training: 150 rounds or accuracy above 100.0%
+
+[INFO][15:22:55]: Algorithm: fedavg
+[INFO][15:22:55]: Data source: CIFAR10
+[INFO][15:22:57]: Starting client #1's process.
+Files already downloaded and verified
+Files already downloaded and verified
+[INFO][15:22:57]: Starting client #2's process.
+[INFO][15:22:57]: Starting client #3's process.
+[INFO][15:22:57]: Starting client #4's process.
+[INFO][15:22:57]: Setting the random seed for selecting clients: 1
+[INFO][15:22:57]: Starting a server at address 127.0.0.1 and port 7999.
+[ERROR][15:22:57]: unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-2' coro=<_run_app() done, defined at /home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web.py:289> exception=OSError(98, "error while attempting to bind on address ('127.0.0.1', 7999): address already in use")>
+Traceback (most recent call last):
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web.py", line 516, in run_app
+    loop.run_until_complete(main_task)
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/asyncio/base_events.py", line 647, in run_until_complete
+    return future.result()
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web.py", line 415, in _run_app
+    await site.start()
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web_runner.py", line 121, in start
+    self._server = await loop.create_server(
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/asyncio/base_events.py", line 1506, in create_server
+    raise OSError(err.errno, 'error while attempting '
+OSError: [Errno 98] error while attempting to bind on address ('127.0.0.1', 7999): address already in use
+Traceback (most recent call last):
+  File "/home/ykang/plato_verify_pisces/examples/pisces/pisces.py", line 26, in <module>
+    main()
+  File "/home/ykang/plato_verify_pisces/examples/pisces/pisces.py", line 22, in main
+    server.run(client)
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/plato/servers/base.py", line 295, in run
+    self.start()
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/plato/servers/base.py", line 317, in start
+    web.run_app(
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web.py", line 516, in run_app
+    loop.run_until_complete(main_task)
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/asyncio/base_events.py", line 647, in run_until_complete
+    return future.result()
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web.py", line 415, in _run_app
+    await site.start()
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/site-packages/aiohttp/web_runner.py", line 121, in start
+    self._server = await loop.create_server(
+  File "/home/ykang/miniforge3/envs/federated/lib/python3.9/asyncio/base_events.py", line 1506, in create_server
+    raise OSError(err.errno, 'error while attempting '
+OSError: [Errno 98] error while attempting to bind on address ('127.0.0.1', 7999): address already in use
+[INFO][15:23:00]: Starting a custom client #1
+[INFO][15:23:00]: Starting a custom client #2
+[INFO][15:23:00]: Starting a custom client #3
+[INFO][15:23:00]: Starting a custom client #4
+[INFO][15:23:00]: Algorithm: fedavg
+[INFO][15:23:00]: Algorithm: fedavg
+[INFO][15:23:00]: Algorithm: fedavg
+[INFO][15:23:00]: Algorithm: fedavg
+[INFO][15:23:05]: [Client #1] Contacting the server.
+[INFO][15:23:05]: [Client #2] Contacting the server.
+[INFO][15:23:05]: [Client #1] Connecting to the server at http://127.0.0.1:7999.
+[INFO][15:23:05]: [Client #2] Connecting to the server at http://127.0.0.1:7999.
+[INFO][15:23:05]: [Client #3] Contacting the server.
+[INFO][15:23:05]: [Client #3] Connecting to the server at http://127.0.0.1:7999.
+[INFO][15:23:05]: [Client #2] Connected to the server.
+[INFO][15:23:05]: [Client #1] Connected to the server.
+[INFO][15:23:05]: [Client #2] Waiting to be selected.
+[INFO][15:23:05]: [Client #1] Waiting to be selected.
+[INFO][15:23:05]: [Client #3] Connected to the server.
+[INFO][15:23:05]: [Client #3] Waiting to be selected.
+[INFO][15:23:05]: [Client #4] Contacting the server.
+[INFO][15:23:05]: [Client #4] Connecting to the server at http://127.0.0.1:7999.
+[INFO][15:23:05]: [Client #4] Connected to the server.
+[INFO][15:23:05]: [Client #4] Waiting to be selected.
+[INFO][17:48:39]: [Client #1] The server disconnected the connection.
+[INFO][17:48:39]: [Client #2] The server disconnected the connection.
+[INFO][17:48:39]: [Client #3] The server disconnected the connection.
+[INFO][17:48:39]: [Client #4] The server disconnected the connection.
