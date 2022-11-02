@@ -43,7 +43,7 @@ parameter size of original, float16 and qsgd (in bytes):  472 455 55
 
 parameter size of original, float16 and qsgd (in bytes):  3797 2120 887
 
-[INFO][22:58:13]: Compression level: 1, Original payload data size is 0.24 MB, quantized payload data size is 0.06 MB, compressed payload data size is 0.04 MB (simulated).
+[INFO][22:58:13]: Compression level: 1, **Original payload data size is 0.24 MB, quantized payload data size is 0.06 MB, compressed payload data size is 0.04 MB (simulated).**
 
 [INFO][22:58:13]: [Client #2] Compressed model parameters.
 
@@ -65,7 +65,7 @@ parameter size of original, float16 and qsgd (in bytes):  3797 2120 887
 
 [INFO][22:58:13]: [Server #72102] Started model testing.
 
-[INFO][22:58:18]: [Server #72102] Global model accuracy: 98.14%
+[INFO][22:58:18]: [Server #72102] **Global model accuracy: 98.14%**
 
 [INFO][22:58:18]: [Server #72102] All client reports have been processed.
 
