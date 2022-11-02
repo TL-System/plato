@@ -89,7 +89,7 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_pro_zipf_biga1",
+        label="Async_pisces_client",
     )
     ax.plot(
         x_value4,
@@ -119,10 +119,10 @@ def main():
     result_csv_file2 = "./oort_cifar_sample1000_zipf.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./async_pro_cifar_biga1_cifar10.csv"
+    result_csv_file3 = "./async_piscesclient_cifar.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_cifar.csv"
+    result_csv_file4 = "./async_cifar_rand1_verify.csv"  # ./async_cifar.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     # x_item = 'round'
     x_label = "Elapsed Time"
@@ -138,7 +138,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = "./cifar10_rand1_concen1_zipf_async_pro.pdf"
+    figure_file_name = "./cifar10_rand1_concen1_zipf_verify1.pdf"
 
     plot(
         x_label,

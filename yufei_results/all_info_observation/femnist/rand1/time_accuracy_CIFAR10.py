@@ -122,7 +122,7 @@ def main():
     result_csv_file3 = "./async_pro_femnist_biga1.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_femnist_verity_rand1.csv"
+    result_csv_file4 = "./async_femnist_verify_rand1_Nov2_normal.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     # x_item = 'round'
     x_label = "Elapsed Time"
@@ -138,7 +138,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = "./femnist_rand1.pdf"
+    figure_file_name = "./femnist_rand1_verify.pdf"
 
     plot(
         x_label,
