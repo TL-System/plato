@@ -5,7 +5,9 @@
 
 ### Changed Files
 /plato/processors/model_compress_qsgd.py
+
 /plato/processors/model_decompress_qsgd.py
+
 /plato/processors/registry.py
 
 ### Selected Log
