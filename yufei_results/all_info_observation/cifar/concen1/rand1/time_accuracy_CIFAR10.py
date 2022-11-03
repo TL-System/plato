@@ -80,7 +80,7 @@ def plot(
         linewidth=1.5,
         linestyle="-.",
         # marker='v',
-        label="Oort",
+        label="Async_pro",
     )
     ax.plot(
         x_value3,
@@ -116,7 +116,7 @@ def main():
     result_csv_file1 = "./pisces_cifar_zipf.csv"  #'./fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = "./oort_cifar_sample1000_zipf.csv"
+    result_csv_file2 = "./async_pro_cifar_zipf.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
     result_csv_file3 = "./async_piscesclient_cifar.csv"
@@ -138,7 +138,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = "./cifar10_rand1_concen1_zipf_verify1.pdf"
+    figure_file_name = "./cifar10_rand1_concen1_zipf_pro.pdf"
 
     plot(
         x_label,
