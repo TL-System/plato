@@ -265,8 +265,26 @@ class Server:
             self._resume_from_checkpoint()
 
         if Config().is_central_server():
-            # In cross-silo FL, the central server lets edge servers start first
-            # Then starts their clients
+            #First launch the central server in a non-blocking fashion
+            #by wrapping it in a separate process
+            def start_self(self):
+                asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
+                if hasattr(Config().server, "random_seed"):
+                    seed = Config().server.random_seed
+                    logging.info("Setting the random seed for selecting clients: %s", seed)
+                    random.seed(seed)
+                    self.prng_state = random.getstate()
+                self.start()
+            
+            proc = mp.Process(
+            target=start_self,
+                args=(self,)
+                )
+            proc.start()
+            
+            #Next, start the edge servers as clients of the central server
+            #Once all edge servers are live, clients will be initialized in the 
+            #training_will_start() event call of the central server
             Server._start_clients(
                 as_server=True,
                 client=self.client,
@@ -275,23 +293,21 @@ class Server:
                 trainer=trainer,
             )
 
-            # Allowing some time for the edge servers to start
-            time.sleep(5)
-
-        if self.disable_clients:
-            logging.info("No clients are launched (server:disable_clients = true)")
         else:
-            Server._start_clients(client=self.client)
+            if self.disable_clients:
+                logging.info("No clients are launched (server:disable_clients = true)")
+            else:
+                Server._start_clients(client=self.client)
 
-        asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
+            asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
 
-        if hasattr(Config().server, "random_seed"):
-            seed = Config().server.random_seed
-            logging.info("Setting the random seed for selecting clients: %s", seed)
-            random.seed(seed)
-            self.prng_state = random.getstate()
+            if hasattr(Config().server, "random_seed"):
+                seed = Config().server.random_seed
+                logging.info("Setting the random seed for selecting clients: %s", seed)
+                random.seed(seed)
+                self.prng_state = random.getstate()
 
-        self.start()
+            self.start()
 
     def start(self, port=Config().server.port):
         """Start running the socket.io server."""
@@ -1300,6 +1316,11 @@ class Server:
         """
         Method called before selecting clients for the first round of training.
         """
+        if Config().is_central_server():
+            if self.disable_clients:
+                logging.info("No clients are launched (server:disable_clients = true)")
+            else:
+                Server._start_clients(client=self.client)
 
     def server_will_close(self) -> None:
         """
