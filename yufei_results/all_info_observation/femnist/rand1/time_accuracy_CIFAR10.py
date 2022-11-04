@@ -80,7 +80,7 @@ def plot(
         linewidth=1.5,
         linestyle="-.",
         # marker='v',
-        label="Oort",
+        label="Async_G",
     )
     ax.plot(
         x_value3,
@@ -116,7 +116,7 @@ def main():
     result_csv_file1 = "./pisces_femnist.csv"  #'./fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = "./oort_femnist.csv"
+    result_csv_file2 = "./async_G_femnist.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
     result_csv_file3 = "./async_femnist_pointSeven.csv"
@@ -138,7 +138,7 @@ def main():
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
 
-    figure_file_name = "./femnist_rand1_verify.pdf"
+    figure_file_name = "./femnist_rand1_verify_G.pdf"
 
     plot(
         x_label,
