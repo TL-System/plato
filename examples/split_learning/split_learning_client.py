@@ -15,6 +15,7 @@ from types import SimpleNamespace
 
 from plato.clients import simple
 from plato.config import Config
+from plato.utils import fonts
 
 
 class Client(simple.Client):
@@ -41,6 +42,10 @@ class Client(simple.Client):
         self.gradient_received = False
         self.contexts = {}
 
+        # Iteration control
+        self.iterations = Config().clients.iteration
+        self.iter_left = Config().clients.iteration
+
     async def inbound_processed(self, processed_inbound_payload):
         """Extract features or complete the training using split learning."""
         server_payload, info = processed_inbound_payload
@@ -49,34 +54,56 @@ class Client(simple.Client):
         report, payload = None, None
 
         if info == "weights":
-            # server sends the global model, i.e., feature extraction
-            report, payload = self._extract_features(server_payload)
-            self._save_context()
+            # Server prompts a new client to conduct split learning
+            self.algorithm.load_context(self.client_id, self.trainset, self.sampler)
+            report, payload = self._extract_features()
         elif info == "gradients":
             # server sends the gradients of the features, i.e., complete training
-            self._load_context()
-            report, payload = self._complete_training(server_payload)
+            logging.warn(f"[{self}] Gradeints received, complete training.")
+            training_time, weights = self._complete_training(server_payload)
+            self.iter_left -= 1
 
+            if self.iter_left == 0:
+                logging.warn(
+                    f"[{self}] Finished training, send weights to server for evaluation."
+                )
+                # Save the state of current client
+                self.algorithm.save_context(self.client_id)
+                # Send weights to server for evaluation
+                report = SimpleNamespace(
+                    num_samples=self.sampler.num_samples(),
+                    accuracy=0,
+                    training_time=training_time,
+                    comm_time=time.time(),
+                    update_response=False,
+                    type="weights",
+                )
+                payload = weights
+                self.iter_left = self.iterations
+            else:
+                # Continue feature extraction
+                report, payload = self._extract_features()
+                report.training_time += training_time
         return report, payload
 
-    def _extract_features(self, payload):
+    def _extract_features(self):
         """Extract the feature till the cut layer."""
-        self.algorithm.load_weights(payload)
-        # Perform a forward pass till the cut layer in the model
-        logging.info("[%s] Performing a forward pass till the cut layer.", self)
-
-        features, training_time = self.algorithm.extract_features(
-            self.trainset, self.sampler
+        round_number = self.iterations - self.iter_left + 1
+        logging.warn(
+            fonts.colourize(
+                f"[{self}] Started split learning in round #{round_number}/{self.iterations}"
+                + f" (Global round {self.current_round})."
+            )
         )
-        logging.info("[%s] Finished extracting features.", self)
-        # Generate a report for the server, performing model testing if applicable
+
+        features, training_time = self.algorithm.extract_features()
         report = SimpleNamespace(
             num_samples=self.sampler.num_samples(),
             accuracy=0,
             training_time=training_time,
             comm_time=time.time(),
             update_response=False,
-            phase="features",
+            type="features",
         )
         return report, features
 
@@ -84,26 +111,6 @@ class Client(simple.Client):
         """Complete the training based on the gradients from server."""
         self.algorithm.receive_gradients(payload)
         # Perform a complete training with gradients received
-        config = Config().trainer._asdict()
-        training_time = self.algorithm.complete_train(
-            config, self.trainset, self.sampler
-        )
+        training_time = self.algorithm.complete_train()
         weights = self.algorithm.extract_weights()
-        # Generate a report, signal the end of train
-        report = SimpleNamespace(
-            num_samples=self.sampler.num_samples(),
-            accuracy=0,
-            training_time=training_time,
-            comm_time=time.time(),
-            update_response=False,
-            phase="weights",
-        )
-        return report, weights
-
-    def _save_context(self):
-        """Save the context of current client to accommodate simulated clients."""
-        self.contexts[self.client_id] = self.algorithm.extract_weights()
-
-    def _load_context(self):
-        """Load context to complete the training."""
-        self.algorithm.load_weights(self.contexts.pop(self.client_id))
+        return training_time, weights

@@ -17,6 +17,8 @@ from plato.config import Config
 from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
+from plato.utils import fonts
+from plato.datasources import registry as datasources_registry
 
 
 class Server(fedavg.Server):
@@ -26,64 +28,78 @@ class Server(fedavg.Server):
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
         super().__init__(model, datasource, algorithm, trainer, callbacks)
-
+        # Split learning clients interact with server sequentially
+        assert Config().clients.per_round == 1
         self.phase = "weights"
-        self.clients_selected_last = None
+        self.clients_list = []
+        self.client_last = None
+        self.next_client = True
         self.gradients_to_send = {}
+        self.test_accuracy = 0.0
 
     def choose_clients(self, clients_pool, clients_count):
-        """Choose the same clients every two rounds."""
-        if self.phase == "weights":
-            self.clients_selected_last = super().choose_clients(
-                clients_pool, clients_count
-            )
+        """Shuffle the clients and sequentially select them when the previous one is done."""
+        if len(self.clients_list) == 0 and self.next_client:
+            # Shuffle the client list
+            self.clients_list = super().choose_clients(clients_pool, len(clients_pool))
+            logging.warn(f"Client order: {self.clients_list}")
 
-        return self.clients_selected_last
+        if self.next_client:
+            # Sequentially select clients
+            self.client_last = [self.clients_list.pop(0)]
+            self.next_client = False
+        return self.client_last
 
     def customize_server_payload(self, payload):
         """Wrap up generating the server payload with any additional information."""
         if self.phase == "weights":
-            # Send global model weights to the clients
-            return (payload, "weights")
+            # Split learning server doesn't send weights to client
+            return (None, "weights")
         else:
             # Send gradients back to client to complete the training
             return (self.gradients_to_send.pop(self.selected_client_id), "gradients")
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Compute gradients and aggregate weights in different rounds."""
-        if self.phase == "weights":
-            for update in updates:
-                feature_dataset = feature.DataSource([update.payload])
+        update = updates[0]
+        report = update.report
+        if report.type == "features":
+            logging.warn("[%s] Features received, compute gradients.", self)
+            feature_dataset = feature.DataSource([update.payload])
 
-                # Training the model using all the features received from the client
-                sampler = all_inclusive.Sampler(feature_dataset)
-                self.algorithm.train(feature_dataset, sampler)
+            # Training the model using all the features received from the client
+            sampler = all_inclusive.Sampler(feature_dataset)
+            self.algorithm.train(feature_dataset, sampler)
 
-                # Compute the gradients and get ready to be sent
-                self.gradients_to_send[update.client_id] = self._load_gradients()
+            # Compute the gradients and get ready to be sent
+            self.gradients_to_send[update.client_id] = self._load_gradients()
+            self.phase = "gradient"
 
-            self.phase = "gradients"
-            # No weights update in this round
-            return baseline_weights
+        elif report.type == "weights":
+            logging.warn("[%s] Weights received, start testing accuracy.", self)
+            weights = update.payload
 
-        elif self.phase == "gradients":
-            # Perform federated averaging algorithm (copied from fedavg.Server for convenience)
-            self.total_samples = sum(update.report.num_samples for update in updates)
-            updated_weights = {
-                name: self.trainer.zeros(weight.shape)
-                for name, weight in weights_received[0].items()
-            }
+            # The weights after cut layer are not trained by clients
+            self.algorithm.update_weights_before_cut(weights)
 
-            for i, update in enumerate(weights_received):
-                report = updates[i].report
-                num_samples = report.num_samples
-
-                for name, weight in update.items():
-                    # Use weighted average by the number of samples
-                    updated_weights[name] += weight * (num_samples / self.total_samples)
-
+            # Manually Set up the testset since do_test is turned off in config
+            if self.datasource is None:
+                self.datasource = datasources_registry.get(client_id=0)
+                self.testset = self.datasource.get_test_set()
+                self.testset_sampler = all_inclusive.Sampler(
+                    self.datasource, testing=True
+                )
+            self.test_accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            logging.warn(
+                fonts.colourize(
+                    f"[{self}] Global model accuracy: {100 * self.test_accuracy:.2f}%\n"
+                )
+            )
             self.phase = "weights"
-            return updated_weights
+            # Change client in next round
+            self.next_client = True
+
+        updated_weights = self.algorithm.extract_weights()
+        return updated_weights
 
     def _load_gradients(self):
         """Loading gradients from a file."""
@@ -96,3 +112,9 @@ class Server(fedavg.Server):
         )
 
         return torch.load(model_gradients_path)
+
+    def get_logged_items(self):
+        """Overwrite the logged accuracy by latest test accuracy."""
+        logged_items = super().get_logged_items()
+        logged_items["accuracy"] = self.test_accuracy
+        return logged_items
