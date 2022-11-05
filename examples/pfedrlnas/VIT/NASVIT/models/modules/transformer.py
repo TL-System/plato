@@ -649,18 +649,21 @@ class DynamicSwinTransformerBlock(MyModule):
             f"window_size={self.window_size}, shift_size={self.shift_size}, mlp_ratio={self.mlp_ratio}"
         )
 
-    def flops(self,C,H,W):
+    def flops(self, channel, height, width):
+        """
+        Calculate the flops of transformr block
+        """
         flops = 0
         # H, W = self.input_resolution
         # norm1
-        flops += C * H * W
+        flops += channel * height * width
         # W-MSA/SW-MSA
-        nW = H * W / self.window_size / self.window_size
-        flops += nW * self.attn.flops(self.window_size * self.window_size)
+        next_width = height * width / self.window_size / self.window_size
+        flops += next_width * self.attn.flops(self.window_size * self.window_size)
         # mlp
-        flops += 2 * H * W * C * C * self.mlp_ratio
+        flops += 2 * height * width * channel * channel * self.mlp_ratio
         # norm2
-        flops += C * H * W
+        flops += channel * height * width
         return flops
 
 

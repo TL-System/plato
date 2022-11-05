@@ -248,8 +248,9 @@ class DynamicMBConvLayer(MyModule):
     ############################################################################################
 
     def get_weight_from_subnet(self, in_channel, sub_layer):
+        """Get weight from subnet of this basic dynamic operation."""
         middle_channel = make_divisible(round(in_channel * self.active_expand_ratio), 8)
-        channels_per_group = self.depth_conv.conv.channels_per_group
+        # channels_per_group = self.depth_conv.conv.channels_per_group
 
         # copy weight from current layer
         if self.inverted_bottleneck is not None:
@@ -431,6 +432,7 @@ class DynamicConvBnActLayer(MyModule):
         return sub_layer
 
     def get_weight_from_subnet(self, in_channel, sub_layer):
+        """Get weight from subnet of this basic dynamic operation."""
         self.conv.conv.weight.data[: self.active_out_channel, :in_channel, :, :].copy_(
             sub_layer.conv.weight.data
         )
@@ -498,6 +500,7 @@ class DynamicLinearLayer(MyModule):
         return sub_layer
 
     def get_weight_from_subnet(self, in_features, sub_layer):
+        """Get weight from subnet of this basic dynamic operation."""
         self.linear.linear.weight.data[: self.out_features, :in_features].copy_(
             sub_layer.linear.weight.data
         )
@@ -579,6 +582,7 @@ class DynamicShortcutLayer(MyModule):
         return sub_layer
 
     def get_weight_from_subnet(self, in_channel, sub_layer):
+        """Get weight from subnet of this basic dynamic operation."""
         self.conv.conv.weight.data[: self.active_out_channel, :in_channel, :, :].copy_(
             sub_layer.conv.weight.data
         )

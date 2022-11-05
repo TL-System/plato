@@ -1,14 +1,19 @@
+"""
+Customized Server for PerFedRLNAS.
+"""
+
 import logging
+import pickle
+import numpy as np
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import fonts
 
-import pickle
-import numpy as np
-
 
 class Server(fedavg.Server):
+    """The PerFedRLNAS server assigns and aggregates global model with different architectures."""
+
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(model, datasource, algorithm, trainer)
         self.subnets_config = [None for i in range(Config().clients.total_clients)]
@@ -21,13 +26,18 @@ class Server(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received
+    ):  # pylint: disable=unused-argument
+        """Aggregates weights of models with different architectures."""
         client_id_list = [update.client_id for update in self.updates]
+        num_samples = [update.report.num_samples for update in self.updates]
         self.neg_ratio = self.algorithm.nas_aggregation(
-            self.subnets_config, weights_received, client_id_list
+            self.subnets_config, weights_received, client_id_list, num_samples
         )
 
     def weights_aggregated(self, updates):
+        """After weight aggregation, update the architecture parameter alpha."""
         accuracy_list = [update.report.accuracy for update in updates]
         client_id_list = [update.client_id for update in self.updates]
         subnet_configs = []
@@ -47,15 +57,9 @@ class Server(fedavg.Server):
         flops = []
         for i in range(1, Config().clients.total_clients):
             cfg = self.subnets_config[i]
-            if not cfg == None:
+            if cfg:
                 logging.info("the config of client %s is %s", str(i), str(cfg))
-                self.algorithm.model.model.set_active_subnet(
-                    cfg["resolution"],
-                    cfg["width"],
-                    cfg["depth"],
-                    cfg["kernel_size"],
-                    cfg["expand_ratio"],
-                )
+                self.algorithm.set_active_subnet(cfg)
                 flops.append(self.algorithm.model.model.compute_active_subnet_flops())
         logging.info(
             fonts.colourize(
@@ -63,5 +67,5 @@ class Server(fedavg.Server):
             )
         )
         save_config = f"{Config().server.model_path}/subnet_configs.pickle"
-        with open(save_config, "wb") as f:
-            pickle.dump((self.subnets_config, flops), f)
+        with open(save_config, "wb") as file:
+            pickle.dump((self.subnets_config, flops), file)

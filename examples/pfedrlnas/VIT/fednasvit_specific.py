@@ -1,20 +1,26 @@
-from NASVIT.misc.smallconfig import get_config
+"""
+Helped functions in PerFedRLNAS only applicable for search space: NASVIT
+"""
 from timm.loss import LabelSmoothingCrossEntropy
-import torch.optim as optim
+from torch import optim
+
+from nasvit.misc.smallconfig import get_config
 
 
-def get_NASVIT_loss_criterion():
+def get_nasvit_loss_criterion():
+    """Get timm Label Smoothing Cross Entropy, only NASVIT needs this."""
     return LabelSmoothingCrossEntropy(smoothing=get_config().MODEL.LABEL_SMOOTHING)
 
 
 def set_weight_decay(model, skip_list=(), skip_keywords=()):
+    """If the module name is in skip list, do not use weight decay."""
     has_decay = []
     no_decay = []
 
     for name, param in model.named_parameters():
         if not param.requires_grad:
             continue  # frozen weights
-        if (
+        if (  # pylint: disable=too-many-boolean-expressions
             len(param.shape) == 1
             or name.endswith(".bias")
             or "rescale" in name
@@ -33,6 +39,7 @@ def set_weight_decay(model, skip_list=(), skip_keywords=()):
 
 
 def check_keywords_in_name(name, keywords=()):
+    """Check whether module name is in keywords list."""
     isin = False
     for keyword in keywords:
         if keyword in name:
@@ -41,6 +48,7 @@ def check_keywords_in_name(name, keywords=()):
 
 
 def get_optimizer(model):
+    """Get a specific optimizer where only assigned parts of model weights use weight decay."""
     config = get_config()
 
     skip = {"rescale", "bn", "absolute_pos_embed"}

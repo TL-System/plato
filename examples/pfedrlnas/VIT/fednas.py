@@ -1,7 +1,7 @@
 """
 Implement new algorithm: personalized federarted NAS.
 
-Reference Search Space: NASVIT: NEURAL ARCHITECTURE SEARCH FOR EFFICIENT VISION TRANSFORMERS WITH GRADIENT CONFLICT-AWARE SUPERNET TRAINING.
+Reference Search Space: NASVIT: https://openreview.net/pdf?id=Qaw16njk6L.
 
 The code: https://github.com/facebookresearch/NASViT.
 """
@@ -10,12 +10,15 @@ import fednas_server
 import fednas_client
 import fednas_algorithm
 
-from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
-from NASVIT.architect import Architect
+from nasvit.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+from nasvit.architect import Architect
 import fednas_trainer
 
 
 def main():
+    """
+    A Plato federated learning training session using PerFedRLNAS, paper unpublished.
+    """
     supernet = AttentiveNasDynamicModel
     client = fednas_client.Client(
         model=supernet,

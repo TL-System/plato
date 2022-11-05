@@ -1,24 +1,28 @@
-import torch
+"""
+NAS architect in PerFedRLNAS, a wrapper over the supernet.
+"""
+import copy
+import logging
 import numpy as np
-import torch.nn as nn
+
+import torch
+from torch import nn
 from torch.autograd import Variable
 import torch.nn.functional as F
-import copy
-from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
-from plato.config import Config
-import logging
+
 from NASVIT.misc.bigconfig import get_config
+from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+
+from plato.config import Config
 
 
 class Architect(nn.Module):
+    """The supernet wrapper, including supernet and arch parameters."""
+
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(
         self,
-        model=None,
-        momentum=0.9,
-        weight_decay=3e-4,
-        arch_learning_rate=3e-3,
-        arch_weight_decay=3e-1,
-        arch_baseline_decay=0.99,
     ):
         super().__init__()
         self.model = AttentiveNasDynamicModel(supernet=get_config().supernet_config)
@@ -50,6 +54,7 @@ class Architect(nn.Module):
         self.device = Config().device()
 
     def step(self, epoch_acc, neg_ratio, epoch_index, client_id_list):
+        """Step of architect, update architecture parameters."""
         rewards = self._compute_reward(epoch_acc, neg_ratio, client_id_list)
         if (
             hasattr(Config().parameters.architect, "natural")
@@ -66,7 +71,7 @@ class Architect(nn.Module):
 
     def _compute_grad(self, alphas, rewards, index_list, client_id_list):
         grad = torch.zeros(alphas.size())
-        for client_idx in range(len(rewards)):
+        for client_idx, reward in enumerate(rewards):
             for edge_idx in range(len(self.stop_index) - 1):
                 prob = F.softmax(
                     alphas[client_id_list[client_idx] - 1][
@@ -76,7 +81,6 @@ class Architect(nn.Module):
                     ],
                     dim=-1,
                 )
-                reward = rewards[client_idx]
                 index = index_list[client_idx]
                 client_grad = torch.Tensor(prob.shape)
                 client_grad.copy_(prob)
@@ -102,28 +106,29 @@ class Architect(nn.Module):
                 dim=-1,
             )
             alphas, reward = alphas.to(self.device), reward.to(self.device)
-            v = self.value_net.forward(alphas)
-            v = v[:, 0]
+            value = self.value_net.forward(alphas)[:, 0]
             least_value = 1.0 / self.client_nums
-            v = torch.where(
-                v < least_value, torch.ones(v.size()).to(self.device) * least_value, v
+            value = torch.where(
+                value < least_value,
+                torch.ones(value.size()).to(self.device) * least_value,
+                value,
             )
-            reward = reward - v
+            reward = reward - value
             return reward.detach().cpu()
-        else:
-            if self.baseline == None:
-                self.baseline = np.mean(accuracy)  # - np.mean(neg_ratio)
-            reward = accuracy - self.baseline  # - neg_ratio
-            logging.info("reward: %s", str(reward))
-            self.baseline = (
-                self.baseline_decay * np.mean(accuracy)
-                + (1 - self.baseline_decay) * self.baseline
-            )
-            return reward
+
+        if self.baseline is None:
+            self.baseline = np.mean(accuracy) - 0 * np.mean(neg_ratio)
+        reward = accuracy - self.baseline - 0 * neg_ratio
+        logging.info("reward: %s", str(reward))
+        self.baseline = (
+            self.baseline_decay * np.mean(accuracy)
+            + (1 - self.baseline_decay) * self.baseline
+        )
+        return reward
 
     def _compute_grad_natural(self, alphas, rewards, index_list, client_id_list):
         grad = torch.zeros(alphas.size())
-        for client_idx in range(len(rewards)):
+        for reward, client_idx in enumerate(rewards):
             for edge_idx in range(len(self.stop_index) - 1):
                 prob = F.softmax(
                     alphas[client_id_list[client_idx] - 1][
@@ -133,8 +138,6 @@ class Architect(nn.Module):
                     ],
                     dim=-1,
                 )
-                print(prob.shape[0])
-                reward = rewards[client_idx]
                 index = index_list[client_idx]
                 client_grad = torch.Tensor(prob.shape)
                 client_grad.copy_(prob)
@@ -143,11 +146,12 @@ class Architect(nn.Module):
                     index_prob = client_grad[edge_idx][index[edge_idx]]
                     client_grad[edge_idx][index[edge_idx]] = index_prob - 1
                     dalpha = client_grad
-                    Fish = torch.matmul(dalpha, torch.transpose(dalpha, 0, 1))
-                    Finverse = torch.pinverse(Fish)
+                    finverse = torch.pinverse(
+                        torch.matmul(dalpha, torch.transpose(dalpha, 0, 1))
+                    )
                 grad[client_id_list[client_idx] - 1][
                     self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx] + 1
-                ] += reward * torch.matmul(Finverse, client_grad)
+                ] += reward * torch.matmul(finverse, client_grad)
             grad /= len(rewards)
         return grad
 
@@ -175,8 +179,8 @@ class Architect(nn.Module):
         )
         self._arch_parameters = [self.alphas]
 
-        input = Variable(torch.Tensor(self.alphas.size()), requires_grad=False)
-        logits = input * self.alphas
+        feature = Variable(torch.Tensor(self.alphas.size()), requires_grad=False)
+        logits = feature * self.alphas
         loss = torch.mean(logits)
         loss.backward()
 
@@ -184,9 +188,11 @@ class Architect(nn.Module):
         self.zero_grad()
 
     def arch_parameters(self):
+        """Returns architecture parameters."""
         return self._arch_parameters
 
     def get_index(self, prob, length):
+        """Exract the index of choice based on given probability."""
         prob = F.softmax(prob, dim=-1)
         prob = prob.detach().numpy()
         prob /= prob.sum()
@@ -194,7 +200,9 @@ class Architect(nn.Module):
         return mask_idx[0]
 
     def sample_config(self, client_id):
+        """Smaple a ViT structure from current alphas"""
         cfg_candidate = self.model.cfg_candidates
+        # pylint: disable=unsubscriptable-object
         alpha = self.alphas[client_id]
         cfg = {}
         stop_index_point = 1
@@ -220,6 +228,7 @@ class Architect(nn.Module):
         return cfg
 
     def extract_index(self, subnets_config):
+        """Exract the index with which choice is made in each candidate pool."""
         cfg_candidate = self.model.cfg_candidates
         epoch_index = []
         for cfg in subnets_config:
@@ -232,3 +241,7 @@ class Architect(nn.Module):
                     index.append(candidate_list.index(candidate))
             epoch_index.append(index)
         return epoch_index
+
+    def forward(self, feature):
+        "Forwards output of the supernet."
+        return self.model(feature)

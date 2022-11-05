@@ -1,11 +1,28 @@
-from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+"""
+Helped functions used by trainer and algorithm in PerFedRLNAS.
+"""
 import copy
 import logging
+
+from nasvit.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+
 import torch
 import numpy as np
 
 
+def set_active_subnet(model, cfg):
+    """Set the suupernet to subnet with given cfg."""
+    model.set_active_subnet(
+        cfg["resolution"],
+        cfg["width"],
+        cfg["depth"],
+        cfg["kernel_size"],
+        cfg["expand_ratio"],
+    )
+
+
 def sample_subnet_wo_config(supernet):
+    """Sample a subnet of random structure and return the random structure."""
     subnet_config = supernet.sample_active_subnet()
     subnet = supernet.get_active_subnet(preserve_weight=True)
 
@@ -13,19 +30,14 @@ def sample_subnet_wo_config(supernet):
 
 
 def sample_subnet_w_config(supernet, cfg, preserver_weight=True):
-    supernet.set_active_subnet(
-        cfg["resolution"],
-        cfg["width"],
-        cfg["depth"],
-        cfg["kernel_size"],
-        cfg["expand_ratio"],
-    )
+    """Sample a subnet of with given ViT structure."""
+    set_active_subnet(supernet,cfg)
     subnet = supernet.get_active_subnet(preserve_weight=preserver_weight)
     return subnet
 
 
 def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
-    # total_samples=sum(num_samples)
+    # pylint: disable=too-many-locals
     weight_numbers = np.zeros(len(client_iters))
     neg_numebers = np.zeros(len(client_iters))
     try:
@@ -72,6 +84,7 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
 
 
 def fuse_weight(supernet, subnets, cfgs, num_samples):
+    """Fuse weights of subnets with different structure into supernet."""
     proxy_supernets = []
     for i, cfg in enumerate(cfgs):
         proxy_supernet = AttentiveNasDynamicModel()

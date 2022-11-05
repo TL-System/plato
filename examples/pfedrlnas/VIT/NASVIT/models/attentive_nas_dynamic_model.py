@@ -3,7 +3,8 @@ Nearly the same as the source code in  https://github.com/facebookresearch/NASVi
 
 Except three modifications:
 1. In init, we support a smaller search space.
-2. We add a function get_weight_from_subnet to support the supernet copied weights from subnets uploaded by clients.
+2. We add a function get_weight_from_subnet to support\
+    the supernet copied weights from subnets uploaded by clients.
 3. Support Flops computatoin of Transformer Blocks.
 """
 
@@ -12,7 +13,9 @@ import random
 import collections
 
 import torch
-import torch.nn as nn
+from torch import nn
+
+from plato.config import Config
 
 from .modules.dynamic_layers import (
     DynamicMBConvLayer,
@@ -29,14 +32,21 @@ from .modules.transformer import (
 from .attentive_nas_static_model import AttentiveNasStaticModel
 from ..misc.smallconfig import get_config
 from ..misc.bigconfig import get_config as big_config
-from plato.config import Config
 
 
 class AttentiveNasDynamicModel(MyNetwork):
-    def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
-        super(AttentiveNasDynamicModel, self).__init__()
+    """The supernet for NASVIT."""
 
-        if supernet == None:
+    # pylint:disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
+
+    def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+        # pylint:disable=too-many-locals
+        # pylint:disable=too-many-statements
+
+        super().__init__()
+
+        if supernet is None:
             supernet = big_config().supernet_config
         if n_classes == -1:
             n_classes = Config().parameters.model.num_classes
@@ -45,42 +55,7 @@ class AttentiveNasDynamicModel(MyNetwork):
         bn_param = (bn_momentum, bn_eps)
 
         self.supernet = supernet
-        self.n_classes = n_classes
-        self.use_v3_head = getattr(self.supernet, "use_v3_head", False)
-        self.stage_names = [
-            "first_conv",
-            "mb1",
-            "mb2",
-            "mb3",
-            "mb4",
-            "mb5",
-            "mb6",
-            "mb7",
-            "last_conv",
-        ]
-
-        self.width_list, self.depth_list, self.ks_list, self.expand_ratio_list = (
-            [],
-            [],
-            [],
-            [],
-        )
-        for name in self.stage_names:
-            block_cfg = getattr(self.supernet, name)
-            self.width_list.append(block_cfg.c)
-            if name.startswith("mb"):
-                self.depth_list.append(block_cfg.d)
-                self.ks_list.append(block_cfg.k)
-                self.expand_ratio_list.append(block_cfg.t)
-        self.resolution_list = self.supernet.resolutions
-
-        self.cfg_candidates = {
-            "resolution": self.resolution_list,
-            "width": self.width_list,
-            "depth": self.depth_list,
-            "kernel_size": self.ks_list,
-            "expand_ratio": self.expand_ratio_list,
-        }
+        self.init_cfg_candidates()
 
         # first conv layer, including conv, bn, act
         out_channel_list, act_func, stride = (
@@ -106,7 +81,7 @@ class AttentiveNasDynamicModel(MyNetwork):
             width = block_cfg.c
             n_block = max(block_cfg.d)
             act_func = block_cfg.act_func
-            ks = block_cfg.k
+            kernel_size = block_cfg.k
             expand_ratio_list = block_cfg.t
             use_se = block_cfg.se
 
@@ -143,7 +118,7 @@ class AttentiveNasDynamicModel(MyNetwork):
                     mobile_inverted_conv = DynamicMBConvLayer(
                         in_channel_list=feature_dim,
                         out_channel_list=output_channel,
-                        kernel_size_list=ks,
+                        kernel_size_list=kernel_size,
                         expand_ratio_list=expand_ratio_list,
                         stride=stride,
                         act_func=act_func,
@@ -221,54 +196,60 @@ class AttentiveNasDynamicModel(MyNetwork):
 
         if Config().parameters.architect.space == "small":
             self.supernet = get_config().supernet_config
-            self.use_v3_head = getattr(self.supernet, "use_v3_head", False)
-            self.stage_names = [
-                "first_conv",
-                "mb1",
-                "mb2",
-                "mb3",
-                "mb4",
-                "mb5",
-                "mb6",
-                "mb7",
-                "last_conv",
-            ]
+            self.init_cfg_candidates()
 
-            self.width_list, self.depth_list, self.ks_list, self.expand_ratio_list = (
-                [],
-                [],
-                [],
-                [],
-            )
-            for name in self.stage_names:
-                block_cfg = getattr(self.supernet, name)
-                self.width_list.append(block_cfg.c)
-                if name.startswith("mb"):
-                    self.depth_list.append(block_cfg.d)
-                    self.ks_list.append(block_cfg.k)
-                    self.expand_ratio_list.append(block_cfg.t)
-            self.resolution_list = self.supernet.resolutions
+    def init_cfg_candidates(self):
+        """Initialize the cfg candidates based on current supernet cfg."""
+        self.use_v3_head = getattr(self.supernet, "use_v3_head", False)
+        self.stage_names = [
+            "first_conv",
+            "mb1",
+            "mb2",
+            "mb3",
+            "mb4",
+            "mb5",
+            "mb6",
+            "mb7",
+            "last_conv",
+        ]
 
-            self.cfg_candidates = {
-                "resolution": self.resolution_list,
-                "width": self.width_list,
-                "depth": self.depth_list,
-                "kernel_size": self.ks_list,
-                "expand_ratio": self.expand_ratio_list,
-            }
+        self.width_list, self.depth_list, self.ks_list, self.expand_ratio_list = (
+            [],
+            [],
+            [],
+            [],
+        )
+        for name in self.stage_names:
+            block_cfg = getattr(self.supernet, name)
+            self.width_list.append(block_cfg.c)
+            if name.startswith("mb"):
+                self.depth_list.append(block_cfg.d)
+                self.ks_list.append(block_cfg.k)
+                self.expand_ratio_list.append(block_cfg.t)
+        self.resolution_list = self.supernet.resolutions
+
+        self.cfg_candidates = {
+            "resolution": self.resolution_list,
+            "width": self.width_list,
+            "depth": self.depth_list,
+            "kernel_size": self.ks_list,
+            "expand_ratio": self.expand_ratio_list,
+        }
 
     def zero_residual_block_bn_weights(self):
+        """Set the bn weights of residual blocks to zero."""
         with torch.no_grad():
-            for m in self.modules():
-                if isinstance(m, MobileInvertedResidualBlock):
+            for module in self.modules():
+                if isinstance(module, MobileInvertedResidualBlock):
                     if (
-                        isinstance(m.mobile_inverted_conv, DynamicMBConvLayer)
-                        and m.shortcut is not None
+                        isinstance(module.mobile_inverted_conv, DynamicMBConvLayer)
+                        and module.shortcut is not None
                     ):
-                        m.mobile_inverted_conv.point_linear.bn.bn.weight.zero_()
+                        module.mobile_inverted_conv.point_linear.bn.bn.weight.zero_()
 
     @staticmethod
     def name():
+        """Return model name."""
         return "AttentiveNasModel"
 
     def forward(self, x):
@@ -304,6 +285,7 @@ class AttentiveNasDynamicModel(MyNetwork):
 
         x = self.last_conv(x)
         x = x.mean(3, keepdim=True).mean(2, keepdim=True)  # global average pooling
+        # pylint: disable=no-member
         x = torch.squeeze(x)
 
         if self.active_dropout_rate > 0 and self.training:
@@ -354,8 +336,6 @@ class AttentiveNasDynamicModel(MyNetwork):
     def build_from_config(config):
         raise ValueError("do not support this function")
 
-    """ set, sample and get active sub-networks """
-
     def set_active_subnet(
         self,
         resolution=224,
@@ -363,8 +343,10 @@ class AttentiveNasDynamicModel(MyNetwork):
         depth=None,
         kernel_size=None,
         expand_ratio=None,
-        **kwargs
     ):
+        # pylint:disable=too-many-locals
+        # pylint:disable=too-many-arguments
+        """Set, sample and get active sub-networks"""
         assert len(depth) == len(kernel_size) == len(expand_ratio) == len(width) - 2
         # set resolution
         self.active_resolution = resolution
@@ -372,10 +354,10 @@ class AttentiveNasDynamicModel(MyNetwork):
         # first conv
         self.first_conv.active_out_channel = width[0]
 
-        for stage_id, (c, k, e, d) in enumerate(
+        for stage_id, (channel, kernel, expansion, depth_this_block) in enumerate(
             zip(width[1:-1], kernel_size, expand_ratio, depth)
         ):
-            start_idx, end_idx = min(self.block_group_info[stage_id]), max(
+            start_idx, _ = min(self.block_group_info[stage_id]), max(
                 self.block_group_info[stage_id]
             )
 
@@ -383,27 +365,27 @@ class AttentiveNasDynamicModel(MyNetwork):
             # active_idx = np.arange(0, end_idx - start_idx + 1, idx_step).astype('int') + start_idx
 
             # for block_id in active_idx:
-            for block_id in range(start_idx, start_idx + d):
+            for block_id in range(start_idx, start_idx + depth_this_block):
                 block = self.blocks[block_id]
                 # block output channels
 
-                if block.mobile_inverted_conv != None:
-                    block.mobile_inverted_conv.active_out_channel = c
+                if block.mobile_inverted_conv:
+                    block.mobile_inverted_conv.active_out_channel = channel
                     if block.shortcut is not None:
-                        block.shortcut.active_out_channel = c
+                        block.shortcut.active_out_channel = channel
 
                     # dw kernel size
-                    block.mobile_inverted_conv.active_kernel_size = k
+                    block.mobile_inverted_conv.active_kernel_size = kernel
 
                     # dw expansion ration
-                    block.mobile_inverted_conv.active_expand_ratio = e
+                    block.mobile_inverted_conv.active_expand_ratio = expansion
                 else:
                     pass
                     # if block_id == start_idx:
                     #     block.out_dim = c
         # IRBlocks repated times
-        for i, d in enumerate(depth):
-            self.runtime_depth[i] = min(len(self.block_group_info[i]), d)
+        for i, depth_irb_block in enumerate(depth):
+            self.runtime_depth[i] = min(len(self.block_group_info[i]), depth_irb_block)
 
         # last conv
         if not self.use_v3_head:
@@ -414,26 +396,20 @@ class AttentiveNasDynamicModel(MyNetwork):
             self.last_conv.feature_mix_layer.active_out_channel = width[-1]
 
     def get_active_subnet_settings(self):
-        r = self.active_resolution
+        """Get the active setting of current subnet."""
+        resolution = self.active_resolution
         width, depth, kernel_size, expand_ratio = [], [], [], []
 
         # first conv
         width.append(self.first_conv.active_out_channel)
-        for stage_id in range(len(self.block_group_info)):
+        for stage_id, _ in enumerate(self.block_group_info):
             start_idx = min(self.block_group_info[stage_id])
             block = self.blocks[start_idx]  # first block
-            try:
+            if block.mobile_inverted_conv is not None:
                 width.append(block.mobile_inverted_conv.active_out_channel)
                 kernel_size.append(block.mobile_inverted_conv.active_kernel_size)
                 expand_ratio.append(block.mobile_inverted_conv.active_expand_ratio)
-            except:
-                pass
-                """
-                # double check
-                width.append(block.out_dim)
-                kernel_size.append(3)
-                expand_ratio.append(4)
-                """
+
             depth.append(self.runtime_depth[stage_id])
 
         if not self.use_v3_head:
@@ -442,7 +418,7 @@ class AttentiveNasDynamicModel(MyNetwork):
             width.append(self.last_conv.feature_mix_layer.active_out_channel)
 
         return {
-            "resolution": r,
+            "resolution": resolution,
             "width": width,
             "kernel_size": kernel_size,
             "expand_ratio": expand_ratio,
@@ -452,31 +428,34 @@ class AttentiveNasDynamicModel(MyNetwork):
     def set_dropout_rate(
         self, dropout=0, drop_connect=0, drop_connect_only_last_two_stages=True
     ):
+        """Set the dropout rate of current subnet."""
         self.active_dropout_rate = dropout
         for idx, block in enumerate(self.blocks):
             if drop_connect_only_last_two_stages:
                 if idx not in self.block_group_info[-1] + self.block_group_info[-2]:
                     continue
             this_drop_connect_rate = drop_connect * float(idx) / len(self.blocks)
-            try:
+            if block.DropPath is not None:
                 block.DropPath.drop_prob = this_drop_connect_rate
-            except:
-                pass
             # block.drop_connect_rate = this_drop_connect_rate
 
     def sample_min_subnet(self):
+        """Sample the smallest subnet."""
         return self._sample_active_subnet(min_net=True)
 
     def sample_max_subnet(self):
+        """Sample the biggest subnet."""
         return self._sample_active_subnet(max_net=True)
 
     def sample_active_subnet(self, compute_flops=False):
+        """Sample a random subnet."""
         cfg = self._sample_active_subnet(False, False)
         if compute_flops:
             cfg["flops"] = self.compute_active_subnet_flops()
         return cfg
 
     def sample_active_subnet_within_range(self, targeted_min_flops, targeted_max_flops):
+        """Sample a random subnet, but with assigned flops"""
         while True:
             cfg = self._sample_active_subnet()
             cfg["flops"] = self.compute_active_subnet_flops()
@@ -487,12 +466,12 @@ class AttentiveNasDynamicModel(MyNetwork):
                 return cfg
 
     def _sample_active_subnet(self, min_net=False, max_net=False):
-
-        sample_cfg = (
-            lambda candidates, sample_min, sample_max: min(candidates)
-            if sample_min
-            else (max(candidates) if sample_max else random.choice(candidates))
-        )
+        def sample_cfg(candidates, sample_min, sample_max):
+            if sample_min:
+                return min(candidates)
+            if sample_max:
+                return max(candidates)
+            return random.choice(candidates)
 
         cfg = {}
         # sample a resolution
@@ -501,8 +480,8 @@ class AttentiveNasDynamicModel(MyNetwork):
         )
         for k in ["width", "depth", "kernel_size", "expand_ratio"]:
             cfg[k] = []
-            for vv in self.cfg_candidates[k]:
-                cfg[k].append(sample_cfg(int2list(vv), min_net, max_net))
+            for value in self.cfg_candidates[k]:
+                cfg[k].append(sample_cfg(int2list(value), min_net, max_net))
 
         self.set_active_subnet(
             cfg["resolution"],
@@ -514,15 +493,17 @@ class AttentiveNasDynamicModel(MyNetwork):
         return cfg
 
     def mutate_and_reset(self, cfg, prob=0.1, keep_resolution=False):
+        """Mutate configs in evolutionary search."""
         cfg = copy.deepcopy(cfg)
-        pick_another = (
-            lambda x, candidates: x
-            if len(candidates) == 1
-            else random.choice([v for v in candidates if v != x])
-        )
+
+        def pick_another(current, candidates):
+            if len(candidates) == 1:
+                return current
+            return random.choice([v for v in candidates if v != current])
+
         # sample a resolution
-        r = random.random()
-        if r < prob and not keep_resolution:
+        resolution = random.random()
+        if resolution < prob and not keep_resolution:
             cfg["resolution"] = pick_another(
                 cfg["resolution"], self.cfg_candidates["resolution"]
             )
@@ -530,8 +511,8 @@ class AttentiveNasDynamicModel(MyNetwork):
         # sample channels, depth, kernel_size, expand_ratio
         for k in ["width", "depth", "kernel_size", "expand_ratio"]:
             for _i, _v in enumerate(cfg[k]):
-                r = random.random()
-                if r < prob:
+                resolution = random.random()
+                if resolution < prob:
                     cfg[k][_i] = pick_another(
                         cfg[k][_i], int2list(self.cfg_candidates[k][_i])
                     )
@@ -545,22 +526,25 @@ class AttentiveNasDynamicModel(MyNetwork):
         )
         return cfg
 
-    def crossover_and_reset(self, cfg1, cfg2, p=0.5):
-        def _cross_helper(g1, g2, prob):
-            assert type(g1) == type(g2)
-            if isinstance(g1, int):
-                return g1 if random.random() < prob else g2
-            elif isinstance(g1, list):
-                return [v1 if random.random() < prob else v2 for v1, v2 in zip(g1, g2)]
-            else:
-                raise NotImplementedError
+    def crossover_and_reset(self, cfg1, cfg2, prob=0.5):
+        """Crossover different configs in evolutinary search."""
+
+        def _cross_helper(gene1, gene2, prob):
+            assert isinstance(gene1, type(gene2))
+            if isinstance(gene1, int):
+                return gene1 if random.random() < prob else gene2
+            if isinstance(gene1, list):
+                return [
+                    v1 if random.random() < prob else v2 for v1, v2 in zip(gene1, gene2)
+                ]
+            raise NotImplementedError
 
         cfg = {}
         cfg["resolution"] = (
-            cfg1["resolution"] if random.random() < p else cfg2["resolution"]
+            cfg1["resolution"] if random.random() < prob else cfg2["resolution"]
         )
         for k in ["width", "depth", "kernel_size", "expand_ratio"]:
-            cfg[k] = _cross_helper(cfg1[k], cfg2[k], p)
+            cfg[k] = _cross_helper(cfg1[k], cfg2[k], prob)
 
         self.set_active_subnet(
             cfg["resolution"],
@@ -572,6 +556,8 @@ class AttentiveNasDynamicModel(MyNetwork):
         return cfg
 
     def get_active_subnet(self, preserve_weight=True):
+        """Get the subnet generated from current supernet."""
+        # pylint: disable=too-many-locals
         with torch.no_grad():
             first_conv = self.first_conv.get_active_subnet(3, preserve_weight)
 
@@ -583,12 +569,11 @@ class AttentiveNasDynamicModel(MyNetwork):
 
                 # cygong: mark: new-way to share weight
                 # idx_step = len(block_idx) * 1. / depth
-                # active_idx = np.array(block_idx)[np.arange(0, len(block_idx), idx_step).astype('int')]
                 active_idx = block_idx[:depth]
                 stage_blocks = []
                 for idx in active_idx:
                     self.blocks[idx].rescale_idx = len(active_idx)
-                    try:
+                    if self.blocks[idx].mobile_inverted_conv is not None:
                         # if idx > active_idx[0]:
                         #     self.blocks[idx].mobile_inverted_conv.rescale_idx = len(active_idx)
 
@@ -607,7 +592,7 @@ class AttentiveNasDynamicModel(MyNetwork):
                         input_channel = stage_blocks[
                             -1
                         ].mobile_inverted_conv.out_channels
-                    except:
+                    else:
                         if idx > active_idx[0]:
                             # self.blocks[idx].rescale_mlp != None:
                             self.blocks[idx].rescale_idx = len(active_idx)
@@ -651,6 +636,7 @@ class AttentiveNasDynamicModel(MyNetwork):
     def get_weight_from_subnet(
         self, subnet: AttentiveNasStaticModel, jump_classifier=False
     ):
+        """Copied the weight from subnet to the supernet."""
         with torch.no_grad():
             self.first_conv.get_weight_from_subnet(3, subnet.first_conv)
 
@@ -662,22 +648,21 @@ class AttentiveNasDynamicModel(MyNetwork):
                 active_idx = block_idx[:depth]
                 for idx in active_idx:
                     self.blocks[idx].rescale_idx = len(active_idx)
-                    try:
+                    if self.blocks[idx].mobile_inverted_conv is not None:
                         self.blocks[idx].rescale_idx = len(active_idx)
                         self.blocks[idx].mobile_inverted_conv.get_weight_from_subnet(
                             input_channel,
                             subnet.blocks[sub_net_blk_idx].mobile_inverted_conv,
                         )
-                        self.blocks[idx].shortcut.get_weight_from_subnet(
-                            input_channel, subnet.blocks[sub_net_blk_idx].shortcut
-                        ) if subnet.blocks[
-                            sub_net_blk_idx
-                        ].shortcut is not None else None
+                        if subnet.blocks[sub_net_blk_idx].shortcut is not None:
+                            self.blocks[idx].shortcut.get_weight_from_subnet(
+                                input_channel, subnet.blocks[sub_net_blk_idx].shortcut
+                            )
                         input_channel = subnet.blocks[
                             sub_net_blk_idx
                         ].mobile_inverted_conv.out_channels
                         sub_net_blk_idx += 1
-                    except:
+                    else:
                         if idx > active_idx[0]:
                             # self.blocks[idx].rescale_mlp != None:
                             self.blocks[idx].rescale_idx = len(active_idx)
@@ -704,9 +689,13 @@ class AttentiveNasDynamicModel(MyNetwork):
             self.set_bn_param(**subnet.get_bn_param())
 
     def get_active_net_config(self):
+        """Get the config of current active net."""
         raise NotImplementedError
 
     def compute_active_subnet_flops(self):
+        # pylint: disable=too-many-locals
+        """Compute the flops of current active net."""
+
         def count_conv(c_in, c_out, size_out, groups, k):
             kernel_ops = k**2
             output_elements = c_out * size_out**2
@@ -783,15 +772,17 @@ class AttentiveNasDynamicModel(MyNetwork):
         total_ops += count_linear(c_out, self.n_classes)
         return total_ops / 1e6
 
-    def load_weights_from_pretrained_models(self, checkpoint_path):
-        with open(checkpoint_path, "rb") as f:
-            checkpoint = torch.load(f, map_location="cpu")
+    def load_weights_from_pretrained_models(self, checkpoint_path, load_from_ema=False):
+        """Load model weights from pretrained models."""
+        with open(checkpoint_path, "rb") as file:
+            checkpoint = torch.load(file, map_location="cpu")
         assert isinstance(checkpoint, dict)
         pretrained_state_dicts = checkpoint["state_dict"]
-        for k, v in self.state_dict().items():
+        for k, value in self.state_dict().items():
             name = "module." + k if not k.startswith("module") else k
-            v.copy_(pretrained_state_dicts[name])
+            value.copy_(pretrained_state_dicts[name])
 
     @torch.jit.ignore
     def no_weight_decay_keywords(self):
+        """Return keywords of modules without weight decay."""
         return {"rescale_mlp", "rescale_attn"}
