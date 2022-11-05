@@ -14,7 +14,7 @@ clients:
     # Processors for outbound data payloads
     outbound_processors:
         - unstructured_pruning
-        - model_compress_qsgd
+        - model_quantize_qsgd
 
 server:
     address: 127.0.0.1
@@ -24,7 +24,7 @@ server:
 
     # Processors for inbound data payloads
     inbound_processors:
-        - model_decompress_qsgd
+        - model_dequantize_qsgd
 
 data: 
     # The training and testing dataset

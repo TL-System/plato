@@ -1,5 +1,17 @@
 """
-Implements a Processor for decompressing model weights.
+Implements a Processor to decompress and dequantize upload models.
+
+In more detail, this processor first decompress each received parameter. Next,
+dequantize quantize each upload parameter under given quantization level.
+Hence, the 8-bit received parameter can be transfered to 32-bit parameter.
+
+Reference:
+
+Alistarh, D., Grubic, D., Li, J., Tomioka, R., & Vojnovic, M. (2017).
+"QSGD: Communication-efficient SGD via gradient quantization and encoding."
+Advances in neural information processing systems, 30.
+
+https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
 
 import logging
@@ -7,7 +19,6 @@ from typing import Any
 import pickle
 from struct import unpack
 import sys
-import zstd
 import torch
 
 from plato.processors import model
@@ -27,7 +38,6 @@ class Processor(model.Processor):
         """Implements a Processor for decompressing model parameters."""
 
         data_size_old = sys.getsizeof(pickle.dumps(data))
-        data = pickle.loads(zstd.decompress(data))
         output = super().process(data)
         data_size_new = sys.getsizeof(pickle.dumps(output))
 
@@ -37,7 +47,8 @@ class Processor(model.Processor):
                 self.server_id,
             )
             logging.info(
-                "[Server #%d] Quantization level: %d, received payload data size is %.2f MB, original payload data size is %.2f MB(simulated).",
+                "[Server #%d] Quantization level: %d, received payload data size is %.2f MB,"
+                "dequantized size is %.2f MB(simulated).",
                 self.server_id,
                 self.quantization_level,
                 data_size_old / 1024**2,
@@ -45,7 +56,7 @@ class Processor(model.Processor):
             )
         else:
             logging.info(
-                "[Client #%d] Decompressed received model parameters.", self.client_id
+                "[Client #%d] Dequantized received model parameters.", self.client_id
             )
         return output
 

@@ -1,5 +1,17 @@
 """
-Implements a Processor for compressing model weights.
+Implements a Processor to quantize and compress upload models.
+
+In more detail, this processor first quantize each upload parameter under given
+quantization level. Next, compress and store each quantization value. Hence, the
+32-bit parameter can be transfered to 8-bit parameter.
+
+Reference:
+
+Alistarh, D., Grubic, D., Li, J., Tomioka, R., & Vojnovic, M. (2017).
+"QSGD: Communication-efficient SGD via gradient quantization and encoding."
+Advances in neural information processing systems, 30.
+
+https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
 import logging
 import pickle
@@ -7,7 +19,6 @@ from typing import Any
 import sys
 import random
 from struct import pack, unpack
-import zstd
 import torch
 
 from plato.processors import model
@@ -18,29 +29,28 @@ class Processor(model.Processor):
     Implements a Processor for compressing of model parameters.
     """
 
-    def __init__(self, compression_level=1, quantization_level=64, **kwargs) -> None:
+    def __init__(self, quantization_level=64, **kwargs) -> None:
         super().__init__(**kwargs)
 
-        self.compression_level = compression_level
         self.quantization_level = quantization_level  # must <= 128!
 
     def process(self, data: Any) -> Any:
         """Implements a Processor for compressing model parameters."""
 
         data_size_old = sys.getsizeof(pickle.dumps(data))
-        data = super().process(data)
-        output = zstd.compress(pickle.dumps(data), self.compression_level)
+        output = super().process(data)
         data_size_new = sys.getsizeof(pickle.dumps(output))
 
         if self.client_id is None:
-            logging.info("[Server #%d] Compressed model parameters.", self.server_id)
+            logging.info("[Server #%d] Quantized model parameters.", self.server_id)
         else:
             logging.info(
                 "[Client #%d] Quantized and compressed upload model parameters.",
                 self.client_id,
             )
             logging.info(
-                "[Client #%d] Quantization level: %d, original payload data size is %.2f MB, sent payload data size is %.2f MB (simulated).",
+                "[Client #%d] Quantization level: %d, original payload data size is %.2f MB,"
+                "quantized size is %.2f MB (simulated).",
                 self.client_id,
                 self.quantization_level,
                 data_size_old / 1024**2,
