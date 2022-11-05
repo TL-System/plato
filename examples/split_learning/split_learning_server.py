@@ -42,7 +42,7 @@ class Server(fedavg.Server):
         if len(self.clients_list) == 0 and self.next_client:
             # Shuffle the client list
             self.clients_list = super().choose_clients(clients_pool, len(clients_pool))
-            logging.warn(f"Client order: {self.clients_list}")
+            logging.warning(f"Client order: {self.clients_list}")
 
         if self.next_client:
             # Sequentially select clients
@@ -63,7 +63,7 @@ class Server(fedavg.Server):
         update = updates[0]
         report = update.report
         if report.type == "features":
-            logging.warn("[%s] Features received, compute gradients.", self)
+            logging.warning("[%s] Features received, compute gradients.", self)
             feature_dataset = feature.DataSource([update.payload])
 
             # Training the model using all the features received from the client
@@ -75,7 +75,7 @@ class Server(fedavg.Server):
             self.phase = "gradient"
 
         elif report.type == "weights":
-            logging.warn("[%s] Weights received, start testing accuracy.", self)
+            logging.warning("[%s] Weights received, start testing accuracy.", self)
             weights = update.payload
 
             # The weights after cut layer are not trained by clients
@@ -89,7 +89,7 @@ class Server(fedavg.Server):
                     self.datasource, testing=True
                 )
             self.test_accuracy = self.trainer.test(self.testset, self.testset_sampler)
-            logging.warn(
+            logging.warning(
                 fonts.colourize(
                     f"[{self}] Global model accuracy: {100 * self.test_accuracy:.2f}%\n"
                 )

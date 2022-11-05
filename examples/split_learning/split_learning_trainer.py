@@ -54,7 +54,7 @@ class Trainer(basic.Trainer):
         examples = examples.detach().requires_grad_(True)
 
         loss = super().perform_forward_and_backward_passes(config, examples, labels)
-        logging.warn(
+        logging.warning(
             "[Server #%d] Gradients computed with training loss: %.4f",
             os.getpid(),
             loss,

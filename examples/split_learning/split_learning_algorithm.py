@@ -11,9 +11,10 @@ https://arxiv.org/pdf/1812.00564.pdf
 
 import logging
 import time
+from copy import deepcopy
+
 import torch
 
-from copy import deepcopy
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.datasources import feature_dataset
@@ -30,8 +31,6 @@ class Algorithm(fedavg.Algorithm):
         self.input_dataset = []
         self.data_loader = None
 
-        self.contexts = {}
-        self.original_weights = None
 
     def receive_gradients(self, gradients):
         """Receive gradients from the server."""
@@ -58,7 +57,7 @@ class Algorithm(fedavg.Algorithm):
         self.input_dataset.append((inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
-        logging.warn(
+        logging.warning(
             "[Client #%d] Features extracted from %s examples in %.2f seconds.",
             self.client_id,
             Config().trainer.batch_size,
@@ -83,7 +82,7 @@ class Algorithm(fedavg.Algorithm):
 
         grad_index = 0
 
-        for batch_id, (examples, labels) in enumerate(data_loader):
+        for __, (examples, labels) in enumerate(data_loader):
             examples, labels = examples.to(self.trainer.device), labels.to(
                 self.trainer.device
             )
@@ -95,7 +94,7 @@ class Algorithm(fedavg.Algorithm):
             optimizer.step()
 
         toc = time.perf_counter()
-        logging.warn(
+        logging.warning(
             "[Client #%d] Training completed in %.2f seconds.",
             self.client_id,
             toc - tic,
@@ -109,24 +108,14 @@ class Algorithm(fedavg.Algorithm):
             feature_dataset.FeatureDataset(trainset.feature_dataset), sampler
         )
 
-    def load_context(self, client_id, dataset, sampler):
-        """Load client's model weights and setup the data loader."""
-        if not client_id in self.contexts:
-            if self.original_weights == None:
-                self.original_weights = self.extract_weights()
-            self.load_weights(self.original_weights)
-        else:
-            self.load_weights(self.contexts.pop(client_id))
-
+    def load_data(self, dataset, sampler):
+        """Setting up the data loader."""
         data_loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=Config().trainer.batch_size,
             sampler=sampler.get(),
         )
         self.data_loader = iter(data_loader)
-
-    def save_context(self, client_id):
-        self.contexts[client_id] = self.extract_weights()
 
     def update_weights_before_cut(self, weights):
         # Update the weights before cut layer, called when testing accuracy

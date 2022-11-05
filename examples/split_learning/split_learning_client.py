@@ -41,6 +41,7 @@ class Client(simple.Client):
         self.model_received = False
         self.gradient_received = False
         self.contexts = {}
+        self.original_weights = None
 
         # Iteration control
         self.iterations = Config().clients.iteration
@@ -55,20 +56,19 @@ class Client(simple.Client):
 
         if info == "prompt":
             # Server prompts a new client to conduct split learning
-            self.algorithm.load_context(self.client_id, self.trainset, self.sampler)
+            self._load_context(self.client_id)
+            self.algorithm.load_data(self.trainset, self.sampler)
             report, payload = self._extract_features()
         elif info == "gradients":
             # server sends the gradients of the features, i.e., complete training
-            logging.warn(f"[{self}] Gradeints received, complete training.")
+            logging.warning("[%s] Gradients received, complete training.", self)
             training_time, weights = self._complete_training(server_payload)
             self.iter_left -= 1
 
             if self.iter_left == 0:
-                logging.warn(
-                    f"[{self}] Finished training, send weights to server for evaluation."
-                )
+                logging.warning("[%s] Finished training, sending weights to the server.", self)
                 # Save the state of current client
-                self.algorithm.save_context(self.client_id)
+                self._save_context(self.client_id)
                 # Send weights to server for evaluation
                 report = SimpleNamespace(
                     num_samples=self.sampler.num_samples(),
@@ -86,10 +86,23 @@ class Client(simple.Client):
                 report.training_time += training_time
         return report, payload
 
+    def _save_context(self, client_id):
+        """Saving the extracted weights for a given client."""
+        self.contexts[client_id] = self.algorithm.extract_weights()
+
+    def _load_context(self, client_id):
+        """Load client's model weights."""
+        if not client_id in self.contexts:
+            if self.original_weights is None:
+                self.original_weights = self.algorithm.extract_weights()
+            self.algorithm.load_weights(self.original_weights)
+        else:
+            self.algorithm.load_weights(self.contexts.pop(client_id))
+
     def _extract_features(self):
         """Extract the feature till the cut layer."""
         round_number = self.iterations - self.iter_left + 1
-        logging.warn(
+        logging.warning(
             fonts.colourize(
                 f"[{self}] Started split learning in round #{round_number}/{self.iterations}"
                 + f" (Global round {self.current_round})."
