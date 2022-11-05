@@ -2,7 +2,6 @@
 Base processor for processing PyTorch models.
 """
 
-from abc import abstractmethod
 from typing import OrderedDict
 
 import torch
@@ -11,6 +10,7 @@ from plato.processors import base
 
 class Processor(base.Processor):
     """Base processor for processing PyTorch models."""
+
     def __init__(self, client_id=None, server_id=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.client_id = client_id
@@ -27,8 +27,6 @@ class Processor(base.Processor):
 
         return new_data
 
-    @abstractmethod
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
-        """
-        Process individual layer of the model
-        """
+        """Process an individual layer of the model."""
+        return layer

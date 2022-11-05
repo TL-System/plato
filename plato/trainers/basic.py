@@ -31,7 +31,6 @@ class Trainer(base.Trainer):
         super().__init__()
 
         self.training_start_time = time.time()
-        self.models_per_epoch = {}
         self.model_state_dict = None
         self.current_round = 0
 
@@ -398,44 +397,61 @@ class Trainer(base.Trainer):
 
         return accuracy
 
-    def obtain_model_update(self, wall_time):
+    def obtain_model_update(self, client_id, requested_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
         wall clock time is reached.
         """
         # Constructing a list of epochs and training times
-        self.models_per_epoch = {}
+        models_per_epoch = {}
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
                 filename,
             )
 
             if split is not None:
                 epoch = split.group("epoch")
                 training_time = split.group("training_time")
-                if self.client_id == int(split.group("client_id")):
-                    self.models_per_epoch[epoch] = {
+                if client_id == int(split.group("client_id")):
+                    models_per_epoch[epoch] = {
                         "training_time": float(training_time),
                         "model_checkpoint": filename,
                     }
         # Locate the model at a specific wall clock time
-        for epoch in sorted(self.models_per_epoch):
-            training_time = self.models_per_epoch[epoch]["training_time"]
-            model_checkpoint = self.models_per_epoch[epoch]["model_checkpoint"]
-            if training_time + self.training_start_time > wall_time:
-                self.load_model(model_checkpoint)
+        for epoch in sorted(models_per_epoch, reverse=True):
+            model_training_time = models_per_epoch[epoch]["training_time"]
+            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
+
+            if model_training_time < requested_time:
+                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+
+                print(model_path)
+                pretrained = None
+                if torch.cuda.is_available():
+                    pretrained = torch.load(model_path)
+                else:
+                    pretrained = torch.load(
+                        model_path, map_location=torch.device("cpu")
+                    )
+
+                model = models_registry.get()
+                model.load_state_dict(pretrained, strict=True)
+
                 logging.info(
                     "[Client #%s] Responding to the server with the model after "
                     "epoch %s finished, at time %s.",
-                    self.client_id,
+                    client_id,
                     epoch,
-                    training_time + self.training_start_time,
+                    model_training_time,
                 )
-                return self.model
 
-        return self.model
+                return model
+
+        raise ValueError(
+            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
+        )
 
     # pylint: disable=unused-argument
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
@@ -568,19 +584,43 @@ class TrainerWithTimmScheduler(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.num_updates = None
+        self.past_epochs = None
 
     def train_epoch_start(self, config):
         """Method called at the beginning of a training epoch."""
         super().train_epoch_start(config)
+
         self.num_updates = self.current_epoch * len(self.train_loader)
+
+        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+            self.num_updates += self.past_epochs * len(self.train_loader)
 
     def lr_scheduler_step(self):
         self.num_updates += 1
+
         if self.lr_scheduler is not None:
             self.lr_scheduler.step_update(num_updates=self.num_updates)
 
     def train_epoch_end(self, config):
         """Method called at the end of a training epoch."""
         super().train_epoch_end(config)
+
         if self.lr_scheduler is not None:
-            self.lr_scheduler.step(self.current_epoch + 1)
+            if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+                self.lr_scheduler.step(self.past_epochs + self.current_epoch + 1)
+            else:
+                self.lr_scheduler.step(self.current_epoch + 1)
+
+    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
+        """Returns an optimizer with an initial learning rate that has been
+        adjusted according to the current round, so that learning rate
+        schedulers can be effective throughout the communication rounds."""
+
+        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
+            past_epochs = (self.current_round - 1) * Config().trainer.epochs
+            self.past_epochs = past_epochs
+
+            lr_scheduler.step(past_epochs)
+            lr_scheduler.step_update(past_epochs * len(self.train_loader))
+
+        return optimizer

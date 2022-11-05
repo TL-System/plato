@@ -34,7 +34,7 @@ class Server(fedavg.Server):
         # Whether adjust mixing hyperparameter after each round
         self.adaptive_mixing = False
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the mixing hyperparameter for the server, as well as
         other parameters from the configuration file.
         """
