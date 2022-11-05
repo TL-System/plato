@@ -119,9 +119,7 @@ class Client:
                 else Config().clients.per_round
             )
             # Contact one of the edge servers
-            self.edge_server_id = Config().clients.total_clients + math.ceil(
-                self.client_id / (launched_client_num / Config().algorithm.total_silos)
-            )
+            self.edge_server_id = Config().clients.total_clients + Config().get_edge_id_for_client()
 
             logging.info(
                 "[Client #%d] Contacting Edge Server #%d.",
