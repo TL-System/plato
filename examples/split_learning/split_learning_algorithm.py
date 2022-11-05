@@ -58,7 +58,6 @@ class Algorithm(fedavg.Algorithm):
         self.input_dataset.append((inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
-
         logging.warn(
             "[Client #%d] Features extracted from %s examples in %.2f seconds.",
             self.client_id,
