@@ -45,51 +45,10 @@ class Server(fedavg.Server):
             edge_server_id = Config().args.id - Config().clients.total_clients
 
             # Compute the number of clients in each silo for edge servers
-            edges_total_clients = [
-                len(i)
-                for i in np.array_split(
-                    np.arange(Config().clients.total_clients),
-                    Config().algorithm.total_silos,
-                )
-            ]
-            self.total_clients = edges_total_clients[edge_server_id - 1]
-
-            self.clients_per_round = [
-                len(i)
-                for i in np.array_split(
-                    np.arange(Config().clients.per_round),
-                    Config().algorithm.total_silos,
-                )
-            ][edge_server_id - 1]
-
-            if hasattr(Config().trainer, "max_concurrency"):
-                launched_total_clients = min(
-                    Config().trainer.max_concurrency
-                    * max(1, Config().gpu_count())
-                    * Config().algorithm.total_silos,
-                    Config().clients.per_round,
-                )
-            else:
-                launched_total_clients = Config().clients.per_round
-
-            edges_launched_clients = [
-                len(i)
-                for i in np.array_split(
-                    np.arange(launched_total_clients), Config().algorithm.total_silos
-                )
-            ]
-            starting_client_id = sum(edges_launched_clients[: edge_server_id - 1])
-            launched_clients = edges_launched_clients[edge_server_id - 1]
-            self.launched_clients = list(
-                range(starting_client_id + 1, starting_client_id + 1 + launched_clients)
-            )
-
-            starting_client_id = sum(edges_total_clients[: edge_server_id - 1])
-            self.clients_pool = list(
-                range(
-                    starting_client_id + 1, starting_client_id + 1 + self.total_clients
-                )
-            )
+            self.total_clients = Config().get_total_clients_for_edge()
+            self.clients_per_round = Config().get_clients_per_round_for_edge()
+            self.launched_clients = Config().get_launched_clients_for_edge()
+            self.clients_pool = Config().get_client_pool_for_edge()
 
             logging.info(
                 "[Edge server #%d (#%d)] Started training on %d clients with %d per round.",

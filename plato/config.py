@@ -308,6 +308,108 @@ class Config:
         return hasattr(Config().algorithm, "cross_silo") and Config().args.port is None
 
     @staticmethod
+    def get_total_clients_for_edge()->int:
+        """Return the total number of clients for the current edge server in cross-silo FL"""
+        assert Config().is_edge_server()
+        edge_server_id = Config().args.id - Config().clients.total_clients
+        
+        edges_total_clients = Config().get_total_clients_for_all_edges()
+        total_clients = edges_total_clients[edge_server_id - 1]
+        return total_clients
+    
+    @staticmethod
+    def get_clients_per_round_for_edge()->int:
+        """Return the total number of clients per round for the current edge server in cross-silo FL"""
+        assert Config().is_edge_server()
+        edge_server_id = Config().args.id - Config().clients.total_clients
+        clients_per_round = [
+            len(i)
+            for i in np.array_split(
+                np.arange(Config().clients.per_round),
+                Config().algorithm.total_silos,
+            )
+        ][edge_server_id - 1]
+        return clients_per_round
+    
+    @staticmethod
+    def get_total_clients_for_all_edges()->int:
+        """Return a list of the total number of clients for all edge servers in cross-silo FL"""
+        
+        edges_total_clients = [
+            len(i)
+            for i in np.array_split(
+                np.arange(Config().clients.total_clients),
+                Config().algorithm.total_silos,
+            )
+        ]
+        return edges_total_clients
+    
+    @staticmethod
+    def get_launched_clients_for_all_edges() -> int:
+        """Returns a list of the number of launched clients for all servers in cross-silo FL"""
+
+        if hasattr(Config().trainer, "max_concurrency"):
+            launched_total_clients = min(
+                Config().trainer.max_concurrency
+                * max(1, Config().gpu_count())
+                * Config().algorithm.total_silos,
+                Config().clients.per_round,
+            )
+        else:
+            launched_total_clients = Config().clients.per_round
+
+        edges_launched_clients = [
+            len(i)
+            for i in np.array_split(
+                np.arange(launched_total_clients), Config().algorithm.total_silos
+            )
+        ]
+        
+        return edges_launched_clients
+    
+    @staticmethod
+    def get_launched_clients_for_edge() -> int:
+        """Returns the launched clients in cross-silo FL."""
+        assert Config().is_edge_server()
+        edge_server_id = Config().args.id - Config().clients.total_clients  
+
+        edges_launched_clients = Config().get_launched_clients_for_all_edges()
+        
+        starting_client_id = sum(edges_launched_clients[: edge_server_id-1])
+        launched_clients = edges_launched_clients[edge_server_id - 1]
+        launched_clients = list(
+            range(starting_client_id + 1, starting_client_id + 1 + launched_clients)
+        )
+        return launched_clients
+    
+    @staticmethod
+    def get_client_pool_for_edge()-> int:
+        assert Config().is_edge_server()
+        edge_server_id = Config().args.id - Config().clients.total_clients  
+        
+        edges_total_clients = Config().get_total_clients_for_all_edges()
+        edge_total_clients=Config().get_total_clients_for_edge()
+        starting_client_id = sum(edges_total_clients[: edge_server_id-1])
+        clients_pool = list(
+            range(
+                starting_client_id + 1, starting_client_id + 1 + edge_total_clients
+            )
+        )
+        return clients_pool
+
+    @staticmethod
+    def get_edge_id_for_client() -> int:
+        """Returns the corresponding edge server id given a client in cross-silo FL. """
+        client_id = Config().args.id
+        edges_launched_clients = Config.get_launched_clients_for_all_edges()
+        total = 0
+        for i, count in enumerate(edges_launched_clients):
+            total += count
+            if client_id <= total:
+                return i+1
+        raise ValueError(f"No edge server found for the client: client_id: {client_id}, total number of clients: {total}")
+    
+    @staticmethod
     def gpu_count() -> int:
         """Returns the number of GPUs available for training."""
         if hasattr(Config().trainer, "use_mindspore"):
