@@ -265,24 +265,8 @@ class Server:
             self._resume_from_checkpoint()
 
         if Config().is_central_server():
-            #First launch the central server in a non-blocking fashion
-            #by wrapping it in a separate process
-            def start_self(self):
-                asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
-                if hasattr(Config().server, "random_seed"):
-                    seed = Config().server.random_seed
-                    logging.info("Setting the random seed for selecting clients: %s", seed)
-                    random.seed(seed)
-                    self.prng_state = random.getstate()
-                self.start()
-            
-            proc = mp.Process(
-            target=start_self,
-                args=(self,)
-                )
-            proc.start()
-            
-            #Next, start the edge servers as clients of the central server
+
+            #start the edge servers as clients of the central server
             #Once all edge servers are live, clients will be initialized in the 
             #training_will_start() event call of the central server
             Server._start_clients(
@@ -293,6 +277,14 @@ class Server:
                 trainer=trainer,
             )
 
+            asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
+            if hasattr(Config().server, "random_seed"):
+                seed = Config().server.random_seed
+                logging.info("Setting the random seed for selecting clients: %s", seed)
+                random.seed(seed)
+                self.prng_state = random.getstate()
+            self.start()
+            
         else:
             if self.disable_clients:
                 logging.info("No clients are launched (server:disable_clients = true)")
