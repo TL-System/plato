@@ -11,10 +11,9 @@ https://arxiv.org/pdf/1812.00564.pdf
 
 import logging
 import time
-from copy import deepcopy
-from collections import OrderedDict
-
 import torch
+
+from copy import deepcopy
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.datasources import feature_dataset
@@ -29,67 +28,52 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer)
         self.gradients_list = []
         self.input_dataset = []
+        self.data_loader = None
+
+        self.contexts = {}
+        self.original_weights = None
 
     def receive_gradients(self, gradients):
         """Receive gradients from the server."""
         self.gradients_list = deepcopy(gradients)
 
-    def extract_features(self, dataset, sampler):
-        """Extracting features using layers before the cut_layer.
-
-        dataset: The training or testing dataset.
-        """
+    def extract_features(self):
+        """Extracting features using layers before the cut_layer."""
         self.model.to(self.trainer.device)
         self.model.eval()
-
-        _train_loader = getattr(self.trainer, "train_loader", None)
-
-        if callable(_train_loader):
-            data_loader = self.trainer.train_loader(
-                batch_size=1,
-                trainset=dataset,
-                sampler=sampler.get(),
-                extract_features=True,
-            )
-        else:
-            data_loader = torch.utils.data.DataLoader(
-                dataset, batch_size=Config().trainer.batch_size, sampler=sampler.get()
-            )
 
         tic = time.perf_counter()
 
         features_dataset = []
         self.input_dataset = []
 
-        for inputs, targets, *__ in data_loader:
-            with torch.no_grad():
-                inputs, targets = inputs.to(self.trainer.device), targets.to(
-                    self.trainer.device
-                )
-                logits = self.model.forward_to(inputs)
+        inputs, targets = next(self.data_loader)
+        with torch.no_grad():
+            inputs, targets = inputs.to(self.trainer.device), targets.to(
+                self.trainer.device
+            )
+            logits = self.model.forward_to(inputs)
 
-            features_dataset.append((logits.detach().cpu(), targets.detach().cpu()))
-            self.input_dataset.append((inputs.detach().cpu(), targets.detach().cpu()))
+        features_dataset.append((logits.detach().cpu(), targets.detach().cpu()))
+        self.input_dataset.append((inputs.detach().cpu(), targets.detach().cpu()))
 
         toc = time.perf_counter()
 
-        logging.info(
-            "[Client #%d] Features extracted from %s examples.",
+        logging.warn(
+            "[Client #%d] Features extracted from %s examples in %.2f seconds.",
             self.client_id,
-            len(features_dataset),
+            Config().trainer.batch_size,
+            toc - tic,
         )
-        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id, toc - tic)
 
         return features_dataset, toc - tic
 
-    def complete_train(self, config, dataset, sampler):
+    def complete_train(self):
         """Update the model on the client/device with the gradients received
         from the server.
         """
         self.model.to(self.trainer.device)
         self.model.train()
-
-        batch_size = config["batch_size"]
 
         data_loader = self.input_dataset
 
@@ -112,42 +96,50 @@ class Algorithm(fedavg.Algorithm):
             optimizer.step()
 
         toc = time.perf_counter()
-
-        logging.info("[Client #%d] Training completed.", self.client_id)
-        logging.info("[Client #%d] Time used: %.2f seconds.", self.client_id, toc - tic)
+        logging.warn(
+            "[Client #%d] Training completed in %.2f seconds.",
+            self.client_id,
+            toc - tic,
+        )
 
         return toc - tic
-
-    def compute_weight_deltas(self, baseline_weights, weights_received):
-        """Extract the weights received from a client and compute the deltas
-        that will be used to update the global model on the server.
-        """
-        ignored_layers = []
-        cut_layer_idx = self.model.layers.index(self.model.cut_layer)
-        # These layers are trained on the server, so we should ignore the weights
-        # of these layers reported by the client
-        for i in range(cut_layer_idx + 1, len(self.model.layers)):
-            ignored_layers.append(f"{self.model.layers[i]}.weight")
-            ignored_layers.append(f"{self.model.layers[i]}.bias")
-
-        # Calculate updates from the received weights
-        deltas = []
-        for weight in weights_received:
-            delta = OrderedDict()
-            for name, current_weight in weight.items():
-                baseline = baseline_weights[name]
-                if name in ignored_layers:
-                    # Do not update the layers that are not trained on clients
-                    _delta = torch.zeros(baseline.shape)
-                else:
-                    # Calculate update
-                    _delta = current_weight - baseline
-                delta[name] = _delta
-            deltas.append(delta)
-        return deltas
 
     def train(self, trainset, sampler):
         """Train the neural network model after the cut layer."""
         self.trainer.train(
             feature_dataset.FeatureDataset(trainset.feature_dataset), sampler
         )
+
+    def load_context(self, client_id, dataset, sampler):
+        """Load client's model weights and setup the data loader."""
+        if not client_id in self.contexts:
+            if self.original_weights == None:
+                self.original_weights = self.extract_weights()
+            self.load_weights(self.original_weights)
+        else:
+            self.load_weights(self.contexts.pop(client_id))
+
+        data_loader = torch.utils.data.DataLoader(
+            dataset,
+            batch_size=Config().trainer.batch_size,
+            sampler=sampler.get(),
+        )
+        self.data_loader = iter(data_loader)
+
+    def save_context(self, client_id):
+        self.contexts[client_id] = self.extract_weights()
+
+    def update_weights_before_cut(self, weights):
+        # Update the weights before cut layer, called when testing accuracy
+        current_weights = self.extract_weights()
+        cut_layer_idx = self.model.layers.index(self.model.cut_layer)
+        for i in range(0, cut_layer_idx):
+            weight_name = f"{self.model.layers[i]}.weight"
+            bias_name = f"{self.model.layers[i]}.bias"
+
+            if weight_name in current_weights:
+                current_weights[weight_name] = weights[weight_name]
+
+            if bias_name in current_weights:
+                current_weights[bias_name] = weights[bias_name]
+        self.load_weights(current_weights)
