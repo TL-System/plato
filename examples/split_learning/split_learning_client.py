@@ -53,7 +53,7 @@ class Client(simple.Client):
         # Preparing the client response
         report, payload = None, None
 
-        if info == "weights":
+        if info == "prompt":
             # Server prompts a new client to conduct split learning
             self.algorithm.load_context(self.client_id, self.trainset, self.sampler)
             report, payload = self._extract_features()

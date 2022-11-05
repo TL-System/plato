@@ -30,7 +30,7 @@ class Server(fedavg.Server):
         super().__init__(model, datasource, algorithm, trainer, callbacks)
         # Split learning clients interact with server sequentially
         assert Config().clients.per_round == 1
-        self.phase = "weights"
+        self.phase = "prompt"
         self.clients_list = []
         self.client_last = None
         self.next_client = True
@@ -52,9 +52,9 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload):
         """Wrap up generating the server payload with any additional information."""
-        if self.phase == "weights":
+        if self.phase == "prompt":
             # Split learning server doesn't send weights to client
-            return (None, "weights")
+            return (None, "prompt")
         else:
             # Send gradients back to client to complete the training
             return (self.gradients_to_send.pop(self.selected_client_id), "gradients")
@@ -94,7 +94,7 @@ class Server(fedavg.Server):
                     f"[{self}] Global model accuracy: {100 * self.test_accuracy:.2f}%\n"
                 )
             )
-            self.phase = "weights"
+            self.phase = "prompt"
             # Change client in next round
             self.next_client = True
 
