@@ -4,10 +4,10 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 import copy
-from .models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
 from plato.config import Config
 import logging
-from .misc.bigconfig import get_config
+from NASVIT.misc.bigconfig import get_config
 
 
 class Architect(nn.Module):
@@ -45,13 +45,9 @@ class Architect(nn.Module):
             betas=(0.5, 0.999),
             weight_decay=Config().parameters.architect.weight_decay,
         )
-        # self.optimizer=torch.optim.SGD(self.arch_parameters(),lr=0.5,momentum=0.9)
-        self.baseline = None  # 1.0 / Config().parameters.model.num_classes
+        self.baseline = None
         self.baseline_decay = Config().parameters.architect.baseline_decay
         self.device = Config().device()
-        # value net
-        if hasattr(Config().parameters.architect, "value_net"):
-            pass
 
     def step(self, epoch_acc, neg_ratio, epoch_index, client_id_list):
         rewards = self._compute_reward(epoch_acc, neg_ratio, client_id_list)
@@ -64,11 +60,9 @@ class Architect(nn.Module):
             )
         else:
             grad = self._compute_grad(self.alphas, rewards, epoch_index, client_id_list)
-        logging.info(str(grad[client_id_list[0] - 1][0]))
         self.alphas.grad.copy_(grad)
         self.optimizer.step()
         self.optimizer.zero_grad()
-        logging.info(str(self.alphas[client_id_list[0] - 1][0]))
 
     def _compute_grad(self, alphas, rewards, index_list, client_id_list):
         grad = torch.zeros(alphas.size())
@@ -238,7 +232,3 @@ class Architect(nn.Module):
                     index.append(candidate_list.index(candidate))
             epoch_index.append(index)
         return epoch_index
-
-
-if __name__ == "__main__":
-    arch = Architect()

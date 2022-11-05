@@ -1,19 +1,18 @@
 """
-Implement new algorithm: personalized federarted NAS
+Implement new algorithm: personalized federarted NAS.
 
-Search Space: https://github.com/facebookresearch/NASViT
+Reference Search Space: NASVIT: NEURAL ARCHITECTURE SEARCH FOR EFFICIENT VISION TRANSFORMERS WITH GRADIENT CONFLICT-AWARE SUPERNET TRAINING.
+
+The code: https://github.com/facebookresearch/NASViT.
 """
 
 import fednas_server
 import fednas_client
 import fednas_algorithm
+
 from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
 from NASVIT.architect import Architect
 import fednas_trainer
-
-# import torch
-
-# torch.multiprocessing.set_sharing_strategy("file_system")
 
 
 def main():

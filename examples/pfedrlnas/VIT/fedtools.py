@@ -1,7 +1,3 @@
-from array import array
-from NASVIT import models
-from plato.config import Config
-from NASVIT.misc.config import get_config
 from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
 import copy
 import logging
@@ -58,7 +54,6 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
             is_updates = torch.where(
                 is_updates == 0, torch.ones(is_updates.size()), is_updates
             )
-            # logging.info(is_updates)
             deltas = torch.div(deltas, is_updates)
             for idx, delta in enumerate(temp_delta):
                 if (
@@ -96,13 +91,3 @@ def fuse_weight(supernet, subnets, cfgs, num_samples):
     global_iter = supernet.named_parameters()
     neg_ratio = _average_fuse(global_iter, proxy_iters, num_samples)
     return neg_ratio
-
-
-if __name__ == "__main__":
-    for i in range(100):
-        supernet = AttentiveNasDynamicModel()
-        subnet, subnet_config = sample_subnet_wo_config(supernet)
-        current_subnet = subnet
-        payload = current_subnet.cpu().state_dict()
-        model = sample_subnet_w_config(AttentiveNasDynamicModel(), subnet_config, False)
-        model.load_state_dict(payload)
