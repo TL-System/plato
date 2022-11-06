@@ -19,17 +19,9 @@ server:
     do_test: false
     random_seed: 1
 
-    checkpoint_path: /data/dixi/plato/models/fednasvit/cifar10_noniid/
-    model_path: /data/dixi/plato/models/fednasvit/cifar10_noniid/
-    # checkpoint_path: ../plato_models/fednasvit/cifar10_noniid/
-    # model_path: ../plato_models/fednasvit/cifar10_noniid/
-
 data:
     # The training and testing dataset
     datasource:  CIFAR10
-
-    data_path: /data/dixi
-    # data_path: ../data/
 
     # Number of samples in each partition
     partition_size: 600
@@ -72,10 +64,6 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-    
-results:
-    result_path: /data/dixi/plato/results/fednasvit/cifar10_noniid/
-    # result_path: ../plato_results/fednasvit/cifar10_noniid/
 
 parameters:
     model:
@@ -113,5 +101,3 @@ parameters:
         learning_rate: 0.5
         weight_decay: 0
         baseline_decay: 0.9
-        # pretrain_path: /data/dixi/plato/pretrained/nasvit/checkpoint.pth
-        # pretrain_path: ../pretrained/ML_Models/nasvit/checkpoint.pth
