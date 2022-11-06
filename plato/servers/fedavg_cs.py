@@ -42,8 +42,6 @@ class Server(fedavg.Server):
             # before starting the first round of local aggregation
             self.new_global_round_begins = asyncio.Event()
 
-            edge_server_id = Config().args.id - Config().clients.total_clients
-
             # Compute the number of clients in each silo for edge servers
             self.total_clients = Config().get_total_clients_for_edge()
             self.clients_per_round = Config().get_clients_per_round_for_edge()
@@ -73,6 +71,8 @@ class Server(fedavg.Server):
                 "The central server starts training with %s edge servers.",
                 self.total_clients,
             )
+
+        self.result_file=None
 
     def configure(self) -> None:
         """
@@ -271,6 +271,14 @@ class Server(fedavg.Server):
         if Config().is_central_server():
             super().clients_processed()
 
+            #Save the results to csv
+            if self.result_file is None:
+                self.result_file = f"{Config().params['result_path']}/central_server_{os.getpid()}.csv"
+                with open(self.result_file, 'w') as f:
+                    f.write(','.join(self.get_logged_items().keys()) + "\n")
+            with open(self.result_file, 'a') as f:
+                f.write(','.join([str(v) for i, v in self.get_logged_items().items()]) + "\n")
+
         if Config().is_edge_server():
             logged_items = self.get_logged_items()
             self.edge_training_time += logged_items["round_time"]
@@ -288,6 +296,14 @@ class Server(fedavg.Server):
 
                 self.current_round = 0
                 self.current_global_round += 1
+
+            #Save the results to csv
+            if self.result_file is None:
+                self.result_file = f"{Config().params['result_path']}/edge_server_{self.trainer.client_id}_{os.getpid()}.csv"
+                with open(self.result_file, 'w') as f:
+                    f.write(','.join(self.get_logged_items().keys()) + "\n")
+            with open(self.result_file, 'a') as f:
+                f.write(','.join([str(v) for i, v in self.get_logged_items().items()]) + "\n")
 
     def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
