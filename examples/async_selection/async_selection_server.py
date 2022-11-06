@@ -123,7 +123,7 @@ class Server(fedavg.Server):
         """
         logging.info("Calculating selection probabitliy ... ")
         alpha = 1
-        BigA = 10
+        BigA = 1
         # extract info for clients in the pool
         clients_pool = [
             index - 1 for index in clients_pool
@@ -138,19 +138,27 @@ class Server(fedavg.Server):
         aggre_weight_square = np.square(aggregation_weights_inpool)  # p_i^2
         local_gradient_bound_square = np.square(local_gradient_bounds_inpool)  # G_i^2
 
-        f1_params = alpha * np.multiply(
-            aggre_weight_square, local_gradient_bound_square
+        f1_params = matrix(
+            alpha * np.multiply(aggre_weight_square, local_gradient_bound_square)
         )  # p_i^2 * G_i^2
-        f1 = matrix(np.eye(num_of_clients_inpool) * f1_params)
 
-        f2_params = BigA * np.multiply(
-            local_staleness_inpool, local_gradient_bounds_inpool
-        )  # \tau_i * G_i
-        f2 = matrix(-1 * np.eye(num_of_clients_inpool) * f2_params)
+        # f1 = matrix(np.eye(num_of_clients_inpool) * f1_params)
+        f2_temp = np.multiply(local_staleness_inpool, local_gradient_bounds_inpool)
+        f2_params = matrix(
+            BigA * np.multiply(aggre_weight_square, f2_temp)
+        )  # \tau_i * G_i #没加p_i^2
 
+        # f2 = matrix(-1 * np.eye(num_of_clients_inpool) * f2_params)
+
+        # F = sparse([[f1, f2]])
+
+        # g = log(matrix(np.ones(2 * num_of_clients_inpool)))
+
+        f1 = matrix(-1 * np.eye(num_of_clients_inpool))
+        f2 = matrix(np.eye(num_of_clients_inpool))
         F = sparse([[f1, f2]])
 
-        g = log(matrix(np.ones(2 * num_of_clients_inpool)))
+        g = log(matrix(sparse([[f1_params, f2_params]])))
 
         K = [2 * num_of_clients_inpool]
         G = matrix(-1 * np.eye(num_of_clients_inpool))  # None
