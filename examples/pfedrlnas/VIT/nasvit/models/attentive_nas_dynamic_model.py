@@ -55,6 +55,7 @@ class AttentiveNasDynamicModel(MyNetwork):
         bn_param = (bn_momentum, bn_eps)
 
         self.supernet = supernet
+        self.n_classes = n_classes
         self.init_cfg_candidates()
 
         # first conv layer, including conv, bn, act

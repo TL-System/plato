@@ -7,10 +7,10 @@ from plato.trainers import basic
 from plato.config import Config
 
 
-if Config().trainer.type == "basic":
-    BasicTrainer = basic.Trainer
-else:
+if Config().trainer.lr_scheduler == "timm":
     BasicTrainer = basic.TrainerWithTimmScheduler
+else:
+    BasicTrainer = basic.Trainer
 
 
 class Trainer(BasicTrainer):
