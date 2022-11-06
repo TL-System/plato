@@ -10,8 +10,8 @@ from torch import nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from NASVIT.misc.bigconfig import get_config
-from NASVIT.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+from nasvit.misc.bigconfig import get_config
+from nasvit.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
 
 from plato.config import Config
 
