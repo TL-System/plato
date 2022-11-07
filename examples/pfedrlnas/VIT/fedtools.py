@@ -31,7 +31,7 @@ def sample_subnet_wo_config(supernet):
 
 def sample_subnet_w_config(supernet, cfg, preserver_weight=True):
     """Sample a subnet of with given ViT structure."""
-    set_active_subnet(supernet,cfg)
+    set_active_subnet(supernet, cfg)
     subnet = supernet.get_active_subnet(preserve_weight=preserver_weight)
     return subnet
 
@@ -40,6 +40,8 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
     # pylint: disable=too-many-locals
     weight_numbers = np.zeros(len(client_iters))
     neg_numebers = np.zeros(len(client_iters))
+    total_samples = sum(num_samples)
+
     try:
         while True:
             global_name, global_param = next(global_iter)
@@ -51,22 +53,16 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
             deltas = torch.zeros(baseline.size())
             weight_numbers += 1
             temp_delta = []
-            is_updates = torch.zeros(deltas.size())
+            is_update = torch.zeros(deltas.size())
             for idx, client_iter in enumerate(client_iters):
                 _, client_param = next(client_iter)
                 delta = client_param.data - baseline
-                is_update = torch.where(
-                    client_param.data == baseline,
-                    torch.zeros(delta.size()),
-                    torch.ones(delta.size()),
-                )
-                deltas += delta * num_samples[idx] * is_update
+                is_update = torch.ones(is_update.size()) - (
+                    torch.abs(delta) < 1e-8
+                ).type(dtype=is_update.dtype)
+                deltas += delta * num_samples[idx] / total_samples * is_update
                 temp_delta.append(copy.deepcopy(delta))
-                is_updates += is_update * num_samples[idx]
-            is_updates = torch.where(
-                is_updates == 0, torch.ones(is_updates.size()), is_updates
-            )
-            deltas = torch.div(deltas, is_updates)
+            global_param.data += deltas
             for idx, delta in enumerate(temp_delta):
                 if (
                     torch.cosine_similarity(
@@ -75,7 +71,6 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
                     < 0
                 ):
                     neg_numebers[idx] += 1
-            global_param.data += deltas
     except StopIteration:
         pass
     neg_ratio = np.divide(neg_numebers, weight_numbers)
