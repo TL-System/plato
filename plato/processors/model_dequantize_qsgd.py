@@ -26,7 +26,7 @@ from plato.processors import model
 
 class Processor(model.Processor):
     """
-    Implements a Processor for decompressing of model parameters.
+    Implements a Processor to dequantize model parameters quantized with QSGD.
     """
 
     def __init__(self, quantization_level=64, **kwargs) -> None:
@@ -64,7 +64,7 @@ class Processor(model.Processor):
         """Decompress and dequantize each individual layer of the model"""
 
         # Step 1: decompress the header
-        tuning_param = self.quantization_level - 1  # quantization level
+        tuning_param = self.quantization_level - 1
         max_v = unpack("!f", layer[0:4])[0]
         numel = unpack("!I", layer[4:8])[0]
         dimensions = unpack("!h", layer[8:10])[0]

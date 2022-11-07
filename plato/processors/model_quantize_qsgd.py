@@ -26,7 +26,7 @@ from plato.processors import model
 
 class Processor(model.Processor):
     """
-    Implements a Processor for compressing of model parameters.
+    Implements a Processor to quantize model parameters with QSGD.
     """
 
     def __init__(self, quantization_level=64, **kwargs) -> None:
@@ -35,7 +35,7 @@ class Processor(model.Processor):
         self.quantization_level = quantization_level  # must <= 128!
 
     def process(self, data: Any) -> Any:
-        """Implements a Processor for compressing model parameters."""
+        """Implements a Processor for quantizing model parameters."""
 
         data_size_old = sys.getsizeof(pickle.dumps(data))
         output = super().process(data)
@@ -45,7 +45,7 @@ class Processor(model.Processor):
             logging.info("[Server #%d] Quantized model parameters.", self.server_id)
         else:
             logging.info(
-                "[Client #%d] Quantized and compressed upload model parameters.",
+                "[Client #%d] Quantized and compressed updated model parameters.",
                 self.client_id,
             )
             logging.info(
