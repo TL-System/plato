@@ -119,7 +119,9 @@ class Client:
                 else Config().clients.per_round
             )
             # Contact one of the edge servers
-            self.edge_server_id = Config().clients.total_clients + Config().get_edge_id_for_client()
+            self.edge_server_id = (
+                Config().clients.total_clients + Config().get_edge_id_for_client()
+            )
 
             logging.info(
                 "[Client #%d] Contacting Edge Server #%d.",

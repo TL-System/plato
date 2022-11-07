@@ -266,9 +266,9 @@ class Server:
 
         if Config().is_central_server():
 
-            #start the edge servers as clients of the central server
-            #Once all edge servers are live, clients will be initialized in the 
-            #training_will_start() event call of the central server
+            # start the edge servers as clients of the central server
+            # Once all edge servers are live, clients will be initialized in the
+            # training_will_start() event call of the central server
             Server._start_clients(
                 as_server=True,
                 client=self.client,
@@ -284,7 +284,7 @@ class Server:
                 random.seed(seed)
                 self.prng_state = random.getstate()
             self.start()
-            
+
         else:
             if self.disable_clients:
                 logging.info("No clients are launched (server:disable_clients = true)")
