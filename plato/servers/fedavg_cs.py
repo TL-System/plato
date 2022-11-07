@@ -107,7 +107,7 @@ class Server(fedavg.Server):
                 hasattr(Config().server, "edge_do_test")
                 and Config().server.edge_do_test
             ):
-                self.datasource = datasources_registry.get(client_id=Config().args.id)
+                self.datasource = datasources_registry.get(client_id=0)
                 self.testset = self.datasource.get_test_set()
 
                 if hasattr(Config().data, "testset_sampler"):
