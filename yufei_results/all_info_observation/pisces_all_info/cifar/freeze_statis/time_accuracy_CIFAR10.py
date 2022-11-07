@@ -119,7 +119,7 @@ def main():
     result_csv_file2 = "./pisces_freeze_statis.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./pisces_freezeboth_96.csv"
+    result_csv_file3 = "./pisces_freeze_both_150.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
     result_csv_file4 = "./async_freeze_both.csv"  # ./async_cifar.csv"
