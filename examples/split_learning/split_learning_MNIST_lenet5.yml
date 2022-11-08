@@ -71,4 +71,5 @@ parameters:
         momentum: 0.9
         weight_decay: 0.0
 
-results: round, accuracy
+results: 
+    types: round, accuracy, elapsed_time, comm_overhead
