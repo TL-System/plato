@@ -59,7 +59,7 @@ class Trainer(basic.Trainer):
         return trainset
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform the forward and backward passes of the training loop.
+        """Perform forward and backward passes in the training loop.
 
         Arguments:
         config: the configuration.
@@ -70,17 +70,17 @@ class Trainer(basic.Trainer):
         """
         if self.client_id == 0:
             return self._server_train_loop(config, examples, labels)
-        else:
-            return self._client_train_loop(examples)
+
+        return self._client_train_loop(examples)
 
     def train_run_end(self, config):
-        """Aditional tasks after training."""
+        """Additional tasks after training."""
         if self.client_id == 0:
             # Server needs to save gradients, clients not
             self.save_gradients(config)
 
     def get_optimizer(self, model):
-        """Return the optimizer used last round to avoid reconfiguration."""
+        """Return the optimizer used in the last round to avoid reconfiguration."""
         if self.last_optimizer is None or self.last_client_id != self.client_id:
             self.last_optimizer = super().get_optimizer(model)
             self.last_client_id = self.client_id

@@ -94,10 +94,11 @@ class Client(simple.Client):
                 # Continue feature extraction
                 report, payload = self._extract_features()
                 report.training_time += training_time
+
         return report, payload
 
     def _save_context(self, client_id):
-        """Saving the extracted weights and data sampler for a given client."""
+        """Saving the extracted weights and the data sampler for a given client."""
         # Sampler needs to be saved otherwise same data samples will be selected every round
         self.contexts[client_id] = (
             self.algorithm.extract_weights(),
