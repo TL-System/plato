@@ -61,7 +61,9 @@ class Server(fedavg.Server):
             # Send gradients back to client to complete the training
             return (self.trainer.get_gradients(), "gradients")
 
+    # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Aggregate weight updates from the clients or train the model."""
         update = updates[0]
         report = update.report
         if report.type == "features":
@@ -80,14 +82,16 @@ class Server(fedavg.Server):
             # The weights after cut layer are not trained by clients
             self.algorithm.update_weights_before_cut(weights)
 
-            # Manually Set up the testset since do_test is turned off in config
+            # Manually set up the testset since do_test is turned off in config
             if self.datasource is None:
                 self.datasource = datasources_registry.get(client_id=0)
                 self.testset = self.datasource.get_test_set()
                 self.testset_sampler = all_inclusive.Sampler(
                     self.datasource, testing=True
                 )
+
             self.test_accuracy = self.trainer.test(self.testset, self.testset_sampler)
+
             logging.warning(
                 fonts.colourize(
                     f"[{self}] Global model accuracy: {100 * self.test_accuracy:.2f}%\n"

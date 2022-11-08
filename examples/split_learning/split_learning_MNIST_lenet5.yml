@@ -28,7 +28,7 @@ data:
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 10000
+    partition_size: 12000
 
     # Fixed random seed
     random_seed: 1

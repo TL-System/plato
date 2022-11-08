@@ -8,7 +8,7 @@ Raw Patient Data," in Proc. AI for Social Good Workshop, affiliated with ICLR 20
 
 https://arxiv.org/pdf/1812.00564.pdf
 
-Chopra, Ayush, et al. "AdaSplit: Adaptive Trade-offs for Resource-constrained Distributed 
+Chopra, Ayush, et al. "AdaSplit: Adaptive Trade-offs for Resource-Constrained Distributed
 Deep Learning." arXiv preprint arXiv:2112.01637 (2021).
 
 https://arxiv.org/pdf/2112.01637.pdf
@@ -86,9 +86,10 @@ class Algorithm(fedavg.Algorithm):
         )
 
     def update_weights_before_cut(self, weights):
-        # Update the weights before cut layer, called when testing accuracy
+        """Update the weights before cut layer, called when testing accuracy."""
         current_weights = self.extract_weights()
         cut_layer_idx = self.model.layers.index(self.model.cut_layer)
+
         for i in range(0, cut_layer_idx):
             weight_name = f"{self.model.layers[i]}.weight"
             bias_name = f"{self.model.layers[i]}.bias"
@@ -98,4 +99,5 @@ class Algorithm(fedavg.Algorithm):
 
             if bias_name in current_weights:
                 current_weights[bias_name] = weights[bias_name]
+
         self.load_weights(current_weights)

@@ -69,9 +69,9 @@ class Trainer(basic.Trainer):
         Returns: loss values after the current batch has been processed.
         """
         if self.client_id == 0:
-            return self.server_train_loop(config, examples, labels)
+            return self._server_train_loop(config, examples, labels)
         else:
-            return self.client_train_loop(examples)
+            return self._client_train_loop(examples)
 
     def train_run_end(self, config):
         """Aditional tasks after training."""
@@ -87,11 +87,10 @@ class Trainer(basic.Trainer):
 
         return self.last_optimizer
 
-    """Client side functions"""
-
     def get_train_samples(self, batch_size, trainset, sampler):
-        """Get a batch of training samples to extract feature,
-        trainer has to save these samples to complete training later.
+        """
+        Get a batch of training samples to extract feature, the trainer has to save these
+        samples to complete training later.
         """
         data_loader = torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -111,7 +110,7 @@ class Trainer(basic.Trainer):
         """Load the gradients which will be used to complete client training."""
         self.gradients = gradients
 
-    def client_train_loop(self, examples):
+    def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
         self.optimizer.zero_grad()
         outputs = self.model.forward_to(examples)
@@ -125,10 +124,8 @@ class Trainer(basic.Trainer):
         self._loss_tracker.update(loss, examples.size(0))
         return loss
 
-    """Server side functions"""
-
-    def server_train_loop(self, config, examples, labels):
-
+    def _server_train_loop(self, config, examples, labels):
+        """The training loop on the server."""
         examples = examples.detach().requires_grad_(True)
 
         loss = super().perform_forward_and_backward_passes(config, examples, labels)
