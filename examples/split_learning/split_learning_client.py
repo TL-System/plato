@@ -8,7 +8,7 @@ Raw Patient Data," in Proc. AI for Social Good Workshop, affiliated with ICLR 20
 
 https://arxiv.org/pdf/1812.00564.pdf
 
-Chopra, Ayush, et al. "AdaSplit: Adaptive Trade-offs for Resource-constrained Distributed 
+Chopra, Ayush, et al. "AdaSplit: Adaptive Trade-offs for Resource-constrained Distributed
 Deep Learning." arXiv preprint arXiv:2112.01637 (2021).
 
 https://arxiv.org/pdf/2112.01637.pdf
