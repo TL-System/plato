@@ -49,7 +49,7 @@ class Architect(nn.Module):
             betas=(0.5, 0.999),
             weight_decay=Config().parameters.architect.weight_decay,
         )
-        self.baseline = None
+        self.baseline = {}
         self.baseline_decay = Config().parameters.architect.baseline_decay
         self.device = Config().device()
 
@@ -116,14 +116,21 @@ class Architect(nn.Module):
             reward = reward - value
             return reward.detach().cpu()
 
-        if self.baseline is None:
-            self.baseline = np.mean(accuracy) - 0 * np.mean(neg_ratio)
-        reward = accuracy - self.baseline - 0 * neg_ratio
+        def _add_accuracy_into_baseline(self, accuracy_list, client_id_list):
+            for client_id, accuracy in zip(client_id_list, accuracy_list):
+                self.baseline[client_id] = accuracy
+
+        if not self.baseline:
+            _add_accuracy_into_baseline(self, accuracy_list, client_id_list)
+            # self.baseline = np.mean(accuracy)
+        avg_accuracy = np.mean(np.array([item[1] for item in self.baseline.items()]))
+        reward = accuracy - avg_accuracy - 0 * neg_ratio
+        _add_accuracy_into_baseline(self, accuracy_list, client_id_list)
         logging.info("reward: %s", str(reward))
-        self.baseline = (
-            self.baseline_decay * np.mean(accuracy)
-            + (1 - self.baseline_decay) * self.baseline
-        )
+        # self.baseline = (
+        #     self.baseline_decay * np.mean(accuracy)
+        #     + (1 - self.baseline_decay) * self.baseline
+        # )
         return reward
 
     def _compute_grad_natural(self, alphas, rewards, index_list, client_id_list):
