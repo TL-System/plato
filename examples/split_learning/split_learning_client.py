@@ -47,6 +47,10 @@ class Client(simple.Client):
         self.iterations = Config().clients.iteration
         self.iter_left = Config().clients.iteration
 
+        # Sampler cannot be reconfigured otherwise same training samples
+        # will be selected every round
+        self.static_sampler = None
+
     async def inbound_processed(self, processed_inbound_payload):
         """Extract features or complete the training using split learning."""
         server_payload, info = processed_inbound_payload
@@ -57,7 +61,6 @@ class Client(simple.Client):
         if info == "prompt":
             # Server prompts a new client to conduct split learning
             self._load_context(self.client_id)
-            self.algorithm.load_data(self.trainset, self.sampler)
             report, payload = self._extract_features()
         elif info == "gradients":
             # server sends the gradients of the features, i.e., complete training
@@ -66,7 +69,9 @@ class Client(simple.Client):
             self.iter_left -= 1
 
             if self.iter_left == 0:
-                logging.warning("[%s] Finished training, sending weights to the server.", self)
+                logging.warning(
+                    "[%s] Finished training, sending weights to the server.", self
+                )
                 # Save the state of current client
                 self._save_context(self.client_id)
                 # Send weights to server for evaluation
@@ -87,17 +92,24 @@ class Client(simple.Client):
         return report, payload
 
     def _save_context(self, client_id):
-        """Saving the extracted weights for a given client."""
-        self.contexts[client_id] = self.algorithm.extract_weights()
+        """Saving the extracted weights and data sampler for a given client."""
+        # Sampler needs to be saved otherwise same data samples will be selected every round
+        self.contexts[client_id] = (
+            self.algorithm.extract_weights(),
+            self.static_sampler,
+        )
 
     def _load_context(self, client_id):
-        """Load client's model weights."""
+        """Load client's model weights and the sampler from last selected round."""
         if not client_id in self.contexts:
             if self.original_weights is None:
                 self.original_weights = self.algorithm.extract_weights()
             self.algorithm.load_weights(self.original_weights)
+            self.static_sampler = self.sampler.get()
         else:
-            self.algorithm.load_weights(self.contexts.pop(client_id))
+            weights, sampler = self.contexts.pop(client_id)
+            self.algorithm.load_weights(weights)
+            self.static_sampler = sampler
 
     def _extract_features(self):
         """Extract the feature till the cut layer."""
@@ -109,7 +121,9 @@ class Client(simple.Client):
             )
         )
 
-        features, training_time = self.algorithm.extract_features()
+        features, training_time = self.algorithm.extract_features(
+            self.trainset, self.static_sampler
+        )
         report = SimpleNamespace(
             num_samples=self.sampler.num_samples(),
             accuracy=0,
@@ -122,8 +136,6 @@ class Client(simple.Client):
 
     def _complete_training(self, payload):
         """Complete the training based on the gradients from server."""
-        self.algorithm.receive_gradients(payload)
-        # Perform a complete training with gradients received
-        training_time = self.algorithm.complete_train()
+        training_time = self.algorithm.complete_train(payload)
         weights = self.algorithm.extract_weights()
         return training_time, weights
