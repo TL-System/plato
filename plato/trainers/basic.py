@@ -163,7 +163,7 @@ class Trainer(base.Trainer):
             self.save_model(filename)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform the forward and backward passes of the training loop.
+        """Perform forward and backward passes in the training loop.
 
         Arguments:
         config: the configuration.
