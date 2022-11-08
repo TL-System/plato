@@ -11,7 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Split learning iterations for each round
+    # Split learning iterations for each client
     iteration: 20
 
 server:
@@ -28,7 +28,7 @@ data:
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 60000
+    partition_size: 10000
 
     # Fixed random seed
     random_seed: 1
@@ -42,9 +42,6 @@ trainer:
 
     # The maximum number of training rounds
     rounds: 50000
-
-    # The maximum number of clients running concurrently
-    max_concurrency: 1
 
     # The target accuracy
     target_accuracy: 0.95
@@ -67,7 +64,7 @@ algorithm:
 parameters:
     model:
         num_classes: 10
-        cut_layer: relu3
+        cut_layer: relu2
 
     optimizer:
         lr: 0.01
