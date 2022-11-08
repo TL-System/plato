@@ -10,9 +10,7 @@ https://arxiv.org/pdf/1812.00564.pdf
 """
 
 import logging
-import os
 
-import torch
 from plato.config import Config
 from plato.datasources import feature
 from plato.samplers import all_inclusive
@@ -34,7 +32,6 @@ class Server(fedavg.Server):
         self.clients_list = []
         self.client_last = None
         self.next_client = True
-        self.gradients_to_send = {}
         self.test_accuracy = 0.0
 
     def choose_clients(self, clients_pool, clients_count):
@@ -57,7 +54,7 @@ class Server(fedavg.Server):
             return (None, "prompt")
         else:
             # Send gradients back to client to complete the training
-            return (self.gradients_to_send.pop(self.selected_client_id), "gradients")
+            return (self.trainer.get_gradients(), "gradients")
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         update = updates[0]
@@ -70,10 +67,7 @@ class Server(fedavg.Server):
             sampler = all_inclusive.Sampler(feature_dataset)
             self.algorithm.train(feature_dataset, sampler)
 
-            # Compute the gradients and get ready to be sent
-            self.gradients_to_send[update.client_id] = self._load_gradients()
             self.phase = "gradient"
-
         elif report.type == "weights":
             logging.warning("[%s] Weights received, start testing accuracy.", self)
             weights = update.payload
@@ -100,18 +94,6 @@ class Server(fedavg.Server):
 
         updated_weights = self.algorithm.extract_weights()
         return updated_weights
-
-    def _load_gradients(self):
-        """Loading gradients from a file."""
-        model_path = Config().params["model_path"]
-        model_name = Config().trainer.model_name
-
-        model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
-        logging.info(
-            "[Server #%d] Loading gradients from %s.", os.getpid(), model_gradients_path
-        )
-
-        return torch.load(model_gradients_path)
 
     def get_logged_items(self):
         """Overwrite the logged accuracy by latest test accuracy."""
