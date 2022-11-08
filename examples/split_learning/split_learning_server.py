@@ -104,8 +104,6 @@ class Server(fedavg.Server):
         updated_weights = self.algorithm.extract_weights()
         return updated_weights
 
-    def get_logged_items(self):
-        """Overwrite the logged accuracy by latest test accuracy."""
-        logged_items = super().get_logged_items()
-        logged_items["accuracy"] = self.test_accuracy
-        return logged_items
+    def clients_processed(self):
+        # Replace the default accuracy by manually tested accuracy
+        self.accuracy = self.test_accuracy
