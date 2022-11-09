@@ -108,7 +108,9 @@ A list of processors for the client to apply on the payload before sending it ou
 
 - `model_randomized_response` Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
 
-- `model_quantize` Quantize features for model parameters for PyTorch.
+- `model_quantize` Quantize model parameters for PyTorch.
+
+- `model_quantize_qsgd` Quantize model parameters for PyTorch with QSGD.
 
 - `unstructured_pruning` Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
@@ -231,7 +233,9 @@ A list of processors to apply on the payload right after receiving. Multiple pro
 
 - `feature_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
 
-- `model_dequantize`: Dequantize features for PyTorch model parameters.
+- `model_dequantize`: Dequantize PyTorch model parameters back to the 32-bit floating number format.
+
+- `model_dequantize_qsgd`: Dequantize PyTorch model parameters quantized with QSGD.
 ```
 
 ```{admonition} downlink_bandwidth
