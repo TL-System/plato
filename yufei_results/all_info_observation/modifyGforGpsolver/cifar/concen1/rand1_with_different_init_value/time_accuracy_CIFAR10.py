@@ -84,7 +84,7 @@ def plot(
         linewidth=1.5,
         linestyle="-.",
         # marker='v',
-        label="Async_G_s_1",
+        label="Async_G_localnum",
     )
     ax.plot(
         x_value3,
@@ -105,6 +105,7 @@ def plot(
         # marker='s',
         label="Async_G_Squared0.01",
     )
+    """
     ax.plot(
         x_value5,
         y_value5,
@@ -114,6 +115,7 @@ def plot(
         # marker='s',
         label="Async_G_Squared0.5",
     )
+    
     ax.plot(
         x_value6,
         y_value6,
@@ -123,6 +125,7 @@ def plot(
         # marker='s',
         label="Async_G_Squared0.3",
     )
+    """
 
     ax.legend(loc="lower right")
     ax.set(xlabel=x_label, ylabel=y_label)
@@ -140,10 +143,10 @@ def main():
     result_csv_file1 = "./pisces_cifar_zipf.csv"  #'./fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = "./async_G_s_init1.csv"
+    result_csv_file2 = "./async_localnum.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./async_G_pointSeven.csv"
+    result_csv_file3 = "./async_g_s_localnum_stale.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
     result_csv_file4 = "./async_squared_G.csv"  # ./async_cifar.csv"
@@ -173,7 +176,7 @@ def main():
     y_value5 = result_dict5[y_item]
     y_value6 = result_dict6[y_item]
 
-    figure_file_name = "./cifar10_rand1_concen1_zipf_G_s_inits.pdf"
+    figure_file_name = "./cifar10_rand1_concen1_zipf_G_s_localunm.pdf"
 
     plot(
         x_label,

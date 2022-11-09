@@ -86,8 +86,9 @@ def plot(
         linewidth=1.5,
         linestyle="-.",
         # marker='v',
-        label="async_localnum",  # async_G_s_femnist_0.3",
+        label="async_stale",  # async_G_s_femnist_0.3",
     )
+    """
     ax.plot(
         x_value3,
         y_value3,
@@ -97,7 +98,7 @@ def plot(
         # marker='s',
         label="Async_G_s_pointSeven",
     )
-    """
+    
     ax.plot(
         x_value4,
         y_value4,
@@ -107,7 +108,7 @@ def plot(
         # marker='s',
         label="async_G_femnist1",
     )
-    """
+    
     ax.plot(
         x_value5,
         y_value5,
@@ -117,7 +118,7 @@ def plot(
         # marker='s',
         label="async_G_0.01",
     )
-    """
+    
     ax.plot(
         x_value6,
         y_value6,
@@ -153,7 +154,7 @@ def main():
     result_csv_file1 = "./pisces_femnist.csv"  #'./fedavg_rand1.csv'
     result_dict1 = read_csv_to_dict(result_csv_file1, x_item, y_item)
 
-    result_csv_file2 = "async_localnum.csv"  # "./async_G_s_point3.csv"
+    result_csv_file2 = "async_stale.csv"  # "./async_G_s_point3.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
     result_csv_file3 = "./async_G_s_pointSeven.csv"
