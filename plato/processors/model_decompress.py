@@ -12,7 +12,7 @@ from plato.processors import model
 
 class Processor(model.Processor):
     """
-    Implements a Processor for decompressing of model parameters.
+    Implements a Processor for decompressing model parameters.
     """
 
     def __init__(self, **kwargs) -> None:

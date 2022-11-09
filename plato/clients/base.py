@@ -4,13 +4,13 @@ The base class for all federated learning clients on edge devices or edge server
 
 import asyncio
 import logging
-import math
 import os
 import pickle
 import re
 import sys
 import uuid
 from abc import abstractmethod
+import numpy as np
 
 import socketio
 from plato.callbacks.handler import CallbackHandler
@@ -106,20 +106,10 @@ class Client:
 
     async def start_client(self) -> None:
         """Startup function for a client."""
-
         if hasattr(Config().algorithm, "cross_silo") and not Config().is_edge_server():
-            launched_client_num = (
-                min(
-                    Config().trainer.max_concurrency
-                    * max(1, Config().gpu_count())
-                    * Config().algorithm.total_silos,
-                    Config().clients.per_round,
-                )
-                if hasattr(Config().trainer, "max_concurrency")
-                else Config().clients.per_round
-            )
             # Contact one of the edge servers
-            self.edge_server_id = Config().clients.total_clients + Config().get_edge_id_for_client()
+
+            self.edge_server_id = self.get_edge_server_id()
 
             logging.info(
                 "[Client #%d] Contacting Edge Server #%d.",
@@ -157,6 +147,32 @@ class Client:
 
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
+
+    def get_edge_server_id(self):
+        """Returns the edge server id of the client in cross-silo FL."""
+        launched_client_num = (
+            min(
+                Config().trainer.max_concurrency
+                * max(1, Config().gpu_count())
+                * Config().algorithm.total_silos,
+                Config().clients.per_round,
+            )
+            if hasattr(Config().trainer, "max_concurrency")
+            else Config().clients.per_round
+        )
+
+        edges_launched_clients = [
+            len(i)
+            for i in np.array_split(
+                np.arange(launched_client_num), Config().algorithm.total_silos
+            )
+        ]
+
+        total = 0
+        for i, count in enumerate(edges_launched_clients):
+            total += count
+            if self.client_id <= total:
+                return i + 1 + Config().clients.total_clients
 
     async def _payload_to_arrive(self, response) -> None:
         """Upon receiving a response from the server."""
