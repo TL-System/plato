@@ -14,11 +14,8 @@ Advances in neural information processing systems.
 https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
 
-import logging
 from typing import Any
-import pickle
 from struct import unpack
-import sys
 import torch
 
 from plato.processors import model
@@ -34,34 +31,8 @@ class Processor(model.Processor):
 
         self.quantization_level = quantization_level  # must <= 128!
 
-    def process(self, data: Any) -> Any:
-        """Implements a Processor for decompressing model parameters."""
-
-        data_size_old = sys.getsizeof(pickle.dumps(data))
-        output = super().process(data)
-        data_size_new = sys.getsizeof(pickle.dumps(output))
-
-        if self.client_id is None:
-            logging.info(
-                "[Server #%d] Dequantized and decompressed received upload model parameters.",
-                self.server_id,
-            )
-            logging.info(
-                "[Server #%d] Quantization level: %d, received payload data size is %.2f MB,"
-                "dequantized size is %.2f MB(simulated).",
-                self.server_id,
-                self.quantization_level,
-                data_size_old / 1024**2,
-                data_size_new / 1024**2,
-            )
-        else:
-            logging.info(
-                "[Client #%d] Dequantized received model parameters.", self.client_id
-            )
-        return output
-
     def _process_layer(self, layer: Any) -> Any:
-        """Decompress and dequantize each individual layer of the model."""
+        """Dequantizes each individual layer of the model."""
 
         # Step 1: decompress the header
         tuning_param = self.quantization_level - 1

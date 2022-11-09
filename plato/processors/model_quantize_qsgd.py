@@ -13,10 +13,8 @@ Advances in neural information processing systems.
 
 https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
-import logging
-import pickle
+
 from typing import Any
-import sys
 import random
 from struct import pack, unpack
 import torch
@@ -34,36 +32,11 @@ class Processor(model.Processor):
 
         self.quantization_level = quantization_level  # must <= 128!
 
-    def process(self, data: Any) -> Any:
-        """Implements a Processor for quantizing model parameters."""
-
-        data_size_old = sys.getsizeof(pickle.dumps(data))
-        output = super().process(data)
-        data_size_new = sys.getsizeof(pickle.dumps(output))
-
-        if self.client_id is None:
-            logging.info("[Server #%d] Quantized model parameters.", self.server_id)
-        else:
-            logging.info(
-                "[Client #%d] Quantized and compressed updated model parameters.",
-                self.client_id,
-            )
-            logging.info(
-                "[Client #%d] Quantization level: %d, original payload data size is %.2f MB,"
-                "quantized size is %.2f MB (simulated).",
-                self.client_id,
-                self.quantization_level,
-                data_size_old / 1024**2,
-                data_size_new / 1024**2,
-            )
-
-        return output
-
     def _process_layer(self, layer: Any) -> Any:
-        """Quantize and compress each individual layer of the model."""
+        """Quantizes each individual layer of the model with QSGD."""
 
         def add_prob(prob: Any) -> Any:
-            """Add 1 to the corresponding positions with given probability."""
+            """Adds 1 to the corresponding positions with given probability."""
             size = prob.size()
             prob = prob.reshape(-1)
             random.seed()
