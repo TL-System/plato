@@ -178,7 +178,7 @@ class Server:
         return f"Server #{os.getpid()}"
 
     def configure(self) -> None:
-        """Initializing configuration settings based on the configuration file."""
+        """Initializes configuration settings based on the configuration file."""
         logging.info("[Server #%d] Configuring the server...", os.getpid())
 
         # Ping interval and timeout setup for the server
@@ -257,7 +257,7 @@ class Server:
             self.uplink_bandwidth = self.uplink_bandwidth / self.clients_per_round
 
     def run(self, client=None, edge_server=None, edge_client=None, trainer=None):
-        """Start a run loop for the server."""
+        """Starts a run loop for the server."""
         self.client = client
         self.configure()
 
@@ -265,8 +265,9 @@ class Server:
             self._resume_from_checkpoint()
 
         if Config().is_central_server():
-            # In cross-silo FL, the central server lets edge servers start first
-            # Then starts their clients
+            # Start the edge servers as clients of the central server first
+            # Once all edge servers are live, clients will be initialized in the
+            # training_will_start() event call of the central server
             Server._start_clients(
                 as_server=True,
                 client=self.client,
@@ -275,26 +276,32 @@ class Server:
                 trainer=trainer,
             )
 
-            # Allowing some time for the edge servers to start
-            time.sleep(5)
+            asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
+            if hasattr(Config().server, "random_seed"):
+                seed = Config().server.random_seed
+                logging.info("Setting the random seed for selecting clients: %s", seed)
+                random.seed(seed)
+                self.prng_state = random.getstate()
+            self.start()
 
-        if self.disable_clients:
-            logging.info("No clients are launched (server:disable_clients = true)")
         else:
-            Server._start_clients(client=self.client)
+            if self.disable_clients:
+                logging.info("No clients are launched (server:disable_clients = true)")
+            else:
+                Server._start_clients(client=self.client)
 
-        asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
+            asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
 
-        if hasattr(Config().server, "random_seed"):
-            seed = Config().server.random_seed
-            logging.info("Setting the random seed for selecting clients: %s", seed)
-            random.seed(seed)
-            self.prng_state = random.getstate()
+            if hasattr(Config().server, "random_seed"):
+                seed = Config().server.random_seed
+                logging.info("Setting the random seed for selecting clients: %s", seed)
+                random.seed(seed)
+                self.prng_state = random.getstate()
 
-        self.start()
+            self.start()
 
     def start(self, port=Config().server.port):
-        """Start running the socket.io server."""
+        """Starts running the socket.io server."""
         logging.info(
             "Starting a server at address %s and port %s.",
             Config().server.address,
@@ -318,7 +325,7 @@ class Server:
         )
 
     async def register_client(self, sid, client_id):
-        """Adding a newly arrived client to the list of clients."""
+        """Adds a newly arrived client to the list of clients."""
         if not client_id in self.clients:
             # The last contact time is stored for each client
             self.clients[client_id] = {
@@ -355,7 +362,7 @@ class Server:
     def _start_clients(
         client=None, as_server=False, edge_server=None, edge_client=None, trainer=None
     ):
-        """Starting all the clients as separate processes."""
+        """Starts all the clients as separate processes."""
         starting_id = 1
 
         # We only need to launch the number of clients necessary for concurrent training
@@ -407,13 +414,13 @@ class Server:
                 proc.start()
 
     async def _close_connections(self):
-        """Closing all socket.io connections after training completes."""
+        """Closes all socket.io connections after training completes."""
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
             await self.sio.emit("disconnect", room=client["sid"])
 
     async def _select_clients(self, for_next_batch=False):
-        """Select a subset of the clients and send messages to them to start training."""
+        """Selects a subset of the clients and send messages to them to start training."""
         if not for_next_batch:
             self.updates = []
             self.current_round += 1
@@ -549,7 +556,7 @@ class Server:
 
                 if self.asynchronous_mode and self.simulate_wall_time:
 
-                    # skip if this sid is currently `training' with reporting clients
+                    # Skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
                     while sid in self.training_sids or sid in self.selected_sids:
                         client_id = client_id % self.clients_per_round + 1
@@ -624,13 +631,13 @@ class Server:
                         (self.downlink_bandwidth / 8) / len(self.selected_clients)
                     )
 
-                # Sending the server response as metadata to the clients (payload to follow)
+                # Send the server response as metadata to the clients (payload to follow)
                 await self.sio.emit(
                     "payload_to_arrive", {"response": server_response}, room=sid
                 )
 
                 if not self.comm_simulation:
-                    # Sending the server payload to the client
+                    # Send the server payload to the client
                     logging.info(
                         "[%s] Sending the current model to client #%d.",
                         self,
@@ -645,7 +652,7 @@ class Server:
             )
 
     def choose_clients(self, clients_pool, clients_count):
-        """Choose a subset of the clients to participate in each round."""
+        """Chooses a subset of the clients to participate in each round."""
         assert clients_count <= len(clients_pool)
         random.setstate(self.prng_state)
 
@@ -709,7 +716,7 @@ class Server:
                 )
 
     async def _send_in_chunks(self, data, sid, client_id) -> None:
-        """Sending a bytes object in fixed-sized chunks to the client."""
+        """Sends a bytes object in fixed-sized chunks to the client."""
         step = 1024 ^ 2
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
 
@@ -719,7 +726,7 @@ class Server:
         await self.sio.emit("payload", {"id": client_id}, room=sid)
 
     async def _send(self, sid, payload, client_id) -> None:
-        """Sending a new data payload to the client using either S3 or socket.io."""
+        """Sends a new data payload to the client using either S3 or socket.io."""
         # First apply outbound processors, if any
         payload = self.outbound_processor.process(payload)
 
@@ -838,7 +845,7 @@ class Server:
         await self.process_client_info(client_id, sid)
 
     async def process_client_info(self, client_id, sid):
-        """Process the received metadata information from a reporting client."""
+        """Processes the received metadata information from a reporting client."""
         # First pass through the inbound_processor(s), if any
         self.client_payload[sid] = self.inbound_processor.process(
             self.client_payload[sid]
@@ -902,7 +909,7 @@ class Server:
         return client_staleness > self.staleness_bound and finish_time > self.wall_time
 
     async def _process_clients(self, client_info):
-        """Determine whether it is time to process the client reports and
+        """Determines whether it is time to process the client reports and
         proceed with the aggregation process.
 
         When in asynchronous mode, additional processing is needed to simulate
@@ -1159,7 +1166,7 @@ class Server:
                         await self._select_clients()
 
     def save_to_checkpoint(self) -> None:
-        """Save a checkpoint for resuming the training session."""
+        """Saves a checkpoint for resuming the training session."""
         checkpoint_path = Config.params["checkpoint_path"]
 
         model_name = (
@@ -1179,7 +1186,7 @@ class Server:
             pickle.dump(self.current_round, checkpoint_file)
 
     def _resume_from_checkpoint(self):
-        """Resume a training session from a previously saved checkpoint."""
+        """Resumes a training session from a previously saved checkpoint."""
         logging.info(
             "[%s] Resume a training session from a previously saved checkpoint.", self
         )
@@ -1202,7 +1209,7 @@ class Server:
         self.trainer.load_model(filename, checkpoint_path)
 
     def _save_random_states(self, round_to_save, checkpoint_path):
-        """Saving the random states in the server for resuming its session later on."""
+        """Saves the random states in the server for resuming its session later on."""
         states_to_save = [
             f"numpy_prng_state_{round_to_save}",
             f"prng_state_{round_to_save}",
@@ -1218,7 +1225,7 @@ class Server:
                 pickle.dump(variables_to_save[i], checkpoint_file)
 
     def _restore_random_states(self, round_to_restore, checkpoint_path):
-        """Restoring the numpy.random and random states from previously saved checkpoints
+        """Restors the numpy.random and random states from previously saved checkpoints
         for a particular round.
         """
         states_to_load = ["numpy_prng_state", "prng_state"]
@@ -1237,7 +1244,7 @@ class Server:
         random.setstate(self.prng_state)
 
     async def wrap_up(self) -> None:
-        """Wrapping up when each round of training is done."""
+        """Wraps up when each round of training is done."""
         self.save_to_checkpoint()
 
         # Break the loop when the target accuracy is achieved
@@ -1262,7 +1269,7 @@ class Server:
             await self._close()
 
     async def _close(self):
-        """Closing the server."""
+        """Closes the server."""
         logging.info("[%s] Training concluded.", self)
         self.trainer.save_model()
 
@@ -1282,7 +1289,7 @@ class Server:
 
     @abstractmethod
     async def _process_reports(self) -> None:
-        """Process a client report."""
+        """Processes a client report."""
 
     async def periodic_task(self) -> None:
         """
@@ -1300,6 +1307,11 @@ class Server:
         """
         Method called before selecting clients for the first round of training.
         """
+        if Config().is_central_server():
+            if self.disable_clients:
+                logging.info("No clients are launched (server:disable_clients = true)")
+            else:
+                Server._start_clients(client=self.client)
 
     def server_will_close(self) -> None:
         """
