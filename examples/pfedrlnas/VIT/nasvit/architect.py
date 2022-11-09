@@ -43,12 +43,15 @@ class Architect(nn.Module):
                 copy.deepcopy(self.model.classifier) for _ in range(self.client_nums)
             ]
         self._initialize_alphas()
-        self.optimizer = torch.optim.Adam(
-            self.arch_parameters(),
-            lr=Config().parameters.architect.learning_rate,
-            betas=(0.5, 0.999),
-            weight_decay=Config().parameters.architect.weight_decay,
-        )
+        self.optimizers = [
+            torch.optim.Adam(
+                alpha,
+                lr=Config().parameters.architect.learning_rate,
+                betas=(0.5, 0.999),
+                weight_decay=Config().parameters.architect.weight_decay,
+            )
+            for alpha in self.arch_parameters()
+        ]
         self.baseline = {}
         self.baseline_decay = Config().parameters.architect.baseline_decay
         self.device = Config().device()
@@ -60,21 +63,22 @@ class Architect(nn.Module):
             hasattr(Config().parameters.architect, "natural")
             and Config().parameters.architect.natural
         ):
-            grad = self._compute_grad_natural(
-                self.alphas, rewards, epoch_index, client_id_list
-            )
+            grads = self._compute_grad_natural(rewards, epoch_index, client_id_list)
         else:
-            grad = self._compute_grad(self.alphas, rewards, epoch_index, client_id_list)
-        self.alphas.grad.copy_(grad)
-        self.optimizer.step()
-        self.optimizer.zero_grad()
+            grads = self._compute_grad(rewards, epoch_index, client_id_list)
+        for index, client_id in enumerate(client_id_list):
+            self.alphas[client_id - 1].grad.copy_(grads[index])
+            self.optimizers[client_id - 1].step()
+            self.optimizers[client_id - 1].zero_grad()
 
-    def _compute_grad(self, alphas, rewards, index_list, client_id_list):
-        grad = torch.zeros(alphas.size())
+    def _compute_grad(self, rewards, index_list, client_id_list):
+        grads = []
         for client_idx, reward in enumerate(rewards):
+            alpha = self.alphas[client_id_list[client_idx] - 1]
+            grad = torch.zeros(alpha.size())
             for edge_idx in range(len(self.stop_index) - 1):
                 prob = F.softmax(
-                    alphas[client_id_list[client_idx] - 1][
+                    alpha[
                         self.stop_index[edge_idx]
                         + 1 : self.stop_index[edge_idx + 1]
                         + 1
@@ -87,11 +91,11 @@ class Architect(nn.Module):
                 # nabla _alpha { log(p(g_i)) } = (p_1, ..., p_i-1, ..., p_N)
                 index_prob = client_grad[index[edge_idx]]
                 client_grad[index[edge_idx]] = index_prob - 1
-                grad[client_id_list[client_idx] - 1][
+                grad[
                     self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx + 1] + 1
                 ] += (reward * client_grad)
-            grad /= len(rewards)
-        return grad
+            grads.append(grad)
+        return grads
 
     def _compute_reward(self, accuracy_list, neg_ratio, client_id_list):
         # scale accuracy to 0-1
@@ -133,12 +137,15 @@ class Architect(nn.Module):
         # )
         return reward
 
-    def _compute_grad_natural(self, alphas, rewards, index_list, client_id_list):
-        grad = torch.zeros(alphas.size())
+    def _compute_grad_natural(self, rewards, index_list, client_id_list):
+        # pylint:disable=too-many-locals
+        grads = []
         for reward, client_idx in enumerate(rewards):
+            alpha = self.alphas[client_id_list[client_idx] - 1]
+            grad = torch.zeros(alpha.size())
             for edge_idx in range(len(self.stop_index) - 1):
                 prob = F.softmax(
-                    alphas[client_id_list[client_idx] - 1][
+                    alpha[
                         self.stop_index[edge_idx]
                         + 1 : self.stop_index[edge_idx + 1]
                         + 1
@@ -156,13 +163,14 @@ class Architect(nn.Module):
                     finverse = torch.pinverse(
                         torch.matmul(dalpha, torch.transpose(dalpha, 0, 1))
                     )
-                grad[client_id_list[client_idx] - 1][
+                grad[
                     self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx] + 1
                 ] += reward * torch.matmul(finverse, client_grad)
-            grad /= len(rewards)
-        return grad
+            grads.append(grad)
+        return grads
 
     def _initialize_alphas(self):
+        # pylint:disable=too-many-locals
         cfg_candidate = self.model.cfg_candidates
         stop_index = [-1]
         resolution = cfg_candidate["resolution"]
@@ -181,15 +189,20 @@ class Architect(nn.Module):
             stop_index.append(stop_index[-1] + len(expand_ratio_candidate))
 
         self.stop_index = stop_index
-        self.alphas = Variable(
-            torch.zeros(self.client_nums, self.stop_index[-1] + 1), requires_grad=True
-        )
-        self._arch_parameters = [self.alphas]
+        self.alphas = [
+            Variable(
+                torch.zeros(self.stop_index[-1] + 1),
+                requires_grad=True,
+            )
+            for _ in range(self.client_nums)
+        ]
+        self._arch_parameters = [[alpha] for alpha in self.alphas]
 
-        feature = Variable(torch.Tensor(self.alphas.size()), requires_grad=False)
-        logits = feature * self.alphas
-        loss = torch.mean(logits)
-        loss.backward()
+        for alpha in self.alphas:
+            feature = Variable(torch.Tensor(alpha.size()), requires_grad=False)
+            logits = feature * alpha
+            loss = torch.mean(logits)
+            loss.backward()
 
         self.model.zero_grad()
         self.zero_grad()
