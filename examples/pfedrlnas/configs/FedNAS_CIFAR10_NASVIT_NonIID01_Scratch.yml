@@ -113,6 +113,7 @@ parameters:
         #FedRLNAS: 0.003 weight_dacey 0.0001
         learning_rate: 0.5
         weight_decay: 0
-        baseline_decay: 0.9
+        lambda_time: 0.001
+        lambda_neg: 0.1
         # pretrain_path: /data/dixi/plato/pretrained/nasvit/checkpoint.pth
         # pretrain_path: ../pretrained/ML_Models/nasvit/checkpoint.pth

@@ -39,6 +39,10 @@ class Server(fedavg.Server):
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
         accuracy_list = [update.report.accuracy for update in updates]
+        round_time_list = [
+            update.report.training_time + update.report.comm_time
+            for update in self.updates
+        ]
         client_id_list = [update.client_id for update in self.updates]
         subnet_configs = []
         for client_id_ in client_id_list:
@@ -48,7 +52,9 @@ class Server(fedavg.Server):
 
         epoch_index = self.algorithm.model.extract_index(subnet_configs)
         self.algorithm.model.step(
-            accuracy_list, self.neg_ratio, epoch_index, client_id_list
+            [accuracy_list, round_time_list, self.neg_ratio],
+            epoch_index,
+            client_id_list,
         )
 
         self.trainer.model = self.algorithm.model
