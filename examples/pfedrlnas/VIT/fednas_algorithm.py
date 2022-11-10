@@ -4,6 +4,8 @@ Customized NAS algorithms for PerFedRLNAS.
 import fedtools
 from nasvit.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
 
+import numpy as np
+
 from plato.algorithms import fedavg
 from plato.config import Config
 
@@ -63,6 +65,17 @@ class ServerAlgorithm(fedavg.Algorithm):
     def set_active_subnet(self, cfg):
         """Set the suupernet to subnet with given cfg."""
         fedtools.set_active_subnet(self.model.model, cfg)
+
+    def get_baseline_accuracy_info(self):
+        """Get the information of accuracies of all clients."""
+        accuracies = np.array([item[1] for item in self.model.baseline.items()])
+        info = {
+            "mean": np.mean(accuracies),
+            "std": np.std(accuracies),
+            "max": np.max(accuracies),
+            "min": np.min(accuracies),
+        }
+        return info
 
 
 class ClientAlgorithm(fedavg.Algorithm):

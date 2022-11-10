@@ -69,3 +69,12 @@ class Server(fedavg.Server):
         save_config = f"{Config().server.model_path}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump((self.subnets_config, flops), file)
+
+    def get_logged_items(self) -> dict:
+        logged_items = super().get_logged_items()
+        acc_info = self.algorithm.get_baseline_accuracy_info()
+        logged_items["clients_accuracy_mean"] = acc_info["mean"]
+        logged_items["clients_accuracy_std"] = acc_info["std"]
+        logged_items["clients_accuracy_max"] = acc_info["max"]
+        logged_items["clients_accuracy_min"] = acc_info["min"]
+        return logged_items

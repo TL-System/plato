@@ -76,6 +76,7 @@ algorithm:
 results:
     result_path: /data/dixi/plato/results/fednasvit/cifar10_noniid/
     # result_path: ../plato_results/fednasvit/cifar10_noniid/
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead, clients_accuracy_mean, clients_accuracy_std, clients_accuracy_max, clients_accuracy_min
 
 parameters:
     model:
@@ -102,7 +103,7 @@ parameters:
     #     warmup_epochs: 20
     #     cooldown_epochs: 0
     learning_rate:
-        eta_min: 0.0002
+        eta_min: 0.000005
         T_max: 7500
     architect:
         space: small

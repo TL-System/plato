@@ -122,7 +122,10 @@ class Architect(nn.Module):
 
         def _add_accuracy_into_baseline(self, accuracy_list, client_id_list):
             for client_id, accuracy in zip(client_id_list, accuracy_list):
-                self.baseline[client_id] = accuracy
+                if client_id in self.baseline:
+                    self.baseline[client_id] = max(self.baseline[client_id], accuracy)
+                else:
+                    self.baseline[client_id] = accuracy
 
         if not self.baseline:
             _add_accuracy_into_baseline(self, accuracy_list, client_id_list)
