@@ -19,6 +19,13 @@ class ResolutionAdjustedModel(nn.Module):
             config=config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
+
+        if (
+            hasattr(Config().parameters, "model")
+            and hasattr(Config().parameters.model, "pretrained")
+            and not Config().parameters.model.pretrained
+        ):
+            self.model.init_weights()
         self.resolution = config.image_size
 
     def forward(self, image):
