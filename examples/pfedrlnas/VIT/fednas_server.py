@@ -5,19 +5,42 @@ Customized Server for PerFedRLNAS.
 import logging
 import pickle
 import numpy as np
+import time
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import fonts
+from plato.callbacks.server import ServerCallback
+
+
+class Servercallback(ServerCallback):
+    """Customized ServerCallBack for logging overhead on the server."""
+
+    def on_weights_received(self, server, weights_received):
+        server.process_begin = time.time()
+
+    def on_clients_processed(self, server, **kwargs):
+        server.process_end = time.time()
 
 
 class Server(fedavg.Server):
     """The PerFedRLNAS server assigns and aggregates global model with different architectures."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__(model, datasource, algorithm, trainer)
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+    ):
+        # pylint:disable=too-many-arguments
+        super().__init__(
+            model, datasource, algorithm, trainer, callbacks=Servercallback
+        )
         self.subnets_config = [None for i in range(Config().clients.total_clients)]
         self.neg_ratio = None
+        self.process_begin = None
+        self.process_end = None
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         subnet_config = self.algorithm.sample_config(server_response)
@@ -83,4 +106,6 @@ class Server(fedavg.Server):
         logged_items["clients_accuracy_std"] = acc_info["std"]
         logged_items["clients_accuracy_max"] = acc_info["max"]
         logged_items["clients_accuracy_min"] = acc_info["min"]
+        logged_items["server_overhead"] = self.process_end - self.process_begin
+        logged_items["elapsed_time"] += logged_items["server_overhead"]
         return logged_items
