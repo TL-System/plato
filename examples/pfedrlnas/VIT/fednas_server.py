@@ -2,25 +2,16 @@
 Customized Server for PerFedRLNAS.
 """
 
+import sys
 import logging
 import pickle
-import numpy as np
 import time
+import numpy as np
+
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import fonts
-from plato.callbacks.server import ServerCallback
-
-
-class Servercallback(ServerCallback):
-    """Customized ServerCallBack for logging overhead on the server."""
-
-    def on_weights_received(self, server, weights_received):
-        server.process_begin = time.time()
-
-    def on_clients_processed(self, server, **kwargs):
-        server.process_end = time.time()
 
 
 class Server(fedavg.Server):
@@ -34,13 +25,12 @@ class Server(fedavg.Server):
         trainer=None,
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(
-            model, datasource, algorithm, trainer, callbacks=Servercallback
-        )
+        super().__init__(model, datasource, algorithm, trainer)
         self.subnets_config = [None for i in range(Config().clients.total_clients)]
         self.neg_ratio = None
         self.process_begin = None
         self.process_end = None
+        self.model_size = np.zeros(Config().clients.total_clients)
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         subnet_config = self.algorithm.sample_config(server_response)
@@ -53,11 +43,15 @@ class Server(fedavg.Server):
         self, updates, baseline_weights, weights_received
     ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
+        self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
         num_samples = [update.report.num_samples for update in self.updates]
         self.neg_ratio = self.algorithm.nas_aggregation(
             self.subnets_config, weights_received, client_id_list, num_samples
         )
+        for payload, client_id in zip(weights_received, client_id_list):
+            payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
+            self.model_size[client_id - 1] = payload_size
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
@@ -81,6 +75,7 @@ class Server(fedavg.Server):
         )
 
         self.trainer.model = self.algorithm.model
+        self.process_end = time.time()
 
     def server_will_close(self):
         flops = []
@@ -107,5 +102,5 @@ class Server(fedavg.Server):
         logged_items["clients_accuracy_max"] = acc_info["max"]
         logged_items["clients_accuracy_min"] = acc_info["min"]
         logged_items["server_overhead"] = self.process_end - self.process_begin
-        logged_items["elapsed_time"] += logged_items["server_overhead"]
+        logged_items["model_size"] = np.mean(self.model_size)
         return logged_items

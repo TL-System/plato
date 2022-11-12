@@ -13,6 +13,9 @@ clients:
 
     random_seed: 1
 
+    comm_simulation: true 
+    compute_comm_time: true
+
 server:
     address: 127.0.0.1
     port: 8003
@@ -23,6 +26,8 @@ server:
     model_path: /data/dixi/plato/models/fednasvit/cifar10_noniid/
     # checkpoint_path: ../plato_models/fednasvit/cifar10_noniid/
     # model_path: ../plato_models/fednasvit/cifar10_noniid/
+
+    simulate_wall_time: true
 
 data:
     # The training and testing dataset
@@ -76,7 +81,7 @@ algorithm:
 results:
     result_path: /data/dixi/plato/results/fednasvit/cifar10_noniid/
     # result_path: ../plato_results/fednasvit/cifar10_noniid/
-    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead, clients_accuracy_mean, clients_accuracy_std, clients_accuracy_max, clients_accuracy_min
+    types: round, accuracy, elapsed_time, comm_time, round_time, server_overhead, comm_overhead, clients_accuracy_mean, clients_accuracy_std, clients_accuracy_max, clients_accuracy_min, model_size
 
 parameters:
     model:
