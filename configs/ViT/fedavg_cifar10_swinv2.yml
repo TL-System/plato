@@ -59,6 +59,7 @@ algorithm:
 parameters:
     model:
         num_labels: 10
+        pretrained: false
 
     optimizer:
         lr: 0.00004
@@ -67,6 +68,3 @@ parameters:
     learning_rate:
         eta_min: 0
         T_max: 30
-
-    model:
-        pretrained: false
