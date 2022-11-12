@@ -3,11 +3,9 @@ A customized server for Knot, a clustered aggregation mechanism designed for
 federated unlearning.
 """
 
-import asyncio
 import copy
 import logging
 import os
-import pickle
 import random
 from collections import deque
 
@@ -92,7 +90,7 @@ class Server(fedunlearning_server.Server):
         # Initialize the function that clustering clients by solver or randomly
         self._clustering_clients()
 
-    def init_trainer(self):
+    def init_trainer(self) -> None:
         """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
         super().init_trainer()
 
@@ -367,7 +365,7 @@ class Server(fedunlearning_server.Server):
 
         return server_response
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         logged_items = super().get_logged_items()
 
@@ -382,7 +380,7 @@ class Server(fedunlearning_server.Server):
 
         return logged_items
 
-    def save_to_checkpoint(self):
+    def save_to_checkpoint(self) -> None:
         """Save a checkpoint for resuming the training session."""
         super().save_to_checkpoint()
 
@@ -404,7 +402,7 @@ class Server(fedunlearning_server.Server):
             )
             self._save_model(cluster_id, filename, checkpoint_path)
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 
@@ -427,7 +425,7 @@ class Server(fedunlearning_server.Server):
 
             if self.current_round >= Config().trainer.rounds:
                 logging.info("Target number of training rounds reached.")
-                await self.close()
+                await self._close()
 
             if hasattr(Config().trainer, "target_accuracy"):
                 target_accuracy = Config().trainer.target_accuracy
@@ -438,13 +436,13 @@ class Server(fedunlearning_server.Server):
                 logging.info(
                     "[%s] Target accuracy and standard deviation reached.", self
                 )
-                await self.close()
+                await self._close()
 
             if target_perplexity and self.accuracy <= target_perplexity:
                 logging.info(
                     "[%s] Target perplexity and standard deviation reached.", self
                 )
-                await self.close()
+                await self._close()
 
     def _load_model(self, cluster_id, filename=None, location=None):
         """Loading pre-trained model weights before retraining from a file."""

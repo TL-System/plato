@@ -32,8 +32,9 @@ class Server(fedavg.Server):
 
         return server_response
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         await super().wrap_up()
+
         logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.genotype())
 
     async def aggregate_weights(

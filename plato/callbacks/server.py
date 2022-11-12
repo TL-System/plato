@@ -31,18 +31,18 @@ class ServerCallback(ABC):
         Event called after the updated weights have been aggregated.
         """
 
-    def on_client_arrived(self, server, **kwargs):
+    def on_client_selected(self, server, selected_clients, **kwargs):
         """
         Event called after a new client arrived.
         """
+
+    def on_clients_processed(self, server, **kwargs):
+        """Additional work to be performed after client reports have been processed."""
 
     def on_training_will_start(self, server, **kwargs):
         """
         Event called before selecting clients for the first round of training.
         """
-
-    def on_clients_processed(self, server, **kwargs):
-        """Additional work to be performed after client reports have been processed."""
 
     def on_server_will_close(self, server, **kwargs):
         """

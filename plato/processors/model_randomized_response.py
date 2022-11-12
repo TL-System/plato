@@ -1,8 +1,6 @@
 """
 Implements a Processor for applying local differential privacy using randomized response.
 """
-import logging
-from typing import Any
 
 import torch
 
@@ -15,22 +13,9 @@ class Processor(model.Processor):
     """
     Implements a Processor for applying local differential privacy using randomized response.
     """
+
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-
-    def process(self, data: Any) -> Any:
-        """
-        Implements a Processor for applying randomized response as the
-        local differential privacy mechanism.
-        """
-
-        output = super().process(data)
-
-        logging.info(
-            "[Client #%d] Local differential privacy (using randomized response) applied.",
-            self.client_id)
-
-        return output
 
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
 
@@ -39,6 +24,7 @@ class Processor(model.Processor):
 
         epsilon = Config().algorithm.epsilon
 
+        # Apply randomized response as the local differential privacy mechanism
         layer = layer.detach().cpu().numpy()
 
         layer = unary_encoding.encode(layer)

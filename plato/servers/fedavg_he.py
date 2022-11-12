@@ -28,10 +28,12 @@ class Server(fedavg.Server):
         self.weight_shapes = {}
         self.para_nums = {}
 
-    def configure(self):
+    def configure(self) -> None:
         """Configure the model information like weight shapes and parameter numbers."""
         super().configure()
+
         extract_model = self.trainer.model.cpu().state_dict()
+
         for key in extract_model.keys():
             self.weight_shapes[key] = extract_model[key].size()
             self.para_nums[key] = reduce(lambda a, b: a * b, self.weight_shapes[key])
@@ -44,6 +46,7 @@ class Server(fedavg.Server):
         """Server can only send the encrypted aggreagtion result to clients."""
         return self.encrypted_model
 
+    # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate the model updates and decrypt the result for evaluation purpose."""
         self.encrypted_model = self._fedavg_hybrid(updates)

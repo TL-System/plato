@@ -50,7 +50,7 @@ class Server(base.Server):
             self.clients_per_round,
         )
 
-    def configure(self):
+    def configure(self) -> None:
         """
         Booting the federated learning server by setting up the data, model, and
         creating the clients.
@@ -111,7 +111,7 @@ class Server(base.Server):
                 accuracy_csv_file, accuracy_headers, Config().params["result_path"]
             )
 
-    def init_trainer(self):
+    def init_trainer(self) -> None:
         """Setting up the global model, trainer, and algorithm."""
         if self.model is None and self.custom_model is not None:
             self.model = self.custom_model
@@ -221,10 +221,10 @@ class Server(base.Server):
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
 
-    def clients_processed(self):
+    def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""
 
-    def get_logged_items(self):
+    def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         return {
             "round": self.current_round,
