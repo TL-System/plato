@@ -3,6 +3,8 @@ NAS architect in PerFedRLNAS, a wrapper over the supernet.
 """
 import copy
 import logging
+import pickle
+import os
 import numpy as np
 
 import torch
@@ -53,6 +55,11 @@ class Architect(nn.Module):
             for alpha in self.arch_parameters()
         ]
         self.baseline = {}
+        if Config().args.resume:
+            save_config = f"{Config().server.model_path}/baselines.pickle"
+            if os.path.exists(save_config):
+                with open(save_config, "rb") as file:
+                    self.baseline = pickle.loads(file)
         self.lambda_time = Config().parameters.architect.lambda_time
         self.lambda_neg = Config().parameters.architect.lambda_neg
         self.device = Config().device()

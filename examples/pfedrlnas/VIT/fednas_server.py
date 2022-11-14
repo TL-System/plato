@@ -94,6 +94,15 @@ class Server(fedavg.Server):
         with open(save_config, "wb") as file:
             pickle.dump((self.subnets_config, flops), file)
 
+    def save_to_checkpoint(self) -> None:
+        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+        with open(save_config, "wb") as file:
+            pickle.dump(self.subnets_config, file)
+        save_config = f"{Config().server.model_path}/baselines.pickle"
+        with open(save_config, "wb") as file:
+            pickle.dump(self.algorithm.model.baseline, file)
+        return super().save_to_checkpoint()
+
     def get_logged_items(self) -> dict:
         logged_items = super().get_logged_items()
         acc_info = self.algorithm.get_baseline_accuracy_info()
