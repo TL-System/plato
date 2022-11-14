@@ -1,5 +1,12 @@
 """
 Obtaining a ViT model for image classification from HuggingFace.
+
+The reference to T2T-ViT model:
+https://github.com/yitu-opensource/T2T-ViT.
+
+The reference to Deep-ViT model:
+https://github.com/zhoudaquan/dvit_repo.
+
 """
 
 import torch
