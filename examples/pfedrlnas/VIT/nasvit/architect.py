@@ -59,7 +59,7 @@ class Architect(nn.Module):
             save_config = f"{Config().server.model_path}/baselines.pickle"
             if os.path.exists(save_config):
                 with open(save_config, "rb") as file:
-                    self.baseline = pickle.loads(file)
+                    self.baseline = pickle.load(file)
         self.lambda_time = Config().parameters.architect.lambda_time
         self.lambda_neg = Config().parameters.architect.lambda_neg
         self.device = Config().device()
