@@ -14,7 +14,9 @@ from torch import nn
 from transformers import AutoConfig, AutoModelForImageClassification
 
 from plato.config import Config
-from plato.models import dvit, t2tvit
+from plato.models import dvit
+import plato.models.t2tvit.models as t2tvits
+import plato.models.t2tvit.utils as t2t_utils
 
 
 class ResolutionAdjustedModel(nn.Module):
@@ -56,7 +58,7 @@ class T2TVIT(nn.Module):
     def __init__(self, name) -> nn.Module:
         super().__init__()
 
-        model_name = getattr(t2tvit.models, name)
+        model_name = getattr(t2tvits, name)
         t2t = model_name(num_classes=Config().trainer.num_classes)
 
         if (
@@ -64,7 +66,7 @@ class T2TVIT(nn.Module):
             and hasattr(Config().parameters.model, "pretrained")
             and Config().parameters.model.pretrained
         ):
-            t2tvit.utils.load_for_transfer_learning(
+            t2t_utils.load_for_transfer_learning(
                 t2t,
                 Config().parameters.model.pretrain_path,
                 use_ema=True,
@@ -74,11 +76,13 @@ class T2TVIT(nn.Module):
         self.model = t2t
         self.resolution = 224
 
-    def forward(self, x):
+    def forward(self, feature):
         """forward function"""
-        if x.size(-1) != self.resolution:
-            x = nn.functional.interpolate(x, size=self.resolution, mode="bicubic")
-        return self.model(x)
+        if feature.size(-1) != self.resolution:
+            feature = nn.functional.interpolate(
+                feature, size=self.resolution, mode="bicubic"
+            )
+        return self.model(feature)
 
 
 class DeepViT(nn.Module):
@@ -105,11 +109,13 @@ class DeepViT(nn.Module):
         self.model = deepvit
         self.resolution = 224
 
-    def forward(self, x):
+    def forward(self, feature):
         """forward function"""
-        if x.size(-1) != self.resolution:
-            x = nn.functional.interpolate(x, size=self.resolution, mode="bicubic")
-        return self.model(x)
+        if feature.size(-1) != self.resolution:
+            feature = nn.functional.interpolate(
+                feature, size=self.resolution, mode="bicubic"
+            )
+        return self.model(feature)
 
 
 class Model:
@@ -119,6 +125,7 @@ class Model:
     https://huggingface.co/docs/transformers/model_doc/auto#transformers.AutoModel
     """
 
+    # pylint:disable=too-few-public-methods
     @staticmethod
     def get(model_name=None, **kwargs):  # pylint: disable=unused-argument
         """Returns a named model from HuggingFace."""
