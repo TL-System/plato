@@ -13,10 +13,9 @@ import torch
 from torch import nn
 from transformers import AutoConfig, AutoModelForImageClassification
 
+
 from plato.config import Config
-from plato.models import dvit
-import plato.models.t2tvit.models as t2tvits
-import plato.models.t2tvit.utils as t2t_utils
+from plato.models import t2tvit, dvit
 
 
 class ResolutionAdjustedModel(nn.Module):
@@ -58,7 +57,7 @@ class T2TVIT(nn.Module):
     def __init__(self, name) -> nn.Module:
         super().__init__()
 
-        model_name = getattr(t2tvits, name)
+        model_name = getattr(t2tvit.models, name)
         t2t = model_name(num_classes=Config().trainer.num_classes)
 
         if (
@@ -66,7 +65,7 @@ class T2TVIT(nn.Module):
             and hasattr(Config().parameters.model, "pretrained")
             and Config().parameters.model.pretrained
         ):
-            t2t_utils.load_for_transfer_learning(
+            t2tvit.utils.load_for_transfer_learning(
                 t2t,
                 Config().parameters.model.pretrain_path,
                 use_ema=True,
