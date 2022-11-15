@@ -57,7 +57,7 @@ class T2TVIT(nn.Module):
     def __init__(self, name) -> nn.Module:
         super().__init__()
 
-        model_name = getattr(t2tvit.models, name)
+        model_name = getattr(t2tvit, name)
         t2t = model_name(num_classes=Config().trainer.num_classes)
 
         if (
@@ -128,7 +128,7 @@ class Model:
     @staticmethod
     def get(model_name=None, **kwargs):  # pylint: disable=unused-argument
         """Returns a named model from HuggingFace."""
-        if "t2t" in model_name:
+        if "T2t" in model_name:
             return T2TVIT(model_name)
         if "deepvit" in model_name:
             return DeepViT(model_name)
