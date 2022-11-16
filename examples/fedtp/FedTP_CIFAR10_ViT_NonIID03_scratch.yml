@@ -119,9 +119,8 @@ trainer:
     # space as more samples will be contained within one loading.
     epochs: 5
     batch_size: 32
-    optimizer: AdamW
+    optimizer: SGD
     #SGD
-    lr_scheduler: CosineAnnealingLR
 
     epoch_log_interval: 1
     epoch_model_log_interval: 50
@@ -132,9 +131,7 @@ trainer:
     # does not utilize the
     pers_epochs: 10
     pers_batch_size: 32
-    pers_optimizer: AdamW
-    pers_lr_scheduler: CosineAnnealingLR
-    global_lr_scheduler: true
+    pers_optimizer: SGD
 
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
@@ -145,8 +142,8 @@ trainer:
     # however, in the central test, we do not use this
     #   but use the custom model
     model_type: vit
-    model_name: T2t_vit_14
-    personalized_model_name: T2t_vit_14
+    model_name: FedTP_ViT
+    personalized_model_name: FedTP_ViT
 
     # encoder, whole
     global_submodules_prefix: whole
@@ -171,30 +168,33 @@ algorithm:
 
 parameters:
     optimizer:
-        lr: 0.0005
-        #momentum: 0.9
-        weight_decay: 0.05
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.00001
 
     pers_optimizer:
-        lr: 0.0005
-        #momentum: 0.9
-        weight_decay: 0.05
-
-    learning_rate:
-        eta_min: 0.000
-        T_max: 7500
-
-    pers_learning_rate:
-        eta_min: 0.000
-        T_max: 7500
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.00001
     
     hypernet:
-        attention: model.blocks.%d.attn.qkv.weight 
-        depth: 14
+        attention: transformer.layers.%d.0.fn.to_qkv.weight
+        depth: 6
         embed_dim: 128
         hidden_dim: 100
-        dim: 384
-        num_heads: 6 
+        dim: 128
+        num_heads: 8
+
+    model:
+        image_size: 32
+        patch_size: 4
+        num_classes: 10 
+        dim: 128
+        depth: 6
+        heads: 8
+        mlp_dim: 256
+        dropout: 0.1
+        emb_dropout: 0.1
     #architect:
     #    pretrain_path: ../pretrained/ML_Models/VIT/T2T-VIT/T2T_ViT_14.pth.tar
 

@@ -14,14 +14,21 @@ arXiv preprint arXiv:2211.01572 (2022).
 https://arxiv.org/pdf/2211.01572v1.pdf.
 """
 import fedtp_server
+import vit
 
 from plato.clients.simple import Client
+from plato.config import Config
 
 
 def main():
     """A Plato federated learning training session using FedProx."""
-    client = Client()
-    server = fedtp_server.Server()
+    if Config().trainer.model_name == "FedTP_ViT":
+        model = vit.ViT
+    else:
+        model = None
+
+    client = Client(model=model)
+    server = fedtp_server.Server(model=model)
     server.run(client)
 
 

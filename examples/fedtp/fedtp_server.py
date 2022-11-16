@@ -52,6 +52,7 @@ class Server(fedavg.Server):
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         attentions_customized = self.algorithm.generate_attention(self.hnet, client_id)
+
         self.attentions[client_id] = attentions_customized
         self.current_attention = attentions_customized
         return super().customize_server_response(
@@ -71,7 +72,7 @@ class Server(fedavg.Server):
         for idx, update in enumerate(updates):
             node_weights = self.attentions[update.client_id]
             delta_theta = OrderedDict(
-                {k: deltas_received[k] for k in node_weights.keys()}
+                {k: deltas_received[idx][k] for k in node_weights.keys()}
             )
             hnet_grads = self.algorithm.calculate_hnet_grads(
                 node_weights, delta_theta, self.hnet
@@ -90,7 +91,7 @@ class Server(fedavg.Server):
 
         self.hnet_optimizer.zero_grad()
         for param, grad in zip(self.hnet.parameters(), grads_update):
-            param.grad.copy_(grad)
+            param.grad = grad
         self.hnet_optimizer.step()
 
         avg_update = await super().aggregate_deltas(updates, deltas_received)
