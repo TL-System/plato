@@ -80,6 +80,7 @@ def plot(
         label="Pisces",
     )
     """
+
     ax.plot(
         x_value2,
         y_value2,
@@ -99,7 +100,7 @@ def plot(
         # marker='s',
         label="Async_G_s_staleonly",
     )
-    """
+
     ax.plot(
         x_value4,
         y_value4,
@@ -107,8 +108,9 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_G_staleonly1_0.01",
+        label="Async_G_simplify",
     )
+    """
 
     ax.plot(
         x_value5,
@@ -119,7 +121,7 @@ def plot(
         # marker='s',
         label="Async_G_staleonly1_1",
     )
-    """
+
     ax.plot(
         x_value6,
         y_value6,
@@ -129,6 +131,7 @@ def plot(
         # marker='s',
         label="Async_G_staleonly0.1_0.01",
     )
+    """
     ax.plot(
         x_value7,
         y_value7,
@@ -161,7 +164,7 @@ def main():
     result_csv_file3 = "./async_staleonly.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_stale1_init1.csv"  # ./async_cifar.csv"
+    result_csv_file4 = "./async_simplify.csv"  # ./async_cifar.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
 
     result_csv_file5 = "./async_stale1_initpointpoint1.csv"
@@ -192,7 +195,7 @@ def main():
     y_value6 = result_dict6[y_item]
     y_value7 = result_dict7[y_item]
 
-    figure_file_name = "./cifar10_rand1_concen1_zipf_G_s_inits.pdf"
+    figure_file_name = "./cifar10_rand1_concen1_zipf_G_s_.pdf"
 
     plot(
         x_label,

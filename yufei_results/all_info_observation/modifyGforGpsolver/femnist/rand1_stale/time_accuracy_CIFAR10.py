@@ -90,7 +90,7 @@ def plot(
         label="async_G_s_femnist",
     )
     """
-    """
+
     ax.plot(
         x_value3,
         y_value3,
@@ -98,9 +98,9 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_G_s_stale_localnum",
+        label="Async_simplify",
     )
-    """
+
     ax.plot(
         x_value4,
         y_value4,
@@ -158,7 +158,7 @@ def main():
     result_csv_file2 = "./async_G_s_femnist.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./async_stale_localnum.csv"
+    result_csv_file3 = "./async_simplify.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
     result_csv_file4 = "./async_staleonly.csv"
