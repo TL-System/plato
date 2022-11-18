@@ -65,14 +65,22 @@ class Server(fedavg.Server):
             payload[weight_name].copy_(self.current_attention[weight_name])
         return payload
 
-    async def aggregate_deltas(self, updates, deltas_received):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Aggregation of weights in FedTP"""
+        deltas_recieved = self.algorithm.compute_weight_deltas(
+            baseline_weights, weights_received
+        )
+
         self.total_samples = sum(update.report.num_samples for update in updates)
 
         grads_update = OrderedDict()
         for idx, update in enumerate(updates):
             node_weights = self.attentions[update.client_id]
             delta_theta = OrderedDict(
-                {k: deltas_received[idx][k] for k in node_weights.keys()}
+                {
+                    k: node_weights[k] - weights_received[idx][k]
+                    for k in node_weights.keys()
+                }
             )
             hnet_grads = self.algorithm.calculate_hnet_grads(
                 node_weights, delta_theta, self.hnet
@@ -94,5 +102,5 @@ class Server(fedavg.Server):
             param.grad = grad
         self.hnet_optimizer.step()
 
-        avg_update = await super().aggregate_deltas(updates, deltas_received)
+        avg_update = await super().aggregate_deltas(updates, deltas_recieved)
         return avg_update
