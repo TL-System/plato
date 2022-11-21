@@ -13,7 +13,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8000
+    port: 8001
     simulate_wall_time: false
     checkpoint_path: checkpoints/huggingface/fedavg
     model_path: models/huggingface/fedavg
@@ -59,6 +59,7 @@ algorithm:
 parameters:
     model:
         num_labels: 10
+        pretrained: false
 
     optimizer:
         lr: 0.00004
@@ -67,4 +68,3 @@ parameters:
     learning_rate:
         eta_min: 0
         T_max: 30
-
