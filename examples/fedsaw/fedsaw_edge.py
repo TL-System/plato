@@ -1,40 +1,37 @@
 """
-A federated learning client using pruning.
+A federated learning client at the edge server in a cross-silo training workload.
 """
 
 import copy
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
+
 import torch
 from torch.nn.utils import prune
 
-from plato.clients import simple
+from plato.clients import edge
 from plato.config import Config
 
 
-class Client(simple.Client):
-    """
-    A federated learning client prunes its update before sending out.
-    """
+class Client(edge.Client):
+    """A federated learning client at the edge server in a cross-silo training workload."""
 
     async def _train(self):
-        """The training process on a FedSaw client."""
-        previous_weights = copy.deepcopy(self.algorithm.extract_weights())
+        """The training process on a FedSaw edge client."""
+        previous_weights = copy.deepcopy(self.server.algorithm.extract_weights())
 
-        # Perform model training
-        self._report, _ = await super().train()
+        self._report, new_weights = await super()._train()
 
-        weight_updates = self.prune_updates(previous_weights)
-        logging.info("[Client #%d] Pruned its weight updates.", self.client_id)
+        weight_updates = self.prune_updates(previous_weights, new_weights)
+        logging.info("[Edge Server #%d] Pruned its aggregated updates.", self.client_id)
 
         return self._report, weight_updates
 
-    def prune_updates(self, previous_weights):
-        """Prune locally trained updates."""
-
-        updates = self.compute_weight_deltas(previous_weights)
-        self.algorithm.load_weights(updates)
-        updates_model = self.algorithm.model
+    def prune_updates(self, previous_weights, new_weights):
+        """Prunes aggregated updates."""
+        updates = self.compute_weight_updates(previous_weights, new_weights)
+        self.server.algorithm.load_weights(updates)
+        updates_model = self.server.algorithm.model
 
         parameters_to_prune = []
         for _, module in updates_model.named_modules():
@@ -54,7 +51,7 @@ class Client(simple.Client):
         prune.global_unstructured(
             parameters_to_prune,
             pruning_method=pruning_method,
-            amount=Config().clients.pruning_amount,
+            amount=self.server.edge_pruning_amount,
         )
 
         for module, name in parameters_to_prune:
@@ -62,11 +59,8 @@ class Client(simple.Client):
 
         return updates_model.cpu().state_dict()
 
-    def compute_weight_deltas(self, previous_weights):
-        """Compute the weight deltas."""
-        # Extract trained model weights
-        new_weights = self.algorithm.extract_weights()
-
+    def compute_weight_updates(self, previous_weights, new_weights):
+        """Computes the weight updates."""
         # Calculate deltas from the received weights
         deltas = OrderedDict()
         for name, new_weight in new_weights.items():
@@ -80,8 +74,9 @@ class Client(simple.Client):
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        if "pruning_amount" in server_response:
-            # Update pruning amount
-            Config().clients = Config().clients._replace(
-                pruning_amount=server_response["pruning_amount"]
-            )
+        super().process_server_response(server_response)
+
+        pruning_amount_list = server_response["pruning_amount"]
+        pruning_amount = pruning_amount_list[str(self.client_id)]
+        # Update pruning amount
+        self.server.edge_pruning_amount = pruning_amount
