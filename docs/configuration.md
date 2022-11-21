@@ -263,7 +263,7 @@ The training and test datasets. The following options are available:
 - `FashionMNIST`
 - `EMNIST`
 - `CIFAR10`
-- `CIFAR100`-
+- `CIFAR100`
 - `CINIC10`
 - `YOLO`
 - `HuggingFace`
@@ -482,23 +482,20 @@ If `true`, the learning rate of the first epoch in the next communication round 
 ````{admonition} **model_type**
 The repository where the machine learning model should be retrieved from. The following options are available:
 
-- `huggingface`
-- `torch_hub`
-- `vit`
+- `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
+- `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
+- `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
 
 The name of the model should be specified below, in `model_name`.
 
-```{note}
-For `vit`, please replace the `/` in model name from https://huggingface.co/models with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained
-weights, set `parameters -> model -> pretrained` to false.
-```
+````{note}
+For `vit`, please replace the `/` in model name from [https://huggingface.co/models](https://huggingface.co/models) with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained weights, set `parameters -> model -> pretrained` to `false`, as in the following example:
 
 ```
 parameters:
     model:
         pretrained: false
 ```
-
 ````
 
 ````{admonition} **model_name**
