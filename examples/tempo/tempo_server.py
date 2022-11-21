@@ -29,6 +29,9 @@ class Server(fedavg_cs.Server):
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wrap up generating the server response with any additional information."""
+        server_response = super().customize_server_response(
+            server_response, client_id=client_id
+        )
         if Config().is_central_server():
             server_response["local_epoch_num"] = self.local_epoch_list
         if Config().is_edge_server():
