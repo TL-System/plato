@@ -15,7 +15,8 @@ from transformers import AutoConfig, AutoModelForImageClassification
 
 
 from plato.config import Config
-from plato.models import t2tvit, dvit
+from plato.models import t2tvit
+from plato.models.dvit.models import deep_vision_transformer
 
 
 class ResolutionAdjustedModel(nn.Module):
@@ -90,7 +91,7 @@ class DeepViT(nn.Module):
     def __init__(self, name) -> nn.Module:
         super().__init__()
 
-        model_name = getattr(dvit.models.deep_vision_transformer, name)
+        model_name = getattr(deep_vision_transformer, name)
         deepvit = model_name(
             pretrained=False, num_classes=Config.trainer.num_classes, in_chans=3
         )
