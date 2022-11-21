@@ -55,11 +55,15 @@ def plot(
     x_value2,
     x_value3,
     x_value4,
+    x_value5,
+    x_value6,
     y_label,
     y_value1,
     y_value2,
     y_value3,
     y_value4,
+    y_value5,
+    y_value6,
     figure_file_name,
 ):
     """Plot a figure."""
@@ -92,7 +96,7 @@ def plot(
         # marker='s',
         label="Pisces_lossPerClient_withSqrt",
     )
-    """
+
     ax.plot(
         x_value4,
         y_value4,
@@ -100,9 +104,27 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_selection",
+        label="Pisces_lossPerClient_movingAvg",
     )
-    """
+
+    ax.plot(
+        x_value5,
+        y_value5,
+        color="black",
+        linewidth=1.5,
+        linestyle=":",
+        # marker='s',
+        label="Async_lossPerClient_movingAvg",
+    )
+    ax.plot(
+        x_value6,
+        y_value6,
+        color="purple",
+        linewidth=1.5,
+        linestyle=":",
+        # marker='s',
+        label="Pisces_modelUpdateAsStats",
+    )
     ax.legend(loc="lower right")
     ax.set(xlabel=x_label, ylabel=y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -125,14 +147,23 @@ def main():
     result_csv_file3 = "./pisces_femnist_lossPerClient_withsqrt.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./pisces_femnist.csv"
+    result_csv_file4 = "./pisces_lossPerClient_MovingAvg.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
+
+    result_csv_file5 = "./async_piscesClient_lossPerClient_epochMovingAvg_200rounds.csv"
+    result_dict5 = read_csv_to_dict(result_csv_file5, x_item, y_item)
+
+    result_csv_file6 = "./pisces_modelUpdateAsStats.csv"
+    result_dict6 = read_csv_to_dict(result_csv_file6, x_item, y_item)
+
     # x_item = 'round'
     x_label = "Elapsed Time"
     x_value1 = result_dict1[x_item]
     x_value2 = result_dict2[x_item]
     x_value3 = result_dict3[x_item]
     x_value4 = result_dict4[x_item]
+    x_value5 = result_dict5[x_item]
+    x_value6 = result_dict6[x_item]
 
     # y_item = 'accuracy'
     y_label = "Accuracy (%)"
@@ -140,6 +171,8 @@ def main():
     y_value2 = result_dict2[y_item]
     y_value3 = result_dict3[y_item]
     y_value4 = result_dict4[y_item]
+    y_value5 = result_dict5[y_item]
+    y_value6 = result_dict6[y_item]
 
     figure_file_name = "./femnist_rand1.pdf"
 
@@ -149,11 +182,15 @@ def main():
         x_value2,
         x_value3,
         x_value4,
+        x_value5,
+        x_value6,
         y_label,
         y_value1,
         y_value2,
         y_value3,
         y_value4,
+        y_value5,
+        y_value6,
         figure_file_name,
     )
 

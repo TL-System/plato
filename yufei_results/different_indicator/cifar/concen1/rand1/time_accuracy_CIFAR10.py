@@ -57,6 +57,7 @@ def plot(
     x_value4,
     x_value5,
     x_value6,
+    x_value7,
     y_label,
     y_value1,
     y_value2,
@@ -64,6 +65,7 @@ def plot(
     y_value4,
     y_value5,
     y_value6,
+    y_value7,
     figure_file_name,
 ):
     """Plot a figure."""
@@ -124,9 +126,18 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_g_s_0.01",
+        label="Async_modelUpdateAsStats",
     )
 
+    ax.plot(
+        x_value7,
+        y_value7,
+        color="purple",
+        linewidth=1.5,
+        linestyle=":",
+        # marker='s',
+        label="Pisces_modelUdpateAsStats",
+    )
     ax.legend(loc="lower right")
     ax.set(xlabel=x_label, ylabel=y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -158,6 +169,9 @@ def main():
     result_csv_file6 = "./async_logpoint1_initpoinpoint1_reach.csv"
     result_dict6 = read_csv_to_dict(result_csv_file6, x_item, y_item)
 
+    result_csv_file7 = "./pisces_modelUpdateAsStats.csv"
+    result_dict7 = read_csv_to_dict(result_csv_file7, x_item, y_item)
+
     # x_item = 'round'
     x_label = "Elapsed Time"
     x_value1 = result_dict1[x_item]
@@ -166,6 +180,7 @@ def main():
     x_value4 = result_dict4[x_item]
     x_value5 = result_dict5[x_item]
     x_value6 = result_dict6[x_item]
+    x_value7 = result_dict7[x_item]
 
     # y_item = 'accuracy'
     y_label = "Accuracy (%)"
@@ -175,6 +190,7 @@ def main():
     y_value4 = result_dict4[y_item]
     y_value5 = result_dict5[y_item]
     y_value6 = result_dict6[y_item]
+    y_value7 = result_dict7[y_item]
 
     figure_file_name = "./cifar10_rand1_concen1.pdf"
 
@@ -186,6 +202,7 @@ def main():
         x_value4,
         x_value5,
         x_value6,
+        x_value7,
         y_label,
         y_value1,
         y_value2,
@@ -193,6 +210,7 @@ def main():
         y_value4,
         y_value5,
         y_value6,
+        y_value7,
         figure_file_name,
     )
 
