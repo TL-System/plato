@@ -1,11 +1,11 @@
 """
-Obtaining a ViT model for image classification from HuggingFace.
+Obtaining a Vision Transformer (ViT) model for image classification from HuggingFace.
 
-The reference to T2T-ViT model:
-https://github.com/yitu-opensource/T2T-ViT.
+Reference to the Tokens-to-Token ViT (T2T-ViT) model:
+https://github.com/yitu-opensource/T2T-ViT
 
-The reference to Deep-ViT model:
-https://github.com/zhoudaquan/dvit_repo.
+Reference to the Deep Vision Transformer (DeepViT) model:
+https://github.com/zhoudaquan/dvit_repo
 
 """
 
@@ -53,7 +53,7 @@ class ResolutionAdjustedModel(nn.Module):
 
 
 class T2TVIT(nn.Module):
-    """Wrap up t2t-vit."""
+    """Wrapper for the T2T-ViT model."""
 
     def __init__(self, name) -> nn.Module:
         super().__init__()
@@ -77,7 +77,7 @@ class T2TVIT(nn.Module):
         self.resolution = 224
 
     def forward(self, feature):
-        """forward function"""
+        """The forward pass."""
         if feature.size(-1) != self.resolution:
             feature = nn.functional.interpolate(
                 feature, size=self.resolution, mode="bicubic"
@@ -86,7 +86,7 @@ class T2TVIT(nn.Module):
 
 
 class DeepViT(nn.Module):
-    """Wrap up deep vit."""
+    """Wrapper for the DeepViT model."""
 
     def __init__(self, name) -> nn.Module:
         super().__init__()
@@ -110,11 +110,12 @@ class DeepViT(nn.Module):
         self.resolution = 224
 
     def forward(self, feature):
-        """forward function"""
+        """The forward pass."""
         if feature.size(-1) != self.resolution:
             feature = nn.functional.interpolate(
                 feature, size=self.resolution, mode="bicubic"
             )
+
         return self.model(feature)
 
 
@@ -131,6 +132,7 @@ class Model:
         """Returns a named model from HuggingFace."""
         if "T2t" in model_name:
             return T2TVIT(model_name)
+
         if "deepvit" in model_name:
             return DeepViT(model_name)
 
