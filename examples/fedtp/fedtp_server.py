@@ -42,6 +42,7 @@ class Server(fedavg.Server):
             depth=Config().parameters.hypernet.depth,
             client_sample=Config().clients.per_round,
         )
+        self.hnet = self.hnet.to(Config().device())
         self.hnet_optimizer = None
         self.attentions = {}
         self.current_attention = None
@@ -98,8 +99,9 @@ class Server(fedavg.Server):
                     )
 
         self.hnet_optimizer.zero_grad()
+
         for param, grad in zip(self.hnet.parameters(), grads_update):
-            param.grad = grad
+            param.grad = grad  # .copy_(grad)
         self.hnet_optimizer.step()
 
         avg_update = await super().aggregate_deltas(updates, deltas_recieved)

@@ -60,8 +60,8 @@ server:
     ping_interval: 12000
     ping_timeout: 12000
 
-    #model_path: ../plato_models/fedtp/cifar10_noniid/t2tvit14
-    #checkpoint_path: ../plato_models/fedtp/cifar10_noniid/t2tvit14
+    #model_path: ../plato_models/fedtp/cifar10_noniid/vit
+    #checkpoint_path: ../plato_models/fedtp/cifar10_noniid/vit
 
     simulate_wall_time: true
 
@@ -199,5 +199,5 @@ parameters:
     #    pretrain_path: ../pretrained/ML_Models/VIT/T2T-VIT/T2T_ViT_14.pth.tar
 
 results:
-    #result_path: ../plato_results/fedtp/cifar10_noniid/t2tvit14
+    #result_path: ../plato_results/fedtp/cifar10_noniid/vit
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead

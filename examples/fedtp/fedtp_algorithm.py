@@ -9,7 +9,6 @@ arXiv preprint arXiv:2211.01572 (2022).
 
 https://arxiv.org/pdf/2211.01572v1.pdf.
 """
-
 import torch
 
 from plato.algorithms import fedavg
@@ -26,7 +25,6 @@ class ServerAlgorithm(fedavg.Algorithm):
 
     def generate_attention(self, hnet, client_id):
         """Generated the customized attention of each client"""
-        hnet = hnet.to(Config.device())
         weights = hnet(
             torch.tensor([client_id - 1], dtype=torch.long).to(Config().device())
         )
