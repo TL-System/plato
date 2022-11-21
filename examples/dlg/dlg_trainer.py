@@ -75,7 +75,7 @@ class Trainer(basic.Trainer):
         self.target_grad = None
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform the forward and backward passes of the training loop."""
+        """Perform forward and backward passes in the training loop."""
         # Store data in the first epoch (later epochs will still have the same partitioned data)
         if self.current_epoch == 1:
             try:
