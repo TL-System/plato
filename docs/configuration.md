@@ -108,7 +108,9 @@ A list of processors for the client to apply on the payload before sending it ou
 
 - `model_randomized_response` Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
 
-- `model_quantize` Quantize features for model parameters for PyTorch.
+- `model_quantize` Quantize model parameters for PyTorch.
+
+- `model_quantize_qsgd` Quantize model parameters for PyTorch with QSGD.
 
 - `unstructured_pruning` Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
@@ -231,7 +233,9 @@ A list of processors to apply on the payload right after receiving. Multiple pro
 
 - `feature_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
 
-- `model_dequantize`: Dequantize features for PyTorch model parameters.
+- `model_dequantize`: Dequantize PyTorch model parameters back to the 32-bit floating number format.
+
+- `model_dequantize_qsgd`: Dequantize PyTorch model parameters quantized with QSGD.
 ```
 
 ```{admonition} downlink_bandwidth
@@ -259,7 +263,7 @@ The training and test datasets. The following options are available:
 - `FashionMNIST`
 - `EMNIST`
 - `CIFAR10`
-- `CIFAR100`-
+- `CIFAR100`
 - `CINIC10`
 - `YOLO`
 - `HuggingFace`
@@ -478,16 +482,20 @@ If `true`, the learning rate of the first epoch in the next communication round 
 ````{admonition} **model_type**
 The repository where the machine learning model should be retrieved from. The following options are available:
 
-- `huggingface`
-- `torch_hub`
-- `vit`
+- `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
+- `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
+- `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
 
 The name of the model should be specified below, in `model_name`.
 
-```{note}
-For `vit`, please replace the `/` in model name from https://huggingface.co/models with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`.
-```
+````{note}
+For `vit`, please replace the `/` in model name from [https://huggingface.co/models](https://huggingface.co/models) with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained weights, set `parameters -> model -> pretrained` to `false`, as in the following example:
 
+```
+parameters:
+    model:
+        pretrained: false
+```
 ````
 
 ````{admonition} **model_name**
