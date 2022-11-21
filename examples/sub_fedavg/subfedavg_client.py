@@ -16,8 +16,8 @@ class Client(simple.Client):
         """The training process on a Sub-FedAvg client."""
 
         # Perform model training
-        self.report, weights = await super().train()
+        self._report, weights = await super()._train()
 
         logging.info("[Client #%d] Trained with Sub-FedAvg algorithm.", self.client_id)
 
-        return self.report, weights
+        return self._report, weights

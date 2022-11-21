@@ -165,6 +165,27 @@ python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_len
 ```
 ````
 
+````{admonition} **Sub-FedAvg**
+Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. local data and reduce. It iteratively prunes the parameters of the neural networks which results in removing the commonly shared parameters of clients’ models and keeping the personalized ones. Besides the original version for two-layer federated learning, the version for three-layer federated learning has been implemented as well.
+
+For two-layer federated learning:
+
+```shell
+python examples/sub_fedavg/subfedavg.py -c examples/sub_fedavg/subfedavg_MNIST_lenet5.yml
+```
+
+For three-layer federated learning:
+
+```shell
+python examples/sub_fedavg/subcs.py -c examples/sub_fedavg/subcs_MNIST_lenet5.yml
+```
+
+```{note}
+Vahidian et al., &ldquo;[Personalized Federated Learning by Structured and Unstructured Pruning under Data Heterogeneity](https://arxiv.org/pdf/2105.00562.pdf),
+&rdquo; in Proc. 41st IEEE International Conference on Distributed Computing Systems Workshops (ICDCSW), 2021.
+```
+````
+
 ````{admonition} **Tempo**
 Tempo is proposed to improve training performance in three-layer federated learning. It adaptively tunes the number of each client's local training epochs based on the difference between its edge server's locally aggregated model and the current global model.
 
