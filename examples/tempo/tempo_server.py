@@ -1,6 +1,6 @@
 """
 A cross-silo federated learning server that tunes
-clients' local epoch numbers of each institution.
+clients' local epoch numbers of each edge server (institution).
 """
 
 import math
@@ -14,13 +14,13 @@ from plato.servers import fedavg_cs
 class Server(fedavg_cs.Server):
     """
     A cross-silo federated learning server that tunes
-    clients' local epoch numbers of each institution.
+    clients' local epoch numbers of each edge server.
     """
 
     def __init__(self):
         super().__init__()
 
-        # The central server uses a list to store each institution's clients' local epoch numbers
+        # The central server uses a list to store each edge server's clients' local epoch numbers
         self.local_epoch_list = None
         if Config().is_central_server():
             self.local_epoch_list = [
@@ -28,7 +28,7 @@ class Server(fedavg_cs.Server):
             ]
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
-        """Wrap up generating the server response with any additional information."""
+        """Wraps up generating the server response with any additional information."""
         server_response = super().customize_server_response(
             server_response, client_id=client_id
         )
@@ -50,8 +50,8 @@ class Server(fedavg_cs.Server):
 
     def _update_local_epoch_list(self):
         """
-        Update the local epoch list:
-        decide clients' local epoch numbers of each institution.
+        Updates the local epoch list:
+        decide clients' local epoch numbers of each edge server.
         """
         weights_diff_list = self.get_weights_differences()
 
@@ -76,7 +76,7 @@ class Server(fedavg_cs.Server):
 
     def get_weights_differences(self):
         """
-        Get the weights divergence of each edge server's aggregated model
+        Gets the weights divergence of each edge server's aggregated model
         and the global model accuracy.
         """
         weights_diff_list = []
@@ -97,7 +97,7 @@ class Server(fedavg_cs.Server):
 
     def compute_weights_difference(self, local_weights, num_samples):
         """
-        Compute the weight difference of an edge server's aggregated model
+        Computes the weight difference of an edge server's aggregated model
         and the global model.
         """
         weights_diff = 0

@@ -18,5 +18,5 @@ class Client(edge.Client):
         index = self.client_id - Config().clients.total_clients - 1
         local_epoch_num = local_epoch_list[index]
 
-        # Update the number of local epochs
+        # Update the number of local training epochs
         Config().trainer = Config().trainer._replace(epochs=local_epoch_num)
