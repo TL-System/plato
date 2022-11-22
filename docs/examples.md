@@ -165,6 +165,48 @@ python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_len
 ```
 ````
 
+````{admonition} **Sub-FedAvg**
+Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. local data and reduce. It iteratively prunes the parameters of the neural networks which results in removing the commonly shared parameters of clients’ models and keeping the personalized ones. Besides the original version for two-layer federated learning, the version for three-layer federated learning has been implemented as well.
+
+For two-layer federated learning:
+
+```shell
+python examples/sub_fedavg/subfedavg.py -c examples/sub_fedavg/subfedavg_MNIST_lenet5.yml
+```
+
+For three-layer federated learning:
+
+```shell
+python examples/sub_fedavg/subcs.py -c examples/sub_fedavg/subcs_MNIST_lenet5.yml
+```
+
+```{note}
+Vahidian et al., &ldquo;[Personalized Federated Learning by Structured and Unstructured Pruning under Data Heterogeneity](https://arxiv.org/pdf/2105.00562.pdf),
+&rdquo; in Proc. 41st IEEE International Conference on Distributed Computing Systems Workshops (ICDCSW), 2021.
+```
+````
+
+````{admonition} **Tempo**
+Tempo is proposed to improve training performance in three-layer federated learning. It adaptively tunes the number of each client's local training epochs based on the difference between its edge server's locally aggregated model and the current global model.
+
+```shell
+python examples/tempo/tempo.py -c examples/tempo/tempo_MNIST_lenet5.yml
+```
+
+```{note}
+Ying et al., &ldquo;[Tempo: Improving Training Performance in Cross-Silo Federated Learning](https://iqua.ece.toronto.edu/papers/chenying-icassp22.pdf),
+&rdquo; in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2022.
+```
+````
+
+````{admonition} **FedSaw**
+FedSaw is proposed to improve training performance in three-layer federated learning with L1-norm structured pruning. Edge servers and clients pruned their updates before sending them out. FedSaw adaptively tunes the pruning amount of each edge server and its clients based on the difference between the edge server's locally aggregated model and the current global model.
+
+```shell
+python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
+```
+````
+
 ````{admonition} **PerFedRLNAS**
 PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, only example of NASVIT search space is provided.
 
@@ -172,7 +214,6 @@ PerFedRLNAS is an algorithm designed to personalize different models on each cli
 python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/FedNAS_CIFAR10_NASVIT_NonIID01_Scratch.yml
 ```
 ````
-
 
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 

@@ -1,13 +1,14 @@
 """
 A federated learning training session using Tempo.
 """
+
 import tempo_server
 import tempo_client
 import tempo_edge
 
 
 def main():
-    """ A Plato federated learning training session using the Tempo algorithm. """
+    """A Plato federated learning training session using the Tempo algorithm."""
     server = tempo_server.Server()
     client = tempo_client.Client()
     edge_server = tempo_server.Server
