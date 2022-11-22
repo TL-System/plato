@@ -59,12 +59,11 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    personalized_model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
-parameters:
 
 parameters:
     optimizer:
@@ -90,3 +89,10 @@ parameters:
 
     personalized_loss_criterion:
       label_smoothing: 0.5
+
+    model:
+        num_classes: 10
+
+    personalized_model:
+        num_classes: 20
+
