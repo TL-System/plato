@@ -1,10 +1,10 @@
 """
 Returns a learning rate scheduler according to the configuration.
 """
-
 import bisect
 import sys
 from types import SimpleNamespace
+from typing import Union
 
 import numpy as np
 from timm import scheduler
@@ -13,7 +13,9 @@ from torch import optim
 from plato.config import Config
 
 
-def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
+def get(
+    optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: Union[str, dict]
+):
     """Returns a learning rate scheduler according to the configuration."""
 
     registered_schedulers = {
@@ -33,17 +35,25 @@ def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
         "timm": scheduler.create_scheduler,
     }
 
-    _scheduler = Config().trainer.lr_scheduler
-    lr_params = Config().parameters.learning_rate._asdict()
+    _scheduler = (
+        kwargs["optim.lr_scheduler"]
+        if "optim.lr_scheduler" in kwargs
+        else Config().trainer.optim.lr_scheduler
+    )
+    lr_params = (
+        kwargs["lr_params"]
+        if "lr_params" in kwargs
+        else Config().parameters.learning_rate._asdict()
+    )
 
     # First, look up the registered factories of LR schedulers
     if _scheduler in registered_factories:
         scheduler_args = SimpleNamespace(**lr_params)
         scheduler_args.epochs = Config().trainer.epochs
-        lr_scheduler, __ = registered_factories[_scheduler](
+        optim.lr_scheduler, __ = registered_factories[_scheduler](
             args=scheduler_args, optimizer=optimizer
         )
-        return lr_scheduler
+        return optim.lr_scheduler
 
     # The list containing the learning rate schedulers that must be returned or
     # the learning rate schedulers that ChainedScheduler or SequentialLR will
@@ -54,18 +64,18 @@ def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
     use_sequential = False
     if "ChainedScheduler" in _scheduler:
         use_chained = True
-        lr_scheduler = [
+        optim.lr_scheduler = [
             sched for sched in _scheduler.split(",") if sched != ("ChainedScheduler")
         ]
     elif "SequentialLR" in _scheduler:
         use_sequential = True
-        lr_scheduler = [
+        optim.lr_scheduler = [
             sched for sched in _scheduler.split(",") if sched != ("SequentialLR")
         ]
     else:
-        lr_scheduler = [_scheduler]
+        optim.lr_scheduler = [_scheduler]
 
-    for _scheduler in lr_scheduler:
+    for _scheduler in optim.lr_scheduler:
         retrieved_scheduler = registered_schedulers.get(_scheduler)
 
         if retrieved_scheduler is None:
