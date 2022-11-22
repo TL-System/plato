@@ -31,7 +31,7 @@ class Server(fedavg.Server):
         self.masks_received = []
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Aggregate weight updates from the clients using personalized aggregating."""
+        """Aggregates weight updates from the clients using personalized aggregating."""
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
@@ -89,7 +89,8 @@ class Server(fedavg.Server):
         return weights_received
 
     def save_personalized_models(self, personalized_models, updates):
-        """Save each client's personalized model."""
+        """Saves each client's personalized model."""
+
         for (personalized_model, update) in zip(personalized_models, updates):
             model_name = (
                 Config().trainer.model_name
@@ -141,7 +142,6 @@ class Server(fedavg.Server):
 
     def weights_received(self, weights_received):
         """Event called after the updated weights have been received."""
-
         # Extract the model weight updates from client updates along with the masks
         self.masks_received = [payload[1] for payload in weights_received]
         weights = [payload[0] for payload in weights_received]
