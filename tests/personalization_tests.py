@@ -4,11 +4,9 @@ import unittest
 
 os.environ["config_file"] = "tests/TestsConfig/personalized_config.yml"
 
+from plato.models import registry as models_registry
 from plato.config import Config
-import plato.models.registry as models_registry
-from plato.trainers import optimizers
-from plato.trainers import lr_schedulers
-from plato.trainers import loss_criterion
+from plato.trainers import loss_criterion, lr_schedulers, optimizers
 
 
 class LrSchedulerTest(unittest.TestCase):
@@ -23,7 +21,6 @@ class LrSchedulerTest(unittest.TestCase):
         self.loss = loss_criterion.get()
 
     def test_personalized_config(self):
-
         # define the terms for personalization
         # 1. optimizer
         personalized_optimizer = optimizers.get(

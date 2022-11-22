@@ -24,15 +24,25 @@ def get(**kwargs: Union[str, dict]):
         "KLDivLoss": nn.KLDivLoss,
     }
 
-    loss_criterion_name = kwargs[
-        "loss_criterion"] if "loss_criterion" in kwargs else (
-            Config().trainer.loss_criterion if hasattr(
-                Config.trainer, "loss_criterion") else "CrossEntropyLoss")
+    loss_criterion_name = (
+        kwargs["loss_criterion"]
+        if "loss_criterion" in kwargs
+        else (
+            Config().trainer.loss_criterion
+            if hasattr(Config.trainer, "loss_criterion")
+            else "CrossEntropyLoss"
+        )
+    )
 
-    loss_criterion_params = kwargs[
-        "loss_criterion_params"] if "loss_criterion_params" in kwargs else (
-            Config().parameters.loss_criterion._asdict() if hasattr(
-                Config.parameters, "loss_criterion") else {})
+    loss_criterion_params = (
+        kwargs["loss_criterion_params"]
+        if "loss_criterion_params" in kwargs
+        else (
+            Config().parameters.loss_criterion._asdict()
+            if hasattr(Config.parameters, "loss_criterion")
+            else {}
+        )
+    )
 
     loss_criterion = registered_loss_criterion.get(loss_criterion_name)
 

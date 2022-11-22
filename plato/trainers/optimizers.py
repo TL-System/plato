@@ -28,12 +28,16 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         "SGD": optim.SGD,
     }
 
-    optimizer_name = kwargs[
-        "optimizer_name"] if "optimizer_name" in kwargs else Config(
-        ).trainer.optimizer
-    optim_params = kwargs[
-        "optim_params"] if "optim_params" in kwargs else Config(
-        ).parameters.optimizer._asdict()
+    optimizer_name = (
+        kwargs["optimizer_name"]
+        if "optimizer_name" in kwargs
+        else Config().trainer.optimizer
+    )
+    optim_params = (
+        kwargs["optim_params"]
+        if "optim_params" in kwargs
+        else Config().parameters.optimizer._asdict()
+    )
 
     optimizer = registered_optimizers.get(optimizer_name)
     if optimizer is not None:
