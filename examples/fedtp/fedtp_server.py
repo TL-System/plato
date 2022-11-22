@@ -9,6 +9,7 @@ arXiv preprint arXiv:2211.01572 (2022).
 
 https://arxiv.org/pdf/2211.01572v1.pdf.
 """
+import copy
 from collections import OrderedDict
 
 import hypernetworks
@@ -54,7 +55,7 @@ class Server(fedavg.Server):
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         attentions_customized = self.algorithm.generate_attention(self.hnet, client_id)
 
-        self.attentions[client_id] = attentions_customized
+        self.attentions[client_id] = copy.deepcopy(attentions_customized)
         self.current_attention = attentions_customized
         return super().customize_server_response(
             server_response=server_response, client_id=client_id
