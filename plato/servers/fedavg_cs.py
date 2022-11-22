@@ -198,7 +198,6 @@ class Server(fedavg.Server):
                 "[Server #%d] Aggregating model weights directly rather than weight deltas.",
                 os.getpid(),
             )
-
             updated_weights = await self.aggregate_weights(
                 self.updates, baseline_weights, weights_received
             )
@@ -340,8 +339,9 @@ class Server(fedavg.Server):
         logged_items["local_epoch_num"] = Config().trainer.epochs
 
         if Config().is_central_server():
-            logged_items["comm_time"] += max(
-                update.report.edge_server_comm_time for update in self.updates
+            logged_items["comm_time"] = max(
+                update.report.comm_time + update.report.edge_server_comm_time
+                for update in self.updates
             )
 
         return logged_items

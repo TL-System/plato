@@ -1,11 +1,14 @@
+general:
+    base_path: ./test
+
 clients:
     type: simple
 
     # The total number of clients
-    total_clients: 200
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -21,20 +24,25 @@ data:
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ../../../data
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 100
 
     # IID or non-IID?
     sampler: iid
+
+    testset_size: 1000
+
+    # The random seed for sampling data
+    random_seed: 1
 
 trainer:
     # The type of the trainer
     type: basic
 
     # The maximum number of training rounds
-    rounds: 30
+    rounds: 2
 
     # The maximum number of clients running concurrently
     max_concurrency: 1
@@ -43,7 +51,7 @@ trainer:
     target_accuracy: 0.95
 
     # Number of epoches for local training in each communication round
-    epochs: 6
+    epochs: 4
     batch_size: 10
     optimizer: SGD
 
@@ -58,14 +66,18 @@ algorithm:
     cross_silo: true
 
     # The total number of silos (edge servers)
-    total_silos: 5
+    total_silos: 2
 
     # The number of local aggregation rounds on edge servers before sending
     # aggregated weights to the central server
-    local_rounds: 4
+    local_rounds: 2
 
 parameters:
     optimizer:
         lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead

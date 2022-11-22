@@ -1,3 +1,6 @@
+general:
+    base_path: ./test
+
 clients:
     # Type
     type: simple
@@ -11,11 +14,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Whether simulate clients or not
-    simulation: true
-    comm_simulation: true
-
-    pruning_amount: 0.4
+    #pruning_amount: 0.4
 
     # Processors for outbound data payloads
     outbound_processors:
@@ -26,7 +25,6 @@ server:
     address: 127.0.0.1
     port: 8000
     do_test: true
-    edge_do_test: true
 
     inbound_processors:
         - model_decompress
@@ -39,7 +37,7 @@ data:
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ../../../data
 
     # Number of samples in each partition
     partition_size: 100
@@ -58,10 +56,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
-
-    # Whether the training should use multiple GPUs if available
-    parallelized: false
+    rounds: 3
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -93,9 +88,7 @@ algorithm:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, average_accuracy, elapsed_time, comm_time, round_time, comm_overhead
-
-    result_path: ./results/test
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
 parameters:
     optimizer:

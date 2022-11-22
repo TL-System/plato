@@ -27,11 +27,10 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
         self.clients_first_time = [True for _ in range(Config().clients.total_clients)]
-        self.personalized_models = []
         self.masks_received = []
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Aggregate weight updates from the clients using personalized aggregating."""
+        """Aggregates weight updates from the clients using personalized aggregating."""
         # Extract the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
@@ -85,11 +84,21 @@ class Server(fedavg.Server):
                 for model in weights_received:
                     model[layer_name] = new_tensor
 
-        self.save_personalized_models(self.personalized_models, updates)
-        return weights_received
+        self.save_personalized_models(weights_received, updates)
+
+        deltas_received = self.algorithm.compute_weight_deltas(
+            baseline_weights, weights_received
+        )
+
+        deltas = await self.aggregate_deltas(self.updates, deltas_received)
+        # Updates the existing model weights from the provided deltas
+        updated_weights = self.algorithm.update_weights(deltas)
+
+        return updated_weights
 
     def save_personalized_models(self, personalized_models, updates):
-        """Save each client's personalized model."""
+        """Saves each client's personalized model."""
+
         for (personalized_model, update) in zip(personalized_models, updates):
             model_name = (
                 Config().trainer.model_name
@@ -121,12 +130,10 @@ class Server(fedavg.Server):
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
+
         model_path = Config().params["model_path"]
         if not self.clients_first_time[self.selected_client_id - 1]:
-            filename = (
-                f"{model_path}/personalized_{model_name}"
-                f"_client{self.selected_client_id}.pth"
-            )
+            filename = f"{model_path}/personalized_{model_name}_client{self.selected_client_id}.pth"
             with open(filename, "rb") as payload_file:
                 payload = pickle.load(payload_file)
             logging.info(
@@ -141,7 +148,6 @@ class Server(fedavg.Server):
 
     def weights_received(self, weights_received):
         """Event called after the updated weights have been received."""
-
         # Extract the model weight updates from client updates along with the masks
         self.masks_received = [payload[1] for payload in weights_received]
         weights = [payload[0] for payload in weights_received]

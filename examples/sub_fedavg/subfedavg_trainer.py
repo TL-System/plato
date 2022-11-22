@@ -3,7 +3,7 @@ The training and testing loops for PyTorch.
 """
 import copy
 import logging
-import os
+import time
 
 import torch
 
@@ -17,12 +17,20 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer for Sub-Fedavg algorithm."""
 
-    def __init__(self, model=None):
-        """Initializing the trainer with the provided model."""
-        super().__init__(model=model)
+    def __init__(self, model=None, callbacks=None):
+        """Initializes the trainer with the provided model."""
+        super().__init__(model=model, callbacks=callbacks)
         self.mask = None
-        self.pruning_target = Config().clients.pruning_amount * 100
-        self.pruning_amount = Config().clients.pruning_amount * 100
+        self.pruning_target = (
+            Config().clients.pruning_amount * 100
+            if hasattr(Config().clients, "pruning_amount")
+            else 40
+        )
+        self.pruning_amount = (
+            Config().clients.pruning_amount * 100
+            if hasattr(Config().clients, "pruning_amount")
+            else 40
+        )
         self.pruned = 0
         self.made_init_mask = False
         self.mask_distance_threshold = (
@@ -30,6 +38,8 @@ class Trainer(basic.Trainer):
             if hasattr(Config().clients, "mask_distance_threshold")
             else 0.0001
         )
+        self.first_epoch_mask = None
+        self.last_epoch_mask = None
 
         self.datasource = None
         self.testset = None
@@ -41,122 +51,61 @@ class Trainer(basic.Trainer):
             else 0.5
         )
 
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Performs forward and backward passes in the training loop."""
+        self.optimizer.zero_grad()
+
+        outputs = self.model(examples)
+
+        loss = self._loss_criterion(outputs, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        # Freeze pruned weights by zeroing their gradients
+        step = 0
+        for name, parameter in self.model.named_parameters():
+            if "weight" in name:
+                grad_tensor = parameter.grad.data.cpu().numpy()
+                grad_tensor = grad_tensor * self.mask[step]
+                parameter.grad.data = torch.from_numpy(grad_tensor).to(self.device)
+                step = step + 1
+
+        self.optimizer.step()
+
+        return loss
+
     # pylint: disable=unused-argument
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """The custom training loop for Sub-FedAvg(Un)."""
-        batch_size = config["batch_size"]
-        log_interval = 10
+    def train_run_start(self, config):
+        """Method called at the start of training run."""
+        self.mask = pruning_processor.make_init_mask(self.model)
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        _train_loader = getattr(self, "train_loader", None)
-
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler)
-        else:
-            train_loader = torch.utils.data.DataLoader(
-                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+    def train_epoch_end(self, config):
+        """Method called at the end of a training epoch."""
+        if self.current_epoch == 1:
+            self.first_epoch_mask = pruning_processor.fake_prune(
+                self.pruning_amount,
+                copy.deepcopy(self.model),
+                copy.deepcopy(self.mask),
             )
-
-        epochs = config["epochs"]
-
-        # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = torch.nn.CrossEntropyLoss()
-
-        # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
-
-        # Initializing the learning rate schedule, if necessary
-        if "lr_schedule" in config:
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, len(train_loader), train_loader
+        if self.current_epoch == config["epochs"]:
+            self.last_epoch_mask = pruning_processor.fake_prune(
+                self.pruning_amount,
+                copy.deepcopy(self.model),
+                copy.deepcopy(self.mask),
             )
-        else:
-            lr_schedule = None
+        super().train_epoch_end(config)
 
-        self.model.to(self.device)
-        self.model.train()
-
-        # Initializing the learning rate schedule, if necessary
-        if hasattr(config, "lr_scheduler"):
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader
-            )
-        else:
-            lr_schedule = None
-
-        for epoch in range(1, epochs + 1):
-            # Use a default training loop
-            for batch_id, (examples, labels) in enumerate(train_loader):
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                optimizer.zero_grad()
-
-                outputs = self.model(examples)
-
-                loss = loss_criterion(outputs, labels)
-
-                loss.backward()
-
-                # Freezing Pruned weights by making their gradients Zero
-                step = 0
-                for name, parameter in self.model.named_parameters():
-                    if "weight" in name:
-                        grad_tensor = parameter.grad.data.cpu().numpy()
-                        grad_tensor = grad_tensor * self.mask[step]
-                        parameter.grad.data = torch.from_numpy(grad_tensor).to(
-                            self.device
-                        )
-                        step = step + 1
-
-                optimizer.step()
-
-                if batch_id % log_interval == 0:
-                    if self.client_id == 0:
-                        logging.info(
-                            "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            os.getpid(),
-                            epoch,
-                            epochs,
-                            batch_id,
-                            len(train_loader),
-                            loss.data.item(),
-                        )
-                    else:
-                        logging.info(
-                            "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                            self.client_id,
-                            epoch,
-                            epochs,
-                            batch_id,
-                            len(train_loader),
-                            loss.data.item(),
-                        )
-
-            if lr_schedule is not None:
-                lr_scheduler.step()
-
-            if epoch == 1:
-                first_epoch_mask = pruning_processor.fake_prune(
-                    self.pruning_amount,
-                    copy.deepcopy(self.model),
-                    copy.deepcopy(self.mask),
-                )
-            if epoch == epochs:
-                last_epoch_mask = pruning_processor.fake_prune(
-                    self.pruning_amount,
-                    copy.deepcopy(self.model),
-                    copy.deepcopy(self.mask),
-                )
-
-        self.process_pruning(first_epoch_mask, last_epoch_mask)
+    # pylint: disable=unused-argument
+    def train_run_end(self, config):
+        """Method called at the end of a training run."""
+        self.process_pruning(self.first_epoch_mask, self.last_epoch_mask)
 
     def process_pruning(self, first_epoch_mask, last_epoch_mask):
-        """Process unstructed pruning."""
+        """Processes unstructed pruning."""
         mask_distance = pruning_processor.dist_masks(first_epoch_mask, last_epoch_mask)
 
         if (
@@ -196,7 +145,7 @@ class Trainer(basic.Trainer):
         self.pruned, _ = pruning_processor.compute_pruned_amount(self.model)
 
     def eval_test(self):
-        """Test if needs to update pruning mask and conduct pruning."""
+        """Tests if needs to update pruning mask and conduct pruning."""
         if not self.testset_loaded:
             self.datasource = datasources_registry.get(client_id=self.client_id)
             self.testset = self.datasource.get_test_set()

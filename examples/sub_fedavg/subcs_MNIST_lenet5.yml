@@ -1,3 +1,6 @@
+general:
+    base_path: ./test
+
 clients:
     # Type
     type: simple
@@ -11,6 +14,10 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Whether simulate clients or not
+    simulation: true
+    comm_simulation: true
+
     pruning_amount: 0.4
 
     # Processors for outbound data payloads
@@ -18,6 +25,7 @@ clients:
         - model_compress
 
 server:
+    type: fedavg_cross_silo
     address: 127.0.0.1
     port: 8000
     do_test: true
@@ -25,15 +33,12 @@ server:
     inbound_processors:
         - model_decompress
 
-    checkpoint_path: results/test/checkpoint
-    model_path: results/test/model
-
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ../../../data
 
     # Number of samples in each partition
     partition_size: 100
@@ -53,6 +58,9 @@ trainer:
     # The maximum number of training rounds
     rounds: 2
 
+    # Whether the training should use multiple GPUs if available
+    parallelized: false
+
     # The maximum number of clients running concurrently
     max_concurrency: 2
 
@@ -71,14 +79,22 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-results:
-    # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
+    # Cross-silo training
+    cross_silo: true
 
-    result_path: results/test
+    # The total number of silos (edge servers)
+    total_silos: 2
+
+    # The number of local aggregation rounds on edge servers before sending
+    # aggregated weights to the central server
+    local_rounds: 2
 
 parameters:
     optimizer:
         lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
