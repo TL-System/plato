@@ -1,10 +1,10 @@
 """
 Returns a learning rate scheduler according to the configuration.
 """
-
 import bisect
 import sys
 from types import SimpleNamespace
+from typing import Union
 
 import numpy as np
 from timm import scheduler
@@ -13,7 +13,7 @@ from torch import optim
 from plato.config import Config
 
 
-def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
+def get(optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: Union[str, dict]):
     """Returns a learning rate scheduler according to the configuration."""
 
     registered_schedulers = {
@@ -33,8 +33,8 @@ def get(optimizer: optim.Optimizer, iterations_per_epoch: int):
         "timm": scheduler.create_scheduler,
     }
 
-    _scheduler = Config().trainer.lr_scheduler
-    lr_params = Config().parameters.learning_rate._asdict()
+    _scheduler = kwargs["lr_scheduler"] if "lr_scheduler" in kwargs else Config().trainer.lr_scheduler
+    lr_params = kwargs["lr_params"] if "lr_params" in kwargs else Config().parameters.learning_rate._asdict()
 
     # First, look up the registered factories of LR schedulers
     if _scheduler in registered_factories:
