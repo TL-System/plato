@@ -36,9 +36,9 @@ def get(
     }
 
     _scheduler = (
-        kwargs["optim.lr_scheduler"]
-        if "optim.lr_scheduler" in kwargs
-        else Config().trainer.optim.lr_scheduler
+        kwargs["lr_scheduler"]
+        if "lr_scheduler" in kwargs
+        else Config().trainer.lr_scheduler
     )
     lr_params = (
         kwargs["lr_params"]
@@ -50,10 +50,10 @@ def get(
     if _scheduler in registered_factories:
         scheduler_args = SimpleNamespace(**lr_params)
         scheduler_args.epochs = Config().trainer.epochs
-        optim.lr_scheduler, __ = registered_factories[_scheduler](
+        lr_scheduler, __ = registered_factories[_scheduler](
             args=scheduler_args, optimizer=optimizer
         )
-        return optim.lr_scheduler
+        return lr_scheduler
 
     # The list containing the learning rate schedulers that must be returned or
     # the learning rate schedulers that ChainedScheduler or SequentialLR will
@@ -64,18 +64,18 @@ def get(
     use_sequential = False
     if "ChainedScheduler" in _scheduler:
         use_chained = True
-        optim.lr_scheduler = [
+        lr_scheduler = [
             sched for sched in _scheduler.split(",") if sched != ("ChainedScheduler")
         ]
     elif "SequentialLR" in _scheduler:
         use_sequential = True
-        optim.lr_scheduler = [
+        lr_scheduler = [
             sched for sched in _scheduler.split(",") if sched != ("SequentialLR")
         ]
     else:
-        optim.lr_scheduler = [_scheduler]
+        lr_scheduler = [_scheduler]
 
-    for _scheduler in optim.lr_scheduler:
+    for _scheduler in lr_scheduler:
         retrieved_scheduler = registered_schedulers.get(_scheduler)
 
         if retrieved_scheduler is None:
