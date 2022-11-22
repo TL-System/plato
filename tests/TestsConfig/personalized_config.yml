@@ -1,0 +1,92 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 30
+
+    # The number of clients selected in each round
+    per_round: 30
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Number of samples in each partition
+    partition_size: 2000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 5
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 4
+
+    # The target accuracy
+    target_accuracy: 0.94
+
+    # Number of epoches for local training in each communication round
+    epochs: 3
+    batch_size: 64
+    optimizer: SGD
+    lr_scheduler: MultiStepLR
+    loss_criterion: BCEWithLogitsLoss
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    personalized_epochs: 10
+    personalized_batch_size: 12
+    personalized_optimizer: Adam
+    personalized_lr_scheduler: StepLR
+    personalized_loss_criterion: CrossEntropyLoss
+
+    # The machine learning model
+    model_name: lenet5
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+
+parameters:
+    optimizer:
+        lr: 0.05
+        momentum: 0.9
+        weight_decay: 0.000001
+
+    personalized_optimizer:
+        lr: 0.1
+        eps: 1.0e-6
+        weight_decay: 0.0
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 150ep,350ep
+
+    personalized_learning_rate:
+        gamma: 0.3
+        step_size: 10
+
+    loss_criterion:
+      reduction: mean
+
+    personalized_loss_criterion:
+      label_smoothing: 0.5
