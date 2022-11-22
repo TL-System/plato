@@ -51,11 +51,11 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    pers_epochs: 10
-    pers_batch_size: 12
-    pers_optimizer: Adam
-    pers_lr_scheduler: StepLR
-    pers_loss_criterion: CrossEntropyLoss
+    personalized_epochs: 10
+    personalized_batch_size: 12
+    personalized_optimizer: Adam
+    personalized_lr_scheduler: StepLR
+    personalized_loss_criterion: CrossEntropyLoss
 
     # The machine learning model
     model_name: lenet5
@@ -72,7 +72,7 @@ parameters:
         momentum: 0.9
         weight_decay: 0.000001
 
-    pers_optimizer:
+    personalized_optimizer:
         lr: 0.1
         eps: 1.0e-6
         weight_decay: 0.0
@@ -81,12 +81,12 @@ parameters:
         gamma: 0.1
         milestone_steps: 150ep,350ep
 
-    pers_learning_rate:
+    personalized_learning_rate:
         gamma: 0.3
         step_size: 10
 
     loss_criterion:
       reduction: mean
 
-    pers_loss_criterion:
+    personalized_loss_criterion:
       label_smoothing: 0.5

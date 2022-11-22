@@ -28,20 +28,20 @@ class LrSchedulerTest(unittest.TestCase):
         # 1. optimizer
         personalized_optimizer = optimizers.get(
             self.model,
-            optimizer_name=Config().trainer.pers_optimizer,
-            optim_params=Config().parameters.pers_optimizer._asdict(),
+            optimizer_name=Config().trainer.personalized_optimizer,
+            optim_params=Config().parameters.personalized_optimizer._asdict(),
         )
         # 2. lr scheduler
         personalized_lrs = lr_schedulers.get(
             personalized_optimizer,
             10,
-            lr_scheduler=Config().trainer.pers_lr_scheduler,
-            lr_params=Config().parameters.pers_learning_rate._asdict(),
+            lr_scheduler=Config().trainer.personalized_lr_scheduler,
+            lr_params=Config().parameters.personalized_learning_rate._asdict(),
         )
         # 3. loss function
         personalized_loss = loss_criterion.get(
-            loss_criterion=Config().trainer.pers_loss_criterion,
-            loss_criterion_params=Config().parameters.pers_loss_criterion._asdict(),
+            loss_criterion=Config().trainer.personalized_loss_criterion,
+            loss_criterion_params=Config().parameters.personalized_loss_criterion._asdict(),
         )
 
         # test whether loading different hyper-parameters:
