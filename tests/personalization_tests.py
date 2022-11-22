@@ -8,6 +8,7 @@ from plato.config import Config
 import plato.models.registry as models_registry
 from plato.trainers import optimizers
 from plato.trainers import lr_schedulers
+from plato.trainers import loss_criterion
 
 
 class LrSchedulerTest(unittest.TestCase):
@@ -20,30 +21,42 @@ class LrSchedulerTest(unittest.TestCase):
         self.optimizer = optimizers.get(self.model)
         self.lrs = lr_schedulers.get(self.optimizer, 50)
 
-    def assert_unequal_lrs(self, customize_lr):
-        self.assertNotEqual(self.lrs.get_last_lr(), customize_lr.get_last_lr())
-
-    def assert_unequal_optimizers(self, customize_optimizer):
-        self.assertNotEqual(self.optimizer.param_groups[0]['lr'],
-                            customize_optimizer.param_groups[0]['lr'])
-        self.assertNotEqual(
-            self.optimizer.param_groups[0]['weight_decay'],
-            customize_optimizer.param_groups[0]['weight_decay'])
+        self.loss = loss_criterion.get()
 
     def test_personalized_config(self):
 
+        # define the terms for personalization
+        # 1. optimizer
         personalized_optimizer = optimizers.get(
             self.model,
             optimizer_name=Config().trainer.pers_optimizer,
             optim_params=Config().parameters.pers_optimizer._asdict())
+        # 2. lr scheduler
         personalized_lrs = lr_schedulers.get(
             personalized_optimizer,
             10,
             lr_scheduler=Config().trainer.pers_lr_scheduler,
             lr_params=Config().parameters.pers_learning_rate._asdict())
+        # 3. loss function
+        personalized_loss = loss_criterion.get(
+            loss_criterion=Config().trainer.pers_loss_criterion,
+            loss_criterion_params=Config(
+            ).parameters.pers_loss_criterion._asdict())
 
-        self.assert_unequal_optimizers(personalized_optimizer)
-        self.assert_unequal_lrs(personalized_lrs)
+        # test whether loading different hyper-parameters:
+        # 1. for the optimizer.
+        self.assertNotEqual(self.optimizer.param_groups[0]['lr'],
+                            personalized_optimizer.param_groups[0]['lr'])
+        self.assertNotEqual(
+            self.optimizer.param_groups[0]['weight_decay'],
+            personalized_optimizer.param_groups[0]['weight_decay'])
+
+        # 2. for the lr scheduler.
+        self.assertNotEqual(self.lrs.get_last_lr(),
+                            personalized_lrs.get_last_lr())
+
+        # 3. for the loss function.
+        self.assertNotEqual(self.loss.__str__(), personalized_loss.__str__())
 
 
 if __name__ == "__main__":

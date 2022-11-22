@@ -46,6 +46,7 @@ trainer:
     batch_size: 64
     optimizer: SGD
     lr_scheduler: MultiStepLR
+    loss_criterion: BCEWithLogitsLoss
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
@@ -54,6 +55,7 @@ trainer:
     pers_batch_size: 12
     pers_optimizer: Adam
     pers_lr_scheduler: StepLR
+    pers_loss_criterion: CrossEntropyLoss
 
     # The machine learning model
     model_name: lenet5
@@ -82,3 +84,9 @@ parameters:
     pers_learning_rate:
         gamma: 0.3
         step_size: 10
+
+    loss_criterion:
+      reduction: mean
+
+    pers_loss_criterion:
+      label_smoothing: 0.5
