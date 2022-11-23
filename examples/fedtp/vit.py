@@ -2,7 +2,7 @@
 The origin ViTs used in FedTP, in the origin implementation,
 only this simple tiny ViT is supported.
 
-Modified based on https://github.com/zhyczy/FedTP/blob/main/models/Hypernetworks.py.
+Modified based on https://github.com/zhyczy/FedTP/blob/main/models/vit.py.
 """
 
 import torch
