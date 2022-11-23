@@ -13,7 +13,7 @@ from plato.config import Config
 
 class ViTHyper(nn.Module):
     """
-    HyerNetwork for traditional ViT.
+    The HyerNetwork for generating Vision Transformer (ViT)'s attention maps.
     """
 
     def __init__(
@@ -57,31 +57,48 @@ class ViTHyper(nn.Module):
 
         self.to_qkv_value_list = nn.ModuleList([])
         for _ in range(self.depth):
-            to_qkv_value = nn.Linear(hidden_dim, self.dim * self.inner_dim * 3)
+            if len(Config().parameters.hypernet.attention.split(",")) > 1:
+                to_qkv_value = nn.ModuleList(
+                    [nn.Linear(hidden_dim, self.dim * self.inner_dim) for _ in range(3)]
+                )
+            else:
+                to_qkv_value = nn.Linear(hidden_dim, self.dim * self.inner_dim * 3)
             self.to_qkv_value_list.append(to_qkv_value)
 
     def forward(self, idx):
-        "Forward functoin of hypernetwork"
+        "The forward pass of hypernetwork."
         weights = 0
         emd = self.embeddings(idx)
         features = self.mlp(emd)
         weights = OrderedDict()
         for dep in range(self.depth):
             layer_d_qkv_value_hyper = self.to_qkv_value_list[dep]
-            layer_d_qkv_value = layer_d_qkv_value_hyper(features).view(
-                self.inner_dim * 3, self.dim
-            )
-            name = Config().parameters.hypernet.attention % (dep)
-            weights[
-                name
-                # "transformer.layers." + str(dep) + ".0.fn.to_qkv.weight"
-            ] = layer_d_qkv_value.cpu()
+            attention_map = Config().parameters.hypernet.attention.split(",")
+            if len(attention_map) == 1:
+                layer_d_qkv_value = layer_d_qkv_value_hyper(features).view(
+                    self.inner_dim * 3, self.dim
+                )
+                name = Config().parameters.hypernet.attention % (dep)
+                weights[name] = layer_d_qkv_value.cpu()
+            else:
+                layer_d_qkv_value = [
+                    layer(features).view(self.inner_dim, self.dim)
+                    for layer in layer_d_qkv_value_hyper
+                ]
+                name = Config().parameters.hypernet.attention % (dep, dep, dep)
+                names = name.split(",")
+                key = names[0]
+                query = names[1]
+                value = names[2]
+                weights[key] = layer_d_qkv_value[0].cpu()
+                weights[query] = layer_d_qkv_value[1].cpu()
+                weights[value] = layer_d_qkv_value[2].cpu()
         return weights
 
 
 class ShakesHyper(nn.Module):
     """
-    HyperNetwork for transformer
+    HyperNetwork for transformer.
     """
 
     # pylint:disable=too-many-instance-attributes

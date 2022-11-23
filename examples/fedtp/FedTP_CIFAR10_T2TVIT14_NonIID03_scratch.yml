@@ -195,6 +195,7 @@ parameters:
         hidden_dim: 100
         dim: 384
         num_heads: 6 
+        dim_head: 64
     #architect:
     #    pretrain_path: ../pretrained/ML_Models/VIT/T2T-VIT/T2T_ViT_14.pth.tar
 

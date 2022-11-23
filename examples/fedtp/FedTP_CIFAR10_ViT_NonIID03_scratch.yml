@@ -142,8 +142,8 @@ trainer:
     # however, in the central test, we do not use this
     #   but use the custom model
     model_type: vit
-    model_name: FedTP_ViT
-    personalized_model_name: FedTP_ViT
+    model_name: google@vit-base-patch16-224 
+    personalized_model_name: google@vit-base-patch16-224 
 
     # encoder, whole
     global_submodules_prefix: whole
@@ -178,23 +178,27 @@ parameters:
         weight_decay: 0.00001
     
     hypernet:
-        attention: transformer.layers.%d.0.fn.to_qkv.weight
+        attention: model.vit.encoder.layer.%d.attention.attention.key.weight,model.vit.encoder.layer.%d.attention.attention.query.weight,model.vit.encoder.layer.%d.attention.attention.value.weight
         depth: 6
         embed_dim: 128
         hidden_dim: 100
         dim: 128
         num_heads: 8
+        dim_head: 16
 
     model:
         image_size: 32
         patch_size: 4
         num_classes: 10 
-        dim: 128
-        depth: 6
-        heads: 8
-        mlp_dim: 256
-        dropout: 0.1
-        emb_dropout: 0.1
+        hidden_size: 128
+        num_hidden_layers: 6
+        num_attention_heads: 8
+        intermediate_size: 256
+        attention_probs_dropout_prob: 0.1
+        hidden_dropout_prob: 0.1
+        num_labels: 10
+        pretrained: false
+        ignore_mismatched_sizes: true
     #architect:
     #    pretrain_path: ../pretrained/ML_Models/VIT/T2T-VIT/T2T_ViT_14.pth.tar
 
