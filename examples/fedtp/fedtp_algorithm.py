@@ -1,5 +1,5 @@
 """
-FedTP learns a personalized self-attention layer for each client 
+FedTP learns a personalized self-attention layer for each client
 while the parameters of the other layers are shared among the clients.
 
 Reference:
@@ -24,7 +24,7 @@ class ServerAlgorithm(fedavg.Algorithm):
         self.current_weights = None
 
     def generate_attention(self, hnet, client_id):
-        """Generated the customized attention of each client"""
+        """Generated the customized attention of each client."""
         weights = hnet(
             torch.tensor([client_id - 1], dtype=torch.long).to(Config().device())
         )
@@ -42,7 +42,7 @@ class ServerAlgorithm(fedavg.Algorithm):
         return hnet_grads
 
     def get_hnet_optimizer(self, hnet: torch.nn.Module) -> torch.optim:
-        """Get the specific optimizer of hypernet"""
+        """Get the specific optimizer of hypernet."""
         optimizer = torch.optim.SGD(
             hnet.parameters(), lr=0.01, momentum=0.9, weight_decay=1e-3
         )

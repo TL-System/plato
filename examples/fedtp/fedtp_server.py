@@ -1,5 +1,5 @@
 """
-FedTP learns a personalized self-attention layer for each client 
+FedTP learns a personalized self-attention layer for each client
 while the parameters of the other layers are shared among the clients.
 
 Reference:
@@ -38,7 +38,7 @@ class Server(fedavg.Server):
             Config().parameters.hypernet.hidden_dim,
             Config().parameters.hypernet.dim,
             heads=Config().parameters.hypernet.num_heads,
-            dim_head=64,
+            dim_head=Config().parameters.hypernet.dim_head,
             n_hidden=3,
             depth=Config().parameters.hypernet.depth,
             client_sample=Config().clients.per_round,
@@ -55,7 +55,7 @@ class Server(fedavg.Server):
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         attentions_customized = self.algorithm.generate_attention(self.hnet, client_id)
 
-        self.attentions[client_id] = copy.deepcopy(attentions_customized)
+        self.attentions[client_id] = attentions_customized
         self.current_attention = attentions_customized
         return super().customize_server_response(
             server_response=server_response, client_id=client_id
@@ -68,7 +68,10 @@ class Server(fedavg.Server):
         return payload
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Aggregation of weights in FedTP"""
+        """Aggregation of weights in FedTP."""
+
+        # pylint:disable=too-many-locals
+
         deltas_recieved = self.algorithm.compute_weight_deltas(
             baseline_weights, weights_received
         )
