@@ -525,10 +525,14 @@ class Server:
                             if client_id % available_gpus == cuda_id:
                                 selected_clients.append(client_id)
                             if len(selected_clients) >= min(
+                                len(self.clients),
                                 (cuda_id + 1) * Config().trainer.max_concurrency,
                                 self.clients_per_round,
                             ):
                                 break
+                        # There is no enough alive clients, break the selection
+                        if len(selected_clients) > len(self.clients):
+                            break
                 else:
                     selected_clients = self.selected_clients[
                         len(self.trained_clients) : min(
