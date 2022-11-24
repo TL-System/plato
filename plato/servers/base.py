@@ -1147,11 +1147,20 @@ class Server:
 
                 # Remove the physical client from server list
                 del self.clients[client_id]
-                logging.info(
-                    "[%s] Physical client #%d disconnected and removed from this server.",
+                logging.warning(
+                    "[%s] Physical client #%d disconnected and removed from this server, %d client processes left.",
                     self,
                     client_id,
+                    len(self.client),
                 )
+
+                if len(self.clients) == 0:
+                    logging.warning(
+                        fonts.colourize(
+                            f"[{self}] All clients disconnected, closing the server."
+                        )
+                    )
+                    await self._close()
 
                 # Handle the logic client under different situations
                 if sim_id in self.training_clients:
