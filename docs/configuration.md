@@ -15,6 +15,12 @@ The path prefix for datasets, models, checkpoints, and results.
 The default value is `./`.
 ```
 
+```{admonition} debug
+When `debug` is turned on, Plato will try to recover from a failed client by placing the training on another physical client process that is still alive. If it's turned off, Plato will terminate itself immediately when a client fails to avoid blocking. 
+
+Valid values are `true` or `false`. The default value is `false`.
+```
+
 
 ## clients
 
