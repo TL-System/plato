@@ -331,6 +331,7 @@ class Server:
             self.clients[client_id] = {
                 "sid": sid,
                 "last_contacted": time.perf_counter(),
+                "sim_id": client_id,  # Logic client id in client simulation mode
             }
             logging.info("[%s] New client with id #%d arrived.", self, client_id)
         else:
@@ -564,6 +565,9 @@ class Server:
 
                     self.training_sids.append(sid)
                     self.selected_sids.append(sid)
+
+                # Assign the logic client id to physical client
+                self.clients[client_id]["sim_id"] = self.selected_client_id
 
                 self.training_clients[self.selected_client_id] = {
                     "id": self.selected_client_id,
@@ -1138,32 +1142,40 @@ class Server:
         """When a client disconnected it should be removed from its internal states."""
         for client_id, client in dict(self.clients).items():
             if client["sid"] == sid:
+                # Obtain the logic client id before deleting
+                sim_id = self.clients[client_id]["sim_id"]
+
+                # Remove the physical client from server list
                 del self.clients[client_id]
-
-                if client_id in self.training_clients:
-                    del self.training_clients[client_id]
-
-                if client_id in self.current_reported_clients:
-                    del self.current_reported_clients[client_id]
-
                 logging.info(
-                    "[%s] Client #%d disconnected and removed from this server.",
+                    "[%s] Physical client #%d disconnected and removed from this server.",
                     self,
                     client_id,
                 )
 
-                if client_id in self.selected_clients:
-                    self.selected_clients.remove(client_id)
+                # Handle the logic client under different situations
+                if sim_id in self.training_clients:
+                    del self.training_clients[sim_id]
 
-                    if len(self.updates) >= len(self.selected_clients):
-                        logging.info(
-                            "[%s] All %d client report(s) received. Processing.",
-                            self,
-                            len(self.updates),
-                        )
-                        await self._process_reports()
-                        await self.wrap_up()
-                        await self._select_clients()
+                if sim_id in self.current_reported_clients:
+                    del self.current_reported_clients[sim_id]
+
+                # Treat failing client as untrained and re-select it in the next selection batch
+                if sim_id in self.selected_clients and sim_id in self.trained_clients:
+                    self.trained_clients.remove(sim_id)
+                    fail_client_index = self.selected_clients.index(sim_id)
+                    untrained_client_index = len(self.trained_clients)
+                    # Swap current client to the begining of untrained clients
+                    self.selected_clients[fail_client_index] = self.selected_clients[
+                        untrained_client_index
+                    ]
+                    self.selected_clients[untrained_client_index] = sim_id
+
+                    # Start next batch of client selection if current batch is done
+                    if len(self.updates) >= len(self.trained_clients) or len(
+                        self.current_reported_clients
+                    ) >= len(self.trained_clients):
+                        await self._select_clients(for_next_batch=True)
 
     def save_to_checkpoint(self) -> None:
         """Saves a checkpoint for resuming the training session."""
