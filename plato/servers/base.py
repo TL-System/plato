@@ -1151,7 +1151,7 @@ class Server:
                     "[%s] Physical client #%d disconnected and removed from this server, %d client processes left.",
                     self,
                     client_id,
-                    len(self.client),
+                    len(self.clients),
                 )
 
                 if len(self.clients) == 0:
