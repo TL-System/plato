@@ -1172,22 +1172,39 @@ class Server:
                 if sim_id in self.current_reported_clients:
                     del self.current_reported_clients[sim_id]
 
-                # Treat failing client as untrained and re-select it in the next selection batch
-                if sim_id in self.selected_clients and sim_id in self.trained_clients:
-                    self.trained_clients.remove(sim_id)
-                    fail_client_index = self.selected_clients.index(sim_id)
-                    untrained_client_index = len(self.trained_clients)
-                    # Swap current client to the begining of untrained clients
-                    self.selected_clients[fail_client_index] = self.selected_clients[
-                        untrained_client_index
-                    ]
-                    self.selected_clients[untrained_client_index] = sim_id
+                # Decide continue or exit training
+                if (
+                    hasattr(Config(), "general")
+                    and hasattr(Config(), "debug")
+                    and not Config().debug
+                ):
+                    # Recover from the failing client and proceed training
+                    if (
+                        sim_id in self.selected_clients
+                        and sim_id in self.trained_clients
+                    ):
+                        self.trained_clients.remove(sim_id)
+                        fail_client_index = self.selected_clients.index(sim_id)
+                        untrained_client_index = len(self.trained_clients)
+                        # Swap current client to the begining of untrained clients
+                        self.selected_clients[
+                            fail_client_index
+                        ] = self.selected_clients[untrained_client_index]
+                        self.selected_clients[untrained_client_index] = sim_id
 
-                    # Start next batch of client selection if current batch is done
-                    if len(self.updates) >= len(self.trained_clients) or len(
-                        self.current_reported_clients
-                    ) >= len(self.trained_clients):
-                        await self._select_clients(for_next_batch=True)
+                        # Start next batch of client selection if current batch is done
+                        if len(self.updates) >= len(self.trained_clients) or len(
+                            self.current_reported_clients
+                        ) >= len(self.trained_clients):
+                            await self._select_clients(for_next_batch=True)
+                else:
+                    # Debug is either turned on or not specified, stop the training to avoid blocking.
+                    logging.warning(
+                        fonts.colourize(
+                            f"[{self}] Closing the server due to failed client."
+                        )
+                    )
+                    self._close()
 
     def save_to_checkpoint(self) -> None:
         """Saves a checkpoint for resuming the training session."""
