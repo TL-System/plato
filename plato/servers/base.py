@@ -532,8 +532,7 @@ class Server:
                 else:
                     selected_clients = self.selected_clients[
                         len(self.trained_clients) : min(
-                            len(self.trained_clients)
-                            + Config().trainer.max_concurrency,
+                            len(self.trained_clients) + len(self.clients),
                             len(self.selected_clients),
                         )
                     ]
@@ -551,7 +550,7 @@ class Server:
                 elif Config().is_edge_server():
                     client_id = self.launched_clients[i]
                 else:
-                    client_id = i + 1
+                    client_id = list(self.clients.keys())[i]
 
                 sid = self.clients[client_id]["sid"]
 
