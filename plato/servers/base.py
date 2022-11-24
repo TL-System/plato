@@ -1176,7 +1176,7 @@ class Server:
                 if (
                     hasattr(Config(), "general")
                     and hasattr(Config().general, "debug")
-                    and not Config().debug
+                    and not Config().general.debug
                 ):
                     # Recover from the failing client and proceed training
                     if (
