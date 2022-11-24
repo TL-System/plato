@@ -1175,7 +1175,7 @@ class Server:
                 # Decide continue or exit training
                 if (
                     hasattr(Config(), "general")
-                    and hasattr(Config(), "debug")
+                    and hasattr(Config().general, "debug")
                     and not Config().debug
                 ):
                     # Recover from the failing client and proceed training
@@ -1204,7 +1204,7 @@ class Server:
                             f"[{self}] Closing the server due to failed client."
                         )
                     )
-                    self._close()
+                    await self._close()
 
     def save_to_checkpoint(self) -> None:
         """Saves a checkpoint for resuming the training session."""
