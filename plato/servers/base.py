@@ -531,7 +531,7 @@ class Server:
                             ):
                                 break
                         # There is no enough alive clients, break the selection
-                        if len(selected_clients) > len(self.clients):
+                        if len(selected_clients) >= len(self.clients):
                             break
                 else:
                     selected_clients = self.selected_clients[
