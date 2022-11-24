@@ -8,7 +8,6 @@ import multiprocessing as mp
 import os
 import pickle
 import re
-import sys
 import time
 
 import torch
@@ -195,8 +194,7 @@ class Trainer(base.Trainer):
         batch_size = config["batch_size"]
         self.sampler = sampler
         tic = time.perf_counter()
-        if self.client_id == 1:
-            sys.exit(1)
+
         self.run_history.reset()
 
         self.train_run_start(config)
