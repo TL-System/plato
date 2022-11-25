@@ -65,8 +65,12 @@ parameters:
         output_dim: 100
         hidden_layers_dim:
           - 1024
+          - 512
           - 256
+          - 128
         batch_norms:
+          - null
+          - null
           - null
           - null
           - null
@@ -74,7 +78,11 @@ parameters:
           - tanh
           - tanh
           - tanh
+          - tanh
+          - null
         dropout_ratios:
+          - 0.0
+          - 0.0
           - 0.0
           - 0.0
           - 0.0
