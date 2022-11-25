@@ -130,11 +130,12 @@ class Model:
             )
 
         if model_name == "simclr_projection_mlp":
+            projection_hidden_dim = kwargs["projection_hidden_dim"]
             return build_mlp_from_config(
                 dict(
                     output_dim=output_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
+                    hidden_layers_dim=[projection_hidden_dim],
                     batch_norms=[None, None],
                     activations=["relu", None],
                     dropout_ratios=[0.0, 0.0],
@@ -142,13 +143,14 @@ class Model:
             )
 
         if model_name == "simsiam_projection_mlp":
+            projection_hidden_dim = kwargs["projection_hidden_dim"]
             return build_mlp_from_config(
                 dict(
                     output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[
-                        Config.trainer.projection_hidden_dim,
-                        Config.trainer.projection_hidden_dim,
+                        projection_hidden_dim,
+                        projection_hidden_dim,
                     ],
                     batch_norms=[
                         dict(momentum=0.1, eps=1e-5),
@@ -161,11 +163,12 @@ class Model:
             )
 
         if model_name == "simsiam_prediction_mlp":
+            prediction_hidden_dim = kwargs["prediction_hidden_dim"]
             return build_mlp_from_config(
                 dict(
                     output_dim=output_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[Config.trainer.prediction_hidden_dim],
+                    hidden_layers_dim=[prediction_hidden_dim],
                     batch_norms=[dict(momentum=0.1, eps=1e-5), None],
                     activations=["relu", None],
                     dropout_ratios=[0.0, 0.0],
@@ -173,11 +176,12 @@ class Model:
             )
 
         if model_name == "byol_projection_mlp":
+            projection_hidden_dim = kwargs["projection_hidden_dim"]
             return build_mlp_from_config(
                 dict(
                     output_dim=output_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
+                    hidden_layers_dim=[projection_hidden_dim],
                     batch_norms=[dict(momentum=0.1, eps=1e-5), None],
                     activations=["relu", None],
                     dropout_ratios=[0.0, 0.0],
@@ -185,23 +189,24 @@ class Model:
             )
 
         if model_name == "byol_prediction_mlp":
+            prediction_hidden_dim = kwargs["prediction_hidden_dim"]
             return build_mlp_from_config(
                 dict(
                     output_dim=output_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[Config.trainer.prediction_hidden_dim],
+                    hidden_layers_dim=[prediction_hidden_dim],
                     batch_norms=[dict(momentum=0.1, eps=1e-5), None],
                     activations=["relu", None],
                     dropout_ratios=[0.0, 0.0],
                 )
             )
         if model_name == "moco_final_mlp":
+            projection_hidden_dim = kwargs["projection_hidden_dim"]
             return build_mlp_from_config(
                 dict(
-                    type="FullyConnectedHead",
                     output_dim=output_dim,
                     input_dim=input_dim,
-                    hidden_layers_dim=[Config.trainer.projection_hidden_dim],
+                    hidden_layers_dim=[projection_hidden_dim],
                     batch_norms=[None, None],
                     activations=["relu", None],
                     dropout_ratios=[0.0, 0.0],
