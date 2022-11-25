@@ -23,6 +23,7 @@ Tricks:
     regularization benefits as Dropout intuitively.
 
 """
+from typing import Union, Dict, List
 
 from collections import OrderedDict
 
@@ -33,12 +34,23 @@ activations_func = {"relu": nn.ReLU, "sigmoid": nn.Sigmoid, "softmax": nn.Softma
 
 
 # pylint: disable=too-many-locals
-def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
-    """Build one fully-connected network based the input setting.
+def build_mlp_from_config(
+    mlp_configs: Dict[str, Union[int, List[str, None, dict]]],
+    layer_name_prefix: str = "layer",
+):
+    """
+    Build the fully-connected network (Multi-layer perceptron)
+    based on the input configuration.
 
-
-    Args:
-        mlp_configs (dict):
+    :param  mlp_configs: A Dict type containing the hyper-parameters for definition.
+        It should contains:
+            input_dim: Integar
+            output_dim: Integar
+            hidden_layers_dim: List[int], with length N - 1
+            batch_norms: List[Union[None, dict]], with length N
+            activations: List[Union[None, str]], with length N
+            dropout_ratios: List[float], with length N
+    :param  layer_name_prefix: A string added to the layer's name.
     """
     input_dim = mlp_configs["input_dim"]
     output_dim = mlp_configs["output_dim"]
@@ -58,7 +70,7 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
     assert hidden_n == len(batch_norms) - 1
 
     def build_one_layer(
-        layer_ipt_dim, layer_opt_dim, batch_norm_type, activation, dropout_prob
+        layer_ipt_dim, layer_opt_dim, batch_norm_param, activation, dropout_prob
     ):
         """Build one layer of MLP. Default no hidden layer.
 
@@ -68,22 +80,12 @@ def build_mlp_from_config(mlp_configs, layer_name_prefix="layer"):
         """
         layer_structure = OrderedDict()
         layer_structure["fc"] = nn.Linear(layer_ipt_dim, layer_opt_dim)
-        # the batch_norm_type here can be:
-        #   - default if the user wants to use
-        #       the batch norm following the defualt parameters 'default_params'.
-        #   - dict if the use wants to set custom parameters
-        # however, once the batch_norm_type
-        if batch_norm_type is not None:
-            default_params = dict(momentum=0.1, eps=1e-5)
-            bn_params = (
-                default_params
-                if batch_norm_type == "default"
-                else default_params.update(batch_norm_type)
-            )
-            layer_structure["bn"] = nn.BatchNorm1d(layer_opt_dim, **bn_params)
+
+        if batch_norm_param is not None:
+            layer_structure["bn"] = nn.BatchNorm1d(layer_opt_dim, **batch_norm_param)
         if activation is not None:
             layer_structure[activation] = activations_func[activation](inplace=True)
-        if dropout_prob != 0:
+        if dropout_prob != 0.0:
             layer_structure["drop"] = nn.Dropout(p=dropout_prob)
 
         return nn.Sequential(layer_structure)
@@ -111,100 +113,103 @@ class Model:
 
     # pylint: disable=too-few-public-methods
     @staticmethod
-    def get(model_type, input_dim):
+    def get(model_name, input_dim, output_dim, **kwargs):
         # pylint:disable=too-many-return-statements
-
         """Get the desired MLP model with required input dimension (input_dim)."""
-        if model_type == "pure_one_layer_mlp":
+
+        if model_name == "linear_mlp":
             return build_mlp_from_config(
                 mlp_configs=dict(
-                    type="FullyConnectedHead",
-                    output_dim=Config().trainer.num_classes,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[],
                     batch_norms=[None],
                     activations=[None],
-                    dropout_ratios=[0],
+                    dropout_ratios=[0.0],
                 )
             )
 
-        if model_type == "simclr_projection_mlp":
+        if model_name == "simclr_projection_mlp":
             return build_mlp_from_config(
                 dict(
-                    type="FullyConnectedHead",
-                    output_dim=Config.trainer.projection_dim,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[Config.trainer.projection_hidden_dim],
                     batch_norms=[None, None],
                     activations=["relu", None],
-                    dropout_ratios=[0, 0],
+                    dropout_ratios=[0.0, 0.0],
                 )
             )
 
-        if model_type == "simsiam_projection_mlp":
+        if model_name == "simsiam_projection_mlp":
             return build_mlp_from_config(
                 dict(
-                    type="FullyConnectedHead",
-                    output_dim=Config.trainer.projection_dim,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[
                         Config.trainer.projection_hidden_dim,
                         Config.trainer.projection_hidden_dim,
                     ],
-                    batch_norms=["default", "default", "default"],
+                    batch_norms=[
+                        dict(momentum=0.1, eps=1e-5),
+                        dict(momentum=0.1, eps=1e-5),
+                        dict(momentum=0.1, eps=1e-5),
+                    ],
                     activations=["relu", "relu", None],
-                    dropout_ratios=[0, 0, 0],
+                    dropout_ratios=[0.0, 0.0, 0.0],
                 )
             )
 
-        if model_type == "simsiam_prediction_mlp":
+        if model_name == "simsiam_prediction_mlp":
             return build_mlp_from_config(
                 dict(
-                    type="FullyConnectedHead",
-                    output_dim=Config.trainer.prediction_dim,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[Config.trainer.prediction_hidden_dim],
-                    batch_norms=["default", None],
+                    batch_norms=[dict(momentum=0.1, eps=1e-5), None],
                     activations=["relu", None],
-                    dropout_ratios=[0, 0],
+                    dropout_ratios=[0.0, 0.0],
                 )
             )
 
-        if model_type == "byol_projection_mlp":
+        if model_name == "byol_projection_mlp":
             return build_mlp_from_config(
                 dict(
-                    type="FullyConnectedHead",
-                    output_dim=Config.trainer.projection_dim,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[Config.trainer.projection_hidden_dim],
-                    batch_norms=["default", None],
+                    batch_norms=[dict(momentum=0.1, eps=1e-5), None],
                     activations=["relu", None],
-                    dropout_ratios=[0, 0],
+                    dropout_ratios=[0.0, 0.0],
                 )
             )
 
-        if model_type == "byol_prediction_mlp":
+        if model_name == "byol_prediction_mlp":
             return build_mlp_from_config(
                 dict(
-                    type="FullyConnectedHead",
-                    output_dim=Config.trainer.prediction_dim,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[Config.trainer.prediction_hidden_dim],
-                    batch_norms=["default", None],
+                    batch_norms=[dict(momentum=0.1, eps=1e-5), None],
                     activations=["relu", None],
-                    dropout_ratios=[0, 0],
+                    dropout_ratios=[0.0, 0.0],
                 )
             )
-        if model_type == "moco_final_mlp":
+        if model_name == "moco_final_mlp":
             return build_mlp_from_config(
                 dict(
                     type="FullyConnectedHead",
-                    output_dim=Config.trainer.projection_dim,
+                    output_dim=output_dim,
                     input_dim=input_dim,
                     hidden_layers_dim=[Config.trainer.projection_hidden_dim],
                     batch_norms=[None, None],
                     activations=["relu", None],
-                    dropout_ratios=[0, 0],
+                    dropout_ratios=[0.0, 0.0],
                 )
             )
-        raise ValueError(f"No such MLP model: {model_type}")
+
+        # obtain the customized mlp layer if the required model does not
+        # existed
+
+
+        raise ValueError(f"No such MLP model: {model_name}")
