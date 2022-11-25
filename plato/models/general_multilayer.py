@@ -28,7 +28,12 @@ from collections import OrderedDict
 
 from torch import nn
 
-activations_func = {"relu": nn.ReLU, "sigmoid": nn.Sigmoid, "softmax": nn.Softmax}
+activations_func = {
+    "relu": nn.ReLU,
+    "sigmoid": nn.Sigmoid,
+    "softmax": nn.Softmax,
+    "tanh": nn.Tanh,
+}
 
 
 # pylint: disable=too-many-locals
@@ -82,13 +87,14 @@ def build_mlp_from_config(
         if batch_norm_param is not None:
             layer_structure["bn"] = nn.BatchNorm1d(layer_opt_dim, **batch_norm_param)
         if activation is not None:
-            layer_structure[activation] = activations_func[activation](inplace=True)
+            layer_structure[activation] = activations_func[activation]()
         if dropout_prob != 0.0:
             layer_structure["drop"] = nn.Dropout(p=dropout_prob)
 
         return nn.Sequential(layer_structure)
 
     mlp_layers = OrderedDict()
+
     # add the final output layer to the hidden layer for building layers
     hidden_layers_dim.append(output_dim)
     for hid_id, hid_dim in enumerate(hidden_layers_dim):
@@ -203,6 +209,7 @@ class Model:
                     dropout_ratios=[0.0, 0.0],
                 )
             )
+
         if model_name == "moco_final_mlp":
             projection_hidden_dim = kwargs["projection_hidden_dim"]
             return build_mlp_from_config(
@@ -213,6 +220,18 @@ class Model:
                     batch_norms=[None, None],
                     activations=["relu", None],
                     dropout_ratios=[0.0, 0.0],
+                )
+            )
+
+        if model_name == "plato_multilayer":
+            return build_mlp_from_config(
+                dict(
+                    output_dim=output_dim,
+                    input_dim=input_dim,
+                    hidden_layers_dim=[1024, 512, 256, 128],
+                    batch_norms=[None, None, None, None, None],
+                    activations=["tanh", "tanh", "tanh", "tanh", None],
+                    dropout_ratios=[0.0, 0.0, 0.0, 0.0, 0.0],
                 )
             )
 

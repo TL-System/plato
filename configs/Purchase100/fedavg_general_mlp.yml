@@ -48,7 +48,7 @@ trainer:
 
     # The machine learning model
     model_type: general_multilayer
-    model_name: linear_mlp
+    model_name: plato_multilayer
 
     # Number of epoches for local training in each communication round
     epochs: 5
