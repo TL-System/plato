@@ -24,18 +24,16 @@ Tricks:
 
 """
 from typing import Union, Dict, List
-
 from collections import OrderedDict
 
 from torch import nn
-from plato.config import Config
 
 activations_func = {"relu": nn.ReLU, "sigmoid": nn.Sigmoid, "softmax": nn.Softmax}
 
 
 # pylint: disable=too-many-locals
 def build_mlp_from_config(
-    mlp_configs: Dict[str, Union[int, List[str, None, dict]]],
+    mlp_configs: Dict[str, Union[int, List[Union[str, None, dict]]]],
     layer_name_prefix: str = "layer",
 ):
     """
@@ -113,9 +111,14 @@ class Model:
 
     # pylint: disable=too-few-public-methods
     @staticmethod
-    def get(model_name, input_dim, output_dim, **kwargs):
+    def get(
+        model_name: str,
+        input_dim: int,
+        output_dim: int,
+        **kwargs: Dict[str, Union[int, List[Union[str, None, dict]]]]
+    ):
         # pylint:disable=too-many-return-statements
-        """Get the desired MLP model with required input dimension (input_dim)."""
+        """Get the desired MLP model with required hyper-parameters (input_dim)."""
 
         if model_name == "linear_mlp":
             return build_mlp_from_config(
@@ -215,6 +218,11 @@ class Model:
 
         # obtain the customized mlp layer if the required model does not
         # existed
-
-
-        raise ValueError(f"No such MLP model: {model_name}")
+        # then the user needs to put the corresponding hyper-parameters
+        # in the 'kwargs'
+        return build_mlp_from_config(
+            dict(
+                output_dim=output_dim,
+                input_dim=input_dim,
+            ).update(kwargs)
+        )
