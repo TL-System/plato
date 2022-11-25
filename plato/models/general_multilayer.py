@@ -246,11 +246,9 @@ class Model:
                 )
             )
 
-        # obtain the customized mlp layer if the required model does not
-        # existed
-        # then the user needs to put the corresponding hyper-parameters
+        # obtain the customized mlp laye
+        # the user needs to put the corresponding hyper-parameters
         # in the 'kwargs'
-
         if model_name == "customized_mlp":
             return build_mlp_from_config(
                 dict(output_dim=output_dim, input_dim=input_dim, **kwargs)
