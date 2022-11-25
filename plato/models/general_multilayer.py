@@ -1,18 +1,18 @@
 """
 The implementation of the general Multi-layer perceptron (MLP).
 
-I.e., build the fully-connected net based on the configs.
+I.e., build the fully-connected network based on the configuration.
 
-This a very flexible MLP network generator to define any types of MLP networks.
+This a very flexible MLP network generator to define any type of MLP network.
 
-Note: The general order of components in one MLP layer is:
+NOTE: The general order of components in one MLP layer is:
     Schema A: From the original paper of bn and dropout.
     fc -> bn -> activation -> dropout -> ....
 
     Schema B: From the researcher "https://math.stackexchange.com/users/167500/pseudomarvin".
     fc -> activation -> dropout -> bn -> ....
 
-    See more discussion in:
+    See more discussion on the website:
     https://stackoverflow.com/questions/39691902/ordering-of-batch-normalization-and-dropout
 
 Our work use the schema A.
@@ -78,7 +78,7 @@ def build_mlp_from_config(
         """Build one layer of MLP. Default no hidden layer.
 
         For the structure of one MLP layer. Please access the description
-        below the function 'build_mlp_from_config' for details.
+        in the NOTE part.
 
         """
         layer_structure = OrderedDict()
@@ -107,13 +107,24 @@ def build_mlp_from_config(
         )
         mlp_layers[layer_name_prefix + str(hid_id + 1)] = built_layer
 
-    fc_net = nn.Sequential(mlp_layers)
-
-    return fc_net
+    return nn.Sequential(mlp_layers)
 
 
 class Model:
-    """The Multi-layer perceptron (MLP) model."""
+    """The Multi-layer perceptron (MLP) model.
+
+    The implemented mlp networks are:
+    - linear_mlp, The mlp with one hidden layer.
+    - simclr_projection_mlp, The projection layer of SimCLR method.
+    - simsiam_projection_mlp, The projection layer of SimSiam method.
+    - simsiam_prediction_mlp, The prediction layer of SimSiam method.
+    - byol_projection_mlp, The projection layer of BYOL method.
+    - byol_prediction_mlp, The prediction layer of BYOL method.
+    - moco_final_mlp, The final layer of MoCo method.
+    - plato_multilayer, The Plato's multilayer.
+    - customized_mlp, The customized layer.
+
+    """
 
     # pylint: disable=too-few-public-methods
     @staticmethod
@@ -121,7 +132,7 @@ class Model:
         model_name: str,
         input_dim: int,
         output_dim: int,
-        **kwargs: Dict[str, Union[int, List[Union[str, None, dict]]]]
+        **kwargs: Dict[str, Union[int, List[Union[str, None, dict]]]],
     ):
         # pylint:disable=too-many-return-statements
         """Get the desired MLP model with required hyper-parameters (input_dim)."""
@@ -239,9 +250,10 @@ class Model:
         # existed
         # then the user needs to put the corresponding hyper-parameters
         # in the 'kwargs'
-        return build_mlp_from_config(
-            dict(
-                output_dim=output_dim,
-                input_dim=input_dim,
-            ).update(kwargs)
-        )
+
+        if model_name == "customized_mlp":
+            return build_mlp_from_config(
+                dict(output_dim=output_dim, input_dim=input_dim, **kwargs)
+            )
+
+        raise ValueError(f"No such MLP model: {model_name}")
