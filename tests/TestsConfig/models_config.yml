@@ -56,6 +56,7 @@ trainer:
     # The machine learning model
     model_type: cnn_encoder
     model_name: lenet5
+    personalized_model_type: resnet
     personalized_model_name: resnet_18
 
 algorithm:
