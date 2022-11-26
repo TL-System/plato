@@ -331,7 +331,7 @@ class Server:
             self.clients[client_id] = {
                 "sid": sid,
                 "last_contacted": time.perf_counter(),
-                "sim_id": client_id,  # Logical client id in client simulation mode
+                "sim_id": client_id,  # Logical client id
             }
             logging.info("[%s] New client with id #%d arrived.", self, client_id)
         else:
@@ -569,7 +569,7 @@ class Server:
                     self.training_sids.append(sid)
                     self.selected_sids.append(sid)
 
-                # Assign the logic client id to physical client
+                # Assign the logical client id to the physical client
                 self.clients[client_id]["sim_id"] = self.selected_client_id
 
                 self.training_clients[self.selected_client_id] = {
@@ -1165,7 +1165,7 @@ class Server:
                     )
                     await self._close()
 
-                # Handle the logic client under different situations
+                # Handle the logical client under different situations
                 if sim_id in self.training_clients:
                     del self.training_clients[sim_id]
 
@@ -1186,6 +1186,7 @@ class Server:
                         self.trained_clients.remove(sim_id)
                         fail_client_index = self.selected_clients.index(sim_id)
                         untrained_client_index = len(self.trained_clients)
+                        
                         # Swap current client to the begining of untrained clients
                         self.selected_clients[
                             fail_client_index
