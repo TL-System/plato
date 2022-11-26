@@ -462,7 +462,7 @@ class Server:
                 # training.
                 training_client_ids = [
                     self.training_clients[client_id]["id"]
-                    for client_id in list(self.training_clients.keys())
+                    for client_id in self.training_clients
                 ]
 
                 # If the server is simulating the wall clock time, some of the clients who
