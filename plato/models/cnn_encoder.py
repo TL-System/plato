@@ -45,14 +45,16 @@ class Model(nn.Module):
     fully-connected blocks of the required model.
     """
 
-
     @staticmethod
     def get(
-        model_name: Optional[str] = None,
-        num_classes: Optional[int] = None,
-        **kwargs: Dict[str]
+        model_name: Optional[str] = None, **kwargs: Dict[str, str]
     ):  # pylint: disable=unused-argument
         """Returns an encoder that is a fully CNN block."""
+
+        # as the final fully-connected layer will be removed
+        # the number of classes can be the randomly value
+        # thus, set it to be constant value 10.
+        num_classes = 10
 
         if model_name == "lenet5":
             model = lenet5_model(num_classes=num_classes)
@@ -67,7 +69,6 @@ class Model(nn.Module):
             #   i.e., the output dim of the encoder
             encode_output_dim = encoder.fc.in_features
             encoder.fc = nn.Identity()
-
 
         if "resnet" in model_name:
             resnets = {

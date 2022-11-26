@@ -26,6 +26,7 @@ else:
         torch_hub,
         huggingface,
         vit,
+        cnn_encoder
     )
 
     registered_models = {
@@ -37,6 +38,7 @@ else:
     registered_factories = {
         "resnet": resnet.Model,
         "vgg": vgg.Model,
+        "cnn_encoder": cnn_encoder.Model,
         "torch_hub": torch_hub.Model,
         "huggingface": huggingface.Model,
         "vit": vit.Model,
