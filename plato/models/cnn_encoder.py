@@ -12,8 +12,8 @@ Besides, the 'AdaptiveAvgPool2d' layer is included to support extracting
 features with fixed dimensions.
 
 """
-import logging
-from typing import Optional
+
+from typing import Optional, Dict
 
 from torch import nn
 import torchvision
@@ -43,22 +43,16 @@ class TruncatedLeNetModel(nn.Module):
 class Model(nn.Module):
     """The encoder obtained by removing the final
     fully-connected blocks of the required model.
-
-    :param model_name: The model name that the encoder
-        comes from.
-    :param datasource: The dataset name utilized to
-        train the model.
     """
+
 
     @staticmethod
     def get(
-        model_name: Optional[str] = None, num_classes: Optional[int] = None, **kwargs
+        model_name: Optional[str] = None,
+        num_classes: Optional[int] = None,
+        **kwargs: Dict[str]
     ):  # pylint: disable=unused-argument
         """Returns an encoder that is a fully CNN block."""
-        logging.info(
-            "Define the encoder from the model: %s without final fully-connected layers",
-            model_name,
-        )
 
         if model_name == "lenet5":
             model = lenet5_model(num_classes=num_classes)
@@ -73,6 +67,7 @@ class Model(nn.Module):
             #   i.e., the output dim of the encoder
             encode_output_dim = encoder.fc.in_features
             encoder.fc = nn.Identity()
+
 
         if "resnet" in model_name:
             resnets = {
@@ -103,4 +98,6 @@ class Model(nn.Module):
             encode_output_dim = encoder.fc.in_features
             encoder.fc = nn.Identity()
 
-        return encoder, encode_output_dim
+        encoder.encoding_dim = encode_output_dim
+
+        return encoder
