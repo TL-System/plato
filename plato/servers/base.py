@@ -331,7 +331,7 @@ class Server:
             self.clients[client_id] = {
                 "sid": sid,
                 "last_contacted": time.perf_counter(),
-                "sim_id": client_id,  # Logical client id
+                "client_id": client_id,
             }
             logging.info("[%s] New client with id #%d arrived.", self, client_id)
         else:
@@ -569,8 +569,8 @@ class Server:
                     self.training_sids.append(sid)
                     self.selected_sids.append(sid)
 
-                # Assign the logical client id to the physical client
-                self.clients[client_id]["sim_id"] = self.selected_client_id
+                # Assign the client id to the client process
+                self.clients[client_id]["client_id"] = self.selected_client_id
 
                 self.training_clients[self.selected_client_id] = {
                     "id": self.selected_client_id,
@@ -1142,18 +1142,18 @@ class Server:
                 await self._select_clients(for_next_batch=True)
 
     async def _client_disconnected(self, sid):
-        """When a client disconnected it should be removed from its internal states."""
-        for client_id, client in dict(self.clients).items():
+        """When a client process disconnected it should be removed from its internal states."""
+        for client_process_id, client in dict(self.clients).items():
             if client["sid"] == sid:
-                # Obtain the logic client id before deleting
-                sim_id = self.clients[client_id]["sim_id"]
+                # Obtain the client id before deleting
+                client_id = self.clients[client_process_id]["client_id"]
 
                 # Remove the physical client from server list
-                del self.clients[client_id]
+                del self.clients[client_process_id]
                 logging.warning(
-                    "[%s] Physical client #%d disconnected and removed from this server, %d client processes left.",
+                    "[%s] Client process #%d disconnected and removed from this server, %d client processes are remaining.",
                     self,
-                    client_id,
+                    client_process_id,
                     len(self.clients),
                 )
 
@@ -1166,11 +1166,11 @@ class Server:
                     await self._close()
 
                 # Handle the logical client under different situations
-                if sim_id in self.training_clients:
-                    del self.training_clients[sim_id]
+                if client_id in self.training_clients:
+                    del self.training_clients[client_id]
 
-                if sim_id in self.current_reported_clients:
-                    del self.current_reported_clients[sim_id]
+                if client_id in self.current_reported_clients:
+                    del self.current_reported_clients[client_id]
 
                 # Decide continue or exit training
                 if (
@@ -1178,20 +1178,20 @@ class Server:
                     and hasattr(Config().general, "debug")
                     and not Config().general.debug
                 ):
-                    # Recover from the failing client and proceed training
+                    # Recover from the failed client and proceed with training
                     if (
-                        sim_id in self.selected_clients
-                        and sim_id in self.trained_clients
+                        client_id in self.selected_clients
+                        and client_id in self.trained_clients
                     ):
-                        self.trained_clients.remove(sim_id)
-                        fail_client_index = self.selected_clients.index(sim_id)
+                        self.trained_clients.remove(client_id)
+                        fail_client_index = self.selected_clients.index(client_id)
                         untrained_client_index = len(self.trained_clients)
-                        
+
                         # Swap current client to the begining of untrained clients
                         self.selected_clients[
                             fail_client_index
                         ] = self.selected_clients[untrained_client_index]
-                        self.selected_clients[untrained_client_index] = sim_id
+                        self.selected_clients[untrained_client_index] = client_id
 
                         # Start next batch of client selection if current batch is done
                         if len(self.updates) >= len(self.trained_clients) or len(
@@ -1202,7 +1202,7 @@ class Server:
                     # Debug is either turned on or not specified, stop the training to avoid blocking.
                     logging.warning(
                         fonts.colourize(
-                            f"[{self}] Closing the server due to failed client."
+                            f"[{self}] Closing the server due to a failed client."
                         )
                     )
                     await self._close()
