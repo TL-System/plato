@@ -40,11 +40,12 @@ class TruncatedLeNetModel(nn.Module):
         return self.model.forward_to(samples)
 
 
-class Model(nn.Module):
+class Model:
     """The encoder obtained by removing the final
     fully-connected blocks of the required model.
     """
 
+    # pylint:disable=too-few-public-methods
     @staticmethod
     def get(
         model_name: Optional[str] = None, **kwargs: Dict[str, str]

@@ -1,4 +1,4 @@
-"""Unit tests for the personalization."""
+"""Unit tests for the model definition."""
 import os
 import unittest
 
@@ -6,7 +6,7 @@ os.environ["config_file"] = "tests/TestsConfig/models_config.yml"
 
 from plato.models import registry as models_registry
 from plato.config import Config
-from plato.trainers import lr_schedulers, optimizers
+from plato.trainers import optimizers
 
 
 class ModelsTest(unittest.TestCase):
@@ -31,6 +31,7 @@ class ModelsTest(unittest.TestCase):
         )
 
     def test_model_config(self):
+        """ Test whether the models are defined based on the configuration files. """
         # test the defined models based on the
         # hyper-parameters
 
@@ -40,7 +41,6 @@ class ModelsTest(unittest.TestCase):
         # 2. test whether the defined personalized model is
         # a normal resnet with output's dimension 'num_classes'
         self.assertEqual(self.personalized_model.linear.out_features, 20)
-
 
 
 if __name__ == "__main__":
