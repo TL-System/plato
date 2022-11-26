@@ -42,7 +42,7 @@ class ServerEvents(socketio.AsyncNamespace):
         await self.plato_server._client_disconnected(sid)
 
     async def on_client_alive(self, sid, data):
-        """A new client arrived or an existing client sends a heartbeat."""
+        """A new client arrived."""
         await self.plato_server.register_client(sid, data["id"])
 
     async def on_client_report(self, sid, data):
@@ -326,17 +326,16 @@ class Server:
 
     async def register_client(self, sid, client_id):
         """Adds a newly arrived client to the list of clients."""
-        if not client_id in self.clients:
-            # The last contact time is stored for each client
-            self.clients[client_id] = {
-                "sid": sid,
-                "last_contacted": time.perf_counter(),
-                "client_id": client_id,
-            }
-            logging.info("[%s] New client with id #%d arrived.", self, client_id)
-        else:
-            self.clients[client_id]["last_contacted"] = time.perf_counter()
-            logging.info("[%s] New contact from Client #%d received.", self, client_id)
+        client_process_id = len(self.clients) + 1
+
+        # The last contact time is stored for each client
+        self.clients[client_process_id] = {
+            "sid": sid,
+            "last_contacted": time.perf_counter(),
+            "client_id": client_id,
+        }
+        logging.info("[%s] New client with id #%d arrived.", self, client_id)
+        logging.info("[%s] Client process #%d registered.", self, client_process_id)
 
         if (
             hasattr(Config().trainer, "max_concurrency")
@@ -550,27 +549,28 @@ class Server:
                 self.selected_client_id = selected_client_id
 
                 if Config().is_central_server():
-                    client_id = selected_client_id
+                    client_process_id = selected_client_id
                 elif Config().is_edge_server():
-                    client_id = self.launched_clients[i]
+                    client_process_id = self.launched_clients[i]
                 else:
-                    client_id = list(self.clients.keys())[i]
+                    client_processes = [client for client in self.clients]
+                    client_process_id = client_processes[i]
 
-                sid = self.clients[client_id]["sid"]
+                sid = self.clients[client_process_id]["sid"]
 
                 if self.asynchronous_mode and self.simulate_wall_time:
 
                     # Skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
                     while sid in self.training_sids or sid in self.selected_sids:
-                        client_id = client_id % self.clients_per_round + 1
-                        sid = self.clients[client_id]["sid"]
+                        client_process_id = client_process_id % self.clients_per_round + 1
+                        sid = self.clients[client_process_id]["sid"]
 
                     self.training_sids.append(sid)
                     self.selected_sids.append(sid)
 
                 # Assign the client id to the client process
-                self.clients[client_id]["client_id"] = self.selected_client_id
+                self.clients[client_process_id]["client_id"] = self.selected_client_id
 
                 self.training_clients[self.selected_client_id] = {
                     "id": self.selected_client_id,
