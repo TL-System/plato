@@ -4,6 +4,8 @@ The registry for machine learning models.
 Having a registry of all available classes is convenient for retrieving an instance
 based on a configuration at run-time.
 """
+from typing import Union
+
 from plato.config import Config
 
 if hasattr(Config().trainer, "use_mindspore"):
@@ -41,18 +43,31 @@ else:
     }
 
 
-def get():
+def get(**kwargs: Union[str, dict]):
     """Get the model with the provided name."""
-    model_name = Config().trainer.model_name
-    model_type = (
-        Config().trainer.model_type
-        if hasattr(Config().trainer, "model_type")
-        else model_name.split("_")[0]
+    model_name = (
+        kwargs["model_name"] if "model_name" in kwargs else Config().trainer.model_name
     )
-    if hasattr(Config().parameters, "model"):
-        model_params = Config().parameters.model._asdict()
-    else:
-        model_params = {}
+
+    model_type = (
+        kwargs["model_type"]
+        if "model_type" in kwargs
+        else (
+            Config().trainer.model_type
+            if hasattr(Config().trainer, "model_type")
+            else model_name.split("_")[0]
+        )
+    )
+
+    model_params = (
+        kwargs["model_params"]
+        if "model_params" in kwargs
+        else (
+            Config().parameters.model._asdict()
+            if hasattr(Config().parameters, "model")
+            else {}
+        )
+    )
 
     if model_type in registered_models:
         registered_model = registered_models[model_type]
