@@ -16,7 +16,7 @@ The default value is `./`.
 ```
 
 ```{admonition} debug
-When `debug` is turned on, Plato will try to recover from a failed client by placing the training on another physical client process that is still alive. If it's turned off, Plato will terminate itself immediately when a client fails to avoid blocking. 
+When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails. 
 
 Valid values are `true` or `false`. The default value is `false`.
 ```
