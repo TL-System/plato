@@ -331,7 +331,7 @@ class Server:
             self.clients[client_id] = {
                 "sid": sid,
                 "last_contacted": time.perf_counter(),
-                "sim_id": client_id,  # Logic client id in client simulation mode
+                "sim_id": client_id,  # Logical client id in client simulation mode
             }
             logging.info("[%s] New client with id #%d arrived.", self, client_id)
         else:
