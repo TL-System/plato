@@ -16,4 +16,4 @@ class Model:
     # pylint: disable=unused-argument
     def get(model_name=None, **kwargs):
         """Returns a named model from PyTorch Hub."""
-        return torch.hub.load("pytorch/vision", model_name)
+        return torch.hub.load("pytorch/vision", model_name, **kwargs)
