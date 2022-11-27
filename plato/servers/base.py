@@ -43,7 +43,7 @@ class ServerEvents(socketio.AsyncNamespace):
 
     async def on_client_alive(self, sid, data):
         """A new client arrived."""
-        await self.plato_server.register_client(sid, data["id"])
+        await self.plato_server.register_client(sid, data["pid"], data["id"])
 
     async def on_client_report(self, sid, data):
         """An existing client sends a new report from local training."""
@@ -324,14 +324,10 @@ class Server:
             app, host=Config().server.address, port=port, loop=asyncio.get_event_loop()
         )
 
-    async def register_client(self, sid, client_id):
+    async def register_client(self, sid, client_process_id, client_id):
         """Adds a newly arrived client to the list of clients."""
-        client_process_id = len(self.clients) + 1
-
-        # The last contact time is stored for each client
         self.clients[client_process_id] = {
             "sid": sid,
-            "last_contacted": time.perf_counter(),
             "client_id": client_id,
         }
         logging.info("[%s] New client with id #%d arrived.", self, client_id)
