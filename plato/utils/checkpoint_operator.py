@@ -8,7 +8,6 @@ from typing import Dict, Optional, List
 import torch
 
 from plato.utils.format_saving_name import get_format_name
-from plato.config import Config
 
 
 class CheckpointsOperator:
@@ -72,17 +71,18 @@ class CheckpointsOperator:
 
     def search_latest_checkpoint_file(
         self,
-        key_words: List[str],
+        search_words: List[str],
         anchor_metric: str = "round",
         mask_anchors: Optional[List[str]] = None,
     ):
         """Search the latest checkpoint file under the checkpoint dir based on the key_words.
-            The latest
+            The 'anchor_metric' is utilized to measure to 'latest'
+            The 'mask_anchors' term is utilized to filter out unrelated terms.
 
-        :param key_words: A list holding the
-        :param anchor_metric: A string presenting the
-        :param mask_anchors:
-
+        :param key_words: A list holding the key words contained in the file name.
+        :param anchor_metric: A string presenting the metric used to measure the latest.
+        :param mask_anchors: A list holding strings that should be ignored when searching
+            for the file name.
         """
 
         if mask_anchors is None:
@@ -92,7 +92,7 @@ class CheckpointsOperator:
             return any(anchor in ckp_file for anchor in mask_anchors)
 
         def is_required_file(ckp_file):
-            return all(word in ckp_file for word in key_words if word is not None)
+            return all(word in ckp_file for word in search_words if word is not None)
 
         checkpoint_files = [
             ckp_file
@@ -111,36 +111,34 @@ class CheckpointsOperator:
 
         return latest_checkpoint_filename
 
-    def vaild_checkpoint_file(self, filename):
-        """Check whether the file path exists."""
+    def vaild_checkpoint_file(self, filename: str):
+        """Check whether the file exists."""
         file_path = os.path.join(self.checkpoints_dir, filename)
         if os.path.exists(file_path):
             return True
         return False
 
 
-def get_client_checkpoint_operator(client_id, current_round):
+def get_client_checkpoint_operator(
+    client_id: int, target_checkpoint_dir: str, current_round: int
+):
     """Get checkpoint operator specific for clients."""
-    if current_round == Config().trainer.rounds:
-        target_dir = Config().params["model_path"]
-    else:
-        target_dir = Config().params["checkpoint_path"]
 
-    client_cpk_dir = os.path.join(target_dir, "client_" + str(client_id))
+    client_cpk_dir = os.path.join(target_checkpoint_dir, "client_" + str(client_id))
     cpk_oper = CheckpointsOperator(checkpoints_dir=client_cpk_dir)
     return cpk_oper
 
 
 def perform_client_checkpoint_saving(
-    client_id,
-    model_name,
-    model_state_dict,
-    optimizer_state_dict,
-    lr_schedule_state_dict,
-    config,
-    present_epoch,
-    base_epoch,
-    prefix=None,
+    client_id: int,
+    model_name: str,
+    model_state_dict: Dict[str, torch.Tensor],
+    optimizer_state_dict: dict,
+    lr_schedule_state_dict: dict,
+    config: dict,
+    present_epoch: int,
+    base_epoch: int,
+    prefix: Optional[str] = None,
 ):
     # pylint:disable=too-many-arguments
 
@@ -176,15 +174,15 @@ def perform_client_checkpoint_saving(
 
 
 def perform_client_checkpoint_loading(
-    client_id,
-    model_name,
-    current_round,
-    run_id,
-    epoch,
-    prefix=None,
-    anchor_metric="round",
-    mask_anchors=None,
-    use_latest=True,
+    client_id: int,
+    model_name: str,
+    current_round: int,
+    run_id: int,
+    epoch: int,
+    prefix: Optional[str] = None,
+    anchor_metric: str = "round",
+    mask_anchors: Optional[List[str]] = None,
+    use_latest: bool = True,
 ):
     # pylint:disable=too-many-arguments
 

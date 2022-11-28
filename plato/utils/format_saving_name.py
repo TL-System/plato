@@ -4,17 +4,17 @@ Implementation of arranging filename for saving and loading
 This is to make sure that the saving file share the same name logic
 
 """
-
+from typing import Optional
 
 def get_format_name(
-    client_id,
-    model_name=None,
-    round_n=None,
-    epoch_n=None,
-    run_id=None,
-    prefix=None,
-    suffix=None,
-    ext="pth",
+    client_id: int,
+    model_name: Optional[str] = None,
+    round_n: Optional[int] = None,
+    epoch_n: Optional[int] = None,
+    run_id: Optional[str] = None,
+    prefix: Optional[str] = None,
+    suffix: Optional[str] = None,
+    ext: str="pth",
 ):
     # pylint:disable=too-many-arguments
 
