@@ -156,7 +156,7 @@ class ShakesHyper(nn.Module):
             self.wvs_value_list.append(wv_value)
 
     def forward(self, idx, test):
-        "Forward functoin of hypernetwork"
+        "The forward pass of hypernetwork."
         weights = 0
         emd = self.embeddings(idx)
         features = self.mlp(emd)

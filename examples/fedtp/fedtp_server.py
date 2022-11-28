@@ -48,10 +48,12 @@ class Server(fedavg.Server):
         self.current_attention = None
 
     def training_will_start(self) -> None:
+        """Assign optimizer particular for hypernetwork."""
         self.hnet_optimizer = self.algorithm.get_hnet_optimizer(self.hnet)
         return super().training_will_start()
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
+        """Generate personalized attention for models of each client and have a copy on server."""
         attentions_customized = self.algorithm.generate_attention(self.hnet, client_id)
 
         self.attentions[client_id] = attentions_customized
@@ -61,6 +63,7 @@ class Server(fedavg.Server):
         )
 
     def customize_server_payload(self, payload):
+        """Change the attention in payload into personalized attention."""
         payload = super().customize_server_payload(payload)
         for weight_name in self.current_attention:
             payload[weight_name].copy_(self.current_attention[weight_name])
