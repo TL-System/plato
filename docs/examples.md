@@ -233,6 +233,13 @@ python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
 ```
 ````
 
+````{admonition} **PerFedRLNAS**
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, only example of NASVIT search space is provided.
+
+```shell
+python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/FedNAS_CIFAR10_NASVIT_NonIID01_Scratch.yml
+```
+````
 
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 

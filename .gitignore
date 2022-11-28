@@ -1,3 +1,36 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+@dixiyao 
+TL-System
+/
+plato
+Public
+Code
+Issues
+2
+Pull requests
+1
+Actions
+Projects
+Wiki
+Security
+Insights
+plato/.gitignore
+@dixiyao
+dixiyao Allowed ViT models from HuggingFace to be trained from scratch; Added…
+…
+Latest commit 8f35014 24 minutes ago
+ History
+ 5 contributors
+@baochunli@dixiyao@CSJDeveloper@cying17@HeyHao
+165 lines (131 sloc)  2.17 KB
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -163,3 +196,18 @@ tensorflow_datasets/
 
 # Homomorphic encryption
 .ckks_context/
+Footer
+© 2022 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+plato/.gitignore at main · TL-System/plato
