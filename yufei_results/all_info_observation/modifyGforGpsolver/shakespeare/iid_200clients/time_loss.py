@@ -82,7 +82,7 @@ def plot(
         # marker='v',
         label="Fedbuff",
     )
-    """
+
     ax.plot(
         x_value3,
         y_value3,
@@ -90,9 +90,9 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Polaris",
+        label="Pisces",
     )
-    
+
     ax.plot(
         x_value4,
         y_value4,
@@ -100,9 +100,9 @@ def plot(
         linewidth=1.5,
         linestyle=":",
         # marker='s',
-        label="Async_freeze_both",
+        label="Polaris_verify",
     )
-    """
+
     ax.legend(loc="lower right")
     ax.set(xlabel=x_label, ylabel=y_label)
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -122,10 +122,10 @@ def main():
     result_csv_file2 = "./fedbuff_200_10.csv"
     result_dict2 = read_csv_to_dict(result_csv_file2, x_item, y_item)
 
-    result_csv_file3 = "./async_200_20.csv"
+    result_csv_file3 = "./pisces_200_20.csv"
     result_dict3 = read_csv_to_dict(result_csv_file3, x_item, y_item)
 
-    result_csv_file4 = "./async_200_20.csv"  # ./async_cifar.csv"
+    result_csv_file4 = "./async_200_20_verify.csv"  # ./async_cifar.csv"
     result_dict4 = read_csv_to_dict(result_csv_file4, x_item, y_item)
     # x_item = 'round'
     x_label = "Elapsed Time"
