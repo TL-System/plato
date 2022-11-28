@@ -546,8 +546,6 @@ class Server:
 
                 if Config().is_central_server():
                     client_process_id = selected_client_id
-                elif Config().is_edge_server():
-                    client_process_id = self.launched_clients[i]
                 else:
                     client_processes = [client for client in self.clients]
                     client_process_id = client_processes[i]
@@ -559,7 +557,9 @@ class Server:
                     # Skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
                     while sid in self.training_sids or sid in self.selected_sids:
-                        client_process_id = client_process_id % self.clients_per_round + 1
+                        client_process_id = (
+                            client_process_id % self.clients_per_round + 1
+                        )
                         sid = self.clients[client_process_id]["sid"]
 
                     self.training_sids.append(sid)
