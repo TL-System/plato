@@ -21,9 +21,10 @@ else:
         lenet5,
         dcgan,
         multilayer,
-        general_multilayer,
         resnet,
         vgg,
+        cnn_encoder,
+        general_multilayer,
         torch_hub,
         huggingface,
         vit,
@@ -38,10 +39,11 @@ else:
     registered_factories = {
         "resnet": resnet.Model,
         "vgg": vgg.Model,
+        "cnn_encoder": cnn_encoder.Model,
+        "general_multilayer": general_multilayer.Model,
         "torch_hub": torch_hub.Model,
         "huggingface": huggingface.Model,
         "vit": vit.Model,
-        "general_multilayer": general_multilayer.Model,
     }
 
 

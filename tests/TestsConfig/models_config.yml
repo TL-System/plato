@@ -1,0 +1,82 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 30
+
+    # The number of clients selected in each round
+    per_round: 30
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Number of samples in each partition
+    partition_size: 2000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 5
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 4
+
+    # The target accuracy
+    target_accuracy: 0.94
+
+    # Number of epoches for local training in each communication round
+    epochs: 3
+    batch_size: 64
+    optimizer: SGD
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    personalized_epochs: 10
+    personalized_batch_size: 12
+    personalized_optimizer: Adam
+
+    # The machine learning model
+    model_type: cnn_encoder
+    model_name: lenet5
+    personalized_model_type: resnet
+    personalized_model_name: resnet_18
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    optimizer:
+        lr: 0.05
+        momentum: 0.9
+        weight_decay: 0.000001
+
+    personalized_optimizer:
+        lr: 0.1
+        eps: 1.0e-6
+        weight_decay: 0.0
+
+    # model:
+    #     num_classes: 10
+
+    personalized_model:
+        num_classes: 20
+

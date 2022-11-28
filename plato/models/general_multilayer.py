@@ -1,5 +1,5 @@
 """
-The implementation of the general Multi-layer perceptron (MLP), with the ability to build a fully-
+A factory that generates a Multi-layer perceptron (MLP), with the ability to build a fully-
 connected network based on a specific configuration. This a very flexible MLP network generator to
 define any type of MLP network.
 
