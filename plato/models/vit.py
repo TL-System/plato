@@ -26,9 +26,20 @@ class ResolutionAdjustedModel(nn.Module):
 
     def __init__(self, model_name, config) -> nn.Module:
         super().__init__()
+
+        if (
+            hasattr(Config().parameters, "model")
+            and hasattr(Config().parameters.model, "pretrained")
+            and not Config().parameters.model.pretrained
+        ):
+            ignore_mismatched_sizes = True
+        else:
+            ignore_mismatched_sizes = False
+
         self.model = AutoModelForImageClassification.from_pretrained(
             model_name,
             config=config,
+            ignore_mismatched_sizes=ignore_mismatched_sizes,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
 
@@ -141,6 +152,7 @@ class Model:
             "revision": "main",
             "use_auth_token": None,
         }
+        config_kwargs.update(kwargs)
 
         model_name = model_name.replace("@", "/")
         config = AutoConfig.from_pretrained(model_name, **config_kwargs)

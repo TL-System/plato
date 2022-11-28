@@ -482,6 +482,8 @@ If `true`, the learning rate of the first epoch in the next communication round 
 ````{admonition} **model_type**
 The repository where the machine learning model should be retrieved from. The following options are available:
 
+- `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
+- `general_multilayer` (for generateing a multi-layer perceptron using a provided configuration)
 - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
 - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
 - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
