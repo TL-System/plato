@@ -1,8 +1,8 @@
 """
-Implementation of the fully convolutional neural network encoder.
+A factory that generates fully convolutional neural network encoder.
 
 The fully convolutional neural network used as the encoder in this implementation
-is the backbone part of one model.
+is the backbone part of a model.
 
 This encoder is solely capable of extracting features from the input sample.
 Generally, in the context of classification tasks, this encoder has to cooperate
