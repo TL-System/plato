@@ -28,7 +28,7 @@ class Client(simple.Client):
                 )
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Wrap up generating the report with any additional information."""
+        """Wraps up generating the report with any additional information."""
         if self.trainer.use_adaptive:
             report.div_from_global = self.trainer.run_history.get_latest_metric(
                 "div_from_global"

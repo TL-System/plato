@@ -59,14 +59,14 @@ class Server(fedavg.Server):
         )
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
-        """Wrap up generating the server response with any additional information."""
+        """Wraps up generating the server response with any additional information."""
         if self.trainer.use_adaptive and self.current_round > 1:
             self.calc_threshold()
             server_response["update_thresholds"] = self.update_thresholds
         return server_response
 
     def calc_threshold(self):
-        """Calculate new update thresholds for each client."""
+        """Calculates new update thresholds for each client."""
         for client_id in self.divs:
             sigmoid = (
                 self.delta1 * self.divs[client_id]
@@ -77,12 +77,15 @@ class Server(fedavg.Server):
                 1 / (1 + (np.exp(-sigmoid)))
             ) * self.orig_threshold
 
-    def compute_weight_deltas(self, weights_received):
-        """Extract weight updates."""
-        return weights_received
+    # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Aggregates the reported weight updates from the selected clients."""
+        deltas = await self.aggregate_deltas(updates, weights_received)
+        updated_weights = self.algorithm.update_weights(deltas)
+        return updated_weights
 
     def weights_aggregated(self, updates):
-        """Extract required information from client reports after aggregating weights."""
+        """Extracts required information from client reports after aggregating weights."""
         if self.trainer.use_adaptive:
             # Compute mean of loss variances
             self.loss_variances.append(

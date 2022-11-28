@@ -165,6 +165,32 @@ python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_len
 ```
 ````
 
+````{admonition} **Hermes**
+Hermes utilizes structured pruning to improve both communication efficiency and inference efficiency of federated learning. It prunes channels with the lowest magnitudes in each local model and adjusts the pruning amount based on each local model’s test accuracy and its previous pruning amount. When the server aggregates pruned updates, it only averages parameters that were not pruned on all clients.
+
+```shell
+python examples/hermes/hermes.py -c examples/hermes/hermes_MNIST_lenet5.yml
+```
+
+```{note}
+Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients](https://sites.duke.edu/angli/files/2021/10/2021_Mobicom_Hermes_v1.pdf),
+&rdquo; in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
+```
+````
+
+````{admonition} **FedSCR**
+FedSCR uses structured pruning to prune each update’s entire filters and channels if their summed parameter values are below a particular threshold.
+
+```shell
+python examples/fedscr/fedscr.py -c examples/fedscr/fedscr_MNIST_lenet5.yml
+```
+
+```{note}
+Wu et al., &ldquo;[FedSCR: Structure-Based Communication Reduction for Federated Learning](https://ieeexplore.ieee.org/document/9303442),
+&rdquo; IEEE Trans. Parallel Distributed Syst., 2021.
+```
+````
+
 ````{admonition} **Sub-FedAvg**
 Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. local data and reduce. It iteratively prunes the parameters of the neural networks which results in removing the commonly shared parameters of clients’ models and keeping the personalized ones. Besides the original version for two-layer federated learning, the version for three-layer federated learning has been implemented as well.
 
