@@ -9,7 +9,7 @@ from plato.config import Config
 from plato.trainers import loss_criterion, lr_schedulers, optimizers
 
 
-class LrSchedulerTest(unittest.TestCase):
+class PersonalizationTest(unittest.TestCase):
     def setUp(self):
         super().setUp()
         __ = Config()
