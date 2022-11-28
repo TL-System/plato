@@ -1,11 +1,9 @@
 """
-The implementation of the general Multi-layer perceptron (MLP).
+The implementation of the general Multi-layer perceptron (MLP), with the ability to build a fully-
+connected network based on a specific configuration. This a very flexible MLP network generator to
+define any type of MLP network.
 
-I.e., build the fully-connected network based on the configuration.
-
-This a very flexible MLP network generator to define any type of MLP network.
-
-NOTE: The general order of components in one MLP layer is:
+Note: The general order of components in one MLP layer is:
     Schema A: From the original paper of bn and dropout.
     fc -> bn -> activation -> dropout -> ....
 
@@ -17,10 +15,8 @@ NOTE: The general order of components in one MLP layer is:
 
 Our work use the schema A.
 
-Tricks:
-    - Usually, Just drop the Dropout(when you have BN)
-    as BN eliminates the need for Dropout in some cases cause BN provides similar
-    regularization benefits as Dropout intuitively.
+Trick: One may just drop the Dropout (when you have BN) as BN eliminates the need for Dropout in
+some cases, since intuitively BN provides similar regularization benefits as Dropout.
 
 """
 from typing import Union, Dict, List
@@ -111,7 +107,8 @@ def build_mlp_from_config(
 
 
 class Model:
-    """The Multi-layer perceptron (MLP) model.
+    """
+    The Multi-layer perceptron (MLP) model.
 
     The implemented mlp networks are:
     - linear_mlp, The mlp with one hidden layer.
@@ -123,7 +120,6 @@ class Model:
     - moco_final_mlp, The final layer of MoCo method.
     - plato_multilayer, The Plato's multilayer.
     - customized_mlp, The customized layer.
-
     """
 
     # pylint: disable=too-few-public-methods
