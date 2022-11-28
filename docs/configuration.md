@@ -507,6 +507,7 @@ The name of the machine learning model. The following options are available:
 - `yolov5`
 - `dcgan`
 - `multilayer`
+- `general_multiplayer`
 
 ```{note}
 If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, here.
