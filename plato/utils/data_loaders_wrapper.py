@@ -109,13 +109,11 @@ class SequentialIter:
         # terminates, this iterator will terminates.
         # The `StopIteration` raised inside that shortest loader's `__next__`
         # method will in turn gets out of this `__next__` method.
-
         cur_loader_idx = np.digitize(self.batch_idx, self.loaders_batch_bound)
 
         # if completed the final loader, we just recycle to the final loader
         # then, this loader will be terminated because:
         # The `StopIteration` raised inside that final loader's `__next__`
-
         if cur_loader_idx == self.num_loaders:
             cur_loader_idx -= 1
 
@@ -136,8 +134,7 @@ class StreamBatchesLoader:
     into one. This class mimics the `for batch in loader:` interface of
     pytorch `DataLoader`.
 
-    Args:
-        defined_loaders: a list or tuple of pytorch DataLoader objects
+    :param defined_loaders: A list or tuple containing pytorch DataLoader objects
 
     The size of this dataloader equals to the minimum length of the dataloader
     within input defined loaders.
@@ -155,95 +152,3 @@ class StreamBatchesLoader:
     def process_batch(self, batch):
         """Customize the behavior of combining batches here."""
         return batch
-
-
-# # For test:
-
-# import torchvision
-# from torch.utils.data import DataLoader
-# from torchvision import transforms
-
-# loader1 = DataLoader(torchvision.datasets.MNIST('data',
-#                                                 train=True,
-#                                                 download=True,
-#                                                 transform=transforms.Compose([
-#                                                     transforms.ToTensor(),
-#                                                     transforms.Normalize(
-#                                                         (0.1307, ), (0.3081, ))
-#                                                 ])),
-#                      batch_size=8,
-#                      shuffle=True)
-
-# loader2 = DataLoader(torchvision.datasets.MNIST('data',
-#                                                 train=True,
-#                                                 download=True,
-#                                                 transform=transforms.Compose([
-#                                                     transforms.ToTensor(),
-#                                                     transforms.Normalize(
-#                                                         (0.1307, ), (0.3081, ))
-#                                                 ])),
-#                      batch_size=64,
-#                      shuffle=True)
-
-# loader3 = DataLoader(torchvision.datasets.MNIST('data',
-#                                                 train=True,
-#                                                 download=True,
-#                                                 transform=transforms.Compose([
-#                                                     transforms.ToTensor(),
-#                                                     transforms.Normalize(
-#                                                         (0.1307, ), (0.3081, ))
-#                                                 ])),
-#                      batch_size=128,
-#                      shuffle=True)
-
-# my_parallel_loader = CombinedBatchesLoader([loader1, loader2, loader3])
-
-# my_sequence_loader = StreamBatchesLoader([loader1, loader2, loader3, None])
-
-# print("len(loader1): ", len(loader1))
-# print("len(loader2): ", len(loader2))
-# print("len(loader3): ", len(loader3))
-
-# def loop_through_loader(loader):
-#     """A use case of iterating through a mnist dataloader."""
-#     for i, b1 in enumerate(loader):
-#         data, target = b1
-#         if i in [100, 200]:
-#             print(type(data), data.size(), type(target), target.size())
-#     print('num of batches: {}'.format(i + 1))
-
-# def loop_through_my_combined_loader(loader):
-#     """A use case of iterating through my_loader."""
-#     stopped_batches = 0
-#     for i, batches in enumerate(loader):
-#         if i in [10, 20]:
-#             for j, b in enumerate(batches):
-#                 data, target = b
-#                 print(j + 1, type(data), data.size(), type(target),
-#                       target.size())
-#         stopped_batches = i
-
-#     print('stopped_batches: {}'.format(stopped_batches + 1))
-
-# # for _ in range(4):
-# #     loop_through_my_loader(my_parallel_loader)
-
-# # print('len(my_loader):', len(my_parallel_loader))
-
-# def loop_through_my_sequence_loader(loader):
-#     """A use case of iterating through my_loader."""
-#     stopped_batches = 0
-#     for batch_id, batch in enumerate(loader):
-#         if batch_id % 100 == 0:
-#             data, target = batch
-#             print(batch_id + 1, type(data), data.size(), type(target),
-#                   target.size())
-
-#         stopped_batches = batch_id
-
-#     print('stopped_batches: {}'.format(stopped_batches + 1))
-
-# for _ in range(4):
-#     loop_through_my_sequence_loader(my_sequence_loader)
-
-# print('len(my_loader):', len(my_sequence_loader))
