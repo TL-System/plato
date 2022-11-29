@@ -556,11 +556,13 @@ class Server:
 
                     # Skip if this sid is currently `training' with reporting clients
                     # or it has already been selected in this round
+                    offset = 1
+                    client_processes = [client for client in self.clients]
                     while sid in self.training_sids or sid in self.selected_sids:
-                        client_process_id = (
-                            client_process_id % self.clients_per_round + 1
-                        )
+                        next_process_index = (i + offset) % len(client_processes)
+                        client_process_id = client_processes[next_process_index]
                         sid = self.clients[client_process_id]["sid"]
+                        offset += 1
 
                     self.training_sids.append(sid)
                     self.selected_sids.append(sid)
