@@ -1,22 +1,23 @@
 """
-The implementation of various wrappers to support a flexible combination of
-    dataloaders
+The implementation of various wrappers to support flexible
+combinations of dataloaders.
 
-For example, the
-This is typical required in the self-supervised learning of the Plato.
+Currently, two types of data loader wrappers are supported.
+They are:
+    - CombinedBatchesLoader
+    - StreamBatchesLoader
 
-For one data, it may contain:
-    - trainset with labels
-    - unlabeled set
+[Example]
+One specific utilization condition is self-supervised learning:
+    One dataset, such as STL10, contains
+    1. trainset with labels
+    2. trainset without labels
 
-The plato will create a dataloader for the trainser based on the
-sampler of the trainset.
+The desired data loader first loads the trainset with labels and then
+the one without labels.
 
-Then, the ssl-related method will also create a dataloader for the
-unlabeled set based on the sampler of the unlabeled set.
-
-Thus, there are two dataloaders to be used in the training loop for
-one epoch.
+Under this condition, the StreamBatchesLoader can be utilized to
+achieve this target.
 
 """
 
@@ -54,8 +55,13 @@ class CombinedBatchesLoader:
     into one. This class mimics the `for batch in loader:` interface of
     pytorch `DataLoader`.
 
-    Args:
-        defined_loaders: a list or tuple of pytorch DataLoader objects
+    :param defined_loaders: a list or tuple of pytorch DataLoader objects
+
+    [For example]
+    There are two dataloaders A and B.
+    With CombinedBatchesLoader, one iter will extract one batch of samples 'A_b'
+    from A and one batch of samples 'B_b' from B. Thus, the loaded term is a
+    list containing [A_b, B_b].
 
     The size of this dataloader equals to the minimum length of the dataloader
     within input defined loaders.
@@ -83,7 +89,7 @@ class SequentialIter:
         once A finished, B  will start
         then C will start.
 
-    Thus, the length of this iter is the:
+    Thus, the length of this iter is:
         len(A) + len(B) + len(C)
     """
 
