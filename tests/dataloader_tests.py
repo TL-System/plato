@@ -1,4 +1,4 @@
-"""Unit tests for the data loaders."""
+"""Unit tests for data loaders."""
 
 import unittest
 import math
