@@ -174,7 +174,7 @@ tests/data/
 
 # Models and checkpoints
 pretrained/
-./models/
+models/
 logs/
 checkpoints/
 *.pth
