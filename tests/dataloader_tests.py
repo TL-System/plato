@@ -18,8 +18,7 @@ class DataLoadersTest(unittest.TestCase):
         super().setUp()
         __ = Config()
 
-        # set a randomly constant value
-        # as the client id.
+        # set client id
         self.client1_id = 10
         self.client2_id = 20
         self.client3_id = 39
@@ -29,7 +28,7 @@ class DataLoadersTest(unittest.TestCase):
         self.client2_batch_size = 64
         self.client3_batch_size = 128
 
-        # partition size of each client
+        # get partition size of each client
         self.partition_size = Config().data.partition_size
 
         # as plato's sample will pad the #samples based on the
