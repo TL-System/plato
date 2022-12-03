@@ -1,11 +1,12 @@
 """
-Implementation of arranging filename for saving and loading
+Implementation of arranging filenames for saving and loading.
 
-This is to make sure that the saving file share the same name logic
+This is to make sure that the saving file share the same name logic.
 
 """
 from typing import Optional
 
+# pylint:disable=too-many-arguments
 def get_format_name(
     client_id: int,
     model_name: Optional[str] = None,
@@ -14,11 +15,17 @@ def get_format_name(
     run_id: Optional[str] = None,
     prefix: Optional[str] = None,
     suffix: Optional[str] = None,
-    ext: str="pth",
+    ext: str = "pth",
 ):
-    # pylint:disable=too-many-arguments
+    """Arrange the save file name for all saving part of client.
 
-    """Arrange the save file name for all saving part of client."""
+    The desired filename will be:
+
+    {prefix}_{model_name}_client{client_id}_round{round_n}\
+        _epoch{epoch_n}_runid{run_id}_{suffix}.{ext}
+
+    The 'client_id' and 'ext' are two mandatory parts.
+    """
     file_name = ""
 
     if prefix is not None:

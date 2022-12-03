@@ -3,7 +3,7 @@ Save and load desired checkpoints.
 """
 import os
 import re
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Optional
 
 import torch
 
@@ -11,39 +11,45 @@ from plato.utils.filename_formatter import get_format_name
 
 
 class CheckpointsOperator:
-    """The saver for checkpoints that includes pretrained models and checkpoints models.
+    """The operations for checkpoints, including pretrained models and checkpoints models.
 
-    We call it CheckpointsSaver as the pretrained models can be regarded as one type
-    of checkpoint.
+    This class is called CheckpointsOperator, as the pre-trained models can also
+    be regarded as one type of checkpoint.
     """
 
     def __init__(self, checkpoints_dir="checkpoints/"):
-        """Initialize the loader with the directory where checkpoints should be stored."""
+        """Initialize the directory where checkpoints should be stored or loaded."""
         self.checkpoints_dir = checkpoints_dir
         os.makedirs(self.checkpoints_dir, exist_ok=True)
 
     def save_checkpoint(
         self,
         model_state_dict: Dict[str, torch.Tensor],
-        check_points_name: str,
-        optimizer_state_dict: dict,
-        lr_scheduler_state_dict: dict,
-        epoch: int,
-        config_args: dict,
+        checkpoints_name: List[str],
+        optimizer_state_dict: Optional[dict] = None,
+        lr_scheduler_state_dict: Optional[dict] = None,
+        epoch: Optional[int] = None,
+        config_args: Optional[dict] = None,
     ) -> bool:
         # pylint:disable=too-many-arguments
         """Save the checkpoint to specific dir.
 
         :param model_state_dict: A Dict holding the state of a to-be-saved model
-        :param check_points_name: The string for the name of the checkpoint file.
+        :param checkpoints_name: The List containg strings for names of checkpoint files.
+            This support saving the checkpoint to multiple pieces, each piece corresponding
+            to one string name within 'checkpoints_name'.
         :param optimizer_state_dict: A Dict holding the state of a to-be-saved optimizer.
+            Default to be None for not saving.
         :param lr_scheduler_state_dict: A Dict holding the state of a to-be-saved lr_scheduler.
-        :param epoch (int): A Integer presenting the epoch number.
-        :param config_args (dict): A Dict containing the hyper-parameters
+            Default to be None for not saving.
+        :param epoch: A Integer presenting the epoch number.
+            Default to be None for not saving.
+        :param config_args: A Dict containing the hyper-parameters
+            Default to be None for not saving.
         """
         checkpoint_paths = [
-            os.path.join(self.checkpoints_dir, checkpoint_name)
-            for checkpoint_name in check_points_name
+            os.path.join(self.checkpoints_dir, ckpt_name)
+            for ckpt_name in checkpoints_name
         ]
 
         for checkpoint_path in checkpoint_paths:
@@ -73,23 +79,23 @@ class CheckpointsOperator:
         self,
         search_words: List[str],
         anchor_metric: str = "round",
-        mask_anchors: Optional[List[str]] = None,
+        mask_words: Optional[List[str]] = None,
     ):
-        """Search the latest checkpoint file under the checkpoint dir based on the key_words.
-            The 'anchor_metric' is utilized to measure to 'latest'
-            The 'mask_anchors' term is utilized to filter out unrelated terms.
+        """Search the latest checkpoint file under the checkpoint dir based on 'search_words'.
+            The 'anchor_metric' is utilized to measure what is 'latest'.
+            The 'mask_words' term is utilized to filter out unrelated files.
 
-        :param key_words: A list holding the key words contained in the file name.
+        :param search_words: A list holding the words for searching target files.
         :param anchor_metric: A string presenting the metric used to measure the latest.
-        :param mask_anchors: A list holding strings that should be ignored when searching
+        :param mask_words: A list holding strings that should be ignored when searching
             for the file name.
         """
 
-        if mask_anchors is None:
-            mask_anchors = ["epohs"]
+        if mask_words is None:
+            mask_words = ["epohs"]
 
         def is_masked_file(ckp_file):
-            return any(anchor in ckp_file for anchor in mask_anchors)
+            return any(word in ckp_file for word in mask_words)
 
         def is_required_file(ckp_file):
             return all(word in ckp_file for word in search_words if word is not None)
@@ -119,9 +125,7 @@ class CheckpointsOperator:
         return False
 
 
-def get_client_checkpoint_operator(
-    client_id: int, target_checkpoint_dir: str, current_round: int
-):
+def get_client_checkpoint_operator(client_id: int, target_checkpoint_dir: str):
     """Get checkpoint operator specific for clients."""
 
     client_cpk_dir = os.path.join(target_checkpoint_dir, "client_" + str(client_id))
@@ -219,4 +223,3 @@ def perform_client_checkpoint_loading(
             )
 
     return filename, cpk_oper
-
