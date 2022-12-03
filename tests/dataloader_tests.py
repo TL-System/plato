@@ -9,7 +9,7 @@ import numpy as np
 
 from plato.config import Config
 from plato.datasources.cifar10 import DataSource
-from plato.utils import data_loaders_wrapper
+from plato.utils import data_loaders
 from plato.samplers import registry as samplers_registry
 
 
@@ -86,7 +86,7 @@ class DataLoadersTest(unittest.TestCase):
         target_batch_sizes: List[int],
         target_loaders_length: List[int],
     ):
-        """A use case of iterating through a parallel combined dataloader."""
+        """A use case of iterating through a parallel dataloader."""
         num_batches = 0
         for batch_id, loaders_batch in enumerate(data_loader):
             if batch_id % 50 == 0:
@@ -139,17 +139,17 @@ class DataLoadersTest(unittest.TestCase):
 
         # define different data loaders for comprehensive tests
         # adding the 'None' here to test the specific case
-        parallel_loader23 = data_loaders_wrapper.CombinedBatchesLoader(
+        parallel_loader23 = data_loaders.ParallelDataLoader(
             [client2_dataloader, client3_dataloader, None]
         )
-        parallel_loader123 = data_loaders_wrapper.CombinedBatchesLoader(
+        parallel_loader123 = data_loaders.ParallelDataLoader(
             [client1_dataloader, client2_dataloader, client3_dataloader]
         )
 
-        sequence_loader23 = data_loaders_wrapper.StreamBatchesLoader(
+        sequence_loader23 = data_loaders.SequentialDataLoader(
             [client2_dataloader, client3_dataloader, None]
         )
-        sequence_loader123 = data_loaders_wrapper.StreamBatchesLoader(
+        sequence_loader123 = data_loaders.SequentialDataLoader(
             [client1_dataloader, client2_dataloader, client3_dataloader, None]
         )
 
