@@ -1,0 +1,39 @@
+"""Unit tests for checkpoint operations."""
+import os
+import unittest
+
+os.environ["config_file"] = "tests/TestsConfig/models_config.yml"
+
+from plato.models import registry as models_registry
+from plato.config import Config
+from plato.trainers import optimizers
+from plato.utils import checkpoint_operator
+
+class CheckpointTest(unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        __ = Config()
+
+        # 1. define the main model to be the encoder
+        self.model = models_registry.get()
+        self.optimizer = optimizers.get(self.model)
+
+        # 2. define the personalized model to be normal resnet
+        self.personalized_model = models_registry.get(
+            model_type=Config().trainer.personalized_model_type,
+            model_name=Config().trainer.personalized_model_name,
+            model_params=Config().parameters.personalized_model._asdict(),
+        )
+        self.personalized_optimizer = optimizers.get(
+            self.personalized_model,
+            optimizer_name=Config().trainer.personalized_optimizer,
+            optim_params=Config().parameters.personalized_optimizer._asdict(),
+        )
+
+    def test_checkpoint_saving(self):
+        """ Test operations for checkpoint saving. """
+        ckp_operator = checkpoint_operator.CheckpointsOperator(checkpoints_dir="checkpoints/")
+
+
+if __name__ == "__main__":
+    unittest.main()
