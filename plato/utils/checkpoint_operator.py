@@ -3,7 +3,7 @@ Save and load desired checkpoints.
 """
 import os
 import re
-from typing import Dict, Optional, List, Optional
+from typing import Dict, Optional, List
 
 import torch
 
@@ -167,7 +167,7 @@ def perform_client_checkpoint_saving(
     )
     cpk_oper.save_checkpoint(
         model_state_dict=model_state_dict,
-        check_points_name=[filename],
+        checkpoints_name=[filename],
         optimizer_state_dict=optimizer_state_dict,
         lr_scheduler_state_dict=lr_schedule_state_dict,
         epoch=base_epoch,
@@ -185,7 +185,7 @@ def perform_client_checkpoint_loading(
     epoch: int,
     prefix: Optional[str] = None,
     anchor_metric: str = "round",
-    mask_anchors: Optional[List[str]] = None,
+    mask_words: Optional[List[str]] = None,
     use_latest: bool = True,
 ):
     # pylint:disable=too-many-arguments
@@ -195,8 +195,8 @@ def perform_client_checkpoint_loading(
     :param use_latest: A boolean to show whether utilize the latest checkpoint file
         if the required file does not exist.
     """
-    if mask_anchors is None:
-        mask_anchors = ["epohs"]
+    if mask_words is None:
+        mask_words = ["epohs"]
 
     cpk_oper = get_client_checkpoint_operator(client_id, current_round)
 
@@ -215,11 +215,11 @@ def perform_client_checkpoint_loading(
     if use_latest:
         if not cpk_oper.vaild_checkpoint_file(filename):
             # Loading the latest checkpoint file
-            key_words = [model_name, prefix]
+            search_words = [model_name, prefix]
             filename = cpk_oper.search_latest_checkpoint_file(
-                key_words=key_words,
+                search_words=search_words,
                 anchor_metric=anchor_metric,
-                mask_anchors=mask_anchors,
+                mask_words=mask_words,
             )
 
     return filename, cpk_oper
