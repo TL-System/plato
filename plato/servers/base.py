@@ -541,7 +541,7 @@ class Server:
             else:
                 selected_clients = self.selected_clients
 
-            for i, selected_client_id in enumerate(selected_clients):
+            for selected_client_id in selected_clients:
                 self.selected_client_id = selected_client_id
 
                 if Config().is_central_server():
