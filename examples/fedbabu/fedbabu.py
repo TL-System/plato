@@ -4,8 +4,8 @@ The implementation of FedBABU method.
 Jaehoon Oh, et.al, FedBABU: Toward Enhanced Representation for Federated Image Classification.
 in the Proceedings of ICML 2021.
 
-Paper address: https://openreview.net/pdf?id=HuaYQfggn5u
-Official code: https://github.com/jhoon-oh/FedBABU
+Paper address: https://openreview.net/pdf?id=HuaYQfggn5u.
+Official code: https://github.com/jhoon-oh/FedBABU.
 
 """
 

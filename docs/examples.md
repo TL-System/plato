@@ -266,7 +266,7 @@ Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Feder
 ````
 
 ````{admonition} **FedBABU**
-FedBabu determined that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during federated training. In this implementation, head is froze at the beginning of each local training epoch through the API ```train_run_start```.
+FedBabu determined that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during federated training. In this implementation, the head is frozen at the beginning of each local training epoch through the API ```train_run_start```.
 
 ```shell
 python3 examples/fedbabu/fedbabu.py -c examples/fedbabu/fedavg_cifar10_levit.yml
