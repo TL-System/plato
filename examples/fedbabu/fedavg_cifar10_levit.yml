@@ -60,6 +60,7 @@ algorithm:
 parameters:
     model:
         num_labels: 10
+        pretrained: false
 
     optimizer:
         lr: 0.00004
