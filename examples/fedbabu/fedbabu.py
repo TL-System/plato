@@ -1,12 +1,12 @@
 """
-The implementation of FedBABU method.
+An implementation of the FedBABU algorithm.
 
-Jaehoon Oh, et.al, FedBABU: Toward Enhanced Representation for Federated Image Classification.
-in the Proceedings of ICML 2021.
+J. Oh, et al., "FedBABU: Toward Enhanced Representation for Federated Image Classification,"
+in the Proceedings of ICLR 2022.
 
-Paper address: https://openreview.net/pdf?id=HuaYQfggn5u.
-Official code: https://github.com/jhoon-oh/FedBABU.
+https://openreview.net/pdf?id=HuaYQfggn5u
 
+Source code: https://github.com/jhoon-oh/FedBABU
 """
 
 from fedbabu_trainer import Trainer
@@ -16,7 +16,8 @@ from plato.clients.simple import Client
 
 
 def main():
-    """An interface for running the FedBABU method under the
+    """
+    A Plato federated learning training session using the FedBABU algorithm under the
     supervised learning setting.
     """
 

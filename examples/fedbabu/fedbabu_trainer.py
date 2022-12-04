@@ -10,14 +10,14 @@ class Trainer(basic.Trainer):
     """A personalized federated learning trainer using the FedBABU algorithm."""
 
     def freeze_model(self, model, param_prefix=None):
-        """Freeze part of the model."""
+        """Freeze a part of the model."""
         for name, param in model.named_parameters():
             if param_prefix is not None and param_prefix in name:
                 logging.info("%s is freezed", name)
                 param.requires_grad = False
 
     def activate_model(self, model, param_prefix=None):
-        """Defreeze part of the model."""
+        """Defreeze a part of the model."""
         for name, param in model.named_parameters():
             if param_prefix is not None and param_prefix in name:
                 param.requires_grad = True
