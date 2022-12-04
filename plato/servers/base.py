@@ -548,24 +548,23 @@ class Server:
                     client_process_id = selected_client_id
                 else:
                     client_processes = [client for client in self.clients]
-                    client_process_id = client_processes[i]
+
+                    # Find a client process that is currently not training
+                    # or selected in this round
+                    for process_id in client_processes:
+                        current_sid = self.clients[process_id]["sid"]
+                        if not (
+                            current_sid in self.training_sids
+                            or current_sid in self.selected_sids
+                        ):
+                            client_process_id = process_id
+                            break
 
                 sid = self.clients[client_process_id]["sid"]
 
-                if self.asynchronous_mode and self.simulate_wall_time:
-
-                    # Skip if this sid is currently `training' with reporting clients
-                    # or it has already been selected in this round
-                    offset = 1
-                    client_processes = [client for client in self.clients]
-                    while sid in self.training_sids or sid in self.selected_sids:
-                        next_process_index = (i + offset) % len(client_processes)
-                        client_process_id = client_processes[next_process_index]
-                        sid = self.clients[client_process_id]["sid"]
-                        offset += 1
-
-                    self.training_sids.append(sid)
-                    self.selected_sids.append(sid)
+                # Track the selected client process
+                self.training_sids.append(sid)
+                self.selected_sids.append(sid)
 
                 # Assign the client id to the client process
                 self.clients[client_process_id]["client_id"] = self.selected_client_id
@@ -901,8 +900,7 @@ class Server:
         self.current_reported_clients[client_info[2]["client_id"]] = True
         del self.training_clients[client_id]
 
-        if self.asynchronous_mode and self.simulate_wall_time:
-            self.training_sids.remove(client_info[2]["sid"])
+        self.training_sids.remove(client_info[2]["sid"])
 
         await self._process_clients(client_info)
 
@@ -977,8 +975,7 @@ class Server:
 
                         sid = client["sid"]
 
-                        if self.asynchronous_mode and self.simulate_wall_time:
-                            self.training_sids.append(sid)
+                        self.training_sids.append(sid)
 
                         await self.sio.emit(
                             "request_update",
