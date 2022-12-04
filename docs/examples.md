@@ -253,7 +253,7 @@ python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/FedNA
 ````
 
 ````{admonition} **FedRep**
-FedRep is an algorithm for learning a shared data representation across clients and unique local heads for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
+FedRep is an algorithm for learning a shared data representation across clients and unique, personalized local ``heads'' for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
 
 ```shell
 python3 examples/fedrep/fedrep.py -c examples/fedrep/fedrep_MNIST_lenet5.yml
@@ -266,7 +266,7 @@ Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Feder
 ````
 
 ````{admonition} **FedBABU**
-FedBabu determined that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during federated training. In this implementation, the head is frozen at the beginning of each local training epoch through the API ```train_run_start```.
+FedBABU argued that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during FL training. In this implementation, the head is frozen at the beginning of each local training epoch through the API ```train_run_start```.
 
 ```shell
 python3 examples/fedbabu/fedbabu.py -c examples/fedbabu/fedavg_cifar10_levit.yml
