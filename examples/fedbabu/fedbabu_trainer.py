@@ -23,7 +23,8 @@ class Trainer(basic.Trainer):
                 param.requires_grad = True
 
     def train_run_start(self, config):
-        """According to FedBabu, freeze the classifier and never train it."""
+        """According to FedBabu, freeze the classifier and
+        never update it in federated learning phase."""
         self.freeze_model(self.model, config["classifier"])
 
     def train_run_end(self, config):
