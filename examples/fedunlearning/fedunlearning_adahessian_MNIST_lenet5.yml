@@ -1,7 +1,6 @@
 clients:
     # Type
     type: simple
-    simulation: true
 
     # The total number of clients
     total_clients: 10

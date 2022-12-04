@@ -11,9 +11,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    # Client simulation mode
-    simulation: true
-
 server:
     address: 127.0.0.1
     port: 8000
