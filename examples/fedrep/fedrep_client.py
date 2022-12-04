@@ -20,6 +20,7 @@ class Client(simple.Client):
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
+        # pylint:disable=too-many-arguments
         super().__init__(
             model=model,
             datasource=datasource,
