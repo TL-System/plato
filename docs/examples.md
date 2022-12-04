@@ -252,6 +252,19 @@ python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/FedNA
 ```
 ````
 
+````{admonition} **FedBABU**
+FedBabu determined that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during federated training. In this implementation, head is froze at the beginning of each local training epoch through the API ```train_run_start```.
+
+```shell
+python3 examples/fedbabu/fedbabu.py -c examples/fedbabu/fedavg_cifar10_levit.yml
+```
+
+```{note}
+Jaehoon et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image Classification](https://openreview.net/forum?id=HuaYQfggn5u),
+&rdquo; in International Conference on Learning Representations (ICLR), 2022.
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
