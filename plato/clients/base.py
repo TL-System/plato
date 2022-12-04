@@ -142,7 +142,7 @@ class Client:
 
         logging.info("[%s] Connecting to the server at %s.", self, uri)
         await self.sio.connect(uri, wait_timeout=600)
-        await self.sio.emit("client_alive", {"id": self.client_id})
+        await self.sio.emit("client_alive", {"pid": os.getpid(), "id": self.client_id})
 
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
