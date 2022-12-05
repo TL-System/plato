@@ -177,6 +177,7 @@ class Client(base.Client):
             ) * Config().trainer.epochs
 
         report = SimpleNamespace(
+            client_id=self.client_id,
             num_samples=self.sampler.num_samples(),
             accuracy=accuracy,
             training_time=training_time,
