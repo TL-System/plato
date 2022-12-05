@@ -185,7 +185,7 @@ class Client:
         self.process_server_response(response)
 
         self._load_data()
-        
+
         self.configure()
 
         self._allocate_data()

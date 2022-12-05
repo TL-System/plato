@@ -67,5 +67,5 @@ class Client(simple.Client):
             )
 
             self.sampler = unlearning_iid.Sampler(
-                self.datasource, self.client_id, False
+                self.datasource, self.client_id, testing=False
             )
