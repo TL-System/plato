@@ -185,9 +185,7 @@ class Client:
         self.process_server_response(response)
 
         self._load_data()
-
         self.configure()
-
         self._allocate_data()
 
         if self.comm_simulation:
@@ -287,7 +285,7 @@ class Client:
         )
 
         # Sending the client training payload to the server
-        await self.send(payload)
+        await self._send(payload)
 
     async def _payload_arrived(self, client_id) -> None:
         """Upon receiving a portion of the new payload from the server."""
