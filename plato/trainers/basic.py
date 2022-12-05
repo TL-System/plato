@@ -427,7 +427,6 @@ class Trainer(base.Trainer):
             if model_training_time < requested_time:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
 
-                print(model_path)
                 pretrained = None
                 if torch.cuda.is_available():
                     pretrained = torch.load(model_path)
