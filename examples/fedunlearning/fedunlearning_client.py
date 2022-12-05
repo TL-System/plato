@@ -33,11 +33,11 @@ class Client(simple.Client):
         )
 
         self.previous_round = {}
+        self.unlearning_clients = []
 
     def process_server_response(self, server_response):
         """
-        If a client requested deletion, replace its sampler accordingly in the
-        retraining phase.
+        Register the client when the retraining happens (communication round rollback).
         """
         if self.client_id in self.previous_round:
             previous_round = self.previous_round[self.client_id]
@@ -47,6 +47,19 @@ class Client(simple.Client):
         client_pool = Config().clients.clients_requesting_deletion
 
         if self.client_id in client_pool and self.current_round <= previous_round:
+            if self.client_id not in self.unlearning_clients:
+                self.unlearning_clients.append(self.client_id)
+
+        self.previous_round[self.client_id] = self.current_round
+
+    def configure(self):
+        """
+        If a client requested deletion, replace its sampler accordingly in the
+        retraining phase.
+        """
+        super().configure()
+
+        if self.client_id in self.unlearning_clients:
             logging.info(
                 "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
                 self,
@@ -56,5 +69,3 @@ class Client(simple.Client):
             self.sampler = unlearning_iid.Sampler(
                 self.datasource, self.client_id, False
             )
-
-        self.previous_round[self.client_id] = self.current_round
