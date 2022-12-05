@@ -69,6 +69,19 @@ class Client(base.Client):
             "Client", client_id=self.client_id, trainer=self.trainer
         )
 
+        # Setting up the data sampler
+        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+
+        if (
+            hasattr(Config().clients, "do_test")
+            and Config().clients.do_test
+            and hasattr(Config().data, "testset_sampler")
+        ):
+            # Set the sampler for test set
+            self.testset_sampler = samplers_registry.get(
+                self.datasource, self.client_id, testing=True
+            )
+
     def _load_data(self) -> None:
         """Generates data and loads them onto this client."""
         logging.info("[%s] Loading its data source...", self)
@@ -90,9 +103,8 @@ class Client(base.Client):
             "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
         )
 
-        # Setting up the data sampler
-        self.sampler = samplers_registry.get(self.datasource, self.client_id)
-
+    def _allocate_data(self) -> None:
+        """Allocate training or testing dataset of this client."""
         if hasattr(Config().trainer, "use_mindspore"):
             # MindSpore requires samplers to be used while constructing
             # the dataset
@@ -104,11 +116,6 @@ class Client(base.Client):
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
-            if hasattr(Config().data, "testset_sampler"):
-                # Set the sampler for test set
-                self.testset_sampler = samplers_registry.get(
-                    self.datasource, self.client_id, testing=True
-                )
 
     def _load_payload(self, server_payload) -> None:
         """Loads the server model onto this client."""

@@ -180,14 +180,15 @@ class Client:
         # Update (virtual) client id for client, trainer and algorithm
         self.client_id = response["id"]
 
-        self.process_server_response(response)
-
-        self.configure()
-
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if not hasattr(Config().data, "reload_data") or Config().data.reload_data:
-            self._load_data()
+        self.process_server_response(response)
+
+        self._load_data()
+        
+        self.configure()
+
+        self._allocate_data()
 
         if self.comm_simulation:
             payload_filename = response["payload_filename"]
@@ -433,6 +434,10 @@ class Client:
     @abstractmethod
     def _load_data(self) -> None:
         """Generating data and loading them onto this client."""
+
+    @abstractmethod
+    def _allocate_data(self) -> None:
+        """Allocate training or testing dataset of this client."""
 
     @abstractmethod
     def _load_payload(self, server_payload) -> None:
