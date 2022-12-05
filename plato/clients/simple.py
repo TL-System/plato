@@ -85,24 +85,25 @@ class Client(base.Client):
 
     def _load_data(self) -> None:
         """Generates data and loads them onto this client."""
-        logging.info("[%s] Loading its data source...", self)
-
+        # The only case where Config().data.reload_data is set to true is
+        # when clients with different client IDs need to load from different datasets,
+        # such as in the pre-partitioned Federated EMNIST dataset. We do not support
+        # reloading data from a custom datasource at this time.
         if (
             self.datasource is None
-            and self.custom_datasource is None
-            or (hasattr(Config().data, "reload_data") and Config().data.reload_data)
+            or hasattr(Config().data, "reload_data")
+            and Config().data.reload_data
         ):
-            # The only case where Config().data.reload_data is set to true is
-            # when clients with different client IDs need to load from different datasets,
-            # such as in the pre-partitioned Federated EMNIST dataset. We do not support
-            # reloading data from a custom datasource at this time.
-            self.datasource = datasources_registry.get(client_id=self.client_id)
-        elif self.datasource is None and self.custom_datasource is not None:
-            self.datasource = self.custom_datasource()
+            logging.info("[%s] Loading its data source...", self)
 
-        logging.info(
-            "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
-        )
+            if self.custom_datasource is None:
+                self.datasource = datasources_registry.get(client_id=self.client_id)
+            elif self.custom_datasource is not None:
+                self.datasource = self.custom_datasource()
+
+            logging.info(
+                "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
+            )
 
     def _allocate_data(self) -> None:
         """Allocate training or testing dataset of this client."""
