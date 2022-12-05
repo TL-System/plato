@@ -70,17 +70,18 @@ class Client(base.Client):
         )
 
         # Setting up the data sampler
-        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+        if self.datasource:
+            self.sampler = samplers_registry.get(self.datasource, self.client_id)
 
-        if (
-            hasattr(Config().clients, "do_test")
-            and Config().clients.do_test
-            and hasattr(Config().data, "testset_sampler")
-        ):
-            # Set the sampler for test set
-            self.testset_sampler = samplers_registry.get(
-                self.datasource, self.client_id, testing=True
-            )
+            if (
+                hasattr(Config().clients, "do_test")
+                and Config().clients.do_test
+                and hasattr(Config().data, "testset_sampler")
+            ):
+                # Set the sampler for test set
+                self.testset_sampler = samplers_registry.get(
+                    self.datasource, self.client_id, testing=True
+                )
 
     def _load_data(self) -> None:
         """Generates data and loads them onto this client."""
