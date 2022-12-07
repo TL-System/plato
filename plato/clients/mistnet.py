@@ -37,6 +37,7 @@ class Client(simple.Client):
         comm_time = time.time()
         return (
             SimpleNamespace(
+                client_id=self.client_id,
                 num_samples=self.sampler.num_samples(),
                 accuracy=0,
                 training_time=training_time,

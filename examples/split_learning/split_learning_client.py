@@ -81,6 +81,7 @@ class Client(simple.Client):
                 self._save_context(self.client_id)
                 # Send weights to server for evaluation
                 report = SimpleNamespace(
+                    client_id=self.client_id,
                     num_samples=self.sampler.num_samples(),
                     accuracy=0,
                     training_time=training_time,
@@ -131,6 +132,7 @@ class Client(simple.Client):
             self.trainset, self.static_sampler
         )
         report = SimpleNamespace(
+            client_id=self.client_id,
             num_samples=self.sampler.num_samples(),
             accuracy=0,
             training_time=training_time,
