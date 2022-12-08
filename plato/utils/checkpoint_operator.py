@@ -1,5 +1,5 @@
 """
-Save and load desired checkpoints.
+The implementation of checkpoints operations, such as saving and loading.
 """
 import os
 import re
@@ -17,8 +17,11 @@ class CheckpointsOperator:
     be regarded as one type of checkpoint.
     """
 
-    def __init__(self, checkpoints_dir="checkpoints/"):
-        """Initialize the directory where checkpoints should be stored or loaded."""
+    def __init__(self, checkpoints_dir: str = "checkpoints/"):
+        """Initialize the directory where checkpoints should be stored or loaded.
+
+        :param checkpoints_dir: A string to show where checkpoint operations perform.
+        """
         self.checkpoints_dir = checkpoints_dir
         os.makedirs(self.checkpoints_dir, exist_ok=True)
 
@@ -28,6 +31,7 @@ class CheckpointsOperator:
         checkpoints_name: List[str],
         optimizer_state_dict: Optional[dict] = None,
         lr_scheduler_state_dict: Optional[dict] = None,
+        learning_dict: Optional[dict] = None,
         epoch: Optional[int] = None,
         config_args: Optional[dict] = None,
     ) -> bool:
@@ -42,6 +46,8 @@ class CheckpointsOperator:
             Default to be None for not saving.
         :param lr_scheduler_state_dict: A Dict holding the state of a to-be-saved lr_scheduler.
             Default to be None for not saving.
+        :param learning_dict: A Dict holding the state of the learning process. It can
+            include "loss" for example. Default to be None for not saving.
         :param epoch: A Integer presenting the epoch number.
             Default to be None for not saving.
         :param config_args: A Dict containing the hyper-parameters
@@ -58,6 +64,7 @@ class CheckpointsOperator:
                     "model": model_state_dict,
                     "optimizer": optimizer_state_dict,
                     "lr_scheduler": lr_scheduler_state_dict,
+                    "learning": learning_dict,
                     "epoch": epoch,
                     "args": config_args,
                 },
@@ -77,33 +84,35 @@ class CheckpointsOperator:
 
     def search_latest_checkpoint_file(
         self,
-        search_words: List[str],
+        search_key_words: List[str],
         anchor_metric: str = "round",
-        mask_words: Optional[List[str]] = None,
+        filter_words: Optional[List[str]] = None,
     ):
-        """Search the latest checkpoint file under the checkpoint dir based on 'search_words'.
+        """Search the latest checkpoint file under the checkpoint dir based on 'search_key_words'.
             The 'anchor_metric' is utilized to measure what is 'latest'.
-            The 'mask_words' term is utilized to filter out unrelated files.
+            The 'filter_words' term is utilized to filter out unrelated files.
 
-        :param search_words: A list holding the words for searching target files.
+        :param search_key_words: A list holding the words for searching target files.
         :param anchor_metric: A string presenting the metric used to measure the latest.
-        :param mask_words: A list holding strings that should be ignored when searching
+        :param filter_words: A list holding strings that should be ignored when searching
             for the file name.
         """
 
-        if mask_words is None:
-            mask_words = ["epohs"]
+        if filter_words is None:
+            filter_words = ["epohs"]
 
-        def is_masked_file(ckp_file):
-            return any(word in ckp_file for word in mask_words)
+        def is_filterd_file(ckp_file):
+            return any(word in ckp_file for word in filter_words)
 
         def is_required_file(ckp_file):
-            return all(word in ckp_file for word in search_words if word is not None)
+            return all(
+                word in ckp_file for word in search_key_words if word is not None
+            )
 
         checkpoint_files = [
             ckp_file
             for ckp_file in os.listdir(self.checkpoints_dir)
-            if not is_masked_file(ckp_file) and is_required_file(ckp_file)
+            if not is_filterd_file(ckp_file) and is_required_file(ckp_file)
         ]
 
         latest_checkpoint_filename = None
@@ -136,23 +145,45 @@ def get_client_checkpoint_operator(client_id: int, target_checkpoint_dir: str):
 def perform_client_checkpoint_saving(
     client_id: int,
     model_name: str,
+    checkpoints_dir: str,
     model_state_dict: Dict[str, torch.Tensor],
-    optimizer_state_dict: dict,
-    lr_schedule_state_dict: dict,
-    config: dict,
-    present_epoch: int,
-    base_epoch: int,
+    optimizer_state_dict: Optional[dict] = None,
+    lr_scheduler_state_dict: Optional[dict] = None,
+    learning_dict: Optional[dict] = None,
+    config: dict = {},
+    global_epoch: Optional[int] = None,
+    local_epoch: Optional[int] = None,
     prefix: Optional[str] = None,
 ):
     # pylint:disable=too-many-arguments
 
-    """Save the checkpoint for sepcific client."""
-    current_round = config["current_round"]
+    """Save the checkpoint for sepcific client.
+
+    :param client_id: A integer to present the client id.
+    :param model_name: A integer to present the model's name used
+        for the checkpoint saving.
+    :param checkpoints_dir: A string to present whether to save the
+        checkpoints.
+    :param model_state_dict: A Dict holding the state of a to-be-saved model
+    :param optimizer_state_dict: A Dict holding the state of a to-be-saved optimizer.
+        Default to be None for not saving.
+    :param lr_scheduler_state_dict: A Dict holding the state of a to-be-saved lr_scheduler.
+        Default to be None for not saving.
+    :param learning_dict: A Dict holding the state of the learning process. It can
+        include "loss" for example. Default to be None for not saving.
+    :param global_epoch: A integer to present the client id.
+    :param global_epoch: A integer to present global epoch.
+    :param local_epoch: A integer to present local epoch within the client.
+    :param prefix: A integer to present the client id.
+
+    """
+    current_round = config["current_round"] if "current_round" in config else None
     # run_id = config['run_id']
     # we have to set the run_id to be None here as the client can
     # have different run id in the whole training process.
     run_id = None
-    cpk_oper = get_client_checkpoint_operator(client_id, current_round)
+
+    cpk_oper = CheckpointsOperator(checkpoints_dir=checkpoints_dir)
 
     # Before the training, we expect to save the initial
     # model of this round
@@ -160,7 +191,7 @@ def perform_client_checkpoint_saving(
         model_name=model_name,
         client_id=client_id,
         round_n=current_round,
-        epoch_n=present_epoch,
+        epoch_n=local_epoch,
         run_id=run_id,
         prefix=prefix,
         ext="pth",
@@ -169,8 +200,9 @@ def perform_client_checkpoint_saving(
         model_state_dict=model_state_dict,
         checkpoints_name=[filename],
         optimizer_state_dict=optimizer_state_dict,
-        lr_scheduler_state_dict=lr_schedule_state_dict,
-        epoch=base_epoch,
+        lr_scheduler_state_dict=lr_scheduler_state_dict,
+        learning_dict=learning_dict,
+        epoch=global_epoch,
         config_args=config,
     )
 
@@ -180,6 +212,7 @@ def perform_client_checkpoint_saving(
 def perform_client_checkpoint_loading(
     client_id: int,
     model_name: str,
+    checkpoints_dir: str,
     current_round: int,
     run_id: int,
     epoch: int,
@@ -198,7 +231,7 @@ def perform_client_checkpoint_loading(
     if mask_words is None:
         mask_words = ["epohs"]
 
-    cpk_oper = get_client_checkpoint_operator(client_id, current_round)
+    cpk_oper = CheckpointsOperator(checkpoints_dir=checkpoints_dir)
 
     # Before the training, we expect to save the initial
     # model of this round
