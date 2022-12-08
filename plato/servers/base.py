@@ -42,8 +42,8 @@ class ServerEvents(socketio.AsyncNamespace):
         await self.plato_server._client_disconnected(sid)
 
     async def on_client_alive(self, sid, data):
-        """A new client arrived or an existing client sends a heartbeat."""
-        await self.plato_server.register_client(sid, data["id"])
+        """A new client arrived."""
+        await self.plato_server.register_client(sid, data["pid"], data["id"])
 
     async def on_client_report(self, sid, data):
         """An existing client sends a new report from local training."""
@@ -324,18 +324,14 @@ class Server:
             app, host=Config().server.address, port=port, loop=asyncio.get_event_loop()
         )
 
-    async def register_client(self, sid, client_id):
+    async def register_client(self, sid, client_process_id, client_id):
         """Adds a newly arrived client to the list of clients."""
-        if not client_id in self.clients:
-            # The last contact time is stored for each client
-            self.clients[client_id] = {
-                "sid": sid,
-                "last_contacted": time.perf_counter(),
-            }
-            logging.info("[%s] New client with id #%d arrived.", self, client_id)
-        else:
-            self.clients[client_id]["last_contacted"] = time.perf_counter()
-            logging.info("[%s] New contact from Client #%d received.", self, client_id)
+        self.clients[client_process_id] = {
+            "sid": sid,
+            "client_id": client_id,
+        }
+        logging.info("[%s] New client with id #%d arrived.", self, client_id)
+        logging.info("[%s] Client process #%d registered.", self, client_process_id)
 
         if (
             hasattr(Config().trainer, "max_concurrency")
@@ -461,7 +457,7 @@ class Server:
                 # training.
                 training_client_ids = [
                     self.training_clients[client_id]["id"]
-                    for client_id in list(self.training_clients.keys())
+                    for client_id in self.training_clients
                 ]
 
                 # If the server is simulating the wall clock time, some of the clients who
@@ -524,15 +520,18 @@ class Server:
                             if client_id % available_gpus == cuda_id:
                                 selected_clients.append(client_id)
                             if len(selected_clients) >= min(
+                                len(self.clients),
                                 (cuda_id + 1) * Config().trainer.max_concurrency,
                                 self.clients_per_round,
                             ):
                                 break
+                        # There is no enough alive clients, break the selection
+                        if len(selected_clients) >= len(self.clients):
+                            break
                 else:
                     selected_clients = self.selected_clients[
                         len(self.trained_clients) : min(
-                            len(self.trained_clients)
-                            + Config().trainer.max_concurrency,
+                            len(self.trained_clients) + len(self.clients),
                             len(self.selected_clients),
                         )
                     ]
@@ -542,28 +541,33 @@ class Server:
             else:
                 selected_clients = self.selected_clients
 
-            for i, selected_client_id in enumerate(selected_clients):
+            for selected_client_id in selected_clients:
                 self.selected_client_id = selected_client_id
 
                 if Config().is_central_server():
-                    client_id = selected_client_id
-                elif Config().is_edge_server():
-                    client_id = self.launched_clients[i]
+                    client_process_id = selected_client_id
                 else:
-                    client_id = i + 1
+                    client_processes = [client for client in self.clients]
 
-                sid = self.clients[client_id]["sid"]
+                    # Find a client process that is currently not training
+                    # or selected in this round
+                    for process_id in client_processes:
+                        current_sid = self.clients[process_id]["sid"]
+                        if not (
+                            current_sid in self.training_sids
+                            or current_sid in self.selected_sids
+                        ):
+                            client_process_id = process_id
+                            break
 
-                if self.asynchronous_mode and self.simulate_wall_time:
+                sid = self.clients[client_process_id]["sid"]
 
-                    # Skip if this sid is currently `training' with reporting clients
-                    # or it has already been selected in this round
-                    while sid in self.training_sids or sid in self.selected_sids:
-                        client_id = client_id % self.clients_per_round + 1
-                        sid = self.clients[client_id]["sid"]
+                # Track the selected client process
+                self.training_sids.append(sid)
+                self.selected_sids.append(sid)
 
-                    self.training_sids.append(sid)
-                    self.selected_sids.append(sid)
+                # Assign the client id to the client process
+                self.clients[client_process_id]["client_id"] = self.selected_client_id
 
                 self.training_clients[self.selected_client_id] = {
                     "id": self.selected_client_id,
@@ -865,10 +869,9 @@ class Server:
         else:
             self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
 
-        if hasattr(self.reports[sid], "client_id"):
-            # When the client is responding to an urgent request for an update, it will
-            # store its client ID in its report
-            client_id = self.reports[sid].client_id
+        # When the client is responding to an urgent request for an update, it will
+        # store its (possibly different) client ID in its report
+        client_id = self.reports[sid].client_id
 
         start_time = self.training_clients[client_id]["start_time"]
         finish_time = (
@@ -896,8 +899,7 @@ class Server:
         self.current_reported_clients[client_info[2]["client_id"]] = True
         del self.training_clients[client_id]
 
-        if self.asynchronous_mode and self.simulate_wall_time:
-            self.training_sids.remove(client_info[2]["sid"])
+        self.training_sids.remove(client_info[2]["sid"])
 
         await self._process_clients(client_info)
 
@@ -972,8 +974,7 @@ class Server:
 
                         sid = client["sid"]
 
-                        if self.asynchronous_mode and self.simulate_wall_time:
-                            self.training_sids.append(sid)
+                        self.training_sids.append(sid)
 
                         await self.sio.emit(
                             "request_update",
@@ -1135,35 +1136,70 @@ class Server:
                 await self._select_clients(for_next_batch=True)
 
     async def _client_disconnected(self, sid):
-        """When a client disconnected it should be removed from its internal states."""
-        for client_id, client in dict(self.clients).items():
+        """When a client process disconnected it should be removed from its internal states."""
+        for client_process_id, client in dict(self.clients).items():
             if client["sid"] == sid:
-                del self.clients[client_id]
+                # Obtain the client id before deleting
+                client_id = self.clients[client_process_id]["client_id"]
 
+                # Remove the physical client from server list
+                del self.clients[client_process_id]
+                logging.warning(
+                    "[%s] Client process #%d disconnected and removed from this server, %d client processes are remaining.",
+                    self,
+                    client_process_id,
+                    len(self.clients),
+                )
+
+                if len(self.clients) == 0:
+                    logging.warning(
+                        fonts.colourize(
+                            f"[{self}] All clients disconnected, closing the server."
+                        )
+                    )
+                    await self._close()
+
+                # Handle the logical client under different situations
                 if client_id in self.training_clients:
                     del self.training_clients[client_id]
 
                 if client_id in self.current_reported_clients:
                     del self.current_reported_clients[client_id]
 
-                logging.info(
-                    "[%s] Client #%d disconnected and removed from this server.",
-                    self,
-                    client_id,
-                )
+                # Decide continue or exit training
+                if (
+                    hasattr(Config(), "general")
+                    and hasattr(Config().general, "debug")
+                    and not Config().general.debug
+                ):
+                    # Recover from the failed client and proceed with training
+                    if (
+                        client_id in self.selected_clients
+                        and client_id in self.trained_clients
+                    ):
+                        self.trained_clients.remove(client_id)
+                        fail_client_index = self.selected_clients.index(client_id)
+                        untrained_client_index = len(self.trained_clients)
 
-                if client_id in self.selected_clients:
-                    self.selected_clients.remove(client_id)
+                        # Swap current client to the begining of untrained clients
+                        self.selected_clients[
+                            fail_client_index
+                        ] = self.selected_clients[untrained_client_index]
+                        self.selected_clients[untrained_client_index] = client_id
 
-                    if len(self.updates) >= len(self.selected_clients):
-                        logging.info(
-                            "[%s] All %d client report(s) received. Processing.",
-                            self,
-                            len(self.updates),
+                        # Start next batch of client selection if current batch is done
+                        if len(self.updates) >= len(self.trained_clients) or len(
+                            self.current_reported_clients
+                        ) >= len(self.trained_clients):
+                            await self._select_clients(for_next_batch=True)
+                else:
+                    # Debug is either turned on or not specified, stop the training to avoid blocking.
+                    logging.warning(
+                        fonts.colourize(
+                            f"[{self}] Closing the server due to a failed client."
                         )
-                        await self._process_reports()
-                        await self.wrap_up()
-                        await self._select_clients()
+                    )
+                    await self._close()
 
     def save_to_checkpoint(self) -> None:
         """Saves a checkpoint for resuming the training session."""

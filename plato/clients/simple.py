@@ -69,30 +69,44 @@ class Client(base.Client):
             "Client", client_id=self.client_id, trainer=self.trainer
         )
 
+        # Setting up the data sampler
+        if self.datasource:
+            self.sampler = samplers_registry.get(self.datasource, self.client_id)
+
+            if (
+                hasattr(Config().clients, "do_test")
+                and Config().clients.do_test
+                and hasattr(Config().data, "testset_sampler")
+            ):
+                # Set the sampler for test set
+                self.testset_sampler = samplers_registry.get(
+                    self.datasource, self.client_id, testing=True
+                )
+
     def _load_data(self) -> None:
         """Generates data and loads them onto this client."""
-        logging.info("[%s] Loading its data source...", self)
-
+        # The only case where Config().data.reload_data is set to true is
+        # when clients with different client IDs need to load from different datasets,
+        # such as in the pre-partitioned Federated EMNIST dataset. We do not support
+        # reloading data from a custom datasource at this time.
         if (
             self.datasource is None
-            and self.custom_datasource is None
-            or (hasattr(Config().data, "reload_data") and Config().data.reload_data)
+            or hasattr(Config().data, "reload_data")
+            and Config().data.reload_data
         ):
-            # The only case where Config().data.reload_data is set to true is
-            # when clients with different client IDs need to load from different datasets,
-            # such as in the pre-partitioned Federated EMNIST dataset. We do not support
-            # reloading data from a custom datasource at this time.
-            self.datasource = datasources_registry.get(client_id=self.client_id)
-        elif self.datasource is None and self.custom_datasource is not None:
-            self.datasource = self.custom_datasource()
+            logging.info("[%s] Loading its data source...", self)
 
-        logging.info(
-            "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
-        )
+            if self.custom_datasource is None:
+                self.datasource = datasources_registry.get(client_id=self.client_id)
+            elif self.custom_datasource is not None:
+                self.datasource = self.custom_datasource()
 
-        # Setting up the data sampler
-        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+            logging.info(
+                "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
+            )
 
+    def _allocate_data(self) -> None:
+        """Allocate training or testing dataset of this client."""
         if hasattr(Config().trainer, "use_mindspore"):
             # MindSpore requires samplers to be used while constructing
             # the dataset
@@ -104,11 +118,6 @@ class Client(base.Client):
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
-            if hasattr(Config().data, "testset_sampler"):
-                # Set the sampler for test set
-                self.testset_sampler = samplers_registry.get(
-                    self.datasource, self.client_id, testing=True
-                )
 
     def _load_payload(self, server_payload) -> None:
         """Loads the server model onto this client."""
@@ -168,6 +177,7 @@ class Client(base.Client):
             ) * Config().trainer.epochs
 
         report = SimpleNamespace(
+            client_id=self.client_id,
             num_samples=self.sampler.num_samples(),
             accuracy=accuracy,
             training_time=training_time,
