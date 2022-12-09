@@ -2,6 +2,7 @@
 The implementation of basic visual augmentations.
 
 """
+from typing import Tuple, List
 
 from torchvision import transforms
 from PIL import Image, ImageOps
@@ -23,8 +24,8 @@ class Equalization:
 
 
 def get_visual_transform(
-    image_size,
-    normalize,
+    image_size: Tuple[int, int],
+    normalize: List[list, list],
     brightness: float,
     contrast: float,
     saturation: float,
@@ -41,29 +42,29 @@ def get_visual_transform(
     max_scale: float = 1.0,
     crop_size: int = 32,
 ):
-    """Class that applies Cifar10/Cifar100 transformations.
+    """Get the target transformation.
 
-    Args:
-        cifar (str): type of cifar, either cifar10 or cifar100.
-        brightness (float): sampled uniformly in [max(0, 1 - brightness), 1 + brightness].
-        contrast (float): sampled uniformly in [max(0, 1 - contrast), 1 + contrast].
-        saturation (float): sampled uniformly in [max(0, 1 - saturation), 1 + saturation].
-        hue (float): sampled uniformly in [-hue, hue].
-        color_jitter_prob (float, optional): probability of applying color jitter.
+    :param image_size: A tuple containing the input image size.
+    :param normalize: A neste list containing the mean and std of the normalization.
+    :param brightness: Sampled uniformly in [max(0, 1 - brightness), 1 + brightness].
+    :param contrast: sampled uniformly in [max(0, 1 - contrast), 1 + contrast].
+    :param saturation: sampled uniformly in [max(0, 1 - saturation), 1 + saturation].
+    :param hue: sampled uniformly in [-hue, hue].
+    :param color_jitter_prob: The probability of applying color jitter.
             Defaults to 0.8.
-        gray_scale_prob (float, optional): probability of converting to gray scale.
+    :param gray_scale_prob: The probability of converting to gray scale.
             Defaults to 0.2.
-        horizontal_flip_prob (float, optional): probability of flipping horizontally.
+    :param horizontal_flip_prob: The probability of flipping horizontally.
             Defaults to 0.5.
-        gaussian_prob (float, optional): probability of applying gaussian blur.
+    :param gaussian_prob: The probability of applying gaussian blur.
+            Defaults to 0.5.
+    :param solarization_prob: The probability of applying solarization.
             Defaults to 0.0.
-        solarization_prob (float, optional): probability of applying solarization.
+    :param equalization_prob: The probability of applying equalization.
             Defaults to 0.0.
-        equalization_prob (float, optional): probability of applying equalization.
-            Defaults to 0.0.
-        min_scale (float, optional): minimum scale of the crops. Defaults to 0.08.
-        max_scale (float, optional): maximum scale of the crops. Defaults to 1.0.
-        crop_size (int, optional): size of the crop. Defaults to 32.
+    :param min_scale: Minimum scale of the crops. Defaults to 0.08.
+    :param max_scale: Maximum scale of the crops. Defaults to 1.0.
+    :param crop_size: Size of the crop. Defaults to 32.
     """
     if kernel_size == 0.0:
         kernel_size = image_size // 20 * 2 + 1
