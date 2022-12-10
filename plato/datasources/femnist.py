@@ -64,7 +64,7 @@ class ReshapeListTransform:
 class DataSource(base.DataSource):
     """The FEMNIST dataset."""
 
-    def __init__(self, client_id=0):
+    def __init__(self, client_id=0, **kwargs):
         super().__init__()
         self.trainset = None
         self.testset = None

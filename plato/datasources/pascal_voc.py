@@ -11,7 +11,7 @@ from plato.datasources import base
 class DataSource(base.DataSource):
     """The PASCAL dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         _path = Config().params['data_path']
         self.mean = [0.45734706, 0.43338275, 0.40058118]
