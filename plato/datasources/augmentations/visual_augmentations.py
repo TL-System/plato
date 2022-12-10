@@ -1,7 +1,7 @@
 """
 The implementation of basic visual augmentations.
-
 """
+
 from typing import Tuple, List
 
 from torchvision import transforms

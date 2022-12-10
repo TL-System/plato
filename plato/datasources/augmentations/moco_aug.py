@@ -3,27 +3,26 @@ The implementation of the MoCo's [1] augmentation function.
 
 The official code: https://github.com/facebookresearch/moco
 
+MoCo v1's aug: the same as InstDisc https://arxiv.org/abs/1805.01978
+    augmentation = [
+        transforms.RandomResizedCrop(224, scale=(0.2, 1.)),
+        transforms.RandomGrayscale(p=0.2),
+        transforms.ColorJitter(0.4, 0.4, 0.4, 0.4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        normalize
+    ]
 
 Reference:
+    [1]. https://arxiv.org/abs/1911.05722
 
-[1]. https://arxiv.org/abs/1911.05722
 """
-
-# MoCo v1's aug: the same as InstDisc https://arxiv.org/abs/1805.01978
-# augmentation = [
-#     transforms.RandomResizedCrop(224, scale=(0.2, 1.)),
-#     transforms.RandomGrayscale(p=0.2),
-#     transforms.ColorJitter(0.4, 0.4, 0.4, 0.4),
-#     transforms.RandomHorizontalFlip(),
-#     transforms.ToTensor(),
-#     normalize
-# ]
 
 from plato.datasources.augmentations.visual_augmentations import get_visual_transform
 
 
-class MoCoTransform():
-    """ This the contrastive data augmentation used by the MoCo method. """
+class MoCoTransform:
+    """This the contrastive data augmentation used by the MoCo method."""
 
     def __init__(self, image_size, normalize):
         image_size = 224 if image_size is None else image_size
@@ -42,11 +41,12 @@ class MoCoTransform():
             equalization_prob=0.0,
             min_scale=0.08,
             max_scale=1.0,
-            crop_size=image_size)
+            crop_size=image_size,
+        )
         self.transform_funcs = transform_funcs
 
     def __call__(self, x):
-        """ Perform the contrastive data augmentation. """
+        """Perform the contrastive data augmentation."""
         x1 = self.transform(x)
         x2 = self.transform(x)
 

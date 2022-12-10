@@ -1,33 +1,32 @@
 """
 The implementation of the simsiam's [1] augmentation function.
 
-[1]. Chen & He, Exploring Simple Siamese Representation Learning, 2021.
-
 This augmentaion is directly extracted from the 'augmentaions/' of
  https://github.com/PatrickHua/SimSiam.
 
+One template is:
+    p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
+    # the paper didn't specify this, feel free to change this value
+    # I use the setting from simclr which is 50% chance applying the gaussian blur
+    # the 32 is prepared for cifar training where they disabled gaussian blur
+    transform_functions = [
+        T.RandomResizedCrop(image_size, scale=(0.2, 1.0)),
+        T.RandomHorizontalFlip(),
+        T.RandomApply([T.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
+        T.RandomGrayscale(p=0.2),
+        T.RandomApply([
+            T.GaussianBlur(kernel_size=image_size // 20 * 2 + 1,
+                            sigma=(0.1, 2.0))
+        ],
+                        p=p_blur),
+        T.ToTensor()
+    ]
 
-p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
-# the paper didn't specify this, feel free to change this value
-# I use the setting from simclr which is 50% chance applying the gaussian blur
-# the 32 is prepared for cifar training where they disabled gaussian blur
-transform_functions = [
-    T.RandomResizedCrop(image_size, scale=(0.2, 1.0)),
-    T.RandomHorizontalFlip(),
-    T.RandomApply([T.ColorJitter(0.4, 0.4, 0.4, 0.1)], p=0.8),
-    T.RandomGrayscale(p=0.2),
-    T.RandomApply([
-        T.GaussianBlur(kernel_size=image_size // 20 * 2 + 1,
-                        sigma=(0.1, 2.0))
-    ],
-                    p=p_blur),
-    T.ToTensor()
-]
+    if normalize is not None:
+        transform_functions.append(T.Normalize(*normalize))
 
-if normalize is not None:
-    transform_functions.append(T.Normalize(*normalize))
-
-
+Reference:
+    [1]. Chen & He, Exploring Simple Siamese Representation Learning, 2021.
 """
 
 from plato.datasources.augmentations.visual_augmentations import get_visual_transform
