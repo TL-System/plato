@@ -14,19 +14,31 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().params["data_path"]
 
-        train_transform = transforms.Compose(
-            [
-                transforms.RandomHorizontalFlip(),
-                transforms.RandomAffine(
-                    degrees=10, translate=(0.2, 0.2), scale=(0.8, 1.2)
-                ),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.5], std=[0.5]),
-            ]
+        train_transform = (
+            kwargs["train_transform"]
+            if "train_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        transforms.RandomHorizontalFlip(),
+                        transforms.RandomAffine(
+                            degrees=10, translate=(0.2, 0.2), scale=(0.8, 1.2)
+                        ),
+                        transforms.ToTensor(),
+                        transforms.Normalize(mean=[0.5], std=[0.5]),
+                    ]
+                )
+            )
         )
 
-        test_transform = transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize(mean=[0.5], std=[0.5])]
+        test_transform = (
+            kwargs["test_transform"]
+            if "test_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [transforms.ToTensor(), transforms.Normalize(mean=[0.5], std=[0.5])]
+                )
+            )
         )
 
         self.trainset = datasets.EMNIST(

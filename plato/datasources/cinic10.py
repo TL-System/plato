@@ -31,20 +31,28 @@ class DataSource(base.DataSource):
             )
             DataSource.download(url, _path)
 
-        _transform = transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Normalize(
-                    [0.47889522, 0.47227842, 0.43047404],
-                    [0.24205776, 0.23828046, 0.25874835],
-                ),
-            ]
+        train_transform = (
+            kwargs["train_transform"]
+            if "train_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        transforms.ToTensor(),
+                        transforms.Normalize(
+                            [0.47889522, 0.47227842, 0.43047404],
+                            [0.24205776, 0.23828046, 0.25874835],
+                        ),
+                    ]
+                )
+            )
         )
+        test_transform = train_transform
+
         self.trainset = datasets.ImageFolder(
-            root=os.path.join(_path, "train"), transform=_transform
+            root=os.path.join(_path, "train"), transform=train_transform
         )
         self.testset = datasets.ImageFolder(
-            root=os.path.join(_path, "test"), transform=_transform
+            root=os.path.join(_path, "test"), transform=test_transform
         )
 
     def num_train_examples(self):
