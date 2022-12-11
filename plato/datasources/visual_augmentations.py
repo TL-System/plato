@@ -2,7 +2,7 @@
 The implementation of basic visual augmentations.
 """
 
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 from torchvision import transforms
 from PIL import Image, ImageOps
@@ -11,7 +11,7 @@ from PIL import Image, ImageOps
 class Solarization:
     """Behave as the Image Filter"""
 
-    def __init__(self, threshold=128):
+    def __init__(self, threshold: int=128):
         self.threshold = threshold
 
     def __call__(self, image):
@@ -24,7 +24,7 @@ class Equalization:
 
 
 def get_visual_transform(
-    image_size: Tuple[int, int],
+    image_size: Union[int, Tuple[int, int]],
     normalize: List[list, list],
     brightness: float,
     contrast: float,
@@ -44,7 +44,7 @@ def get_visual_transform(
 ):
     """Get the target transformation.
 
-    :param image_size: A tuple containing the input image size.
+    :param image_size: A tuple or integer containing the input image size.
     :param normalize: A neste list containing the mean and std of the normalization.
     :param brightness: Sampled uniformly in [max(0, 1 - brightness), 1 + brightness].
     :param contrast: sampled uniformly in [max(0, 1 - contrast), 1 + contrast].
@@ -83,7 +83,8 @@ def get_visual_transform(
         ),
         transforms.RandomGrayscale(p=gray_scale_prob),
         transforms.RandomApply(
-            [transforms.GaussianBlur(blur_kernel_size, sigma=blur_sigma)], p=gaussian_prob
+            [transforms.GaussianBlur(blur_kernel_size, sigma=blur_sigma)],
+            p=gaussian_prob,
         ),
         transforms.RandomApply([Solarization()], p=solarization_prob),
         transforms.RandomApply([Equalization()], p=equalization_prob),
@@ -105,7 +106,7 @@ class BYOLTransform:
         to self-supervised Learning, 2021.
     """
 
-    def __init__(self, image_size, normalize):
+    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
         self.transform1, transform_funcs1 = get_visual_transform(
             image_size,
             normalize,
@@ -160,7 +161,7 @@ class MoCoTransform:
         Learning, 2020.
     """
 
-    def __init__(self, image_size, normalize):
+    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
         image_size = 224 if image_size is None else image_size
         self.transform, transform_funcs = get_visual_transform(
             image_size,
@@ -198,7 +199,7 @@ class SimCLRTransform:
         Visual Representations, 2020.
     """
 
-    def __init__(self, image_size, normalize):
+    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
         image_size = 224 if image_size is None else image_size
         self.transform, transform_funcs = get_visual_transform(
             image_size,
@@ -234,7 +235,7 @@ class SimSiamTransform:
     [2]. Chen & He, Exploring Simple Siamese Representation Learning, 2021.
     """
 
-    def __init__(self, image_size, normalize):
+    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
         # by default simsiam use image size 224
         image_size = 224 if image_size is None else image_size
         p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
@@ -271,7 +272,7 @@ class SvAVTransform:
         Cluster Assignments, 2020.
     """
 
-    def __init__(self, image_size, normalize):
+    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
         p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
         self.transform, transform_funcs = get_visual_transform(
             image_size,
