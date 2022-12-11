@@ -134,15 +134,7 @@ class CheckpointsOperator:
         return False
 
 
-def get_client_checkpoint_operator(client_id: int, target_checkpoint_dir: str):
-    """Get checkpoint operator specific for clients."""
-
-    client_cpk_dir = os.path.join(target_checkpoint_dir, "client_" + str(client_id))
-    cpk_oper = CheckpointsOperator(checkpoints_dir=client_cpk_dir)
-    return cpk_oper
-
-
-def perform_client_checkpoint_saving(
+def save_client_checkpoint(
     client_id: int,
     model_name: str,
     checkpoints_dir: str,
@@ -209,13 +201,13 @@ def perform_client_checkpoint_saving(
     return filename
 
 
-def perform_client_checkpoint_loading(
+def load_client_checkpoint(
     client_id: int,
     model_name: str,
     checkpoints_dir: str,
-    current_round: int,
-    run_id: int,
-    epoch: int,
+    current_round: Optional[int] = None,
+    run_id: Optional[int] = None,
+    epoch: Optional[int] = None,
     prefix: Optional[str] = None,
     anchor_metric: str = "round",
     mask_words: Optional[List[str]] = None,
@@ -245,8 +237,10 @@ def perform_client_checkpoint_loading(
         ext="pth",
     )
 
-    if use_latest:
-        if not cpk_oper.vaild_checkpoint_file(filename):
+    if cpk_oper.vaild_checkpoint_file(filename):
+        return filename, cpk_oper.load_checkpoint(filename)
+    else:
+        if use_latest:
             # Loading the latest checkpoint file
             search_words = [model_name, prefix]
             filename = cpk_oper.search_latest_checkpoint_file(
@@ -254,5 +248,6 @@ def perform_client_checkpoint_loading(
                 anchor_metric=anchor_metric,
                 mask_words=mask_words,
             )
+            return filename, cpk_oper.load_checkpoint(filename)
 
-    return filename, cpk_oper
+    return filename, None
