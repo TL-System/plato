@@ -1,7 +1,6 @@
 """
 Visual normalizations.
 
-
 Most visual normalizations strictly follows the 'dataset_normalizations' of
 https://github.com/Lightning-AI/lightning-bolts (lightning-bolts).
 
