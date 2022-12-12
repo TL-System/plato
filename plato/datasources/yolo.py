@@ -44,7 +44,7 @@ class YOLODataset(torch.utils.data.Dataset):
 class DataSource(base.DataSource):
     """The YOLO dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         _path = Config().params["data_path"]
 

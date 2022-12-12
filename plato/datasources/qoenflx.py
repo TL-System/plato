@@ -50,7 +50,7 @@ class QoENFLXDataset(torch.utils.data.Dataset):
 class DataSource(base.DataSource):
     """A data source for QoENFLX datasets."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
 
         logging.info("Dataset: QoENFLX")

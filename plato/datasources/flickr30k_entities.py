@@ -209,7 +209,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
 class DataSource(multimodal_base.MultiModalDataSource):
     """The Flickr30K Entities dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
 
         self.data_name = Config().data.dataname

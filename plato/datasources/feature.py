@@ -7,8 +7,9 @@ from plato.datasources import base
 
 
 class DataSource(base.DataSource):
-    """ The feature dataset. """
-    def __init__(self, features):
+    """The feature dataset."""
+
+    def __init__(self, features, **kwargs):
         super().__init__()
 
         # Faster way to deep flatten a list of lists compared to list comprehension
