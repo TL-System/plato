@@ -63,7 +63,7 @@ else:
     registered_partitioned_datasources = {"FEMNIST": femnist}
 
 
-def get(client_id=0):
+def get(client_id: int = 0, **kwargs):
     """Get the data source with the provided name."""
     datasource_name = Config().data.datasource
 
@@ -71,37 +71,37 @@ def get(client_id=0):
     if datasource_name == "kinetics700":
         from plato.datasources import kinetics
 
-        return kinetics.DataSource()
+        return kinetics.DataSource(**kwargs)
 
     if datasource_name == "Gym":
         from plato.datasources import gym
 
-        return gym.DataSource()
+        return gym.DataSource(**kwargs)
 
     if datasource_name == "Flickr30KE":
         from plato.datasources import flickr30k_entities
 
-        return flickr30k_entities.DataSource()
+        return flickr30k_entities.DataSource(**kwargs)
 
     if datasource_name == "ReferItGame":
         from plato.datasources import referitgame
 
-        return referitgame.DataSource()
+        return referitgame.DataSource(**kwargs)
 
     if datasource_name == "COCO":
         from plato.datasources import coco
 
-        return coco.DataSource()
+        return coco.DataSource(**kwargs)
 
     if datasource_name == "YOLO":
         from plato.datasources import yolo
 
-        return yolo.DataSource()
+        return yolo.DataSource(**kwargs)
     elif datasource_name in registered_datasources:
-        dataset = registered_datasources[datasource_name].DataSource()
+        dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:
         dataset = registered_partitioned_datasources[datasource_name].DataSource(
-            client_id
+            client_id, **kwargs
         )
     else:
         raise ValueError(f"No such data source: {datasource_name}")
