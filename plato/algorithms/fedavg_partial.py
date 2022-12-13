@@ -1,5 +1,5 @@
 """
-The enhanced federated averaging algorithm to aggregate partial sub-modules of one whole model.
+The enhanced federated averaging algorithm to aggregate partial sub-modules of one model.
 
 Utilization condition:
     In some scenarios, even given one defined model, the users want to utilize the partial
