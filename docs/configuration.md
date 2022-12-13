@@ -78,7 +78,7 @@ For the normal distribution, we can specify `mean` for its mean value and `sd` f
 
 ```yaml
 speed_simulation: true
-simulation_distribution: pareto
+simulation_distribution:
     distribution: pareto
     alpha: 1
 ```
