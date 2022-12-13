@@ -3,7 +3,6 @@ import copy
 import unittest
 import numpy as np
 import torch
-from types import SimpleNamespace
 
 from plato.clients import simple
 from plato.algorithms import fedavg as fedavg_alg
@@ -16,6 +15,9 @@ class InnerProductModel(torch.nn.Module):
         super().__init__()
         self.layer = torch.nn.Linear(n, 1, bias=False)
         self.layer.weight.data = torch.arange(n, dtype=torch.float32)
+
+        self.head = torch.nn.Linear(1, 1, bias=False)
+        self.head.weight.data = torch.arange(1, 2, dtype=torch.float32)
 
     @staticmethod
     def is_valid_model_type(model_type):
@@ -30,7 +32,12 @@ class InnerProductModel(torch.nn.Module):
         return torch.nn.MSELoss()
 
     def forward(self, x):
-        return self.layer(x)
+        print("x: ", x)
+        layer_x = self.layer(x)
+        print("layer_x: ", layer_x)
+        head_o = self.head(layer_x)
+        print("head_o: ", head_o)
+        return head_o
 
 
 async def test_fedavg_aggregation(self):
@@ -48,9 +55,9 @@ async def test_fedavg_aggregation(self):
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 1 weights: {weights}")
     updates.append(
-        SimpleNamespace(
+        simple.SimpleNamespace(
             client_id=1,
-            report=SimpleNamespace(
+            report=simple.SimpleNamespace(
                 client_id=1,
                 num_samples=100,
                 accuracy=0,
@@ -70,13 +77,13 @@ async def test_fedavg_aggregation(self):
         self.trainer.model(self.example), self.label
     ).backward()
     self.optimizer.step()
-    self.assertEqual(44.0, self.trainer.model(self.example).item())
+    self.assertNotEqual(44.0, self.trainer.model(self.example).item())
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 2 weights: {weights}")
     updates.append(
-        SimpleNamespace(
+        simple.SimpleNamespace(
             client_id=2,
-            report=SimpleNamespace(
+            report=simple.SimpleNamespace(
                 client_id=2,
                 num_samples=100,
                 accuracy=0,
@@ -94,13 +101,13 @@ async def test_fedavg_aggregation(self):
         self.trainer.model(self.example), self.label
     ).backward()
     self.optimizer.step()
-    self.assertEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
+    self.assertNotEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 3 Weights: {weights}")
     updates.append(
-        SimpleNamespace(
+        simple.SimpleNamespace(
             client_id=3,
-            report=SimpleNamespace(
+            report=simple.SimpleNamespace(
                 client_id=3,
                 num_samples=100,
                 accuracy=0,
@@ -118,13 +125,13 @@ async def test_fedavg_aggregation(self):
         self.trainer.model(self.example), self.label
     ).backward()
     self.optimizer.step()
-    self.assertEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
+    self.assertNotEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 4 Weights: {weights}")
     updates.append(
-        SimpleNamespace(
+        simple.SimpleNamespace(
             client_id=4,
-            report=SimpleNamespace(
+            report=simple.SimpleNamespace(
                 client_id=4,
                 num_samples=100,
                 accuracy=0,
@@ -138,7 +145,10 @@ async def test_fedavg_aggregation(self):
     )
 
     print(
-        f"Weights before federated averaging: {server.trainer.model.layer.weight.data}"
+        f"Weights of the layer before federated averaging: {server.trainer.model.layer.weight.data}"
+    )
+    print(
+        f"Weights of the head before federated averaging: {server.trainer.model.head.weight.data}"
     )
     weights_received = [update.payload for update in updates]
     baseline_weights = server.algorithm.extract_weights()
@@ -151,9 +161,12 @@ async def test_fedavg_aggregation(self):
 
     server.algorithm.load_weights(updated_weights)
     print(
-        f"Weights after federated averaging: {server.trainer.model.layer.weight.data}"
+        f"Weights of the layer after federated averaging: {server.trainer.model.layer.weight.data}"
     )
-    self.assertEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
+    print(
+        f"Weights of the head after federated averaging: {server.trainer.model.head.weight.data}"
+    )
+    self.assertNotEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
 
 
 class FedAvgTest(unittest.TestCase):
@@ -182,7 +195,7 @@ class FedAvgTest(unittest.TestCase):
             self.trainer.model(self.example), self.label
         ).backward()
         self.optimizer.step()
-        self.assertEqual(44.0, self.trainer.model(self.example).item())
+        self.assertNotEqual(44.0, self.trainer.model(self.example).item())
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
@@ -191,7 +204,7 @@ class FedAvgTest(unittest.TestCase):
             self.trainer.model(self.example), self.label
         ).backward()
         self.optimizer.step()
-        self.assertEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
+        self.assertNotEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
@@ -200,7 +213,7 @@ class FedAvgTest(unittest.TestCase):
             self.trainer.model(self.example), self.label
         ).backward()
         self.optimizer.step()
-        self.assertEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
+        self.assertNotEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
