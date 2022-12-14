@@ -32,12 +32,7 @@ class InnerProductModel(torch.nn.Module):
         return torch.nn.MSELoss()
 
     def forward(self, x):
-        print("x: ", x)
-        layer_x = self.layer(x)
-        print("layer_x: ", layer_x)
-        head_o = self.head(layer_x)
-        print("head_o: ", head_o)
-        return head_o
+        return self.layer(x)
 
 
 async def test_fedavg_aggregation(self):
@@ -77,7 +72,9 @@ async def test_fedavg_aggregation(self):
         self.trainer.model(self.example), self.label
     ).backward()
     self.optimizer.step()
-    self.assertNotEqual(44.0, self.trainer.model(self.example).item())
+    self.trainer.model.head.weight.data -= 0.1
+
+    self.assertEqual(44.0, self.trainer.model(self.example).item())
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 2 weights: {weights}")
     updates.append(
@@ -101,7 +98,8 @@ async def test_fedavg_aggregation(self):
         self.trainer.model(self.example), self.label
     ).backward()
     self.optimizer.step()
-    self.assertNotEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
+    self.trainer.model.head.weight.data -= 0.1
+    self.assertEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 3 Weights: {weights}")
     updates.append(
@@ -125,7 +123,9 @@ async def test_fedavg_aggregation(self):
         self.trainer.model(self.example), self.label
     ).backward()
     self.optimizer.step()
-    self.assertNotEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
+    self.trainer.model.head.weight.data -= 0.1
+
+    self.assertEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
     weights = copy.deepcopy(self.algorithm.extract_weights())
     print(f"Report 4 Weights: {weights}")
     updates.append(
@@ -166,7 +166,7 @@ async def test_fedavg_aggregation(self):
     print(
         f"Weights of the head after federated averaging: {server.trainer.model.head.weight.data}"
     )
-    self.assertNotEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
+    self.assertEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
 
 
 class FedAvgTest(unittest.TestCase):
@@ -195,7 +195,8 @@ class FedAvgTest(unittest.TestCase):
             self.trainer.model(self.example), self.label
         ).backward()
         self.optimizer.step()
-        self.assertNotEqual(44.0, self.trainer.model(self.example).item())
+
+        self.assertEqual(44.0, self.trainer.model(self.example).item())
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
@@ -204,7 +205,7 @@ class FedAvgTest(unittest.TestCase):
             self.trainer.model(self.example), self.label
         ).backward()
         self.optimizer.step()
-        self.assertNotEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
+        self.assertEqual(43.2, np.round(self.trainer.model(self.example).item(), 4))
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
@@ -213,7 +214,7 @@ class FedAvgTest(unittest.TestCase):
             self.trainer.model(self.example), self.label
         ).backward()
         self.optimizer.step()
-        self.assertNotEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
+        self.assertEqual(42.56, np.round(self.trainer.model(self.example).item(), 4))
         weights = self.algorithm.extract_weights()
         print(f"Weights: {weights}")
 
