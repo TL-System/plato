@@ -48,10 +48,11 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
+    global_submodules_name: head
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_partial
 
 parameters:
     optimizer:

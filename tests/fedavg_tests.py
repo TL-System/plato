@@ -195,6 +195,20 @@ class FedAvgTest(unittest.TestCase):
     def test_backward(self):
         print("\nTesting backward pass.")
         self.trainer.model.train()
+        if hasattr(self.algorithm, "extract_submodules_name"):
+            print(
+                "\nTesting submodules extraction.",
+                self.algorithm.extract_submodules_name(
+                    self.trainer.model.state_dict().keys()
+                ),
+            )
+        if hasattr(self.algorithm, "is_consistent_weights"):
+            print(
+                "\nTesting weights consistency judge.",
+                self.algorithm.is_consistent_weights(
+                    self.trainer.model.state_dict().keys()
+                ),
+            )
 
         self.optimizer.zero_grad()
         self.trainer.model.loss_criterion(
