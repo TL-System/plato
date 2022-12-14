@@ -3,11 +3,17 @@ import copy
 import unittest
 import numpy as np
 import torch
+import os
+
+
+os.environ["config_file"] = "tests/TestsConfig/fedavg_tests.yml"
+
 
 from plato.clients import simple
-from plato.algorithms import fedavg as fedavg_alg
+from plato.algorithms import registry as algorithms_registry
 from plato.servers import fedavg as fedavg_server
 from plato.trainers import basic
+from plato.config import Config
 
 
 class InnerProductModel(torch.nn.Module):
@@ -43,7 +49,7 @@ async def test_fedavg_aggregation(self):
     model = InnerProductModel
 
     trainer = basic.Trainer
-    algorithm = fedavg_alg.Algorithm
+    algorithm = algorithms_registry.registered_algorithms[Config().algorithm.type]
     server = fedavg_server.Server(model=model, algorithm=algorithm, trainer=trainer)
     server.init_trainer()
 
@@ -176,7 +182,7 @@ class FedAvgTest(unittest.TestCase):
         self.example = torch.ones(1, 10)
         self.label = torch.ones(1) * 40.0
         self.trainer = basic.Trainer(model=self.model)
-        self.algorithm = fedavg_alg.Algorithm(trainer=self.trainer)
+        self.algorithm = algorithms_registry.get(trainer=self.trainer)
         self.optimizer = torch.optim.SGD(self.trainer.model.parameters(), lr=0.01)
 
     def test_forward(self):
