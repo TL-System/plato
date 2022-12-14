@@ -101,24 +101,23 @@ class Algorithm(fedavg.Algorithm):
             [
                 (name, param)
                 for name, param in full_weights.items()
-                if any([name in param_name for param_name in submodules_name])
+                if any([param_name in name for param_name in submodules_name])
             ]
         )
         return extracted_weights
 
-    def is_consistent_weights(self, weights):
+    def is_consistent_weights(self, weights_param_name):
         """Whether the 'weights' holds the parameters' name the same as the self.model."""
 
         model_params_name = self.model.state_dict().keys()
-        weights_params = weights.state_dict().keys()
 
         search_func = lambda x, y: [x_i for x_i in x if x_i not in y]
 
         inconsistent_params = []
-        if len(model_params_name) > len(weights_params):
-            inconsistent_params = search_func(model_params_name, weights_params)
+        if len(model_params_name) > len(weights_param_name):
+            inconsistent_params = search_func(model_params_name, weights_param_name)
         else:
-            inconsistent_params = search_func(weights_params, model_params_name)
+            inconsistent_params = search_func(weights_param_name, model_params_name)
 
         return len(inconsistent_params) == 0, inconsistent_params
 
