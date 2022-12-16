@@ -336,7 +336,7 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ```
 ````
 
-````{admonition} test_set_sampler
+````{admonition} testset_sampler
 How the test dataset is sampled when clients test locally. Any sampler type is valid. 
 
 ```{note}
