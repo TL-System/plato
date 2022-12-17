@@ -4,12 +4,12 @@ Helped functions used by trainer and algorithm in PerFedRLNAS.
 import copy
 import logging
 
+import torch
+import numpy as np
+
 from plato.models.nasvit.models.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
-
-import torch
-import numpy as np
 
 
 def set_active_subnet(model, cfg):

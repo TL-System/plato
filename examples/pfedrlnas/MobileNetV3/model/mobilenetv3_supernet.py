@@ -26,7 +26,9 @@ from plato.models.nasvit.models.modules.static_layers import MobileInvertedResid
 from plato.models.nasvit.models.modules.nn_utils import int2list
 from plato.models.nasvit.models.modules.nn_base import MyNetwork
 
-from plato.models.nasvit.models import AttentiveNasStaticModel
+from plato.models.nasvit.models.attentive_nas_static_model import (
+    AttentiveNasStaticModel,
+)
 
 # Todo: Configuration set to MobileNetV3, Set activation to HardSwish
 
