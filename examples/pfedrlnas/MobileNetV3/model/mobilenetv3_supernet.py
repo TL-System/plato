@@ -29,8 +29,7 @@ from plato.models.nasvit.models.modules.nn_base import MyNetwork
 from plato.models.nasvit.models.attentive_nas_static_model import (
     AttentiveNasStaticModel,
 )
-
-# Todo: Configuration set to MobileNetV3, Set activation to HardSwish
+from .config import get_config
 
 
 class NasDynamicModel(MyNetwork):
@@ -46,7 +45,7 @@ class NasDynamicModel(MyNetwork):
         super().__init__()
 
         if supernet is None:
-            supernet = big_config().supernet_config
+            supernet = get_config().supernet_config
         if n_classes == -1:
             n_classes = Config().parameters.model.num_classes
         bn_momentum = Config().parameters.model.bn_momentum
