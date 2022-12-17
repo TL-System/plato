@@ -28,7 +28,7 @@ from plato.models.nasvit.models.modules.nn_base import MyNetwork
 
 from plato.models.nasvit.models import AttentiveNasStaticModel
 
-# Todo: Configuration set to MobileNetV3, Set activation to HardSwish,
+# Todo: Configuration set to MobileNetV3, Set activation to HardSwish
 
 
 class NasDynamicModel(MyNetwork):
