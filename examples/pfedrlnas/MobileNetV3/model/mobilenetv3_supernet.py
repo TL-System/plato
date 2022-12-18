@@ -33,12 +33,12 @@ from .config import get_config
 
 
 class NasDynamicModel(MyNetwork):
-    """The supernet for NASVIT."""
+    """The supernet for Mobilenetv3."""
 
     # pylint:disable=too-many-instance-attributes
     # pylint: disable=too-many-public-methods
 
-    def __init__(self, last_channel: int, n_classes: int = -1):
+    def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
         # pylint:disable=too-many-locals
         # pylint:disable=too-many-statements
 
@@ -67,7 +67,7 @@ class NasDynamicModel(MyNetwork):
             out_channel_list=out_channel_list,
             kernel_size=3,
             stride=stride,
-            act_func=act_func,  # HardSwish
+            act_func=act_func,
         )
 
         # inverted residual blocks
@@ -75,7 +75,7 @@ class NasDynamicModel(MyNetwork):
         blocks = []
         _block_index = 0
         feature_dim = out_channel_list
-        for key in enumerate(self.stage_names[1:-1]):
+        for _, key in enumerate(self.stage_names[1:-1]):
             block_cfg = getattr(self.supernet, key)
             width = block_cfg.c
             n_block = max(block_cfg.d)
@@ -112,14 +112,13 @@ class NasDynamicModel(MyNetwork):
                 blocks.append(
                     MobileInvertedResidualBlock(mobile_inverted_conv, shortcut)
                 )
-            feature_dim = output_channel
+                feature_dim = output_channel
         self.blocks = nn.ModuleList(blocks)
 
         last_channel, act_func = (
             self.supernet.last_conv.c,
             self.supernet.last_conv.act_func,
         )
-
         expand_feature_dim = [f_dim * 6 for f_dim in feature_dim]
         self.last_conv = nn.Sequential(
             collections.OrderedDict(
@@ -176,8 +175,6 @@ class NasDynamicModel(MyNetwork):
             "mb3",
             "mb4",
             "mb5",
-            "mb6",
-            "mb7",
             "last_conv",
         ]
 
@@ -236,10 +233,18 @@ class NasDynamicModel(MyNetwork):
         block_outputs = []
         for stage_id, block_idx in enumerate(self.block_group_info):
             depth = self.runtime_depth[stage_id]
+
+            # idx_step = len(block_idx) * 1. / depth
+            # active_idx = np.array(block_idx)[np.arange(0, len(block_idx), idx_step).astype('int')]
+
             active_idx = block_idx[:depth]
             for idx in active_idx:
+                # if idx > active_idx[0]:
                 self.blocks[idx].rescale_idx = len(active_idx)
                 x = self.blocks[idx](x)
+
+                # if self.training:
+                #     x = x + torch.randn_like(x) * 5e-3 * x.detach().abs()
 
             block_outputs.append(x)
 
@@ -339,21 +344,13 @@ class NasDynamicModel(MyNetwork):
 
                     # dw expansion ration
                     block.mobile_inverted_conv.active_expand_ratio = expansion
-                else:
-                    pass
-                    # if block_id == start_idx:
-                    #     block.out_dim = c
         # IRBlocks repated times
         for i, depth_irb_block in enumerate(depth):
             self.runtime_depth[i] = min(len(self.block_group_info[i]), depth_irb_block)
 
         # last conv
-        if not self.use_v3_head:
-            self.last_conv.active_out_channel = width[-1]
-        else:
-            # default expansion ratio: 6
-            self.last_conv.final_expand_layer.active_out_channel = width[-2] * 6
-            self.last_conv.feature_mix_layer.active_out_channel = width[-1]
+        self.last_conv.final_expand_layer.active_out_channel = width[-2] * 6
+        self.last_conv.feature_mix_layer.active_out_channel = width[-1]
 
     def get_active_subnet_settings(self):
         """Get the active setting of current subnet."""
@@ -552,33 +549,19 @@ class NasDynamicModel(MyNetwork):
                         input_channel = stage_blocks[
                             -1
                         ].mobile_inverted_conv.out_channels
-                    else:
-                        if idx > active_idx[0]:
-                            # self.blocks[idx].rescale_mlp != None:
-                            self.blocks[idx].rescale_idx = len(active_idx)
-                        stage_blocks.append(self.blocks[idx])
 
                 blocks += stage_blocks
 
-            if not self.use_v3_head:
-                last_conv = self.last_conv.get_active_subnet(
-                    input_channel, preserve_weight
-                )
-                in_features = last_conv.out_channels
-            else:
-
-                final_expand_layer = (
-                    self.last_conv.final_expand_layer.get_active_subnet(
-                        input_channel, preserve_weight
-                    )
-                )
-                feature_mix_layer = self.last_conv.feature_mix_layer.get_active_subnet(
-                    input_channel * 6, preserve_weight
-                )
-                in_features = feature_mix_layer.out_channels
-                last_conv = nn.Sequential(
-                    final_expand_layer, nn.AdaptiveAvgPool2d((1, 1)), feature_mix_layer
-                )
+            final_expand_layer = self.last_conv.final_expand_layer.get_active_subnet(
+                input_channel, preserve_weight
+            )
+            feature_mix_layer = self.last_conv.feature_mix_layer.get_active_subnet(
+                input_channel * 6, preserve_weight
+            )
+            in_features = feature_mix_layer.out_channels
+            last_conv = nn.Sequential(
+                final_expand_layer, nn.AdaptiveAvgPool2d((1, 1)), feature_mix_layer
+            )
 
             classifier = self.classifier.get_active_subnet(in_features, preserve_weight)
 
@@ -622,26 +605,14 @@ class NasDynamicModel(MyNetwork):
                             sub_net_blk_idx
                         ].mobile_inverted_conv.out_channels
                         sub_net_blk_idx += 1
-                    else:
-                        if idx > active_idx[0]:
-                            # self.blocks[idx].rescale_mlp != None:
-                            self.blocks[idx].rescale_idx = len(active_idx)
-                        self.blocks[idx].load_state_dict(
-                            subnet.blocks[sub_net_blk_idx].state_dict()
-                        )
-                        sub_net_blk_idx += 1
 
-            if not self.use_v3_head:
-                self.last_conv.get_weight_from_subnet(input_channel, subnet.last_conv)
-                in_features = self.last_conv.out_channels
-            else:
-                self.last_conv.final_expand_layer.get_weight_from_subnet(
-                    input_channel, subnet.last_conv[0]
-                )
-                self.last_conv.feature_mix_layer.get_weight_from_subnet(
-                    input_channel * 6, subnet.last_conv[2]
-                )
-                in_features = self.last_conv.feature_mix_layer.active_out_channel
+            self.last_conv.final_expand_layer.get_weight_from_subnet(
+                input_channel, subnet.last_conv[0]
+            )
+            self.last_conv.feature_mix_layer.get_weight_from_subnet(
+                input_channel * 6, subnet.last_conv[2]
+            )
+            in_features = self.last_conv.feature_mix_layer.active_out_channel
 
             if not jump_classifier:
                 self.classifier.get_weight_from_subnet(in_features, subnet.classifier)
@@ -651,3 +622,18 @@ class NasDynamicModel(MyNetwork):
     def get_active_net_config(self):
         """Get the config of current active net."""
         raise NotImplementedError
+
+    def load_weights_from_pretrained_models(self, checkpoint_path, load_from_ema=False):
+        """Load model weights from pretrained models."""
+        with open(checkpoint_path, "rb") as file:
+            checkpoint = torch.load(file, map_location="cpu")
+        assert isinstance(checkpoint, dict)
+        pretrained_state_dicts = checkpoint["state_dict"]
+        for k, value in self.state_dict().items():
+            name = "module." + k if not k.startswith("module") else k
+            value.copy_(pretrained_state_dicts[name])
+
+    @torch.jit.ignore
+    def no_weight_decay_keywords(self):
+        """Return keywords of modules without weight decay."""
+        return {"rescale_mlp", "rescale_attn"}
