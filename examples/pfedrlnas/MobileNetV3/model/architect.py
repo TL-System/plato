@@ -18,7 +18,7 @@ class Architect(architect.Architect):
     # pylint: disable=too-many-instance-attributes
     def initialization(self):
         """
-        Initizalization function
+        Initizalization function.
         """
         self.model = NasDynamicModel(supernet=get_config().supernet_config)
         if hasattr(Config().parameters.architect, "pretrain_path"):

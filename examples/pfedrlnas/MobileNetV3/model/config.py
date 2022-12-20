@@ -1,5 +1,5 @@
 """
-Configuration file for mobilenetv3 search space.
+Configuration file for MobileNetV3 search space.
 """
 from yacs.config import CfgNode as CN
 
