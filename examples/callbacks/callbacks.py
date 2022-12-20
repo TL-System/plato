@@ -18,6 +18,9 @@ def main():
     # Dynamically add callbacks after instantiated
     client.add_callbacks(callbacks=[dynamicClientCallback])
     server.add_callbacks(callbacks=[dynamicServerCallback])
+
+    # Add callbacks to trainer
+    # We cannot use client.trainer.add_callbacks because the trainer is not created yet.
     client.add_trainer_callbacks(trainer_callbacks=[dynamicTrainerCallback])
 
     # Run the session
