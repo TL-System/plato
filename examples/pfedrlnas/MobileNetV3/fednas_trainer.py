@@ -1,7 +1,7 @@
 """
 Customized Trainer for PerFedRLNAS.
 """
-import fednasvit_specific
+import fednas_specific
 
 from plato.trainers import basic
 from plato.config import Config
@@ -17,8 +17,8 @@ class Trainer(BasicTrainer):
     """Use special optimizer and loss criterion specific for NASVIT."""
 
     def get_loss_criterion(self):
-        return fednasvit_specific.get_nasvit_loss_criterion()
+        return fednas_specific.get_nasvit_loss_criterion()
 
     def get_optimizer(self, model):
-        optimizer = fednasvit_specific.get_optimizer(model)
+        optimizer = fednas_specific.get_optimizer(model)
         return optimizer

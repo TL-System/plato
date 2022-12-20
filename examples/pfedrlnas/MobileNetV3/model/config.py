@@ -27,6 +27,7 @@ _C.MODEL.NUM_CLASSES = 1000
 
 
 _C.supernet_config = CN()
+_C.supernet_config.use_v3_head = True
 _C.supernet_config.resolutions = [224]
 _C.supernet_config.first_conv = CN()
 _C.supernet_config.first_conv.c = [16]

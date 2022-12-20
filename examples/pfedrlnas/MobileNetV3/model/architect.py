@@ -16,11 +16,10 @@ class Architect(architect.Architect):
     """The supernet wrapper, including supernet and arch parameters."""
 
     # pylint: disable=too-many-instance-attributes
-
-    def __init__(
-        self,
-    ):
-        super().__init__()
+    def initialization(self):
+        """
+        Initizalization function
+        """
         self.model = NasDynamicModel(supernet=get_config().supernet_config)
         if hasattr(Config().parameters.architect, "pretrain_path"):
             weight = torch.load(

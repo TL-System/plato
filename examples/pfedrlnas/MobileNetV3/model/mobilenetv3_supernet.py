@@ -33,12 +33,12 @@ class NasDynamicModel(AttentiveNasDynamicModel):
     # pylint:disable=too-many-instance-attributes
     # pylint: disable=too-many-public-methods
 
-    def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+    def initialization(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+        """
+        Initilization function.
+        """
         # pylint:disable=too-many-locals
         # pylint:disable=too-many-statements
-
-        super().__init__()
-
         if supernet is None:
             supernet = get_config().supernet_config
         if n_classes == -1:
