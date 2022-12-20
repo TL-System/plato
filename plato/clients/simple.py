@@ -51,8 +51,10 @@ class Client(base.Client):
 
         if self.trainer is None and self.custom_trainer is None:
             self.trainer = trainers_registry.get(model=self.model)
+            self.trainer.add_callbacks(self.custom_trainer_callbacks)
         elif self.trainer is None and self.custom_trainer is not None:
             self.trainer = self.custom_trainer(model=self.model)
+            self.trainer.add_callbacks(self.custom_trainer_callbacks)
 
         self.trainer.set_client_id(self.client_id)
 

@@ -101,6 +101,8 @@ class Client:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
 
+        self.custom_trainer_callbacks = []
+
     def __repr__(self):
         return f"Client #{self.client_id}"
 
@@ -424,6 +426,11 @@ class Client:
     def add_callbacks(self, callbacks):
         """Adds a list of callbacks to the client callback handler."""
         self.callback_handler.add_callbacks(callbacks)
+
+    def add_trainer_callbacks(self, trainer_callbacks):
+        """Set up a list of trainer callbacks which will be added to trainer
+        when it is configured."""
+        self.custom_trainer_callbacks = trainer_callbacks
 
     @abstractmethod
     async def _train(self):
