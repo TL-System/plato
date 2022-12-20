@@ -11,7 +11,6 @@ import numpy as np
 
 from plato.config import Config
 from plato.servers import fedavg
-from plato.utils import fonts
 
 
 class Server(fedavg.Server):
@@ -78,18 +77,10 @@ class Server(fedavg.Server):
         self.process_end = time.time()
 
     def server_will_close(self):
-        #flops = []
         for i in range(1, Config().clients.total_clients):
             cfg = self.subnets_config[i]
             if cfg:
                 logging.info("the config of client %s is %s", str(i), str(cfg))
-                #self.algorithm.set_active_subnet(cfg)
-                #flops.append(self.algorithm.model.model.compute_active_subnet_flops())
-        #logging.info(
-        #    fonts.colourize(
-        #        f"[{self}] Average Flops of models is {np.mean(np.array(flops))}."
-        #    )
-        #)
         save_config = f"{Config().server.model_path}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
