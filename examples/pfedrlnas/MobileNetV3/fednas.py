@@ -2,6 +2,8 @@
 Implement new algorithm: personalized federarted NAS.
 
 Reference Search Space: MobileNetv3.
+https://openaccess.thecvf.com/content_ICCV_2019/papers/Howard_Searching_for_MobileNetV3_ICCV_2019_paper.pdf.
+https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv3.html.
 """
 
 import fednas_server
