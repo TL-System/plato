@@ -2,7 +2,7 @@
 import logging
 from plato.callbacks.client import ClientCallback
 from plato.callbacks.server import ServerCallback
-from transformers import TrainerCallback
+from plato.callbacks.trainer import TrainerCallback
 
 
 class argumentClientCallback(ClientCallback):
@@ -26,7 +26,7 @@ class dynamicServerCallback(ServerCallback):
 
 
 class dynamicTrainerCallback(TrainerCallback):
-    def on_epoch_begin(self, trainer, config):
+    def on_train_run_start(self, trainer, config):
         logging.info(
             f"[Client {trainer.client_id}] Trainer callback from dynamic adding."
         )
