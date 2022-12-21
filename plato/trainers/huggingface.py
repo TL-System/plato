@@ -53,11 +53,11 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         super().__init__(model)
 
         self.trainer = None
-        self.trainer_callbacks = []
+        self.trainer_callbacks = callbacks if callbacks else []
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)

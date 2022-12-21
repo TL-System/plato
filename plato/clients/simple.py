@@ -20,9 +20,18 @@ class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
     ):
         super().__init__(callbacks=callbacks)
+        # Save the callbacks that will be passed to trainer later
+        self.trainer_callbacks = trainer_callbacks
+
         self.custom_model = model
         self.model = None
 
@@ -50,16 +59,13 @@ class Client(base.Client):
             self.model = self.custom_model
 
         if self.trainer is None and self.custom_trainer is None:
-            self.trainer = trainers_registry.get(model=self.model)
+            self.trainer = trainers_registry.get(
+                model=self.model, callbacks=self.trainer_callbacks
+            )
         elif self.trainer is None and self.custom_trainer is not None:
-            self.trainer = self.custom_trainer(model=self.model)
-
-        # Add customized callbacks to trainer if applicable
-        if len(self.custom_trainer_callbacks) and hasattr(
-            self.trainer, "add_callbacks"
-        ):
-            self.trainer.add_callbacks(self.custom_trainer_callbacks)
-            self.custom_trainer_callbacks = []
+            self.trainer = self.custom_trainer(
+                model=self.model, callbacks=self.trainer_callbacks
+            )
 
         self.trainer.set_client_id(self.client_id)
 
