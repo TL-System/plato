@@ -25,7 +25,7 @@ class dynamicServerCallback(ServerCallback):
         logging.info(f"[{server}] Server callback from dynamic adding.")
 
 
-class dynamicTrainerCallback(TrainerCallback):
+class customTrainerCallback(TrainerCallback):
     def on_train_run_start(self, trainer, config):
         logging.info(
             f"[Client {trainer.client_id}] Trainer callback from dynamic adding."

@@ -11,17 +11,15 @@ def main():
     """
     A Plato federated learning training session customized by callbacks.
     """
-    # Pass the callbacks to client and server as arguments
-    client = simple.Client(callbacks=[argumentClientCallback])
+    # Pass callbacks as arguments
+    client = simple.Client(
+        callbacks=[argumentClientCallback], trainer_callbacks=[customTrainerCallback]
+    )
     server = fedavg.Server(callbacks=[argumentServerCallback])
 
-    # Dynamically add callbacks after instantiated
+    # Add callbacks after initialization
     client.add_callbacks(callbacks=[dynamicClientCallback])
     server.add_callbacks(callbacks=[dynamicServerCallback])
-
-    # Add callbacks to trainer
-    # We cannot use client.trainer.add_callbacks because the trainer is not created yet.
-    client.add_trainer_callbacks(trainer_callbacks=[dynamicTrainerCallback])
 
     # Run the session
     server.run(client)
