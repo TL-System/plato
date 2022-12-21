@@ -57,7 +57,11 @@ class Trainer(basic.Trainer):
         super().__init__(model)
 
         self.trainer = None
-        self.trainer_callbacks = callbacks if callbacks else []
+        self.trainer_callbacks = []
+        if callbacks:
+            # Huggingface needs to check callback types
+            self.add_callbacks(callbacks)
+
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)
