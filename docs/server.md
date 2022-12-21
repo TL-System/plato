@@ -230,7 +230,7 @@ For infrastructure changes, such as logging and recording metrics, we tend to cu
 
 Within the implementation of these callback methods, one can access additional information about the global training by using the `server` instance. 
 
-To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods, and then pass it to the server when it is initialized, or call `server.add_callbacks` after initialization. Examples can be found in `examples/callbacks`.
+To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods, then pass it to the server when it is initialized, or call `server.add_callbacks` after initialization. Examples can be found in `examples/callbacks`.
 
 ````{admonition} **on_weights_received()**
 **`def on_weights_received(self, server, weights_received)`**
