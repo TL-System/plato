@@ -548,7 +548,7 @@ The number of local aggregation rounds on edge servers before sending aggregated
 
 ```{note}
 When `fedavg_partial` is utilized as the algorithm, the hyper-parameter `global_submodules_name` should be set under the `trainer` of the
-configuration file. Otherwise, `global_submodules_name` will be defaulted as "whole", which makes the whole defined model utilize as the global model - All parameters of the defined model will be extracted for sending and global aggregation.  .
+configuration file. Otherwise, `global_submodules_name` will be defaulted as "whole", which makes the whole defined model utilize as the global model - All parameters of the defined model will be extracted for sending and global aggregation.
 ```
 
 
