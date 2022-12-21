@@ -18,7 +18,7 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A differentially private federated learning trainer, used by the client."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, **kwargs):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model)
 
