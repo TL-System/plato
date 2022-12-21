@@ -16,7 +16,7 @@ The default value is `./`.
 ```
 
 ```{admonition} debug
-When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails. 
+When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails.
 
 Valid values are `true` or `false`. The default value is `false`.
 ```
@@ -45,7 +45,7 @@ If this setting is `true` and the configuration file has a `results` section, te
 ````
 
 ````{admonition} comm_simulation
-Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. 
+Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem.
 
 The default value is `true`.
 
@@ -60,13 +60,13 @@ Whether or not the training speed of the clients are simulated. Simulating the t
 If `speed_simulation` is `true`, we need to specify the probability distribution used for generating a sleep time (in seconds per epoch) for each client, using the following setting:
 
 ```{admonition} random_seed
-This random seed is used exclusively for generating the sleep time (in seconds per epoch). 
+This random seed is used exclusively for generating the sleep time (in seconds per epoch).
 
 The default value is `1`.
 ```
 
 ```{admonition} max_sleep_time
-This is used to specify the longest possible sleep time in seconds. 
+This is used to specify the longest possible sleep time in seconds.
 
 The default value is `60`.
 ```
@@ -337,7 +337,7 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ````
 
 ````{admonition} test_set_sampler
-How the test dataset is sampled when clients test locally. Any sampler type is valid. 
+How the test dataset is sampled when clients test locally. Any sampler type is valid.
 
 ```{note}
 Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
@@ -384,7 +384,7 @@ The maximum norm of the per-sample gradients with the `diff_privacy` trainer. An
 
 
 ```{admonition} **rounds**
-The maximum number of training rounds. 
+The maximum number of training rounds.
 
 `round` could be any positive integer.
 ```
@@ -526,10 +526,11 @@ For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ## algorithm
 
 ```{admonition} **type**
-Aggregation algorithm. 
+Aggregation algorithm.
 
 The input should be:
 - `fedavg`:  the federated averaging algorithm
+- `fedavg_partial`:  the federated averaging algorithm
 - `mistnet`: the MistNet algorithm
 ```
 
@@ -548,7 +549,7 @@ The number of local aggregation rounds on edge servers before sending aggregated
 ## results
 
 ````{admonition} types
-The set of columns that will be written into a .csv file. 
+The set of columns that will be written into a .csv file.
 
 The valid values are:
 - `round`
