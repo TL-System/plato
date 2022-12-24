@@ -4,6 +4,7 @@ Utility functions for MaskCrypt.
 import os
 import pickle
 import numpy as np
+import torch
 
 from plato.utils import homo_enc
 
@@ -44,3 +45,28 @@ def get_est(filename):
             return pickle.load(est_file)
     except:
         return None
+
+
+def save_gradients(gradients, config, ppid=None):
+    """Save gradients to a file."""
+    model_name = config.trainer.model_name
+    filename = f"{model_name}_gradient_{ppid}.pth"
+
+    model_path = config.params["model_path"]
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+    gradient_path = f"{model_path}/{filename}"
+    torch.save(gradients, gradient_path)
+
+
+def load_gradients(config, ppid=None):
+    """Read gradients from a file."""
+    model_name = config.trainer.model_name
+    filename = f"{model_name}_gradient_{ppid}.pth"
+
+    model_path = config.params["model_path"]
+    gradient_path = f"{model_path}/{filename}"
+
+    gradients = torch.load(gradient_path)
+    os.remove(gradient_path)  # remove the gradient file
+    return gradients
