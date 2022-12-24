@@ -15,7 +15,13 @@ class Client(simple.Client):
     """A MaskCrypt client with selective homomorphic encryption support."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        **kwargs,
     ):
         super().__init__(
             model=model,
@@ -23,6 +29,7 @@ class Client(simple.Client):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            **kwargs,
         )
 
         self.encrypt_ratio = Config().clients.encrypt_ratio
@@ -45,8 +52,13 @@ class Client(simple.Client):
             report, model_weights = await super().inbound_processed(
                 processed_inbound_payload
             )
+            gradients = maskcrypt_utils.load_gradients(
+                config=Config(),
+                client_id=self.client_id,
+                ppid=Config().params["run_id"],
+            )
             mask_proposal = self._compute_mask(
-                self.algorithm.extract_weights(), self.trainer.get_gradient()
+                self.algorithm.extract_weights(), gradients
             )
             self.model_buffer[self.client_id] = (report, model_weights)
             return report, mask_proposal
