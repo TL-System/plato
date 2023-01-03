@@ -54,7 +54,6 @@ class Client(simple.Client):
             )
             gradients = maskcrypt_utils.load_gradients(
                 config=Config(),
-                client_id=self.client_id,
                 ppid=Config().params["run_id"],
             )
             mask_proposal = self._compute_mask(

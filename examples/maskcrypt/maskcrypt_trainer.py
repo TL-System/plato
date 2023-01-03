@@ -46,9 +46,6 @@ class huggingfaceTrainerCallback(hTrainerCallback):
 
     def on_train_end(self, args, state, control, **kwargs):
         """Compute gradients on local data when training is finished."""
-        logging.info(
-            "[Client #%d] Training completed, computing gradient.", trainer.client_id
-        )
         model = kwargs["model"]
         train_loader = kwargs["train_dataloader"]
 
