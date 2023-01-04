@@ -431,12 +431,7 @@ class Server:
                 )
             )
 
-            if Config().is_central_server():
-                # In cross-silo FL, the central server selects from the pool of edge servers
-                self.clients_pool = list(self.clients)
-
-            elif not Config().is_edge_server():
-                self.clients_pool = list(range(1, 1 + self.total_clients))
+            self.initialize_clients_pool()
 
             # In asychronous FL, avoid selecting new clients to replace those that are still
             # training at this time
@@ -1200,6 +1195,15 @@ class Server:
                         )
                     )
                     await self._close()
+
+    def initialize_clients_pool(self):
+        """ Initialize clients pool to be selected during federated learning. """
+        if Config().is_central_server():
+            # In cross-silo FL, the central server selects from the pool of edge servers
+            self.clients_pool = list(self.clients)
+
+        elif not Config().is_edge_server():
+            self.clients_pool = list(range(1, 1 + self.total_clients))
 
     def save_to_checkpoint(self) -> None:
         """Saves a checkpoint for resuming the training session."""
