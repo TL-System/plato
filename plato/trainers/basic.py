@@ -500,6 +500,10 @@ class Trainer(base.Trainer):
 
         return correct / total
 
+    def add_callbacks(self, callbacks):
+        """Adds a list of callbacks to the trainer callback handler."""
+        self.callback_handler.add_callbacks(callbacks)
+
     def get_optimizer(self, model):
         """Returns the optimizer."""
         return optimizers.get(model)

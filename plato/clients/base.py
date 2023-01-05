@@ -421,6 +421,10 @@ class Client:
                 file_path = f"{model_path}/{filename}"
                 os.remove(file_path)
 
+    def add_callbacks(self, callbacks):
+        """Adds a list of callbacks to the client callback handler."""
+        self.callback_handler.add_callbacks(callbacks)
+
     @abstractmethod
     async def _train(self):
         """The machine learning training workload on a client."""

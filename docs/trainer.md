@@ -203,7 +203,8 @@ For infrastructure changes, such as logging, recording metrics, and stopping the
 
 Within the implementation of these callback methods, one can access additional information about the training loop by using the `trainer` instance. For example, `trainer.sampler` can be used to access the sampler used by the train dataloader, `trainer.trainloader` can be used to access the current train dataloader, and `trainer.current_epoch` can be used to access the current epoch number.
 
-To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods:
+To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods, then pass it to the trainer when it is initialized, or call `trainer.add_callbacks` after initialization. For built-in trainers that user has no access to the initialization, one can also pass the trainer callbacks to client through parameter `trainer_callbacks`, which will be delivered to trainers later. Examples can be found in `examples/callbacks`.
+
 
 ````{admonition} **on_train_run_start()**
 **`def on_train_run_start(self, trainer, config)`**
