@@ -7,7 +7,7 @@ from typing import Optional
 
 from torch.utils.data import RandomSampler, Sampler
 
-from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
+from transformers import AutoConfig, AutoTokenizer, HfArgumentParser, TrainerCallback
 from transformers import Trainer as HuggingFaceTrainer
 from transformers import TrainingArguments, default_data_collator
 
@@ -30,6 +30,7 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
         tokenizer,
         data_collator,
         sampler,
+        callbacks,
     ):
         super().__init__(
             model=model,
@@ -38,6 +39,7 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
             eval_dataset=eval_dataset,
             tokenizer=tokenizer,
             data_collator=data_collator,
+            callbacks=callbacks,
         )
         self.sampler = sampler
 
@@ -51,10 +53,15 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         super().__init__(model)
 
         self.trainer = None
+        self.trainer_callbacks = []
+        if callbacks:
+            # Huggingface needs to check callback types
+            self.add_callbacks(callbacks)
+
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)
@@ -101,11 +108,14 @@ class Trainer(basic.Trainer):
             tokenizer=self.tokenizer,
             data_collator=default_data_collator,
             sampler=sampler,
+            callbacks=self.trainer_callbacks,
         )
 
         self.trainer.train()
 
-    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
+    def test_model(
+        self, config, testset, sampler=None, **kwargs
+    ):  # pylint: disable=unused-argument
         """The testing loop for HuggingFace models.
 
         Arguments:
@@ -129,3 +139,12 @@ class Trainer(basic.Trainer):
             perplexity = float("inf")
 
         return perplexity
+
+    def add_callbacks(self, callbacks):
+        """Callbacks will be handled by Huggingface instead of Plato."""
+        for callback in callbacks:
+            if not issubclass(callback, TrainerCallback):
+                raise ValueError(
+                    f"Huggingface trainer expects subclass of {TrainerCallback}, got {callback} instead."
+                )
+        self.trainer_callbacks.extend(callbacks)
