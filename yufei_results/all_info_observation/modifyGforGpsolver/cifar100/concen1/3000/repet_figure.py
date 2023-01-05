@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 from matplotlib import markers
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+import matplotlib as mpl
 from scipy import interpolate
 import numpy as np
 
@@ -26,13 +26,13 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["pisces", "polaris", "fedbuff"]:
+for method_name in ["Pisces", "Polaris", "FedBuff"]:
 
     x_collect = []
     y_collect = []
     z_collect = []
 
-    for i in range(4):
+    for i in range(5):
 
         filename_temp = "./rand" + str(i + 1) + "/" + method_name + ".csv"
         df_temp = pd.read_csv(filename_temp)
@@ -45,7 +45,7 @@ for method_name in ["pisces", "polaris", "fedbuff"]:
         x_min = x_temp.min()
         x_max = x_temp.max()
 
-        x_new = np.arange(x_min, min(x_max, 8000), 50)
+        x_new = np.arange(120, min(x_max, 8000), 50)
         y_new = f_temp(x_new)
 
         x_collect.extend(x_new)
@@ -59,7 +59,7 @@ for method_name in ["pisces", "polaris", "fedbuff"]:
     # print(z_all)
 
     df = pd.DataFrame([x_collect, y_collect]).transpose()
-    df.columns = ["elapsed_time", "accuracy"]
+    df.columns = ["Elapsed_time", "Accuracy"]
 
     # save interpolate results into csv file
     saving_name = "interpolate_results_" + method_name + ".csv"
@@ -67,7 +67,7 @@ for method_name in ["pisces", "polaris", "fedbuff"]:
 
 # combine all interpolate results into one dataframe
 df_all = pd.DataFrame([x_all, y_all, z_all]).transpose()
-df_all.columns = ["elapsed_time", "accuracy", "method"]
+df_all.columns = ["Elapsed_time", "Accuracy (%)", "Method"]
 df_all.to_csv("interpolate_results_all.csv", index=False)
 
 """
@@ -88,7 +88,15 @@ df_all.to_csv("interpolate_results_all.csv", index=False)
 """
 
 # draw figures directly from df
-sns.lineplot(x="elapsed_time", y="accuracy", data=df_all, hue="method")
+sns.lineplot(
+    x="Elapsed_time",
+    y="Accuracy (%)",
+    data=df_all,
+    hue="Method",
+    style="Method",
+    # palette="flare",
+    # hue_norm=mpl.colors.LogNorm(),
+)
 
 
 # save figure as pdf file
