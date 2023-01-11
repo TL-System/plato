@@ -6,14 +6,21 @@ clients:
     total_clients: 30
 
     # The number of clients selected in each round
-    per_round: 30
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: true
 
+    # the ratio of clients participanting in learning
+    participant_clients_ratio: 1.0
+
+
 server:
     address: 127.0.0.1
     port: 8000
+
+    do_personalization_interval: -1
+    do_personalization_type: Selected
 
 data:
     # The training and testing dataset
@@ -33,7 +40,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 2
 
     # The maximum number of clients running concurrently
     max_concurrency: 4
@@ -46,7 +53,7 @@ trainer:
     batch_size: 64
     optimizer: SGD
     lr_scheduler: MultiStepLR
-    loss_criterion: BCEWithLogitsLoss
+    loss_criterion: CrossEntropyLoss
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
@@ -55,7 +62,7 @@ trainer:
     personalized_batch_size: 12
     personalized_optimizer: Adam
     personalized_lr_scheduler: StepLR
-    personalized_loss_criterion: CrossEntropyLoss
+    personalized_loss_criterion: BCEWithLogitsLoss
 
     # The machine learning model
     model_name: lenet5
@@ -84,8 +91,8 @@ parameters:
         gamma: 0.3
         step_size: 10
 
-    loss_criterion:
-      reduction: mean
+    # loss_criterion:
+    #   reduction: mean
 
     personalized_loss_criterion:
       label_smoothing: 0.5
