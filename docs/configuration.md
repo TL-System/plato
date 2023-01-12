@@ -16,7 +16,7 @@ The default value is `./`.
 ```
 
 ```{admonition} debug
-When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails. 
+When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails.
 
 Valid values are `true` or `false`. The default value is `false`.
 ```
@@ -45,7 +45,7 @@ If this setting is `true` and the configuration file has a `results` section, te
 ````
 
 ````{admonition} comm_simulation
-Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. 
+Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem.
 
 The default value is `true`.
 
@@ -60,13 +60,13 @@ Whether or not the training speed of the clients are simulated. Simulating the t
 If `speed_simulation` is `true`, we need to specify the probability distribution used for generating a sleep time (in seconds per epoch) for each client, using the following setting:
 
 ```{admonition} random_seed
-This random seed is used exclusively for generating the sleep time (in seconds per epoch). 
+This random seed is used exclusively for generating the sleep time (in seconds per epoch).
 
 The default value is `1`.
 ```
 
 ```{admonition} max_sleep_time
-This is used to specify the longest possible sleep time in seconds. 
+This is used to specify the longest possible sleep time in seconds.
 
 The default value is `60`.
 ```
@@ -136,6 +136,12 @@ A list of processors for the client to apply on the payload before receiving it 
 
 ```
 
+
+```{admonition} participant_clients_ratio
+Percentage of clients participating in federated training out of all clients.
+
+```
+
 ## server
 
 ```{admonition} type
@@ -150,6 +156,9 @@ The type of the server.
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
 
 - `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates.
+
+- `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
+
 ```
 
 ```{admonition} **address**
@@ -260,6 +269,13 @@ The edge server's estimated downlink capacity (an edge server to its clients) in
 The edge server's estimated uplink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `uplink_bandwidth`.
 ```
 
+```{admonition} do_personalization_interval
+The round interval for a server commanding when to perform personalization. The default value is 0, meaning that no personalization will be performed.
+```
+
+```{admonition} do_personalization_group
+The group of clients that is required by the server to perform personalization. The default value is "participant", meaning the clients participating in training.
+```
 ## data
 
 ```{admonition} **dataset**
@@ -337,7 +353,7 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ````
 
 ````{admonition} testset_sampler
-How the test dataset is sampled when clients test locally. Any sampler type is valid. 
+How the test dataset is sampled when clients test locally. Any sampler type is valid.
 
 ```{note}
 Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
@@ -384,7 +400,7 @@ The maximum norm of the per-sample gradients with the `diff_privacy` trainer. An
 
 
 ```{admonition} **rounds**
-The maximum number of training rounds. 
+The maximum number of training rounds.
 
 `round` could be any positive integer.
 ```
@@ -526,7 +542,7 @@ For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ## algorithm
 
 ```{admonition} **type**
-Aggregation algorithm. 
+Aggregation algorithm.
 
 The input should be:
 - `fedavg`:  the federated averaging algorithm
@@ -548,7 +564,7 @@ The number of local aggregation rounds on edge servers before sending aggregated
 ## results
 
 ````{admonition} types
-The set of columns that will be written into a .csv file. 
+The set of columns that will be written into a .csv file.
 
 The valid values are:
 - `round`
