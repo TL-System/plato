@@ -21,9 +21,9 @@ server:
 
     # do personalization for testing purpose
     # for every do_personalization_interval rounds
-    do_personalization_interval: -1
+    do_personalization_interval: 2
     # total, participant, nonparticipant
-    do_personalization_group: selected
+    do_personalization_group: nonparticipant
 
 data:
     # The training and testing dataset
@@ -43,7 +43,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 3
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
