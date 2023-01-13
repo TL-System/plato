@@ -1,10 +1,12 @@
 """
-A simple federated learning server capable of selecting clients unseen during
-training.
+A simple federated learning server capable of
+1.- performing personalized training.
+2.- utilizing a subset of clients for federated training while
+others for evaluation.
 
 The total clients are divided into two parts, referred to as
 1.- participant clients
-2.- unparticipant clients
+2.- nonparticipant clients
 
 """
 
@@ -19,6 +21,8 @@ from plato.config import Config
 
 
 class TupleAsKeyDict(UserDict):
+    """A customized dict with tuple as the key value."""
+
     def key_status(self, key):
         target_key = [
             data_key
@@ -32,7 +36,7 @@ class TupleAsKeyDict(UserDict):
         return None, False
 
     def __getitem__(self, key):
-
+        """Get value in response to the key."""
         target_key, is_key_existed = self.key_status(key)
 
         if is_key_existed:
@@ -48,7 +52,7 @@ class TupleAsKeyDict(UserDict):
 
 
 class Server(fedavg.Server):
-    """Federated learning server controling the client selection."""
+    """Federated learning server for personalization and partial client selection."""
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -67,7 +71,7 @@ class Server(fedavg.Server):
         # unused clients during federated training
         self.nonparticipant_clients = 0
 
-        # percentage of participating customers among all customers
+        # participanted clients as a percentage of all clients
         # by default, all clients will participant
         self.participant_clients_ratio = 1.0
 
@@ -75,20 +79,23 @@ class Server(fedavg.Server):
         self.participant_clients_pool = None
         self.nonparticipant_clients_pool = None
 
-        self.personalization_groups = None
+        # client pool of three groups of clients
+        # i.e., total, participant, nonparticipant
+        self.client_groups_pool = None
 
         # the flag denoting whether all clients
-        # perform personalization based on the
-        # received global model.
+        # perform personalization.
         # two special value -1 and 0,
         # if -1, do personalization after final round
-        # if 0, ignore personalization
+        # if 0, ignore personalization. Default.
         self.do_personalization_interval = 0
         self.do_personalization_group = "participant"
+
+        # these two variables are used for reminder purposes
         self.personalization_status_info = {}
         self.personalization_group_type_info = {}
 
-        # the clients that have completed
+        # clients that have completed
         # personalization
         self.personalization_done_clients_pool = []
 
@@ -103,7 +110,7 @@ class Server(fedavg.Server):
         self.check_hyper_parameters()
 
     def check_hyper_parameters(self):
-        """Check whether the hyper-parameters are set correctly."""
+        """Check whether hyper-parameters are set correctly."""
         loaded_config = Config()
 
         # `the participant_clients_pool` and `participant_clients_ratio`
@@ -176,7 +183,7 @@ class Server(fedavg.Server):
             "participant": "Personalization on participanting clients",
             "nonparticipant": "Personalization on non-participanting clients",
         }
-        self.personalization_groups = {
+        self.client_groups_pool = {
             "total": self.clients_pool,
             "participant": self.participant_clients_pool,
             "nonparticipant": self.nonparticipant_clients_pool,
@@ -234,7 +241,7 @@ class Server(fedavg.Server):
                 if hasattr(loaded_config.clients, "participant_clients_pool")
                 else clients_pool[: self.participant_clients]
             )
-            self.personalization_groups["participant"] = self.participant_clients_pool
+            self.client_groups_pool["participant"] = self.participant_clients_pool
             logging.info(
                 "[%s] Prepared participanting clients pool: %s",
                 self,
@@ -256,12 +263,10 @@ class Server(fedavg.Server):
                 self,
                 self.nonparticipant_clients_pool,
             )
-            self.personalization_groups[
-                "nonparticipant"
-            ] = self.nonparticipant_clients_pool
+            self.client_groups_pool["nonparticipant"] = self.nonparticipant_clients_pool
 
-        if not self.personalization_groups["total"]:
-            self.personalization_groups["total"] = self.clients_pool
+        if not self.client_groups_pool["total"]:
+            self.client_groups_pool["total"] = self.clients_pool
 
     def perform_normal_training(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee general federated learning without personalization."""
@@ -273,7 +278,9 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def perform_intermediate_personalization(self, clients_pool: List[int], clients_count: int):
+    def perform_intermediate_personalization(
+        self, clients_pool: List[int], clients_count: int
+    ):
         """Operations to guarantee the personalization during federated training.
 
         This is generally utilized as the evaluation purpose.
@@ -286,19 +293,22 @@ class Server(fedavg.Server):
         if self.current_round % self.do_personalization_interval == 0:
             # set the clients pool based on which group is setup
             # to do personalization
-            clients_pool = self.personalization_groups[
+            clients_pool = self.client_groups_pool[
                 self.do_personalization_group.lower()
             ]
 
         return clients_pool, clients_count
 
-    def perform_final_personalization(self, clients_pool: List[int], clients_count: int):
+    def perform_final_personalization(
+        self, clients_pool: List[int], clients_count: int
+    ):
         """Operations to guarantee the personalization in the final."""
+
         if self.current_round > Config().trainer.rounds:
 
             # set the clients pool based on which group is setup
             # to do personalization
-            clients_pool = self.personalization_groups[
+            clients_pool = self.client_groups_pool[
                 self.do_personalization_group.lower()
             ]
 
@@ -339,7 +349,9 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def before_clients_sampling(self, clients_pool: List[int], clients_count: int, **kwargs):
+    def before_clients_sampling(
+        self, clients_pool: List[int], clients_count: int, **kwargs
+    ):
         """Determine clients pool and clients count before samling clients."""
 
         # perform normal training
