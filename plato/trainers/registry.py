@@ -32,7 +32,7 @@ else:
     }
 
 
-def get(model=None):
+def get(model=None, callbacks=None):
     """Get the trainer with the provided name."""
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
@@ -44,8 +44,8 @@ def get(model=None):
     elif Config().trainer.type == "HuggingFace":
         from plato.trainers import huggingface
 
-        return huggingface.Trainer(model)
+        return huggingface.Trainer(model=model, callbacks=callbacks)
     elif trainer_name in registered_trainers:
-        return registered_trainers[trainer_name](model)
+        return registered_trainers[trainer_name](model=model, callbacks=callbacks)
     else:
         raise ValueError(f"No such trainer: {trainer_name}")
