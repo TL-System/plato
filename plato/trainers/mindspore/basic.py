@@ -24,7 +24,7 @@ class Trainer(base.Trainer):
     the client and the server.
     """
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, **kwargs):
         """Initializing the trainer with the provided model.
 
         Arguments:
