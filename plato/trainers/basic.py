@@ -427,7 +427,6 @@ class Trainer(base.Trainer):
             if model_training_time < requested_time:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
 
-                print(model_path)
                 pretrained = None
                 if torch.cuda.is_available():
                     pretrained = torch.load(model_path)
@@ -500,6 +499,10 @@ class Trainer(base.Trainer):
                 correct += (predicted == labels).sum().item()
 
         return correct / total
+
+    def add_callbacks(self, callbacks):
+        """Adds a list of callbacks to the trainer callback handler."""
+        self.callback_handler.add_callbacks(callbacks)
 
     def get_optimizer(self, model):
         """Returns the optimizer."""

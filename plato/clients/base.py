@@ -142,7 +142,7 @@ class Client:
 
         logging.info("[%s] Connecting to the server at %s.", self, uri)
         await self.sio.connect(uri, wait_timeout=600)
-        await self.sio.emit("client_alive", {"id": self.client_id})
+        await self.sio.emit("client_alive", {"pid": os.getpid(), "id": self.client_id})
 
         logging.info("[Client #%d] Waiting to be selected.", self.client_id)
         await self.sio.wait()
@@ -180,14 +180,13 @@ class Client:
         # Update (virtual) client id for client, trainer and algorithm
         self.client_id = response["id"]
 
-        self.process_server_response(response)
-
-        self.configure()
-
         logging.info("[Client #%d] Selected by the server.", self.client_id)
 
-        if not hasattr(Config().data, "reload_data") or Config().data.reload_data:
-            self._load_data()
+        self.process_server_response(response)
+
+        self._load_data()
+        self.configure()
+        self._allocate_data()
 
         if self.comm_simulation:
             payload_filename = response["payload_filename"]
@@ -286,7 +285,7 @@ class Client:
         )
 
         # Sending the client training payload to the server
-        await self.send(payload)
+        await self._send(payload)
 
     async def _payload_arrived(self, client_id) -> None:
         """Upon receiving a portion of the new payload from the server."""
@@ -422,6 +421,10 @@ class Client:
                 file_path = f"{model_path}/{filename}"
                 os.remove(file_path)
 
+    def add_callbacks(self, callbacks):
+        """Adds a list of callbacks to the client callback handler."""
+        self.callback_handler.add_callbacks(callbacks)
+
     @abstractmethod
     async def _train(self):
         """The machine learning training workload on a client."""
@@ -433,6 +436,10 @@ class Client:
     @abstractmethod
     def _load_data(self) -> None:
         """Generating data and loading them onto this client."""
+
+    @abstractmethod
+    def _allocate_data(self) -> None:
+        """Allocate training or testing dataset of this client."""
 
     @abstractmethod
     def _load_payload(self, server_payload) -> None:

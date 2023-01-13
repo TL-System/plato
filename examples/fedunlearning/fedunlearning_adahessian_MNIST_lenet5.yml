@@ -1,7 +1,6 @@
 clients:
     # Type
     type: simple
-    simulation: true
 
     # The total number of clients
     total_clients: 10
@@ -29,6 +28,9 @@ server:
     port: 8000
     random_seed: 1
 
+    mia_eval: true
+    mia_eval_round: 2
+
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -38,6 +40,11 @@ data:
 
     # IID or non-IID?
     sampler: iid
+
+    # Number of classes
+    num_classes: 10
+
+    random_seed: 1
 
 trainer:
     # The type of the trainer
@@ -72,3 +79,9 @@ parameters:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+results:
+    result_path: results/fedunlearning
+
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time

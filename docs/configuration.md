@@ -15,6 +15,12 @@ The path prefix for datasets, models, checkpoints, and results.
 The default value is `./`.
 ```
 
+```{admonition} debug
+When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails. 
+
+Valid values are `true` or `false`. The default value is `false`.
+```
+
 
 ## clients
 
@@ -72,7 +78,7 @@ For the normal distribution, we can specify `mean` for its mean value and `sd` f
 
 ```yaml
 speed_simulation: true
-simulation_distribution: pareto
+simulation_distribution:
     distribution: pareto
     alpha: 1
 ```
@@ -330,7 +336,7 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ```
 ````
 
-````{admonition} test_set_sampler
+````{admonition} testset_sampler
 How the test dataset is sampled when clients test locally. Any sampler type is valid. 
 
 ```{note}

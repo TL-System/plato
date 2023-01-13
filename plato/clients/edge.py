@@ -85,13 +85,13 @@ class Client(simple.Client):
 
         # Generate a report for the central server
         report = SimpleNamespace(
+            client_id=self.client_id,
             num_samples=self.server.total_samples,
             accuracy=accuracy,
             training_time=training_time,
             comm_time=comm_time,
             update_response=False,
             average_accuracy=average_accuracy,
-            client_id=self.client_id,
             edge_server_comm_overhead=self.server.comm_overhead,
             edge_server_comm_time=edge_server_comm_time,
         )

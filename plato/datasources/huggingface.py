@@ -20,7 +20,7 @@ from plato.datasources import base
 class DataSource(base.DataSource):
     """A data source for the HuggingFace datasets."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
 
         dataset_name = Config().data.dataset_name

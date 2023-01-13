@@ -1,6 +1,6 @@
 """
-The MS COCO- dataset stands for Common Objects in Context, and is 
-  designed to represent a vast array of objects that we 
+The MS COCO- dataset stands for Common Objects in Context, and is
+  designed to represent a vast array of objects that we
   regularly encounter in everyday life.
 
 We mainly utilize COCO-17 (25.20 GB):
@@ -56,7 +56,7 @@ from plato.datasources import multimodal_base
 class DataSource(multimodal_base.MultiModalDataSource):
     """ The COCO dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
 
         self.data_name = Config().data.dataname
