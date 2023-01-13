@@ -18,29 +18,44 @@ from plato.datasources import base
 class DataSource(base.DataSource):
     """The Tiny ImageNet 200 dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
-        _path = Config().params['data_path']
+        _path = Config().params["data_path"]
 
         if not os.path.exists(_path):
             logging.info(
                 "Downloading the Tiny ImageNet 200 dataset. This may take a while."
             )
-            url = Config().data.download_url if hasattr(
-                Config().data, 'download_url'
-            ) else 'http://cs231n.stanford.edu/tiny-imagenet-200.zip'
+            url = (
+                Config().data.download_url
+                if hasattr(Config().data, "download_url")
+                else "http://cs231n.stanford.edu/tiny-imagenet-200.zip"
+            )
             DataSource.download(url, _path)
 
-        _transform = transforms.Compose([
-            transforms.RandomResizedCrop(299),
-            transforms.CenterCrop(299),
-            transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ])
-        self.trainset = datasets.ImageFolder(root=os.path.join(_path, 'train'),
-                                             transform=_transform)
-        self.testset = datasets.ImageFolder(root=os.path.join(_path, 'test'),
-                                            transform=_transform)
+        train_transform = (
+            kwargs["train_transform"]
+            if "train_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        transforms.RandomResizedCrop(299),
+                        transforms.CenterCrop(299),
+                        transforms.ToTensor(),
+                        transforms.Normalize(
+                            [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
+                        ),
+                    ]
+                )
+            )
+        )
+        test_transform = train_transform
+        self.trainset = datasets.ImageFolder(
+            root=os.path.join(_path, "train"), transform=train_transform
+        )
+        self.testset = datasets.ImageFolder(
+            root=os.path.join(_path, "test"), transform=test_transform
+        )
 
     def num_train_examples(self):
         return 100000
