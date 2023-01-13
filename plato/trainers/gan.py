@@ -23,7 +23,7 @@ from plato.trainers import optimizers
 class Trainer(basic.Trainer):
     """A federated learning trainer for GAN models."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, **kwargs):
         super().__init__()
 
         if model is None:
