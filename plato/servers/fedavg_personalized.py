@@ -263,7 +263,7 @@ class Server(fedavg.Server):
         if not self.personalization_groups["total"]:
             self.personalization_groups["total"] = self.clients_pool
 
-    def perform_normal_training(self, clients_pool, clients_count):
+    def perform_normal_training(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee general federated learning without personalization."""
 
         # by default, we run the general federated training
@@ -273,7 +273,7 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def perform_intermediate_personalization(self, clients_pool, clients_count):
+    def perform_intermediate_personalization(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee the personalization during federated training.
 
         This is generally utilized as the evaluation purpose.
@@ -292,7 +292,7 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def perform_final_personalization(self, clients_pool, clients_count):
+    def perform_final_personalization(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee the personalization in the final."""
         if self.current_round > Config().trainer.rounds:
 
@@ -339,7 +339,7 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def before_clients_sampling(self, clients_pool, clients_count, **kwargs):
+    def before_clients_sampling(self, clients_pool: List[int], clients_count: int, **kwargs):
         """Determine clients pool and clients count before samling clients."""
 
         # perform normal training
@@ -360,7 +360,7 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def after_clients_sampling(self, selected_clients, **kwargs):
+    def after_clients_sampling(self, selected_clients: List[int], **kwargs):
         """Perform operations after clients sampling."""
         # add clients who has been selected for personalization
         # to the `personalization_done_clients_pool`
@@ -368,7 +368,7 @@ class Server(fedavg.Server):
         if self.personalization_started:
             self.personalization_done_clients_pool += selected_clients
 
-    def choose_clients(self, clients_pool, clients_count):
+    def choose_clients(self, clients_pool: List[int], clients_count: int):
         """Chooses a subset of the clients to participate in each round.
 
         In plato, this input `clients_pool` contains total clients
