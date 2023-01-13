@@ -1,5 +1,5 @@
 """
-Defines the TrainerCallback class, which is the abstract base class to be subclassed
+Defines the ClientCallback class, which is the abstract base class to be subclassed
 when creating new client callbacks.
 
 Defines a default callback to print local training progress.

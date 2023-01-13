@@ -895,7 +895,11 @@ class Server:
             },
         )
 
-        heapq.heappush(self.reported_clients, client_info)
+        if (
+            self.asynchronous_mode
+            and self.simulate_wall_time
+        ):
+            heapq.heappush(self.reported_clients, client_info)
         self.current_reported_clients[client_info[2]["client_id"]] = True
         del self.training_clients[client_id]
 
@@ -1314,6 +1318,10 @@ class Server:
 
         await self._close_connections()
         os._exit(0)
+    
+    def add_callbacks(self, callbacks):
+        """Adds a list of callbacks to the server callback handler."""
+        self.callback_handler.add_callbacks(callbacks)
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizes the server response with any additional information."""

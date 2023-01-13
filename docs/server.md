@@ -226,11 +226,11 @@ Override this method to complete additional tasks before closing the server.
 
 ## Customizing servers using callbacks
 
-For infrastructure changes, such as logging and recording metrics, we tend to customize the global training process using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the client when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
+For infrastructure changes, such as logging and recording metrics, we tend to customize the global training process using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the server when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
 
 Within the implementation of these callback methods, one can access additional information about the global training by using the `server` instance. 
 
-To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods:
+To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods, then pass it to the server when it is initialized, or call `server.add_callbacks` after initialization. Examples can be found in `examples/callbacks`.
 
 ````{admonition} **on_weights_received()**
 **`def on_weights_received(self, server, weights_received)`**

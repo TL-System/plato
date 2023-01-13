@@ -31,7 +31,7 @@ class ServerCallback(ABC):
         Event called after the updated weights have been aggregated.
         """
 
-    def on_client_selected(self, server, selected_clients, **kwargs):
+    def on_clients_selected(self, server, selected_clients, **kwargs):
         """
         Event called after a new client arrived.
         """
