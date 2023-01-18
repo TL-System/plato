@@ -14,8 +14,18 @@ import numpy as np
 
 import pandas as pd
 
-sns.set_theme(style="darkgrid")
-
+# sns.set_context("poster", font_scale=5, rc={"lines.linewidth": 2.5})
+sns.set_theme(style="whitegrid")
+sns.set_context(
+    "talk",
+    rc={
+        "legend.fontsize": "large",
+        # "axes.labelsize": 12,
+        "xtick.labelsize": "small",
+        "axes.labelsize": "small",
+        "xtick.labelsize": 9,
+    },
+)
 # create a new csv file
 # with open("collect_results.csv", "w", newline="") as file:
 #    writer = csv.writer(file)
@@ -26,7 +36,7 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["Pisces", "Polaris", "fedbuff"]:
+for method_name in ["Pisces", "Polaris", "FedBuff"]:
 
     x_collect = []
     y_collect = []
@@ -34,7 +44,7 @@ for method_name in ["Pisces", "Polaris", "fedbuff"]:
 
     for i in range(5):
 
-        filename_temp = "./rand" + str(i + 1) + "/" + method_name + ".csv"
+        filename_temp = "./rand" + str(i + 1) + "/" + method_name.lower() + ".csv"
         df_temp = pd.read_csv(filename_temp)
 
         # perform interpolation
@@ -67,7 +77,7 @@ for method_name in ["Pisces", "Polaris", "fedbuff"]:
 
 # combine all interpolate results into one dataframe
 df_all = pd.DataFrame([x_all, y_all, z_all]).transpose()
-df_all.columns = ["Elapsed_time", "Accuracy (%)", "Method"]
+df_all.columns = ["Elapsed time", "Accuracy (%)", "Method"]
 df_all.to_csv("interpolate_results_all.csv", index=False)
 
 """
@@ -89,7 +99,7 @@ df_all.to_csv("interpolate_results_all.csv", index=False)
 
 # draw figures directly from df
 sns.lineplot(
-    x="Elapsed_time", y="Accuracy (%)", data=df_all, hue="Method", style="Method"
+    x="Elapsed time", y="Accuracy (%)", data=df_all, hue="Method", style="Method"
 )
 
 

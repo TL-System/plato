@@ -1,4 +1,4 @@
-Elapsed_time,Accuracy (%),Method
+Elapsed time,Accuracy (%),Method
 351,0.059433565358350045,polaris
 401,0.06665651940818566,polaris
 451,0.08208723446744136,polaris

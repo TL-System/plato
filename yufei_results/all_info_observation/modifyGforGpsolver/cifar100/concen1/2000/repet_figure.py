@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 from matplotlib import markers
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+import matplotlib as mpl
 from scipy import interpolate
 import numpy as np
 
@@ -14,7 +14,17 @@ import numpy as np
 
 import pandas as pd
 
-sns.set_theme(style="darkgrid")
+sns.set_theme(style="whitegrid")
+sns.set_context(
+    "talk",
+    rc={
+        "legend.fontsize": "large",
+        # "axes.labelsize": 12,
+        "xtick.labelsize": "small",
+        "axes.labelsize": "small",
+        "xtick.labelsize": 9,
+    },
+)
 
 # create a new csv file
 # with open("collect_results.csv", "w", newline="") as file:
@@ -44,7 +54,6 @@ for method_name in ["Pisces", "Polaris", "FedBuff"]:
 
         x_min = x_temp.min()
         x_max = x_temp.max()
-        print(x_min)
 
         x_new = np.arange(120, min(x_max, 8000), 50)
         y_new = f_temp(x_new)
@@ -60,7 +69,7 @@ for method_name in ["Pisces", "Polaris", "FedBuff"]:
     # print(z_all)
 
     df = pd.DataFrame([x_collect, y_collect]).transpose()
-    df.columns = ["elapsed_time", "accuracy"]
+    df.columns = ["Elapsed_time", "Accuracy"]
 
     # save interpolate results into csv file
     saving_name = "interpolate_results_" + method_name + ".csv"
@@ -68,7 +77,7 @@ for method_name in ["Pisces", "Polaris", "FedBuff"]:
 
 # combine all interpolate results into one dataframe
 df_all = pd.DataFrame([x_all, y_all, z_all]).transpose()
-df_all.columns = ["Elapsed_time", "Accuracy (%)", "Method"]
+df_all.columns = ["Elapsed time", "Accuracy (%)", "Method"]
 df_all.to_csv("interpolate_results_all.csv", index=False)
 
 """
@@ -90,11 +99,13 @@ df_all.to_csv("interpolate_results_all.csv", index=False)
 
 # draw figures directly from df
 sns.lineplot(
-    x="Elapsed_time",
+    x="Elapsed time",
     y="Accuracy (%)",
     data=df_all,
     hue="Method",
     style="Method",
+    # palette="flare",
+    # hue_norm=mpl.colors.LogNorm(),
 )
 
 
