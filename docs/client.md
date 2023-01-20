@@ -92,7 +92,7 @@ For infrastructure changes, such as logging and recording metrics, we tend to cu
 
 Within the implementation of these callback methods, one can access additional information about the local training by using the `client` instance. 
 
-To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods:
+To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client`, and override the following methods, then pass it to the client when it is initialized, or call `client.add_callbacks` after initialization. Examples can be found in `examples/callbacks`.
 
 
 ````{admonition} **on_inbound_received()**
