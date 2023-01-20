@@ -3,7 +3,7 @@ Implement new algorithm: personalized federarted NAS.
 """
 from Darts.model_search_local import MaskedNetwork
 
-from fedrlnas_tools import (
+from fednas_tools import (
     client_weight_param,
     sample_mask,
     fuse_weight_gradient,
