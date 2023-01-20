@@ -9,7 +9,17 @@ import pandas as pd
 """
 Read .out file and draw clients distribution figure
 """
-sns.set_theme(style="darkgrid")
+sns.set_theme(style="whitegrid")
+sns.set_context(
+    "talk",
+    rc={
+        "legend.fontsize": "large",
+        # "axes.labelsize": 12,
+        "xtick.labelsize": "small",
+        "axes.labelsize": "small",
+        "xtick.labelsize": 9,
+    },
+)
 with open("client_selection_fedbuff.txt") as f:
     client_set = []
     num_list = []

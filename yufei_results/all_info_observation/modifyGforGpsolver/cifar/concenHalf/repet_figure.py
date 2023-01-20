@@ -42,7 +42,7 @@ for method_name in ["Pisces", "Polaris", "FedBuff"]:
     y_collect = []
     z_collect = []
 
-    for i in range(5):
+    for i in range(4):
 
         filename_temp = "./rand" + str(i + 1) + "/" + method_name.lower() + ".csv"
         df_temp = pd.read_csv(filename_temp)

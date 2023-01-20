@@ -65,7 +65,7 @@ for file_name in os.listdir():
         x_min = x_temp.min()
         x_max = x_temp.max()
 
-        x_new = np.arange(max(23, np.ceil(x_min)), min(x_max, 7000), 40)
+        x_new = np.arange(max(23, np.ceil(x_min)), min(x_max, 1650), 40)
         y_new = f_temp(x_new)
 
         # write into lists
