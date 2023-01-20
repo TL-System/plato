@@ -17,7 +17,7 @@ from model.architect import Architect
 
 def main():
     """
-    A Plato federated learning training session using PerFedRLNAS, paper unpublished.
+    A Plato federated learning training session using PerFedRLNAS.
     """
     supernet = NasDynamicModel
     client = fednas_client.Client(
