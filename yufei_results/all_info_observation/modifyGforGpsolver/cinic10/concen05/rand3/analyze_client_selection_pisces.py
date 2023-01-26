@@ -8,7 +8,7 @@ Read .out file and draw clients distribution figure
 """
 new_outfile = open("client_selection_pisces.txt", "w")
 new_outfile.close()
-with open("Pisces_cinic10_concenHalf_rand2.out") as f:
+with open("Pisces_cinic10_concenHalf_rand3.out") as f:
     for line in f.readlines():
 
         if "Selected clients" in line:
