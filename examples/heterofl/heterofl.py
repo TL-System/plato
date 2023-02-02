@@ -9,15 +9,21 @@ Reference "https://github.com/dem123456789/HeteroFL-Computation-and-Communicatio
 """
 
 from mobilenetv3 import MobileNetV3
-from plato.clients import simple
-
+import resnet
+from plato.config import Config
+from heterofl_client import Client
+from heterofl_server import Server
 from heterofl_trainer import ServerTrainer
 
 
 def main():
     """A Plato federated learning training session using the HeteroFL algorithm."""
-    server = Server(trainer=ServerTrainer, model=MobileNetV3)
-    client = simple.Client(model=MobileNetV3)
+    if "mobilenet" in Config().trainer.model_name:
+        model=MobileNetV3
+    else
+        model=resnet.resnet152#check the paper, and choose the correct one
+    server = Server(trainer=ServerTrainer, model=model)
+    client = Client(model=model)
     server.run(client)
 
 
