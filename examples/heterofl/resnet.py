@@ -128,6 +128,7 @@ class ResNet(nn.Module):
             track_running_stats=track,
         )
         self.n4 = n4
+        self.scaler = Scaler(rate)
         self.linear = nn.Linear(hidden_size[3] * block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride, rate, track):
@@ -138,9 +139,7 @@ class ResNet(nn.Module):
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layers)
 
-    def forward(self, input):
-        output = {}
-        x = input["img"]
+    def forward(self, x):
         out = self.conv1(x)
         out = self.layer1(out)
         out = self.layer2(out)
@@ -150,9 +149,7 @@ class ResNet(nn.Module):
         out = F.adaptive_avg_pool2d(out, 1)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
-        output["score"] = out
-        output["loss"] = F.cross_entropy(output["score"], input["label"])
-        return output
+        return out
 
 
 def resnet18(model_rate=1, track=False):

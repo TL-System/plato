@@ -22,22 +22,22 @@ class Server(fedavg.Server):
         super().__init__(model, datasource, algorithm, trainer)
         self.rates = [None for _ in range(Config().clients.total_clients)]
         self.limitation = np.zeros(
-            (Config().trainer.rounds, Config().clients.per_round, 2)
+            (Config().trainer.rounds, Config().clients.total_clients, 2)
         )
-        if not (
+        if (
             hasattr(Config().parameters.limitation, "activated")
             and Config().parameters.limitation.activated
         ):
             limitation = Config().parameters.limitation
-            self.limitation[:, 0] = np.random.uniform(
+            self.limitation[:, :, 0] = np.random.uniform(
                 limitation.min_size,
                 limitation.max_size,
-                (Config().trainer.rounds, Config().clients.per_round),
+                (Config().trainer.rounds, Config().clients.total_clients),
             )
-            self.limitation[:, 1] = np.random.uniform(
+            self.limitation[:, :, 1] = np.random.uniform(
                 limitation.min_flops,
                 limitation.max_flops,
-                (Config().trainer.rounds, Config().clients.per_round),
+                (Config().trainer.rounds, Config().clients.total_clients),
             )
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:

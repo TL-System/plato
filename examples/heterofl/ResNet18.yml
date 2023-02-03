@@ -84,12 +84,14 @@ parameters:
     model:
         model_rate: 1
         track: true
+    client_model:
+        track: false
     optimizer:
         lr: 0.1
         weight_decay: 0.0005
         momentum: 0.9
     learning_rate:
-        step_size: 150, 250
+        milestone_steps: 150, 250
         gamma: 0.1
     limitation:
         activated: false

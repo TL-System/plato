@@ -11,6 +11,6 @@ class Client(simple.Client):
     def process_server_response(self, server_response) -> None:
         rate = server_response["rate"]
         self.algorithm.model = self.model(
-            rate, **Config().parameters.cllient_model._asdict()
+            rate, **Config().parameters.client_model._asdict()
         )
         self.trainer.model = self.algorithm.model
