@@ -103,7 +103,7 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         self.in_planes = hidden_size[0]
         self.conv1 = nn.Conv2d(
-            data_shape[0],
+            data_shape,
             hidden_size[0],
             kernel_size=3,
             stride=1,
@@ -127,7 +127,7 @@ class ResNet(nn.Module):
             momentum=None,
             track_running_stats=track,
         )
-
+        self.n4 = n4
         self.linear = nn.Linear(hidden_size[3] * block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride, rate, track):
@@ -156,7 +156,7 @@ class ResNet(nn.Module):
 
 
 def resnet18(model_rate=1, track=False):
-    data_shape = 32
+    data_shape = 3
     classes_size = 10
     hidden_size = [int(np.ceil(model_rate * x)) for x in [64, 128, 256, 512]]
     scaler_rate = model_rate
@@ -168,7 +168,7 @@ def resnet18(model_rate=1, track=False):
 
 
 def resnet34(model_rate=1, track=False):
-    data_shape = 32
+    data_shape = 3
     classes_size = 10
     hidden_size = [int(np.ceil(model_rate * x)) for x in [64, 128, 256, 512]]
     scaler_rate = model_rate
@@ -180,7 +180,7 @@ def resnet34(model_rate=1, track=False):
 
 
 def resnet50(model_rate=1, track=False):
-    data_shape = 32
+    data_shape = 3
     classes_size = 10
     hidden_size = [int(np.ceil(model_rate * x)) for x in [64, 128, 256, 512]]
     scaler_rate = model_rate
@@ -198,7 +198,7 @@ def resnet50(model_rate=1, track=False):
 
 
 def resnet101(model_rate=1, track=False):
-    data_shape = 32
+    data_shape = 3
     classes_size = 10
     hidden_size = [int(np.ceil(model_rate * x)) for x in [64, 128, 256, 512]]
     scaler_rate = model_rate
@@ -216,7 +216,7 @@ def resnet101(model_rate=1, track=False):
 
 
 def resnet152(model_rate=1, track=False):
-    data_shape = 32
+    data_shape = 3
     classes_size = 10
     hidden_size = [int(np.ceil(model_rate * x)) for x in [64, 128, 256, 512]]
     scaler_rate = model_rate
