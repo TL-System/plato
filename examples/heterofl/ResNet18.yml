@@ -1,0 +1,101 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 100
+
+    # The number of clients selected in each round
+    per_round: 10
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    random_seed: 1
+
+    comm_simulation: true
+    compute_comm_time: true
+
+server:
+    address: 127.0.0.1
+    port: 8010
+    do_test: true
+    random_seed: 1
+
+#    checkpoint_path: /scratch/dixiyao/plato/models/fedavgdrop/cifar10/mobilenetv3/large
+#    model_path: /scratch/dixiyao/plato/models/fedavgdrop/cifar10/mobilenetv3/large
+    checkpoint_path: /data/dixi/plato/models/heterofl/cifar10/resnet/
+    model_path: /data/dixi/plato/models/heterofl/cifar10/resnet/
+
+    simulate_wall_time: true
+
+data:
+    # The training and testing dataset
+    datasource:  CIFAR10
+
+    data_path: /data/dixi
+#    data_path: ../data/
+
+    # Number of samples in each partition
+    partition_size: 500
+    test_partition_size: 10000
+
+    sampler: iid
+    testset_sampler: iid
+##
+##    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 400
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 5
+
+    # The target accuracy
+    target_accuracy: 1.
+
+    # Number of epochs for local training in each communication round
+    epochs: 5
+    batch_size: 10
+    loss_criterion: CrossEntropyLoss
+    optimizer: SGD
+    global_lr_scheduler: true
+    lr_scheduler: MultiStepLR
+
+    model_type: torch_hub
+    model_name: resnet18
+
+
+algorithm:
+    # A aggregation algorithm
+    type: fedavg
+    
+results:
+    result_path: /data/dixi/plato/results/heterofl/cifar10/resnet/
+#    result_path: /scratch/dixiyao/plato/results/heterofl/cifar10/resnet/
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
+
+parameters:
+    model:
+        model_rate: 1
+        track: true
+    optimizer:
+        lr: 0.1
+        weight_decay: 0.0005
+        momentum: 0.9
+    learning_rate:
+        step_size: 150, 250
+        gamma: 0.1
+    limitation:
+        activated: false
+        min_size: 1
+        max_size: 20
+        min_flops: 5
+        max_flops: 100
+
+
