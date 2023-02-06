@@ -167,7 +167,15 @@ class Bottleneck(nn.Module):
                 # nn.BatchNorm2d(num_features=out_channels_num, momentum=BN_momentum)
                 nn.Sequential(
                     OrderedDict(
-                        [("lastBN", nn.BatchNorm2d(num_features=out_channels_num))]
+                        [
+                            (
+                                "lastBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
                     )
                 )
                 if self.use_residual
@@ -226,14 +234,30 @@ class Bottleneck(nn.Module):
                 # nn.BatchNorm2d(num_features=out_channels_num, momentum=BN_momentum)
                 nn.Sequential(
                     OrderedDict(
-                        [("lastBN", nn.BatchNorm2d(num_features=out_channels_num))]
+                        [
+                            (
+                                "lastBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
                     )
                 )
                 if self.use_residual
-                else nn.BatchNorm2d(
-                    num_features=out_channels_num,
-                    momentum=BN_momentum,
-                    track_running_stats=tracking_stat,
+                else nn.Sequential(
+                    OrderedDict(
+                        [
+                            (
+                                "lastBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
+                    )
                 ),
             )
 
@@ -260,8 +284,8 @@ class MobileNetV3(nn.Module):
         dropout=0.2,
         BN_momentum=0.1,
         zero_gamma=False,
-        rate=1.0,
-        is_global_model=True,
+        model_rate=1.0,
+        track=True,
     ):
         """
         configs: setting of the model
@@ -271,8 +295,8 @@ class MobileNetV3(nn.Module):
 
         mode = mode.lower()
         assert mode in ["large", "small"]
-        self.rate = rate
-        self.tracking_stat = is_global_model
+        self.rate = model_rate
+        self.tracking_stat = track
 
         s = 2
         if input_size == 32 or input_size == 56:
@@ -317,8 +341,8 @@ class MobileNetV3(nn.Module):
                 [5, 576, 96, True, "HS", 1],
             ]
         for index, config in enumerate(configs):
-            configs[index][1] = int(self.rate * config[1])
-            configs[index][2] = int(self.rate * config[2])
+            configs[index][1] = max(int(self.rate * config[1]), 1)
+            configs[index][2] = max(int(self.rate * config[2]), 1)
 
         first_channels_num = int(16 * self.rate)
 
@@ -432,15 +456,6 @@ class MobileNetV3(nn.Module):
         self.classifier = nn.Sequential(
             nn.Dropout(p=dropout), nn.Linear(last_channels_num, classes_num)
         )
-
-        """
-        self.extras = nn.ModuleList([
-            InvertedResidual(576, 512, 2, 0.2),
-            InvertedResidual(512, 256, 2, 0.25),
-            InvertedResidual(256, 256, 2, 0.5),
-            InvertedResidual(256, 64, 2, 0.25)
-        ])
-        """
 
         ########################################################################################################################
         # Initialize the weights

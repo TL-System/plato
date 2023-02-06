@@ -21,6 +21,7 @@ class Algorithm(fedavg.Algorithm):
     def __init__(self, trainer=None):
         super().__init__(trainer)
         self.current_rate = 1
+        self.model_class = None
         self.size_complexities = np.zeros(5)
         self.flops_complexities = np.zeros(5)
         self.rates = np.array([1, 0.5, 0.25, 0.125, 0.0625])
@@ -35,6 +36,7 @@ class Algorithm(fedavg.Algorithm):
         Choose a compression rate based on current limitation.
         Update the sub model for the client.
         """
+        self.model_class = model_class
         if (
             hasattr(Config().parameters, "limitation")
             and hasattr(Config().parameters.limitation, "activated")
@@ -74,36 +76,24 @@ class Algorithm(fedavg.Algorithm):
         Get the parameters of local models from the global model.
         """
         current_rate = self.current_rate
-        local_parameters = OrderedDict()
+        pre_model = self.model_class(
+            current_rate, **Config().parameters.cllient_model._asdict()
+        )
+        local_parameters = pre_model.state_dict()
         for key, value in self.model.state_dict().items():
-            if "weight" in key or "bias" in key:
-                if value.dim() == 4:
-                    if key == "conv1.weight":
-                        local_parameters[key] = copy.deepcopy(
-                            value[: int(current_rate * value.shape[0]), ...]
-                        )
-                    else:
-                        local_parameters[key] = copy.deepcopy(
-                            value[
-                                : int(current_rate * value.shape[0]),
-                                : int(current_rate * value.shape[1]),
-                                ...,
-                            ]
-                        )
-                elif value.dim() == 2:
+            if ("weight" in key or "bias" in key) and not "BN" in key:
+                if value.dim() == 4 or value.dim() == 2:
                     local_parameters[key] = copy.deepcopy(
                         value[
-                            :,
-                            : int(current_rate * value.shape[1]),
+                            : local_parameters[key].shape[0],
+                            : local_parameters[key].shape[1],
+                            ...,
                         ]
                     )
-                elif value.dim() == 1:
-                    if not "linear" in key:
-                        local_parameters[key] = copy.deepcopy(
-                            value[: int(current_rate * value.shape[0])]
-                        )
-                    else:
-                        local_parameters[key] = copy.deepcopy(value)
+                else:
+                    local_parameters[key] = copy.deepcopy(
+                        value[: local_parameters[key].shape[0]]
+                    )
         return local_parameters
 
     def aggregation(self, weights_received):
@@ -112,50 +102,36 @@ class Algorithm(fedavg.Algorithm):
         """
         global_parameters = copy.deepcopy(self.model.state_dict())
         for key, value in self.model.state_dict().items():
-            if "weight" in key or "bias" in key:
+            if ("weight" in key or "bias" in key) and not "BN" in key:
                 count = torch.zeros(value.shape)
                 for local_weights in weights_received:
                     if value.dim() == 4:
-                        if key == "conv1.weight":
-                            global_parameters[key][
-                                : local_weights[key].shape[0], ...
-                            ] += copy.deepcopy(local_weights[key])
-                            count[: local_weights[key].shape[0], ...] += torch.ones(
-                                local_weights[key].shape
-                            )
-                        else:
-                            global_parameters[key][
-                                : local_weights[key].shape[0],
-                                : local_weights[key].shape[1],
-                                ...,
-                            ] += copy.deepcopy(local_weights[key])
-                            count[
-                                : local_weights[key].shape[0],
-                                : local_weights[key].shape[1],
-                                ...,
-                            ] += torch.ones(local_weights[key].shape)
+                        global_parameters[key][
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                            ...,
+                        ] += copy.deepcopy(local_weights[key])
+                        count[
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                            ...,
+                        ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 2:
                         global_parameters[key][
-                            :,
+                            : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                         ] += copy.deepcopy(local_weights[key])
                         count[
-                            :,
+                            : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                         ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 1:
-                        if not "linear" in key:
-                            global_parameters[key][
-                                : local_weights[key].shape[0]
-                            ] += copy.deepcopy(local_weights[key])
-                            count[: local_weights[key].shape[0]] += torch.ones(
-                                local_weights[key].shape
-                            )
-                        else:
-                            global_parameters[key] += copy.deepcopy(local_weights[key])
-                            count += torch.ones(local_weights[key].shape)
-                count = torch.where(count == 0, torch.ones(count.shape), count)
-                global_parameters[key] = torch.div(
-                    global_parameters[key] - value, count
-                )
+                        global_parameters[key][
+                            : local_weights[key].shape[0]
+                        ] += copy.deepcopy(local_weights[key])
+                        count[: local_weights[key].shape[0]] += torch.ones(
+                            local_weights[key].shape
+                        )
+            count = torch.where(count == 0, torch.ones(count.shape), count)
+            global_parameters[key] = torch.div(global_parameters[key] - value, count)
         return global_parameters
