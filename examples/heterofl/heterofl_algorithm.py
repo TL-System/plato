@@ -45,7 +45,7 @@ class Algorithm(fedavg.Algorithm):
             for index, rate in enumerate(self.rates):
                 if self.size_complexities[index] == 0:
                     pre_model = model_class(
-                        rate, **Config().parameters.cllient_model._asdict()
+                        rate, **Config().parameters.client_model._asdict()
                     )
                     payload = pre_model.state_dict()
                     size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
@@ -77,7 +77,7 @@ class Algorithm(fedavg.Algorithm):
         """
         current_rate = self.current_rate
         pre_model = self.model_class(
-            current_rate, **Config().parameters.cllient_model._asdict()
+            current_rate, **Config().parameters.client_model._asdict()
         )
         local_parameters = pre_model.state_dict()
         for key, value in self.model.state_dict().items():
