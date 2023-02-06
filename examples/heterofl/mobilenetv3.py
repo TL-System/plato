@@ -3,14 +3,14 @@
 """
 MobileNetV3 From <Searching for MobileNetV3>, arXiv:1905.02244.
 Ref: https://github.com/d-li14/mobilenetv3.pytorch/blob/master/mobilenetv3.py
-     https://github.com/kuan-wang/pytorch-mobilenet-v3/blob/master/mobilenetv3.py   
+     https://github.com/kuan-wang/pytorch-mobilenet-v3/blob/master/mobilenetv3.py
 
 Modified specific for algorithm HeteroFL. sBN and scaler modules are implemented.
 """
 
 from collections import OrderedDict
 
-import torch.nn as nn
+from torch import nn
 import torch.nn.functional as F
 
 
@@ -37,35 +37,39 @@ class Scaler(nn.Module):
         super().__init__()
         self.rate = rate
 
-    def forward(self, input):
-        output = input / self.rate if self.training else input
+    def forward(self, feature):
+        "Forward function."
+        output = feature / self.rate if self.training else feature
         return output
 
 
+# pylint:disable=invalid-name
 class H_sigmoid(nn.Module):
     """
-    hard sigmoid
+    Hard sigmoid.
     """
 
     def __init__(self, inplace=True):
-        super(H_sigmoid, self).__init__()
+        super().__init__()
         self.inplace = inplace
 
-    def forward(self, x):
-        return F.relu6(x + 3, inplace=self.inplace) / 6
+    def forward(self, feature):
+        "Forward function."
+        return F.relu6(feature + 3, inplace=self.inplace) / 6
 
 
 class H_swish(nn.Module):
     """
-    hard swish
+    Hard swish.
     """
 
     def __init__(self, inplace=True):
-        super(H_swish, self).__init__()
+        super().__init__()
         self.inplace = inplace
 
-    def forward(self, x):
-        return x * F.relu6(x + 3, inplace=self.inplace) / 6
+    def forward(self, feature):
+        "Forward function."
+        return feature * F.relu6(feature + 3, inplace=self.inplace) / 6
 
 
 class SEModule(nn.Module):
@@ -75,7 +79,7 @@ class SEModule(nn.Module):
     """
 
     def __init__(self, in_channels_num, reduction_ratio=4):
-        super(SEModule, self).__init__()
+        super().__init__()
 
         if in_channels_num % reduction_ratio != 0:
             raise ValueError(
@@ -91,6 +95,7 @@ class SEModule(nn.Module):
         )
 
     def forward(self, x):
+        "Forward function."
         batch_size, channel_num, _, _ = x.size()
         y = self.avg_pool(x).view(batch_size, channel_num)
         y = self.fc(y).view(batch_size, channel_num, 1, 1)
@@ -99,9 +104,10 @@ class SEModule(nn.Module):
 
 class Bottleneck(nn.Module):
     """
-    The basic unit of MobileNetV3
+    The basic unit of MobileNetV3.
     """
 
+    # pylint:disable=too-many-arguments
     def __init__(
         self,
         in_channels_num,
@@ -119,7 +125,7 @@ class Bottleneck(nn.Module):
         use_SE: True or False -- use SE Module or not
         NL: nonlinearity, 'RE' or 'HS'
         """
-        super(Bottleneck, self).__init__()
+        super().__init__()
 
         assert stride in [1, 2]
         NL = NL.upper()
@@ -262,19 +268,23 @@ class Bottleneck(nn.Module):
             )
 
     def forward(self, x, expand=False):
+        "Forward function"
         out1 = self.conv1(x)
         out = self.conv2(out1)
         if self.use_residual:
             out = out + x
         if expand:
             return out, out1
-        else:
-            return out
+        return out
 
 
 class MobileNetV3(nn.Module):
-    """ """
+    """
+    MobilenetV3 network.
+    """
 
+    # pylint:disable=too-many-arguments
+    # pylint:disable=too-many-locals
     def __init__(
         self,
         mode="small",
@@ -291,7 +301,7 @@ class MobileNetV3(nn.Module):
         configs: setting of the model
         mode: type of the model, 'large' or 'small'
         """
-        super(MobileNetV3, self).__init__()
+        super().__init__()
 
         mode = mode.lower()
         assert mode in ["large", "small"]
@@ -299,7 +309,7 @@ class MobileNetV3(nn.Module):
         self.tracking_stat = track
 
         s = 2
-        if input_size == 32 or input_size == 56:
+        if input_size in [32, 56]:
             # using cifar-10, cifar-100 or Tiny-ImageNet
             s = 1
 
@@ -346,14 +356,10 @@ class MobileNetV3(nn.Module):
 
         first_channels_num = int(16 * self.rate)
 
-        # last_channels_num = 1280
-        # according to https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet_v3.py
-        # if small -- 1024, if large -- 1280
         last_channels_num = int(1280 if mode == "large" else 1024 * self.rate)
 
         divisor = 8
 
-        ########################################################################################################################
         # feature extraction part
         # input layer
         input_channels_num = _ensure_divisible(
@@ -429,11 +435,6 @@ class MobileNetV3(nn.Module):
         feature_extraction_layers.append(last_stage_layer1)
 
         self.featureList = nn.ModuleList(feature_extraction_layers)
-
-        # SE Module
-        # remove the last SE Module according to https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet_v3.py
-        # feature_extraction_layers.append(SEModule(last_stage_channels_num) if mode == 'small' else nn.Sequential())
-
         last_stage = []
         last_stage.append(nn.AdaptiveAvgPool2d(1))
         last_stage.append(
@@ -449,19 +450,16 @@ class MobileNetV3(nn.Module):
         last_stage.append(H_swish())
 
         self.last_stage_layers = nn.Sequential(*last_stage)
-
-        ########################################################################################################################
         # Classification part
 
         self.classifier = nn.Sequential(
             nn.Dropout(p=dropout), nn.Linear(last_channels_num, classes_num)
         )
-
-        ########################################################################################################################
         # Initialize the weights
         self._initialize_weights(zero_gamma)
 
     def forward(self, x):
+        "Forward function."
         for i in range(9):
             x = self.featureList[i](x)
         x = self.featureList[9](x)
