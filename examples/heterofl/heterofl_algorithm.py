@@ -21,13 +21,13 @@ class Algorithm(fedavg.Algorithm):
     def __init__(self, trainer=None):
         super().__init__(trainer)
         self.current_rate = 1
-        self.current_subnet = None
         self.size_complexities = np.zeros(5)
         self.flops_complexities = np.zeros(5)
         self.rates = np.array([1, 0.5, 0.25, 0.125, 0.0625])
 
     def extract_weights(self, model=None):
-        payload = self.current_subnet.cpu().state_dict()
+        self.model = self.model.cpu()
+        payload = self.get_local_parameters()
         return payload
 
     def choose_rate(self, limitation, model_class):
@@ -35,43 +35,38 @@ class Algorithm(fedavg.Algorithm):
         Choose a compression rate based on current limitation.
         Update the sub model for the client.
         """
-        # for index, rate in enumerate(self.rates):
-        #     if self.size_complexities[index] == 0:
-        #         pre_model = model_class(
-        #             rate, **Config().parameters.cllient_model._asdict()
-        #         )
-        #         payload = pre_model.state_dict()
-        #         size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
-        #         self.size_complexities[index] = size
-        #         macs, _ = ptflops.get_model_complexity_info(
-        #             pre_model,
-        #             (3, 32, 32),
-        #             as_strings=False,
-        #             print_per_layer_stat=False,
-        #             verbose=False,
-        #         )
-        #         macs /= 1024**2
-        #         self.flops_complexities[index] = macs
-        #     if index == self.rates.shape[0] - 1 or (
-        #         self.size_complexities[index] <= limitation[0]
-        #         and self.size_complexities[index] <= limitation[1]
-        #     ):
-        #         self.current_rate = rate
-        #         self.current_subnet = model_class(
-        #             rate, **Config().parameters.client_model._asdict()
-        #         )
-        #         break
-
-        # In the original implementation, the rate are uniformly sampled
-
-        rate = random.choice(self.rates)
-        self.current_rate = rate
-        self.current_subnet = model_class(
-            rate, **Config().parameters.client_model._asdict()
-        )
-
-        local_parameters = self.get_local_parameters()
-        self.current_subnet.load_state_dict(local_parameters)
+        if (
+            hasattr(Config().parameters, "limitation")
+            and hasattr(Config().parameters.limitation, "activated")
+            and Config().parameters.limitation.activated
+        ):
+            for index, rate in enumerate(self.rates):
+                if self.size_complexities[index] == 0:
+                    pre_model = model_class(
+                        rate, **Config().parameters.cllient_model._asdict()
+                    )
+                    payload = pre_model.state_dict()
+                    size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
+                    self.size_complexities[index] = size
+                    macs, _ = ptflops.get_model_complexity_info(
+                        pre_model,
+                        (3, 32, 32),
+                        as_strings=False,
+                        print_per_layer_stat=False,
+                        verbose=False,
+                    )
+                    macs /= 1024**2
+                    self.flops_complexities[index] = macs
+                if index == self.rates.shape[0] - 1 or (
+                    self.size_complexities[index] <= limitation[0]
+                    and self.size_complexities[index] <= limitation[1]
+                ):
+                    self.current_rate = rate
+                    break
+        else:
+            # In the original implementation, the rate are uniformly sampled
+            rate = random.choice(self.rates)
+            self.current_rate = rate
         return self.current_rate
 
     def get_local_parameters(self):
@@ -85,14 +80,14 @@ class Algorithm(fedavg.Algorithm):
                 if value.dim() == 4:
                     if key == "conv1.weight":
                         local_parameters[key] = copy.deepcopy(
-                            value[: int(current_rate * value.shape[0]), :]
+                            value[: int(current_rate * value.shape[0]), ...]
                         )
                     else:
                         local_parameters[key] = copy.deepcopy(
                             value[
                                 : int(current_rate * value.shape[0]),
                                 : int(current_rate * value.shape[1]),
-                                :,
+                                ...,
                             ]
                         )
                 elif value.dim() == 2:
@@ -123,21 +118,21 @@ class Algorithm(fedavg.Algorithm):
                     if value.dim() == 4:
                         if key == "conv1.weight":
                             global_parameters[key][
-                                : local_weights[key].shape[0], :
+                                : local_weights[key].shape[0], ...
                             ] += copy.deepcopy(local_weights[key])
-                            count[: local_weights[key].shape[0], :] += torch.ones(
+                            count[: local_weights[key].shape[0], ...] += torch.ones(
                                 local_weights[key].shape
                             )
                         else:
                             global_parameters[key][
                                 : local_weights[key].shape[0],
                                 : local_weights[key].shape[1],
-                                :,
+                                ...,
                             ] += copy.deepcopy(local_weights[key])
                             count[
                                 : local_weights[key].shape[0],
                                 : local_weights[key].shape[1],
-                                :,
+                                ...,
                             ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 2:
                         global_parameters[key][

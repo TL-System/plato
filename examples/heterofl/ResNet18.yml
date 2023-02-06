@@ -11,7 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    random_seed: 1
+    random_seed: 12345
 
     comm_simulation: true
     compute_comm_time: true
@@ -44,7 +44,7 @@ data:
     testset_sampler: iid
 ##
 ##    # The random seed for sampling data
-    random_seed: 1
+    random_seed: 1234
 
 trainer:
     # The type of the trainer
@@ -82,7 +82,7 @@ results:
 
 parameters:
     model:
-        model_rate: 1
+        model_rate: 1.0
         track: true
     client_model:
         track: false
