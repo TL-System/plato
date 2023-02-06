@@ -22,19 +22,11 @@ server:
     do_test: true
     random_seed: 1
 
-#    checkpoint_path: /scratch/dixiyao/plato/models/fedavgdrop/cifar10/mobilenetv3/large
-#    model_path: /scratch/dixiyao/plato/models/fedavgdrop/cifar10/mobilenetv3/large
-    checkpoint_path: /data/dixi/plato/models/heterofl/cifar10/resnet/
-    model_path: /data/dixi/plato/models/heterofl/cifar10/resnet/
-
     simulate_wall_time: true
 
 data:
     # The training and testing dataset
     datasource:  CIFAR10
-
-    data_path: /data/dixi
-#    data_path: ../data/
 
     # Number of samples in each partition
     partition_size: 500
@@ -76,8 +68,6 @@ algorithm:
     type: fedavg
     
 results:
-    result_path: /data/dixi/plato/results/heterofl/cifar10/resnet/
-#    result_path: /scratch/dixiyao/plato/results/heterofl/cifar10/resnet/
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
 parameters:
