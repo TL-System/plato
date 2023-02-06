@@ -278,6 +278,19 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ```
 ````
 
+````{admonition} **HeteroFL**
+HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
+
+```shell
+python examples/heterofl/heterofl.py -c examples/heterofl/heterofl_resnet18_dynamic.yml
+```
+
+```{note}
+Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
+&rdquo; in International Conference on Learning Representations (ICLR), 2021.
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
