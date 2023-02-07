@@ -36,7 +36,7 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["Pisces", "Polaris", "FedBuff"]:
+for method_name in ["Polaris", "Pisces", "FedBuff", "Oort"]:
 
     x_collect = []
     y_collect = []
@@ -55,7 +55,7 @@ for method_name in ["Pisces", "Polaris", "FedBuff"]:
         x_min = x_temp.min()
         x_max = x_temp.max()
 
-        x_new = np.arange(max(26, np.ceil(x_min)), min(x_max, 7000), 20)
+        x_new = np.arange(max(26, np.ceil(x_min)), min(x_max, 600), 20)
         y_new = f_temp(x_new)
 
         x_collect.extend(x_new)

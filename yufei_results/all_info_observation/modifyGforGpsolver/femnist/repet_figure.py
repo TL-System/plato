@@ -37,7 +37,7 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["polaris", "pisces", "fedbuff"]:
+for method_name in ["Polaris", "Pisces", "Fedbuff", "Oort"]:
 
     x_collect = []
     y_collect = []
@@ -45,7 +45,7 @@ for method_name in ["polaris", "pisces", "fedbuff"]:
 
     for i in range(5):
 
-        filename_temp = "./rand" + str(i + 1) + "/" + method_name + ".csv"
+        filename_temp = "./rand" + str(i + 1) + "/" + method_name.lower() + ".csv"
         df_temp = pd.read_csv(filename_temp)
 
         # perform interpolation

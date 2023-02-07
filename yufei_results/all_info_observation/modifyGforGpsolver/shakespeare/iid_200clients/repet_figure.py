@@ -37,7 +37,7 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["pisces", "polaris", "fedbuff"]:
+for method_name in ["Polaris", "Pisces", "Fedbuff", "Oort"]:
 
     x_collect = []
     y_collect = []
