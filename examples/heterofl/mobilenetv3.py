@@ -120,6 +120,7 @@ class Bottleneck(nn.Module):
         BN_momentum,
         rate,
         tracking_stat,
+        first,
     ):
         """
         use_SE: True or False -- use SE Module or not
@@ -136,7 +137,7 @@ class Bottleneck(nn.Module):
         # Whether to use residual structure or not
         self.use_residual = stride == 1 and in_channels_num == out_channels_num
 
-        if exp_size == in_channels_num:
+        if first:
             # Without expansion, the first depthwise convolution is omitted
             self.conv1 = nn.Sequential(
                 # Depthwise Convolution
@@ -150,10 +151,19 @@ class Bottleneck(nn.Module):
                     bias=False,
                 ),
                 Scaler(rate),
-                nn.BatchNorm2d(
-                    num_features=exp_size,
-                    momentum=BN_momentum,
-                    track_running_stats=tracking_stat,
+                nn.Sequential(
+                    OrderedDict(
+                        [
+                            (
+                                "lastBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
+                    )
                 ),
                 # SE Module
                 SEModule(exp_size) if use_SE else nn.Sequential(),
@@ -185,10 +195,19 @@ class Bottleneck(nn.Module):
                     )
                 )
                 if self.use_residual
-                else nn.BatchNorm2d(
-                    num_features=out_channels_num,
-                    momentum=BN_momentum,
-                    track_running_stats=tracking_stat,
+                else nn.Sequential(
+                    OrderedDict(
+                        [
+                            (
+                                "lastBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
+                    )
                 ),
             )
         else:
@@ -204,10 +223,19 @@ class Bottleneck(nn.Module):
                     bias=False,
                 ),
                 Scaler(rate),
-                nn.BatchNorm2d(
-                    num_features=exp_size,
-                    momentum=BN_momentum,
-                    track_running_stats=tracking_stat,
+                nn.Sequential(
+                    OrderedDict(
+                        [
+                            (
+                                "lastBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
+                    )
                 ),
                 H_swish() if use_HS else nn.ReLU(inplace=True),
             )
@@ -223,7 +251,20 @@ class Bottleneck(nn.Module):
                     bias=False,
                 ),
                 Scaler(rate),
-                nn.BatchNorm2d(num_features=exp_size, momentum=BN_momentum),
+                nn.Sequential(
+                    OrderedDict(
+                        [
+                            (
+                                "firstBN",
+                                nn.BatchNorm2d(
+                                    num_features=out_channels_num,
+                                    momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
+                                ),
+                            )
+                        ]
+                    )
+                ),
                 # SE Module
                 SEModule(exp_size) if use_SE else nn.Sequential(),
                 H_swish() if use_HS else nn.ReLU(inplace=True),
@@ -259,6 +300,7 @@ class Bottleneck(nn.Module):
                                 "lastBN",
                                 nn.BatchNorm2d(
                                     num_features=out_channels_num,
+                                    momentum=BN_momentum,
                                     track_running_stats=tracking_stat,
                                 ),
                             )
@@ -318,37 +360,37 @@ class MobileNetV3(nn.Module):
             # Configuration of a MobileNetV3-Large Model
             configs = [
                 # kernel_size, exp_size, out_channels_num, use_SE, NL, stride
-                [3, 16, 16, False, "RE", 1],
-                [3, 64, 24, False, "RE", s],
-                [3, 72, 24, False, "RE", 1],
-                [5, 72, 40, True, "RE", 2],
-                [5, 120, 40, True, "RE", 1],
-                [5, 120, 40, True, "RE", 1],
-                [3, 240, 80, False, "HS", 2],
-                [3, 200, 80, False, "HS", 1],
-                [3, 184, 80, False, "HS", 1],
-                [3, 184, 80, False, "HS", 1],
-                [3, 480, 112, True, "HS", 1],
-                [3, 672, 112, True, "HS", 1],
-                [5, 672, 160, True, "HS", 2],
-                [5, 960, 160, True, "HS", 1],
-                [5, 960, 160, True, "HS", 1],
+                [3, 16, 16, False, "RE", 1, True],
+                [3, 64, 24, False, "RE", s, False],
+                [3, 72, 24, False, "RE", 1, False],
+                [5, 72, 40, True, "RE", 2, False],
+                [5, 120, 40, True, "RE", 1, False],
+                [5, 120, 40, True, "RE", 1, False],
+                [3, 240, 80, False, "HS", 2, False],
+                [3, 200, 80, False, "HS", 1, False],
+                [3, 184, 80, False, "HS", 1, False],
+                [3, 184, 80, False, "HS", 1, False],
+                [3, 480, 112, True, "HS", 1, False],
+                [3, 672, 112, True, "HS", 1, False],
+                [5, 672, 160, True, "HS", 2, False],
+                [5, 960, 160, True, "HS", 1, False],
+                [5, 960, 160, True, "HS", 1, False],
             ]
         elif mode == "small":
             # Configuration of a MobileNetV3-Small Model
             configs = [
                 # kernel_size, exp_size, out_channels_num, use_SE, NL, stride
-                [3, 16, 16, True, "RE", s],
-                [3, 72, 24, False, "RE", 2],
-                [3, 88, 24, False, "RE", 1],
-                [5, 96, 40, True, "HS", 2],
-                [5, 240, 40, True, "HS", 1],
-                [5, 240, 40, True, "HS", 1],
-                [5, 120, 48, True, "HS", 1],
-                [5, 144, 48, True, "HS", 1],
-                [5, 288, 96, True, "HS", 2],
-                [5, 576, 96, True, "HS", 1],
-                [5, 576, 96, True, "HS", 1],
+                [3, 16, 16, True, "RE", s, True],
+                [3, 72, 24, False, "RE", 2, False],
+                [3, 88, 24, False, "RE", 1, False],
+                [5, 96, 40, True, "HS", 2, False],
+                [5, 240, 40, True, "HS", 1, False],
+                [5, 240, 40, True, "HS", 1, False],
+                [5, 120, 48, True, "HS", 1, False],
+                [5, 144, 48, True, "HS", 1, False],
+                [5, 288, 96, True, "HS", 2, False],
+                [5, 576, 96, True, "HS", 1, False],
+                [5, 576, 96, True, "HS", 1, False],
             ]
         for index, config in enumerate(configs):
             configs[index][1] = max(int(self.rate * config[1]), 1)
@@ -390,7 +432,15 @@ class MobileNetV3(nn.Module):
         )
         feature_extraction_layers.append(first_layer)
         # Overlay of multiple bottleneck structures
-        for kernel_size, exp_size, out_channels_num, use_SE, NL, stride in configs:
+        for (
+            kernel_size,
+            exp_size,
+            out_channels_num,
+            use_SE,
+            NL,
+            stride,
+            first,
+        ) in configs:
             output_channels_num = _ensure_divisible(
                 out_channels_num * width_multiplier, divisor
             )
@@ -407,6 +457,7 @@ class MobileNetV3(nn.Module):
                     BN_momentum,
                     self.rate,
                     self.tracking_stat,
+                    first,
                 )
             )
             input_channels_num = output_channels_num
