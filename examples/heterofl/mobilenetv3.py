@@ -157,7 +157,7 @@ class Bottleneck(nn.Module):
                             (
                                 "lastBN",
                                 nn.BatchNorm2d(
-                                    num_features=out_channels_num,
+                                    num_features=exp_size,
                                     momentum=BN_momentum,
                                     track_running_stats=tracking_stat,
                                 ),
@@ -229,7 +229,7 @@ class Bottleneck(nn.Module):
                             (
                                 "lastBN",
                                 nn.BatchNorm2d(
-                                    num_features=out_channels_num,
+                                    num_features=exp_size,
                                     momentum=BN_momentum,
                                     track_running_stats=tracking_stat,
                                 ),
@@ -257,7 +257,7 @@ class Bottleneck(nn.Module):
                             (
                                 "firstBN",
                                 nn.BatchNorm2d(
-                                    num_features=out_channels_num,
+                                    num_features=exp_size,
                                     momentum=BN_momentum,
                                     track_running_stats=tracking_stat,
                                 ),

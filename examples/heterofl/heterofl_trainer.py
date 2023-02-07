@@ -3,6 +3,7 @@ HeteroFL algorithm trainer.
 """
 
 import logging
+from plato.config import Config
 from plato.trainers.basic import Trainer
 
 
@@ -12,6 +13,7 @@ class ServerTrainer(Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model=model, callbacks=callbacks)
         self.is_train = False
+        self.model = model(**Config().parameters.model._asdict())
 
     def test(self, testset, sampler=None, **kwargs) -> float:
         """Because the global model will need to compute the statistics of the model."""
