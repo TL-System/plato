@@ -6,7 +6,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """A federated learning server using the Hermes algorithm."""
+    """A federated learning server using the HeteroFL algorithm."""
 
     def process_server_response(self, server_response) -> None:
         rate = server_response["rate"]

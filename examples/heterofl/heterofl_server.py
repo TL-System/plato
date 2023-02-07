@@ -9,7 +9,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """A federated learning server using the Hermes algorithm."""
+    """A federated learning server using the HeteroFL algorithm."""
 
     def __init__(
         self,

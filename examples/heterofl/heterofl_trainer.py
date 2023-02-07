@@ -7,7 +7,7 @@ from plato.trainers.basic import Trainer
 
 
 class ServerTrainer(Trainer):
-    """A federated learning trainer of Hermes, used by the server."""
+    """A federated learning trainer of HeteroFL, used by the server."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model=model, callbacks=callbacks)

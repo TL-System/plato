@@ -7,7 +7,6 @@ import pickle
 import random
 import copy
 
-from collections import OrderedDict
 import torch
 import ptflops
 import numpy as np
@@ -16,7 +15,7 @@ from plato.algorithms import fedavg
 
 
 class Algorithm(fedavg.Algorithm):
-    """A federated learning algorithm using the Hermes algorithm."""
+    """A federated learning algorithm using the HeteroFL algorithm."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
