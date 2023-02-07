@@ -37,29 +37,32 @@ class Algorithm(fedavg.Algorithm):
             and hasattr(Config().parameters.limitation, "activated")
             and Config().parameters.limitation.activated
         ):
-            for index, rate in enumerate(self.rates):
-                if self.size_complexities[index] == 0:
-                    pre_model = model_class(
+            smallest=0.5
+            biggest=1.0
+            last=0
+            while True:
+                rate=(smallest+biggest)/2
+                if(abs(last-rate))<0.01:
+                    break
+                pre_model = model_class(
                         rate, **Config().parameters.client_model._asdict()
                     )
-                    payload = pre_model.state_dict()
-                    size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
-                    self.size_complexities[index] = size
-                    macs, _ = ptflops.get_model_complexity_info(
+                payload = pre_model.state_dict()
+                size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
+                macs, _ = ptflops.get_model_complexity_info(
                         pre_model,
                         (3, 32, 32),
                         as_strings=False,
                         print_per_layer_stat=False,
                         verbose=False,
                     )
-                    macs /= 1024**2
-                    self.flops_complexities[index] = macs
-                if index == self.rates.shape[0] - 1 or (
-                    self.size_complexities[index] <= limitation[0]
-                    and self.size_complexities[index] <= limitation[1]
-                ):
-                    self.current_rate = rate
-                    break
+                macs /= 1024**2   
+                if macs<=limitation[1] and size<=limitation[0]:
+                    smallest=rate
+                else:
+                    biggest=rate
+                last=rate
+            self.current_rate=rate
         else:
             # In the original implementation, the rate are uniformly sampled
             rate = random.choice(self.rates)
@@ -76,17 +79,16 @@ class Algorithm(fedavg.Algorithm):
         )
         local_parameters = pre_model.state_dict()
         for key, value in self.model.state_dict().items():
-            if ("weight" in key or "bias" in key) and not "BN" in key:
-                if value.dim() == 4 or value.dim() == 2:
-                    local_parameters[key] = copy.deepcopy(
-                        value[
+            if value.dim() == 4 or value.dim() == 2:
+                local_parameters[key] = copy.deepcopy(
+                    value[
                             : local_parameters[key].shape[0],
                             : local_parameters[key].shape[1],
                             ...,
                         ]
                     )
-                else:
-                    local_parameters[key] = copy.deepcopy(
+            else:
+                local_parameters[key] = copy.deepcopy(
                         value[: local_parameters[key].shape[0]]
                     )
         return local_parameters
@@ -97,34 +99,33 @@ class Algorithm(fedavg.Algorithm):
         """
         global_parameters = copy.deepcopy(self.model.state_dict())
         for key, value in self.model.state_dict().items():
-            if ("weight" in key or "bias" in key) and not "BN" in key:
-                count = torch.zeros(value.shape)
-                for local_weights in weights_received:
-                    if value.dim() == 4:
-                        global_parameters[key][
+            count = torch.zeros(value.shape)
+            for local_weights in weights_received:
+                if value.dim() == 4:
+                    global_parameters[key][
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             ...,
                         ] += copy.deepcopy(local_weights[key])
-                        count[
+                    count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             ...,
                         ] += torch.ones(local_weights[key].shape)
-                    elif value.dim() == 2:
-                        global_parameters[key][
+                elif value.dim() == 2:
+                    global_parameters[key][
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                         ] += copy.deepcopy(local_weights[key])
-                        count[
+                    count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                         ] += torch.ones(local_weights[key].shape)
-                    elif value.dim() == 1:
-                        global_parameters[key][
+                elif value.dim() == 1:
+                    global_parameters[key][
                             : local_weights[key].shape[0]
                         ] += copy.deepcopy(local_weights[key])
-                        count[: local_weights[key].shape[0]] += torch.ones(
+                    count[: local_weights[key].shape[0]] += torch.ones(
                             local_weights[key].shape
                         )
             count = torch.where(count == 0, torch.ones(count.shape), count)
