@@ -16,9 +16,9 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer of Hermes, used by both the client and the server."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         """Initializes the global model."""
-        super().__init__(model=model)
+        super().__init__(model=model, callbacks=callbacks)
         self.mask = None
         self.pruning_target = Config().clients.pruning_target * 100
         self.pruned_amount = 0
