@@ -895,7 +895,11 @@ class Server:
             },
         )
 
-        heapq.heappush(self.reported_clients, client_info)
+        if (
+            self.asynchronous_mode
+            and self.simulate_wall_time
+        ):
+            heapq.heappush(self.reported_clients, client_info)
         self.current_reported_clients[client_info[2]["client_id"]] = True
         del self.training_clients[client_id]
 

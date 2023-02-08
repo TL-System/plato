@@ -101,7 +101,7 @@ class DataSource(base.DataSource):
 
         train_transform = (
             kwargs["train_transform"]
-            if train_transform in kwargs
+            if "train_transform" in kwargs
             else (
                 transforms.Compose(
                     [

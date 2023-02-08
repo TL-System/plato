@@ -15,10 +15,10 @@ import logging
 import os
 
 from plato.config import Config
-from plato.servers import fedavg
+from plato.utils.lib_mia import mia_server
 
 
-class Server(fedavg.Server):
+class Server(mia_server.Server):
     """A federated unlearning server that implements the federated unlearning baseline algorithm.
 
     When 'data_deletion_round' specified in the configuration, the server will enter a retraining
@@ -48,6 +48,8 @@ class Server(fedavg.Server):
 
         # A dictionary that maps client IDs to the first round when the server selected it
         self.round_first_selected = {}
+        # A dictionary that maps client IDs to their sample indices
+        self.sample_indices = {}
 
     def clients_selected(self, selected_clients):
         """Remembers the first round that a particular client ID was selected."""
@@ -89,6 +91,15 @@ class Server(fedavg.Server):
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
         super().clients_processed()
+
+        # MIA evaluation after unlearning
+        if (
+            hasattr(Config().server, "mia_eval")
+            and Config().server.mia_eval
+            and self.current_round == Config().server.mia_eval_round
+            and self.retraining
+        ):
+            self._perform_mia()
 
         clients_to_delete = Config().clients.clients_requesting_deletion
 
