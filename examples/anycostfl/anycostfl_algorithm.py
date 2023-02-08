@@ -45,7 +45,7 @@ class Algorithm(fedavg.Algorithm):
                 if (abs(last - rate)) < 0.01:
                     break
                 pre_model = model_class(
-                    rate, **Config().parameters.client_model._asdict()
+                    model_rate=rate, **Config().parameters.client_model._asdict()
                 )
                 payload = pre_model.state_dict()
                 size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
@@ -75,22 +75,23 @@ class Algorithm(fedavg.Algorithm):
         """
         current_rate = self.current_rate
         pre_model = self.model_class(
-            current_rate, **Config().parameters.client_model._asdict()
+            model_rate=current_rate, **Config().parameters.client_model._asdict()
         )
         local_parameters = pre_model.state_dict()
         for key, value in self.model.state_dict().items():
-            if value.dim() == 4 or value.dim() == 2:
-                local_parameters[key] = copy.deepcopy(
-                    value[
-                        : local_parameters[key].shape[0],
-                        : local_parameters[key].shape[1],
-                        ...,
-                    ]
-                )
-            else:
-                local_parameters[key] = copy.deepcopy(
-                    value[: local_parameters[key].shape[0]]
-                )
+            if "weight" in key or "bias" in key:
+                if value.dim() == 4 or value.dim() == 2:
+                    local_parameters[key] = copy.deepcopy(
+                        value[
+                            : local_parameters[key].shape[0],
+                            : local_parameters[key].shape[1],
+                            ...,
+                        ]
+                    )
+                else:
+                    local_parameters[key] = copy.deepcopy(
+                        value[: local_parameters[key].shape[0]]
+                    )
         return local_parameters
 
     def aggregation(self, weights_received):
@@ -99,44 +100,47 @@ class Algorithm(fedavg.Algorithm):
         """
         global_parameters = copy.deepcopy(self.model.state_dict())
         for key, value in self.model.state_dict().items():
-            count = torch.zeros(value.shape)
-            for local_weights in weights_received:
-                if value.dim() == 4:
-                    global_parameters[key][
-                        : local_weights[key].shape[0],
-                        : local_weights[key].shape[1],
-                        ...,
-                    ] += copy.deepcopy(local_weights[key])
-                    count[
-                        : local_weights[key].shape[0],
-                        : local_weights[key].shape[1],
-                        ...,
-                    ] += torch.ones(local_weights[key].shape)
-                elif value.dim() == 2:
-                    global_parameters[key][
-                        : local_weights[key].shape[0],
-                        : local_weights[key].shape[1],
-                    ] += copy.deepcopy(local_weights[key])
-                    count[
-                        : local_weights[key].shape[0],
-                        : local_weights[key].shape[1],
-                    ] += torch.ones(local_weights[key].shape)
-                elif value.dim() == 1:
-                    global_parameters[key][
-                        : local_weights[key].shape[0]
-                    ] += copy.deepcopy(local_weights[key])
-                    count[: local_weights[key].shape[0]] += torch.ones(
-                        local_weights[key].shape
+            if "weight" in key or "bias" in key:
+                count = torch.zeros(value.shape)
+                for local_weights in weights_received:
+                    if value.dim() == 4:
+                        global_parameters[key][
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                            ...,
+                        ] += copy.deepcopy(local_weights[key])
+                        count[
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                            ...,
+                        ] += torch.ones(local_weights[key].shape)
+                    elif value.dim() == 2:
+                        global_parameters[key][
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                        ] += copy.deepcopy(local_weights[key])
+                        count[
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                        ] += torch.ones(local_weights[key].shape)
+                    elif value.dim() == 1:
+                        global_parameters[key][
+                            : local_weights[key].shape[0]
+                        ] += copy.deepcopy(local_weights[key])
+                        count[: local_weights[key].shape[0]] += torch.ones(
+                            local_weights[key].shape
+                        )
+                    count = torch.where(count == 0, torch.ones(count.shape), count)
+                    global_parameters[key] = torch.div(
+                        global_parameters[key] - value, count
                     )
-            count = torch.where(count == 0, torch.ones(count.shape), count)
-            global_parameters[key] = torch.div(global_parameters[key] - value, count)
         return global_parameters
 
     def sort_channels(self):
         "Sort channels according to L2 norms."
         argindex = None
         parameters = self.model.state_dict()
-        for key, value in parameters.item():
+        for key, value in parameters.items():
             # Sort the input channels according to the sequence of last output channels
             if argindex is not None:
                 if value.dim() == 1:
@@ -154,4 +158,4 @@ class Algorithm(fedavg.Algorithm):
                     l2_norm = torch.norm(value, p=2, dim=dims)
                     argindex = torch.argsort(l2_norm, descending=True)
                     parameters[key] = copy.deepcopy(value[argindex])
-        self.model.load_stat_dict(parameters)
+        self.model.load_state_dict(parameters)
