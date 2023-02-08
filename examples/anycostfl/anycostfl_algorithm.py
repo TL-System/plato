@@ -6,6 +6,7 @@ import sys
 import pickle
 import random
 import copy
+import math
 
 import torch
 import ptflops
@@ -137,7 +138,7 @@ class Algorithm(fedavg.Algorithm):
                 )
         return global_parameters
 
-    def sort_channels(self):
+    def sort_channels(self, current_round):
         "Sort channels according to L2 norms."
         argindex = None
         parameters = self.model.state_dict()
@@ -156,11 +157,20 @@ class Algorithm(fedavg.Algorithm):
             if (value.dim() == 4 and value.shape[1] > 1) or value.dim() == 2:
                 if not "classifier" in key:
                     dims = (1, 2, 3) if value.dim() == 4 else (1)
+                    # FedDropout method
                     if (
-                        hasattr(Config().parameters, "random_sort")
-                        and Config().parameters.random_sort
+                        hasattr(Config().parameters, "prune")
+                        and Config().parameters.prune == "random"
                     ):
                         argindex = torch.randperm(value.shape[0])
+                    # FedRolex method
+                    elif (
+                        hasattr(Config().parameters, "prune")
+                        and Config().parameters.prune == "even"
+                    ):
+                        argindex = torch.arange(1, value.shape[0] + 1)
+                        argindex[-1] = 0
+                    # AnyCostFL method.
                     else:
                         l2_norm = torch.norm(value, p=2, dim=dims)
                         argindex = torch.argsort(l2_norm, descending=True)

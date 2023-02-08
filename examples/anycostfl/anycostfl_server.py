@@ -54,4 +54,4 @@ class Server(fedavg.Server):
 
     def weights_aggregated(self, updates):
         super().weights_aggregated(updates)
-        self.algorithm.sort_channels()
+        self.algorithm.sort_channels(self.current_round)
