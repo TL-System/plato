@@ -51,8 +51,7 @@ class Server(fedavg.Server):
     ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         return self.algorithm.aggregation(weights_received)
-    
 
-    # waiting implementation, sort channels
-    async def weights_aggregated(self, updates):
-        return super().weights_aggregated(updates)
+    def weights_aggregated(self, updates):
+        super().weights_aggregated(updates)
+        self.algorithm.sort_channels()
