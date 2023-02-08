@@ -20,6 +20,7 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer)
         self.current_rate = 1
         self.model_class = None
+        self.rate = [1.0, 0.5, 0.25, 0.125, 0.0625]
 
     def extract_weights(self, model=None):
         self.model = self.model.cpu()
