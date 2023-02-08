@@ -156,7 +156,13 @@ class Algorithm(fedavg.Algorithm):
             if (value.dim() == 4 and value.shape[1] > 1) or value.dim() == 2:
                 if not "classifier" in key:
                     dims = (1, 2, 3) if value.dim() == 4 else (1)
-                    l2_norm = torch.norm(value, p=2, dim=dims)
-                    argindex = torch.argsort(l2_norm, descending=True)
+                    if (
+                        hasattr(Config().parameters, "random_sort")
+                        and Config().parameters.random_sort
+                    ):
+                        argindex = torch.randperm(value.shape[0])
+                    else:
+                        l2_norm = torch.norm(value, p=2, dim=dims)
+                        argindex = torch.argsort(l2_norm, descending=True)
                     parameters[key] = copy.deepcopy(value[argindex])
         self.model.load_state_dict(parameters)
