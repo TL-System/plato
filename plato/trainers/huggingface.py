@@ -103,7 +103,7 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
         """
 
-        self.training_args.num_train_epoches = config["epochs"]
+        self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
 
         self.trainer = SampledHuggingFaceTrainer(
