@@ -65,7 +65,7 @@ class Algorithm(fedavg.Algorithm):
             self.current_rate = rate
         else:
             # In the original implementation, the rate are uniformly sampled
-            rate = 1.0  # random.choice(self.rates)
+            rate = random.choice(self.rates)
             self.current_rate = rate
         return self.current_rate
 
@@ -130,10 +130,10 @@ class Algorithm(fedavg.Algorithm):
                         count[: local_weights[key].shape[0]] += torch.ones(
                             local_weights[key].shape
                         )
-                    count = torch.where(count == 0, torch.ones(count.shape), count)
-                    global_parameters[key] = torch.div(
-                        global_parameters[key] - value, count
-                    )
+                count = torch.where(count == 0, torch.ones(count.shape), count)
+                global_parameters[key] = torch.div(
+                    global_parameters[key] - value, count
+                )
         return global_parameters
 
     def sort_channels(self):

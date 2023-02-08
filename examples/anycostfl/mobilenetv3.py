@@ -28,6 +28,21 @@ def _ensure_divisible(number, divisor, min_value=None):
     return new_num
 
 
+class Scaler(nn.Module):
+    """
+    Scaler module in HeteroFL
+    """
+
+    def __init__(self, rate):
+        super().__init__()
+        self.rate = rate
+
+    def forward(self, feature):
+        "Forward function."
+        output = feature / self.rate if self.training else feature
+        return output
+
+
 # pylint:disable=invalid-name
 class H_sigmoid(nn.Module):
     """
@@ -103,6 +118,8 @@ class Bottleneck(nn.Module):
         use_SE,
         NL,
         BN_momentum,
+        rate,
+        tracking_stat,
         first,
     ):
         """
@@ -133,6 +150,7 @@ class Bottleneck(nn.Module):
                     groups=in_channels_num,
                     bias=False,
                 ),
+                Scaler(rate),
                 nn.Sequential(
                     OrderedDict(
                         [
@@ -141,6 +159,7 @@ class Bottleneck(nn.Module):
                                 nn.BatchNorm2d(
                                     num_features=exp_size,
                                     momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -160,6 +179,7 @@ class Bottleneck(nn.Module):
                     padding=0,
                     bias=False,
                 ),
+                Scaler(rate),
                 # nn.BatchNorm2d(num_features=out_channels_num, momentum=BN_momentum)
                 nn.Sequential(
                     OrderedDict(
@@ -168,6 +188,7 @@ class Bottleneck(nn.Module):
                                 "lastBN",
                                 nn.BatchNorm2d(
                                     num_features=out_channels_num,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -182,6 +203,7 @@ class Bottleneck(nn.Module):
                                 nn.BatchNorm2d(
                                     num_features=out_channels_num,
                                     momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -200,6 +222,7 @@ class Bottleneck(nn.Module):
                     padding=0,
                     bias=False,
                 ),
+                Scaler(rate),
                 nn.Sequential(
                     OrderedDict(
                         [
@@ -208,6 +231,7 @@ class Bottleneck(nn.Module):
                                 nn.BatchNorm2d(
                                     num_features=exp_size,
                                     momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -226,6 +250,7 @@ class Bottleneck(nn.Module):
                     groups=exp_size,
                     bias=False,
                 ),
+                Scaler(rate),
                 nn.Sequential(
                     OrderedDict(
                         [
@@ -234,6 +259,7 @@ class Bottleneck(nn.Module):
                                 nn.BatchNorm2d(
                                     num_features=exp_size,
                                     momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -251,6 +277,7 @@ class Bottleneck(nn.Module):
                     padding=0,
                     bias=False,
                 ),
+                Scaler(rate),
                 # nn.BatchNorm2d(num_features=out_channels_num, momentum=BN_momentum)
                 nn.Sequential(
                     OrderedDict(
@@ -259,6 +286,7 @@ class Bottleneck(nn.Module):
                                 "lastBN",
                                 nn.BatchNorm2d(
                                     num_features=out_channels_num,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -273,6 +301,7 @@ class Bottleneck(nn.Module):
                                 nn.BatchNorm2d(
                                     num_features=out_channels_num,
                                     momentum=BN_momentum,
+                                    track_running_stats=tracking_stat,
                                 ),
                             )
                         ]
@@ -308,6 +337,7 @@ class MobileNetV3(nn.Module):
         BN_momentum=0.1,
         zero_gamma=False,
         model_rate=1.0,
+        track=True,
     ):
         """
         configs: setting of the model
@@ -318,6 +348,7 @@ class MobileNetV3(nn.Module):
         mode = mode.lower()
         assert mode in ["large", "small"]
         self.rate = model_rate
+        self.tracking_stat = track
 
         s = 2
         if input_size in [32, 56]:
@@ -391,9 +422,11 @@ class MobileNetV3(nn.Module):
                 padding=1,
                 bias=False,
             ),
+            Scaler(self.rate),
             nn.BatchNorm2d(
                 num_features=input_channels_num,
                 momentum=BN_momentum,
+                track_running_stats=self.tracking_stat,
             ),
             H_swish(),
         )
@@ -422,6 +455,8 @@ class MobileNetV3(nn.Module):
                     use_SE,
                     NL,
                     BN_momentum,
+                    self.rate,
+                    self.tracking_stat,
                     first,
                 )
             )
@@ -440,9 +475,11 @@ class MobileNetV3(nn.Module):
                 padding=0,
                 bias=False,
             ),
+            Scaler(self.rate),
             nn.BatchNorm2d(
                 num_features=last_stage_channels_num,
                 momentum=BN_momentum,
+                track_running_stats=self.tracking_stat,
             ),
             H_swish(),
         )
