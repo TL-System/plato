@@ -1,6 +1,7 @@
 """
 A MaskCrypt client with selective homomorphic encryption support.
 """
+import copy
 import random
 import time
 import torch
@@ -59,7 +60,7 @@ class Client(simple.Client):
             mask_proposal = self._compute_mask(
                 self.algorithm.extract_weights(), gradients
             )
-            self.model_buffer[self.client_id] = (report, model_weights)
+            self.model_buffer[self.client_id] = (report, copy.deepcopy(model_weights))
             return report, mask_proposal
         else:
             # Set final encryption mask and send model updates to server

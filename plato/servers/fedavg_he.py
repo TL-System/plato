@@ -36,7 +36,12 @@ class Server(fedavg.Server):
 
         for key in extract_model.keys():
             self.weight_shapes[key] = extract_model[key].size()
-            self.para_nums[key] = reduce(lambda a, b: a * b, self.weight_shapes[key])
+            if self.weight_shapes[key]:
+                self.para_nums[key] = reduce(
+                    lambda a, b: a * b, self.weight_shapes[key]
+                )
+            else:
+                self.para_nums[key] = 1
 
         self.encrypted_model = homo_enc.encrypt_weights(
             extract_model, True, self.context, []
@@ -56,9 +61,9 @@ class Server(fedavg.Server):
             self.encrypted_model, self.weight_shapes, self.para_nums
         )
         # Serialize the encrypted weights after decryption
-        self.encrypted_model["encrypted_weights"] = self.encrypted_model[
-            "encrypted_weights"
-        ].serialize()
+        self.encrypted_model["encrypted_weights"] = [
+            x.serialize() for x in self.encrypted_model["encrypted_weights"]
+        ]
 
         return decrypted_weights
 
@@ -84,8 +89,10 @@ class Server(fedavg.Server):
         self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging on unencrypted weights
-        unencrypted_avg_update = self.trainer.zeros(unencrypted_weights[0].size)
-        encrypted_avg_update = self.trainer.zeros(encrypted_weights[0].size())
+        unencrypted_avg_update = self.trainer.zeros(unencrypted_weights[0].size())
+        encrypted_avg_update = [
+            self.trainer.zeros(x.size()) for x in encrypted_weights[0]
+        ]
 
         for i, (unenc_w, enc_w) in enumerate(
             zip(unencrypted_weights, encrypted_weights)
@@ -94,7 +101,8 @@ class Server(fedavg.Server):
             num_samples = report.num_samples
 
             unencrypted_avg_update += unenc_w * (num_samples / self.total_samples)
-            encrypted_avg_update += enc_w * (num_samples / self.total_samples)
+            for j in range(len(enc_w)):
+                encrypted_avg_update[j] += enc_w[j] * (num_samples / self.total_samples)
 
         if len(encrypt_indices) == 0:
             # No weights are encrypted, set to None

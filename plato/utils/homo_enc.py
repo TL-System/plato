@@ -4,6 +4,7 @@ Utility functions for homomorphric encryption with TenSEAL.
 import os
 import pickle
 import zlib
+import math
 from typing import OrderedDict
 
 import numpy as np
@@ -47,9 +48,8 @@ def encrypt_weights(
     assert not context is None
 
     # Step 1: flatten all weight tensors to a vector
-    weights_vector = np.array([])
-    for weight in plain_weights.values():
-        weights_vector = np.append(weights_vector, weight)
+    weights_list = [x for x in plain_weights.values()]
+    weights_vector = torch.cat([torch.flatten(x) for x in weights_list])
 
     # Step 2: set up the indices for encrypted weights
     encrypt_indices = None
@@ -77,10 +77,16 @@ def encrypt_weights(
 
 
 def _encrypt(data_vector, context, serialize=True):
+    # Split data vector into chunks if exceeding maximum length
+    chunk_num = math.ceil(len(data_vector) / 25000000)
+    chunk_size = math.ceil(len(data_vector) / chunk_num)
+    chunks = [
+        data_vector[chunk_size * i : chunk_size * (i + 1)] for i in range(chunk_num)
+    ]
     if serialize:
-        return ts.ckks_vector(context, data_vector).serialize()
+        return [ts.ckks_vector(context, chunk).serialize() for chunk in chunks]
     else:
-        return ts.ckks_vector(context, data_vector)
+        return [ts.ckks_vector(context, chunk) for chunk in chunks]
 
 
 def deserialize_weights(serialized_weights, context):
@@ -88,9 +94,11 @@ def deserialize_weights(serialized_weights, context):
     deserialized_weights = OrderedDict()
     for name, weight in serialized_weights.items():
         if name == "encrypted_weights" and weight is not None:
-            deser_weights_vector = ts.lazy_ckks_vector_from(weight)
-            deser_weights_vector.link_context(context)
-            deserialized_weights[name] = deser_weights_vector
+            deserialized_weights[name] = []
+            for w in weight:
+                deser_weights_vector = ts.lazy_ckks_vector_from(w)
+                deser_weights_vector.link_context(context)
+                deserialized_weights[name].append(deser_weights_vector)
         else:
             deserialized_weights[name] = weight
 
@@ -108,7 +116,7 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     unencrypted_weights, encrypted_weights, indices = extract_encrypted_model(data)
 
     if len(indices) != 0:
-        decrypted_vector = np.array(encrypted_weights.decrypt())
+        decrypted_vector = torch.cat([torch.tensor(x.decrypt()) for x in encrypted_weights])
 
         vector_size = len(unencrypted_weights) + len(indices)
         plaintext_weights_vector = np.zeros(vector_size)
@@ -142,7 +150,7 @@ def wrap_encrypted_model(unencrypted_weights, encrypted_weights, indices):
     message = {
         "unencrypted_weights": unencrypted_weights,
         "encrypted_weights": encrypted_weights,
-        "indices": indices,
+        "indices": indices_to_bitmap(indices),
     }
 
     return message
@@ -152,7 +160,7 @@ def extract_encrypted_model(data):
     """Extract infromation from the message of encrytped model"""
     unencrypted_weights = data["unencrypted_weights"]
     encrypted_weights = data["encrypted_weights"]
-    indices = data["indices"]
+    indices = bitmap_to_indices(data["indices"])
     return unencrypted_weights, encrypted_weights, indices
 
 

@@ -37,6 +37,8 @@ def update_est(config, client_id, data):
     with open(est_filename, "wb") as est_file:
         pickle.dump(new_est, est_file)
 
+    return new_est
+
 
 def get_est(filename):
     """Load the estimated model, return None if not exists."""
