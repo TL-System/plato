@@ -80,7 +80,7 @@ class Algorithm(fedavg.Algorithm):
         )
         local_parameters = pre_model.state_dict()
         for key, value in self.model.state_dict().items():
-            if ("weight" in key or "bias" in key) and not "BN" in key:
+            if "weight" in key or "bias" in key:
                 if value.dim() == 4 or value.dim() == 2:
                     local_parameters[key] = copy.deepcopy(
                         value[
@@ -101,7 +101,7 @@ class Algorithm(fedavg.Algorithm):
         """
         global_parameters = copy.deepcopy(self.model.state_dict())
         for key, value in self.model.state_dict().items():
-            if ("weight" in key or "bias" in key) and not "BN" in key:
+            if "weight" in key or "bias" in key:
                 count = torch.zeros(value.shape)
                 for local_weights in weights_received:
                     if value.dim() == 4:
