@@ -93,10 +93,38 @@ with open("client_selection_pisces.txt") as f:
             accumulator += pro
             accumulator_list3.append(accumulator)
 
+with open("client_selection_oort.txt") as f:
+    client_set = []
+    num_list = []
+    counter_array = np.zeros(200)
+    for line in f.readlines():
+        print(len(line.split()))
+        counter = 0
+        for temp in line.split():
+            if int(temp) <= 200:
+                num_list.append(int(temp))
+                if int(temp) == 200:
+                    counter += 1
+        # print(num_list)
+        for item in num_list:
+            counter_array[item - 1] += 1
+        counter_pro_sorted = np.sort(counter_array) / len(num_list)
+
+        accumulator = 0
+        accumulator_list4 = [0]
+        for pro in np.flip(counter_pro_sorted):
+            accumulator += pro
+            accumulator_list4.append(accumulator)
+
 df_all = pd.DataFrame(
-    [accumulator_list, accumulator_list2, accumulator_list3]
+    [accumulator_list2, accumulator_list3, accumulator_list4, accumulator_list]
 ).transpose()
-df_all.columns = ["FedBuff", "Polaris", "Pisces"]
+df_all.columns = [
+    "Polaris",
+    "Pisces",
+    "Oort",
+    "FedBuff",
+]
 df_all.to_csv("client_pdf.csv", index=False)
 sns.lineplot(
     data=df_all

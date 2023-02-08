@@ -36,7 +36,7 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["Polaris", "Pisces", "FedBuff", "Oort"]:
+for method_name in ["Polaris", "Pisces", "Oort","FedBuff", ]:
 
     x_collect = []
     y_collect = []
@@ -56,7 +56,7 @@ for method_name in ["Polaris", "Pisces", "FedBuff", "Oort"]:
         x_max = x_temp.max()
 
         x_new = np.arange(120, min(x_max, 8000), 50)
-        y_new = f_temp(x_new)
+        y_new = f_temp(x_new) * 100
 
         x_collect.extend(x_new)
         y_collect.extend(y_new)
@@ -77,7 +77,7 @@ for method_name in ["Polaris", "Pisces", "FedBuff", "Oort"]:
 
 # combine all interpolate results into one dataframe
 df_all = pd.DataFrame([x_all, y_all, z_all]).transpose()
-df_all.columns = ["Elapsed time", "Accuracy (%)", "Method"]
+df_all.columns = ["Elapsed time (s)", "Accuracy (%)", "Method"]
 df_all.to_csv("interpolate_results_all.csv", index=False)
 
 """
@@ -98,8 +98,8 @@ df_all.to_csv("interpolate_results_all.csv", index=False)
 """
 
 # draw figures directly from df
-sns.lineplot(
-    x="Elapsed time",
+g=sns.lineplot(
+    x="Elapsed time (s)",
     y="Accuracy (%)",
     data=df_all,
     hue="Method",
@@ -107,7 +107,7 @@ sns.lineplot(
     # palette="flare",
     # hue_norm=mpl.colors.LogNorm(),
 )
-
+g.legend_.set_title(None)
 
 # save figure as pdf file
 # plt.show()
