@@ -131,6 +131,8 @@ class Algorithm(fedavg.Algorithm):
                         count[: local_weights[key].shape[0]] += torch.ones(
                             local_weights[key].shape
                         )
-            count = torch.where(count == 0, torch.ones(count.shape), count)
-            global_parameters[key] = torch.div(global_parameters[key] - value, count)
+                count = torch.where(count == 0, torch.ones(count.shape), count)
+                global_parameters[key] = torch.div(
+                    global_parameters[key] - value, count
+                )
         return global_parameters
