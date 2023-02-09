@@ -20,12 +20,13 @@ class ModelEstimateProcessor(base.Processor):
     A client processor used to track the exposed model weights so far.
     """
 
-    def __init__(self, client_id, **kwargs) -> None:
+    def __init__(self, client_id, is_init=False, **kwargs) -> None:
         super().__init__(**kwargs)
+        self.is_init = is_init
         self.client_id = client_id
 
     def process(self, data: Any) -> Any:
-        maskcrypt_utils.update_est(Config(), self.client_id, data)
+        maskcrypt_utils.update_est(Config(), self.client_id, data, self.is_init)
         return data
 
 
@@ -75,22 +76,23 @@ class ModelTestProcessor(base.Processor):
         return decrypted_weights
 
     def process(self, data: Any) -> Any:
-        
+
         if self.phase == 1:
             model_weights = data
         else:
             new_est = maskcrypt_utils.update_est(Config(), self.client_id, data)
-            model_weights = self.reconstruct(new_est)   
-        
+            model_weights = self.reconstruct(new_est)
+
         self.client.algorithm.load_weights(model_weights)
         testset = self.client.datasource.get_train_set()
         testset_sampler = samplers_registry.get(self.client.datasource, self.client_id)
-        accuracy = self.client.trainer.test(
-            testset, testset_sampler
-        )
+        accuracy = self.client.trainer.test(testset, testset_sampler)
         print(f"============\n{self.client}, accuracy: {accuracy}\n==============\n")
         with open("results/%s_phase_%s.txt" % (os.getppid(), self.phase), "a") as f:
-            f.write("%s, \t %s, \t %s \n" % (self.client.current_round, self.client_id, accuracy))
+            f.write(
+                "%s, \t %s, \t %s \n"
+                % (self.client.current_round, self.client_id, accuracy)
+            )
         return data
 
 
@@ -104,7 +106,9 @@ class MaskCryptCallback(ClientCallback):
         if current_round % 2 != 0:
             # Update the exposed model weights from new global model
             inbound_processor.processors.append(
-                ModelEstimateProcessor(client_id=client.client_id)
+                ModelEstimateProcessor(
+                    client_id=client.client_id, is_init=client.current_round == 1
+                )
             )
 
             # Server sends model weights in odd rounds, add decrypt processor
@@ -120,7 +124,7 @@ class MaskCryptCallback(ClientCallback):
         current_round = client.current_round
         if current_round % 2 == 0:
             outbound_processor.processors.append(
-                ModelTestProcessor(client_id=client.client_id, client=client, phase = 1)
+                ModelTestProcessor(client_id=client.client_id, client=client, phase=1)
             )
             # Clients send model weights to server in even rounds, add encrypt processor
             outbound_processor.processors.append(
@@ -138,5 +142,5 @@ class MaskCryptCallback(ClientCallback):
             )
 
             outbound_processor.processors.append(
-                ModelTestProcessor(client_id=client.client_id, client=client, phase = 2)
+                ModelTestProcessor(client_id=client.client_id, client=client, phase=2)
             )

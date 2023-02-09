@@ -9,7 +9,7 @@ import torch
 from plato.utils import homo_enc
 
 
-def update_est(config, client_id, data):
+def update_est(config, client_id, data, is_init=False):
     """Update the exposed model weights that can be estimated by adversaries."""
     unencrypted_weights, _, indices = homo_enc.extract_encrypted_model(data)
     vector_size = len(unencrypted_weights) + len(indices)
@@ -29,13 +29,22 @@ def update_est(config, client_id, data):
     est_filename = (
         f"{checkpoint_path}/{attack_prep_dir}/{model_name}_est_{client_id}.pth"
     )
+
+    init_filename = f"{checkpoint_path}/{attack_prep_dir}/{model_name}_est_init.pth"
+
     old_est = get_est(est_filename)
+    old_est = old_est if old_est is not None else get_est(init_filename)
+    print("============ None Check", old_est is None)
     new_est = weights_vector
     if old_est is not None:
         weights_vector[indices] = old_est[indices]
 
     with open(est_filename, "wb") as est_file:
         pickle.dump(new_est, est_file)
+
+    if is_init:
+        with open(init_filename, "wb") as est_file:
+            pickle.dump(new_est, est_file)
 
     return new_est
 
