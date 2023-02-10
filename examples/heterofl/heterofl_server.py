@@ -57,10 +57,10 @@ class Server(fedavg.Server):
     def weights_aggregated(self, updates):
         super().weights_aggregated(updates)
         # Implement sBN operation.
-        trainset = self.datasource.get_test_set()
+        trainset = self.datasource.get_train_set()
         trainset_sampler = all_inclusive.Sampler(self.datasource, testing=False)
         trainloader = self.trainer.get_train_loader(
-            Config().trainer.batch_size, trainset, trainset_sampler
+            Config().trainer.batch_size, trainset, trainset_sampler.get()
         )
         test_model = self.algorithm.stat(self.model, trainloader)
         self.train_model = copy.deepcopy(self.algorithm.model)

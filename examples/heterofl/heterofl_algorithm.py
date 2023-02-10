@@ -142,11 +142,12 @@ class Algorithm(fedavg.Algorithm):
         The implementation of sBN.
         """
         with torch.no_grad():
-            test_model = model_class(track=True, **Config().parameters.model._asdict())
+            model_param=Config().parameters.model._asdict()
+            if "track" in model_param:
+                model_param.pop("track")
+            test_model = model_class(track=True, **model_param)
             test_model.load_state_dict(self.model.state_dict(), strict=False)
-            test_model = test_model.to(Config().device)
             test_model.train(True)
             for example, _ in trainloader:
-                example = example.to(Config().device)
                 test_model(example)
         return test_model
