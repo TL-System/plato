@@ -1,11 +1,12 @@
 """
 HeteroFL algorithm trainer.
 """
-
+import copy
 import numpy as np
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.samplers import all_inclusive
 
 
 class Server(fedavg.Server):
@@ -39,6 +40,7 @@ class Server(fedavg.Server):
                 limitation.max_flops,
                 (Config().trainer.rounds, Config().clients.total_clients),
             )
+        self.train_model = None
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         server_response["rate"] = self.algorithm.choose_rate(
@@ -51,3 +53,19 @@ class Server(fedavg.Server):
     ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         return self.algorithm.aggregation(weights_received)
+
+    def weights_aggregated(self, updates):
+        super().weights_aggregated(updates)
+        # Implement sBN operation.
+        trainset = self.datasource.get_test_set()
+        trainset_sampler = all_inclusive.Sampler(self.datasource, testing=False)
+        trainloader = self.trainer.get_train_loader(
+            Config().trainer.batch_size, trainset, trainset_sampler
+        )
+        test_model = self.algorithm.stat(self.model, trainloader)
+        self.train_model = copy.deepcopy(self.algorithm.model)
+        self.algorithm.model = test_model
+
+    def clients_processed(self) -> None:
+        super().clients_processed()
+        self.algorithm.model = self.train_model

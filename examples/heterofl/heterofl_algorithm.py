@@ -136,3 +136,17 @@ class Algorithm(fedavg.Algorithm):
                     global_parameters[key] - value, count
                 )
         return global_parameters
+
+    def stat(self, model_class, trainloader):
+        """
+        The implementation of sBN.
+        """
+        with torch.no_grad():
+            test_model = model_class(track=True, **Config().parameters.model._asdict())
+            test_model.load_state_dict(self.model.state_dict(), strict=False)
+            test_model = test_model.to(Config().device)
+            test_model.train(True)
+            for example, _ in trainloader:
+                example = example.to(Config().device)
+                test_model(example)
+        return test_model
