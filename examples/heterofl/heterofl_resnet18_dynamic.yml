@@ -81,7 +81,7 @@ parameters:
         weight_decay: 0.0005
         momentum: 0.9
     learning_rate:
-        milestone_steps: 150, 250
+        milestone_steps: 750, 1250
         gamma: 0.1
     limitation:
         activated: false
