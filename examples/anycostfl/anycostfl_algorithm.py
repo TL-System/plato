@@ -138,7 +138,7 @@ class Algorithm(fedavg.Algorithm):
                 )
         return global_parameters
 
-    def sort_channels(self, current_round):
+    def sort_channels(self):
         "Sort channels according to L2 norms."
         argindex = None
         parameters = self.model.state_dict()
