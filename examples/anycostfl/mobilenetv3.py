@@ -511,11 +511,8 @@ class MobileNetV3(nn.Module):
 
     def forward(self, x):
         "Forward function."
-        for i in range(9):
-            x = self.featureList[i](x)
-        x = self.featureList[9](x)
-        for i in range(10, len(self.featureList)):
-            x = self.featureList[i](x)
+        for layer in self.featureList:
+            x = layer(x)
         x = self.last_stage_layers(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
