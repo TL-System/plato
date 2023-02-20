@@ -7,7 +7,7 @@ in InfoCom 2023.
 
 """
 
-from mobilenetv3 import MobileNetV3
+from resnet import resnet34
 
 from anycostfl_client import Client
 from anycostfl_server import Server
@@ -17,7 +17,7 @@ from anycostfl_trainer import ServerTrainer
 
 def main():
     """A Plato federated learning training session using the AnyCostFL algorithm."""
-    model = MobileNetV3
+    model = resnet34
     server = Server(model=model, algorithm=Algorithm, trainer=ServerTrainer)
     client = Client(model=model)
     server.run(client)

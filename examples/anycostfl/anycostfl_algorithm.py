@@ -141,21 +141,29 @@ class Algorithm(fedavg.Algorithm):
     def sort_channels(self):
         "Sort channels according to L2 norms."
         argindex = None
+        shortcut_index_in = None
         parameters = self.model.state_dict()
         for key, value in parameters.items():
             # Sort the input channels according to the sequence of last output channels
             if argindex is not None:
+                if "conv1" in key:
+                    shortcut_index_in = copy.deepcopy(argindex)
                 if value.dim() == 1:
                     if not "classifier" in key:
                         parameters[key] = copy.deepcopy(value[argindex])
                 elif value.dim() > 1:
-                    if value.dim() == 4 and value.shape[1] == 1:
-                        parameters[key] = copy.deepcopy(value[argindex, ...])
+                    if "shortcut" in key:
+                        parameters[key] = copy.deepcopy(
+                            value[argindex, ...][:, shortcut_index_in, ...]
+                        )
                     else:
-                        parameters[key] = copy.deepcopy(value[:, argindex, ...])
+                        if value.dim() == 4 and value.shape[1] == 1:
+                            parameters[key] = copy.deepcopy(value[argindex, ...])
+                        else:
+                            parameters[key] = copy.deepcopy(value[:, argindex, ...])
             # If this is a conv or linear, we need to sort the channels.
             if (value.dim() == 4 and value.shape[1] > 1) or value.dim() == 2:
-                if not "classifier" in key:
+                if not "classifier" in key and not "shortcut" in key:
                     dims = (1, 2, 3) if value.dim() == 4 else (1)
                     # FedDropout method
                     if (
