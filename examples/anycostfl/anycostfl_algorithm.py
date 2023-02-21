@@ -138,18 +138,20 @@ class Algorithm(fedavg.Algorithm):
                 )
         return global_parameters
 
+    # pylint:disable=too-many-branches
     def sort_channels(self):
         "Sort channels according to L2 norms."
         argindex = None
         shortcut_index_in = None
         parameters = self.model.state_dict()
         for key, value in parameters.items():
+            # print(key, value.shape)
             # Sort the input channels according to the sequence of last output channels
             if argindex is not None:
-                if "conv1" in key:
+                if "conv1" in key and not key == "conv1.weight":
                     shortcut_index_in = copy.deepcopy(argindex)
                 if value.dim() == 1:
-                    if not "classifier" in key:
+                    if not "linear" in key:
                         parameters[key] = copy.deepcopy(value[argindex])
                 elif value.dim() > 1:
                     if "shortcut" in key:
@@ -161,9 +163,9 @@ class Algorithm(fedavg.Algorithm):
                             parameters[key] = copy.deepcopy(value[argindex, ...])
                         else:
                             parameters[key] = copy.deepcopy(value[:, argindex, ...])
-            # If this is a conv or linear, we need to sort the channels.
+                    # If this is a conv or linear, we need to sort the channels.
             if (value.dim() == 4 and value.shape[1] > 1) or value.dim() == 2:
-                if not "classifier" in key and not "shortcut" in key:
+                if not "linear" in key and not "shortcut" in key:
                     dims = (1, 2, 3) if value.dim() == 4 else (1)
                     # FedDropout method
                     if (
@@ -176,11 +178,11 @@ class Algorithm(fedavg.Algorithm):
                         hasattr(Config().parameters, "prune")
                         and Config().parameters.prune == "even"
                     ):
-                        argindex = torch.arange(1, value.shape[0] + 1)
-                        argindex[-1] = 0
+                        argindex = torch.arange(value.shape[0])
+                        argindex = torch.roll(argindex, 1, -1)
                     # AnyCostFL method.
                     else:
                         l2_norm = torch.norm(value, p=2, dim=dims)
                         argindex = torch.argsort(l2_norm, descending=True)
-                    parameters[key] = copy.deepcopy(value[argindex])
+                    parameters[key] = copy.deepcopy(parameters[key][argindex])
         self.model.load_state_dict(parameters)
