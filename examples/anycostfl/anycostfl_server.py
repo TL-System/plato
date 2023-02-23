@@ -41,16 +41,19 @@ class Server(fedavg.Server):
             )
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
-        server_response["rate"] = self.algorithm.choose_rate(
+        rate = self.algorithm.choose_rate(
             self.limitation[self.current_round - 1, client_id - 1], self.model
         )
+        server_response["rate"] = rate
+        self.rates[client_id - 1] = rate
         return super().customize_server_response(server_response, client_id)
 
     async def aggregate_weights(
         self, updates, baseline_weights, weights_received
     ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
-        return self.algorithm.aggregation(weights_received)
+        rates = [self.rates[update.client_id - 1] for update in updates]
+        return self.algorithm.aggregation(weights_received, rates)
 
     def weights_aggregated(self, updates):
         super().weights_aggregated(updates)

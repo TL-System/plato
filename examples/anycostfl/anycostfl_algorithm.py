@@ -6,9 +6,9 @@ import sys
 import pickle
 import random
 import copy
-import math
 
 import torch
+import numpy as np
 import ptflops
 from plato.config import Config
 from plato.algorithms import fedavg
@@ -96,15 +96,20 @@ class Algorithm(fedavg.Algorithm):
                     )
         return local_parameters
 
-    def aggregation(self, weights_received):
+    def aggregation(self, weights_received, rates=None):
         """
         Aggregate weights of different complexities.
         """
+        rates = np.array(rates)
+        rates = 1 / np.power(1 - rates * (2 - rates), 2)
         global_parameters = copy.deepcopy(self.model.state_dict())
         for key, value in self.model.state_dict().items():
             if "weight" in key or "bias" in key:
                 count = torch.zeros(value.shape)
-                for local_weights in weights_received:
+                for index, local_weights in enumerate(weights_received):
+                    scale = 1
+                    if not hasattr(Config().parameters, "prune"):
+                        scale = rates[index] / np.sum(rates)
                     if value.dim() == 4:
                         global_parameters[key][
                             : local_weights[key].shape[0],
@@ -115,22 +120,28 @@ class Algorithm(fedavg.Algorithm):
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             ...,
-                        ] += torch.ones(local_weights[key].shape)
+                        ] += (
+                            torch.ones(local_weights[key].shape) * scale
+                        )
                     elif value.dim() == 2:
                         global_parameters[key][
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
-                        ] += copy.deepcopy(local_weights[key])
+                        ] += (
+                            copy.deepcopy(local_weights[key]) * scale
+                        )
                         count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
-                        ] += torch.ones(local_weights[key].shape)
+                        ] += (
+                            torch.ones(local_weights[key].shape) * scale
+                        )
                     elif value.dim() == 1:
                         global_parameters[key][
                             : local_weights[key].shape[0]
                         ] += copy.deepcopy(local_weights[key])
                         count[: local_weights[key].shape[0]] += torch.ones(
-                            local_weights[key].shape
+                            local_weights[key].shape * scale
                         )
                 count = torch.where(count == 0, torch.ones(count.shape), count)
                 global_parameters[key] = torch.div(
