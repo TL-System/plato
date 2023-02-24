@@ -140,8 +140,8 @@ class Algorithm(fedavg.Algorithm):
                         global_parameters[key][
                             : local_weights[key].shape[0]
                         ] += copy.deepcopy(local_weights[key])
-                        count[: local_weights[key].shape[0]] += torch.ones(
-                            local_weights[key].shape * scale
+                        count[: local_weights[key].shape[0]] += (
+                            torch.ones(local_weights[key].shape) * scale
                         )
                 count = torch.where(count == 0, torch.ones(count.shape), count)
                 global_parameters[key] = torch.div(
