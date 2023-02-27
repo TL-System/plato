@@ -7,8 +7,10 @@ in InfoCom 2023.
 
 """
 
-from resnet import resnet34
+from resnet import resnet34, resnet152
+from vit import ViT
 
+from plato.config import Config
 from anycostfl_client import Client
 from anycostfl_server import Server
 from anycostfl_algorithm import Algorithm
@@ -17,7 +19,12 @@ from anycostfl_trainer import ServerTrainer
 
 def main():
     """A Plato federated learning training session using the AnyCostFL algorithm."""
-    model = resnet34
+    if "resnet34" in Config().trainer.model_name:
+        model = resnet34
+    elif "resnet152" in Config().trainer.model_name:
+        model = resnet152
+    else:
+        model = ViT
     server = Server(model=model, algorithm=Algorithm, trainer=ServerTrainer)
     client = Client(model=model)
     server.run(client)

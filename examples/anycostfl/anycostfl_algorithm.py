@@ -21,7 +21,7 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer)
         self.current_rate = 1
         self.model_class = None
-        self.rate = [1.0, 0.5, 0.25, 0.125, 0.0625]
+        self.rates = [1.0, 0.5, 0.25, 0.125, 0.0625]
 
     def extract_weights(self, model=None):
         self.model = self.model.cpu()
@@ -90,6 +90,15 @@ class Algorithm(fedavg.Algorithm):
                             ...,
                         ]
                     )
+                elif value.dim() == 3:
+                    local_parameters[key] = copy.deepcopy(
+                        value[
+                            : local_parameters[key].shape[0],
+                            : local_parameters[key].shape[1],
+                            : local_parameters[key].shape[2],
+                            ...,
+                        ]
+                    )
                 else:
                     local_parameters[key] = copy.deepcopy(
                         value[: local_parameters[key].shape[0]]
@@ -121,6 +130,23 @@ class Algorithm(fedavg.Algorithm):
                         count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
+                            ...,
+                        ] += (
+                            torch.ones(local_weights[key].shape) * scale
+                        )
+                    if value.dim() == 3:
+                        global_parameters[key][
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                            : local_weights[key].shape[2],
+                            ...,
+                        ] += (
+                            copy.deepcopy(local_weights[key]) * scale
+                        )
+                        count[
+                            : local_weights[key].shape[0],
+                            : local_weights[key].shape[1],
+                            : local_weights[key].shape[2],
                             ...,
                         ] += (
                             torch.ones(local_weights[key].shape) * scale
@@ -164,7 +190,7 @@ class Algorithm(fedavg.Algorithm):
                 if "conv1" in key and not key == "conv1.weight":
                     shortcut_index_in = copy.deepcopy(argindex)
                 if value.dim() == 1:
-                    if not "linear" in key:
+                    if not "linear" in key and not "mlp_head.1.bias" in key:
                         parameters[key] = copy.deepcopy(value[argindex])
                 elif value.dim() > 1:
                     if "shortcut" in key:
@@ -172,13 +198,19 @@ class Algorithm(fedavg.Algorithm):
                             value[argindex, ...][:, shortcut_index_in, ...]
                         )
                     else:
-                        if value.dim() == 4 and value.shape[1] == 1:
-                            parameters[key] = copy.deepcopy(value[argindex, ...])
-                        else:
-                            parameters[key] = copy.deepcopy(value[:, argindex, ...])
+                        if not ("to_out" in key and "weight" in key):
+                            if value.dim() == 4 and value.shape[1] == 1:
+                                parameters[key] = copy.deepcopy(value[argindex, ...])
+                            else:
+                                parameters[key] = copy.deepcopy(value[:, argindex, ...])
                     # If this is a conv or linear, we need to sort the channels.
             if (value.dim() == 4 and value.shape[1] > 1) or value.dim() == 2:
-                if not "linear" in key and not "shortcut" in key:
+                if (
+                    not "linear" in key
+                    and not "shortcut" in key
+                    and not "to_patch_embedding" in key
+                    and not "to_qkv" in key
+                ):
                     dims = (1, 2, 3) if value.dim() == 4 else (1)
                     # FedDropout method
                     if (
