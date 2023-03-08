@@ -51,9 +51,13 @@ class Algorithm(fedavg.Algorithm):
                 )
                 payload = pre_model.state_dict()
                 size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
+                if hasattr(Config().parameters.client_model, "channels"):
+                    in_channel = 1
+                else:
+                    in_channel = 3
                 macs, _ = ptflops.get_model_complexity_info(
                     pre_model,
-                    (3, 32, 32),
+                    (in_channel, 32, 32),
                     as_strings=False,
                     print_per_layer_stat=False,
                     verbose=False,

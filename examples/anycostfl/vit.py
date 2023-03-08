@@ -178,7 +178,7 @@ class ViT(nn.Module):
         heads=8,
         mlp_dim=512,
         pool="cls",
-        channels=3,
+        channels=1,
         dim_head=64,
         dropout=0.1,
         emb_dropout=0.1,
@@ -259,23 +259,59 @@ class ViT(nn.Module):
         return [func([1, 2, 3, 4, 5, 6]), func([0.5, 1])]
 
 
-# model = ViT()
-# config = model.get_net(min)
+model = ViT()
+config = model.get_net(max)
 
-# import sys
-# import pickle
-# import ptflops
+import sys
+import pickle
+import ptflops
 
-# new = ViT(configs=config)
+new = ViT(configs=config)
 # for key, value in new.state_dict().items():
 #     print(key, value.shape)
-# size = sys.getsizeof(pickle.dumps(new.state_dict())) / 1024**2
-# macs, _ = ptflops.get_model_complexity_info(
-#     new,
-#     (3, 32, 32),
-#     as_strings=False,
-#     print_per_layer_stat=False,
-#     verbose=False,
-# )
-# macs /= 1024**2
-# print(size, macs)
+size = sys.getsizeof(pickle.dumps(new.state_dict())) / 1024**2
+macs, _ = ptflops.get_model_complexity_info(
+    new,
+    (1, 32, 32),
+    as_strings=False,
+    print_per_layer_stat=False,
+    verbose=False,
+)
+import copy
+
+macs /= 1024**2
+parameters = new.state_dict()
+argindex = None
+for key, value in parameters.items():
+    # print(key, value.shape)
+    # Sort the input channels according to the sequence of last output channels
+    if argindex is not None:
+        if "conv1" in key and not key == "conv1.weight":
+            shortcut_index_in = copy.deepcopy(argindex)
+        if value.dim() == 1:
+            if not "linear" in key and not "mlp_head.1.bias" in key:
+                parameters[key] = copy.deepcopy(value[argindex])
+        elif value.dim() > 1:
+            if "shortcut" in key:
+                parameters[key] = copy.deepcopy(
+                    value[argindex, ...][:, shortcut_index_in, ...]
+                )
+            else:
+                if not ("to_out" in key and "weight" in key):
+                    if value.dim() == 4 and value.shape[1] == 1:
+                        parameters[key] = copy.deepcopy(value[argindex, ...])
+                    else:
+                        parameters[key] = copy.deepcopy(value[:, argindex, ...])
+                    # If this is a conv or linear, we need to sort the channels.
+    if (value.dim() == 4 and value.shape[1] > 1) or value.dim() == 2:
+        if (
+            not "linear" in key
+            and not "shortcut" in key
+            and not "to_patch_embedding" in key
+            and not "to_qkv" in key
+        ):
+            dims = (1, 2, 3) if value.dim() == 4 else (1)
+            argindex = torch.randperm(value.shape[0])
+            parameters[key] = copy.deepcopy(parameters[key][argindex])
+new.load_state_dict(parameters)
+print(size, macs)
