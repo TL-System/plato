@@ -9,6 +9,7 @@ in InfoCom 2023.
 
 from resnet import resnet34, resnet152
 from vit import ViT
+from vgg import VGG
 
 from plato.config import Config
 from anycostfl_client import Client
@@ -23,6 +24,8 @@ def main():
         model = resnet34
     elif "resnet152" in Config().trainer.model_name:
         model = resnet152
+    elif "vgg" in Config().trainer.model_name:
+        model = VGG
     else:
         model = ViT
     server = Server(model=model, algorithm=Algorithm, trainer=ServerTrainer)
