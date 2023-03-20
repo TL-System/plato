@@ -1,9 +1,9 @@
 """
-A federated learning training session using AnyCostFL
+A federated learning training session using FedRolexFL
 
-Peichun Li, Guoliang Cheng, Xumin Huang, Jiawen Kang, Rong Yu, Yuan Wu, Miao Pan
-“AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device,”
-in InfoCom 2023.
+Alam, Samiul and Liu, Luyang and Yan, Ming and Zhang, Mi
+“FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction,”
+in FedRolex NIPS2022.
 
 """
 
@@ -18,7 +18,7 @@ from plato.config import Config
 
 
 def main():
-    """A Plato federated learning training session using the AnyCostFL algorithm."""
+    """A Plato federated learning training session using the FedRolexFL algorithm."""
     if "resnet18" in Config().trainer.model_name:
         model = resnet18
     else:

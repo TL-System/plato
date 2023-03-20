@@ -1,5 +1,5 @@
 """
-AnyCostfl algorithm.
+FedRolexfl algorithm.
 """
 
 import sys
@@ -15,7 +15,7 @@ from plato.algorithms import fedavg
 
 
 class Algorithm(fedavg.Algorithm):
-    """A federated learning algorithm using the AnyCostfl algorithm."""
+    """A federated learning algorithm using the FedRolexfl algorithm."""
 
     def __init__(self, trainer=None):
         super().__init__(trainer)

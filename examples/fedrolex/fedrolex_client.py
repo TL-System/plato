@@ -1,12 +1,12 @@
 """
-Customized Client for AntCostFL.
+Customized Client for FedRolex.
 """
 from plato.config import Config
 from plato.clients import simple
 
 
 class Client(simple.Client):
-    """A federated learning server using the AnyCostFL algorithm."""
+    """A federated learning server using the FedRolexFL algorithm."""
 
     def process_server_response(self, server_response) -> None:
         rate = server_response["rate"]

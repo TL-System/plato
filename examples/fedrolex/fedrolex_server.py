@@ -1,5 +1,5 @@
 """
-AnyCostFL algorithm trainer.
+FedRolexFL algorithm trainer.
 """
 
 import numpy as np
@@ -9,7 +9,7 @@ from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
-    """A federated learning server using the AnyCostFL algorithm."""
+    """A federated learning server using the FedRolexFL algorithm."""
 
     def __init__(
         self,
