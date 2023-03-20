@@ -279,7 +279,7 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ````
 
 ````{admonition} **FedRolex**
-FedRolex argues the stastical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-geterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
+FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
 
 ```shell
 python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
