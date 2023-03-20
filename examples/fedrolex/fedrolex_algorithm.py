@@ -109,71 +109,54 @@ class Algorithm(fedavg.Algorithm):
                     )
         return local_parameters
 
-    def aggregation(self, weights_received, rates=None):
+    def aggregation(self, weights_received):
         """
         Aggregate weights of different complexities.
         """
-        rates = np.array(rates)
-        rates = 1 / np.power(1 - rates * (2 - rates), 2)
         global_parameters = copy.deepcopy(self.model.state_dict())
         for key, value in self.model.state_dict().items():
             if "weight" in key or "bias" in key:
                 count = torch.zeros(value.shape)
-                for index, local_weights in enumerate(weights_received):
-                    scale = 1
-                    if not hasattr(Config().parameters, "prune"):
-                        scale = rates[index] / np.sum(rates)
+                for _, local_weights in enumerate(weights_received):
                     if value.dim() == 4:
                         global_parameters[key][
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             ...,
-                        ] += (
-                            copy.deepcopy(local_weights[key]) * scale
-                        )
+                        ] += copy.deepcopy(local_weights[key])
                         count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             ...,
-                        ] += (
-                            torch.ones(local_weights[key].shape) * scale
-                        )
+                        ] += torch.ones(local_weights[key].shape)
                     if value.dim() == 3:
                         global_parameters[key][
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             : local_weights[key].shape[2],
                             ...,
-                        ] += (
-                            copy.deepcopy(local_weights[key]) * scale
-                        )
+                        ] += copy.deepcopy(local_weights[key])
                         count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
                             : local_weights[key].shape[2],
                             ...,
-                        ] += (
-                            torch.ones(local_weights[key].shape) * scale
-                        )
+                        ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 2:
                         global_parameters[key][
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
-                        ] += (
-                            copy.deepcopy(local_weights[key]) * scale
-                        )
+                        ] += copy.deepcopy(local_weights[key])
                         count[
                             : local_weights[key].shape[0],
                             : local_weights[key].shape[1],
-                        ] += (
-                            torch.ones(local_weights[key].shape) * scale
-                        )
+                        ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 1:
-                        global_parameters[key][: local_weights[key].shape[0]] += (
-                            copy.deepcopy(local_weights[key]) * scale
-                        )
-                        count[: local_weights[key].shape[0]] += (
-                            torch.ones(local_weights[key].shape) * scale
+                        global_parameters[key][
+                            : local_weights[key].shape[0]
+                        ] += copy.deepcopy(local_weights[key])
+                        count[: local_weights[key].shape[0]] += torch.ones(
+                            local_weights[key].shape
                         )
                 count = torch.where(count == 0, torch.ones(count.shape), count)
                 global_parameters[key] = torch.div(

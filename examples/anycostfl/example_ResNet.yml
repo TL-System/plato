@@ -60,7 +60,7 @@ trainer:
     lr_scheduler: MultiStepLR
 
     model_type: torch_hub
-    model_name: resnet34
+    model_name: resnet18
 
 
 algorithm:

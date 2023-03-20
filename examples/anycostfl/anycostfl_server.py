@@ -52,8 +52,7 @@ class Server(fedavg.Server):
         self, updates, baseline_weights, weights_received
     ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
-        rates = [self.rates[update.client_id - 1] for update in updates]
-        return self.algorithm.aggregation(weights_received, rates)
+        return self.algorithm.aggregation(weights_received)
 
     def weights_aggregated(self, updates):
         super().weights_aggregated(updates)
