@@ -6,7 +6,7 @@ clients:
     total_clients: 50
 
     # The number of clients selected in each round
-    per_round: 50
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -21,9 +21,6 @@ server:
     port: 8027
     do_test: true
     random_seed: 1
-
-    checkpoint_path: /scratch/dixiyao/plato/models/anycostfl/cifar10/mobilenetv3/large
-    model_path: /scratch/dixiyao/plato/models/anycostfl/cifar10/mobilenetv3/large
 
     simulate_wall_time: true
 
@@ -63,7 +60,7 @@ trainer:
     lr_scheduler: MultiStepLR
 
     model_type: torch_hub
-    model_name: mobilenet_v3_large
+    model_name: resnet34
 
 
 algorithm:
@@ -71,20 +68,13 @@ algorithm:
     type: fedavg
     
 results:
-    result_path: /scratch/dixiyao/plato/results/anycostfl/cifar10/mobilenetv3/large
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
 
 parameters:
     model:
         model_rate: 1.0
-        classes_num: 10
-        input_size: 32
-        mode: large
         track: true
     client_model:
-        classes_num: 10
-        input_size: 32
-        mode: large
         track: false
     optimizer:
         lr: 0.1
@@ -94,10 +84,9 @@ parameters:
         milestone_steps: 150, 250
         gamma: 0.1
     limitation:
-        activated: false
-        min_size: 1
-        max_size: 20
-        min_flops: 5
-        max_flops: 100
-
+        activated: true
+        min_size: 43
+        max_size: 82
+        min_flops: 531
+        max_flops: 1108
 

@@ -7,25 +7,20 @@ in InfoCom 2023.
 
 """
 
-from resnet import resnet34, resnet152
+from resnet import resnet18
 from vit import ViT
-from vgg import VGG
 
-from plato.config import Config
 from anycostfl_client import Client
 from anycostfl_server import Server
 from anycostfl_algorithm import Algorithm
 from anycostfl_trainer import ServerTrainer
+from plato.config import Config
 
 
 def main():
     """A Plato federated learning training session using the AnyCostFL algorithm."""
-    if "resnet34" in Config().trainer.model_name:
-        model = resnet34
-    elif "resnet152" in Config().trainer.model_name:
-        model = resnet152
-    elif "vgg" in Config().trainer.model_name:
-        model = VGG
+    if "resnet18" in Config().trainer.model_name:
+        model = resnet18
     else:
         model = ViT
     server = Server(model=model, algorithm=Algorithm, trainer=ServerTrainer)

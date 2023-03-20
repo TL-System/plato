@@ -187,8 +187,8 @@ class Algorithm(fedavg.Algorithm):
         argindex = None
         shortcut_index_in = None
         parameters = self.model.state_dict()
+        # pylint:disable=too-many-nested-blocks
         for key, value in parameters.items():
-            # print(key, value.shape)
             # Sort the input channels according to the sequence of last output channels
             if argindex is not None:
                 if "conv1" in key and not key == "conv1.weight":
@@ -216,22 +216,7 @@ class Algorithm(fedavg.Algorithm):
                     and not "to_qkv" in key
                 ):
                     dims = (1, 2, 3) if value.dim() == 4 else (1)
-                    # FedDropout method
-                    if (
-                        hasattr(Config().parameters, "prune")
-                        and Config().parameters.prune == "random"
-                    ):
-                        argindex = torch.randperm(value.shape[0])
-                    # FedRolex method
-                    elif (
-                        hasattr(Config().parameters, "prune")
-                        and Config().parameters.prune == "even"
-                    ):
-                        argindex = torch.arange(value.shape[0])
-                        argindex = torch.roll(argindex, 1, -1)
-                    # AnyCostFL method.
-                    else:
-                        l2_norm = torch.norm(value, p=2, dim=dims)
-                        argindex = torch.argsort(l2_norm, descending=True)
+                    l2_norm = torch.norm(value, p=2, dim=dims)
+                    argindex = torch.argsort(l2_norm, descending=True)
                     parameters[key] = copy.deepcopy(parameters[key][argindex])
         self.model.load_state_dict(parameters)
