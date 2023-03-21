@@ -278,6 +278,14 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ```
 ````
 
+````{admonition} **SysHeteroFL**
+In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
+
+```shell
+python3 ./examples/sysheterofl/sysheterofl.py -c examples/sysheterofl/config_ResNet152.yml
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
