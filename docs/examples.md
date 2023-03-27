@@ -245,11 +245,21 @@ Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization
 ````
 
 ````{admonition} **PerFedRLNAS**
-PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, only example of NASVIT search space is provided.
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided.
 
+NASVIT search space:
 ```shell
-python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/FedNAS_CIFAR10_NASVIT_NonIID01_Scratch.yml
+python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
 ```
+MobileNetV3 search space:
+```
+python3 ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
+```
+DARTS search space
+```
+python3 ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
+```
+
 ````
 
 ````{admonition} **FedRep**
