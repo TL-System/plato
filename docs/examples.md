@@ -278,6 +278,32 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ```
 ````
 
+````{admonition} **FedRolex**
+FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
+```
+
+```{note}
+Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
+&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
+```
+````
+
+````{admonition} **AnyCostFL**
+AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
+```
+
+```{note}
+Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
+&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
