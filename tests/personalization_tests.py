@@ -8,6 +8,11 @@ from plato.models import registry as models_registry
 from plato.config import Config
 from plato.trainers import loss_criterion, lr_schedulers, optimizers
 
+from plato.trainers import basic
+from plato.algorithms import fedavg
+from plato.clients import simple
+from plato.servers import fedavg_personalized
+
 
 class PersonalizationTest(unittest.TestCase):
     def setUp(self):
@@ -67,6 +72,16 @@ class PersonalizationTest(unittest.TestCase):
 
         # 4. for the loss function.
         self.assertNotEqual(self.loss.__str__(), personalized_loss.__str__())
+
+    def test_personalization_running(self):
+        """Test whether the personalization runs correctly."""
+
+        trainer = basic.Trainer
+        algorithm = fedavg.Algorithm
+        client = simple.Client(algorithm=algorithm, trainer=trainer)
+        server = fedavg_personalized.Server(algorithm=algorithm, trainer=trainer)
+
+        server.run(client)
 
 
 if __name__ == "__main__":
