@@ -269,7 +269,7 @@ Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Feder
 FedBABU argued that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during FL training. In this implementation, the head is frozen at the beginning of each local training epoch through the API ```train_run_start```.
 
 ```shell
-python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
+python3 examples/fedbabu/fedbabu.py -c examples/fedbabu/fedavg_cifar10_levit.yml
 ```
 
 ```{note}
@@ -282,14 +282,14 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
 
 ```shell
-python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
+python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
 ```
 
 ```{note}
 Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
 &rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
 ```
-
+````
 
 ````{admonition} **AnyCostFL**
 AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
