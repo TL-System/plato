@@ -245,11 +245,21 @@ Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization
 ````
 
 ````{admonition} **PerFedRLNAS**
-PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, only example of NASVIT search space is provided.
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided.
 
+NASVIT search space:
 ```shell
-python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/FedNAS_CIFAR10_NASVIT_NonIID01_Scratch.yml
+python3 ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
 ```
+MobileNetV3 search space:
+```
+python3 ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
+```
+DARTS search space
+```
+python3 ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
+```
+
 ````
 
 ````{admonition} **FedRep**
@@ -283,6 +293,44 @@ In the paper system-heterogneous federated learning revisited through architectu
 
 ```shell
 python3 ./examples/sysheterofl/sysheterofl.py -c examples/sysheterofl/config_ResNet152.yml
+```
+````
+
+````{admonition} **HeteroFL**
+HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
+
+```shell
+python examples/heterofl/heterofl.py -c examples/heterofl/heterofl_resnet18_dynamic.yml
+```
+
+```{note}
+Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
+&rdquo; in International Conference on Learning Representations (ICLR), 2021.
+````
+
+````{admonition} **FedRolex**
+FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
+```
+
+```{note}
+Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
+&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
+```
+````
+
+````{admonition} **AnyCostFL**
+AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
+```
+
+```{note}
+Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
+&rdquo; in Proc. INFOCOM, 2022.
 ```
 ````
 
