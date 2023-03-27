@@ -136,6 +136,12 @@ A list of processors for the client to apply on the payload before receiving it 
 
 ```
 
+
+```{admonition} participant_clients_ratio
+Percentage of clients participating in federated training out of all clients.
+
+```
+
 ## server
 
 ```{admonition} type
@@ -150,6 +156,9 @@ The type of the server.
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
 
 - `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates.
+
+- `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
+
 ```
 
 ```{admonition} **address**
@@ -260,6 +269,13 @@ The edge server's estimated downlink capacity (an edge server to its clients) in
 The edge server's estimated uplink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `uplink_bandwidth`.
 ```
 
+```{admonition} do_personalization_interval
+The round interval for a server commanding when to perform personalization. The default value is 0, meaning that no personalization will be performed.
+```
+
+```{admonition} do_personalization_group
+The group of clients that is required by the server to perform personalization. The default value is "participant", meaning the clients participating in training.
+```
 ## data
 
 ```{admonition} **dataset**
