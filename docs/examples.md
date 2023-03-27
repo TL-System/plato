@@ -302,7 +302,7 @@ python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
 Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
 &rdquo; in Proc. INFOCOM, 2022.
 ```
-
+````
 
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
