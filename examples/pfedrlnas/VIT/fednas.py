@@ -9,10 +9,12 @@ The code: https://github.com/facebookresearch/NASViT.
 import fednas_server
 import fednas_client
 import fednas_algorithm
-
-from nasvit.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
-from nasvit.architect import Architect
 import fednas_trainer
+
+from plato.models.nasvit.models.attentive_nas_dynamic_model import (
+    AttentiveNasDynamicModel,
+)
+from plato.models.nasvit.architect import Architect
 
 
 def main():

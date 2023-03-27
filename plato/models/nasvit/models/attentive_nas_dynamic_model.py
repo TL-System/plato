@@ -41,6 +41,13 @@ class AttentiveNasDynamicModel(MyNetwork):
     # pylint: disable=too-many-public-methods
 
     def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+        super().__init__()
+        self.initialization(supernet, n_classes, bn_param)
+
+    def initialization(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+        """
+        Initialization function.
+        """
         # pylint:disable=too-many-locals
         # pylint:disable=too-many-statements
 

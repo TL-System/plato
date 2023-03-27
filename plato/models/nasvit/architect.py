@@ -12,8 +12,10 @@ from torch import nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from nasvit.misc.bigconfig import get_config
-from nasvit.models.attentive_nas_dynamic_model import AttentiveNasDynamicModel
+from plato.models.nasvit.misc.bigconfig import get_config
+from plato.models.nasvit.models.attentive_nas_dynamic_model import (
+    AttentiveNasDynamicModel,
+)
 
 from plato.config import Config
 
@@ -27,6 +29,12 @@ class Architect(nn.Module):
         self,
     ):
         super().__init__()
+        self.initialization()
+
+    def initialization(self):
+        """
+        Initialization function.
+        """
         self.model = AttentiveNasDynamicModel(supernet=get_config().supernet_config)
         if hasattr(Config().parameters.architect, "pretrain_path"):
             weight = torch.load(
