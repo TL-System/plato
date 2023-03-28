@@ -1,5 +1,42 @@
 """
 The implementation of basic visual augmentations.
+
+Most visual normalizations strictly follows the 'dataset_normalizations' of
+https://github.com/Lightning-AI/lightning-bolts (lightning-bolts).
+
+Sources of normalizations:
+    - MNIST
+        mean=(0.1307, ), std=(0.3081, ) from Plato's source code.
+        mean=(0.173, ), std=(0.332, ) from the lightning-bolts.
+
+    - CIFAR10
+        mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010])] from
+            * https://github.com/leftthomas/SimCLR/blob/master/main.py
+        mean=[0.491, 0.482, 0.447], std=[0.247, 0.243, 0.262] from
+            * https://github.com/mpatacchiola/self-supervised-relational-reasoning
+            * lightning-bolts
+        mean=(0.4915, 0.4823, 0.4468), std=(0.2470, 0.2435, 0.2616))
+            * https://www.inside-machinelearning.com/en/why-and-how-to-normalize-data-object-detection-on-image-in-pytorch-part-1/
+
+    - CIFAR100
+        mean=[0.507, 0.487, 0.441], std=[0.267, 0.256, 0.276]
+            https://github.com/mpatacchiola/self-supervised-relational-reasoning
+
+    - IMAGENET:
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225] from
+            * https://github.com/facebookresearch/simsiam/blob/main/main_simsiam.py
+            * https://github.com/PatrickHua/SimSiam/blob/main/main.py
+            * lightning-bolts
+
+    - STL10:
+        mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]
+            * https://github.com/mpatacchiola/self-supervised-relational-reasoning
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+            * https://github.com/DarkFaceMonster/Pytorch-STL10/blob/master/model.ipynb
+
+        mean=(0.43, 0.42, 0.39), std=(0.27, 0.26, 0.27)
+            * lightning-bolts's /models/self_supervised/cpc/transforms.py
+
 """
 
 from typing import Tuple, List, Union
@@ -8,10 +45,34 @@ from torchvision import transforms
 from PIL import Image, ImageOps
 
 
+datasets_norm = {
+    "MNIST": [
+        [
+            0.1307,
+        ],
+        [
+            0.3081,
+        ],
+    ],
+    "FashionMNIST": [
+        [
+            0.1307,
+        ],
+        [
+            0.3081,
+        ],
+    ],
+    "CIFAR10": [[0.491, 0.482, 0.447], [0.247, 0.243, 0.262]],
+    "CIFAR100": [[0.491, 0.482, 0.447], [0.247, 0.243, 0.262]],
+    "IMAGENET": [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]],
+    "STL10": [[0.4914, 0.4823, 0.4466], [0.247, 0.243, 0.261]],
+}
+
+
 class Solarization:
     """Behave as the Image Filter"""
 
-    def __init__(self, threshold: int=128):
+    def __init__(self, threshold: int = 128):
         self.threshold = threshold
 
     def __call__(self, image):
@@ -31,7 +92,7 @@ def get_visual_transform(
     saturation: float,
     hue: float,
     blur_kernel_size: float = 0.0,
-    blur_sigma: list = [0.1, 2.0],
+    blur_sigma: tuple = (0.1, 2.0),
     color_jitter_prob: float = 0.8,
     gray_scale_prob: float = 0.2,
     horizontal_flip_prob: float = 0.5,
@@ -106,7 +167,9 @@ class BYOLTransform:
         to self-supervised Learning, 2021.
     """
 
-    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
+    def __init__(
+        self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]
+    ):
         self.transform1, transform_funcs1 = get_visual_transform(
             image_size,
             normalize,
@@ -161,7 +224,9 @@ class MoCoTransform:
         Learning, 2020.
     """
 
-    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
+    def __init__(
+        self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]
+    ):
         image_size = 224 if image_size is None else image_size
         self.transform, transform_funcs = get_visual_transform(
             image_size,
@@ -199,7 +264,9 @@ class SimCLRTransform:
         Visual Representations, 2020.
     """
 
-    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
+    def __init__(
+        self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]
+    ):
         image_size = 224 if image_size is None else image_size
         self.transform, transform_funcs = get_visual_transform(
             image_size,
@@ -235,7 +302,9 @@ class SimSiamTransform:
     [2]. Chen & He, Exploring Simple Siamese Representation Learning, 2021.
     """
 
-    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
+    def __init__(
+        self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]
+    ):
         # by default simsiam use image size 224
         image_size = 224 if image_size is None else image_size
         p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
@@ -272,7 +341,9 @@ class SvAVTransform:
         Cluster Assignments, 2020.
     """
 
-    def __init__(self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]):
+    def __init__(
+        self, image_size: Union[int, Tuple[int, int]], normalize: List[List[float]]
+    ):
         p_blur = 0.5 if image_size > 32 else 0  # exclude cifar
         self.transform, transform_funcs = get_visual_transform(
             image_size,
