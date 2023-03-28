@@ -12,3 +12,4 @@ zstd
 torch-optimizer
 timm
 protobuf<3.21,>=3.9.2
+tensorflow_datasets==4.8.2
