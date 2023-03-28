@@ -11,4 +11,4 @@ gym
 zstd
 torch-optimizer
 timm
-protobuf==3.20.x
+protobuf<3.21,>=3.9.2
