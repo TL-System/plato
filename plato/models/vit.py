@@ -15,8 +15,6 @@ from transformers import AutoConfig, AutoModelForImageClassification
 
 
 from plato.config import Config
-from plato.models import t2tvit
-from plato.models.dvit.models import deep_vision_transformer
 
 
 class ResolutionAdjustedModel(nn.Module):
@@ -68,8 +66,11 @@ class T2TVIT(nn.Module):
 
     def __init__(self, name) -> nn.Module:
         super().__init__()
+        # pylint:disable=import-outside-toplevel
+        from plato.models import t2tvit
+        from plato.models.t2tvit.models import t2t_vit
 
-        model_name = getattr(t2tvit, name)
+        model_name = getattr(t2t_vit, name)
         t2t = model_name(num_classes=Config().trainer.num_classes)
 
         if (
@@ -101,6 +102,8 @@ class DeepViT(nn.Module):
 
     def __init__(self, name) -> nn.Module:
         super().__init__()
+        # pylint:disable=import-outside-toplevel
+        from plato.models.dvit.models import deep_vision_transformer
 
         model_name = getattr(deep_vision_transformer, name)
         deepvit = model_name(
@@ -141,7 +144,7 @@ class Model:
     @staticmethod
     def get(model_name=None, **kwargs):  # pylint: disable=unused-argument
         """Returns a named model from HuggingFace."""
-        if "T2t" in model_name:
+        if "t2t" in model_name:
             return T2TVIT(model_name)
 
         if "deepvit" in model_name:
