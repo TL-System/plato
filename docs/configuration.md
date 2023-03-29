@@ -36,6 +36,22 @@ The total number of clients in a training session.
 The number of clients selected in each round. It should be lower than `total_clients`.
 ```
 
+````{admonition} logging_data_statistics
+Whether or not the clients collect statistics information of local datasets. Valid values are `true` or `false`.
+
+```{note}
+This setting is only valid when the `type` of the client is `simple_statistics`.
+```
+````
+
+````{admonition} logging_model_statistics
+Whether or not the clients collect statistics information of local models. Valid values are `true` or `false`.
+
+```{note}
+This setting is only valid when the `type` of the client is `simple_statistics`.
+```
+````
+
 ````{admonition} do_test
 Whether or not the clients compute test accuracies locally using local testsets. Computing test accuracies locally may be useful in certain cases, such as personalized federated learning. Valid values are `true` or `false`.
 
