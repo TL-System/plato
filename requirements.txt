@@ -11,4 +11,3 @@ gym
 zstd
 torch-optimizer
 timm
-protobuf
