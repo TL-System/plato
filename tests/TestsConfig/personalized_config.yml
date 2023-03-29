@@ -1,6 +1,9 @@
 clients:
     # Type
-    type: simple
+    type: simple_statistics
+
+    logging_data_statistics: true 
+    do_test: true
 
     # The total number of clients
     total_clients: 10
@@ -24,7 +27,7 @@ server:
     do_personalization_interval: 2
     # total, participant, nonparticipant
     do_personalization_group: nonparticipant
-
+    model_path: models
 data:
     # The training and testing dataset
     datasource: MNIST
@@ -34,7 +37,8 @@ data:
 
     # IID or non-IID?
     sampler: iid
-
+    testset_sampler: iid
+    
     # The random seed for sampling data
     random_seed: 1
 
