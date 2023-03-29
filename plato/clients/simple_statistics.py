@@ -102,7 +102,11 @@ class Client(simple.Client):
         personalized model for the client."""
         super().configure()
         # save statistics of the defined model
-        self.save_model_statistics(model_attr_name="model")
+        if (
+            hasattr(Config().clients, "logging_model_statistics")
+            and Config().clients.logging_model_statistics
+        ):
+            self.save_model_statistics(model_attr_name="model")
 
     def _allocate_data(self) -> None:
         """Allocate training or testing dataset of this client."""
