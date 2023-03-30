@@ -4,7 +4,7 @@ Helped functions in PerFedRLNAS only applicable for search space: NASVIT
 from timm.loss import LabelSmoothingCrossEntropy
 from torch import optim
 
-from plato.models.NASViT.misc.config import _C as config
+from models.config import _C as config
 
 
 def get_nasvit_loss_criterion():
@@ -49,7 +49,6 @@ def check_keywords_in_name(name, keywords=()):
 
 def get_optimizer(model):
     """Get a specific optimizer where only assigned parts of model weights use weight decay."""
-    config = get_config()
 
     skip = {"rescale", "bn", "absolute_pos_embed"}
     skip_keywords = {"relative_position_bias_table"}

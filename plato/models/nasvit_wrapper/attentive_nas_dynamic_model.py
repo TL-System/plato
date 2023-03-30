@@ -16,7 +16,6 @@ from plato.models.NASViT.models.modules.transformer import (
 from plato.config import Config
 from plato.models.NASViT.models import attentive_nas_dynamic_model
 from plato.models.NASViT.models.modules.nn_utils import int2list
-from plato.models.NASViT.misc.config import _C as config
 from plato.models.NASViT.models.attentive_nas_static_model import (
     AttentiveNasStaticModel,
 )
@@ -26,6 +25,7 @@ from .modules.dynamic_layers import (
     DynamicLinearLayer,
     DynamicShortcutLayer,
 )
+from .config import _C as config
 
 
 # pylint:disable=abstract-method
@@ -36,6 +36,8 @@ class AttentiveNasDynamicModel(attentive_nas_dynamic_model.AttentiveNasDynamicMo
     # pylint: disable=too-many-public-methods
 
     def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+        if supernet is None:
+            supernet = config.supernet_config
         super().__init__(supernet)
         self.initialization(supernet, n_classes, bn_param)
 

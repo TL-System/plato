@@ -10,9 +10,10 @@ from torch import nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from attentive_nas_dynamic_model import AttentiveNasDynamicModel
-from plato.models.NASViT.misc.config import _C as config
 from plato.config import Config
+
+from .attentive_nas_dynamic_model import AttentiveNasDynamicModel
+from .config import _C as config
 
 
 class Architect(nn.Module):
@@ -24,6 +25,12 @@ class Architect(nn.Module):
         self,
     ):
         super().__init__()
+        self.initialization()
+
+    def initialization(self):
+        """
+        Initialization function.
+        """
         self.model = AttentiveNasDynamicModel(supernet=config.supernet_config)
         if hasattr(Config().parameters.architect, "pretrain_path"):
             weight = torch.load(
@@ -52,12 +59,18 @@ class Architect(nn.Module):
             for alpha in self.arch_parameters()
         ]
         self.baseline = {}
-        self.baseline_decay = Config().parameters.architect.baseline_decay
+        if Config().args.resume:
+            save_config = f"{Config().server.model_path}/baselines.pickle"
+            if os.path.exists(save_config):
+                with open(save_config, "rb") as file:
+                    self.baseline = pickle.load(file)
+        self.lambda_time = Config().parameters.architect.lambda_time
+        self.lambda_neg = Config().parameters.architect.lambda_neg
         self.device = Config().device()
 
-    def step(self, epoch_acc, neg_ratio, epoch_index, client_id_list):
+    def step(self, epoch_reward, epoch_index, client_id_list):
         """Step of architect, update architecture parameters."""
-        rewards = self._compute_reward(epoch_acc, neg_ratio, client_id_list)
+        rewards = self._compute_reward(epoch_reward, client_id_list)
         if (
             hasattr(Config().parameters.architect, "natural")
             and Config().parameters.architect.natural
@@ -96,30 +109,15 @@ class Architect(nn.Module):
             grads.append(grad)
         return grads
 
-    def _compute_reward(self, accuracy_list, neg_ratio, client_id_list):
+    def _compute_reward(self, reward_list, client_id_list):
         # scale accuracy to 0-1
+        accuracy_list = reward_list[0]
+        round_time_list = reward_list[1]
+        neg_ratio = reward_list[2]
         accuracy = np.array(accuracy_list)
-        if hasattr(Config().parameters.architect, "value_net"):
-            reward = torch.from_numpy(accuracy)
-            alphas = torch.stack(
-                [
-                    self.alphas_normal[torch.tensor(client_id_list) - 1],
-                    self.alphas_reduce[torch.tensor(client_id_list) - 1],
-                ],
-                dim=-1,
-            )
-            alphas, reward = alphas.to(self.device), reward.to(self.device)
-            value = self.value_net.forward(alphas)[:, 0]
-            least_value = 1.0 / self.client_nums
-            value = torch.where(
-                value < least_value,
-                torch.ones(value.size()).to(self.device) * least_value,
-                value,
-            )
-            reward = reward - value
-            return reward.detach().cpu()
+        round_time = np.array(round_time_list)
 
-        def _add_accuracy_into_baseline(self, accuracy_list, client_id_list):
+        def _add_reward_into_baseline(self, accuracy_list, client_id_list):
             for client_id, accuracy in zip(client_id_list, accuracy_list):
                 if client_id in self.baseline:
                     self.baseline[client_id] = max(self.baseline[client_id], accuracy)
@@ -127,11 +125,16 @@ class Architect(nn.Module):
                     self.baseline[client_id] = accuracy
 
         if not self.baseline:
-            _add_accuracy_into_baseline(self, accuracy_list, client_id_list)
+            _add_reward_into_baseline(self, accuracy_list, client_id_list)
             # self.baseline = np.mean(accuracy)
         avg_accuracy = np.mean(np.array([item[1] for item in self.baseline.items()]))
-        reward = accuracy - avg_accuracy - 0 * neg_ratio
-        _add_accuracy_into_baseline(self, accuracy_list, client_id_list)
+        reward = (
+            accuracy
+            - avg_accuracy
+            - self.lambda_time * (round_time - np.min(round_time))
+            - self.lambda_neg * neg_ratio
+        )
+        _add_reward_into_baseline(self, accuracy_list, client_id_list)
         logging.info("reward: %s", str(reward))
         # self.baseline = (
         #     self.baseline_decay * np.mean(accuracy)
