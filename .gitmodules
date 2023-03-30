@@ -4,6 +4,3 @@
 [submodule "plato/models/t2tvit"]
 	path = plato/models/t2tvit
 	url = https://github.com/yitu-opensource/T2T-ViT
-[submodule "examples/pfedrlnas/ViT/nasvit_wrapper/NASViT"]
-	path = examples/pfedrlnas/ViT/nasvit_wrapper/NASViT
-	url = https://github.com/facebookresearch/NASViT
