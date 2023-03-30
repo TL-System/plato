@@ -7,7 +7,7 @@ import os
 
 import torch
 from plato.config import Config
-from plato.models.nasvit import architect
+from plato.models.nasvit_wrapper import architect
 from .mobilenetv3_supernet import NasDynamicModel
 from .config import get_config
 
