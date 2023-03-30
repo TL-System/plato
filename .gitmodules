@@ -1,6 +1,3 @@
-[submodule "plato/models/NASViT"]
-	path = plato/models/NASViT
-	url = https://github.com/facebookresearch/NASViT
 [submodule "plato/models/dvit"]
 	path = plato/models/dvit
 	url = https://github.com/zhoudaquan/dvit_repo
