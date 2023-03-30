@@ -1,6 +1,8 @@
 """
 NAS architect in PerFedRLNAS, a wrapper over the supernet.
 """
+import os
+import pickle
 import copy
 import logging
 import numpy as np
@@ -16,6 +18,7 @@ from .attentive_nas_dynamic_model import AttentiveNasDynamicModel
 from .config import _C as config
 
 
+# pylint:disable=attribute-defined-outside-init
 class Architect(nn.Module):
     """The supernet wrapper, including supernet and arch parameters."""
 

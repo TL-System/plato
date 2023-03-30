@@ -8,18 +8,17 @@ import collections
 import torch
 from torch import nn
 
-
-from plato.models.NASViT.models.modules.static_layers import MobileInvertedResidualBlock
-from plato.models.NASViT.models.modules.transformer import (
+from plato.config import Config
+from ..NASViT.models.modules.static_layers import MobileInvertedResidualBlock
+from ..NASViT.models.modules.transformer import (
     DynamicSwinTransformerBlock as StandardDynamicSwinTransformerBlock,
 )
-from plato.config import Config
-from plato.models.NASViT.models import attentive_nas_dynamic_model
-from plato.models.NASViT.models.modules.nn_utils import int2list
-from plato.models.NASViT.models.attentive_nas_static_model import (
+from ..NASViT.models import attentive_nas_dynamic_model
+from ..NASViT.models.modules.nn_utils import int2list
+from ..NASViT.models.attentive_nas_static_model import (
     AttentiveNasStaticModel,
 )
-from .modules.dynamic_layers import (
+from .dynamic_layers import (
     DynamicMBConvLayer,
     DynamicConvBnActLayer,
     DynamicLinearLayer,

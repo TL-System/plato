@@ -2,12 +2,17 @@
 Inherit modules fron NASViT and add get weights from subnet methods.
 """
 
-from plato.models.NASViT.models.modules import dynamic_layers
-from plato.models.NASViT.models.modules.static_layers import SELayer
-from plato.models.NASViT.models.modules.nn_utils import copy_bn, make_divisible
+from ..NASViT.models.modules import dynamic_layers
+from ..NASViT.models.modules.static_layers import SELayer
+from ..NASViT.models.modules.nn_utils import copy_bn, make_divisible
 
 
+# pylint:disable=abstract-method
 class DynamicMBConvLayer(dynamic_layers.DynamicMBConvLayer):
+    """
+    Added get weight from subnet.
+    """
+
     def get_weight_from_subnet(self, in_channel, sub_layer):
         """Get weight from subnet of this basic dynamic operation."""
         middle_channel = make_divisible(round(in_channel * self.active_expand_ratio), 8)
@@ -52,6 +57,10 @@ class DynamicMBConvLayer(dynamic_layers.DynamicMBConvLayer):
 
 
 class DynamicConvBnActLayer(dynamic_layers.DynamicConvBnActLayer):
+    """
+    Added get weight from subnet.
+    """
+
     def get_weight_from_subnet(self, in_channel, sub_layer):
         """Get weight from subnet of this basic dynamic operation."""
         self.conv.conv.weight.data[: self.active_out_channel, :in_channel, :, :].copy_(
@@ -64,6 +73,10 @@ class DynamicConvBnActLayer(dynamic_layers.DynamicConvBnActLayer):
 
 
 class DynamicLinearLayer(dynamic_layers.DynamicLinearLayer):
+    """
+    Added get weight from subnet.
+    """
+
     def get_weight_from_subnet(self, in_features, sub_layer):
         """Get weight from subnet of this basic dynamic operation."""
         self.linear.linear.weight.data[: self.out_features, :in_features].copy_(
@@ -77,6 +90,10 @@ class DynamicLinearLayer(dynamic_layers.DynamicLinearLayer):
 
 
 class DynamicShortcutLayer(dynamic_layers.DynamicShortcutLayer):
+    """
+    Added get weight from subnet.
+    """
+
     def get_weight_from_subnet(self, in_channel, sub_layer):
         """Get weight from subnet of this basic dynamic operation."""
         self.conv.conv.weight.data[: self.active_out_channel, :in_channel, :, :].copy_(
