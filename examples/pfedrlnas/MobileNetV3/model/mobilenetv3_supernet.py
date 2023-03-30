@@ -8,23 +8,28 @@ https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv3.html.
 """
 
 import collections
+import sys
 
 from torch import nn
 
 from plato.config import Config
 
-from plato.models.NASViT.models.modules.dynamic_layers import (
+from .config import get_config
+
+sys.path.append("./examples/pfedrlnas/")
+from VIT.nasvit_wrapper.NASViT.models.modules.dynamic_layers import (
     DynamicMBConvLayer,
     DynamicConvBnActLayer,
     DynamicLinearLayer,
     DynamicShortcutLayer,
 )
-from plato.models.NASViT.models.modules.static_layers import MobileInvertedResidualBlock
-from plato.models.NASViT.models.modules.nn_utils import int2list
-from plato.models.nasvit_wrapper.attentive_nas_dynamic_model import (
+from VIT.nasvit_wrapper.NASViT.models.modules.static_layers import (
+    MobileInvertedResidualBlock,
+)
+from VIT.nasvit_wrapper.NASViT.models.modules.nn_utils import int2list
+from VIT.nasvit_wrapper.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
-from .config import get_config
 
 
 class NasDynamicModel(AttentiveNasDynamicModel):
