@@ -11,10 +11,10 @@ import fednas_client
 import fednas_algorithm
 import fednas_trainer
 
-from plato.models.nasvit.models.attentive_nas_dynamic_model import (
+from models.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
-from plato.models.nasvit.architect import Architect
+from models.architect import Architect
 
 
 def main():

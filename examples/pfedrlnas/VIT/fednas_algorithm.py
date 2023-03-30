@@ -4,7 +4,7 @@ Customized NAS algorithms for PerFedRLNAS.
 import numpy as np
 
 import fedtools
-from plato.models.nasvit.models.attentive_nas_dynamic_model import (
+from models.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
 

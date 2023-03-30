@@ -7,7 +7,7 @@ import logging
 import torch
 import numpy as np
 
-from plato.models.nasvit.models.attentive_nas_dynamic_model import (
+from models.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
 
