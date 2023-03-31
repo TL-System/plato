@@ -17,7 +17,7 @@ from plato.config import Config
 from .config import get_config
 
 sys.path.append("./examples/pfedrlnas/")
-from VIT.nasvit_wrapper.NASViT.models.modules.dynamic_layers import (
+from VIT.nasvit_wrapper.dynamic_layers import (
     DynamicMBConvLayer,
     DynamicConvBnActLayer,
     DynamicLinearLayer,
