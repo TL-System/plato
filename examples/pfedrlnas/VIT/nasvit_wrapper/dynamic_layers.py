@@ -4,8 +4,21 @@ Inherit modules fron NASViT and add get weights from subnet methods.
 
 from .NASViT.models.modules import dynamic_layers
 from .NASViT.models.modules.static_layers import SELayer
-from .NASViT.models.modules.nn_utils import copy_bn, make_divisible
+from .NASViT.models.modules.nn_utils import make_divisible
 
+
+def copy_bn(target_bn, src_bn):
+    "Copy the BN with exact size."
+    feature_dim = min(target_bn.num_features, src_bn.num_features)
+
+    target_bn.weight.data[:feature_dim].copy_(src_bn.weight.data[:feature_dim])
+    target_bn.bias.data[:feature_dim].copy_(src_bn.bias.data[:feature_dim])
+    target_bn.running_mean.data[:feature_dim].copy_(
+        src_bn.running_mean.data[:feature_dim]
+    )
+    target_bn.running_var.data[:feature_dim].copy_(
+        src_bn.running_var.data[:feature_dim]
+    )
 
 # pylint:disable=abstract-method
 class DynamicMBConvLayer(dynamic_layers.DynamicMBConvLayer):
