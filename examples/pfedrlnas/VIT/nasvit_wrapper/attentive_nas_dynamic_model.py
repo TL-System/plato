@@ -18,7 +18,7 @@ from .NASViT.models.modules.nn_utils import int2list
 from .NASViT.models.attentive_nas_static_model import (
     AttentiveNasStaticModel,
 )
-from .dynamic_layers_custom import (
+from .dynamic_layers import (
     DynamicMBConvLayer,
     DynamicConvBnActLayer,
     DynamicLinearLayer,
