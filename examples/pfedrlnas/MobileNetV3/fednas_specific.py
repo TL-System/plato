@@ -4,7 +4,7 @@ Helped functions in PerFedRLNAS only applicable for search space: NASVIT
 from timm.loss import LabelSmoothingCrossEntropy
 from torch import optim
 
-from plato.models.nasvit.misc.smallconfig import get_config
+from model.config import get_config
 
 
 def get_nasvit_loss_criterion():
