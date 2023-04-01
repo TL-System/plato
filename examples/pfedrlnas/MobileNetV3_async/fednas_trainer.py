@@ -39,13 +39,8 @@ class Trainer(BasicTrainer):
         self.batch_size=config["batch_size"]
         self.unavailable_batch=1024
 
-
     def get_loss_criterion(self):
         return fednas_specific.get_nasvit_loss_criterion()
-
-    def get_optimizer(self, model):
-        optimizer = fednas_specific.get_optimizer(model)
-        return optimizer
     
     def train_run_start(self, config):
         super().train_run_start(config)
