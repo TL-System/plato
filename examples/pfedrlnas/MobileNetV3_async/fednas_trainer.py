@@ -35,6 +35,9 @@ class Trainer(BasicTrainer):
             self.max_mem = None
             self.min_mem = None
         self.max_mem_allocated = 0
+        config = Config().trainer._asdict()
+        self.batch_size=config["batch_size"]
+        self.unavailable_batch=1024
 
 
     def get_loss_criterion(self):
@@ -51,6 +54,8 @@ class Trainer(BasicTrainer):
                 random.random() * (self.max_mem - self.min_mem) + self.min_mem
             )
             self.max_mem_allocated = 0
+        self.unavailable_batch=1024
+        self.batch_size=config["batch_size"]
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         torch.cuda.synchronize(self.device)
@@ -65,16 +70,26 @@ class Trainer(BasicTrainer):
         super().train_step_end(config, batch, loss)
         if self.max_mem_allocated > self.sim_mem:
             raise SimuRuntimeError
+        if self.max_mem_allocated<config.mem_usage*self.sim_mem:
+            if self.batch_size*2<=self.unavailable_batch:
+                self.batch_size*=2
+
+    def adjust_batch_size(self):
+        "Decrease the batch size if cannot run."
+        self.unavailable_batch=min(self.unavailable_batch,self.batch_size)
+        self.batch_size=max(self.batch_size//2,1)
 
     def train_process(self, config, trainset, sampler, **kwargs):
-        try:
-            self.train_model(config, trainset, sampler.get(), **kwargs)
-        except SimuRuntimeError:
-            self.exceed_memory = True
-            self.utilization = 1
-        except Exception as training_exception:
-            logging.info("Training on client #%d failed.", self.client_id)
-            raise training_exception
+        
+        while True:
+            try:
+                self.train_model(config, trainset, sampler.get(), **kwargs)
+                break
+            except SimuRuntimeError:
+                self.adjust_batch_size()
+            except Exception as training_exception:
+                logging.info("Training on client #%d failed.", self.client_id)
+                raise training_exception
         if "max_concurrency" in config:
             self.model.cpu()
             model_name = config["model_name"]
@@ -87,6 +102,9 @@ class Trainer(BasicTrainer):
             self.save_memory(
                 (self.max_mem_allocated, self.exceed_memory, self.sim_mem), filename
             )
+    # pylint: disable=unused-argument
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
+        super().get_train_loader(self.batch_size,trainset,sampler)
 
     @staticmethod
     def save_memory(memory, filename=None):

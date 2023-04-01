@@ -71,6 +71,8 @@ trainer:
 
     model_type: torch_hub
     model_name: mobilenet_v3_large
+    
+    mem_usage: 0.75
 
 algorithm:
     # Aggregation algorithm
