@@ -70,7 +70,7 @@ class Trainer(BasicTrainer):
         super().train_step_end(config, batch, loss)
         if self.max_mem_allocated > self.sim_mem:
             raise SimuRuntimeError
-        if self.max_mem_allocated<config.mem_usage*self.sim_mem:
+        if self.max_mem_allocated<Config().trainer.mem_usage*self.sim_mem:
             if self.batch_size*2<=self.unavailable_batch:
                 self.batch_size*=2
 
@@ -104,7 +104,7 @@ class Trainer(BasicTrainer):
             )
     # pylint: disable=unused-argument
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        super().get_train_loader(self.batch_size,trainset,sampler)
+        return super().get_train_loader(self.batch_size,trainset,sampler)
 
     @staticmethod
     def save_memory(memory, filename=None):
