@@ -82,7 +82,7 @@ class Server(fedavg.Server):
         client_id_list = [update.client_id for update in self.updates]
         num_samples = [update.report.num_samples for update in self.updates]
         self.total_samples=sum(num_samples)
-        deltas=await self.compute_weight_deltas(baseline_weights, weights_received,client_id_list)
+        deltas=await self.compute_weight_deltas(weights_received,client_id_list)
         aggregation_weights= await self.calculate_aggregation_weight(updates,deltas)
         self.neg_ratio = self.algorithm.nas_aggregation(
             aggregation_weights,self.subnets_config, weights_received, client_id_list
@@ -91,15 +91,16 @@ class Server(fedavg.Server):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
 
-    async def compute_weight_deltas(self,baseline_weights,weights_received,client_id_list):
+    async def compute_weight_deltas(self,weights_received,client_id_list):
         """The calculation of deltas in NAS is different."""
+        baseline_weights=self.algorithm.model.model.state_dict()
         client_models = []
         subnet_configs = []
         for i, client_id_ in enumerate(client_id_list):
             client_id = client_id_ - 1
             subnet_config = self.subnets_config[client_id]
             client_model = fedtools.sample_subnet_w_config(
-                self.model.model, subnet_config, False
+                self.algorithm.model.model, subnet_config, False
             )
             client_model.load_state_dict(weights_received[i], strict=True)
             client_models.append(client_model)

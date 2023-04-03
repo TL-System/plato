@@ -43,7 +43,7 @@ server:
     simulate_wall_time: true
 
     # What is the minimum number of clients that need to report before aggregation begins?
-    minimum_clients_aggregated: 15
+    minimum_clients_aggregated: 5
 
     # What is the staleness bound, beyond which the server should wait for stale clients?
     staleness_bound: 10
