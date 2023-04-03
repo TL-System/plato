@@ -6,8 +6,13 @@ import sys
 import logging
 import pickle
 import time
+import copy
 import numpy as np
+import torch
+import torch.nn.functional as F
 
+
+import fedtools
 
 from plato.utils import csv_processor
 from plato.config import Config
@@ -76,12 +81,32 @@ class Server(fedavg.Server):
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
         num_samples = [update.report.num_samples for update in self.updates]
+        self.total_samples=sum(num_samples)
+        deltas=await self.compute_weight_deltas(baseline_weights, weights_received,client_id_list)
+        aggregation_weights= await self.calculate_aggregation_weight(updates,deltas)
         self.neg_ratio = self.algorithm.nas_aggregation(
-            self.subnets_config, weights_received, client_id_list, num_samples
+            aggregation_weights,self.subnets_config, weights_received, client_id_list
         )
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
+
+    async def compute_weight_deltas(self,baseline_weights,weights_received,client_id_list):
+        """The calculation of deltas in NAS is different."""
+        client_models = []
+        subnet_configs = []
+        for i, client_id_ in enumerate(client_id_list):
+            client_id = client_id_ - 1
+            subnet_config = self.subnets_config[client_id]
+            client_model = fedtools.sample_subnet_w_config(
+                self.model.model, subnet_config, False
+            )
+            client_model.load_state_dict(weights_received[i], strict=True)
+            client_models.append(client_model)
+            subnet_configs.append(subnet_config)
+        proxy_supernets = fedtools.generate_proxy_supernets(client_models,subnet_configs)
+        proxy_supernets_weights=[proxy_supernet.state_dict() for proxy_supernet in proxy_supernets]
+        return self.algorithm.compute_weight_deltas(baseline_weights,proxy_supernets_weights)
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
@@ -106,6 +131,9 @@ class Server(fedavg.Server):
 
         self.trainer.model = self.algorithm.model
         self.process_end = time.time()
+        # Save the current model for later retrieval when cosine similarity needs to be computed
+        filename = f"model_{self.current_round}.pth"
+        self.trainer.save_model(filename)
 
     def server_will_close(self):
         for i in range(1, Config().clients.total_clients):
@@ -189,3 +217,101 @@ class Server(fedavg.Server):
             ]
             csv_processor.initialize_csv(
                 accuracy_csv_file, accuracy_headers, Config().params["result_path"])
+            
+    async def calculate_aggregation_weight(self,updates,deltas_received):
+        """Calculate aggregation weights according to the port."""
+        # Constructing the aggregation weights to be used
+        aggregation_weights = []
+
+        for i, update in enumerate(deltas_received):
+            report = updates[i].report
+            staleness = updates[i].staleness
+            num_samples = report.num_samples
+
+            similarity = await self.cosine_similarity(update, staleness)
+            staleness_factor = Server.staleness_function(staleness)
+
+            similarity_weight = (
+                Config().server.similarity_weight
+                if hasattr(Config().server, "similarity_weight")
+                else 1
+            )
+            staleness_weight = (
+                Config().server.staleness_weight
+                if hasattr(Config().server, "staleness_weight")
+                else 1
+            )
+
+            logging.info("[Client %s] similarity: %s", i, (similarity + 1) / 2)
+            logging.info(
+                "[Client %s] staleness: %s, staleness factor: %s",
+                i,
+                staleness,
+                staleness_factor,
+            )
+            raw_weight = (
+                num_samples
+                / self.total_samples
+                * (
+                    (similarity + 1) / 2 * similarity_weight
+                    + staleness_factor * staleness_weight
+                )
+            )
+            logging.info("[Client %s] raw weight = %s", i, raw_weight)
+
+            aggregation_weights.append(raw_weight)
+
+        # Normalize so that the sum of aggregation weights equals 1
+        aggregation_weights = [
+            i / sum(aggregation_weights) for i in aggregation_weights
+        ]
+
+        logging.info(
+            "[Server #%s] normalized aggregation weights: %s",
+            os.getpid(),
+            aggregation_weights,
+        )
+
+        return aggregation_weights
+
+    async def cosine_similarity(self, update, staleness):
+        """Compute the cosine similarity of the received updates and the difference
+        between the current and a previous model according to client staleness."""
+        # Loading the global model from a previous round according to staleness
+        filename = f"model_{self.current_round - 2}.pth"
+        model_path = Config().params["model_path"]
+        model_path = f"{model_path}/{filename}"
+
+        similarity = 1.0
+
+        if staleness > 1 and os.path.exists(model_path):
+            previous_model = copy.deepcopy(self.trainer.model)
+            previous_model.load_state_dict(torch.load(model_path))
+
+            previous = torch.zeros(0)
+            for __, weight in previous_model.cpu().state_dict().items():
+                previous = torch.cat((previous, weight.view(-1)))
+
+            current = torch.zeros(0)
+            for __, weight in self.trainer.model.cpu().state_dict().items():
+                current = torch.cat((current, weight.view(-1)))
+
+            deltas = torch.zeros(0)
+            for __, delta in update.items():
+                deltas = torch.cat((deltas, delta.view(-1)))
+
+            similarity = F.cosine_similarity(current - previous, deltas, dim=0)       
+        return similarity
+
+    @staticmethod
+    def staleness_function(staleness):
+        """The staleness_function."""
+        staleness_bound = 10
+
+        if hasattr(Config().server, "staleness_bound"):
+            staleness_bound = Config().server.staleness_bound
+
+        staleness_factor = staleness_bound / (staleness + staleness_bound)
+
+        return staleness_factor
+    

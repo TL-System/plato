@@ -36,11 +36,10 @@ def sample_subnet_w_config(supernet, cfg, preserver_weight=True):
     return subnet
 
 
-def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
+def _average_fuse(global_iter, client_iters, aggregation_weight, avg_last=True):
     # pylint: disable=too-many-locals
     weight_numbers = np.zeros(len(client_iters))
     neg_numebers = np.zeros(len(client_iters))
-    total_samples = sum(num_samples)
 
     try:
         while True:
@@ -60,7 +59,7 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
                 is_update = torch.ones(is_update.size()) - (
                     torch.abs(delta) < 1e-8
                 ).type(dtype=is_update.dtype)
-                deltas += delta * num_samples[idx] / total_samples * is_update
+                deltas += delta * aggregation_weight[idx] * is_update
                 temp_delta.append(copy.deepcopy(delta))
             global_param.data += deltas
             for idx, delta in enumerate(temp_delta):
@@ -80,6 +79,17 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
 
 def fuse_weight(supernet, subnets, cfgs, num_samples):
     """Fuse weights of subnets with different structure into supernet."""
+    proxy_supernets = generate_proxy_supernets(subnets, cfgs)
+    proxy_iters = []
+    for proxy_supernet in proxy_supernets:
+        proxy_iters.append(proxy_supernet.named_parameters())
+    global_iter = supernet.named_parameters()
+    neg_ratio = _average_fuse(global_iter, proxy_iters, num_samples)
+    return neg_ratio
+
+
+def generate_proxy_supernets(subnets, cfgs):
+    """Generate a series of proxy supernets."""
     proxy_supernets = []
     for i, cfg in enumerate(cfgs):
         proxy_supernet = NasDynamicModel()
@@ -93,9 +103,4 @@ def fuse_weight(supernet, subnets, cfgs, num_samples):
         )
         proxy_supernet.get_weight_from_subnet(subnet)
         proxy_supernets.append(proxy_supernet)
-    proxy_iters = []
-    for proxy_supernet in proxy_supernets:
-        proxy_iters.append(proxy_supernet.named_parameters())
-    global_iter = supernet.named_parameters()
-    neg_ratio = _average_fuse(global_iter, proxy_iters, num_samples)
-    return neg_ratio
+    return proxy_supernets
