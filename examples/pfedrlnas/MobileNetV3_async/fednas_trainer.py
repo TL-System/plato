@@ -1,7 +1,6 @@
 """
 Customized Trainer for PerFedRLNAS.
 """
-import copy
 import logging
 import random
 import pickle
@@ -9,6 +8,9 @@ import os
 import re
 import torch
 import fednas_specific
+
+import fedtools
+from model.mobilenetv3_supernet import NasDynamicModel
 
 from plato.trainers import basic
 from plato.config import Config
@@ -42,6 +44,7 @@ class Trainer(BasicTrainer):
         config = Config().trainer._asdict()
         self.batch_size = config["batch_size"]
         self.unavailable_batch = 1024
+        self.current_config = None
 
     def get_loss_criterion(self):
         return fednas_specific.get_nasvit_loss_criterion()
@@ -160,6 +163,10 @@ class Trainer(BasicTrainer):
                         "training_time": float(training_time),
                         "model_checkpoint": filename,
                     }
+        with open(
+            f"{Config().params['model_path']}/{client_id}.pkl", "rb"
+        ) as history_file:
+            subnet_config = pickle.load(history_file)
         # Locate the model at a specific wall clock time
         for epoch in sorted(models_per_epoch, reverse=True):
             model_training_time = models_per_epoch[epoch]["training_time"]
@@ -175,8 +182,9 @@ class Trainer(BasicTrainer):
                     pretrained = torch.load(
                         model_path, map_location=torch.device("cpu")
                     )
-
-                model = copy.deepcopy(self.model)
+                model = fedtools.sample_subnet_w_config(
+                    NasDynamicModel(), subnet_config, False
+                )
                 model.load_state_dict(pretrained, strict=True)
 
                 logging.info(
@@ -192,3 +200,16 @@ class Trainer(BasicTrainer):
         raise ValueError(
             f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
         )
+
+    def train_epoch_end(self, config):
+        """Method called at the end of a training epoch."""
+        super().train_epoch_end(config)
+        if (
+            hasattr(Config().server, "request_update")
+            and Config().server.request_update
+        ):
+            filename = f"{self.client_id}.pkl"
+            model_path = Config().params["model_path"]
+            model_path = f"{model_path}/{filename}"
+            with open(model_path, "wb") as history_file:
+                pickle.dump(self.current_config, history_file)
