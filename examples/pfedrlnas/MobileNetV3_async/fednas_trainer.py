@@ -172,7 +172,6 @@ class Trainer(BasicTrainer):
             model_training_time = models_per_epoch[epoch]["training_time"]
             model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
 
-            print(model_training_time, requested_time)
             if model_training_time < requested_time:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
 

@@ -52,7 +52,7 @@ server:
     staleness_bound: 10
 
     # Should we send urgent notifications to stale clients beyond the staleness bound?
-    request_update: true
+    request_update: false
 
     # Hyperparameters in the Port algorithm
     similarity_weight: 1
