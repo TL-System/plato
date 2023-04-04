@@ -197,9 +197,25 @@ class Trainer(BasicTrainer):
 
                 return model
 
-        raise ValueError(
-            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
+        model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+
+        pretrained = None
+        if torch.cuda.is_available():
+            pretrained = torch.load(model_path)
+        else:
+            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
+        model = fedtools.sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
+        model.load_state_dict(pretrained, strict=True)
+
+        logging.info(
+            "[Client #%s] Responding to the server with the model after "
+            "epoch %s finished, at time %s.",
+            client_id,
+            epoch,
+            model_training_time,
         )
+
+        return model
 
     def train_epoch_end(self, config):
         """Method called at the end of a training epoch."""
