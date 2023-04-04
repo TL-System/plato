@@ -30,37 +30,3 @@ class Client(simple.Client):
         report.exceed = exceed_memory
         report.budget = sim_mem
         return super().customize_report(report)
-
-    async def _request_update(self, data) -> None:
-        """Upon receiving a request for an urgent model update."""
-        logging.info(
-            "[Client #%s] Urgent request received for model update at time %s.",
-            data["client_id"],
-            data["time"],
-        )
-
-        try:
-            report, payload = await self._obtain_model_update(
-                client_id=data["client_id"],
-                requested_time=data["time"],
-            )
-        except ValueError:
-            logging.info(
-                f"[Client #{data['client_id']}] Cannot find an epoch that matches the wall-clock time provided. No return model."
-            )
-            return
-
-        # Process outbound data when necessary
-        self.callback_handler.call_event(
-            "on_outbound_ready", self, report, self.outbound_processor
-        )
-        self.outbound_ready(report, self.outbound_processor)
-        payload = self.outbound_processor.process(payload)
-
-        # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit(
-            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
-        )
-
-        # Sending the client training payload to the server
-        await self._send(payload)
