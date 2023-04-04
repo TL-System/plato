@@ -1,10 +1,12 @@
 """
 Customized Trainer for PerFedRLNAS.
 """
+import copy
 import logging
 import random
 import pickle
 import os
+import re
 import torch
 import fednas_specific
 
@@ -21,8 +23,10 @@ else:
 class SimuRuntimeError(RuntimeError):
     """Simulated Run time Error"""
 
+
 class Trainer(BasicTrainer):
     """Use special optimizer and loss criterion."""
+
     def __init__(self, model=None, callbacks=None) -> None:
         super().__init__(model, callbacks)
         self.utilization = 0
@@ -36,12 +40,12 @@ class Trainer(BasicTrainer):
             self.min_mem = None
         self.max_mem_allocated = 0
         config = Config().trainer._asdict()
-        self.batch_size=config["batch_size"]
-        self.unavailable_batch=1024
+        self.batch_size = config["batch_size"]
+        self.unavailable_batch = 1024
 
     def get_loss_criterion(self):
         return fednas_specific.get_nasvit_loss_criterion()
-    
+
     def train_run_start(self, config):
         super().train_run_start(config)
         if hasattr(Config().parameters, "simulate"):
@@ -49,8 +53,8 @@ class Trainer(BasicTrainer):
                 random.random() * (self.max_mem - self.min_mem) + self.min_mem
             )
             self.max_mem_allocated = 0
-        self.unavailable_batch=1024
-        self.batch_size=config["batch_size"]
+        self.unavailable_batch = 1024
+        self.batch_size = config["batch_size"]
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         torch.cuda.synchronize(self.device)
@@ -65,17 +69,16 @@ class Trainer(BasicTrainer):
         super().train_step_end(config, batch, loss)
         if self.max_mem_allocated > self.sim_mem:
             raise SimuRuntimeError
-        if self.max_mem_allocated<Config().trainer.mem_usage*self.sim_mem:
-            if self.batch_size*2<=self.unavailable_batch:
-                self.batch_size*=2
+        if self.max_mem_allocated < Config().trainer.mem_usage * self.sim_mem:
+            if self.batch_size * 2 <= self.unavailable_batch:
+                self.batch_size *= 2
 
     def adjust_batch_size(self):
         "Decrease the batch size if cannot run."
-        self.unavailable_batch=min(self.unavailable_batch,self.batch_size)
-        self.batch_size=max(self.batch_size//2,1)
+        self.unavailable_batch = min(self.unavailable_batch, self.batch_size)
+        self.batch_size = max(self.batch_size // 2, 1)
 
     def train_process(self, config, trainset, sampler, **kwargs):
-        
         while True:
             try:
                 self.train_model(config, trainset, sampler.get(), **kwargs)
@@ -97,9 +100,10 @@ class Trainer(BasicTrainer):
             self.save_memory(
                 (self.max_mem_allocated, self.exceed_memory, self.sim_mem), filename
             )
+
     # pylint: disable=unused-argument
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        return super().get_train_loader(self.batch_size,trainset,sampler)
+        return super().get_train_loader(self.batch_size, trainset, sampler)
 
     @staticmethod
     def save_memory(memory, filename=None):
@@ -133,3 +137,58 @@ class Trainer(BasicTrainer):
             memory = pickle.load(file)
 
         return memory
+
+    def obtain_model_update(self, client_id, requested_time):
+        """
+        Obtain a saved model for a particular epoch that finishes just after the provided
+        wall clock time is reached.
+        """
+        # Constructing a list of epochs and training times
+        models_per_epoch = {}
+
+        for filename in os.listdir(Config().params["model_path"]):
+            split = re.match(
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
+                filename,
+            )
+
+            if split is not None:
+                epoch = split.group("epoch")
+                training_time = split.group("training_time")
+                if client_id == int(split.group("client_id")):
+                    models_per_epoch[epoch] = {
+                        "training_time": float(training_time),
+                        "model_checkpoint": filename,
+                    }
+        # Locate the model at a specific wall clock time
+        for epoch in sorted(models_per_epoch, reverse=True):
+            model_training_time = models_per_epoch[epoch]["training_time"]
+            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
+
+            if model_training_time < requested_time:
+                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+
+                pretrained = None
+                if torch.cuda.is_available():
+                    pretrained = torch.load(model_path)
+                else:
+                    pretrained = torch.load(
+                        model_path, map_location=torch.device("cpu")
+                    )
+
+                model = copy.deepcopy(self.model)
+                model.load_state_dict(pretrained, strict=True)
+
+                logging.info(
+                    "[Client #%s] Responding to the server with the model after "
+                    "epoch %s finished, at time %s.",
+                    client_id,
+                    epoch,
+                    model_training_time,
+                )
+
+                return model
+
+        raise ValueError(
+            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
+        )

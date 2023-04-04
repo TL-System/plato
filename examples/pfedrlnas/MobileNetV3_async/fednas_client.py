@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from plato.clients import simple
 from plato.config import Config
 
+
 class Client(simple.Client):
     """A FedRLNAS client. Different clients hold different models."""
 
@@ -15,7 +16,6 @@ class Client(simple.Client):
         subnet_config = server_response["subnet_config"]
         self.algorithm.model = self.algorithm.generate_client_model(subnet_config)
         self.trainer.model = self.algorithm.model
-
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         model_name = Config().trainer.model_name

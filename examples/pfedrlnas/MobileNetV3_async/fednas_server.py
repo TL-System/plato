@@ -61,7 +61,7 @@ class Server(fedavg.Server):
     ):
         # pylint:disable=too-many-arguments
         super().__init__(model, datasource, algorithm, trainer, callbacks=[FendasServerCallback])
-        self.subnets_config = [None for i in range(Config().clients.total_clients)]
+        self.subnets_config = [None for _ in range(Config().clients.total_clients)]
         self.neg_ratio = None
         self.process_begin = None
         self.process_end = None

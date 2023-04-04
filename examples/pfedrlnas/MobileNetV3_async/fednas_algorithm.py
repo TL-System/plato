@@ -40,7 +40,7 @@ class ServerAlgorithm(fedavg.Algorithm):
         return subnet_config
 
     def nas_aggregation(
-        self, aggregation_weights,subnets_config, weights_received, client_id_list
+        self, aggregation_weight, subnets_config, weights_received, client_id_list
     ):
         """Weight aggregation in NAS."""
         client_models = []
@@ -55,10 +55,7 @@ class ServerAlgorithm(fedavg.Algorithm):
             client_models.append(client_model)
             subnet_configs.append(subnet_config)
         neg_ratio = fedtools.fuse_weight(
-            self.model.model,
-            client_models,
-            subnet_configs,
-            aggregation_weights
+            self.model.model, client_models, subnet_configs, aggregation_weight
         )
         return neg_ratio
 
