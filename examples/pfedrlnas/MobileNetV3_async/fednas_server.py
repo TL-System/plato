@@ -48,6 +48,9 @@ class FendasServerCallback(ServerCallback):
                 csv_processor.write_csv(accuracy_csv_file, accuracy_row)
             logging.info("[%s] All client reports have been processed.", server)
 
+    def on_clients_selected(self, server, selected_clients, **kwargs):
+        return super().on_clients_selected(server, selected_clients, **kwargs)
+
 #pylint:disable=too-many-instance-attributes
 class Server(fedavg.Server):
     """The PerFedRLNAS server assigns and aggregates global model with different architectures."""
