@@ -46,13 +46,13 @@ class Client(simple.Client):
         # there are two options:
         # 1.- normal
         # 2.- personalization
-        self.learning_model = "normal"
+        self.learning_mode = "normal"
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
         super().process_server_response(server_response)
-        self.learning_model = server_response["learning_mode"]
+        self.learning_mode = server_response["learning_mode"]
 
     def configure(self) -> None:
         """Performing the general client's configure and then initialize the
@@ -144,10 +144,16 @@ class Client(simple.Client):
             )
             logging.info(
                 fonts.colourize(
-                    "First-time Selection of Client[%d]: initialized its personalized model and persisted to %s under %s",
+                    "First-time Selection of Client[%d] for personalization",
                     colour="blue",
                 ),
                 self.client_id,
+            )
+            logging.info(
+                fonts.colourize(
+                    "Initialized its unique personalized model and persisted to %s under %s",
+                    colour="blue",
+                ),
                 filename,
                 checkpoint_dir_path,
             )
@@ -174,20 +180,6 @@ class Client(simple.Client):
             self.client_id,
             personalized_model_name,
         )
-        # This operation is important to the personalized FL
-        # under Plato
-        # Because, in general, when one client is called the first time,
-        # its personalized model should be randomly intialized.
-        # Howerver, Plato utilizes the `session` to simulate the
-        # client and only the client id of each `session` is changed.
-        # Thus, even a unseen client is selected, its personalized model
-        # is the one trained by other previous clients.
-        # Here, the function aims to
-        #  1. initial the personalized model for this client
-        #  2. persist the initialized personalized model
-        # when the client is selected the first time.
-        self.persist_initial_personalized_model()
-
         # when `persist_personalized_model` is set to be True, it means
         # that each client want to load its latest trained personalzied
         # model instead of using the initial one.
@@ -260,7 +252,21 @@ class Client(simple.Client):
         # load the model
         self.algorithm.load_weights(server_payload)
 
-        if self.personalized_model is not None:
+        if self.is_personalized_learn() and self.personalized_model is not None:
+            # This operation is important to the personalized FL
+            # under Plato
+            # Because, in general, when one client is called the first time,
+            # its personalized model should be randomly intialized.
+            # Howerver, Plato utilizes the `session` to simulate the
+            # client and only the client id of each `session` is changed.
+            # Thus, even a unseen client is selected, its personalized model
+            # is the one trained by other previous clients.
+            # Here, the function aims to
+            #  1. initial the personalized model for this client
+            #  2. persist the initialized personalized model
+            # when the client is selected the first time.
+            self.persist_initial_personalized_model()
+
             # load the personalized model.
             self.load_personalized_model()
 
@@ -277,7 +283,7 @@ class Client(simple.Client):
         if hasattr(self.trainer, "current_round"):
             self.trainer.current_round = self.current_round
 
-        if self.learning_model == "personalization":
+        if self.is_personalized_learn():
             logging.info(
                 fonts.colourize(
                     f"[{self}] Started personalized training in the communication round #{self.current_round}.",
@@ -293,8 +299,7 @@ class Client(simple.Client):
                 )
             except ValueError:
                 await self.sio.disconnect()
-
-        if self.learning_model == "normal":
+        else:
             logging.info(
                 fonts.colourize(
                     f"[{self}] Started training in communication round #{self.current_round}."
@@ -353,3 +358,7 @@ class Client(simple.Client):
         self._report = self.customize_report(report)
 
         return self._report, weights
+
+    def is_personalized_learn(self):
+        """Whether this client will perform personalization."""
+        return self.learning_mode == "personalization"
