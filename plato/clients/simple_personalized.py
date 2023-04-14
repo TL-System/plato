@@ -3,7 +3,7 @@ A basic personalized federated learning client
 who performs the global learning and local learning.
 
 """
-
+import os
 import time
 import logging
 from types import SimpleNamespace
@@ -12,7 +12,6 @@ from plato.clients import simple
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.utils import checkpoint_operator
-from plato.utils.filename_formatter import get_format_name
 from plato.utils import fonts
 
 
@@ -42,35 +41,18 @@ class Client(simple.Client):
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
 
-    def persist_initial_model(self):
-        """Persist the initial model of one client."""
-        pers_model_name = Config().trainer.personalized_model_name
-        # save the defined personalized model as the initial one
-        checkpoint_path = Config.params["checkpoint_path"]
-        cpk_oper = checkpoint_operator.CheckpointsOperator(
-            checkpoints_dir=checkpoint_path
-        )
-        filename = get_format_name(
-            model_name=pers_model_name,
-            client_id=self.client_id,
-            round_n=0,
-            prefix="personalized",
-            ext="pth",
-        )
+        # the learning model to be performed in this client
+        # by default, performing `normal` fl's local update
+        # there are two options:
+        # 1.- normal
+        # 2.- personalization
+        self.learning_model = "normal"
 
-        if not cpk_oper.vaild_checkpoint_file(filename):
-            # reset the personalized model for this client
-            self.personalized_model.apply(cpk_oper.reset_weight)
-            cpk_oper.save_checkpoint(
-                model_state_dict=self.personalized_model.state_dict(),
-                checkpoints_name=[filename],
-            )
-            logging.info(
-                "Client[%d] saves the initial personalized model to %s under %d",
-                self.client_id,
-                filename,
-                checkpoint_path,
-            )
+    def process_server_response(self, server_response) -> None:
+        """Additional client-specific processing on the server response."""
+
+        super().process_server_response(server_response)
+        self.learning_model = server_response["learning_mode"]
 
     def configure(self) -> None:
         """Performing the general client's configure and then initialize the
@@ -81,13 +63,14 @@ class Client(simple.Client):
         if not hasattr(Config().trainer, "personalized_model_name"):
             return None
 
-        # assign the personalized model to the client
-        if self.custom_personalized_model is not None:
-            self.personalized_model = self.custom_personalized_model
-            self.custom_personalized_model = None
         pers_model_name = Config().trainer.personalized_model_name
-        pers_model_type = Config().trainer.personalized_model_type
-        if self.personalized_model is None:
+        pers_model_type = (
+            Config().trainer.personalized_model_type
+            if hasattr(Config().trainer, "personalized_model_type")
+            else pers_model_name.split("_")[0]
+        )
+        # assign the personalized model to the client
+        if self.personalized_model is None and self.custom_personalized_model is None:
 
             pers_model_params = Config().parameters.personalized_model._asdict()
             self.personalized_model = models_registry.get(
@@ -95,33 +78,79 @@ class Client(simple.Client):
                 model_type=pers_model_type,
                 model_params=pers_model_params,
             )
-        else:
-            self.personalized_model = self.personalized_model()
+        elif (
+            self.personalized_model is None
+            and self.custom_personalized_model is not None
+        ):
+            self.personalized_model = self.custom_personalized_model()
 
-            logging.info(
-                "Client[%d] defines the personalized model: %s",
-                self.client_id,
-                pers_model_name,
-            )
-
-        # This operation is important to the personalized FL
-        # under Plato
-        # Because, in general, when one client is called the first time,
-        # its personalized model should be randomly intialized.
-        # Howerver, Plato utilizes the `process` to simulate the
-        # client and only the client id of each `process` is changed.
-        # Thus, even a unseen client is selected, its personalized model
-        # is the one trained by other previous clients.
-        # Here, the function aims to persist the initial personalized model
-        # when the client is selected the first time.
-        self.persist_initial_model()
+        logging.info(
+            "Client[%d] defines the personalized model: %s",
+            self.client_id,
+            pers_model_name,
+        )
 
         # assign the client's personalized model to its trainer
-        if (
-            hasattr(self.trainer, "set_client_personalized_model")
-            and self.trainer.personalized_model is None
-        ):
+        # we need to know that in Plato, the personalized model here
+        # makes no sense and it is only initialized to hold the model
+        # structure/parameters.
+        # The main reason is that Plato simulates the client with multiple
+        # `sessions`, which are started at the beginning of running. These
+        # The server will build fake connection with these `sessions` - when
+        # the `sessions` receive information from the server, the the
+        # `configuration()` function is called the first time to perform
+        # necessary initialization (model, trainer, algorithm, personalized model).
+        # However, only when the actual clients are selected by the server,
+        # these `sessions` will be assigned meaningful client id.
+        # At that time, the parameters of model and personalized model of each client
+        # corresponding to one `session` will be assigned with received payloads
+        # or initialized for current client - see function `_load_payload`
+
+        # to save space and time, the personalized model of the trainer will be
+        # assigned only during the first time - the session is created.
+        if self.trainer.personalized_model is None:
             self.trainer.set_client_personalized_model(self.personalized_model)
+
+    def persist_initial_personalized_model(self):
+        """Persist the initial model of one client."""
+        pers_model_name = Config().trainer.personalized_model_name
+        # save the defined personalized model as the initial one
+        checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
+
+        filename, cpk_oper = checkpoint_operator.load_client_checkpoint(
+            client_id=self.client_id,
+            model_name=pers_model_name,
+            checkpoints_dir=checkpoint_dir_path,
+            current_round=0,
+            run_id=None,
+            epoch=None,
+            prefix="personalized",
+            use_latest=False,
+        )
+
+        # if the personalized model for current client does
+        # not exist - this client is selected the first time
+        if cpk_oper is None:
+            # create a new one for saving
+            new_cpk_oper = checkpoint_operator.CheckpointsOperator(
+                checkpoints_dir=checkpoint_dir_path
+            )
+            # reset the personalized model for this client
+            # thus, different clients have different init parameters
+            self.personalized_model.apply(new_cpk_oper.reset_weight)
+            new_cpk_oper.save_checkpoint(
+                model_state_dict=self.personalized_model.state_dict(),
+                checkpoints_name=[filename],
+            )
+            logging.info(
+                fonts.colourize(
+                    "First-time Selection of Client[%d]: initialized its personalized model and persisted to %s under %s",
+                    colour="blue",
+                ),
+                self.client_id,
+                filename,
+                checkpoint_dir_path,
+            )
 
     def load_personalized_model(self):
         """Load the personalized model.
@@ -129,28 +158,42 @@ class Client(simple.Client):
         This function is necessary for personalized federated learning in
         Plato. Because, in general, when one client is called the first time,
         its personalized model should be randomly intialized. Howerver,
-        Plato utilizes the `process` to simulate the client and only the client
-        id of each `process` is changed.
+        Plato utilizes the `session` to simulate the client and only the client
+        id of each `session` is changed.
 
-        Therefore, in each round, the selected client (each `process`) should load
+        Therefore, in each round, the selected client (each `session`) should load
         its personalized model instead of using the current self.personalized_model
         trained by others.
         """
-
         # model_name = Config().trainer.model_name
         personalized_model_name = Config().trainer.personalized_model_name
         logging.info(
-            "[Client #%d] loading its personalized model [%s].",
+            fonts.colourize(
+                "[Client #%d] loading its personalized model [%s].", colour="blue"
+            ),
             self.client_id,
             personalized_model_name,
         )
+        # This operation is important to the personalized FL
+        # under Plato
+        # Because, in general, when one client is called the first time,
+        # its personalized model should be randomly intialized.
+        # Howerver, Plato utilizes the `session` to simulate the
+        # client and only the client id of each `session` is changed.
+        # Thus, even a unseen client is selected, its personalized model
+        # is the one trained by other previous clients.
+        # Here, the function aims to
+        #  1. initial the personalized model for this client
+        #  2. persist the initialized personalized model
+        # when the client is selected the first time.
+        self.persist_initial_personalized_model()
 
         # when `persist_personalized_model` is set to be True, it means
         # that each client want to load its latest trained personalzied
         # model instead of using the initial one.
         if (
-            hasattr(Config().trainer, "persist_personalized_model")
-            and Config().trainer.persist_personalized_model
+            hasattr(Config().clients, "persist_personalized_model")
+            and Config().clients.persist_personalized_model
         ):
             # load the client's latest personalized model
             # we should know that only when this client is selected the first time,
@@ -160,21 +203,28 @@ class Client(simple.Client):
             desired_round = self.current_round - 1
 
             logging.info(
-                "[Client #%d] loads latest personalized model.",
+                fonts.colourize(
+                    "[Client #%d] loads latest personalized model.", colour="blue"
+                ),
                 self.client_id,
             )
         else:
             # client does not want to use its trained personalzied model
             # thus, load the initial personalized model saved by
-            # `self.persist_initial_model`
+            # `self.persist_initial_personalized_model`
+            # i.e., rollback
             desired_round = 0
             logging.info(
-                "[Client #%d] loads initial personalized model.",
+                fonts.colourize(
+                    "[Client #%d] loads initial personalized model.", colour="blue"
+                ),
                 self.client_id,
             )
 
+        checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
         filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
             client_id=self.client_id,
+            checkpoints_dir=checkpoint_dir_path,
             model_name=personalized_model_name,
             current_round=desired_round,
             run_id=None,
@@ -184,11 +234,13 @@ class Client(simple.Client):
             mask_words=["epoch"],
             use_latest=True,
         )
-        loaded_weights = ckpt_oper.load_checkpoint()["model"]
+        loaded_weights = ckpt_oper.load_checkpoint(checkpoint_name=filename)["model"]
         self.trainer.personalized_model.load_state_dict(loaded_weights, strict=True)
 
         logging.info(
-            "[Client #%d] loads the personalized model from %s.",
+            fonts.colourize(
+                "[Client #%d] loads the personalized model from %s.", colour="blue"
+            ),
             self.client_id,
             filename,
         )
@@ -196,7 +248,9 @@ class Client(simple.Client):
     def _load_payload(self, server_payload) -> None:
         """Load the server model onto this client.
 
-        The server will first assign its model with the server payload
+        By default, each client will
+        1. load the received global model to its trainer's model
+        2. load its personalized model locally.
         """
         logging.info(
             "[Client #%d] Received the model [%s].",
@@ -204,9 +258,11 @@ class Client(simple.Client):
             Config().trainer.model_name,
         )
         # load the model
-        self.algorithm.load_weights(server_payload, strict=True)
-        # load the personalized model.
-        self.load_personalized_model()
+        self.algorithm.load_weights(server_payload)
+
+        if self.personalized_model is not None:
+            # load the personalized model.
+            self.load_personalized_model()
 
     async def _train(self):
         """The machine learning training workload on a client.
@@ -215,49 +271,17 @@ class Client(simple.Client):
 
         """
 
-        rounds = Config().trainer.rounds
         accuracy = -1
         training_time = 0.0
 
         if hasattr(self.trainer, "current_round"):
             self.trainer.current_round = self.current_round
 
-        # visit personalized learning conditions
-        is_pfl_mode = (
-            hasattr(Config().clients, "do_personalization_interval")
-            and Config.clients.do_personalization_interval != 0
-        )
-        # do pfl after the final round
-        final_pfl = (
-            self.current_round == rounds
-            and is_pfl_mode
-            and Config.clients.do_personalization_interval == -1
-        )
-        # do pfl during the training
-        middle_pfl = (
-            self.current_round < rounds
-            and is_pfl_mode
-            and self.current_round % Config().clients.do_personalization_interval == 0
-        )
-
-        normal_train = self.current_round < rounds and not middle_pfl
-
-        # Perform model training
-        if normal_train:
+        if self.learning_model == "personalization":
             logging.info(
                 fonts.colourize(
-                    f"[{self}] Started training in communication round #{self.current_round}."
-                )
-            )
-            try:
-                training_time = self.trainer.train(self.trainset, self.sampler)
-            except ValueError:
-                await self.sio.disconnect()
-
-        if final_pfl or middle_pfl:
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Started personalized training in the communication round #{self.current_round}."
+                    f"[{self}] Started personalized training in the communication round #{self.current_round}.",
+                    colour="blue",
                 )
             )
             try:
@@ -270,7 +294,18 @@ class Client(simple.Client):
             except ValueError:
                 await self.sio.disconnect()
 
-        elif (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
+        if self.learning_model == "normal":
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Started training in communication round #{self.current_round}."
+                )
+            )
+            try:
+                training_time = self.trainer.train(self.trainset, self.sampler)
+            except ValueError:
+                await self.sio.disconnect()
+
+        if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
             hasattr(Config().clients, "test_interval")
             and self.current_round % Config().clients.test_interval == 0
         ):
@@ -307,6 +342,7 @@ class Client(simple.Client):
             ) * Config().trainer.epochs
 
         report = SimpleNamespace(
+            client_id=self.client_id,
             num_samples=self.sampler.num_samples(),
             accuracy=accuracy,
             training_time=training_time,
