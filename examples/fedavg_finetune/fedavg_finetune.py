@@ -12,7 +12,7 @@ in the Proceedings of ICML 2021.
 
 """
 
-from fedavg_pers_client import Client
+from fedavg_finetune_client import Client
 from plato.servers import registry as server_registry
 
 
