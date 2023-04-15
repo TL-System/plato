@@ -1,0 +1,15 @@
+name: single_image_small
+
+defaults:
+  - data: CIFAR10
+  - impl: default
+  - server: honest-but-curious
+  - user: local_gradient
+  - _self_
+model: ConvNet
+
+user:
+  provide_labels: True
+
+# Server and user:
+num_queries: 1

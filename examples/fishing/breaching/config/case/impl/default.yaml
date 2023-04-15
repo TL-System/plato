@@ -1,0 +1,29 @@
+# Dataloader implementation choices:
+# Turn these off for better reproducibility of experiments
+shuffle: False
+sample_with_replacement: False
+
+# PyTorch configuration
+dtype: float # this has to be float when mixed_precision is True
+non_blocking: True
+sharing_strategy: file_descriptor
+enable_gpu_acc: False # use this flag to disable GPU usage
+
+benchmark: True # CUDNN benchmarking
+deterministic: False # This option will disable non-deterministic ops
+
+pin_memory: True
+threads: 0 # maximal number of cpu dataloader workers used per GPU
+persistent_workers: False
+
+mixed_precision: False
+grad_scaling: True # this is a no-op if mixed-precision is off
+JIT: # script currently break autocast mixed precision and trace breaks training
+
+validate_every_nth_step: 10
+
+checkpoint:
+  name:
+  save_every_nth_step: 10
+
+enable_huggingface_offline_mode: True # Only set this to true after caching everything

@@ -1,0 +1,15 @@
+name: sanity_check
+
+defaults:
+  - data: ImageNet
+  - impl: default
+  - server: honest-but-curious
+  - user: local_gradient
+  - _self_
+model: linear
+
+user:
+  provide_labels: True
+
+# Server and user:
+num_queries: 1

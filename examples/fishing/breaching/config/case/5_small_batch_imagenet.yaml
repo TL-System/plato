@@ -1,0 +1,16 @@
+name: small_batch_imagenet
+
+defaults:
+  - data: ImageNetAnimals
+  - impl: default
+  - server: honest-but-curious
+  - user: local_gradient
+  - _self_
+model: ResNet50
+
+# Server and user:
+num_queries: 1
+
+# User data:
+user:
+  num_data_points: 36

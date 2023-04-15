@@ -1,0 +1,43 @@
+type: default
+
+attack_type: optimization # analytic, equation solver
+label_strategy: bias-corrected # Only in effect if the user does not provide labels
+# Label strategy options are 'iDLG', 'analytic', 'yin', 'wainakh-simple', 'wainakh-whitebox', 'random', 'exhaustive'
+text_strategy: run-embedding # options: run-embedding
+token_recovery: from-labels
+
+objective:
+  type: euclidean
+  scale: 1.0
+  task_regularization: 0.0
+
+restarts:
+  num_trials: 1
+  scoring: euclidean
+
+init: randn
+normalize_gradients: False
+
+optim:
+  optimizer: Adam
+  signed:
+  step_size: 1.0
+  boxed: False
+  max_iterations: 400
+  step_size_decay:
+  langevin_noise: 0.0
+  warmup: 0
+  grad_clip:
+
+  callback: 100 # Print objective value every callback many iterations
+
+augmentations:
+
+differentiable_augmentations: False
+
+regularization:
+
+impl:
+  dtype: float
+  mixed_precision: False
+  JIT: # bembel with care

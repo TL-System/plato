@@ -1,0 +1,36 @@
+defaults:
+  - _default_optimization_attack
+  - _self_
+type: invertinggradients
+
+objective:
+  type: cosine-similarity
+  scale: 1.0 # need to have a much smaller scale like 0.0001 for euclidean objectives
+
+init: "patterned-4-randn"
+
+restarts:
+  num_trials: 1
+  scoring: "cosine-similarity"
+
+optim:
+  optimizer: adam
+  signed: "soft"
+  step_size: 0.1
+  boxed: True
+  max_iterations: 24_000
+  step_size_decay: cosine-decay
+  warmup: 50
+
+  callback: 1 #1000 # Print objective value every callback many iterations
+
+regularization:
+  total_variation:
+    scale: 0.2
+    inner_exp: 2
+    outer_exp: 0.5
+    double_opponents: True
+  features:
+    scale: .0
+  deep_inversion:
+    scale: .0

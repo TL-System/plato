@@ -1,0 +1,18 @@
+name: bert_training
+
+defaults:
+  - data: wikitext
+  - impl: default
+  - server: honest-but-curious
+  - user: local_gradient
+  - _self_
+data:
+  tokenizer: bert-base-uncased
+  task: masked-lm
+  vocab_size: 30522
+  mlm_probability: 0.15
+
+model: bert-base-uncased
+
+# Server and user:
+num_queries: 1

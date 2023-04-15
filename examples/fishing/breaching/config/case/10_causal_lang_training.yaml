@@ -1,0 +1,17 @@
+name: causal_lang_training
+
+defaults:
+  - data: wikitext
+  - impl: default
+  - server: honest-but-curious
+  - user: local_gradient
+  - _self_
+data:
+  tokenizer: gpt2
+  task: causal-lm
+  vocab_size: 50257
+
+model: transformer3 # The FL model
+
+# Server and user:
+num_queries: 1

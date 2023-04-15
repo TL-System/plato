@@ -1,0 +1,27 @@
+# TODO(dchu) used in fishing attack
+name: class_malicious_parameters
+pretrained: True
+model_state: unchanged # Disregard updates here
+provide_public_buffers: True # Send public buffers to users (this is batch norm specific)
+
+has_external_data: False
+num_queries: 1
+
+opt_on_avg_grad: False
+one_shot_binary_attack: True # Try to recover only one data point (this is log2(queries), versus all which is queries * log2(queries))
+
+query_once_for_labels: True
+target_cls_idx: 0
+grad_idx: 0 # which gradient to attack
+
+# Attack hyperparams:
+class_multiplier: 0.5 # Multiplicator when attacking separate classes
+feat_multiplier: 300 # Multiplicator in feature scaling
+bias_multiplier: 1000
+reset_param_weights: True
+
+# optional: You can over/under-estimate the number of collisions for a feat attack.
+# This will result in either reduced collisions (but higher chance of hitting nothing)
+# or increased collisions that always recover something (which might be more than one data point)
+reweight_collisions: 1.0
+feat_threshold: 1e-6 # When to identify two features as identical

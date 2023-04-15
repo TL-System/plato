@@ -1,0 +1,15 @@
+name: large_batch_cifar
+
+defaults:
+  - data: CIFAR100
+  - impl: default
+  - server: honest-but-curious
+  - user: local_gradient
+  - _self_
+model: ResNet32-10
+
+# Server and user:
+num_queries: 1
+
+user:
+  num_data_points: 100

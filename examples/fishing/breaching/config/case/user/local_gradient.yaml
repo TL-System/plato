@@ -1,0 +1,17 @@
+user_type: local_gradient
+user_idx: 0 # Evaluate training data from the user with this index. If no index is given, then the user is chosen at random.
+num_data_points: 1 # If users have more data, the remaining data is truncated.
+
+provide_buffers: False
+provide_labels: False
+provide_num_data_points: True
+
+# Local differential privacy:
+local_diff_privacy:
+  gradient_noise: 0.0
+  input_noise: 0.0
+  distribution: laplacian
+  per_example_clipping: 0.0
+# Specific to this user type:
+
+# This user can also be used to simulate a larger silo over which the gradient is aggregated.

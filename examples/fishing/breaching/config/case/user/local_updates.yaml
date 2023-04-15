@@ -1,0 +1,20 @@
+user_type: local_update
+user_idx: 0 # Evaluate training data from the user with this index. If no index is given, then the user is chosen at random.
+num_data_points: 4 # If users have more data, the remaining data is truncated.
+
+provide_buffers: False
+provide_labels: False
+provide_num_data_points: True
+
+# Local differential privacy:
+local_diff_privacy:
+  gradient_noise: 0.0
+  input_noise: 0.0
+  distribution: laplacian
+  per_example_clipping: 0.0
+
+# Specific to this user type:
+num_local_updates: 4
+num_data_per_local_update_step: 1 # Every step is taken on a different sample
+local_learning_rate: 0.001
+provide_local_hyperparams: True # Provide local_learning_rate, num_data_per_local_update_step, num_local_updates to server

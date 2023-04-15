@@ -1,0 +1,12 @@
+name: fedavg_small_scale
+
+defaults:
+  - data: ImageNetAnimals
+  - impl: default
+  - server: honest-but-curious
+  - user: local_updates
+  - _self_
+model: ResNet18
+
+# Server and user:
+num_queries: 1
