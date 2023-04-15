@@ -3,6 +3,9 @@
 Note that parameter files to change are:
 1. examples/fishing/breaching/config/attack/clsattack.yaml
 2. examples/fishing/breaching/cases/users.py
+    * Modify the number of local updates by FedAvg with self.num_local_updates
+    * We do this because this parameter doesn't seem to be set when we change
+    it in the YAML file...
 """
 
 try:
