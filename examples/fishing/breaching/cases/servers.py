@@ -48,7 +48,7 @@ def construct_server(
     return server
 
 
-class HonestServer:   # NOTE(dchu): FISHING
+class HonestServer:
     """Implement an honest server protocol.
 
     This class loads and selects the initial model and then sends this model to the (simulated) user.
@@ -102,7 +102,7 @@ class HonestServer:   # NOTE(dchu): FISHING
                     module.reset_parameters()
             elif model_state == "trained":
                 pass  # model was already loaded as pretrained model
-            elif model_state == "linearized":   # NOTE(dchu): FISHING
+            elif model_state == "linearized":
                 with torch.no_grad():
                     if isinstance(module, torch.nn.BatchNorm2d):
                         module.weight.data = module.running_var.data.clone()
@@ -370,7 +370,7 @@ class MaliciousModelServer(HonestServer):
         return modified_model, decoder
 
 
-class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
+class MaliciousClassParameterServer(HonestServer):
     """Modify parameters for the "class attack" which can pick out a subset of image data from a larger batch."""
 
     THREAT = "Malicious (Parameters)"
@@ -392,7 +392,6 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
         model = self.model  # Re-reference this everywhere
         return self.model
 
-    # TODO(dchu) this is the method to reconstruct!
     def run_protocol(self, user, additional_users=None, run_honest_protocol=False):
         """This server is allowed to run malicious protocols."""
         if run_honest_protocol:
@@ -403,14 +402,13 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
             else:
                 return self.run_protocol_feature_estimation(user, additional_users)
 
-    # TODO(dchu) this is the method to reconstruct!
     def run_protocol_binary_attack(self, user):
         """Helper function for modified protocols, this is a binary attack that will repeatedly query a user
         with malicious server states."""
         # get class info first (this could be skipped and replaced by an attack on all/random labels)
         server_payload = self.distribute_payload()
 
-        if self.cfg_server.query_once_for_labels:   # NOTE(dchu): branch taken
+        if self.cfg_server.query_once_for_labels:
             shared_data, true_user_data = user.compute_local_updates(server_payload)
             # This first query is not strictly necessary, you could also attack for a random class.
             t_labels = shared_data["metadata"]["labels"].detach().cpu().numpy()
@@ -427,12 +425,11 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
 
             # cls attack on all labels in the batch
             self.reconfigure_for_class_attack(target_classes=t_labels)
-            # NOTE(dchu): is this 'server' a reference to self?
             server_payload = self.distribute_payload()
             shared_data, true_user_data = user.compute_local_updates(server_payload)
             final_shared_data = [shared_data]
             final_payload = [server_payload]
-        else:   # NOTE(dchu): branch taken
+        else:
             # attack cls by cls
             target_cls = np.unique(t_labels)[self.cfg_server.target_cls_idx]  # Could be any class
             target_indx = np.where(t_labels == target_cls)[0]
@@ -445,8 +442,7 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
                 log.info(f"Attacking label {reduced_shared_data['metadata']['labels'].item()} with cls attack.")
                 cls_to_obtain = int(reduced_shared_data["metadata"]["labels"][0])
 
-                # modify the parameters first
-                # NOTE(dchu): this is where the parameter modification happens!!!
+                # This is where the parameter modification happens!
                 self.reconfigure_for_class_attack(target_classes=cls_to_obtain)
 
                 server_payload = self.distribute_payload()
@@ -487,7 +483,7 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
                     )
                     attack_state["num_data_points"] = shared_data["metadata"]["num_data_points"]
 
-                    if self.cfg_server.one_shot_binary_attack:  # NOTE(dchu): branch taken
+                    if self.cfg_server.one_shot_binary_attack:
                         recovered_single_gradients = self.one_shot_binary_attack(user, cls_to_obtain, attack_state)
                     else:
                         recovered_single_gradients = self.binary_attack(user, cls_to_obtain, attack_state)
@@ -564,7 +560,6 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
 
         return [shared_data], [server_payload], true_user_data
 
-    # TODO(dchu): this is the function for the attack
     def one_shot_binary_attack(self, user, cls_to_obtain, attack_state):
         feature_loc = attack_state["feature_loc"]
         feature_val = attack_state["feature_val"]
@@ -734,8 +729,7 @@ class MaliciousClassParameterServer(HonestServer):   # NOTE(dchu): FISHING
         if allow_reset_param_weights and self.cfg_server.reset_param_weights:
             feat_multiplier = 1
         else:
-            feat_multiplier = self.cfg_server.feat_multiplier   # NOTE(dchu): 300
-        # TODO(dchu): verify that the model is actually changed here!
+            feat_multiplier = self.cfg_server.feat_multiplier
         *_, l_w, l_b = self.model.parameters()
 
         masked_weight = torch.zeros_like(l_w)

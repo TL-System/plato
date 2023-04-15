@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 embedding_layer_names = ["encoder.weight", "word_embeddings.weight", "transformer.wte"]
 
 
-class _BaseAttacker:   # NOTE(dchu): FISHING
+class _BaseAttacker:
     """This is a template class for an attack.
 
     A basic assumption for this attacker is that user data is fixed over multiple queries.

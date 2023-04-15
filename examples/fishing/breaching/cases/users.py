@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 def construct_user(model, loss_fn, cfg_case, setup):
     """Interface function."""
-    # cfg_case.user.user_type == "multiuser_aggregate":  # NOTE(dchu): FISHING
+    # NOTE cfg_case.user.user_type == "multiuser_aggregate"
     dataloaders, indices = [], []
     for idx in range(*cfg_case.user.user_range):
         dataloaders += [construct_dataloader(cfg_case.data, cfg_case.impl, user_idx=idx)]
@@ -21,7 +21,7 @@ def construct_user(model, loss_fn, cfg_case, setup):
     return user
 
 
-class UserSingleStep(torch.nn.Module):  # NOTE(dchu): FISHING
+class UserSingleStep(torch.nn.Module):
     """A user who computes a single local update step."""
 
     def __init__(self, model, loss, dataloader, setup, idx, cfg_user):
@@ -298,7 +298,7 @@ class UserSingleStep(torch.nn.Module):  # NOTE(dchu): FISHING
                 print(label_classes)
 
 
-class UserMultiStep(UserSingleStep):    # NOTE(dchu): FISHING
+class UserMultiStep(UserSingleStep):
     """A user who computes multiple local update steps as in a FedAVG scenario."""
 
     def __init__(self, model, loss, dataloader, setup, idx, cfg_user):

@@ -6,7 +6,7 @@ from typing import List
 from .make_functional import make_functional_with_buffers
 
 
-class GradientLoss(torch.nn.Module):   # NOTE(dchu): FISHING
+class GradientLoss(torch.nn.Module):
     """Super-class to simplify gradient-based objectives."""
 
     def __init__(self):
@@ -166,7 +166,7 @@ class L1Loss(GradientLoss):
         return objective
 
 
-class CosineSimilarity(GradientLoss):   # NOTE(dchu): FISHING
+class CosineSimilarity(GradientLoss):
     """Gradient matching based on cosine similarity of two gradient vectors."""
 
     def __init__(self, scale=1.0, task_regularization=0.0, **kwargs):
