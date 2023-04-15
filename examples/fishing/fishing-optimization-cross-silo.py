@@ -1,4 +1,9 @@
-"""Run this file to reconstruct """
+"""Run this file to experiment with the Breaching code.
+
+Note that parameter files to change are:
+1. examples/fishing/breaching/config/attack/clsattack.yaml
+2. examples/fishing/breaching/cases/users.py
+"""
 
 try:
     import breaching

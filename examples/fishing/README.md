@@ -2,6 +2,8 @@
 
 Research on gradient leakage attack and defense using the Plato framework.
 
+Note that this is a separate file from the DLG example because I break the Soteria defence. Moreover, the Plato implementation of the fishing attack does not yield any useful results. To get useful results, run `python fishing-optimization-cross-silo.py` from this directory.
+
 --- 
 # Ported Algorithms
 
@@ -12,21 +14,11 @@ Research on gradient leakage attack and defense using the Plato framework.
 
 - {csDLG} [Geiping et al., "Inverting Gradients - How easy is it to break privacy in federated learning?," NeurIPS 2020.](https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf) – [[Code available]](https://github.com/JonasGeiping/invertinggradients)
 
-## Defense baselines
+- {Fishing} [Wen et al., "Fishing for User Data in Large-Batch Federated Learning via Gradient Magnification," arXiv 2022.](https://arxiv.org/pdf/2202.00580.pdf) - [[Code available]](https://github.com/JonasGeiping/breaching)
 
-- {Soteria} [Sun et al., "Soteria: Provable Defense against Privacy Leakage in Federated Learning from Representation Perspective," CVPR 2021.](https://openaccess.thecvf.com/content/CVPR2021/papers/Sun_Soteria_Provable_Defense_Against_Privacy_Leakage_in_Federated_Learning_From_CVPR_2021_paper.pdf) – [[Code available]](https://github.com/jeremy313/Soteria)
-
-- {GradDefense} [Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning," INFOCOM 2022.](https://infocom.info/day/2/track/Track%20A#A-3) – [[Code available]](https://github.com/wangjunxiao/GradDefense)
-
-- {DP} differential privacy (referred to Soteria's code) 
-
-- {GC} gradient compression (referred to Soteria's code) 
----
-
-# Running Plato with DLG attack
-Try replacing `rec_emnist.yml` below with custom config files:
+# Running Plato with Fishing attack
 ```
-python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
+python examples/fishing/dlg.py -c examples/fishing/reconstruction_fishing.yml --cpu
 ```
 
 ## DLG Related Configurations
