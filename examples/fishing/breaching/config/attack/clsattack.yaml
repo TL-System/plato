@@ -18,7 +18,7 @@ optim:
   signed: "soft"
   step_size: 0.1
   boxed: True
-  max_iterations: 24_000
+  max_iterations: 1000 # Originally 24_000
   step_size_decay: cosine-decay
   warmup: 50
 
@@ -34,3 +34,7 @@ regularization:
     scale: .0
   deep_inversion:
     scale: .0
+
+# This does not get picked up by the program...
+user:
+  num_local_updates: 5

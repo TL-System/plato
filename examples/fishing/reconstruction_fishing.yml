@@ -18,9 +18,10 @@ server:
     random_seed: 1
 
     # Fishing config
-    target_cls_idx: 0
+    target_cls_idx: 2
     class_multiplier: 0.5
     bias_multiplier: 1000
+    feat_multiplier: 300
     do_test: false
 
 data:
@@ -28,7 +29,8 @@ data:
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 1
+    # MUST BE LARGER THAN BATCH SIZE!!!
+    partition_size: 100
 
     # IID or non-IID?
     sampler: iid
@@ -60,7 +62,7 @@ algorithm:
 
     ## Data reconstruction related configurations
     # Choose from DLG (default), iDLG, csDLG
-    attack_method: fishing
+    attack_method: fishing-class
     # For calculating the loss between dummy and target gradients/updates
     # Choose from l2, l1, max, sim, simlocal
     cost_fn: sim
@@ -114,7 +116,6 @@ algorithm:
 
     ## Fishing attack related
     boxed: True
-    num_trials: 1
     optim:
         optimizer: Adam
         signed: "soft"

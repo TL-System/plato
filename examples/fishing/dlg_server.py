@@ -68,6 +68,19 @@ def wrap_indices(indices):
     else:
         return list(indices)
 
+def reconstruct_feature(shared_grad, cls_to_obtain):
+    # Arbitrarily pick the first shared_grad
+    shared_grad, *_ = shared_grad
+    shared_grad = tuple(shared_grad.values())
+    weights = shared_grad[-2]
+    bias = shared_grad[-1]
+    grads_fc_debiased = weights / bias[:, None]
+
+    if bias[cls_to_obtain] != 0:
+        return grads_fc_debiased[cls_to_obtain]
+    else:
+        return torch.zeros_like(grads_fc_debiased[0])
+
 
 class Server(fedavg.Server):
     """An honest-but-curious federated learning server with gradient leakage attack."""
@@ -120,7 +133,7 @@ class Server(fedavg.Server):
     def choose_clients(self, client_pool, clients_count):
         """Choose a single client to query for the fishing optimization attack
         (since selecting multiple would be wasteful of compute."""
-        if Config().algorithm.attack_method != "fishing":
+        if Config().algorithm.attack_method not in ["fishing-feature", "fishing-class"]:
             return super().choose_clients(client_pool, clients_count)
         # Arbitrarily select the client with the minimum id in the client_pool,
         # which would ideally be the same client each time. This also implicitly
@@ -130,24 +143,45 @@ class Server(fedavg.Server):
     @torch.no_grad()
     def customize_server_payload(self, payload):
         """Taken from breaching/cases/servers.py:reconfigure_for_class_attack"""
-        target_cls_idx = Config().server.target_cls_idx     # 0
-        class_multiplier = Config().server.class_multiplier     # 0.5
-        bias_multiplier = Config().server.bias_multiplier   # 1000
+        target_cls_idx = Config().server.target_cls_idx
+        class_multiplier = Config().server.class_multiplier
+        bias_multiplier = Config().server.bias_multiplier
 
         target_classes = [target_cls_idx]
         cls_to_obtain = wrap_indices(target_classes)
 
         *_, l_w, l_b = self.algorithm.model.fc.parameters()
 
-        # linear weight
-        masked_weight = torch.zeros_like(l_w)
-        masked_weight[cls_to_obtain] = class_multiplier
-        l_w.copy_(masked_weight)
+        if (
+            self.current_round == Config().algorithm.attack_round
+            and Config().algorithm.attack_method == "fishing-feature"
+        ):
+            feat_multiplier = Config().server.feat_multiplier
+            avg_feature = torch.flatten(
+                reconstruct_feature(self.tmp_client_grad, cls_to_obtain)
+            )
+            feature_loc = int(torch.argmax(avg_feature))
+            feature_val = float(avg_feature[feature_loc])
+            masked_weight = torch.zeros_like(l_w)
+            masked_weight[cls_to_obtain, feature_loc] = feat_multiplier
+            l_w.copy_(masked_weight)
 
-        # linear bias
-        masked_bias = torch.ones_like(l_b) * bias_multiplier
-        masked_bias[cls_to_obtain] = l_b[cls_to_obtain]
-        l_b.copy_(masked_bias)
+            masked_bias = torch.ones_like(l_b) * bias_multiplier
+            masked_bias[
+                cls_to_obtain] = - feature_val * feat_multiplier
+            l_b.copy_(masked_bias)
+        elif Config().algorithm.attack_method == "fishing-class":
+            # linear weight
+            masked_weight = torch.zeros_like(l_w)
+            masked_weight[cls_to_obtain] = class_multiplier
+            l_w.copy_(masked_weight)
+
+            # linear bias
+            masked_bias = torch.ones_like(l_b) * bias_multiplier
+            masked_bias[cls_to_obtain] = l_b[cls_to_obtain]
+            l_b.copy_(masked_bias)
+        else:
+            pass
 
         # Re-extract the payload from the self.model.parameters()
         return self.algorithm.extract_weights()
@@ -163,8 +197,15 @@ class Server(fedavg.Server):
             self.attack_method = Config().algorithm.attack_method
             self._deep_leakage_from_gradients(weights_received)
         elif (
+            self.current_round != Config().algorithm.attack_round
+            and Config().algorithm.attack_method == "fishing-feature"
+        ):
+            # Do nothing suspicious! We just want to know the classes the client
+            # has. We save the weights for analysis later...
+            self.tmp_client_grad = weights_received
+        elif (
             self.current_round == Config().algorithm.attack_round
-            and Config().algorithm.attack_method == "fishing"
+            and Config().algorithm.attack_method in ["fishing-class", "fishing-feature"]
         ):
             self._setup_fishing_reconstruction()
             self.attack_method = Config().algorithm.attack_method
@@ -261,7 +302,7 @@ class Server(fedavg.Server):
 
         # Generate dummy items and initialize optimizer
         torch.manual_seed(Config().algorithm.random_seed)
-
+        logging.info(f"Labels: {torch.argmax(gt_labels, dim=1)}")
         for trial_number in range(trials):
             self.run_trial(
                 trial_number,
@@ -371,7 +412,7 @@ class Server(fedavg.Server):
                     self.defense_method,
                     torch.argmax(gt_labels[i], dim=-1).item(),
                 )
-        elif self.attack_method == "fishing":
+        elif self.attack_method in ["fishing-class", "fishing-feature"]:
             match_optimizer = torch.optim.LBFGS(
                 [
                     dummy_data,
@@ -419,7 +460,7 @@ class Server(fedavg.Server):
             )
 
         for iters in range(num_iters):
-            if Config().algorithm.attack_method == "fishing":
+            if Config().algorithm.attack_method in ["fishing-feature", "fishing-class"]:
                 closure = self._compute_objective(
                     dummy_data, labels_, [model], optimizer, fishing_shared_data,
                     iters
@@ -476,15 +517,15 @@ class Server(fedavg.Server):
                 # without having too many parameters
                 eval_dict = get_evaluation_dict(dummy_data, gt_data, num_images)
                 mses.append(eval_dict["mses"])
-                lpipss.append(eval_dict["lpipss"])
-                psnrs.append(eval_dict["psnrs"])
-                ssims.append(eval_dict["ssims"])
-                library_ssims.append(eval_dict["library_ssims"])
+                # lpipss.append(eval_dict["lpipss"])
+                # psnrs.append(eval_dict["psnrs"])
+                # ssims.append(eval_dict["ssims"])
+                # library_ssims.append(eval_dict["library_ssims"])
                 avg_mses.append(eval_dict["avg_mses"])
-                avg_lpips.append(eval_dict["avg_lpips"])
-                avg_psnr.append(eval_dict["avg_psnr"])
-                avg_ssim.append(eval_dict["avg_ssim"])
-                avg_library_ssim.append(eval_dict["avg_library_ssim"])
+                # avg_lpips.append(eval_dict["avg_lpips"])
+                # avg_psnr.append(eval_dict["avg_psnr"])
+                # avg_ssim.append(eval_dict["avg_ssim"])
+                # avg_library_ssim.append(eval_dict["avg_library_ssim"])
 
                 logging.info(
                     "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
@@ -494,10 +535,10 @@ class Server(fedavg.Server):
                     iters,
                     losses[-1],
                     avg_mses[-1],
-                    avg_lpips[-1],
-                    avg_psnr[-1],
-                    avg_ssim[-1],
-                    avg_library_ssim[-1],
+                    0.0, # avg_lpips[-1],
+                    0.0, # avg_psnr[-1],
+                    0.0, # avg_ssim[-1],
+                    0.0, # avg_library_ssim[-1],
                 )
 
                 if self.attack_method == "DLG":
@@ -533,7 +574,7 @@ class Server(fedavg.Server):
                             for i in range(num_images)
                         ]
                     )
-                elif self.attack_method == "fishing":
+                elif self.attack_method in ["fishing-feature", "fishing-class"]:
                     history.append(
                         [
                             [
@@ -551,10 +592,10 @@ class Server(fedavg.Server):
                     iters,
                     round(losses[-1], 8),
                     round(avg_mses[-1], 8),
-                    round(avg_lpips[-1], 8),
-                    round(avg_psnr[-1], 4),
-                    round(avg_ssim[-1], 3),
-                    round(avg_library_ssim[-1], 3),
+                    0.0, # round(avg_lpips[-1], 8),
+                    0.0, # round(avg_psnr[-1], 4),
+                    0.0, # round(avg_ssim[-1], 3),
+                    0.0, # round(avg_library_ssim[-1], 3),
                 ]
                 csv_processor.write_csv(trial_csv_file, new_row)
 
@@ -596,7 +637,7 @@ class Server(fedavg.Server):
             if self.attack_method == "DLG":
                 dummy_onehot_label = F.softmax(labels, dim=-1)
                 dummy_loss = cross_entropy_for_onehot(dummy_pred, dummy_onehot_label)
-            elif self.attack_method in ["iDLG", "csDLG", "fishing"]:
+            elif self.attack_method in ["iDLG", "csDLG", "fishing-feature", "fishing-class"]:
                 dummy_loss = cross_entropy(dummy_pred, labels)
 
             dummy_grad = torch.autograd.grad(

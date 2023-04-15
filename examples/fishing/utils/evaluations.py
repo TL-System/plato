@@ -62,27 +62,28 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images):
                 eval_dict["mses"][i],
                 torch.mean((dummy_data[i] - ground_truth[j]) ** 2).item(),
             )
-            eval_dict["lpipss"][i] = min(
-                eval_dict["lpipss"][i],
-                loss_fn.forward(dummy_data[i], ground_truth[j]).item(),
-            )
-            eval_dict["ssims"][i] = max(
-                eval_dict["ssims"][i], find_ssim(dummy_data[i], ground_truth[j])
-            )
-            eval_dict["library_ssims"][i] = max(
-                eval_dict["library_ssims"][i],
-                find_ssim_library(
-                    torch.unsqueeze(dummy_data[i], dim=0),
-                    torch.unsqueeze(ground_truth[j], dim=0),
-                ),
-            )
-        eval_dict["psnrs"].append(-10 * math.log10(eval_dict["mses"][i]))
+            # VERY EXPENSIVE TO COMPUTE
+            # eval_dict["lpipss"][i] = min(
+            #     eval_dict["lpipss"][i],
+            #     loss_fn.forward(dummy_data[i], ground_truth[j]).item(),
+            # )
+        #     eval_dict["ssims"][i] = max(
+        #         eval_dict["ssims"][i], find_ssim(dummy_data[i], ground_truth[j])
+        #     )
+        #     eval_dict["library_ssims"][i] = max(
+        #         eval_dict["library_ssims"][i],
+        #         find_ssim_library(
+        #             torch.unsqueeze(dummy_data[i], dim=0),
+        #             torch.unsqueeze(ground_truth[j], dim=0),
+        #         ),
+        #     )
+        # eval_dict["psnrs"].append(-10 * math.log10(eval_dict["mses"][i]))
         # Find the mean for the MSE, LPIPS and PSNR
         eval_dict["avg_mses"] = mean(eval_dict["mses"])
-        eval_dict["avg_lpips"] = mean(eval_dict["lpipss"])
-        eval_dict["avg_psnr"] = mean(eval_dict["psnrs"])
-        eval_dict["avg_ssim"] = mean(eval_dict["ssims"])
-        eval_dict["avg_library_ssim"] = mean(eval_dict["library_ssims"])
+        # eval_dict["avg_lpips"] = mean(eval_dict["lpipss"])
+        # eval_dict["avg_psnr"] = mean(eval_dict["psnrs"])
+        # eval_dict["avg_ssim"] = mean(eval_dict["ssims"])
+        # eval_dict["avg_library_ssim"] = mean(eval_dict["library_ssims"])
 
     return eval_dict
 

@@ -305,6 +305,8 @@ class UserMultiStep(UserSingleStep):    # NOTE(dchu): FISHING
         """Initialize but do not propagate the cfg_case.user dict further."""
         super().__init__(model, loss, dataloader, setup, idx, cfg_user)
 
+        # TODO: This is the line to modify the number of local updates to do in
+        # the FedAvg algorithm!
         self.num_local_updates = cfg_user.num_local_updates
         self.num_data_per_local_update_step = cfg_user.num_data_per_local_update_step
         self.local_learning_rate = cfg_user.local_learning_rate
