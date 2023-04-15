@@ -3,7 +3,7 @@ A basic personalized federated learning client
 who performs the global learning and local learning.
 
 """
-import os
+
 import time
 import logging
 from types import SimpleNamespace
@@ -170,6 +170,10 @@ class Client(simple.Client):
         Therefore, in each round, the selected client (each `session`) should load
         its personalized model instead of using the current self.personalized_model
         trained by others.
+
+        By default,
+        1. the personalized model will be loaded from the initialized one.
+        2. load the latest persisted personalized model.
         """
         # model_name = Config().trainer.model_name
         personalized_model_name = Config().trainer.personalized_model_name

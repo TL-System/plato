@@ -11,45 +11,12 @@ The total clients are divided into two parts, referred to as
 """
 
 from typing import List
-from collections import UserDict
-from collections.abc import Iterable
 import random
 import logging
 
 from plato.servers import fedavg
 from plato.config import Config
 from plato.utils import fonts
-
-
-class TupleAsKeyDict(UserDict):
-    """A customized dict with tuple as the key value."""
-
-    def key_status(self, key):
-        target_key = [
-            data_key
-            for data_key in self.data
-            if key == data_key or (isinstance(data_key, Iterable) and key in data_key)
-        ]
-
-        if target_key:
-            return target_key[0], True
-
-        return None, False
-
-    def __getitem__(self, key):
-        """Get value in response to the key."""
-        target_key, is_key_existed = self.key_status(key)
-
-        if is_key_existed:
-            return self.data[target_key]
-
-        if hasattr(self.__class__, "__missing__"):
-            return self.__class__.__missing__(self, key)
-        raise KeyError(key)
-
-    def __contains__(self, key):
-        """Whether a key contained in the dict."""
-        return self.key_status(key)[-1]
 
 
 class Server(fedavg.Server):
@@ -102,10 +69,7 @@ class Server(fedavg.Server):
 
         # the flag denoting whether the personalization
         # has been started
-        self.personalization_started = False
-        # the flag denoting whether the personalization
-        # has been terminated
-        self.personalization_terminated = False
+        self.performing_personalization = False
 
         self.initialize_personalization()
         self.check_hyper_parameters()
@@ -170,14 +134,14 @@ class Server(fedavg.Server):
         self.do_personalization_group = (
             loaded_config.server.do_personalization_group
             if hasattr(loaded_config.server, "do_personalization_group")
-            else "Selected"
+            else "total"
         )
 
-        self.personalization_status_info = TupleAsKeyDict(
+        self.personalization_status_info = dict(
             {
                 0: "No personalization required.",
                 -1: "Personalization after the final round.",
-                tuple(range(1, loaded_config.trainer.rounds)): (
+                self.do_personalization_interval: (
                     "Personalization every {} rounds."
                 ).format(self.do_personalization_interval),
             }
@@ -312,11 +276,23 @@ class Server(fedavg.Server):
         """
 
         if self.current_round % self.do_personalization_interval == 0:
+
+            logging.info(
+                fonts.colourize(
+                    "Starting Personalization mode during round %d", colour="blue"
+                ),
+                self.current_round,
+            )
+            # open the personalization status flag
+            self.performing_personalization = True
             # set the clients pool based on which group is setup
             # to do personalization
             clients_pool = self.client_groups_pool[
                 self.do_personalization_group.lower()
             ]
+        else:
+            # close the personalization status flag
+            self.performing_personalization = False
 
         return clients_pool, clients_count
 
@@ -340,7 +316,7 @@ class Server(fedavg.Server):
             ]
 
             # open the personalization status flag
-            self.personalization_started = True
+            self.performing_personalization = True
 
             # maintain current round to be final round
             self.current_round = Config().trainer.rounds
@@ -364,10 +340,8 @@ class Server(fedavg.Server):
                 # to be received for aggregation.
                 self.clients_per_round = non_visited_clients_count
 
-                # personalization has been terminated
-                self.personalization_terminated = True
-            else:
-                self.personalization_terminated = False
+                # close the personalization flag
+                self.performing_personalization = False
 
             # remove the visited clients from the clients_pool
             clients_pool = [
@@ -406,8 +380,10 @@ class Server(fedavg.Server):
         # add clients who has been selected for personalization
         # to the `personalization_done_clients_pool`
         # thus, they will not be selected then.
-        if self.personalization_started:
+        if self.performing_personalization:
             self.personalization_done_clients_pool += selected_clients
+        else:
+            self.personalization_done_clients_pool = []
 
     def choose_clients(self, clients_pool: List[int], clients_count: int):
         """Chooses a subset of the clients to participate in each round.
@@ -441,7 +417,7 @@ class Server(fedavg.Server):
         """Customizes the server response with any additional information."""
         super().customize_server_response(server_response, client_id)
 
-        if self.personalization_started:
+        if self.performing_personalization:
             server_response["learning_mode"] = "personalization"
         else:
             server_response["learning_mode"] = "normal"
@@ -464,7 +440,10 @@ class Server(fedavg.Server):
         if self.current_round >= Config().trainer.rounds:
             logging.info("Target number of training rounds reached.")
 
-            if self.do_personalization_interval >= 0 or self.personalization_terminated:
+            if (
+                self.do_personalization_interval >= 0
+                or not self.performing_personalization
+            ):
                 logging.info(
                     "%s Completed.",
                     self.personalization_status_info[self.do_personalization_interval],
