@@ -95,19 +95,19 @@ class Client(simple.Client):
         # makes no sense and it is only initialized to hold the model
         # structure/parameters.
         # The main reason is that Plato simulates the client with multiple
-        # `sessions`, which are started at the beginning of running. These
-        # The server will build fake connection with these `sessions` - when
-        # the `sessions` receive information from the server, the the
+        # `processes`, which are started at the beginning of running. These
+        # The server will build fake connection with these `processes` - when
+        # the `processes` receive information from the server, the the
         # `configuration()` function is called the first time to perform
         # necessary initialization (model, trainer, algorithm, personalized model).
         # However, only when the actual clients are selected by the server,
-        # these `sessions` will be assigned meaningful client id.
+        # these `processes` will be assigned meaningful client id.
         # At that time, the parameters of model and personalized model of each client
-        # corresponding to one `session` will be assigned with received payloads
+        # corresponding to one `process` will be assigned with received payloads
         # or initialized for current client - see function `_load_payload`
 
         # to save space and time, the personalized model of the trainer will be
-        # assigned only during the first time - the session is created.
+        # assigned only during the first time - the process is created.
         if self.trainer.personalized_model is None:
             self.trainer.set_client_personalized_model(self.personalized_model)
 
@@ -164,10 +164,10 @@ class Client(simple.Client):
         This function is necessary for personalized federated learning in
         Plato. Because, in general, when one client is called the first time,
         its personalized model should be randomly intialized. Howerver,
-        Plato utilizes the `session` to simulate the client and only the client
-        id of each `session` is changed.
+        Plato utilizes the `process` to simulate the client and only the client
+        id of each `process` is changed.
 
-        Therefore, in each round, the selected client (each `session`) should load
+        Therefore, in each round, the selected client (each `process`) should load
         its personalized model instead of using the current self.personalized_model
         trained by others.
 
@@ -261,8 +261,8 @@ class Client(simple.Client):
             # under Plato
             # Because, in general, when one client is called the first time,
             # its personalized model should be randomly intialized.
-            # Howerver, Plato utilizes the `session` to simulate the
-            # client and only the client id of each `session` is changed.
+            # Howerver, Plato utilizes the `process` to simulate the
+            # client and only the client id of each `process` is changed.
             # Thus, even a unseen client is selected, its personalized model
             # is the one trained by other previous clients.
             # Here, the function aims to
