@@ -280,7 +280,6 @@ class Config:
         sleep_times = []
 
         if hasattr(Config.clients, "simulation_distribution"):
-
             if dist.distribution.lower() == "normal":
                 sleep_times = np.random.normal(dist.mean, dist.sd, size=total_clients)
             if dist.distribution.lower() == "pareto":
@@ -312,6 +311,12 @@ class Config:
         """Returns the number of GPUs available for training."""
         if hasattr(Config().trainer, "use_mindspore"):
             return 0
+
+        if hasattr(Config().trainer, "use_tensorflow"):
+            import tensorflow as tf
+
+            gpus = tf.config.experimental.list_physical_devices("GPU")
+            return len(gpus)
 
         import torch
 

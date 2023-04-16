@@ -8,23 +8,28 @@ https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv3.html.
 """
 
 import collections
+import sys
 
 from torch import nn
 
 from plato.config import Config
 
-from plato.models.nasvit.models.modules.dynamic_layers import (
+from .config import get_config
+
+sys.path.append("./examples/pfedrlnas/")
+from VIT.nasvit_wrapper.dynamic_layers import (
     DynamicMBConvLayer,
     DynamicConvBnActLayer,
     DynamicLinearLayer,
     DynamicShortcutLayer,
 )
-from plato.models.nasvit.models.modules.static_layers import MobileInvertedResidualBlock
-from plato.models.nasvit.models.modules.nn_utils import int2list
-from plato.models.nasvit.models.attentive_nas_dynamic_model import (
+from VIT.nasvit_wrapper.NASViT.models.modules.static_layers import (
+    MobileInvertedResidualBlock,
+)
+from VIT.nasvit_wrapper.NASViT.models.modules.nn_utils import int2list
+from VIT.nasvit_wrapper.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
-from .config import get_config
 
 
 class NasDynamicModel(AttentiveNasDynamicModel):
@@ -32,6 +37,11 @@ class NasDynamicModel(AttentiveNasDynamicModel):
 
     # pylint:disable=too-many-instance-attributes
     # pylint: disable=too-many-public-methods
+    def __init__(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
+        if supernet is None:
+            supernet = get_config().supernet_config
+        super().__init__()
+        self.initialization(supernet, n_classes, bn_param)
 
     def initialization(self, supernet=None, n_classes=-1, bn_param=(0.0, 1e-5)):
         """

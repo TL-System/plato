@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       # Runs a set of commands using the runners shell
       - name: Install dependencies
