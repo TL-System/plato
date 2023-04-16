@@ -621,8 +621,8 @@ class Trainer(basic.Trainer):
         epoch_log_interval = pers_epochs + 1
 
         eval_outputs = {}
-        if "pers_epoch_log_interval" in config:
-            epoch_log_interval = config["pers_epoch_log_interval"]
+        if "personalized_epoch_log_interval" in config:
+            epoch_log_interval = config["personalized_epoch_log_interval"]
 
         if epoch == 1 or epoch % epoch_log_interval == 0 or epoch == pers_epochs:
             logging.info(
