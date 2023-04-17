@@ -29,7 +29,7 @@ class Client(simple.Client):
 
             if not hasattr(Config().data, "reload_data") or Config().data.reload_data:
                 logging.info("[%s] Loading the dataset.", self)
-                self.load_data()
+                self._load_data()
 
             self.sampler = unlearning_iid.Sampler(
                 self.datasource, self.client_id, False
