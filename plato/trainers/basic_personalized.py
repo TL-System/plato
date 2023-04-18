@@ -38,7 +38,6 @@ from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion, tracking
 from plato.utils import checkpoint_operator
 from plato.utils.filename_formatter import get_format_name
-from plato.utils import fonts
 
 warnings.simplefilter("ignore")
 

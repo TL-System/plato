@@ -12,7 +12,6 @@ from types import SimpleNamespace
 from plato.clients import simple
 from plato.config import Config
 from plato.models import registry as models_registry
-from plato.utils import checkpoint_operator
 from plato.utils import fonts
 from plato.utils.filename_formatter import get_format_name
 
