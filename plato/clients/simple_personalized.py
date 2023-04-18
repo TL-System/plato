@@ -4,6 +4,7 @@ who performs the global learning and local learning.
 
 """
 
+import os
 import time
 import logging
 from types import SimpleNamespace
@@ -13,6 +14,7 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.utils import checkpoint_operator
 from plato.utils import fonts
+from plato.utils.filename_formatter import get_format_name
 
 
 class Client(simple.Client):
@@ -117,45 +119,38 @@ class Client(simple.Client):
         # save the defined personalized model as the initial one
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
-        filename, cpk_oper = checkpoint_operator.load_client_checkpoint(
-            client_id=self.client_id,
+        filename = get_format_name(
             model_name=pers_model_name,
-            checkpoints_dir=checkpoint_dir_path,
-            current_round=0,
+            client_id=self.client_id,
+            round_n=0,
+            epoch_n=None,
             run_id=None,
-            epoch=None,
             prefix="personalized",
-            use_latest=False,
+            ext="pth",
         )
-
+        checkpoint_file_path = os.path.join(checkpoint_dir_path, filename)
         # if the personalized model for current client does
         # not exist - this client is selected the first time
-        if cpk_oper is None:
-            # create a new one for saving
-            new_cpk_oper = checkpoint_operator.CheckpointsOperator(
-                checkpoints_dir=checkpoint_dir_path
-            )
-            # reset the personalized model for this client
-            # thus, different clients have different init parameters
-            self.personalized_model.apply(new_cpk_oper.reset_weight)
-            new_cpk_oper.save_checkpoint(
-                model_state_dict=self.personalized_model.state_dict(),
-                checkpoints_name=[filename],
-            )
+        if not os.path.exists(checkpoint_file_path):
             logging.info(
                 fonts.colourize(
-                    "First-time Selection of Client[%d] for personalization",
+                    "First-time Selection of Client[%d] for personalization.",
                     colour="blue",
                 ),
                 self.client_id,
             )
             logging.info(
                 fonts.colourize(
-                    "Initialized its unique personalized model and persisted to %s under %s",
+                    "Client[%d]. Creating its unique parameters by resetting weights.",
                     colour="blue",
-                ),
-                filename,
-                checkpoint_dir_path,
+                )
+            )
+            # reset the personalized model for this client
+            # thus, different clients have different init parameters
+            self.personalized_model.apply(self.trainer.reset_weight)
+            self.trainer.save_personalized_model(
+                filename=filename,
+                location=checkpoint_dir_path,
             )
 
     def load_personalized_model(self):
@@ -175,7 +170,6 @@ class Client(simple.Client):
         1. the personalized model will be loaded from the initialized one.
         2. load the latest persisted personalized model.
         """
-        # model_name = Config().trainer.model_name
         personalized_model_name = Config().trainer.personalized_model_name
         logging.info(
             fonts.colourize(
@@ -218,27 +212,11 @@ class Client(simple.Client):
             )
 
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
-        filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
-            client_id=self.client_id,
-            checkpoints_dir=checkpoint_dir_path,
+        self.trainer.rollback_model(
             model_name=personalized_model_name,
-            current_round=desired_round,
-            run_id=None,
-            epoch=None,
-            prefix="personalized",
-            anchor_metric="round",
-            mask_words=["epoch"],
-            use_latest=True,
-        )
-        loaded_weights = ckpt_oper.load_checkpoint(checkpoint_name=filename)["model"]
-        self.trainer.personalized_model.load_state_dict(loaded_weights, strict=True)
-
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] loads the personalized model from %s.", colour="blue"
-            ),
-            self.client_id,
-            filename,
+            modelfile_prefix="personalized",
+            rollback_round=desired_round,
+            location=checkpoint_dir_path,
         )
 
     def _load_payload(self, server_payload) -> None:

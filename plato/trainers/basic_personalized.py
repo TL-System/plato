@@ -38,6 +38,7 @@ from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion, tracking
 from plato.utils import checkpoint_operator
 from plato.utils.filename_formatter import get_format_name
+from plato.utils import fonts
 
 warnings.simplefilter("ignore")
 
@@ -106,6 +107,26 @@ class Trainer(basic.Trainer):
         )
 
     @staticmethod
+    @torch.no_grad()
+    def reset_weight(module: torch.nn.Module):
+        """
+        refs:
+        - https://discuss.pytorch.org/t/how-to-re-set-alll-parameters-in-a-network/20819/6
+        - https://stackoverflow.com/questions/63627997/reset-parameters-of-a-neural-network-in-pytorch
+        - https://pytorch.org/docs/stable/generated/torch.nn.Module.html
+
+        One model can be reset by
+        # Applying fn recursively to every submodule see:
+        # https://pytorch.org/docs/stable/generated/torch.nn.Module.html
+        model.apply(fn=weight_reset)
+        """
+
+        # - check if the current module has reset_parameters & if it's callabed called it on m
+        reset_parameters = getattr(module, "reset_parameters", None)
+        if callable(reset_parameters):
+            module.reset_parameters()
+
+    @staticmethod
     def process_save_path(filename, location, work_model_name, desired_extenstion):
         """Process the input arguments to obtain the final saving path."""
         # default saving everything to the model path
@@ -171,6 +192,53 @@ class Trainer(basic.Trainer):
             self.client_id,
             filename,
             to_load_dir,
+        )
+
+    def rollback_model(
+        self,
+        model_name=None,
+        modelfile_prefix=None,
+        rollback_round=None,
+        location=None,
+    ):
+        """Rollback the model to be the previously one.
+        By default, this functon rollbacks the personalized model.
+
+        """
+        rollback_round = (
+            rollback_round if rollback_round is not None else self.current_round - 1
+        )
+        model_name = (
+            model_name
+            if model_name is not None
+            else Config().trainer.personalized_model_name
+        )
+        location = location if location is not None else self.get_checkpoint_dir_path()
+        modelfile_prefix = modelfile_prefix if modelfile_prefix is not None else None
+
+        filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
+            client_id=self.client_id,
+            checkpoints_dir=location,
+            model_name=model_name,
+            current_round=rollback_round,
+            run_id=None,
+            epoch=None,
+            prefix=modelfile_prefix,
+            anchor_metric="round",
+            mask_words=["epoch"],
+            use_latest=True,
+        )
+        loaded_weights = ckpt_oper.load_checkpoint(checkpoint_name=filename)["model"]
+        if modelfile_prefix == "personalized":
+            self.trainer.personalized_model.load_state_dict(loaded_weights, strict=True)
+        else:
+            self.trainer.model.load_state_dict(loaded_weights, strict=True)
+
+        logging.info(
+            "[Client #%d] Rollbacking a model from %s under %s.",
+            self.client_id,
+            filename,
+            location,
         )
 
     @staticmethod

@@ -21,11 +21,12 @@ class Client(simple_personalized.Client):
         """
         logging.info(
             fonts.colourize(
-                "[Client #%d] obtains personalized model from the received model [%s].",
+                "[Client #%d] assings the received model [%s] to personalized model [%s].",
                 colour="blue",
             ),
             self.client_id,
             Config().trainer.model_name,
+            Config().trainer.personalized_model_name,
         )
 
         # load the received model to be personalized model
