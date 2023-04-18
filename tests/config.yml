@@ -57,4 +57,4 @@ parameters:
     optimizer:
         lr: 0.01
         momentum: 0.9
-        weight_delay: 0.0
+        weight_decay: 0.0
