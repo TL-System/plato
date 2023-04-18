@@ -118,8 +118,10 @@ class CheckpointsOperator:
         latest_checkpoint_filename = None
         latest_number = 0
         for ckp_file in checkpoint_files:
-            obtained_anchor = re.findall(f"{anchor_metric}", ckp_file)[0]
-            anchor_value = int(re.findall(r"\d+", obtained_anchor)[0])
+
+            pattern = re.escape(anchor_metric) + r"(\d+)"
+            obtained_anchor = re.search(pattern, ckp_file, re.IGNORECASE)
+            anchor_value = int(obtained_anchor.group(1))
             if anchor_value >= latest_number:
                 latest_number = anchor_value
                 latest_checkpoint_filename = ckp_file
@@ -146,7 +148,7 @@ def save_client_checkpoint(
     global_epoch: Optional[int] = None,
     local_epoch: Optional[int] = None,
     prefix: Optional[str] = None,
-):
+) -> str:
     # pylint:disable=too-many-arguments
 
     """Save the checkpoint for sepcific client.
@@ -212,7 +214,7 @@ def load_client_checkpoint(
     anchor_metric: str = "round",
     mask_words: Optional[List[str]] = None,
     use_latest: bool = True,
-):
+) -> CheckpointsOperator:
     # pylint:disable=too-many-arguments
 
     """Performing checkpoint loading.
@@ -221,7 +223,7 @@ def load_client_checkpoint(
         if the required file does not exist.
     """
     if mask_words is None:
-        mask_words = ["epohs"]
+        mask_words = ["epoch"]
 
     cpk_oper = CheckpointsOperator(checkpoints_dir=checkpoints_dir)
 
@@ -238,16 +240,16 @@ def load_client_checkpoint(
     )
 
     if cpk_oper.vaild_checkpoint_file(filename):
-        return filename, cpk_oper.load_checkpoint(filename)
+        return filename, cpk_oper
     else:
         if use_latest:
             # Loading the latest checkpoint file
-            search_words = [model_name, prefix]
+            search_key_words = [model_name, prefix]
             filename = cpk_oper.search_latest_checkpoint_file(
-                search_words=search_words,
+                search_key_words=search_key_words,
                 anchor_metric=anchor_metric,
-                mask_words=mask_words,
+                filter_words=mask_words,
             )
-            return filename, cpk_oper.load_checkpoint(filename)
+            return filename, cpk_oper
 
     return filename, None

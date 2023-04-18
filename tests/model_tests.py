@@ -27,11 +27,11 @@ class ModelsTest(unittest.TestCase):
         self.personalized_optimizer = optimizers.get(
             self.personalized_model,
             optimizer_name=Config().trainer.personalized_optimizer,
-            optim_params=Config().parameters.personalized_optimizer._asdict(),
+            optimizer_params=Config().parameters.personalized_optimizer._asdict(),
         )
 
     def test_model_config(self):
-        """ Test whether the models are defined based on the configuration files. """
+        """Test whether the models are defined based on the configuration files."""
         # test the defined models based on the
         # hyper-parameters
 

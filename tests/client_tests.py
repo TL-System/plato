@@ -1,15 +1,19 @@
 """
 Testing a federated learning client.
 """
+import os
 import asyncio
+
+os.environ["config_file"] = "tests/config.yml"
+
 from plato.clients import simple
 
 
 async def test_training(client):
-    """ Testing the training loop on the client. """
+    """Testing the training loop on the client."""
     print("Testing training on the client.")
 
-    report, weights = await client.train()
+    report, weights = await client._train()
 
     print("Client model trained.")
     print(f"Report to be sent to the server: {report}")
@@ -17,11 +21,12 @@ async def test_training(client):
 
 
 def main():
-    """ Starting a simple client. """
+    """Starting a simple client."""
     client = simple.Client()
     client.client_id = 1
+    client._load_data()
     client.configure()
-    client.load_data()
+    client._allocate_data()
     asyncio.run(test_training(client))
 
 

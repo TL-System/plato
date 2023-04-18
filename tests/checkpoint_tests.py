@@ -29,7 +29,7 @@ class CheckpointTest(unittest.TestCase):
         self.personalized_optimizer = optimizers.get(
             self.personalized_model,
             optimizer_name=Config().trainer.personalized_optimizer,
-            optim_params=Config().parameters.personalized_optimizer._asdict(),
+            optimizer_params=Config().parameters.personalized_optimizer._asdict(),
         )
 
     def test_checkpoint_saving(self):
@@ -64,7 +64,7 @@ class CheckpointTest(unittest.TestCase):
             )
             logging.info("%s has been saved.", saved_filename)
 
-            loaded_filename, loaded_data = checkpoint_operator.load_client_checkpoint(
+            loaded_filename, _ = checkpoint_operator.load_client_checkpoint(
                 save_id, model_name="global_model", checkpoints_dir="checkpoints/"
             )
             logging.info("%s has been loaded.", loaded_filename)

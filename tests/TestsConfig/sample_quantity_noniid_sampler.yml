@@ -1,5 +1,3 @@
-# include basic settings for the models and the learning process
-general: !include base_path.yml
 
 # clients settings
 clients:
@@ -16,27 +14,21 @@ server:
 
 # dataset settings for the original dataset and the corresponding multimodal data processor
 data:
-  datasource: CIFAR10
+    # The training and testing dataset
+    datasource: MNIST
 
-  downloader:
-    num_workers: 4
-    failed_save_file: failed_record.txt
-    log_file: download_log.txt
-    compress: False
-    verbose: False
-    skip: False
-    videos_per_gpu: 3
-    workers_per_gpu: 4
+    # Number of samples in each partition
+    partition_size: 2000
 
-  sampler: sample_quantity_noniid
-  modality_sampler: modality_iid
+    sampler: sample_quantity_noniid
+    modality_sampler: modality_iid
 
-  client_quantity_concentration: 0.1
+    client_quantity_concentration: 0.1
 
-  min_partition_size: 100
+    min_partition_size: 100
 
-  # The random seed for sampling data
-  random_seed: 1
+    # The random seed for sampling data
+    random_seed: 1
 
 # Train settings
 

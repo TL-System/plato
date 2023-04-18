@@ -34,7 +34,7 @@ class ParallelIterator:
         # terminates, this iterator will terminates.
         # The `StopIteration` raised inside that shortest loader's `__next__`
         # method will in turn gets out of this `__next__` method.
-        batches = [loader_iter.next() for loader_iter in self.loader_iters]
+        batches = [next(loader_iter) for loader_iter in self.loader_iters]
         return self.defined_compound_loader.combine_batch(batches)
 
     def __len__(self):
@@ -114,7 +114,7 @@ class SequentialIterator:
             cur_loader_idx -= 1
 
         loader_iter = self.loader_iters[cur_loader_idx]
-        batch = loader_iter.next()
+        batch = next(loader_iter)
 
         self.batch_idx += 1
 
