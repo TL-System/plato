@@ -42,7 +42,7 @@ class STL10Dataset(Dataset):
 class DataSource(base.DataSource):
     """The STL-10 dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         _path = Config().params["data_path"]
 
@@ -50,22 +50,34 @@ class DataSource(base.DataSource):
             mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
             std=[x / 255.0 for x in [63.0, 62.1, 66.7]],
         )
-
-        train_transform = transforms.Compose(
-            [
-                transforms.RandomCrop(96, padding=4),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                normalize,
-            ]
+        train_transform = (
+            kwargs["train_transform"]
+            if "train_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        transforms.RandomCrop(96, padding=4),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.ToTensor(),
+                        normalize,
+                    ]
+                )
+            )
         )
 
-        test_transform = transforms.Compose(
-            [
-                transforms.ToTensor(),
-                normalize,
-            ]
+        test_transform = (
+            kwargs["test_transform"]
+            if "test_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        transforms.ToTensor(),
+                        normalize,
+                    ]
+                )
+            )
         )
+
         stl10_trainset = datasets.STL10(
             root=_path, split="train", download=True, transform=train_transform
         )
