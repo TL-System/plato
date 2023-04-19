@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -24,7 +24,7 @@ server:
     port: 8000
     synchronous: false
     simulate_wall_time: true
-    minimum_clients_aggregated: 5
+    minimum_clients_aggregated: 3
     staleness_bound: 10
     random_seed: 1
 
@@ -33,7 +33,7 @@ data:
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 600
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: noniid
