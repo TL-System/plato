@@ -14,11 +14,12 @@ import os
 
 import pickle
 
-from plato.clients import simple
+from plato.clients import simple_personalized
 from plato.config import Config
+from plato.utils import fonts
 
 
-class Client(simple.Client):
+class Client(simple_personalized.Client):
     """A SCAFFOLD federated learning client who sends weight updates
     and client control variate."""
 
@@ -29,6 +30,7 @@ class Client(simple.Client):
         algorithm=None,
         trainer=None,
         callbacks=None,
+        personalized_model=None,
     ):
         super().__init__(
             model=model,
@@ -36,6 +38,7 @@ class Client(simple.Client):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            personalized_model=personalized_model,
         )
 
         self.client_control_variate = None
@@ -61,3 +64,24 @@ class Client(simple.Client):
             self.trainer.client_control_variate = self.client_control_variate
 
         self.trainer.client_control_variate_path = client_control_variate_path
+
+    def load_personalized_model(self) -> None:
+        """Load the personalized model.
+
+        Each client of Scaffold will directly utilize the recevied global model as the
+        personalized model.
+        """
+        logging.info(
+            fonts.colourize(
+                "[Client #%d] assings the received model [%s] to personalized model [%s].",
+                colour="blue",
+            ),
+            self.client_id,
+            Config().trainer.model_name,
+            Config().trainer.personalized_model_name,
+        )
+
+        # load the received model to be personalized model
+        self.trainer.personalized_model.load_state_dict(
+            self.trainer.model.state_dict(), strict=True
+        )

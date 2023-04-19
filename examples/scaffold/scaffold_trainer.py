@@ -16,15 +16,15 @@ import pickle
 import torch
 
 from plato.config import Config
-from plato.trainers import basic
+from plato.trainers import basic_personalized
 
 
-class Trainer(basic.Trainer):
+class Trainer(basic_personalized.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
-        super().__init__(model)
+        super().__init__(model, callbacks=None)
 
         self.server_control_variate = None
         self.client_control_variate = None
