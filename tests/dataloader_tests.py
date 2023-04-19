@@ -10,7 +10,7 @@ os.environ["config_file"] = "tests/config.yml"
 import numpy as np
 
 from plato.config import Config
-from plato.datasources.cifar10 import DataSource
+from plato.datasources import registry as datasource_registry
 from plato.utils import data_loaders
 from plato.samplers import registry as samplers_registry
 
@@ -24,7 +24,8 @@ class DataLoadersTest(unittest.TestCase):
         self.client1_id = 10
         self.client2_id = 20
         self.client3_id = 39
-        self.utest_datasource = DataSource()
+
+        self.utest_datasource = datasource_registry.get()
 
         self.client1_batch_size = 8
         self.client2_batch_size = 64
