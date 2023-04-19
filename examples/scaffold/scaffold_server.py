@@ -1,6 +1,8 @@
 """
 A federated learning server using SCAFFOLD.
 
+The personalized federated learning of SCAFFOLD has been supported.
+
 Reference:
 
 Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
