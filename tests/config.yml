@@ -17,7 +17,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: STL10
+    datasource: MNIST
 
     # Number of samples in each partition
     partition_size: 2000
