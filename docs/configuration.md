@@ -298,6 +298,7 @@ The training and test datasets. The following options are available:
 - `CelebA`
 - `Purchase`
 - `Texas`
+- `STL10`
 ```
 
 ````{admonition} data_path

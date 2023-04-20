@@ -41,6 +41,7 @@ else:
         feature,
         qoenflx,
         celeba,
+        stl10
     )
 
     registered_datasources = {
@@ -58,6 +59,7 @@ else:
         "Feature": feature,
         "QoENFLX": qoenflx,
         "CelebA": celeba,
+        "STL10": stl10
     }
 
     registered_partitioned_datasources = {"FEMNIST": femnist}
