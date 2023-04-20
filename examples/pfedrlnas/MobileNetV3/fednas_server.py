@@ -46,9 +46,8 @@ class FendasServerCallback(ServerCallback):
                 csv_processor.write_csv(accuracy_csv_file, accuracy_row)
             logging.info("[%s] All client reports have been processed.", server)
 
-    # pylint:disable=useless-parent-delegation
     def on_clients_selected(self, server, selected_clients, **kwargs):
-        return super().on_clients_selected(server, selected_clients, **kwargs)
+        pass
 
 
 class ServerSync(fedavg.Server):
