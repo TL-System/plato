@@ -63,14 +63,12 @@ class Server(fedavg.Server):
         self.personalization_status_info = {}
         self.personalization_group_type_info = {}
 
-        # clients that have completed
-        # personalization
-        self.personalization_done_clients_pool = []
-
         # the flag denoting whether the personalization
         # has been started or terminated
         self.performing_personalization = False
-        self.personalization_terminated = False
+        # whether stop the terminate personalization
+        # afterwards
+        self.to_terminate_personalization = False
 
         self.initialize_personalization()
         self.check_hyper_parameters()
@@ -258,10 +256,30 @@ class Server(fedavg.Server):
 
     def perform_normal_training(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee general federated learning without personalization."""
+        # always set the performing_personalization to close
+        # personalization
+        self.performing_personalization = False
+
+        # reset `clients_per_round` to the predefined hyper-parameter
+        self.clients_per_round = Config().clients.per_round
+
+        # set the clients_pool to be participant_clients_pool
+        clients_pool = self.participant_clients_pool
+
+        # However, as we modified the membership `clients_per_round` previously,
+        # the clients_count here may be the modified `clients_per_round`.
+        # We need to convert it back to `self.clients_per_round`.
+        # For example, if the previous round performs personalization,
+        # the `clients_per_round` was modified to the size of the client group
+        # that performs personalization, making the current round should change it back.
+        clients_count = (
+            clients_count
+            if clients_count <= self.clients_per_round
+            else self.clients_per_round
+        )
 
         # by default, we run the general federated training
         # the clients pool should be participant clients
-        clients_pool = self.participant_clients_pool
         assert clients_count <= len(self.participant_clients_pool)
 
         return clients_pool, clients_count
@@ -293,9 +311,10 @@ class Server(fedavg.Server):
             clients_pool = self.client_groups_pool[
                 self.do_personalization_group.lower()
             ]
-        else:
-            # close the personalization status flag
-            self.performing_personalization = False
+            # change the clients_per_round to be the whole set
+            # of clients for personalization
+            self.clients_per_round = len(clients_pool)
+            clients_count = self.clients_per_round
 
         return clients_pool, clients_count
 
@@ -318,42 +337,15 @@ class Server(fedavg.Server):
                 self.do_personalization_group.lower()
             ]
 
+            # set clients for personalization
+            self.clients_per_round = len(clients_pool)
+            clients_count = self.clients_per_round
+
             # open the personalization status flag
             self.performing_personalization = True
 
-            # reach the final personalization round
-            self.current_round = Config().trainer.rounds
-
-            # the number of clients have not been visited
-            non_visited_clients_count = len(clients_pool) - len(
-                self.personalization_done_clients_pool
-            )
-            if non_visited_clients_count <= clients_count:
-                # if the non visited clients is less than the
-                # required clients per round,
-                # select all left non visited clients
-                # then personalization on all clients has
-                # been terminated
-                clients_count = non_visited_clients_count
-
-                # we must change the clients_per_round to be
-                # the number of clients_count, i.e., how many
-                # clients will be selected in this round.
-                # By doing so, the server can know how many updates
-                # to be received for aggregation.
-                self.clients_per_round = non_visited_clients_count
-
-                # close the personalization flag
-                self.personalization_terminated = True
-            else:
-                self.personalization_terminated = False
-
-            # remove the visited clients from the clients_pool
-            clients_pool = [
-                client_id
-                for client_id in clients_pool
-                if client_id not in self.personalization_done_clients_pool
-            ]
+            # to terminate the personalization afterwards
+            self.to_terminate_personalization = True
 
         return clients_pool, clients_count
 
@@ -380,16 +372,6 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def after_clients_sampling(self, selected_clients: List[int], **kwargs):
-        """Perform operations after clients sampling."""
-        # add clients who has been selected for personalization
-        # to the `personalization_done_clients_pool`
-        # thus, they will not be selected then.
-        if self.performing_personalization:
-            self.personalization_done_clients_pool += selected_clients
-        else:
-            self.personalization_done_clients_pool = []
-
     def choose_clients(self, clients_pool: List[int], clients_count: int):
         """Chooses a subset of the clients to participate in each round.
 
@@ -407,8 +389,6 @@ class Server(fedavg.Server):
 
         # Select clients randomly
         selected_clients = random.sample(clients_pool, clients_count)
-
-        self.after_clients_sampling(selected_clients)
 
         self.prng_state = random.getstate()
         if selected_clients == len(clients_pool):
@@ -445,7 +425,10 @@ class Server(fedavg.Server):
         if self.current_round >= Config().trainer.rounds:
             logging.info("Target number of training rounds reached.")
 
-            if self.do_personalization_interval >= 0 or self.personalization_terminated:
+            if (
+                self.do_personalization_interval >= 0
+                or self.to_terminate_personalization
+            ):
 
                 logging.info(
                     "%s Completed.",
