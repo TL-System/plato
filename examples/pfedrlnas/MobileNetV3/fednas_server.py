@@ -3,13 +3,12 @@ Customized Server for PerFedRLNAS.
 """
 import os
 import sys
+import copy
 import logging
 import pickle
 import time
 import numpy as np
-import copy
 
-import torch
 import fedtools
 
 from plato.datasources import registry as datasources_registry
@@ -286,7 +285,7 @@ class ServerAsync(ServerSync):
             staleness = updates[i].staleness
             num_samples = report.num_samples
 
-            similarity = await self.algorithm.cosine_similarity(update, staleness)
+            similarity = await self.cosine_similarity(update, staleness)
             staleness_factor = ServerAsync.staleness_function(staleness)
 
             similarity_weight = (
@@ -340,26 +339,9 @@ class ServerAsync(ServerSync):
         model_path = Config().params["model_path"]
         model_path = f"{model_path}/{filename}"
 
-        similarity = 1.0
-
-        if staleness > 1 and os.path.exists(model_path):
-            previous_model = copy.deepcopy(self.trainer.model)
-            previous_model.load_state_dict(torch.load(model_path))
-
-            previous = torch.zeros(0)
-            for __, weight in previous_model.cpu().state_dict().items():
-                previous = torch.cat((previous, weight.view(-1)))
-
-            current = torch.zeros(0)
-            for __, weight in self.trainer.model.cpu().state_dict().items():
-                current = torch.cat((current, weight.view(-1)))
-
-            deltas = torch.zeros(0)
-            for __, delta in update.items():
-                deltas = torch.cat((deltas, delta.view(-1)))
-
-            similarity = F.cosine_similarity(current - previous, deltas, dim=0)
-        return similarity
+        return fedtools.calculate_similarity(
+            model_path, self.trainer.model, update, staleness
+        )
 
     @staticmethod
     def staleness_function(staleness):
