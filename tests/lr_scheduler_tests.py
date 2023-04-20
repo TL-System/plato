@@ -1,7 +1,11 @@
 """Unit tests for the learning rate scheduler."""
+import os
 import unittest
 import warnings
 from collections import namedtuple
+
+os.environ["config_file"] = "tests/TestsConfig/fedavg_tests.yml"
+
 import numpy as np
 
 from plato.config import Config

@@ -36,7 +36,7 @@ class PersonalizationTest(unittest.TestCase):
         personalized_optimizer = optimizers.get(
             personalized_model,
             optimizer_name=Config().trainer.personalized_optimizer,
-            optim_params=Config().parameters.personalized_optimizer._asdict(),
+            optimizer_params=Config().parameters.personalized_optimizer._asdict(),
         )
         # 3. lr scheduler
         personalized_lrs = lr_schedulers.get(

@@ -1,6 +1,4 @@
 clients:
-    # Type
-    type: simple_personalized
 
     # The total number of clients
     total_clients: 10
@@ -13,14 +11,21 @@ clients:
 
     # the ratio of clients participanting in training
     participant_clients_ratio: 0.5
-
+    
+    # whether maintain and load the trained 
+    # personalied model
+    # set to be true, each client will load
+    # the latest trained personalized model
+    persist_personalized_model: False
 
 server:
+
     address: 127.0.0.1
     port: 8000
 
-    # do personalization for testing purpose
-    # for every do_personalization_interval rounds
+    # do personalization 
+    # for every `do_personalization_interval` rounds
+    # set -1 to do personalized only after the final round
     do_personalization_interval: 2
     # total, participant, nonparticipant
     do_personalization_group: nonparticipant
@@ -32,18 +37,21 @@ data:
     # Number of samples in each partition
     partition_size: 2000
 
+    
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
-    # The type of the trainer
-    type: basic_personalized
 
     # The maximum number of training rounds
-    rounds: 3
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -53,7 +61,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 3
-    batch_size: 64
+    batch_size: 32
     optimizer: SGD
     lr_scheduler: MultiStepLR
     loss_criterion: CrossEntropyLoss
@@ -62,10 +70,12 @@ trainer:
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     personalized_epochs: 10
-    personalized_batch_size: 12
-    personalized_optimizer: Adam
+    personalized_batch_size: 32
+    personalized_optimizer: SGD
     personalized_lr_scheduler: StepLR
-    personalized_loss_criterion: BCEWithLogitsLoss
+    personalized_loss_criterion: CrossEntropyLoss
+
+    pers_epoch_log_interval: 2
 
     # The machine learning model
     model_name: lenet5
@@ -77,13 +87,13 @@ algorithm:
 
 parameters:
     optimizer:
-        lr: 0.05
+        lr: 0.01
         momentum: 0.9
-        weight_decay: 0.000001
+        weight_decay: 0.0
 
     personalized_optimizer:
-        lr: 0.1
-        eps: 1.0e-6
+        lr: 0.05
+        momentum: 0.9
         weight_decay: 0.0
 
     learning_rate:
@@ -98,11 +108,11 @@ parameters:
         label_smoothing: 0.5
 
     personalized_loss_criterion:
-        reduction: mean
+        label_smoothing: 0.5
 
     model:
         num_classes: 10
 
     personalized_model:
-        num_classes: 20
+        num_classes: 10
 
