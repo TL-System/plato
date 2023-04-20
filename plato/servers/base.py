@@ -24,6 +24,7 @@ from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
 
+
 # pylint: disable=unused-argument, protected-access
 class ServerEvents(socketio.AsyncNamespace):
     """A custom namespace for socketio.AsyncServer."""
@@ -677,7 +678,8 @@ class Server:
 
     async def _periodic_task(self):
         """A periodic task that is executed from time to time, determined by
-        'server:periodic_interval' with a default value of 5 seconds, in the configuration."""
+        'server:periodic_interval' with a default value of 5 seconds, in the configuration.
+        """
         # Call the async function that defines a customized periodic task, if any
         await self.periodic_task()
 

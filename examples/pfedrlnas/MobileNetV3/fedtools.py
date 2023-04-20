@@ -1,13 +1,15 @@
 """
 Helped functions used by trainer and algorithm in PerFedRLNAS.
 """
+import os
 import copy
 import logging
 
-from model.mobilenetv3_supernet import NasDynamicModel
-
 import torch
+import torch.nn.functional as F
 import numpy as np
+
+from model.mobilenetv3_supernet import NasDynamicModel
 
 
 def set_active_subnet(model, cfg):
@@ -99,3 +101,44 @@ def fuse_weight(supernet, subnets, cfgs, num_samples):
     global_iter = supernet.named_parameters()
     neg_ratio = _average_fuse(global_iter, proxy_iters, num_samples)
     return neg_ratio
+
+
+def generate_proxy_supernets(subnets, cfgs):
+    """Generate a series of proxy supernets."""
+    proxy_supernets = []
+    for i, cfg in enumerate(cfgs):
+        proxy_supernet = NasDynamicModel()
+        subnet = subnets[i]
+        proxy_supernet.set_active_subnet(
+            cfg["resolution"],
+            cfg["width"],
+            cfg["depth"],
+            cfg["kernel_size"],
+            cfg["expand_ratio"],
+        )
+        proxy_supernet.get_weight_from_subnet(subnet)
+        proxy_supernets.append(proxy_supernet)
+    return proxy_supernets
+
+
+def calculate_similarity(model_path, model, update, staleness):
+    """Calculate the model similarity"""
+    similarity = 1
+    if staleness > 1 and os.path.exists(model_path):
+        previous_model = copy.deepcopy(model)
+        previous_model.load_state_dict(torch.load(model_path))
+
+        previous = torch.zeros(0)
+        for __, weight in previous_model.cpu().state_dict().items():
+            previous = torch.cat((previous, weight.view(-1)))
+
+        current = torch.zeros(0)
+        for __, weight in model.cpu().state_dict().items():
+            current = torch.cat((current, weight.view(-1)))
+
+            deltas = torch.zeros(0)
+        for __, delta in update.items():
+            deltas = torch.cat((deltas, delta.view(-1)))
+
+    similarity = F.cosine_similarity(current - previous, deltas, dim=0)
+    return similarity
