@@ -3,7 +3,6 @@ Customized Server for PerFedRLNAS.
 """
 import os
 import sys
-import copy
 import logging
 import pickle
 import time
