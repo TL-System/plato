@@ -255,7 +255,7 @@ MobileNetV3 search space (synchronous mode):
 ```
 python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
 ```
-MobileNetV3 search space (ssynchronous mode):
+MobileNetV3 search space (asynchronous mode):
 ```
 python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
 ```
