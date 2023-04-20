@@ -36,9 +36,6 @@ server:
     do_test: false
     random_seed: 1
 
-    checkpoint_path: /scratch/dixiyao/plato/models/pfedrlnas_async_budget
-    model_path: /scratch/dixiyao/plato/models/pfedrlnas_async_budget
-
      # Should we operate in sychronous mode?
     synchronous: false
 
@@ -61,8 +58,6 @@ server:
 data:
     # The training and testing dataset
     datasource:  CIFAR10
-
-    data_path: ../data
 
     # Number of samples in each partition
     partition_size: 600
@@ -111,7 +106,6 @@ algorithm:
     
 results:
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead, server_overhead
-    result_path: /scratch/dixiyao/plato/results/pfedrlnas_async_budget
 
 parameters:
     model:
