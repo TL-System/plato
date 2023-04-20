@@ -11,8 +11,10 @@ import fednas_client
 import fednas_algorithm
 import fednas_trainer
 
-from model.mobilenetv3_supernet import NasDynamicModel
-from model.architect import Architect
+# pylint: disable=relative-beyond-top-level
+from ..MobileNetV3.model.mobilenetv3_supernet import NasDynamicModel
+from ..MobileNetV3.model.architect import Architect
+from ..MobileNetV3.fednas_algorithm import ClientAlgorithm
 
 
 def main():
@@ -22,7 +24,7 @@ def main():
     supernet = NasDynamicModel
     client = fednas_client.Client(
         model=supernet,
-        algorithm=fednas_algorithm.ClientAlgorithm,
+        algorithm=ClientAlgorithm,
         trainer=fednas_trainer.Trainer,
     )
     server = fednas_server.Server(

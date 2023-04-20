@@ -4,10 +4,10 @@ Helped functions used by trainer and algorithm in PerFedRLNAS.
 import copy
 import logging
 
-from model.mobilenetv3_supernet import NasDynamicModel
-
 import torch
 import numpy as np
+
+from model.mobilenetv3_supernet import NasDynamicModel
 
 
 def set_active_subnet(model, cfg):

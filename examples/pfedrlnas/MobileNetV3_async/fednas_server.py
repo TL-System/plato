@@ -11,19 +11,40 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-
-import fedtools
-
 from plato.utils import csv_processor
 from plato.config import Config
-from plato.servers import fedavg
 from plato.callbacks.server import ServerCallback
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 
+# pylint: disable=relative-beyond-top-level
+from ..MobileNetV3.fedtools import sample_subnet_w_config
+from ..MobileNetV3.model.mobilenetv3_supernet import NasDynamicModel
+from ..MobileNetV3.fednas_server import Server as sync_server
+
+
+def generate_proxy_supernets(subnets, cfgs):
+    """Generate a series of proxy supernets."""
+    proxy_supernets = []
+    for i, cfg in enumerate(cfgs):
+        proxy_supernet = NasDynamicModel()
+        subnet = subnets[i]
+        proxy_supernet.set_active_subnet(
+            cfg["resolution"],
+            cfg["width"],
+            cfg["depth"],
+            cfg["kernel_size"],
+            cfg["expand_ratio"],
+        )
+        proxy_supernet.get_weight_from_subnet(subnet)
+        proxy_supernets.append(proxy_supernet)
+    return proxy_supernets
+
+
 class FendasServerCallback(ServerCallback):
     "The PerFedRLNAS server callback"
+
     def on_clients_processed(self, server, **kwargs):
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Updates the log for client test accuracies
@@ -48,11 +69,13 @@ class FendasServerCallback(ServerCallback):
                 csv_processor.write_csv(accuracy_csv_file, accuracy_row)
             logging.info("[%s] All client reports have been processed.", server)
 
+    # pylint:disable=useless-parent-delegation
     def on_clients_selected(self, server, selected_clients, **kwargs):
         return super().on_clients_selected(server, selected_clients, **kwargs)
 
-#pylint:disable=too-many-instance-attributes
-class Server(fedavg.Server):
+
+# pylint:disable=too-many-instance-attributes
+class Server(sync_server):
     """The PerFedRLNAS server assigns and aggregates global model with different architectures."""
 
     def __init__(
@@ -63,19 +86,17 @@ class Server(fedavg.Server):
         trainer=None,
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(model, datasource, algorithm, trainer, callbacks=[FendasServerCallback])
+        super().__init__(
+            model, datasource, algorithm, trainer, callbacks=[FendasServerCallback]
+        )
         self.subnets_config = [None for _ in range(Config().clients.total_clients)]
         self.neg_ratio = None
         self.process_begin = None
         self.process_end = None
+        self.total_samples = 0
         self.model_size = np.zeros(Config().clients.total_clients)
-
-    def customize_server_response(self, server_response: dict, client_id) -> dict:
-        subnet_config = self.algorithm.sample_config(server_response)
-        self.subnets_config[server_response["id"] - 1] = subnet_config
-        server_response["subnet_config"] = subnet_config
-
-        return server_response
+        if self.datasource is None:
+            self.datasource = datasource
 
     async def aggregate_weights(
         self, updates, baseline_weights, weights_received
@@ -84,84 +105,46 @@ class Server(fedavg.Server):
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
         num_samples = [update.report.num_samples for update in self.updates]
-        self.total_samples=sum(num_samples)
-        deltas=await self.compute_weight_deltas(weights_received,client_id_list)
-        aggregation_weights= await self.calculate_aggregation_weight(updates,deltas)
+        self.total_samples = sum(num_samples)
+        deltas = await self.compute_weight_deltas(weights_received, client_id_list)
+        aggregation_weights = await self.calculate_aggregation_weight(updates, deltas)
         self.neg_ratio = self.algorithm.nas_aggregation(
-            aggregation_weights,self.subnets_config, weights_received, client_id_list
+            aggregation_weights, self.subnets_config, weights_received, client_id_list
         )
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
 
-    async def compute_weight_deltas(self,weights_received,client_id_list):
+    async def compute_weight_deltas(self, weights_received, client_id_list):
         """The calculation of deltas in NAS is different."""
-        baseline_weights=self.algorithm.model.model.state_dict()
+        baseline_weights = self.algorithm.model.model.state_dict()
         client_models = []
         subnet_configs = []
         for i, client_id_ in enumerate(client_id_list):
             client_id = client_id_ - 1
             subnet_config = self.subnets_config[client_id]
-            client_model = fedtools.sample_subnet_w_config(
+            client_model = sample_subnet_w_config(
                 self.algorithm.model.model, subnet_config, False
             )
             client_model.load_state_dict(weights_received[i], strict=True)
             client_models.append(client_model)
             subnet_configs.append(subnet_config)
-        proxy_supernets = fedtools.generate_proxy_supernets(client_models,subnet_configs)
-        proxy_supernets_weights=[proxy_supernet.state_dict() for proxy_supernet in proxy_supernets]
-        return self.algorithm.compute_weight_deltas(baseline_weights,proxy_supernets_weights)
+        proxy_supernets = generate_proxy_supernets(client_models, subnet_configs)
+        proxy_supernets_weights = [
+            proxy_supernet.state_dict() for proxy_supernet in proxy_supernets
+        ]
+        return self.algorithm.compute_weight_deltas(
+            baseline_weights, proxy_supernets_weights
+        )
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
-        accuracy_list = [update.report.accuracy for update in updates]
-        round_time_list = [
-            update.report.training_time + update.report.comm_time
-            for update in self.updates
-        ]
-        client_id_list = [update.client_id for update in self.updates]
-        subnet_configs = []
-        for client_id_ in client_id_list:
-            client_id = client_id_ - 1
-            subnet_config = self.subnets_config[client_id]
-            subnet_configs.append(subnet_config)
-
-        epoch_index = self.algorithm.model.extract_index(subnet_configs)
-        self.algorithm.model.step(
-            [accuracy_list, round_time_list, self.neg_ratio],
-            epoch_index,
-            client_id_list,
-        )
-
-        self.trainer.model = self.algorithm.model
-        self.process_end = time.time()
+        super().weights_aggregated(updates)
         # Save the current model for later retrieval when cosine similarity needs to be computed
         filename = f"model_{self.current_round}.pth"
         self.trainer.save_model(filename)
 
-    def server_will_close(self):
-        for i in range(1, Config().clients.total_clients):
-            cfg = self.subnets_config[i]
-            if cfg:
-                logging.info("the config of client %s is %s", str(i), str(cfg))
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
-        with open(save_config, "wb") as file:
-            pickle.dump(self.subnets_config, file)
-
-    def save_to_checkpoint(self) -> None:
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
-        with open(save_config, "wb") as file:
-            pickle.dump(self.subnets_config, file)
-        save_config = f"{Config().server.model_path}/baselines.pickle"
-        with open(save_config, "wb") as file:
-            pickle.dump(self.algorithm.model.baseline, file)
-        return super().save_to_checkpoint()
-
-    def get_logged_items(self) -> dict:
-        logged_items = super().get_logged_items()
-        logged_items["server_overhead"] = self.process_end - self.process_begin
-        return logged_items
-
+    # pylint:disable=attribute-defined-outside-init
     def configure(self) -> None:
         """
         Booting the federated learning server by setting up the data, model, and
@@ -220,9 +203,10 @@ class Server(fedavg.Server):
                 "model_size",
             ]
             csv_processor.initialize_csv(
-                accuracy_csv_file, accuracy_headers, Config().params["result_path"])
-            
-    async def calculate_aggregation_weight(self,updates,deltas_received):
+                accuracy_csv_file, accuracy_headers, Config().params["result_path"]
+            )
+
+    async def calculate_aggregation_weight(self, updates, deltas_received):
         """Calculate aggregation weights according to the port."""
         # Constructing the aggregation weights to be used
         aggregation_weights = []
@@ -304,7 +288,7 @@ class Server(fedavg.Server):
             for __, delta in update.items():
                 deltas = torch.cat((deltas, delta.view(-1)))
 
-            similarity = F.cosine_similarity(current - previous, deltas, dim=0)       
+            similarity = F.cosine_similarity(current - previous, deltas, dim=0)
         return similarity
 
     @staticmethod
@@ -318,4 +302,3 @@ class Server(fedavg.Server):
         staleness_factor = staleness_bound / (staleness + staleness_bound)
 
         return staleness_factor
-    

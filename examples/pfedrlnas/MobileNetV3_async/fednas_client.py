@@ -1,26 +1,19 @@
 """
 Customized Client for PerFedRLNAS.
 """
-import logging
-import pickle
 from types import SimpleNamespace
-from plato.clients import simple
 from plato.config import Config
 
+# pylint: disable=relative-beyond-top-level
+from ..MobileNetV3.fednas_client import Client as sync_client
 
-class Client(simple.Client):
+
+# pylint: disable=too-few-public-methods
+class Client(sync_client):
     """A FedRLNAS client. Different clients hold different models."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__(model, datasource, algorithm, trainer)
-
-    def process_server_response(self, server_response) -> None:
-        subnet_config = server_response["subnet_config"]
-        self.trainer.current_config = subnet_config
-        self.algorithm.model = self.algorithm.generate_client_model(subnet_config)
-        self.trainer.model = self.algorithm.model
-
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
+        """Customize the information in report."""
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.mem"
         max_mem_allocated, exceed_memory, sim_mem = self.trainer.load_memory(filename)

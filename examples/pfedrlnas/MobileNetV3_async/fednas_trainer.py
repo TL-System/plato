@@ -6,14 +6,18 @@ import random
 import pickle
 import os
 import re
-import torch
-import fednas_specific
 
-import fedtools
-from model.mobilenetv3_supernet import NasDynamicModel
+import torch
+from timm.loss import LabelSmoothingCrossEntropy
+
 
 from plato.trainers import basic
 from plato.config import Config
+
+# pylint: disable=relative-beyond-top-level
+from ..MobileNetV3.fedtools import sample_subnet_w_config
+from ..MobileNetV3.model.mobilenetv3_supernet import NasDynamicModel
+from ..MobileNetV3.model.config import get_config
 
 
 if Config().trainer.lr_scheduler == "timm":
@@ -22,10 +26,16 @@ else:
     BasicTrainer = basic.Trainer
 
 
+def get_nasvit_loss_criterion():
+    """Get timm Label Smoothing Cross Entropy."""
+    return LabelSmoothingCrossEntropy(smoothing=get_config().MODEL.LABEL_SMOOTHING)
+
+
 class SimuRuntimeError(RuntimeError):
     """Simulated Run time Error"""
 
 
+# pylint:disable=too-many-instance-attributes
 class Trainer(BasicTrainer):
     """Use special optimizer and loss criterion."""
 
@@ -47,7 +57,7 @@ class Trainer(BasicTrainer):
         self.current_config = None
 
     def get_loss_criterion(self):
-        return fednas_specific.get_nasvit_loss_criterion()
+        return get_nasvit_loss_criterion()
 
     def train_run_start(self, config):
         super().train_run_start(config)
@@ -182,9 +192,7 @@ class Trainer(BasicTrainer):
                     pretrained = torch.load(
                         model_path, map_location=torch.device("cpu")
                     )
-                model = fedtools.sample_subnet_w_config(
-                    NasDynamicModel(), subnet_config, False
-                )
+                model = sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
                 model.load_state_dict(pretrained, strict=True)
 
                 logging.info(
@@ -204,7 +212,7 @@ class Trainer(BasicTrainer):
             pretrained = torch.load(model_path)
         else:
             pretrained = torch.load(model_path, map_location=torch.device("cpu"))
-        model = fedtools.sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
+        model = sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
         model.load_state_dict(pretrained, strict=True)
 
         logging.info(
