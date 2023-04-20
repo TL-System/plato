@@ -26,9 +26,9 @@ server:
     # do personalization 
     # for every `do_personalization_interval` rounds
     # set -1 to do personalized only after the final round
-    do_personalization_interval: -1
+    do_personalization_interval: 2
     # total, participant, nonparticipant
-    do_personalization_group: total
+    do_personalization_group: nonparticipant
 
 data:
     # The training and testing dataset
@@ -70,7 +70,7 @@ trainer:
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     personalized_epochs: 10
-    personalized_batch_size: 12
+    personalized_batch_size: 32
     personalized_optimizer: SGD
     personalized_lr_scheduler: StepLR
     personalized_loss_criterion: CrossEntropyLoss
