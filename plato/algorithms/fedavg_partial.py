@@ -22,6 +22,7 @@ be defined as:
 thus, the conv1 and conv2 layers will be used as the global model.
 """
 
+import os
 import logging
 from typing import List, Optional
 from collections import OrderedDict
@@ -45,6 +46,14 @@ class Algorithm(fedavg.Algorithm):
         # i.e., whole_model_name = "whole"
         self.whole_model_name = "whole"
 
+    def get_algorithm_holder(self):
+        """Get who holds the defined algorithm."""
+        return (
+            f"server #{os.getpid()}"
+            if self.client_id == 0
+            else f"Client #{self.client_id}"
+        )
+
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
@@ -67,7 +76,12 @@ class Algorithm(fedavg.Algorithm):
         if modules_name is None:
             return model.cpu().state_dict()
         else:
-            logging.info("Extracting parameters with names %s.", modules_name)
+
+            logging.info(
+                "[%s] Extracting parameters with names %s.",
+                self.get_algorithm_holder(),
+                modules_name,
+            )
             return OrderedDict(
                 [
                     (name, param)

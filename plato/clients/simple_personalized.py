@@ -13,7 +13,7 @@ from plato.clients import simple
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.utils import fonts
-from plato.utils.filename_formatter import get_format_name
+from plato.utils.filename_formatter import NameFormatter
 
 
 class Client(simple.Client):
@@ -118,7 +118,7 @@ class Client(simple.Client):
         # save the defined personalized model as the initial one
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
-        filename = get_format_name(
+        filename = NameFormatter.get_format_name(
             model_name=pers_model_name,
             client_id=self.client_id,
             round_n=0,
@@ -140,7 +140,7 @@ class Client(simple.Client):
             )
             logging.info(
                 fonts.colourize(
-                    "[Client #%d]. Creating its unique parameters by resetting weights.",
+                    "[Client #%d] Creating its unique personalized parameters by resetting weights.",
                     colour="blue",
                 ),
                 self.client_id,
@@ -173,7 +173,7 @@ class Client(simple.Client):
         personalized_model_name = Config().trainer.personalized_model_name
         logging.info(
             fonts.colourize(
-                "[Client #%d] loading its personalized model [%s].", colour="blue"
+                "[Client #%d] Loading its personalized model named %s.", colour="blue"
             ),
             self.client_id,
             personalized_model_name,
@@ -194,7 +194,7 @@ class Client(simple.Client):
 
             logging.info(
                 fonts.colourize(
-                    "[Client #%d] loads latest personalized model.", colour="blue"
+                    "[Client #%d] Loading latest personalized model.", colour="blue"
                 ),
                 self.client_id,
             )
@@ -206,7 +206,7 @@ class Client(simple.Client):
             desired_round = 0
             logging.info(
                 fonts.colourize(
-                    "[Client #%d] loads initial personalized model.", colour="blue"
+                    "[Client #%d] Loading initial personalized model.", colour="blue"
                 ),
                 self.client_id,
             )
