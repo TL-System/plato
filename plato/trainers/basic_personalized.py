@@ -229,9 +229,9 @@ class Trainer(basic.Trainer):
         )
         loaded_weights = ckpt_oper.load_checkpoint(checkpoint_name=filename)["model"]
         if modelfile_prefix == "personalized":
-            self.trainer.personalized_model.load_state_dict(loaded_weights, strict=True)
+            self.personalized_model.load_state_dict(loaded_weights, strict=True)
         else:
-            self.trainer.model.load_state_dict(loaded_weights, strict=True)
+            self.model.load_state_dict(loaded_weights, strict=True)
 
         logging.info(
             "[Client #%d] Rollbacking a model from %s under %s.",

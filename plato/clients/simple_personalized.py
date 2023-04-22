@@ -86,7 +86,7 @@ class Client(simple.Client):
             self.personalized_model = self.custom_personalized_model()
 
         logging.info(
-            "Client[%d] defines the personalized model: %s",
+            "[Client #%d] defines the personalized model: %s",
             self.client_id,
             pers_model_name,
         )
@@ -133,16 +133,17 @@ class Client(simple.Client):
         if not os.path.exists(checkpoint_file_path):
             logging.info(
                 fonts.colourize(
-                    "First-time Selection of Client[%d] for personalization.",
+                    "First-time Selection of [Client #%d] for personalization.",
                     colour="blue",
                 ),
                 self.client_id,
             )
             logging.info(
                 fonts.colourize(
-                    "Client[%d]. Creating its unique parameters by resetting weights.",
+                    "[Client #%d]. Creating its unique parameters by resetting weights.",
                     colour="blue",
-                )
+                ),
+                self.client_id,
             )
             # reset the personalized model for this client
             # thus, different clients have different init parameters
