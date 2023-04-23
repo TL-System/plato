@@ -14,6 +14,7 @@ import logging
 
 from plato.clients import simple_personalized
 from plato.config import Config
+from plato.utils import fonts
 
 
 class Client(simple_personalized.Client):
@@ -57,5 +58,25 @@ class Client(simple_personalized.Client):
         logging.info(
             "[Client #%d] Combined head modules to received modules.", self.client_id
         )
+
+        # therefore, everytime the client performs local update, the head of its initial
+        # personalized model is assigned to the self.model, making:
+        # the final global parameter and the initialized global parameter have the
+        # same head parameter. See page 6 of the paper.
         # load the model
         self.algorithm.load_weights(server_payload)
+
+        if self.is_personalized_learn() and self.personalized_model is not None:
+            # during the personalized learning, the received global modules will be
+            # assigned to the self.personalized_model
+            # the updated `server_payload` can be directly used here because this
+            # the combination of the received global modules and the head of its
+            # personalized model.
+            self.personalized_model.load_state_dict(server_payload, strict=True)
+            logging.info(
+                fonts.colourize(
+                    "[Client #%d] Assigned received global modules to its personalized model.",
+                    colour="blue",
+                ),
+                self.client_id,
+            )

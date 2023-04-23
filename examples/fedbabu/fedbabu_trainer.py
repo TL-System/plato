@@ -23,7 +23,7 @@ class Trainer(basic_personalized.Trainer):
                 if param.requires_grad is False
             ]
             logging.info(
-                "[Client #%d] has frozen %s during normal federated training",
+                "[Client #%d] has frozen %s",
                 self.client_id,
                 fedavg_partial.Algorithm.extract_modules_name(frozen_params),
             )
@@ -43,3 +43,23 @@ class Trainer(basic_personalized.Trainer):
     def train_run_end(self, config):
         """Activate the model."""
         self.activate_model(self.model, config["frozen_modules_name"])
+
+    def personalized_train_run_start(self, config, **kwargs):
+        """According to FedBabu, freeze a partial of the model and
+        never update it during personalization."""
+        eval_outputs = super().personalized_train_run_start(config, **kwargs)
+        logging.info(
+            "[Client #%d] will freeze %s before performing personalization",
+            self.client_id,
+            config["frozen_personalized_modules_name"],
+        )
+        self.freeze_model(
+            self.personalized_model, config["frozen_personalized_modules_name"]
+        )
+        return eval_outputs
+
+    def personalized_train_run_end(self, config):
+        """Reactive the personalized model."""
+        self.activate_model(
+            self.personalized_model, config["frozen_personalized_modules_name"]
+        )
