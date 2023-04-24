@@ -10,7 +10,15 @@ from plato.clients import registry as client_registry
 from plato.config import Config
 
 
-def run(client_id, port, client=None, edge_server=None, edge_client=None, trainer=None):
+def run(
+    client_id,
+    port,
+    client=None,
+    edge_server=None,
+    edge_client=None,
+    trainer=None,
+    lock=None,
+):
     """Starting a client to connect to the server."""
     Config().args.id = client_id
     if port is not None:
@@ -51,7 +59,10 @@ def run(client_id, port, client=None, edge_server=None, edge_client=None, traine
 
     else:
         if client is None:
-            client = client_registry.get()
+            if lock is None:
+                client = client_registry.get()
+            else:
+                client = client_registry.get(lock=lock)
             logging.info("Starting a %s client #%d.", Config().clients.type, client_id)
         else:
             client.client_id = client_id

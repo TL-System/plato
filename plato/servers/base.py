@@ -392,6 +392,8 @@ class Server:
         if mp.get_start_method(allow_none=True) != "spawn":
             mp.set_start_method("spawn", force=True)
 
+        lock = mp.Lock()
+
         for client_id in range(starting_id, total_processes + starting_id):
             if as_server:
                 port = int(Config().server.port) + client_id
@@ -405,10 +407,20 @@ class Server:
                 proc.start()
             else:
                 logging.info("Starting client #%d's process.", client_id)
-                proc = mp.Process(
-                    target=run, args=(client_id, None, client, None, None, None)
-                )
+                if hasattr(Config.clients, "type") and Config().clients.type == "mpc":
+                    # clients of "mpc" type needs synchronization, when communicating through files
+                    proc = mp.Process(
+                        target=run,
+                        args=(client_id, None, client, None, None, None, lock),
+                    )
+                else:
+                    proc = mp.Process(
+                        target=run, args=(client_id, None, client, None, None, None)
+                    )
                 proc.start()
+        # sleep is inserted to bypass this issue:
+        # https://superfastpython.com/filenotfounderror-multiprocessing-python/
+        time.sleep(5)
 
     async def _close_connections(self):
         """Closes all socket.io connections after training completes."""

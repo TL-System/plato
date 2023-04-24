@@ -1,0 +1,259 @@
+"""
+A federated learning client who sends weight updates to the server with MPC.
+"""
+
+import logging
+import time
+import pickle
+import os
+from types import SimpleNamespace
+from kazoo.client import KazooClient
+from kazoo.recipe.lock import Lock
+
+from plato.algorithms import registry as algorithms_registry
+from plato.clients import base
+from plato.config import Config
+from plato.datasources import registry as datasources_registry
+from plato.processors import registry as processor_registry
+from plato.samplers import registry as samplers_registry
+from plato.trainers import registry as trainers_registry
+from plato.utils import fonts
+from plato.utils import s3
+
+
+class Client(base.Client):
+    """A basic federated learning client who sends weight updates with MPC."""
+
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        lock=None,
+    ):
+        super().__init__(callbacks=callbacks)
+        self.custom_model = model
+        self.model = None
+
+        self.custom_datasource = datasource
+        self.datasource = None
+
+        self.custom_algorithm = algorithm
+        self.algorithm = None
+
+        self.custom_trainer = trainer
+        self.trainer = None
+
+        self.trainset = None  # Training dataset
+        self.testset = None  # Testing dataset
+        self.sampler = None
+        self.testset_sampler = None  # Sampler for the test set
+
+        self._report = None
+
+        self.s3_client = None
+        self.zk = None
+        self.lock = lock
+
+    def configure(self) -> None:
+        """Prepares this client for training."""
+        super().configure()
+
+        if self.model is None and self.custom_model is not None:
+            self.model = self.custom_model
+
+        if self.trainer is None and self.custom_trainer is None:
+            self.trainer = trainers_registry.get(model=self.model)
+        elif self.trainer is None and self.custom_trainer is not None:
+            self.trainer = self.custom_trainer(model=self.model)
+
+        self.trainer.set_client_id(self.client_id)
+
+        if self.algorithm is None and self.custom_algorithm is None:
+            self.algorithm = algorithms_registry.get(trainer=self.trainer)
+        elif self.algorithm is None and self.custom_algorithm is not None:
+            self.algorithm = self.custom_algorithm(trainer=self.trainer)
+
+        self.algorithm.set_client_id(self.client_id)
+
+        # Pass inbound and outbound data payloads through processors for
+        # additional data processing
+
+        self.outbound_processor, self.inbound_processor = processor_registry.get(
+            "Client",
+            client_id=self.client_id,
+            trainer=self.trainer,
+            file_lock=self.lock,
+        )
+
+        if hasattr(Config().server, "s3_endpoint_url"):
+            self.s3_client = s3.S3()
+            # Use Zookeeper for distributed locking
+            self.zk = KazooClient(
+                hosts=f"{Config().server.zk_address}:{Config().server.zk_port}"
+            )
+
+    def _load_data(self) -> None:
+        """Generates data and loads them onto this client."""
+        logging.info("[%s] Loading its data source...", self)
+
+        if (
+            self.datasource is None
+            and self.custom_datasource is None
+            or (hasattr(Config().data, "reload_data") and Config().data.reload_data)
+        ):
+            # The only case where Config().data.reload_data is set to true is
+            # when clients with different client IDs need to load from different datasets,
+            # such as in the pre-partitioned Federated EMNIST dataset. We do not support
+            # reloading data from a custom datasource at this time.
+            self.datasource = datasources_registry.get(client_id=self.client_id)
+        elif self.datasource is None and self.custom_datasource is not None:
+            self.datasource = self.custom_datasource()
+
+        logging.info(
+            "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
+        )
+
+        # Setting up the data sampler
+        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+
+        if hasattr(Config().trainer, "use_mindspore"):
+            # MindSpore requires samplers to be used while constructing
+            # the dataset
+            self.trainset = self.datasource.get_train_set(self.sampler)
+        else:
+            # PyTorch uses samplers when loading data with a data loader
+            self.trainset = self.datasource.get_train_set()
+
+        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
+            # Set the testset if local testing is needed
+            self.testset = self.datasource.get_test_set()
+            if hasattr(Config().data, "testset_sampler"):
+                # Set the sampler for test set
+                self.testset_sampler = samplers_registry.get(
+                    self.datasource, self.client_id, testing=True
+                )
+
+    def _load_payload(self, server_payload) -> None:
+        """Loads the server model onto this client."""
+        self.algorithm.load_weights(server_payload)
+
+    async def _train(self):
+        """The machine learning training workload on a client."""
+        logging.info(
+            fonts.colourize(
+                f"[{self}] Started training in communication round #{self.current_round}."
+            )
+        )
+
+        # Perform model training
+        try:
+            if hasattr(self.trainer, "current_round"):
+                self.trainer.current_round = self.current_round
+            training_time = self.trainer.train(self.trainset, self.sampler)
+        except ValueError as exc:
+            logging.info(
+                fonts.colourize(f"[{self}] Error occurred during training: {exc}")
+            )
+            await self.sio.disconnect()
+
+        # Extract model weights and biases
+        weights = self.algorithm.extract_weights()
+
+        # Generate a report for the server, performing model testing if applicable
+        if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
+            not hasattr(Config().clients, "test_interval")
+            or self.current_round % Config().clients.test_interval == 0
+        ):
+            accuracy = self.trainer.test(self.testset, self.testset_sampler)
+
+            if accuracy == -1:
+                # The testing process failed, disconnect from the server
+                await self.sio.disconnect()
+
+            if hasattr(Config().trainer, "target_perplexity"):
+                logging.info("[%s] Test perplexity: %.2f", self, accuracy)
+            else:
+                logging.info("[%s] Test accuracy: %.2f%%", self, 100 * accuracy)
+        else:
+            accuracy = 0
+
+        comm_time = time.time()
+
+        if (
+            hasattr(Config().clients, "sleep_simulation")
+            and Config().clients.sleep_simulation
+        ):
+            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
+            avg_training_time = Config().clients.avg_training_time
+
+            training_time = (
+                avg_training_time + sleep_seconds
+            ) * Config().trainer.epochs
+
+        report = SimpleNamespace(
+            client_id=self.client_id,
+            num_samples=self.sampler.num_samples(),
+            accuracy=accuracy,
+            training_time=training_time,
+            comm_time=comm_time,
+            update_response=False,
+        )
+
+        # Save num_samples info in round_info
+        try:
+            if self.s3_client is not None:
+                # Use Zookeeper for distributed locking
+                self.zk.start()
+                lock = Lock(self.zk, "/my/lock/path")
+                lock.acquire()
+                logging.info("[%s] Acquired Zookeeper lock", self)
+
+                s3_key = "round_info"
+                logging.debug("Retrieving round_info from S3")
+                round_info = self.s3_client.receive_from_s3(s3_key)
+            else:
+                round_info_filename = "./mpc_data/round_info"
+                logging.debug("Retrieving round_info from file")
+                self.lock.acquire()
+                with open(round_info_filename, "rb") as round_info_file:
+                    round_info = pickle.load(round_info_file)
+
+            round_info[f"client_{self.client_id}_info"][
+                "num_samples"
+            ] = self.sampler.num_samples()
+
+            if self.s3_client is not None:
+                logging.debug("Saving round_info with current_client_info to S3")
+                self.s3_client.put_to_s3(s3_key, round_info)
+            else:
+                logging.debug("Saving round_info with current_client_info to file")
+                with open(round_info_filename, "wb") as round_info_file:
+                    pickle.dump(round_info, round_info_file)
+        finally:
+            if self.s3_client is not None:
+                lock.release()
+                logging.info("[%s] Released Zookeeper lock", self)
+                self.zk.stop()
+            else:
+                self.lock.release()
+
+        self._report = self.customize_report(report)
+
+        return self._report, weights
+
+    async def _obtain_model_update(self, client_id, requested_time):
+        """Retrieves a model update corresponding to a particular wall clock time."""
+        model = self.trainer.obtain_model_update(client_id, requested_time)
+        weights = self.algorithm.extract_weights(model)
+        self._report.comm_time = time.time()
+        self._report.client_id = client_id
+        self._report.update_response = True
+
+        return self._report, weights
+
+    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
+        """Customizes the report with any additional information."""
+        return report

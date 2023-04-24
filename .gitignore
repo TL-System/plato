@@ -163,3 +163,6 @@ tensorflow_datasets/
 
 # Homomorphic encryption
 .ckks_context/
+
+# Multiparty computation
+mpc_data/
