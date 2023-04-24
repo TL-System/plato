@@ -10,7 +10,7 @@ from plato.algorithms import fedavg
 from plato.config import Config
 
 
-class ServerAlgorithm(fedavg.Algorithm):
+class ServerAlgorithmSync(fedavg.Algorithm):
     """The federated learning algorithm for PerFedRLNAS, used by the server."""
 
     def __init__(self, trainer=None):
@@ -76,6 +76,36 @@ class ServerAlgorithm(fedavg.Algorithm):
             "min": np.min(accuracies),
         }
         return info
+
+
+class ServerAlgorithmAsync(ServerAlgorithmSync):
+    """Server algorithm if asynchronous mode."""
+
+    def nas_aggregation_async(
+        self, aggregation_weight, subnets_config, weights_received, client_id_list
+    ):
+        """Weight aggregation in NAS."""
+        client_models = []
+        subnet_configs = []
+        for i, client_id_ in enumerate(client_id_list):
+            client_id = client_id_ - 1
+            subnet_config = subnets_config[client_id]
+            client_model = fedtools.sample_subnet_w_config(
+                self.model.model, subnet_config, False
+            )
+            client_model.load_state_dict(weights_received[i], strict=True)
+            client_models.append(client_model)
+            subnet_configs.append(subnet_config)
+        neg_ratio = fedtools.fuse_weight(
+            self.model.model, client_models, subnet_configs, aggregation_weight
+        )
+        return neg_ratio
+
+
+if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
+    ServerAlgorithm = ServerAlgorithmAsync
+else:
+    ServerAlgorithm = ServerAlgorithmSync
 
 
 class ClientAlgorithm(fedavg.Algorithm):

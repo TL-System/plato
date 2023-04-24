@@ -1,0 +1,132 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 100
+
+    # The number of clients selected in each round
+    per_round: 100
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+    # Whether client heterogeneity should be simulated
+    speed_simulation: true
+
+    # The distribution of client speeds
+    simulation_distribution:
+        distribution: pareto
+        alpha: 1
+
+    # The maximum amount of time for clients to sleep after each epoch
+    max_sleep_time: 30
+
+    # Should clients really go to sleep, or should we just simulate the sleep times?
+    sleep_simulation: false
+
+    # If we are simulating client training times, what is the average training time?
+    avg_training_time: 20
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8007
+    do_test: false
+    random_seed: 1
+
+     # Should we operate in sychronous mode?
+    synchronous: false
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
+
+    # What is the minimum number of clients that need to report before aggregation begins?
+    minimum_clients_aggregated: 5
+
+    # What is the staleness bound, beyond which the server should wait for stale clients?
+    staleness_bound: 10
+
+    # Should we send urgent notifications to stale clients beyond the staleness bound?
+    request_update: false
+
+    # Hyperparameters in the Port algorithm
+    similarity_weight: 1
+    staleness_weight: 3
+
+data:
+    # The training and testing dataset
+    datasource:  CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 600
+    test_partition_size: 600
+
+    sampler: noniid
+##    # IID or non-IID?
+##
+##    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.3
+##
+    testset_sampler: noniid
+##
+##    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 1500
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 1
+
+    # The target accuracy
+    target_accuracy: 1.
+
+    # Number of epochs for local training in each communication round
+    epochs: 5
+    batch_size: 32
+    loss_criterion: CrossEntropyLoss
+    optimizer: SGD
+    lr_scheduler: CosineAnnealingLR
+    global_lr_scheduler: true
+
+    model_type: torch_hub
+    model_name: mobilenet_v3_large
+
+    mem_usage: 0.75
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+    
+results:
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead, server_overhead
+
+parameters:
+    model:
+        num_classes: 10
+        bn_momentum: 0.1
+        bn_eps: 1e-5
+        dropout: 0
+        drop_connect: 0
+    optimizer:
+        lr: 0.35
+        weight_decay: 0.000005
+    learning_rate:
+        T_max: 7500
+    architect:
+        learning_rate: 0.5
+        weight_decay: 0
+        lambda_time: 0.001
+        lambda_neg: 0
+        ema: 0.99
+    simulate:
+        max_mem: 8
+        min_mem: 2
+        # max: 9020544512
+        # min: 2378544640

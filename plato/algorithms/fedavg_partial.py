@@ -23,6 +23,7 @@ thus, the conv1 and conv2 layers will be used as the global model.
 """
 
 import os
+import string
 import logging
 from typing import List, Optional
 from collections import OrderedDict
@@ -118,19 +119,31 @@ class Algorithm(fedavg.Algorithm):
         """Extracting modules name from given parameters' names."""
 
         extracted_names = []
+        # Remove punctuation and split the strings into words and sub-words
+        translator = str.maketrans("", "", string.punctuation)
+        combined_subnames = [
+            [subname.translate(translator).lower() for subname in word.split(".")]
+            for word in parameters_name
+        ]
 
+        # from which subname, the modules name show difference
+        diff_level = 0
+        # Find the point where the strings begin to differ in content
+        for level, subnames in enumerate(zip(*combined_subnames)):
+            if len(set(subnames)) > 1:
+                diff_level = level
+                break
+        # add 1 to begin from 0
+        diff_level += 1
         # the para name is presented as encoder.xxx.xxx
         # that is combined by the key_word "."
         # we aim to extract the encoder
         split_str = "."
         for para_name in parameters_name:
             splitted_names = para_name.split(split_str)
-            core_name = splitted_names[0]
-            # add the obtained prefix to the list, if
-            #   - empty list
-            #   - a new prefix
-            # add to the empty list directly
-            if core_name not in extracted_names:
-                extracted_names.append(core_name)
+            core_names = splitted_names[:diff_level]
+            module_name = f"{split_str}".join(core_names)
+            if module_name not in extracted_names:
+                extracted_names.append(module_name)
 
         return extracted_names
