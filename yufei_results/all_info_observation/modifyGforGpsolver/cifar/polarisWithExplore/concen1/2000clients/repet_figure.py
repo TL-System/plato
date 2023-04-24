@@ -21,9 +21,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 # create a new csv file
@@ -42,7 +42,7 @@ for method_name in ["Polaris", "Pisces", "Oort", "FedBuff"]:
     y_collect = []
     z_collect = []
 
-    for i in range(3):
+    for i in range(5):
 
         filename_temp = "./rand" + str(i + 1) + "/" + method_name.lower() + ".csv"
         df_temp = pd.read_csv(filename_temp)
@@ -109,4 +109,4 @@ g.legend_.set_title(None)
 
 # save figure as pdf file
 # plt.show()
-plt.savefig("repet_result.pdf")
+plt.savefig("2000clients.pdf")

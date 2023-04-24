@@ -8,7 +8,7 @@ Read .out file and draw clients distribution figure
 """
 new_outfile = open("client_selection_polaris.txt", "w")
 new_outfile.close()
-with open("FedAvg_FEMNIST_lenet5_200_20_rand2.out") as f:
+with open("Polaris2_FEMNIST_lenet5_rand2_alphaHalf.out") as f:
     for line in f.readlines():
 
         if "Selected clients" in line:

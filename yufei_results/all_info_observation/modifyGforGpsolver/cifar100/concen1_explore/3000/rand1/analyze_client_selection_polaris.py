@@ -10,7 +10,7 @@ Read .out file and draw clients distribution figure
 """
 new_outfile = open("client_selection_polaris.txt", "w")
 new_outfile.close()
-with open("async_CIFAR100_200_20_epoch5.out") as f:
+with open("Polaris_cifar100_concen1_3000samples_rand1.out") as f:
     for line in f.readlines():
 
         if "Selected clients" in line:

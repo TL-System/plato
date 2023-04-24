@@ -11,9 +11,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 x_value = {}
@@ -32,7 +32,7 @@ for algorithm in ["Polaris", "Pisces", "Oort", "FedBuff"]:
             first_round = all_selection[0:20]
             for temp in first_round:
                 num_list.append(int(temp))
-            exploration_rate = [0.1]
+            exploration_rate = [10]
 
             counter = 1
             for temp in all_selection[20:]:
@@ -42,7 +42,7 @@ for algorithm in ["Polaris", "Pisces", "Oort", "FedBuff"]:
                     num_list.append(int(temp))
 
                 if counter % 10 == 0:
-                    exploration_rate.append(len(num_list) / 200.0)
+                    exploration_rate.append(100 * len(num_list) / 200.0)
     # print("length of exploration list: ", len(exploration_rate))
     # print("exploreation list: ", exploration_rate)
 
@@ -61,15 +61,18 @@ for algorithm in ["Polaris", "Pisces", "Oort", "FedBuff"]:
 # ax.xlabel('clinet_id')
 # ax.ylabel('# of being selected')
 # ax.title('async_selected_clients_distribution_rand1_round250')
-print("y: ", y_value["Polaris"])
+# print("y: ", y_value["Polaris"])
 
 plt.plot(x_value["Polaris"], y_value["Polaris"], label="Polaris")
-plt.plot(x_value["Pisces"], y_value["Pisces"], label="Pisces", linestyle="--")
-plt.plot(x_value["Oort"], y_value["Oort"][:-1], label="Oort", linestyle=":")
 plt.plot(
-    x_value["FedBuff"][:82], y_value["FedBuff"][:82], label="FedBuff", linestyle="-."
+    x_value["Pisces"][:113], y_value["Pisces"][:113], label="Pisces", linestyle="--"
 )
-
-figure_file_name = "exploration_rate_all.pdf"
+plt.plot(x_value["Oort"][:70], y_value["Oort"][:70], label="Oort", linestyle=":")
+plt.plot(
+    x_value["FedBuff"][:65], y_value["FedBuff"][:65], label="FedBuff", linestyle="-."
+)
+plt.xlabel("Elapsed time (s)")
+plt.ylabel("Exploration rate (%)")
+figure_file_name = "cifar10_exploration_concen1.pdf"
 plt.legend()
 plt.savefig(figure_file_name)

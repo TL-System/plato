@@ -21,9 +21,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 # create a new csv file
@@ -60,7 +60,7 @@ for method_name in [
         x_min = x_temp.min()
         x_max = x_temp.max()
 
-        x_new = np.arange(max(26, np.ceil(x_min)), min(x_max, 8000), 20)
+        x_new = np.arange(max(21, np.ceil(x_min)), min(x_max, 8000), 20)
         y_new = f_temp(x_new) * 100
 
         x_collect.extend(x_new)
@@ -110,4 +110,4 @@ g.legend_.set_title(None)
 
 # save figure as pdf file
 # plt.show()
-plt.savefig("repet_result.pdf")
+plt.savefig("cifar_concen10.pdf")

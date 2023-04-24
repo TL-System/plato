@@ -24,7 +24,7 @@ sns.set_context(
         # "axes.labelsize": 12,
         "xtick.labelsize": "small",
         "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "xtick.labelsize": 12,
     },
 )
 """
@@ -66,7 +66,7 @@ for file_name in os.listdir():
         x_max = x_temp.max()
 
         x_new = np.arange(max(23, np.ceil(x_min)), min(x_max, 1650), 40)
-        y_new = f_temp(x_new)
+        y_new = f_temp(x_new) * 100
 
         # write into lists
         x_all.extend(x_new)

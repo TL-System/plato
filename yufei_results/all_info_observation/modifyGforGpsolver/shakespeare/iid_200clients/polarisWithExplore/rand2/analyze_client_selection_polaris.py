@@ -10,7 +10,7 @@ Read .out file and draw clients distribution figure
 """
 new_outfile = open("client_selection_polaris.txt", "w")
 new_outfile.close()
-with open("async_shakespeare_verifyagain_200_rand2.out") as f:
+with open("Polaris_shakespeare_rand2_alphaHalf.out") as f:
     for line in f.readlines():
 
         if "Selected clients" in line:

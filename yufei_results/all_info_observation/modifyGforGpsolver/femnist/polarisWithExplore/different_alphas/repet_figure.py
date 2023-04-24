@@ -1,0 +1,130 @@
+import seaborn as sns
+import csv
+import os
+from typing import Dict, List, Any
+from matplotlib import markers
+
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+from scipy import interpolate
+import numpy as np
+
+# from plato.config import Config
+# plt.style.use(["ipynb", "use_mathtext", "colors10-ls"])
+
+import pandas as pd
+
+sns.set_theme(style="whitegrid")
+sns.set_context(
+    "talk",
+    rc={
+        "legend.fontsize": "large",
+        # "axes.labelsize": 12,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
+    },
+)
+
+
+# create a new csv file
+# with open("collect_results.csv", "w", newline="") as file:
+#    writer = csv.writer(file)
+#    writer.writerow(["elapsed_time", "accuracy"])
+
+x_all = []
+y_all = []
+z_all = []
+
+figure_name_dict = [
+    r"$\gamma=0.01$",
+    r"$\gamma=0.1$",
+    r"$\gamma=0.5$",
+    r"$\gamma=1$",
+    r"$\gamma=10$",
+]
+
+
+# input results from rands file
+for method_name in [
+    "Polaris_alpha001",
+    "Polaris_alpha01",
+    "Polaris_alpha05",
+    "Polaris_alpha1",
+    "Polaris_alpha10",
+]:
+    counter = 0
+    x_collect = []
+    y_collect = []
+    z_collect = []
+
+    for i in range(5):
+
+        filename_temp = "./rand" + str(i + 1) + "/" + method_name.lower() + ".csv"
+        df_temp = pd.read_csv(filename_temp)
+
+        # perform interpolation
+        x_temp = df_temp["elapsed_time"]
+        y_temp = df_temp["accuracy"]
+        f_temp = interpolate.interp1d(x_temp, y_temp)
+
+        x_min = x_temp.min()
+        x_max = x_temp.max()
+
+        x_new = np.arange(max(50, np.ceil(x_min)), min(x_max, 7000), 20)
+        y_new = f_temp(x_new) * 100
+
+        x_new = np.insert(x_new, 0, (0))
+        y_new = np.insert(y_new, 0, (0))
+
+        x_collect.extend(x_new)
+        y_collect.extend(y_new)
+        # z_collect.extend([method_name] * len(x_new))
+        print("z_new: ", figure_name_dict[counter])
+        z_collect.extend([figure_name_dict[counter]] * len(x_new))
+        counter += 1
+
+    # write into dataframe
+    x_all.extend(x_collect)
+    y_all.extend(y_collect)
+    z_all.extend(z_collect)
+    # print(z_all)
+
+    df = pd.DataFrame([x_collect, y_collect]).transpose()
+    df.columns = ["elapsed_time", "accuracy"]
+
+    # save interpolate results into csv file
+    saving_name = "interpolate_results_" + method_name + ".csv"
+    df.to_csv(saving_name, index=False)
+
+# combine all interpolate results into one dataframe
+df_all = pd.DataFrame([x_all, y_all, z_all]).transpose()
+df_all.columns = ["Elapsed time (s)", "Accuracy (%)", "Alpha"]
+df_all.to_csv("interpolate_results_all.csv", index=False)
+
+"""
+df_pi = pd.read_csv("interpolate_results_pisces.csv")
+df_po = pd.read_csv("interpolate_results_polaris.csv")
+
+df_all = pd.DataFrame()
+# df_all.columns = ["elapsed_time", "accuracy_pisces", "accuracy_polaris"]
+
+df_all["elapsed_time"] = df_pi["elapsed_time"].copy()
+df_all["accuracy_pisces"] = df_pi["accuracy"].copy()
+df_all["method"] = df_pi["method"].copy()
+
+
+df_all["accuracy_polaris"] = df_po["accuracy"].copy()
+
+df_all.to_csv("interpolate_results_all.csv", index=False)
+"""
+
+# draw figures directly from df
+g = sns.lineplot(
+    x="Elapsed time (s)", y="Accuracy (%)", data=df_all, hue="Alpha", style="Alpha"
+)
+g.legend_.set_title(None)
+
+# save figure as pdf file
+# plt.show()
+plt.savefig("femnist_alphas.pdf")

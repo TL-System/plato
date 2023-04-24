@@ -15,9 +15,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 with open("client_selection_fedbuff.txt") as f:
@@ -43,7 +43,7 @@ with open("client_selection_fedbuff.txt") as f:
         accumulator = 0
         accumulator_list = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list.append(accumulator)
 
         # print(accumulator_list)
@@ -67,7 +67,7 @@ with open("client_selection_polaris.txt") as f:
         accumulator = 0
         accumulator_list2 = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list2.append(accumulator)
 
 with open("client_selection_pisces.txt") as f:
@@ -90,7 +90,7 @@ with open("client_selection_pisces.txt") as f:
         accumulator = 0
         accumulator_list3 = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list3.append(accumulator)
 with open("client_selection_oort.txt") as f:
     client_set = []
@@ -112,7 +112,7 @@ with open("client_selection_oort.txt") as f:
         accumulator = 0
         accumulator_list4 = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list4.append(accumulator)
 
 df_all = pd.DataFrame(
@@ -130,7 +130,8 @@ sns.lineplot(
     # palette="flare",
     # hue_norm=mpl.colors.LogNorm(),
 )
-
+plt.ylabel("Cumulative distribution (%)")
+plt.xlabel("Client count (#)")
 # sns.lineplot(data=accumulator_list)
 # sns.lineplot(data=accumulator_list2)
 # sns.lineplot(data=accumulator_list3)
@@ -141,5 +142,5 @@ sns.lineplot(
 # ax.xlabel('clinet_id')
 # ax.ylabel('# of being selected')
 # ax.title('async_selected_clients_distribution_rand1_round250')
-figure_file_name = "prodf.pdf"
+figure_file_name = "cifar10_distribution_concen1.pdf"
 plt.savefig(figure_file_name)

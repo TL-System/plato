@@ -20,9 +20,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 
@@ -36,7 +36,12 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["Polaris", "Pisces", "Oort","FedBuff", ]:
+for method_name in [
+    "Polaris",
+    "Pisces",
+    "Oort",
+    "FedBuff",
+]:
 
     x_collect = []
     y_collect = []
@@ -98,7 +103,7 @@ df_all.to_csv("interpolate_results_all.csv", index=False)
 """
 
 # draw figures directly from df
-g=sns.lineplot(
+g = sns.lineplot(
     x="Elapsed time (s)",
     y="Accuracy (%)",
     data=df_all,
@@ -111,4 +116,4 @@ g.legend_.set_title(None)
 
 # save figure as pdf file
 # plt.show()
-plt.savefig("repet_result.pdf")
+plt.savefig("cifar100_3000.pdf")

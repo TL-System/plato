@@ -20,7 +20,7 @@ plt.figure()
 # linear
 plt.plot(x, y)
 plt.yscale("linear")
-plt.title("geometric")
+# plt.title("geometric")
 plt.grid(True)
 
 
@@ -32,5 +32,17 @@ plt.gca().yaxis.set_minor_formatter(NullFormatter())
 plt.subplots_adjust(
     top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.25, wspace=0.35
 )
-
+plt.arrow(
+    0.4,
+    20,
+    -0.059,
+    -12,
+    length_includes_head=True,
+    head_width=0.04,
+    head_length=2,
+    fc="r",
+    ec="r",
+)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 plt.savefig("geometric_opt_2d.pdf")

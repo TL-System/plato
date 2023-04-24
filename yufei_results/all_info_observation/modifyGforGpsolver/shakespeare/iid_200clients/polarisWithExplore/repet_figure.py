@@ -20,9 +20,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 
@@ -48,7 +48,7 @@ for method_name in [
     y_collect = []
     z_collect = []
 
-    for i in range(4):
+    for i in range(5):
 
         filename_temp = "./rand" + str(i + 1) + "/" + method_name + ".csv"
         df_temp = pd.read_csv(filename_temp)
@@ -86,7 +86,7 @@ for method_name in [
 
 # combine all interpolate results into one dataframe
 df_all = pd.DataFrame([x_all, y_all, z_all]).transpose()
-df_all.columns = ["Elapsed time (s)", "Loss", "Method"]
+df_all.columns = ["Elapsed time (s)", "Perplexity", "Method"]
 df_all.to_csv("interpolate_results_all.csv", index=False)
 
 """
@@ -109,7 +109,7 @@ df_all.to_csv("interpolate_results_all.csv", index=False)
 # draw figures directly from df
 g = sns.lineplot(
     x="Elapsed time (s)",
-    y="Loss",
+    y="Perplexity",
     data=df_all,
     hue="Method",
     style="Method",
@@ -120,4 +120,4 @@ g = sns.lineplot(
 g.legend_.set_title(None)
 # save figure as pdf file
 # plt.show()
-plt.savefig("repet_result.pdf")
+plt.savefig("shakespeare.pdf")

@@ -15,9 +15,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 with open("client_selection_fedbuff.txt") as f:
@@ -43,7 +43,7 @@ with open("client_selection_fedbuff.txt") as f:
         accumulator = 0
         accumulator_list = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list.append(accumulator)
 
         # print(accumulator_list)
@@ -67,7 +67,7 @@ with open("client_selection_polaris.txt") as f:
         accumulator = 0
         accumulator_list2 = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list2.append(accumulator)
 
 with open("client_selection_pisces.txt") as f:
@@ -90,13 +90,40 @@ with open("client_selection_pisces.txt") as f:
         accumulator = 0
         accumulator_list3 = [0]
         for pro in np.flip(counter_pro_sorted):
-            accumulator += pro
+            accumulator += pro * 100
             accumulator_list3.append(accumulator)
+with open("client_selection_oort.txt") as f:
+    client_set = []
+    num_list = []
+    counter_array = np.zeros(200)
+    for line in f.readlines():
+        print(len(line.split()))
+        counter = 0
+        for temp in line.split():
+            if int(temp) <= 200:
+                num_list.append(int(temp))
+                if int(temp) == 200:
+                    counter += 1
+        # print(num_list)
+        for item in num_list:
+            counter_array[item - 1] += 1
+        counter_pro_sorted = np.sort(counter_array) / len(num_list)
+
+        accumulator = 0
+        accumulator_list4 = [0]
+        for pro in np.flip(counter_pro_sorted):
+            accumulator += pro * 100
+            accumulator_list4.append(accumulator)
 
 df_all = pd.DataFrame(
-    [accumulator_list, accumulator_list2, accumulator_list3]
+    [accumulator_list2, accumulator_list3, accumulator_list4, accumulator_list]
 ).transpose()
-df_all.columns = ["FedBuff", "Polaris", "Pisces"]
+df_all.columns = [
+    "Polaris",
+    "Pisces",
+    "Oort",
+    "FedBuff",
+]
 df_all.to_csv("client_pdf.csv", index=False)
 sns.lineplot(
     data=df_all
@@ -114,5 +141,7 @@ sns.lineplot(
 # ax.xlabel('clinet_id')
 # ax.ylabel('# of being selected')
 # ax.title('async_selected_clients_distribution_rand1_round250')
-figure_file_name = "prodf.pdf"
+plt.ylabel("Cumulative distribution (%)")
+plt.xlabel("Client count (#)")
+figure_file_name = "cifar100_exploration_concen1.pdf"
 plt.savefig(figure_file_name)

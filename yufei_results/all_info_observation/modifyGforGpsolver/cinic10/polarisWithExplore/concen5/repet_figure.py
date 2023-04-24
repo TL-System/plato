@@ -20,9 +20,9 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
 
@@ -104,7 +104,6 @@ df_all["accuracy_polaris"] = df_po["accuracy"].copy()
 
 df_all.to_csv("interpolate_results_all.csv", index=False)
 """
-
 # draw figures directly from df
 g = sns.lineplot(
     x="Elapsed time (s)", y="Accuracy (%)", data=df_all, hue="Method", style="Method"
@@ -113,4 +112,4 @@ g.legend_.set_title(None)
 
 # save figure as pdf file
 # plt.show()
-plt.savefig("repet_result.pdf")
+plt.savefig("cinic_concen5.pdf")

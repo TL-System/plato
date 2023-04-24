@@ -21,11 +21,12 @@ sns.set_context(
     rc={
         "legend.fontsize": "large",
         # "axes.labelsize": 12,
-        "xtick.labelsize": "small",
-        "axes.labelsize": "small",
-        "xtick.labelsize": 9,
+        "axes.labelsize": 13,
+        "xtick.labelsize": 13,
+        "ytick.labelsize": 13,
     },
 )
+
 # create a new csv file
 # with open("collect_results.csv", "w", newline="") as file:
 #    writer = csv.writer(file)
@@ -36,7 +37,7 @@ y_all = []
 z_all = []
 
 # input results from rands file
-for method_name in ["Polaris", "Pisces", "Oort","FedBuff"]:
+for method_name in ["Polaris", "Pisces", "Oort", "FedBuff"]:
 
     x_collect = []
     y_collect = []
@@ -112,4 +113,4 @@ g.legend_.set_title(None)
 
 # save figure as pdf file
 # plt.show()
-plt.savefig("repet_result.pdf")
+plt.savefig("cifar10.pdf")
