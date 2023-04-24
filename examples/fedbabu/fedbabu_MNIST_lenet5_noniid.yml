@@ -19,41 +19,55 @@ clients:
     persist_personalized_model: False
 
 server:
+
+    type: fedavg_personalized
     address: 127.0.0.1
-    port: 8005
-    simulate_wall_time: false
+    port: 8000
 
     do_test: false
     
+    # do personalization 
+    # for every `do_personalization_interval` rounds
+    # set -1 to do personalized only after the final round
+    do_personalization_interval: 2
+    # total, participant, nonparticipant
+    do_personalization_group: nonparticipant
+
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 5000
+    partition_size: 2000
 
+    
     # IID or non-IID?
-    sampler: iid
+    sampler: noniid
+    testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 0.5
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
 
-
     # The maximum number of training rounds
-    rounds: 30
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
 
+    # The target accuracy
+    target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 5
-    batch_size: 64
-    optimizer: AdamW
-    lr_scheduler: CosineAnnealingLR
-    global_lr_scheduler: true
+    epochs: 3
+    batch_size: 32
+    optimizer: SGD
+    lr_scheduler: MultiStepLR
+    loss_criterion: CrossEntropyLoss
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
@@ -67,47 +81,59 @@ trainer:
     pers_epoch_log_interval: 2
 
     # The machine learning model
-    model_type: vit
-    model_name: facebook@levit-128
-    personalized_model_type: vit
-    personalized_model_name: facebook@levit-128
+    model_name: lenet5
+    personalized_model_name: lenet5
 
     global_modules_name:
-        - patch_embeddings
-        - encoder
+        - conv1
+        - conv2
+        - conv3
 
     head_modules_name:
-        - classifier
+        - fc4
+        - fc5
 
     frozen_modules_name:
-        - patch_embeddings
-        - encoder
+        - fc4
+        - fc5
 
     frozen_personalized_modules_name:
-        - features
-
-    module_level: 3
-
+        - conv1
+        - conv2
+        - conv3
 
 algorithm:
     # Aggregation algorithm
     type: fedavg_partial
 
 parameters:
-    model:
-        num_labels: 10
-        pretrained: false
-
     optimizer:
-        lr: 0.00004
-        weight_decay: 0.00000001
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
+    personalized_optimizer:
+        lr: 0.05
+        momentum: 0.9
+        weight_decay: 0.0
 
     learning_rate:
-        eta_min: 0
-        T_max: 30
+        gamma: 0.1
+        milestone_steps: 150ep,350ep
+
+    personalized_learning_rate:
+        gamma: 0.3
+        step_size: 10
+
+    loss_criterion:
+        label_smoothing: 0.5
+
+    personalized_loss_criterion:
+        label_smoothing: 0.5
 
     model:
         num_classes: 10
 
     personalized_model:
         num_classes: 10
+

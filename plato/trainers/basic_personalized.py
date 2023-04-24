@@ -37,7 +37,8 @@ from plato.config import Config
 from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion, tracking
 from plato.utils import checkpoint_operator
-from plato.utils.filename_formatter import get_format_name
+from plato.utils.filename_formatter import NameFormatter
+from plato.utils import fonts
 
 warnings.simplefilter("ignore")
 
@@ -166,7 +167,9 @@ class Trainer(basic.Trainer):
         )
 
         logging.info(
-            "[Client #%d] Personalized Model saved to %s under %s.",
+            fonts.colourize(
+                "[Client #%d] Saved personalized model to %s under %s.", colour="blue"
+            ),
             self.client_id,
             filename,
             to_save_dir,
@@ -187,7 +190,10 @@ class Trainer(basic.Trainer):
         )
 
         logging.info(
-            "[Client #%d] Loading a Personalized model from %s under %s.",
+            fonts.colourize(
+                "[Client #%d] Loading a Personalized model from %s under %s.",
+                colour="blue",
+            ),
             self.client_id,
             filename,
             to_load_dir,
@@ -196,7 +202,7 @@ class Trainer(basic.Trainer):
     def rollback_model(
         self,
         model_name=None,
-        modelfile_prefix=None,
+        modelfile_prefix="personalized",
         rollback_round=None,
         location=None,
     ):
@@ -229,12 +235,12 @@ class Trainer(basic.Trainer):
         )
         loaded_weights = ckpt_oper.load_checkpoint(checkpoint_name=filename)["model"]
         if modelfile_prefix == "personalized":
-            self.trainer.personalized_model.load_state_dict(loaded_weights, strict=True)
+            self.personalized_model.load_state_dict(loaded_weights, strict=True)
         else:
-            self.trainer.model.load_state_dict(loaded_weights, strict=True)
+            self.model.load_state_dict(loaded_weights, strict=True)
 
         logging.info(
-            "[Client #%d] Rollbacking a model from %s under %s.",
+            "[Client #%d] Rolled back the model from %s under %s.",
             self.client_id,
             filename,
             location,
@@ -303,7 +309,7 @@ class Trainer(basic.Trainer):
 
         save_location = os.path.join(result_path, "client_" + str(self.client_id))
 
-        filename = get_format_name(
+        filename = NameFormatter.get_format_name(
             client_id=self.client_id, suffix="personalized_accuracy", ext="csv"
         )
         os.makedirs(save_location, exist_ok=True)
@@ -351,7 +357,7 @@ class Trainer(basic.Trainer):
 
         result_path = Config().params["result_path"]
         save_location = os.path.join(result_path, "client_" + str(self.client_id))
-        save_filename = get_format_name(
+        save_filename = NameFormatter.get_format_name(
             client_id=self.client_id,
             round_n=current_round,
             epoch_n=epoch,
@@ -531,7 +537,7 @@ class Trainer(basic.Trainer):
 
             personalized_model_name = config["personalized_model_name"]
             save_location = self.get_checkpoint_dir_path()
-            filename = get_format_name(
+            filename = NameFormatter.get_format_name(
                 client_id=self.client_id,
                 model_name=personalized_model_name,
                 round_n=current_round,
@@ -569,7 +575,10 @@ class Trainer(basic.Trainer):
             self.personalized_train_model(config, trainset, sampler.get(), **kwargs)
         except Exception as training_exception:
             logging.info(
-                "Personalization Training on client #%d failed.", self.client_id
+                fonts.colourize(
+                    "Personalization Training on client #%d failed.", colour="blue"
+                ),
+                self.client_id,
             )
             raise training_exception
 

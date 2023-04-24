@@ -7,7 +7,7 @@ from typing import Dict, Optional, List
 
 import torch
 
-from plato.utils.filename_formatter import get_format_name
+from plato.utils.filename_formatter import NameFormatter
 
 
 class CheckpointsOperator:
@@ -181,7 +181,7 @@ def save_client_checkpoint(
 
     # Before the training, we expect to save the initial
     # model of this round
-    filename = get_format_name(
+    filename = NameFormatter.get_format_name(
         model_name=model_name,
         client_id=client_id,
         round_n=current_round,
@@ -229,7 +229,7 @@ def load_client_checkpoint(
 
     # Before the training, we expect to save the initial
     # model of this round
-    filename = get_format_name(
+    filename = NameFormatter.get_format_name(
         model_name=model_name,
         client_id=client_id,
         round_n=current_round,

@@ -63,7 +63,6 @@ class Algorithm(fedavg.Algorithm):
         """Extract weights from modules of the model.
         By default, weights of the whole model will be extracted."""
         model = self.model if model is None else model
-
         modules_name = (
             modules_name
             if modules_name is not None
