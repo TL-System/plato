@@ -11,10 +11,12 @@ on:
 
 jobs:
     TensorFlow-Tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
 
         steps:
             - uses: actions/checkout@v3
+              with:
+                submodules: recursive
 
             # Runs a set of commands using the runners shell
             - name: Install dependencies
@@ -24,6 +26,8 @@ jobs:
                   sudo apt install -y python3-pip
                   pip3 install -r requirements.txt --upgrade
                   pip3 install tensorflow tensorflow-datasets
+                  pip3 uninstall protobuf
+                  pip3 install protobuf==3.20.3
 
             - name: Training workloads
               shell: bash -l {0}

@@ -11,11 +11,13 @@ on:
 
 jobs:
   PyTorch-Tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       # Runs a set of commands using the runners shell
       - name: Install dependencies

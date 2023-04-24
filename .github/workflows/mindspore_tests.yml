@@ -11,11 +11,13 @@ on:
 
 jobs:
   MindSpore-Tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Setting up Conda
         uses: conda-incubator/setup-miniconda@v2

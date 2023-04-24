@@ -15,7 +15,7 @@ where `plato` is the preferred name of your new environment.
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
 ```shell
-pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cu116
+pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117  --extra-index-url https://download.pytorch.org/whl/cu117
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
@@ -24,10 +24,12 @@ The CUDA version, used in the command above, can be obtained on Ubuntu Linux sys
 nvidia-smi
 ```
 
+Although PyTorch 2.0 will mostly likely work with Plato, it has not been as thoroughly tested as PyTorch 1.13.1 yet.
+
 In macOS (without GPU support), the recommended command would be:
 
 ```shell
-pip install torch torchvision
+pip install torch==1.13.1 torchvision==0.14.1
 ```
 
 ## Installing Plato as a pip package

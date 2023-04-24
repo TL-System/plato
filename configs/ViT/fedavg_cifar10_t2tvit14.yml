@@ -43,7 +43,7 @@ trainer:
 
     # The machine learning model
     model_type: vit
-    model_name: T2t_vit_14
+    model_name: t2t_vit_14
 
     # Number of epoches for local training in each communication round
     epochs: 5

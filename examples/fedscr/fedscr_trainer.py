@@ -17,9 +17,9 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer used by the client."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         """Initializes the trainer with the provided model."""
-        super().__init__(model=model)
+        super().__init__(model=model, callbacks=callbacks)
 
         # The threshold for determining whether an update is significant or not
         self.update_threshold = (

@@ -16,7 +16,7 @@ The default value is `./`.
 ```
 
 ```{admonition} debug
-When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails. 
+When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails.
 
 Valid values are `true` or `false`. The default value is `false`.
 ```
@@ -25,7 +25,7 @@ Valid values are `true` or `false`. The default value is `false`.
 ## clients
 
 ```{admonition} **type**
-The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm.
+The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm; and `simple_personalized`, which controls the personalized learning logic.
 ```
 
 ```{admonition} **total_clients**
@@ -45,7 +45,7 @@ If this setting is `true` and the configuration file has a `results` section, te
 ````
 
 ````{admonition} comm_simulation
-Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. 
+Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem.
 
 The default value is `true`.
 
@@ -60,13 +60,13 @@ Whether or not the training speed of the clients are simulated. Simulating the t
 If `speed_simulation` is `true`, we need to specify the probability distribution used for generating a sleep time (in seconds per epoch) for each client, using the following setting:
 
 ```{admonition} random_seed
-This random seed is used exclusively for generating the sleep time (in seconds per epoch). 
+This random seed is used exclusively for generating the sleep time (in seconds per epoch).
 
 The default value is `1`.
 ```
 
 ```{admonition} max_sleep_time
-This is used to specify the longest possible sleep time in seconds. 
+This is used to specify the longest possible sleep time in seconds.
 
 The default value is `60`.
 ```
@@ -78,7 +78,7 @@ For the normal distribution, we can specify `mean` for its mean value and `sd` f
 
 ```yaml
 speed_simulation: true
-simulation_distribution: pareto
+simulation_distribution:
     distribution: pareto
     alpha: 1
 ```
@@ -136,6 +136,15 @@ A list of processors for the client to apply on the payload before receiving it 
 
 ```
 
+```{admonition} participant_clients_ratio
+Percentage of clients participating in federated training out of all clients. The value should range from 0 to 1.
+```
+
+```{admonition} persist_personalized_model
+Whether the status of the trained personalized model will be persisted for subsequent training. Setting `True` will force each client to load the previously trained personalized model before any personalization learning. 
+
+```
+
 ## server
 
 ```{admonition} type
@@ -150,6 +159,9 @@ The type of the server.
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
 
 - `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates.
+
+- `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
+
 ```
 
 ```{admonition} **address**
@@ -260,6 +272,14 @@ The edge server's estimated downlink capacity (an edge server to its clients) in
 The edge server's estimated uplink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `uplink_bandwidth`.
 ```
 
+```{admonition} do_personalization_interval
+The round interval for a server commanding when to perform personalization. The default value is 0, meaning that no personalization will be performed.
+```
+
+```{admonition} do_personalization_group
+The group of clients that is required by the server to perform personalization. There are three options, including "total", "participant", and "nonparticipant". The default value is "participant", meaning the clients participating in training will be used to perform the personalization.
+```
+
 ## data
 
 ```{admonition} **dataset**
@@ -278,6 +298,7 @@ The training and test datasets. The following options are available:
 - `CelebA`
 - `Purchase`
 - `Texas`
+- `STL10`
 ```
 
 ````{admonition} data_path
@@ -336,8 +357,8 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ```
 ````
 
-````{admonition} test_set_sampler
-How the test dataset is sampled when clients test locally. Any sampler type is valid. 
+````{admonition} testset_sampler
+How the test dataset is sampled when clients test locally. Any sampler type is valid.
 
 ```{note}
 Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
@@ -362,6 +383,7 @@ The number of samples in the server's test dataset when server-side evaluation i
 The type of the trainer. The following types are available:
 - `basic`: a basic trainer with a standard training loop.
 - `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
+- `basic_personalized`: a trainer supports all-purpose personalized federated learning by adding the personalized learning process.
 
 ```{admonition} max_physical_batch_size
 The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
@@ -384,7 +406,7 @@ The maximum norm of the per-sample gradients with the `diff_privacy` trainer. An
 
 
 ```{admonition} **rounds**
-The maximum number of training rounds. 
+The maximum number of training rounds.
 
 `round` could be any positive integer.
 ```
@@ -523,13 +545,47 @@ For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
 
+````{admonition} **personalized learning**
+The variables used when the client performs the personalization locally:
+
+- `personalized_epochs` 
+- `personalized_batch_size`
+- `personalized_optimizer`
+- `personalized_lr_scheduler`
+- `personalized_loss_criterion`
+- `personalized_model_name`
+- `personalized_epoch_log_interval` (Logging the training details)
+
+
+````{note}
+The definitions, configurations, and applications of these variables for personalization align with those of traditional federated learning described previously.
+````
+
+The specific hyperparameters of certain variables, including `model`, `personalized_optimizer`, `personalized_lr_scheduler`, and `personalized_loss_criterion`, can be configured in the parameters section of the configuration file, as demonstrated below:
+
+```
+parameters:
+    model:
+        num_classes: 10
+    personalized_optimizer:
+        lr: 0.1
+        momentum: 0.9
+        weight_decay: 0.0
+```
+
+
+````
+
+
+
 ## algorithm
 
 ```{admonition} **type**
-Aggregation algorithm. 
+Aggregation algorithm.
 
 The input should be:
 - `fedavg`:  the federated averaging algorithm
+- `fedavg_partial`:  the federated partial averaging algorithm (for aggregating partial sub-modules of one model).
 - `mistnet`: the MistNet algorithm
 ```
 
@@ -545,10 +601,19 @@ The number of local aggregation rounds on edge servers before sending aggregated
 ```
 ````
 
+```{note}
+When `fedavg_partial` is utilized as the algorithm, the hyper-parameter `global_submodules_name` should be set under the `trainer` of the
+configuration file. Otherwise, `global_submodules_name` will be defaulted as "whole", which makes the whole defined model utilize as the global model - All parameters of the defined model will be extracted for sending and global aggregation.
+
+Use two consecutive underscores `__` to separate sub-modules in `global_submodules_name`. For instance: "{submodule1_name}__{submodule2_name}__{submodule3_name}".
+
+```
+
+
 ## results
 
 ````{admonition} types
-The set of columns that will be written into a .csv file. 
+The set of columns that will be written into a .csv file.
 
 The valid values are:
 - `round`
@@ -561,7 +626,7 @@ The valid values are:
 - `edge_agg_num`
 
 ```{note}
-Use comma `,` to seperate them. The default is `round, accuracy, elapsed_time`.
+Use comma `,` to separate them. The default is `round, accuracy, elapsed_time`.
 ```
 ````
 
