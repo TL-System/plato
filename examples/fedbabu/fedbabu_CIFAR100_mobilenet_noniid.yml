@@ -33,7 +33,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: CIFAR100
 
     # Number of samples in each partition
     partition_size: 2000
@@ -102,12 +102,12 @@ algorithm:
 
 parameters:
     optimizer:
-        lr: 0.01
+        lr: 0.1
         momentum: 0.9
         weight_decay: 0.0
 
     personalized_optimizer:
-        lr: 0.05
+        lr: 0.5
         momentum: 0.9
         weight_decay: 0.0
 
