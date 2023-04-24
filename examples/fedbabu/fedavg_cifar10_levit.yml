@@ -23,6 +23,8 @@ server:
     port: 8005
     simulate_wall_time: false
 
+    do_test: false
+    
 data:
     # The training and testing dataset
     datasource: CIFAR10

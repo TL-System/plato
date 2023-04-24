@@ -24,6 +24,8 @@ server:
     address: 127.0.0.1
     port: 8000
 
+    do_test: false
+
     # do personalization 
     # for every `do_personalization_interval` rounds
     # set -1 to do personalized only after the final round
