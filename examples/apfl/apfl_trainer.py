@@ -8,10 +8,8 @@ import logging
 
 import numpy as np
 
-from plato.config import Config
 from plato.trainers import basic_personalized
 from plato.utils.filename_formatter import NameFormatter
-from plato.utils.checkpoint_operator import load_client_checkpoint
 
 
 class Trainer(basic_personalized.Trainer):
