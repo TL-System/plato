@@ -167,7 +167,7 @@ class Trainer(basic.Trainer):
         ckpt_oper.save_checkpoint(
             model_state_dict=self.personalized_model.state_dict(),
             checkpoints_name=[filename],
-            **kwargs
+            **kwargs,
         )
 
         logging.info(
@@ -237,7 +237,8 @@ class Trainer(basic.Trainer):
             mask_words=["epoch"],
             use_latest=True,
         )
-        loaded_weights = ckpt_oper.load_checkpoint(checkpoint_name=filename)["model"]
+        rollback_status = ckpt_oper.load_checkpoint(checkpoint_name=filename)
+        loaded_weights = rollback_status["model"]
         if modelfile_prefix == "personalized":
             self.personalized_model.load_state_dict(loaded_weights, strict=True)
         else:
@@ -249,6 +250,9 @@ class Trainer(basic.Trainer):
             filename,
             location,
         )
+        # remove the weights for simplicity
+        del rollback_status["model"]
+        return rollback_status
 
     @staticmethod
     def save_personalized_accuracy(
