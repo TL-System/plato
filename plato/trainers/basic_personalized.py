@@ -58,6 +58,9 @@ class Trainer(basic.Trainer):
         self.personalized_model_state_dict = None
 
         self.personalized_train_loader = None
+        self._personalized_loss_criterion = None
+        self.personalized_optimizer = None
+        self.personalized_lr_scheduler = None
 
     def set_client_personalized_model(self, personalized_model):
         """Setting the client's personalized model"""
@@ -151,7 +154,7 @@ class Trainer(basic.Trainer):
 
         return location, filename
 
-    def save_personalized_model(self, filename=None, location=None):
+    def save_personalized_model(self, filename=None, location=None, **kwargs):
         """Saving the model to a file."""
         # process the arguments to obtain the to save path
         to_save_dir, filename = self.process_save_path(
@@ -164,6 +167,7 @@ class Trainer(basic.Trainer):
         ckpt_oper.save_checkpoint(
             model_state_dict=self.personalized_model.state_dict(),
             checkpoints_name=[filename],
+            **kwargs
         )
 
         logging.info(
@@ -421,9 +425,6 @@ class Trainer(basic.Trainer):
         self,
         epoch,
         config,
-        pers_optimizer,
-        lr_schedule,
-        pers_loss_criterion,
         epoch_loss_meter,
     ):
         # pylint:disable=too-many-arguments
@@ -443,22 +444,22 @@ class Trainer(basic.Trainer):
         for _, (examples, labels) in enumerate(local_progress):
             examples, labels = examples.to(self.device), labels.to(self.device)
             # Clear the previous gradient
-            pers_optimizer.zero_grad()
+            self.personalized_optimizer.zero_grad()
 
             # Perfrom the training and compute the loss
             preds = self.personalized_model(examples)
-            loss = pers_loss_criterion(preds, labels)
+            loss = self._personalized_loss_criterion(preds, labels)
 
             # Perfrom the optimization
             loss.backward()
-            pers_optimizer.step()
+            self.personalized_optimizer.step()
 
             # Update the epoch loss container
             epoch_loss_meter.update(loss, labels.size(0))
 
             local_progress.set_postfix(
                 {
-                    "lr": lr_schedule,
+                    "lr": self.personalized_lr_scheduler,
                     "loss": epoch_loss_meter.loss_value,
                     "loss_avg": epoch_loss_meter.average,
                 }
@@ -493,12 +494,15 @@ class Trainer(basic.Trainer):
         )
 
         # Initializing the optimizer, lr_schedule, and loss criterion
-        pers_optimizer = self.get_personalized_optimizer(self.personalized_model)
-        pers_lr_scheduler = self.get_personalized_lr_scheduler(pers_optimizer)
-        _pers_loss_criterion = self.get_personalized_loss_criterion()
+        self.personalized_optimizer = self.get_personalized_optimizer(
+            self.personalized_model
+        )
+        self.personalized_lr_scheduler = self.get_personalized_lr_scheduler(
+            self.personalized_optimizer
+        )
+        self._personalized_loss_criterion = self.get_personalized_loss_criterion()
 
         self.personalized_model.to(self.device)
-        self.personalized_model.train()
 
         # epoch loss tracker
         epoch_loss_meter = tracking.LossTracker()
@@ -517,13 +521,10 @@ class Trainer(basic.Trainer):
             epoch_loss_meter = self.personalized_train_one_epoch(
                 epoch=epoch,
                 config=config,
-                pers_optimizer=pers_optimizer,
-                lr_schedule=pers_lr_scheduler,
-                pers_loss_criterion=_pers_loss_criterion,
                 epoch_loss_meter=epoch_loss_meter,
             )
 
-            pers_lr_scheduler.step()
+            self.personalized_lr_scheduler.step()
 
             eval_outputs = self.personalized_train_epoch_end(
                 epoch=epoch,
@@ -684,6 +685,7 @@ class Trainer(basic.Trainer):
 
     def personalized_train_epoch_start(self, config):
         """Method called at the beginning of a personalized training epoch."""
+        self.personalized_model.train()
 
     def personalized_train_epoch_end(
         self,
