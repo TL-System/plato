@@ -139,7 +139,7 @@ class KineticsDataset(multimodal_base.MultiModalDataset):
 class DataSource(multimodal_base.MultiModalDataSource):
     """The Kinetics datasource."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
 
         self.data_name = Config().data.datasource

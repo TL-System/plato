@@ -11,7 +11,7 @@ from torch.cuda import amp
 from torch.optim.lr_scheduler import LambdaLR
 from tqdm import tqdm
 from yolov5.utils.general import (
-    NCOLS,
+    TQDM_BAR_FORMAT,
     box_iou,
     check_dataset,
     non_max_suppression,
@@ -317,12 +317,8 @@ class Trainer(basic.Trainer):
             0.0,
         )
         stats, ap = [], []
-        pbar = tqdm(
-            test_loader,
-            desc=s,
-            ncols=NCOLS,
-            bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}",
-        )  # progress bar
+
+        pbar = tqdm(test_loader, desc=s, bar_format=TQDM_BAR_FORMAT)  # progress bar
 
         for __, (img, targets, paths, shapes) in enumerate(pbar):
             t1 = time_sync()

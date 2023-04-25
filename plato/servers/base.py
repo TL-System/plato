@@ -24,6 +24,7 @@ from plato.client import run
 from plato.config import Config
 from plato.utils import s3, fonts
 
+
 # pylint: disable=unused-argument, protected-access
 class ServerEvents(socketio.AsyncNamespace):
     """A custom namespace for socketio.AsyncServer."""
@@ -677,7 +678,8 @@ class Server:
 
     async def _periodic_task(self):
         """A periodic task that is executed from time to time, determined by
-        'server:periodic_interval' with a default value of 5 seconds, in the configuration."""
+        'server:periodic_interval' with a default value of 5 seconds, in the configuration.
+        """
         # Call the async function that defines a customized periodic task, if any
         await self.periodic_task()
 
@@ -895,7 +897,8 @@ class Server:
             },
         )
 
-        heapq.heappush(self.reported_clients, client_info)
+        if self.asynchronous_mode and self.simulate_wall_time:
+            heapq.heappush(self.reported_clients, client_info)
         self.current_reported_clients[client_info[2]["client_id"]] = True
         del self.training_clients[client_id]
 
@@ -1314,6 +1317,10 @@ class Server:
 
         await self._close_connections()
         os._exit(0)
+
+    def add_callbacks(self, callbacks):
+        """Adds a list of callbacks to the server callback handler."""
+        self.callback_handler.add_callbacks(callbacks)
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Customizes the server response with any additional information."""

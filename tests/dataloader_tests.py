@@ -1,14 +1,16 @@
 """Unit tests for data loaders."""
-
+import os
 import unittest
 import math
 import torch
 from typing import Type, List
 
+os.environ["config_file"] = "tests/config.yml"
+
 import numpy as np
 
 from plato.config import Config
-from plato.datasources.cifar10 import DataSource
+from plato.datasources import registry as datasource_registry
 from plato.utils import data_loaders
 from plato.samplers import registry as samplers_registry
 
@@ -22,7 +24,8 @@ class DataLoadersTest(unittest.TestCase):
         self.client1_id = 10
         self.client2_id = 20
         self.client3_id = 39
-        self.utest_datasource = DataSource()
+
+        self.utest_datasource = datasource_registry.get()
 
         self.client1_batch_size = 8
         self.client2_batch_size = 64
@@ -136,7 +139,7 @@ class DataLoadersTest(unittest.TestCase):
         client3_dataloader = self.define_client_dataloader(
             client_id=self.client3_id, testing=True, batch_size=self.client3_batch_size
         )
-
+        print("client1_dataloader: ", client1_dataloader)
         # define different data loaders for comprehensive tests
         # adding the 'None' here to test the specific case
         parallel_loader23 = data_loaders.ParallelDataLoader(

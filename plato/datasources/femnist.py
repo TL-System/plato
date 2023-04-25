@@ -30,17 +30,17 @@ from plato.datasources import base
 
 
 class CustomDictDataset(Dataset):
-    """ Custom dataset from a dictionary with support of transforms. """
+    """Custom dataset from a dictionary with support of transforms."""
 
     def __init__(self, loaded_data, transform=None):
-        """ Initializing the custom dataset. """
+        """Initializing the custom dataset."""
         super().__init__()
         self.loaded_data = loaded_data
         self.transform = transform
 
     def __getitem__(self, index):
-        sample = self.loaded_data['x'][index]
-        target = self.loaded_data['y'][index]
+        sample = self.loaded_data["x"][index]
+        target = self.loaded_data["y"][index]
 
         if self.transform:
             sample = self.transform(sample)
@@ -48,11 +48,11 @@ class CustomDictDataset(Dataset):
         return sample, target
 
     def __len__(self):
-        return len(self.loaded_data['y'])
+        return len(self.loaded_data["y"])
 
 
 class ReshapeListTransform:
-    """ The transform that reshapes an image. """
+    """The transform that reshapes an image."""
 
     def __init__(self, new_shape):
         self.new_shape = new_shape
@@ -64,22 +64,29 @@ class ReshapeListTransform:
 class DataSource(base.DataSource):
     """The FEMNIST dataset."""
 
-    def __init__(self, client_id=0):
+    def __init__(self, client_id=0, **kwargs):
         super().__init__()
         self.trainset = None
         self.testset = None
 
-        root_path = os.path.join(Config().params['data_path'], 'FEMNIST',
-                                 'packaged_data')
+        root_path = os.path.join(
+            Config().params["data_path"], "FEMNIST", "packaged_data"
+        )
         if client_id == 0:
             # If we are on the federated learning server
-            data_dir = os.path.join(root_path, 'test')
-            data_url = "http://iqua.ece.toronto.edu/baochun/FEMNIST/test/" \
-                       + str(client_id) + ".zip"
+            data_dir = os.path.join(root_path, "test")
+            data_url = (
+                "http://iqua.ece.toronto.edu/baochun/FEMNIST/test/"
+                + str(client_id)
+                + ".zip"
+            )
         else:
-            data_dir = os.path.join(root_path, 'train')
-            data_url = "http://iqua.ece.toronto.edu/baochun/FEMNIST/train/" \
-                       + str(client_id) + ".zip"
+            data_dir = os.path.join(root_path, "train")
+            data_url = (
+                "http://iqua.ece.toronto.edu/baochun/FEMNIST/train/"
+                + str(client_id)
+                + ".zip"
+            )
 
         if not os.path.exists(os.path.join(data_dir, str(client_id))):
             logging.info(
@@ -89,24 +96,32 @@ class DataSource(base.DataSource):
             self.download(url=data_url, data_path=data_dir)
 
         loaded_data = DataSource.read_data(
-            file_path=os.path.join(data_dir, str(client_id), 'data.json'))
+            file_path=os.path.join(data_dir, str(client_id), "data.json")
+        )
 
-        _transform = transforms.Compose([
-            ReshapeListTransform((28, 28, 1)),
-            transforms.ToPILImage(),
-            transforms.RandomCrop(28,
-                                  padding=2,
-                                  padding_mode="constant",
-                                  fill=1.0),
-            transforms.RandomResizedCrop(28,
-                                         scale=(0.8, 1.2),
-                                         ratio=(4. / 5., 5. / 4.)),
-            transforms.RandomRotation(5, fill=1.0),
-            transforms.ToTensor(),
-            transforms.Normalize(0.9637, 0.1597),
-        ])
-        dataset = CustomDictDataset(loaded_data=loaded_data,
-                                    transform=_transform)
+        train_transform = (
+            kwargs["train_transform"]
+            if "train_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        ReshapeListTransform((28, 28, 1)),
+                        transforms.ToPILImage(),
+                        transforms.RandomCrop(
+                            28, padding=2, padding_mode="constant", fill=1.0
+                        ),
+                        transforms.RandomResizedCrop(
+                            28, scale=(0.8, 1.2), ratio=(4.0 / 5.0, 5.0 / 4.0)
+                        ),
+                        transforms.RandomRotation(5, fill=1.0),
+                        transforms.ToTensor(),
+                        transforms.Normalize(0.9637, 0.1597),
+                    ]
+                )
+            )
+        )
+
+        dataset = CustomDictDataset(loaded_data=loaded_data, transform=train_transform)
 
         if client_id == 0:  # testing dataset on the server
             self.testset = dataset
@@ -115,8 +130,8 @@ class DataSource(base.DataSource):
 
     @staticmethod
     def read_data(file_path):
-        """ Reading the dataset specific to a client_id. """
-        with open(file_path, 'r', encoding='utf-8') as fin:
+        """Reading the dataset specific to a client_id."""
+        with open(file_path, "r", encoding="utf-8") as fin:
             loaded_data = json.load(fin)
         return loaded_data
 
