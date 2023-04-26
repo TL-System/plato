@@ -347,7 +347,7 @@ class Client:
 
     async def _send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
-        step = 1024 ^ 2
+        step = 1024 ** 2
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
 
         for chunk in chunks:
