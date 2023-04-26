@@ -7,7 +7,7 @@ from typing import Dict, Optional, List
 
 import torch
 
-from plato.utils.filename_formatter import get_format_name
+from plato.utils.filename_formatter import NameFormatter
 
 
 class CheckpointsOperator:
@@ -144,7 +144,7 @@ def save_client_checkpoint(
     optimizer_state_dict: Optional[dict] = None,
     lr_scheduler_state_dict: Optional[dict] = None,
     learning_dict: Optional[dict] = None,
-    config: dict = {},
+    config: Optional[dict] = None,
     global_epoch: Optional[int] = None,
     local_epoch: Optional[int] = None,
     prefix: Optional[str] = None,
@@ -171,6 +171,7 @@ def save_client_checkpoint(
     :param prefix: A integer to present the client id.
 
     """
+    config = config if config is not None else {}
     current_round = config["current_round"] if "current_round" in config else None
     # run_id = config['run_id']
     # we have to set the run_id to be None here as the client can
@@ -181,7 +182,7 @@ def save_client_checkpoint(
 
     # Before the training, we expect to save the initial
     # model of this round
-    filename = get_format_name(
+    filename = NameFormatter.get_format_name(
         model_name=model_name,
         client_id=client_id,
         round_n=current_round,
@@ -229,7 +230,7 @@ def load_client_checkpoint(
 
     # Before the training, we expect to save the initial
     # model of this round
-    filename = get_format_name(
+    filename = NameFormatter.get_format_name(
         model_name=model_name,
         client_id=client_id,
         round_n=current_round,

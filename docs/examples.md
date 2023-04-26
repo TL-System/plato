@@ -292,6 +292,20 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ```
 ````
 
+
+````{admonition} **APFL**
+APFL is a synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models. It has been quite widely cited and compared with in the personalized federated learning literature. In this example, once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
+
+```shell
+python examples/apfl/apfl.py -c examples/apfl/apfl_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
+&rdquo; in Arxiv, 2021.
+```
+````
+
 ````{admonition} **SysHeteroFL**
 In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
 
@@ -337,6 +351,18 @@ Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Hetero
 &rdquo; in Proc. INFOCOM, 2022.
 ```
 ````
+
+````{admonition} **Polaris**
+Polaris is a client selection method for asynchronous federated learning. In this method, it selects clients via balancing between local device speed and local data quality from an optimization perspective. As it does not require extra information rather than local updates, Polaris is pluggable to any other federated aggregation methods.
+
+```shell
+python3 examples/polaris/polaris.py -c examples/polaris/polaris_LeNet5.yml
+```
+```{note}
+Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
+&rdquo; 
+````
+
 
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 

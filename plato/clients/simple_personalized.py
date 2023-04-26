@@ -13,7 +13,7 @@ from plato.clients import simple
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.utils import fonts
-from plato.utils.filename_formatter import get_format_name
+from plato.utils.filename_formatter import NameFormatter
 
 
 class Client(simple.Client):
@@ -86,7 +86,7 @@ class Client(simple.Client):
             self.personalized_model = self.custom_personalized_model()
 
         logging.info(
-            "Client[%d] defines the personalized model: %s",
+            "[Client #%d] defines the personalized model: %s",
             self.client_id,
             pers_model_name,
         )
@@ -118,7 +118,7 @@ class Client(simple.Client):
         # save the defined personalized model as the initial one
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
-        filename = get_format_name(
+        filename = NameFormatter.get_format_name(
             model_name=pers_model_name,
             client_id=self.client_id,
             round_n=0,
@@ -133,16 +133,17 @@ class Client(simple.Client):
         if not os.path.exists(checkpoint_file_path):
             logging.info(
                 fonts.colourize(
-                    "First-time Selection of Client[%d] for personalization.",
+                    "First-time Selection of [Client #%d] for personalization.",
                     colour="blue",
                 ),
                 self.client_id,
             )
             logging.info(
                 fonts.colourize(
-                    "Client[%d]. Creating its unique parameters by resetting weights.",
+                    "[Client #%d] Creating its unique personalized parameters by resetting weights.",
                     colour="blue",
-                )
+                ),
+                self.client_id,
             )
             # reset the personalized model for this client
             # thus, different clients have different init parameters
@@ -172,7 +173,7 @@ class Client(simple.Client):
         personalized_model_name = Config().trainer.personalized_model_name
         logging.info(
             fonts.colourize(
-                "[Client #%d] loading its personalized model [%s].", colour="blue"
+                "[Client #%d] Loading its personalized model named %s.", colour="blue"
             ),
             self.client_id,
             personalized_model_name,
@@ -193,7 +194,7 @@ class Client(simple.Client):
 
             logging.info(
                 fonts.colourize(
-                    "[Client #%d] loads latest personalized model.", colour="blue"
+                    "[Client #%d] Loading latest personalized model.", colour="blue"
                 ),
                 self.client_id,
             )
@@ -205,18 +206,19 @@ class Client(simple.Client):
             desired_round = 0
             logging.info(
                 fonts.colourize(
-                    "[Client #%d] loads initial personalized model.", colour="blue"
+                    "[Client #%d] Loading initial personalized model.", colour="blue"
                 ),
                 self.client_id,
             )
 
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
-        self.trainer.rollback_model(
+        loaded_status = self.trainer.rollback_model(
             model_name=personalized_model_name,
             modelfile_prefix="personalized",
             rollback_round=desired_round,
             location=checkpoint_dir_path,
         )
+        return loaded_status
 
     def _load_payload(self, server_payload) -> None:
         """Load the server model onto this client.
@@ -226,9 +228,9 @@ class Client(simple.Client):
         2. load its personalized model locally.
         """
         logging.info(
-            "[Client #%d] Received the model [%s].",
+            "[Client #%d] Received the payload containing modules: %s.",
             self.client_id,
-            Config().trainer.model_name,
+            self.algorithm.extract_modules_name(list(server_payload.keys())),
         )
         # load the model
         self.algorithm.load_weights(server_payload)
