@@ -338,6 +338,18 @@ Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Hetero
 ```
 ````
 
+````{admonition} **Polaris**
+Polaris is a client selection method for asynchronous federated learning. In this method, it selects clients via balancing between local device speed and local data quality from an optimization perspective. As it does not require extra information rather than local updates, Polaris is pluggable to any other federated aggregation methods.
+
+```shell
+python3 examples/polaris/polaris.py -c examples/polaris/polaris_LeNet5.yml
+```
+```{note}
+Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
+&rdquo; 
+````
+
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |  Method  | Notes | Tested  |
