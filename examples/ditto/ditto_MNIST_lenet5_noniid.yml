@@ -70,13 +70,17 @@ trainer:
     loss_criterion: CrossEntropyLoss
 
     personalized_optimizer: SGD
-
+    personalized_batch_size: 32
+    personalized_epochs: 1
+    
     # The machine learning model
     model_name: lenet5
     personalized_model_name: lenet5
 
-    ditto_lambda: 0.75
-    is_tune_lambda: True
+    # the chosen of lambda derives from 
+    # the appendix D.2 of the paper and 
+    # from the https://github.com/lgcollins/FedRep
+    ditto_lambda: 1.0
 
 algorithm:
     # Aggregation algorithm

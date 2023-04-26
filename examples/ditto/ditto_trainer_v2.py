@@ -2,17 +2,20 @@
 A personalized federated learning trainer using Ditto.
 
 This implementation striclty follows the official code presented in
-https://github.com/s-huu/Ditto.
+https://github.com/lgcollins/FedRep.
 
 """
 
 import os
+import copy
+import logging
 
-import torch
-from torch.nn.functional import cross_entropy
+from tqdm import tqdm
 
 from plato.trainers import basic_personalized
 from plato.utils.filename_formatter import NameFormatter
+from plato.trainers import tracking
+from plato.utils import fonts
 
 
 class Trainer(basic_personalized.Trainer):
@@ -23,39 +26,7 @@ class Trainer(basic_personalized.Trainer):
 
         # the lambda used in the Ditto paper
         self.ditto_lambda = 0.0
-
-    def models_norm_distance(self, norm=2):
-        """Compute the distance between the personalized model and the
-        global model."""
-        size = 0
-        for param in self.personalized_model.parameters():
-            if param.requires_grad:
-                size += param.view(-1).shape[0]
-        sum_var = torch.FloatTensor(size).fill_(0)
-        size = 0
-        for (param, global_param) in zip(
-            self.personalized_model.parameters(),
-            self.model.parameters(),
-        ):
-            if param.requires_grad and global_param.requires_grad:
-                sum_var[size : size + param.view(-1).shape[0]] = (
-                    (param - global_param)
-                ).view(-1)
-                size += param.view(-1).shape[0]
-
-        return torch.norm(sum_var, norm)
-
-    def get_personalized_loss_criterion(self):
-        """Get the loss of Ditto approach."""
-
-        def ditto_loss(outputs, labels):
-
-            return (
-                cross_entropy(outputs, labels)
-                + self.ditto_lambda * self.models_norm_distance()
-            )
-
-        return ditto_loss
+        self.initial_model_params = None
 
     def train_run_start(self, config):
         """Define personalization before running."""
@@ -67,41 +38,78 @@ class Trainer(basic_personalized.Trainer):
         self.personalized_optimizer = self._adjust_lr(
             config, self.lr_scheduler, self.personalized_optimizer
         )
-        self._personalized_loss_criterion = self.get_personalized_loss_criterion()
 
         self.personalized_model.to(self.device)
         self.personalized_model.train()
 
         # initialize the lambda
         self.ditto_lambda = config["ditto_lambda"]
-
-    def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
-
-        """
-        # optimize the personalized model
-        self.personalized_optimizer.zero_grad()
-        outputs = self.personalized_model(examples)
-        personalized_loss = self._personalized_loss_criterion(outputs, labels)
-        personalized_loss.backward()
-        self.personalized_optimizer.step()
-
-        # perform normal local update
-        super().perform_forward_and_backward_passes(config, examples, labels)
-
-        return personalized_loss
+        # backup the unoptimized global model
+        # this is used as the baseline ditto weights in the Ditto solver
+        self.initial_model_params = copy.deepcopy(self.model.state_dict())
 
     def train_run_end(self, config):
-        """Saving the personalized model and lambda."""
+        """Perform the personalized learning of Ditto."""
         # save the personalized model for current round
         # to the model dir of this client
+        personalized_epochs = config["personalized_epochs"]
+
+        show_str = logging.info(
+            fonts.colourize("[Client #%d] performing Ditto Solver: ", colour="blue"),
+            self.client_id,
+        )
+        global_progress = tqdm(range(1, personalized_epochs + 1), desc=show_str)
+        epoch_loss_meter = tracking.LossTracker()
+
+        for epoch in global_progress:
+            epoch_loss_meter.reset()
+            local_progress = tqdm(
+                self.train_loader,
+                desc=f"Epoch {epoch}/{personalized_epochs+1}",
+                disable=True,
+            )
+            for _, (examples, labels) in enumerate(local_progress):
+                examples, labels = examples.to(self.device), labels.to(self.device)
+                # backup the params of defined model before optimization
+                # this is the v_k in the Algorithm. 1
+                v_initial = copy.deepcopy(self.personalized_model.state_dict())
+
+                # Clear the previous gradient
+                self.personalized_optimizer.zero_grad()
+
+                ## 1.- Compute the ∇F_k(v_k), thus to compute the first term
+                #   of the equation in the Algorithm. 1.
+                # i.e., v_k − η∇F_k(v_k)
+                # This can be achieved by the general optimization step.
+                # Perfrom the training and compute the loss
+                # Perfrom the training and compute the loss
+                preds = self.personalized_model(examples)
+                loss = self._loss_criterion(preds, labels)
+
+                # Perfrom the optimization
+                loss.backward()
+                self.personalized_optimizer.step()
+                ## 2.- Compute the ηλ(v_k − w^t), which is the second term of
+                #   the corresponding equation in Algorithm. 1.
+                w_net = copy.deepcopy(self.personalized_model.state_dict())
+                lr = self.lr_scheduler.get_lr()[0]
+                for key in w_net.keys():
+                    w_net[key] = w_net[key] - lr * self.ditto_lambda * (
+                        v_initial[key] - self.initial_model_params[key]
+                    )
+
+                self.personalized_model.load_state_dict(w_net)
+                # Update the epoch loss container
+                epoch_loss_meter.update(loss, labels.size(0))
+
+            logging.info(
+                "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
+                self.client_id,
+                epoch,
+                personalized_epochs,
+                epoch_loss_meter.average,
+            )
+
         if "max_concurrency" in config:
 
             current_round = self.current_round
@@ -124,7 +132,7 @@ class Trainer(basic_personalized.Trainer):
 
     def personalized_train_model(self, config, trainset, sampler, **kwargs):
         """Ditto will only evaluate the personalized model."""
-        batch_size = config["personalized_batch_size"]
+        batch_size = config["batch_size"]
 
         testset = kwargs["testset"]
         testset_sampler = kwargs["testset_sampler"]
