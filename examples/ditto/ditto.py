@@ -9,7 +9,7 @@ Third-part code: https://github.com/lgcollins/FedRep
 
 """
 
-# import ditto_trainer
+# import ditto_trainer_v1 as ditto_trainer
 import ditto_trainer_v2 as ditto_trainer
 import ditto_client
 
