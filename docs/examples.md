@@ -292,6 +292,20 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ```
 ````
 
+
+````{admonition} **APFL**
+APFL is a synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models. It has been quite widely cited and compared with in the personalized federated learning literature. In this example, once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
+
+```shell
+python examples/apfl/apfl.py -c examples/apfl/apfl_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
+&rdquo; in Arxiv, 2021.
+```
+````
+
 ````{admonition} **SysHeteroFL**
 In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
 

@@ -144,7 +144,7 @@ def save_client_checkpoint(
     optimizer_state_dict: Optional[dict] = None,
     lr_scheduler_state_dict: Optional[dict] = None,
     learning_dict: Optional[dict] = None,
-    config: dict = {},
+    config: Optional[dict] = None,
     global_epoch: Optional[int] = None,
     local_epoch: Optional[int] = None,
     prefix: Optional[str] = None,
@@ -171,6 +171,7 @@ def save_client_checkpoint(
     :param prefix: A integer to present the client id.
 
     """
+    config = config if config is not None else {}
     current_round = config["current_round"] if "current_round" in config else None
     # run_id = config['run_id']
     # we have to set the run_id to be None here as the client can

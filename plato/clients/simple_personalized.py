@@ -212,12 +212,13 @@ class Client(simple.Client):
             )
 
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
-        self.trainer.rollback_model(
+        loaded_status = self.trainer.rollback_model(
             model_name=personalized_model_name,
             modelfile_prefix="personalized",
             rollback_round=desired_round,
             location=checkpoint_dir_path,
         )
+        return loaded_status
 
     def _load_payload(self, server_payload) -> None:
         """Load the server model onto this client.
@@ -227,9 +228,9 @@ class Client(simple.Client):
         2. load its personalized model locally.
         """
         logging.info(
-            "[Client #%d] Received the model [%s].",
+            "[Client #%d] Received the payload containing modules: %s.",
             self.client_id,
-            Config().trainer.model_name,
+            self.algorithm.extract_modules_name(list(server_payload.keys())),
         )
         # load the model
         self.algorithm.load_weights(server_payload)
