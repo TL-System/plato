@@ -10,9 +10,10 @@ from collections import OrderedDict
 
 import numpy as np
 import torch
+import defences
+
 
 class Server(fedavg.Server):
-
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
@@ -23,4 +24,6 @@ class Server(fedavg.Server):
             trainer=trainer,
             callbacks=callbacks,
         )
+
     def configure():
+        """Initialize defence related parameter"""
