@@ -28,7 +28,14 @@ class Client(simple.Client):
         super().__init__(
             model, datasource, algorithm, trainer, callbacks, trainer_callbacks
         )
+        self.is_attacker = None
+        self.attack_type = None
 
     def configure(self) -> None:
         """Initialize the attack related parameter"""
-        return super().configure()
+        super().configure()
+
+        self.is_attacker = self.client_id in Config().clients.attacker_ids
+        self.attack_type = Config().clients.attack_type
+
+
