@@ -42,7 +42,7 @@ class Client(simple_personalized.Client):
             self.algorithm.extract_modules_name(list(server_payload.keys())),
         )
 
-        # in FedPer, the head of personalized model should be assigned to the 
+        # in FedPer, the head of personalized model should be assigned to the
         # received model to perform normal training.
         self.persist_initial_personalized_model()
         # load the personalized model.
