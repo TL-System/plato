@@ -306,6 +306,20 @@ Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://a
 ```
 ````
 
+````{admonition} **LG-FedAvg**
+LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
+
+```shell
+python examples/lgfedavg/lgfedavg.py -c examples/lgfedavg/lgfedavg_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Paul Pu Liang, et.al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
+&rdquo; in Proc. NeurIPS, 2019.
+```
+````
+
+
 ````{admonition} **Ditto**
 Ditto is another synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by learning local models that are encouraged to be close together by global regularization. In this example, once the global model is received, each client will carry out a regular local update followed by a Ditto solver to optimize the personalized model. 
 
