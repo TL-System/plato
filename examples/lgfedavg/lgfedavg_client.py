@@ -59,11 +59,7 @@ class Client(simple_personalized.Client):
             "[Client #%d] Combined head modules to received modules.", self.client_id
         )
 
-        # therefore, everytime the client performs local update, the head of its initial
-        # personalized model is assigned to the self.model, making:
-        # the final global parameter and the initialized global parameter have the
-        # same head parameter. See page 6 of the paper.
-        # load the model
+        # assign the combination of the local and gloabl to self.model
         self.algorithm.load_weights(server_payload)
 
         if self.is_personalized_learn() and self.personalized_model is not None:
