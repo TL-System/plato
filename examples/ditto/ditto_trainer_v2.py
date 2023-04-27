@@ -130,6 +130,29 @@ class Trainer(basic_personalized.Trainer):
                 filename=filename, location=save_location, learning_dict=learning_dict
             )
 
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """
+        Evaluates the model with the provided test dataset and test sampler.
+        Auguments:
+        testset: the test dataset.
+        sampler: the test sampler. The default is None.
+        kwargs (optional): Additional keyword arguments.
+        """
+        trained_model_params = copy.deepcopy(self.model)
+        self.model.load_state_dict(self.personalized_model.state_dict(), strict=True)
+        accuracy = super().test_model(config, testset, sampler=None, **kwargs)
+        self.model.load_state_dict(trained_model_params, strict=True)
+        # save the personaliation accuracy to the results dir
+        self.checkpoint_personalized_accuracy(
+            accuracy=accuracy,
+            current_round=self.current_round,
+            epoch=config["epochs"],
+            run_id=None,
+        )
+
+        return accuracy
+
     def personalized_train_model(self, config, trainset, sampler, **kwargs):
         """Ditto will only evaluate the personalized model."""
         batch_size = config["batch_size"]
