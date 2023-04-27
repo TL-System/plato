@@ -35,7 +35,7 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
     partition_size: 2000
@@ -81,32 +81,28 @@ trainer:
     pers_epoch_log_interval: 2
 
     # The machine learning model
-    model_name: resnet_18
-    personalized_model_name: resnet_18
+    model_name: lenet5
+    personalized_model_name: lenet5
 
     head_epochs: 2
 
     global_modules_name:
         - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
+        - conv2
+        - conv3
 
     head_modules_name:
-        - linear
+        - fc4
+        - fc5
 
     frozen_modules_name:
-        - linear
+        - fc4
+        - fc5
 
     frozen_personalized_modules_name:
         - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
+        - conv2
+        - conv3
 
 algorithm:
     # Aggregation algorithm
@@ -114,7 +110,7 @@ algorithm:
 
 parameters:
     optimizer:
-        lr: 0.03
+        lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
 
