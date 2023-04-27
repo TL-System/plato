@@ -49,6 +49,12 @@ class Client(simple.Client):
         # 2.- personalization
         self.learning_mode = "normal"
 
+        # which group that client belongs to
+        # there are two options:
+        # 1. participant
+        # 2. nonparticipant
+        self.client_group = "participant"
+
         # whether this client contains the corresponding
         # personalized model
         self.novel_client = False
@@ -352,3 +358,7 @@ class Client(simple.Client):
     def is_personalized_learn(self):
         """Whether this client will perform personalization."""
         return self.learning_mode == "personalization"
+
+    def is_participant_group(self):
+        """Whether this client participants in federated training."""
+        return self.client_group == "participant"
