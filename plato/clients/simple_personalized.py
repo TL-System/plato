@@ -1,6 +1,6 @@
 """
-A basic personalized federated learning client
-who performs the global learning and local learning.
+A basic personalized federated learning client who performs the 
+global learning and local learning.
 
 """
 
@@ -360,5 +360,5 @@ class Client(simple.Client):
         return self.learning_mode == "personalization"
 
     def is_participant_group(self):
-        """Whether this client participants in federated training."""
+        """Whether this client participants the federated training."""
         return self.client_group == "participant"

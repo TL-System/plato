@@ -1,26 +1,6 @@
 """
 The training and testing loops of PyTorch for personalized federated learning.
 
-Very important notes:
-    1.- For all model saving filename that contains 'epoch', it is a checkpoint file.
-    Our checkpoint file is saved by the function 'perform_client_checkpoint_saving'.
-    Therefore, loading the model parameter of the checkpoint file should be:
-        load_checkpoint(filepath)['model']
-
-    2.- For all model saving filename without containing 'epoch', there are two
-    types of model saving files, including:
-        - lenet5__client4_round1.pth -> corresponds to self.model
-        - personalized_lenet5__client4_round1.pth -> corresponds to self.personalized_model
-
-    For the self.model, we save it as the checkpoint as this model can
-    be regarded as the trained model during the whole training stage of FL.
-        -> Therefore, loading the model parameter of the checkpoint file should be:
-        load_checkpoint(filepath)['model']
-
-    These settings induce our recall self.model and self.personalized_model in each round
-    Please access the 'load_personalized_model' and 'load_payload' in the
-    clients/pers_simple.py.
-
 """
 import logging
 import multiprocessing as mp
@@ -50,10 +30,7 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
-        # the client's personalized model
-        # to perform the evaluation stage of the ssl methods
-        # the client must assign its own personalized model
-        #  to its trainer
+        # the personalized model of this client
         self.personalized_model = None
         self.personalized_model_state_dict = None
 
@@ -685,7 +662,7 @@ class Trainer(basic.Trainer):
         return eval_outputs
 
     def personalized_train_run_end(self, config):
-        """Method called at the end of a training run."""
+        """Method called at the end of a personalized training run."""
 
     def personalized_train_epoch_start(self, config):
         """Method called at the beginning of a personalized training epoch."""
