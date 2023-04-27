@@ -2,7 +2,7 @@
 A personalized federated learning trainer using Ditto.
 
 This implementation striclty follows the official code presented in
-https://github.com/s-huu/Ditto.
+https://github.com/litian96/ditto.
 
 """
 
