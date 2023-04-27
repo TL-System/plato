@@ -49,6 +49,10 @@ class Client(simple.Client):
         # 2.- personalization
         self.learning_mode = "normal"
 
+        # whether this client contains the corresponding
+        # personalized model
+        self.novel_client = False
+
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
@@ -128,6 +132,7 @@ class Client(simple.Client):
             ext="pth",
         )
         checkpoint_file_path = os.path.join(checkpoint_dir_path, filename)
+        self.novel_client = False
         # if the personalized model for current client does
         # not exist - this client is selected the first time
         if not os.path.exists(checkpoint_file_path):
@@ -152,6 +157,8 @@ class Client(simple.Client):
                 filename=filename,
                 location=checkpoint_dir_path,
             )
+            # set this client to be the novel one
+            self.novel_client = True
 
     def load_personalized_model(self):
         """Load the personalized model.
