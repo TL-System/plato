@@ -1,0 +1,98 @@
+clients:
+  # Type
+  type: simple
+
+  # The total number of clients
+  total_clients: 10
+
+  # The number of clients selected in each round
+  per_round: 2
+
+  # Should the clients compute test accuracy locally?
+  do_test: false
+
+  # Whether client heterogeneity should be simulated
+  speed_simulation: true
+
+  # The distribution of client speeds
+  simulation_distribution:
+    distribution: zipf # zipf is used.
+    s: 1.2
+
+    # The maximum amount of time for clients to sleep after each epoch
+    #max_sleep_time: 10
+
+    # Should clients really go to sleep, or should we just simulate the sleep times?
+  sleep_simulation: true
+
+    # If we are simulating client training times, what is the average training time?
+  avg_training_time: 10
+
+  random_seed: 1
+
+  attack_type: LIE
+  attacker_ids: 1
+
+server:
+  address: 127.0.0.1
+  port: 8000
+  random_seed: 1
+  simulate_wall_time: true
+  #defence_type:
+  checkpoint_path: results/MNIST/test/checkpoint
+  model_path: results/MNIST/test/model
+
+data:     
+  # The training and testing dataset
+  datasource: MNIST
+
+  # Number of samples in each partition
+  partition_size: 20000
+
+  # IID or non-IID?
+  sampler: noniid
+
+  # The concentration parameter for the Dirichlet distribution
+  concentration: 0.5
+
+  # The random seed for sampling data
+  random_seed: 1
+
+trainer:
+  # The type of the trainer
+  type: basic
+
+  # The maximum number of training rounds
+  rounds: 5
+
+  # The maximum number of clients running concurrently
+  max_concurrency: 1
+
+  # The target accuracy
+  target_accuracy: 0.97
+
+  # The machine learning model
+  model_name: lenet5
+
+  # Number of epoches for local training in each communication round
+  epochs: 5
+  batch_size: 32
+  optimizer: SGD
+
+algorithm:
+  # Aggregation algorithm
+  type: fedavg
+
+parameters:
+  model:
+    num_classes: 10
+
+  optimizer:
+    lr: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time
+    result_path: /data/ykang/plato/results/attackDefence/obs/mnist
