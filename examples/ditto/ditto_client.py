@@ -1,15 +1,11 @@
 """
-The implementation of APFL method based on the plato's pFL code.
+The client implementation of Ditto method based on the pFL framework of Plato.
 
-Yuyang Deng, et.al, Adaptive Personalized Federated Learning
+Tian Li, et.al, Ditto: Fair and robust federated learning through personalization, 2021:
+ https://proceedings.mlr.press/v139/li21h.html
 
-paper address: https://arxiv.org/abs/2001.01523
-
-Official code: None
-Third-part code: 
-- https://github.com/lgcollins/FedRep
-- https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
-- https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
+Official code: https://github.com/s-huu/Ditto
+Third-part code: https://github.com/lgcollins/FedRep
 
 """
 
@@ -19,7 +15,7 @@ from plato.clients import simple_personalized
 
 
 class Client(simple_personalized.Client):
-    """A APFL federated learning client."""
+    """A Ditto federated learning client."""
 
     def _load_payload(self, server_payload) -> None:
         """Load the server model onto this client.
@@ -34,14 +30,12 @@ class Client(simple_personalized.Client):
             self.client_id,
             self.algorithm.extract_modules_name(list(server_payload.keys())),
         )
-        # in APFL, the personalized model is trained together with the
+        # in Ditto, the personalized model is trained together with the
         # global model
         # thus, personalized model should be loaded.
         self.persist_initial_personalized_model()
         # load the personalized model.
-        loaded_status = self.load_personalized_model()
-
-        self.trainer.extract_alpha(loaded_status)
+        self.load_personalized_model()
 
         # assign the received payload to the local model
         self.algorithm.load_weights(server_payload)
