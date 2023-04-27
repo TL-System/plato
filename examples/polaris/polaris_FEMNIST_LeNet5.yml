@@ -11,7 +11,7 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
-        # Whether client heterogeneity should be simulated
+    # Whether client heterogeneity should be simulated
     speed_simulation: true
 
     # The distribution of client speeds
