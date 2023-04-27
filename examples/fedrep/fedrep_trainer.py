@@ -10,9 +10,13 @@ https://arxiv.org/abs/2102.07078
 
 Source code: https://github.com/lgcollins/FedRep
 """
+import os
 import logging
+
+
 from plato.trainers import basic_personalized
 from plato.algorithms import fedavg_partial
+from plato.utils.filename_formatter import NameFormatter
 
 
 class Trainer(basic_personalized.Trainer):
@@ -73,6 +77,47 @@ class Trainer(basic_personalized.Trainer):
         # The representation will then be optimized for only one epoch
         if self.current_epoch > head_epochs:
             self.activate_model(self.model, config["frozen_modules_name"])
+
+    def train_run_end(self, config):
+        """Save the trained model to be the personalized model."""
+        # copy the trained model to the personalized model
+        self.personalized_model.load_state_dict(self.model.state_dict(), strict=True)
+
+        current_round = self.current_round
+
+        personalized_model_name = config["personalized_model_name"]
+        save_location = self.get_checkpoint_dir_path()
+        filename = NameFormatter.get_format_name(
+            client_id=self.client_id,
+            model_name=personalized_model_name,
+            round_n=current_round,
+            run_id=None,
+            prefix="personalized",
+            ext="pth",
+        )
+        os.makedirs(save_location, exist_ok=True)
+        self.save_personalized_model(filename=filename, location=save_location)
+
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """
+        Evaluates the model with the provided test dataset and test sampler.
+        Auguments:
+        testset: the test dataset.
+        sampler: the test sampler. The default is None.
+        kwargs (optional): Additional keyword arguments.
+        """
+        accuracy = super().test_model(config, testset, sampler=None, **kwargs)
+
+        # save the personaliation accuracy to the results dir
+        self.checkpoint_personalized_accuracy(
+            accuracy=accuracy,
+            current_round=self.current_round,
+            epoch=config["epochs"],
+            run_id=None,
+        )
+
+        return accuracy
 
     def personalized_train_run_start(self, config, **kwargs):
         """According to FedRep, freeze a partial of the model and
