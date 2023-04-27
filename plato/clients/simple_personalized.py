@@ -306,13 +306,13 @@ class Client(simple.Client):
             except ValueError:
                 await self.sio.disconnect()
 
-        if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
-            hasattr(Config().clients, "test_interval")
-            and self.current_round % Config().clients.test_interval == 0
-        ):
-            accuracy = self.trainer.test(self.testset, self.testset_sampler)
-        else:
-            accuracy = 0
+            if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
+                hasattr(Config().clients, "test_interval")
+                and self.current_round % Config().clients.test_interval == 0
+            ):
+                accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            else:
+                accuracy = 0
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
