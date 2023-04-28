@@ -13,15 +13,12 @@ class Trainer(basic_personalized.Trainer):
     def freeze_model(self, model, modules_name=None):
         """Freeze a part of the model."""
         if modules_name is not None:
+            frozen_params = []
             for name, param in model.named_parameters():
                 if any([param_name in name for param_name in modules_name]):
                     param.requires_grad = False
+                    frozen_params.append(name)
 
-            frozen_params = [
-                name
-                for name, param in model.named_parameters()
-                if param.requires_grad is False
-            ]
             logging.info(
                 "[Client #%d] has frozen %s",
                 self.client_id,

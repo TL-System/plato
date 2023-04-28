@@ -306,6 +306,16 @@ Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://a
 ```
 ````
 
+````{admonition} **FedPer**
+FedPer is a synchronous personalized federated learning algorithm that learns a global representation and personalized heads, but makes simultaneous local updates for both sets of parameters, therefore makes the same number of local updates for the head and the representation on each local round.
+
+```shell
+python examples/fedper/fedper.py -c examples/fedper/fedper_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Manoj Ghuhan Arivazhagan, et.al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
+&rdquo; in Arxiv, 2019.
 ````{admonition} **LG-FedAvg**
 LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
 
