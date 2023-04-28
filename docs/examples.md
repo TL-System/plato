@@ -316,6 +316,16 @@ python examples/fedper/fedper.py -c examples/fedper/fedper_MNIST_lenet5_noniid.y
 ```{note}
 Manoj Ghuhan Arivazhagan, et.al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
 &rdquo; in Arxiv, 2019.
+````{admonition} **LG-FedAvg**
+LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
+
+```shell
+python examples/lgfedavg/lgfedavg.py -c examples/lgfedavg/lgfedavg_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Paul Pu Liang, et.al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
+&rdquo; in Proc. NeurIPS, 2019.
 ```
 ````
 
