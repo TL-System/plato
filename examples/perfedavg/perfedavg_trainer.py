@@ -5,7 +5,7 @@ A personalized federated learning trainer using Per-FedAvg
 import os
 from typing import Iterator, Tuple, Union
 from collections import OrderedDict
-from copy import deepcopy
+import copy
 
 import torch
 
@@ -38,7 +38,7 @@ def compute_gradients(
     """Compute the gradients."""
     examples, labels = data_batch
     if second_order_grads:
-        frz_model_params = deepcopy(model.state_dict())
+        frz_model_params = copy.deepcopy(model.state_dict())
         delta = 1e-3
         dummy_model_params_1 = OrderedDict()
         dummy_model_params_2 = OrderedDict()
@@ -56,7 +56,6 @@ def compute_gradients(
         model.load_state_dict(dummy_model_params_2, strict=False)
         logit_2 = model(examples)
         loss_2 = loss_criterion(logit_2, labels)
-        # loss_2 = loss_criterion(logit_2, y) / y.size(-1)
         grads_2 = torch.autograd.grad(loss_2, model.parameters())
 
         model.load_state_dict(frz_model_params)
@@ -83,25 +82,22 @@ class Trainer(basic_personalized.Trainer):
 
         # the iterator for the dataloader
         self.iter_trainloader = None
+        self.iter_personalized_trainloader = None
 
     def train_epoch_start(self, config):
         """Method called at the beginning of a training epoch."""
         self.iter_trainloader = iter(self.train_loader)
 
-    def perform_forward_and_backward_passes(self, config, examples, labels):
+    def perform_forward_and_backward_passes_v2(self, config, examples, labels):
         """Perform forward and backward passes in the training loop.
 
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
+        This implementation derives from
+        https://github.com/KarhouTam/Per-FedAvg
         """
         alpha = config["alpha"]
         beta = config["beta"]
         if config["hessian_free"]:  # Per-FedAvg(HF)
-            temp_model = deepcopy(self.model)
+            temp_model = copy.deepcopy(self.model)
 
             grads, _ = compute_gradients(
                 temp_model, self._loss_criterion, data_batch=(examples, labels)
@@ -119,7 +115,6 @@ class Trainer(basic_personalized.Trainer):
             data_batch_3 = get_data_batch(
                 self.train_loader, self.iter_trainloader, self.device
             )
-
             grads_2nd, loss = compute_gradients(
                 self.model,
                 self._loss_criterion,
@@ -135,8 +130,7 @@ class Trainer(basic_personalized.Trainer):
 
         else:  # Per-FedAvg(FO)
 
-            temp_model = deepcopy(self.model)
-
+            temp_model = copy.deepcopy(self.model)
             grads, _ = compute_gradients(
                 temp_model, self._loss_criterion, data_batch=(examples, labels)
             )
@@ -149,11 +143,55 @@ class Trainer(basic_personalized.Trainer):
             grads, loss = compute_gradients(
                 temp_model, self._loss_criterion, data_batch_2
             )
-
             for param, grad in zip(self.model.parameters(), grads):
                 param.data.sub_(beta * grad)
 
         self._loss_tracker.update(loss, labels.size(0))
+
+        return loss
+
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform forward and backward passes in the training loop.
+
+        This implementation derives from
+        https://github.com/jhoon-oh/FedBABU
+        """
+        alpha = config["alpha"]
+        beta = config["beta"]
+        temp_net = copy.deepcopy(list(self.model.parameters()))
+
+        # Step 1
+        for g in self.optimizer.param_groups:
+            g["lr"] = alpha
+
+        self.model.zero_grad()
+
+        logits = self.model(examples)
+
+        loss = self._loss_criterion(logits, labels)
+        loss.backward()
+        self.optimizer.step()
+
+        # Step 2
+        for g in self.optimizer.param_groups:
+            g["lr"] = beta
+
+        examples, labels = next(self.iter_trainloader)
+        examples, labels = examples.to(self.device), labels.to(self.device)
+
+        self.model.zero_grad()
+
+        logits = self.model(examples)
+
+        loss = self._loss_criterion(logits, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+        loss.backward()
+
+        # restore the model parameters to the one before first update
+        for old_p, new_p in zip(self.model.parameters(), temp_net):
+            old_p.data = new_p.data.clone()
+
+        self.optimizer.step()
 
         return loss
 
@@ -199,62 +237,63 @@ class Trainer(basic_personalized.Trainer):
 
         return accuracy
 
-    def get_optimizer(self, model):
-        """Returns the optimizer."""
+    def personalized_train_epoch_start(self, config):
+        """Operations before one epoch of training."""
+        super().personalized_train_epoch_start(config)
 
-    def get_lr_scheduler(self, config, optimizer):
-        """Returns the learning rate scheduler, if needed."""
+        self.iter_personalized_trainloader = iter(self.personalized_train_loader)
 
-    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
-        """Returns an optimizer with an initial learning rate that has been
-        adjusted according to the current round, so that learning rate
-        schedulers can be effective throughout the communication rounds."""
-        return None
-
-    def personalized_train_model(
+    def personalized_train_one_epoch(
         self,
+        epoch,
         config,
-        trainset,
-        sampler,
-        **kwargs,
+        epoch_loss_meter,
     ):
-        """Perform personalized train process."""
+        # pylint:disable=too-many-arguments
+        """Performing one epoch of learning for the personalization."""
+        alpha = config["alpha"]
+        beta = config["beta"]
 
-        personalized_epochs = config["personalized_epochs"]
-        batch_size = config["personalized_batch_size"]
+        epoch_loss_meter.reset()
+        self.personalized_model.train()
+        self.personalized_model.to(self.device)
 
-        config["batch_size"] = batch_size
-        config["epochs"] = personalized_epochs
+        # Step 1
+        for g in self.personalized_optimizer.param_groups:
+            g["lr"] = alpha
+        examples, labels = next(self.iter_personalized_trainloader)
+        examples, labels = examples.to(self.device), labels.to(self.device)
 
-        testset = kwargs["testset"]
-        testset_sampler = kwargs["testset_sampler"]
+        # Clear the previous gradient
+        self.personalized_model.zero_grad()
 
-        personalized_test_loader = self.get_personalized_data_loader(
-            batch_size, testset, testset_sampler.get()
-        )
+        # Perfrom the training and compute the loss
+        preds = self.personalized_model(examples)
+        loss = self._personalized_loss_criterion(preds, labels)
 
-        super().train_model(
-            config,
-            trainset,
-            sampler,
-            **kwargs,
-        )
-        eval_outputs = self.perform_evaluation(
-            personalized_test_loader, self.personalized_model
-        )
-        accuracy = eval_outputs["accuracy"]
+        # Perfrom the optimization
+        loss.backward()
+        self.personalized_optimizer.step()
 
-        # save the personaliation accuracy to the results dir
-        self.checkpoint_personalized_accuracy(
-            accuracy=accuracy,
-            current_round=self.current_round,
-            epoch=personalized_epochs,
-            run_id=None,
-        )
-        if "max_concurrency" in config:
+        # Step 2
+        # Update the epoch loss container
+        for g in self.personalized_optimizer.param_groups:
+            g["lr"] = beta
 
-            # save the accuracy
-            model_name = config["personalized_model_name"]
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-            self.save_accuracy(accuracy, filename)
-            return None
+        examples, labels = next(self.iter_personalized_trainloader)
+        examples, labels = examples.to(self.device), labels.to(self.device)
+
+        # Clear the previous gradient
+        self.personalized_model.zero_grad()
+
+        # Perfrom the training and compute the loss
+        preds = self.personalized_model(examples)
+        loss = self._personalized_loss_criterion(preds, labels)
+
+        # Perfrom the optimization
+        loss.backward()
+        self.personalized_optimizer.step()
+
+        epoch_loss_meter.update(loss, labels.size(0))
+
+        return epoch_loss_meter
