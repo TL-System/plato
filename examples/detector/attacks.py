@@ -13,11 +13,12 @@ def get():
     )
 
     if attack_type is None:
-        logging.info("No attack is applied.")
+        logging.info(f"No attack is applied.")
         return lambda x: x
 
     if attack_type in registered_attacks:
         registered_attack = registered_attacks[attack_type]
+        logging.info(f"Clients perform {attack_type} attack.")
         return registered_attack
 
     raise ValueError(f"No such attack: {attack_type}")
