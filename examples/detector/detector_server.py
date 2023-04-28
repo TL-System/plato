@@ -36,19 +36,32 @@ class Server(fedavg.Server):
         self.attacker_list = Config().clients.attacker_ids
         self.attack_type = Config().clients.attack_type
 
+    def choose_clients(self, clients_pool, clients_count):
+        selected_clients = super().choose_clients(clients_pool, clients_count)
+
+        # recording how many attackers are selected this round to track the defence performance
+        selected_attackers = []
+        for select_client in selected_clients:
+            if select_client in self.attacker_list:
+                selected_attackers.append(select_client)
+
+        logging.info("[%s] Selected attackers: %s", self, selected_attackers)
+
+        return selected_clients
+
     def weights_received(self, updates):
         """
         Attacker server performs attack based on malicious clients' reports and aggregation server defences attacks.
         """
         # Simulate the attacker server to perform model poisoning. Note that the attack server only accesses to malicious clients' updates.
-        weights_attacked = self.weights_attacked(updates)
+        weights_attacked = self.model_poisoning(updates)
 
         # Simulate the aggregation server to filter out poisoned reports before performing aggregation.
         weights_approved = self.weights_filter(weights_attacked)
 
         return weights_approved
 
-    def weights_attacked(self, updates):
+    def model_poisoning(self, updates):
         # Extract attackers' updates
         attacker_updates = []
         for update in updates:
