@@ -343,6 +343,20 @@ Tian Li, et.al, &ldquo;[Ditto: Fair and robust federated learning through person
 ```
 ````
 
+````{admonition} **PerFedAvg**
+PerFedAvg focuses the personalized federated learning in which our goal is to find an initial shared model that current or new users can easily adapt to their local dataset by performing one or a few steps of gradient descent with respect to their own data. Specifically, it introduces the Model-Agnostic Meta-Learning (MAML) framework into the local update of federated learning.
+
+```shell
+python examples/perfedavg/perfedavg.py -c examples/perfedavg/perfedavg_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Alireza Fallah, et.al, &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
+A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html),
+&rdquo; in Proc NeurIPS, 2020.
+```
+````
+
 ````{admonition} **SysHeteroFL**
 In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
 
