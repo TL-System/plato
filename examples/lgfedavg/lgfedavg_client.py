@@ -1,14 +1,12 @@
 """
-A personalized federated learning client using FedRep.
+An implementation of the LG-FedAvg algorithm.
 
-Reference:
+Paul Pu Liang, et.al, Think Locally, Act Globally: Federated Learning with 
+Local and Global Representations. 
+https://arxiv.org/abs/2001.01523
 
-Collins et al., "Exploiting Shared Representations for Personalized Federated
-Learning", in the Proceedings of ICML 2021.
+Official code: https://github.com/pliang279/LG-FedAvg
 
-https://arxiv.org/abs/2102.07078
-
-Source code: https://github.com/lgcollins/FedRep
 """
 
 
@@ -20,25 +18,25 @@ from plato.utils import fonts
 
 
 class Client(simple_personalized.Client):
-    """A FedBABU federated learning client."""
+    """A LG-FedAvg federated learning client."""
 
     def _load_payload(self, server_payload) -> None:
         """Load the server model onto this client.
 
         Each client will
-        1. recevie the global model (body)
+        1. recevie the global model (head)
         2. load the personalized locally
-        The received body and the extracted head of personalized mdoel
+        The received head and the extracted body of personalized mdoel
         will be combined to be assigned to the self.model for federated
         training.
         """
         logging.info(
-            "[Client #%d] Received the global model (body) containing modules: %s.",
+            "[Client #%d] Received the global model (head) containing modules: %s.",
             self.client_id,
             self.algorithm.extract_modules_name(list(server_payload.keys())),
         )
 
-        # in FedBABU, the head of one model is not trained during the federated
+        # in LG-FedAvg, the head of one model is not trained during the federated
         # training stage, thus every time the client is selected, the initial
         # personalized model will be loaded to be assigned to the self.model
         # for federated training.
@@ -46,26 +44,22 @@ class Client(simple_personalized.Client):
         # load the personalized model.
         self.load_personalized_model()
 
-        # get the `head` from the personalized model head
-        head_modules_name = Config().trainer.head_modules_name
-        model_head_params = self.algorithm.extract_weights(
-            model=self.personalized_model, modules_name=head_modules_name
+        # get the `body` from the personalized model head
+        body_modules_name = Config().trainer.body_modules_name
+        model_body_params = self.algorithm.extract_weights(
+            model=self.personalized_model, modules_name=body_modules_name
         )
         logging.info(
-            "[Client #%d] Extracted head modules: %s from its loaded personalized model.",
+            "[Client #%d] Extracted body modules: %s from its loaded personalized model.",
             self.client_id,
-            self.algorithm.extract_modules_name(list(model_head_params.keys())),
+            self.algorithm.extract_modules_name(list(model_body_params.keys())),
         )
-        server_payload.update(model_head_params)
+        server_payload.update(model_body_params)
         logging.info(
             "[Client #%d] Combined head modules to received modules.", self.client_id
         )
 
-        # therefore, everytime the client performs local update, the head of its initial
-        # personalized model is assigned to the self.model, making:
-        # the final global parameter and the initialized global parameter have the
-        # same head parameter. See page 6 of the paper.
-        # load the model
+        # assign the combination of the local and gloabl to self.model
         self.algorithm.load_weights(server_payload)
 
         if self.is_personalized_learn() and self.personalized_model is not None:
