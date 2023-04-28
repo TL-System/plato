@@ -562,8 +562,7 @@ class Trainer(basic.Trainer):
 
         if "max_concurrency" in config:
 
-            # save the accuracy directly for latter usage
-            # in the eval_test(...)
+            # save the accuracy
             model_name = config["personalized_model_name"]
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
             self.save_accuracy(accuracy, filename)
