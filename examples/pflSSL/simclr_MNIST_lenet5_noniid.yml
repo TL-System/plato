@@ -1,5 +1,7 @@
 clients:
 
+    type: simple_ssl
+
     # The total number of clients
     total_clients: 10
 
@@ -37,14 +39,22 @@ server:
 data:
     # The training and testing dataset
     datasource: MNIST
+    #personalized_datasource: MNIST
 
     # Number of samples in each partition
     partition_size: 2000
 
-    
+    train_transform: SimCLR
+    # test_transform: 
+    # personalized_train_transform:
+    # personalized_test_transform:
+
     # IID or non-IID?
     sampler: noniid
     testset_sampler: noniid
+
+    # personalized_sampler: noniid
+    # personalized_testset_sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 0.5
@@ -52,7 +62,12 @@ data:
     # The random seed for sampling data
     random_seed: 1
 
+
+
+
 trainer:
+
+    type: basic_ssl
 
     # The maximum number of training rounds
     rounds: 5
@@ -81,24 +96,25 @@ trainer:
 
     pers_epoch_log_interval: 2
 
-    # image_size
-    #  - STL10 (Image size=96)
-    #  - CIFAR10 (Image size=32)
-    #  - MNIST (Image size=28)
-    image_size: 28
 
     # The machine learning model
     model_name: SimCLR
     encoder_name: lenet5
-    personalized_model_name: general_multilayer
-
-
+    personalized_model_type: general_multilayer
+    personalized_model_name: linear_mlp
 
 algorithm:
     # Aggregation algorithm
     type: fedavg_partial
 
 parameters:
+    data_transform:
+        # image_size
+        #  - STL10 (Image size=96)
+        #  - CIFAR10 (Image size=32)
+        #  - MNIST (Image size=28)
+        image_size: 28
+
     optimizer:
         lr: 0.01
         momentum: 0.9
