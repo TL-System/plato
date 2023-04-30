@@ -109,6 +109,38 @@ class Trainer(basic_personalized.Trainer):
 
         return compute_plato_loss
 
+    def perform_evaluation(self, data_loader, defined_model=None, **kwargs):
+        """The operation of performing the evaluation on the testset with the defined model."""
+        # Define the test phase of the eval stage
+        defined_model = (
+            self.personalized_model if defined_model is None else defined_model
+        )
+        defined_model.eval()
+        defined_model.to(self.device)
+        self.model.to(self.device)
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for _, (examples, labels) in enumerate(data_loader):
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                features = self.model.encoder(examples)
+                outputs = defined_model(features)
+
+                outputs = self.process_personalized_outputs(outputs)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+
+        eval_outputs = {"accuracy": accuracy}
+
+        return eval_outputs
+
     def personalized_train_one_epoch(
         self,
         epoch,

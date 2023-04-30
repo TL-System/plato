@@ -38,11 +38,23 @@ class Client(simple_personalized.Client):
             personalized_model=personalized_model,
         )
 
-        # obtain the personalized datasource
+        # the personalized datasource
+        # By default, if `personalized_datasource` is not set up, it will
+        # be equal to the `datasource`
         self.custom_personalized_datasource = personalized_datasource
         self.personalized_datasource = None
 
-        # obtain the data transformer
+        # dataset for personalization
+        self.personalized_trainset = None
+        self.personalized_testset = None
+        # By default, if `personalized_sampler` is not set up, it will
+        # be equal to the `sampler`.
+        self.personalized_sampler = None
+        self.personalized_testset_sampler = None
+
+        # the data transformer for personalized data
+        # By default, if transform is not set up, it will utilize the
+        # default transform defined within Plato's data source.
         self.train_transform = None
         self.test_transform = None
         self.data_transforms = {}
@@ -50,47 +62,31 @@ class Client(simple_personalized.Client):
         self.personalized_test_transform = None
         self.personalized_data_transforms = {}
 
-        self.personalized_trainset = None  # Training dataset
-        self.personalized_testset = None  # Testing dataset
-        self.personalized_sampler = None
-        self.personalized_testset_sampler = None  # Sampler for the test set
-
-    def configure(self) -> None:
-        """Prepares this client for training."""
-        super().configure()
-
-        # Setting up the data sampler for personalization
-        if self.personalized_datasource:
-            self.personalized_sampler = samplers_registry.get(
-                self.personalized_datasource,
-                self.client_id,
-                sampler_type=Config().data.personalized_sampler,
-            )
-
-            if (
-                hasattr(Config().clients, "do_personalized_test")
-                and Config().clients.do_personalized_test
-                and hasattr(Config().data, "personalized_testset_sampler")
-            ):
-                # Set the sampler for test set
-                self.personalized_testset_sampler = samplers_registry.get(
-                    self.personalized_datasource,
-                    self.client_id,
-                    testing=True,
-                    sampler_type=Config().data.personalized_test_sampler,
-                )
+    def get_personalized_model_params(self):
+        """Get the params of the personalized model."""
+        pers_model_params = Config().parameters.personalized_model._asdict()
+        pers_model_params["input_dim"] = self.trainer.model.encoding_dim
+        pers_model_params["output_dim"] = pers_model_params["num_classes"]
+        return pers_model_params
 
     def define_data_transform(self):
         """Define the data transform for normal personalized federated learning."""
         if hasattr(Config().data, "train_transform"):
             self.train_transform = transform_registry.get()
+            logging.info("[%s] Defined train transform %s", self, self.train_transform)
+
         if hasattr(Config().data, "test_transform"):
             transform_name = Config().data.test_transform
-            transform_params = Config().parameters.test_transform
+            transform_params = (
+                Config().parameters.test_transform._asdict()
+                if hasattr(Config().parameters, "test_transform")
+                else {}
+            )
             self.test_transform = transform_registry.get(
                 data_transform_name=transform_name,
                 data_transform_params=transform_params,
             )
+            logging.info("[%s] Defined test transform %s", self, self.test_transform)
 
         if self.train_transform is not None:
             self.data_transforms.update({"train_transform": self.train_transform})
@@ -101,17 +97,36 @@ class Client(simple_personalized.Client):
         """Define the data transform for personalized personalized federated learning."""
         if hasattr(Config().data, "personalized_train_transform"):
             transform_name = Config().data.personalized_train_transform
-            transform_params = Config().parameters.personalized_train_transform
+            transform_params = (
+                Config().parameters.personalized_train_transform._asdict()
+                if hasattr(Config().parameters, "personalized_train_transform")
+                else {}
+            )
             self.personalized_train_transform = transform_registry.get(
                 data_transform_name=transform_name,
                 data_transform_params=transform_params,
             )
+            logging.info(
+                "[%s] Defined personalized train transform %s",
+                self,
+                self.personalized_train_transform,
+            )
+
         if hasattr(Config().data, "personalized_test_transform"):
             transform_name = Config().data.personalized_test_transform
-            transform_params = Config().parameters.personalized_test_transform
+            transform_params = (
+                Config().parameters.personalized_test_transform._asdict()
+                if hasattr(Config().parameters, "personalized_test_transform")
+                else {}
+            )
             self.personalized_test_transform = transform_registry.get(
                 data_transform_name=transform_name,
                 data_transform_params=transform_params,
+            )
+            logging.info(
+                "[%s] Defined personalized test transform %s",
+                self,
+                self.personalized_test_transform,
             )
 
         if self.personalized_train_transform is not None:
@@ -137,7 +152,10 @@ class Client(simple_personalized.Client):
         ):
             logging.info("[%s] Loading its data source...", self)
 
+            self.define_data_transform()
+
             if self.custom_datasource is None:
+
                 self.datasource = datasources_registry.get(
                     client_id=self.client_id, **self.data_transforms
                 )
@@ -145,16 +163,24 @@ class Client(simple_personalized.Client):
                 self.datasource = self.custom_datasource(**self.data_transforms)
 
             logging.info(
-                "[%s] Dataset size: %s ; Transforme: %s",
+                "[%s] Dataset size: %s; Transform: %s",
                 self,
                 self.datasource.num_train_examples(),
                 self.data_transforms,
             )
 
-        if self.personalized_datasource is None and hasattr(
-            Config().data, "personalized_datasource"
-        ):
-            logging.info("[%s] Loading its personalized data source...", self)
+        if self.personalized_datasource is None:
+            personalized_datasource = (
+                Config().data.personalized_datasource
+                if hasattr(Config().data, "personalized_datasource")
+                else Config().data.datasource
+            )
+            logging.info(
+                "[%s] Loading its personalized data source %s",
+                self,
+                personalized_datasource,
+            )
+            self.define_personalized_data_transform()
 
             if self.custom_personalized_datasource is None:
                 self.personalized_datasource = datasources_registry.get(
@@ -172,33 +198,61 @@ class Client(simple_personalized.Client):
                 self.personalized_data_transforms,
             )
 
+    def configure(self) -> None:
+        """Prepares this client for training."""
+        super().configure()
+
+        # Setting up the data sampler for personalization
+        if self.personalized_datasource:
+            sampler_type = (
+                Config().data.personalized_sampler
+                if hasattr(Config().data, "personalized_sampler")
+                else Config().data.sampler
+            )
+            self.personalized_sampler = samplers_registry.get(
+                self.personalized_datasource,
+                self.client_id,
+                sampler_type=sampler_type,
+            )
+
+            if (
+                hasattr(Config().clients, "do_personalized_test")
+                and Config().clients.do_personalized_test
+            ):
+                sampler_type = (
+                    Config().data.personalized_test_sampler
+                    if hasattr(Config().data, "personalized_testset_sampler")
+                    else Config().data.testset_sampler
+                )
+                # Set the sampler for test set
+                self.personalized_testset_sampler = samplers_registry.get(
+                    self.personalized_datasource,
+                    self.client_id,
+                    testing=True,
+                    sampler_type=sampler_type,
+                )
+
     def _allocate_data(self) -> None:
         """Allocate training or testing dataset of this client."""
+        super()._allocate_data()
         if hasattr(Config().trainer, "use_mindspore"):
             # MindSpore requires samplers to be used while constructing
             # the dataset
-            self.trainset = self.datasource.get_train_set(self.sampler)
-            self.personalized_trainset = self.trainset
-            if self.personalized_datasource is not None:
-                self.personalized_trainset = self.personalized_datasource.get_train_set(
-                    self.sampler
-                )
+            self.personalized_trainset = self.personalized_datasource.get_train_set(
+                self.sampler
+            )
 
         else:
             # PyTorch uses samplers when loading data with a data loader
-            self.trainset = self.datasource.get_train_set()
-            self.personalized_trainset = self.trainset
-            if self.personalized_datasource is not None:
-                self.personalized_trainset = (
-                    self.personalized_datasource.get_train_set()
-                )
+            self.personalized_trainset = self.personalized_datasource.get_train_set()
 
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-            # Set the testset if local testing is needed
-            self.testset = self.datasource.get_test_set()
-            self.personalized_testset = self.testset
-            if self.personalized_datasource is not None:
-                self.personalized_testset = self.datasource.get_test_set()
+        if (
+            hasattr(Config().clients, "do_personalized_test")
+            and Config().clients.do_personalized_test
+        ):
+            # Set the personalized testset if local testing is needed
+            self.personalized_testset = self.personalized_datasource.get_test_set()
+
 
     async def _train(self):
         """The machine learning training workload on a client.
@@ -222,7 +276,7 @@ class Client(simple_personalized.Client):
             )
             try:
                 training_time, accuracy = self.trainer.personalized_train(
-                    self.personalized_testset,
+                    self.personalized_trainset,
                     self.personalized_sampler,
                     testset=self.personalized_testset,
                     testset_sampler=self.personalized_testset_sampler,
