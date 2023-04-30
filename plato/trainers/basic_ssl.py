@@ -14,6 +14,7 @@ from lightly.data.multi_view_collate import MultiViewCollate
 from tqdm import tqdm
 
 from plato.trainers import basic_personalized
+from plato.trainers import base, loss_criterion
 
 
 class ExamplesList(UserList):
@@ -91,6 +92,22 @@ class Trainer(basic_personalized.Trainer):
             sampler=sampler,
             collate_fn=collate_fn,
         )
+
+    def get_loss_criterion(self):
+        """Returns the loss criterion.
+        As the loss functions derive from the lightly,
+        it is desired to create a interface
+        """
+
+        defined_ssl_loss = loss_criterion.get()
+
+        def compute_plato_loss(outputs, labels):
+            if isinstance(outputs, (list, tuple)):
+                return defined_ssl_loss(*outputs)
+            else:
+                return defined_ssl_loss(outputs)
+
+        return compute_plato_loss
 
     def personalized_train_one_epoch(
         self,
