@@ -25,7 +25,7 @@ Valid values are `true` or `false`. The default value is `false`.
 ## clients
 
 ```{admonition} **type**
-The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm; and `simple_personalized`, which controls the personalized learning logic.
+The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm; and `simple_personalized`, which controls the personalized learning logic; and `simple_ssl`, which performs the self-supervised learning.
 ```
 
 ```{admonition} **total_clients**
@@ -384,6 +384,7 @@ The type of the trainer. The following types are available:
 - `basic`: a basic trainer with a standard training loop.
 - `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
 - `basic_personalized`: a trainer supports all-purpose personalized federated learning by adding the personalized learning process.
+- `basic_ssl`: a trainer, built upon `basic_personalized`, supports all-purpose self-supervised learning for personalized federated learning.
 
 ```{admonition} max_physical_batch_size
 The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.

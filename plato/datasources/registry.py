@@ -41,7 +41,7 @@ else:
         feature,
         qoenflx,
         celeba,
-        stl10
+        stl10,
     )
 
     registered_datasources = {
@@ -59,7 +59,7 @@ else:
         "Feature": feature,
         "QoENFLX": qoenflx,
         "CelebA": celeba,
-        "STL10": stl10
+        "STL10": stl10,
     }
 
     registered_partitioned_datasources = {"FEMNIST": femnist}
@@ -67,9 +67,12 @@ else:
 
 def get(client_id: int = 0, **kwargs):
     """Get the data source with the provided name."""
-    datasource_name = Config().data.datasource
+    datasource_name = (
+        kwargs["datasource_name"] if "datasource_name" in kwargs else Config().data.datasource
+    )
 
-    logging.info("Data source: %s", Config().data.datasource)
+    logging.info("Data source: %s", datasource_name)
+    
     if datasource_name == "kinetics700":
         from plato.datasources import kinetics
 
