@@ -65,6 +65,10 @@ class Client(simple.Client):
         super().process_server_response(server_response)
         self.learning_mode = server_response["learning_mode"]
 
+    def get_personalized_model_params(self):
+        """Get the params of the personalized model."""
+        return Config().parameters.personalized_model._asdict()
+
     def configure(self) -> None:
         """Performing the general client's configure and then initialize the
         personalized model for the client."""
@@ -83,7 +87,7 @@ class Client(simple.Client):
         # assign the personalized model to the client
         if self.personalized_model is None and self.custom_personalized_model is None:
 
-            pers_model_params = Config().parameters.personalized_model._asdict()
+            pers_model_params = self.get_personalized_model_params()
             self.personalized_model = models_registry.get(
                 model_name=pers_model_name,
                 model_type=pers_model_type,

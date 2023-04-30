@@ -64,16 +64,21 @@ else:
     )
 
 
-def get(datasource, client_id, testing=False):
+def get(datasource, client_id, testing=False, **kwargs):
     """Get an instance of the sampler."""
 
-    if testing and hasattr(Config().data, "testset_sampler"):
-        sampler_type = Config().data.testset_sampler
+    sampler_type = (
+        kwargs["sampler_type"]
+        if "sampler_type" in kwargs
+        else Config().data.testset_sampler
+        if testing and hasattr(Config().data, "testset_sampler")
+        else Config().data.sampler
+    )
+    if testing:
         logging.info("[Client #%d] Test set sampler: %s", client_id, sampler_type)
     else:
-        sampler_type = Config().data.sampler
         logging.info("[Client #%d] Sampler: %s", client_id, sampler_type)
-
+        
     if sampler_type in registered_samplers:
         registered_sampler = registered_samplers[sampler_type](
             datasource, client_id, testing=testing

@@ -6,8 +6,6 @@ A personalized federated learning trainer using FedPer.
 import os
 import logging
 
-import torch
-
 from plato.trainers import basic_personalized
 from plato.utils.filename_formatter import NameFormatter
 from plato.algorithms import fedavg_partial

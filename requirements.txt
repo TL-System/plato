@@ -11,3 +11,4 @@ gym
 zstd
 torch-optimizer
 timm
+lightly
