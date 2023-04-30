@@ -30,21 +30,22 @@ class SimCLR(torch.nn.Module):
 
         # extract hyper-parameters
         encoder_name = Config().trainer.encoder_name
-        encoder_params = Config().params.encoder
+        encoder_params = (
+            Config().params.encoder if hasattr(Config().params, "encoder") else {}
+        )
         projection_hidden_dim = Config().trainer.projection_hidden_dim
         projection_out_dim = Config().trainer.projection_out_dim
 
         # define the encoder based on the model_name in config
-        if encoder is None:
-            self.encoder, self.encode_dim = encoder_registry.get(
-                model_name=encoder_name, **encoder_params
-            )
-        # utilize the custom model
-        else:
-            self.encoder, self.encode_dim = encoder, encoder_dim
+        self.encoder = (
+            encoder
+            if encoder is not None
+            else encoder_registry.get(model_name=encoder_name, **encoder_params)
+        )
 
+        self.encoding_dim = self.encoder.encoding_dim
         self.projector = SimCLRProjectionHead(
-            self.encode_dim, projection_hidden_dim, projection_out_dim
+            self.encoding_dim, projection_hidden_dim, projection_out_dim
         )
 
     def forward(self, augmented_samples):

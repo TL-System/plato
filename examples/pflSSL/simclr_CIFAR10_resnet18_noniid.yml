@@ -38,8 +38,8 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: MNIST
-    personalized_datasource: MNIST
+    datasource: CIFAR10
+    personalized_datasource: CIFAR10
 
     # Number of samples in each partition
     partition_size: 2000
@@ -67,7 +67,7 @@ trainer:
     type: basic_ssl
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 1
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -76,7 +76,7 @@ trainer:
     target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 3
+    epochs: 1
     batch_size: 32
     optimizer: SGD
     lr_scheduler: MultiStepLR
@@ -85,7 +85,7 @@ trainer:
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
-    personalized_epochs: 1
+    personalized_epochs: 5
     personalized_batch_size: 32
     personalized_optimizer: SGD
     personalized_lr_scheduler: StepLR
@@ -95,7 +95,7 @@ trainer:
 
     # The machine learning model
     model_name: SimCLR
-    encoder_name: lenet5
+    encoder_name: resnet_18
     personalized_model_type: general_multilayer
     personalized_model_name: linear_mlp
 
@@ -112,7 +112,7 @@ parameters:
         #  - STL10 (Image size=96)
         #  - CIFAR10 (Image size=32)
         #  - MNIST (Image size=28)
-        input_size: 28
+        input_size: 32
 
 
     optimizer:
