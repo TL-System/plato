@@ -5,12 +5,31 @@ self-supervised learning.
 """
 
 from typing import List, Tuple
+from warnings import warn
+from collections import UserList
 
 import torch
 from torch import Tensor
 from lightly.data.multi_view_collate import MultiViewCollate
+from tqdm import tqdm
 
 from plato.trainers import basic_personalized
+
+
+class ExamplesList(UserList):
+    """The list containing multiple examples."""
+
+    def to(self, device):
+        """Assign the tensor item into the specific device."""
+        for example_idx, example in enumerate(self.data):
+            if hasattr(example, "to"):
+                if isinstance(example, torch.Tensor):
+                    example = example.to(device)
+                else:
+                    example.to(device)
+                self.__setitem__(example_idx, example)
+
+        return self.data
 
 
 class MultiViewCollateWrapper(MultiViewCollate):
@@ -20,9 +39,34 @@ class MultiViewCollateWrapper(MultiViewCollate):
     def __call__(
         self, batch: List[Tuple[List[Tensor], int, str]]
     ) -> Tuple[List[Tensor], Tensor, List[str]]:
-        views, labels, _ = super().__call__(batch)
+        """Turns a batch of tuples into single tuple."""
+        if len(batch) == 0:
+            warn("MultiViewCollate received empty batch.")
+            return [], [], []
 
-        return views, labels
+        views = ExamplesList([[] for _ in range(len(batch[0][0]))])
+        labels = []
+        fnames = []
+        for sample in batch:
+            img, label = sample[0], sample[1]
+            fname = sample[3] if len(sample) == 3 else None
+            for i, view in enumerate(img):
+                views[i].append(view.unsqueeze(0))
+            labels.append(label)
+            if fname is not None:
+                fnames.append(fname)
+
+        for i, view in enumerate(views):
+            views[i] = torch.cat(view)
+
+        labels = torch.tensor(
+            labels, dtype=torch.long
+        )  # Conversion to tensor to ensure backwards compatibility
+
+        if fnames:  # Compatible with lightly
+            return views, labels, fnames
+        else:  # Compatible with Plato
+            return views, labels
 
 
 class Trainer(basic_personalized.Trainer):
@@ -47,3 +91,57 @@ class Trainer(basic_personalized.Trainer):
             sampler=sampler,
             collate_fn=collate_fn,
         )
+
+    def personalized_train_one_epoch(
+        self,
+        epoch,
+        config,
+        epoch_loss_meter,
+    ):
+        # pylint:disable=too-many-arguments
+        """Performing one epoch of learning for the personalization."""
+
+        epoch_loss_meter.reset()
+        self.personalized_model.train()
+        self.personalized_model.to(self.device)
+        self.model.to(self.device)
+
+        pers_epochs = config["personalized_epochs"]
+
+        local_progress = tqdm(
+            self.personalized_train_loader,
+            desc=f"Epoch {epoch}/{pers_epochs+1}",
+            disable=True,
+        )
+
+        for _, (examples, labels) in enumerate(local_progress):
+            examples, labels = examples.to(self.device), labels.to(self.device)
+            # Clear the previous gradient
+            self.personalized_optimizer.zero_grad()
+
+            # Extract representation from the trained
+            # frozen encoder of ssl.
+            # No optimization is reuqired by this encoder.
+            with torch.no_grad():
+                features = self.model.encoder(examples)
+
+            # Perfrom the training and compute the loss
+            preds = self.personalized_model(features)
+            loss = self._personalized_loss_criterion(preds, labels)
+
+            # Perfrom the optimization
+            loss.backward()
+            self.personalized_optimizer.step()
+
+            # Update the epoch loss container
+            epoch_loss_meter.update(loss, labels.size(0))
+
+            local_progress.set_postfix(
+                {
+                    "lr": self.personalized_lr_scheduler,
+                    "loss": epoch_loss_meter.loss_value,
+                    "loss_avg": epoch_loss_meter.average,
+                }
+            )
+
+        return epoch_loss_meter
