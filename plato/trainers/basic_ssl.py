@@ -14,7 +14,7 @@ from lightly.data.multi_view_collate import MultiViewCollate
 from tqdm import tqdm
 
 from plato.trainers import basic_personalized
-from plato.trainers import base, loss_criterion
+from plato.trainers import loss_criterion
 
 
 class ExamplesList(UserList):
