@@ -102,6 +102,10 @@ trainer:
     projection_hidden_dim: 512
     projection_out_dim: 128
 
+    global_modules_name:
+        - encoder
+        - projection_head
+
 algorithm:
     # Aggregation algorithm
     type: fedavg_partial
