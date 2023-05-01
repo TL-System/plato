@@ -95,7 +95,7 @@ trainer:
 
     # The machine learning model
     model_name: SMoG
-    encoder_name: lenet5
+    encoder_name: resnet_18
     personalized_model_type: general_multilayer
     personalized_model_name: linear_mlp
 
