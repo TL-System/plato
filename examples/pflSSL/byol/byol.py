@@ -81,7 +81,7 @@ class BYOL(nn.Module):
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
 
-        # define the encoder based on the model_name in config
+        # define the encoder
         self.encoder = (
             encoder
             if encoder is not None
