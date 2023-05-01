@@ -141,7 +141,8 @@ parameters:
         step_size: 10
 
     loss_criterion:
-
+        eps: 1.0E-8
+        
     personalized_loss_criterion:
         label_smoothing: 0.5
 
