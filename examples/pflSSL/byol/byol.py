@@ -1,15 +1,11 @@
 """
 The implementation for the BYOL [1] method.
 
-The official code: https://github.com/lucidrains/byol-pytorch
-
-The third-party code: https://github.com/sthalles/PyTorch-BYOL
-
-Reference:
-
-[1]. https://arxiv.org/pdf/2006.07733.pdf
+[1]. Jean-Bastien Grill, et.al, Bootstrap Your Own Latent A New Approach to Self-Supervised Learning.
+https://arxiv.org/pdf/2006.07733.pdf.
 
 Source code: https://github.com/lucidrains/byol-pytorch
+The third-party code: https://github.com/sthalles/PyTorch-BYOL
 """
 import copy
 
