@@ -6,7 +6,6 @@ from lightly.loss.memory_bank import MemoryBankModule
 from lightly.models.utils import update_momentum
 
 from plato.trainers import basic_ssl
-from plato.trainers import loss_criterion
 from lightly.utils.scheduler import cosine_schedule
 
 from plato.config import Config
