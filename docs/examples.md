@@ -361,6 +361,9 @@ A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/20
 pFLSSL achieves Personalized federated learning by introducing self-supervised learning (SSL) to the training schema. Specifically, there are two stages. In this first stage, one global model is trained based on SSL under the federated training paradigm. Each client, in the second stage, trains its personalized model based on the extracted features of the received global model. Therefore, due to the diversity of SSL approaches, pFLSSL includes:
 - SimCLR [1]
 - BYOL [2]
+- SimSiam [3]
+- MoCoV2 [4]
+- SwAV [5]
 
 ```shell
 python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_MNIST_lenet5_noniid.yml -b NIPS
@@ -374,10 +377,29 @@ python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_CIFAR10
 python examples/pflSSL/byol/byol.py -c examples/pflSSL/byol/byol_MNIST_lenet5_noniid.yml -b NIPS
 ```
 
+```shell
+python examples/pflSSL/simsiam/simsiam.py -c examples/pflSSL/simsiam/simsiam_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/moco/mocov2.py -c examples/pflSSL/moco/mocov2_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/swav/swav.py -c examples/pflSSL/swav/swav_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
 ```{note}
 [1]. Ting Chen, et.al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
 
 [2]. Jean-Bastien Grill, et.al, &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
+
+[3]. Xinlei Chen, et.al, &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in ArXiv, 2020.
+
+[4]. Xinlei Chen, et.al, &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+
+[5]. Mathilde Caron, et.al, &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
+
 
 ```
 ````

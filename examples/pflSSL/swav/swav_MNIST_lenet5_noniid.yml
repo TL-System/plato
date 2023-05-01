@@ -44,7 +44,7 @@ data:
     # Number of samples in each partition
     partition_size: 2000
 
-    train_transform: MoCoV2
+    train_transform: SwaV
     # test_transform: 
     # personalized_train_transform:
     # personalized_test_transform:
@@ -80,7 +80,7 @@ trainer:
     batch_size: 32
     optimizer: SGD
     lr_scheduler: MultiStepLR
-    loss_criterion: NTXentLoss
+    loss_criterion: SwaVLoss
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
@@ -94,13 +94,14 @@ trainer:
     pers_epoch_log_interval: 2
 
     # The machine learning model
-    model_name: MoCoV2
+    model_name: SwaV
     encoder_name: lenet5
     personalized_model_type: general_multilayer
     personalized_model_name: linear_mlp
 
     projection_hidden_dim: 512
     projection_out_dim: 128
+    n_prototypes: 512
 
     global_modules_name:
         - encoder
@@ -116,7 +117,9 @@ parameters:
         #  - STL10 (Image size=96)
         #  - CIFAR10 (Image size=32)
         #  - MNIST (Image size=28)
-        input_size: 28
+        crop_sizes: 
+            - 28
+            - 28
 
     optimizer:
         lr: 0.01
@@ -136,13 +139,8 @@ parameters:
         gamma: 0.3
         step_size: 10
 
-    loss_criterion:
-        temperature: 0.2
-        memory_bank_size: 4096
-
     personalized_loss_criterion:
         label_smoothing: 0.5
-
 
     personalized_model:
         num_classes: 10

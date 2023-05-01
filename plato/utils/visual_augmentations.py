@@ -327,7 +327,7 @@ class SimSiamTransform:
         return x1, x2
 
 
-class SvAVTransform:
+class SwaVTransform:
     """This the contrastive data augmentation [1] used by the SWAV [2] method.
 
     [1]. https://github.com/facebookresearch/swav/blob/master/src/multicropdataset.py

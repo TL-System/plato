@@ -85,13 +85,13 @@ class MoCoV2(nn.Module):
         deactivate_requires_grad(self.encoder_momentum)
         deactivate_requires_grad(self.projection_head_momentum)
 
-    def forward_direct(self, x):
-        query = self.encoder(x).flatten(start_dim=1)
+    def forward_direct(self, samples):
+        query = self.encoder(samples).flatten(start_dim=1)
         query = self.projection_head(query)
         return query
 
-    def forward_momentum(self, x):
-        key = self.encoder_momentum(x).flatten(start_dim=1)
+    def forward_momentum(self, samples):
+        key = self.encoder_momentum(samples).flatten(start_dim=1)
         key = self.projection_head_momentum(key).detach()
         return key
 
