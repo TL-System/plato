@@ -8,12 +8,13 @@ Source code: https://github.com/facebookresearch/simsiam
 Third-party code: https://github.com/PatrickHua/SimSiam
 """
 
-import torch
 from torch import nn
 
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 
+from plato.servers import fedavg_personalized
 from plato.trainers import basic_ssl
+from plato.clients import simple_ssl
 from plato.trainers import loss_criterion
 
 from plato.models.cnn_encoder import Model as encoder_registry
@@ -97,11 +98,10 @@ def main():
     removing the final fully-connected layers of model defined by
     the 'model_name' in config file.
     """
-    trainer = simsiam_trainer.Trainer
-    algorithm = fedavg_pers.Algorithm
-    byol_model = simsiam_net.SimSiam
-    client = ssl_client.Client(model=byol_model, trainer=trainer, algorithm=algorithm)
-    server = ssl_server.Server(model=byol_model, trainer=trainer, algorithm=algorithm)
+
+    trainer = Trainer
+    client = simple_ssl.Client(model=SimSiam, trainer=trainer)
+    server = fedavg_personalized.Server(model=SimSiam, trainer=trainer)
 
     server.run(client)
 
