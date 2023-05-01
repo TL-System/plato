@@ -364,6 +364,7 @@ pFLSSL achieves Personalized federated learning by introducing self-supervised l
 - SimSiam [3]
 - MoCoV2 [4]
 - SwAV [5]
+- SMoG [6]
 
 ```shell
 python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_MNIST_lenet5_noniid.yml -b NIPS
@@ -389,6 +390,10 @@ python examples/pflSSL/moco/mocov2.py -c examples/pflSSL/moco/mocov2_CIFAR10_res
 python examples/pflSSL/swav/swav.py -c examples/pflSSL/swav/swav_CIFAR10_resnet18_noniid.yml -b NIPS
 ```
 
+```shell
+python examples/pflSSL/smog/smog.py -c examples/pflSSL/smog/smog_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
 ```{note}
 [1]. Ting Chen, et.al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
 
@@ -400,11 +405,10 @@ python examples/pflSSL/swav/swav.py -c examples/pflSSL/swav/swav_CIFAR10_resnet1
 
 [5]. Mathilde Caron, et.al, &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
 
+[6]. Bo Pang, et.al, &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
 
 ```
 ````
-
-
 
 ````{admonition} **SysHeteroFL**
 In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
