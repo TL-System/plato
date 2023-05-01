@@ -5,6 +5,7 @@ from typing import Union
 
 import torch_optimizer as torch_optim
 from torch import optim
+from timm import optim as timm_optim
 
 from plato.config import Config
 
@@ -26,6 +27,7 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         "RMSprop": optim.RMSprop,
         "Rprop": optim.Rprop,
         "SGD": optim.SGD,
+        "LARS": timm_optim.lars
     }
 
     optimizer_name = (
