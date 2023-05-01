@@ -2,13 +2,16 @@
 The implemetation of the trainer for SMoG approach.
 """
 
+import logging
+
 from lightly.loss.memory_bank import MemoryBankModule
 from lightly.models.utils import update_momentum
-
-from plato.trainers import basic_ssl
 from lightly.utils.scheduler import cosine_schedule
 
 from plato.config import Config
+from plato.utils.filename_formatter import NameFormatter
+from plato.trainers import basic_ssl
+from plato.utils import checkpoint_operator
 
 
 class Trainer(basic_ssl.Trainer):
@@ -84,3 +87,71 @@ class Trainer(basic_ssl.Trainer):
 
         # update the local iteration
         self.model.n_iteration = batch
+
+    def rollback_memory_bank(self, config):
+        """Load the memory bank."""
+        desired_round = self.current_round - 1
+        checkpoint_dir_path = self.get_checkpoint_dir_path()
+        filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
+            client_id=self.client_id,
+            checkpoints_dir=checkpoint_dir_path,
+            model_name="memory_bank",
+            current_round=desired_round,
+            run_id=None,
+            epoch=None,
+            prefix="personalized",
+            anchor_metric="round",
+            mask_words=["epoch"],
+            use_latest=True,
+        )
+        if filename is not None:  
+            rollback_status = ckpt_oper.load_checkpoint(checkpoint_name=filename)
+            memory_bank_status = rollback_status["model"]
+            self.memory_bank.bank = memory_bank_status["bank"]
+            self.memory_bank.bank_ptr = memory_bank_status["bank_ptr"]
+            logging.info(
+                "[Client #%d] Rolled back the Memory Bank from %s under %s.",
+                self.client_id,
+                filename,
+                checkpoint_dir_path,
+            )
+
+    def save_memory_bank(self, config):
+        """Save the memory bank locally."""
+        current_round = self.current_round
+
+        save_location = self.get_checkpoint_dir_path()
+        filename = NameFormatter.get_format_name(
+            client_id=self.client_id,
+            model_name="memory_bank",
+            round_n=current_round,
+            run_id=None,
+            prefix="personalized",
+            ext="pth",
+        )
+        ckpt_oper = checkpoint_operator.CheckpointsOperator(
+            checkpoints_dir=save_location
+        )
+        ckpt_oper.save_checkpoint(
+            model_state_dict={
+                "bank": self.memory_bank.bank,
+                "bank_ptr": self.memory_bank.bank_ptr,
+            },
+            checkpoints_name=[filename],
+        )
+
+        logging.info(
+            "[Client #%d] Saved Memory Bank model to %s under %s.",
+            self.client_id,
+            filename,
+            save_location,
+        )
+
+    def train_run_start(self, config):
+        super().train_run_start(config)
+        self.rollback_memory_bank(config)
+
+    def train_run_end(self, config):
+        super().train_run_end(config)
+
+        self.save_memory_bank(config)
