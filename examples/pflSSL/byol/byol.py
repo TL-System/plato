@@ -22,8 +22,6 @@ from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
-from lightly.loss import NegativeCosineSimilarity
-
 class Trainer(basic_ssl.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
 

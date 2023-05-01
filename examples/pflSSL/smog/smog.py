@@ -1,11 +1,10 @@
 """
-The implementation for the BYOL [1] method.
+The implementation for the SMoG [1] method.
 
-[1]. Jean-Bastien Grill, et.al, Bootstrap Your Own Latent A New Approach to Self-Supervised Learning.
-https://arxiv.org/pdf/2006.07733.pdf.
+[1]. Bo Pang, et.al, Unsupervised Visual Representation Learning by Synchronous Momentum Grouping.
+ECCV, 2022. https://arxiv.org/pdf/2006.07733.pdf.
 
-Source code: https://github.com/lucidrains/byol-pytorch
-The third-party code: https://github.com/sthalles/PyTorch-BYOL
+Source code: None
 """
 import copy
 
@@ -72,10 +71,15 @@ class SMoGModel(nn.Module):
         deactivate_requires_grad(self.encoder_momentum)
         deactivate_requires_grad(self.projection_head_momentum)
 
-        self.n_groups = 300
+        self.n_groups = Config().trainer.n_groups
+        n_prototypes = Config().trainer.n_prototypes
+        beta = Config().trainer.smog_beta
         self.smog = SMoGPrototypes(
-            group_features=torch.rand(self.n_groups, 128), beta=0.99
+            group_features=torch.rand(self.n_groups, n_prototypes), beta=beta
         )
+ 
+        # current iteration
+        self.n_iteration = 0
 
     def _cluster_features(self, features: torch.Tensor) -> torch.Tensor:
         # clusters the features using sklearn
@@ -112,6 +116,11 @@ class SMoGModel(nn.Module):
 
     def forward(self, multiview_samples):
         samples1, samples2 = multiview_samples
+
+        if self.n_iteration % 2:
+            # swap batches every two iterations
+            samples2, samples1 = samples1, samples2
+
         samples1_encoded, samples1_predicted = self.forward_direct(samples1)
 
         samples2_encoded = self.forward_momentum(samples2)
@@ -119,10 +128,12 @@ class SMoGModel(nn.Module):
         # update group features and get group assignments
         assignments = self.smog.assign_groups(samples2_encoded)
         group_features = self.smog.get_updated_group_features(samples1_encoded)
-        logits = self.smog(samples1_predicted, group_features, temperature=self.temperature)
+        logits = self.smog(
+            samples1_predicted, group_features, temperature=self.temperature
+        )
         self.smog.set_group_features(group_features)
 
-        return logits, assignments
+        return logits, assignments, samples1_encoded
 
 
 def main():
