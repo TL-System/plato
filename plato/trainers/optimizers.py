@@ -27,7 +27,7 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         "RMSprop": optim.RMSprop,
         "Rprop": optim.Rprop,
         "SGD": optim.SGD,
-        "LARS": timm_optim.lars
+        "LARS": timm_optim.lars.Lars,
     }
 
     optimizer_name = (
