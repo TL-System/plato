@@ -80,7 +80,7 @@ trainer:
     batch_size: 32
     optimizer: SGD
     lr_scheduler: MultiStepLR
-    loss_criterion: NTXentLoss
+    loss_criterion: NegativeCosineSimilarity
 
     # Number of epochs for local training in each communication round
     #   The batch size for the downstream task can be larger as it
@@ -141,7 +141,7 @@ parameters:
         step_size: 10
 
     loss_criterion:
-        temperature: 0.2
+        eps: 1.0E-8
 
     personalized_loss_criterion:
         label_smoothing: 0.5
