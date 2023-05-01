@@ -48,9 +48,9 @@ class SimCLR(torch.nn.Module):
             self.encoding_dim, projection_hidden_dim, projection_out_dim
         )
 
-    def forward(self, augmented_samples):
+    def forward(self, multiview_samples):
         """Forward two batch of contrastive samples."""
-        samples1, samples2 = augmented_samples
+        samples1, samples2 = multiview_samples
         encoded_h1 = self.encoder(samples1)
         encoded_h2 = self.encoder(samples2)
 

@@ -357,6 +357,33 @@ A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/20
 ```
 ````
 
+````{admonition} **pFLSSL**
+pFLSSL achieves Personalized federated learning by introducing self-supervised learning (SSL) to the training schema. Specifically, there are two stages. In this first stage, one global model is trained based on SSL under the federated training paradigm. Each client, in the second stage, trains its personalized model based on the extracted features of the received global model. Therefore, due to the diversity of SSL approaches, pFLSSL includes:
+- SimCLR [1]
+- BYOL [2]
+
+```shell
+python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/byol/byol.py -c examples/pflSSL/byol/byol_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+[1]. Ting Chen, et.al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
+
+[2]. Jean-Bastien Grill, et.al, &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
+
+```
+````
+
+
+
 ````{admonition} **SysHeteroFL**
 In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
 
