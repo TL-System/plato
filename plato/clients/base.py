@@ -18,6 +18,7 @@ from plato.callbacks.client import LogProgressCallback
 from plato.config import Config
 from plato.utils import s3
 
+
 # pylint: disable=unused-argument, protected-access
 class ClientEvents(socketio.AsyncClientNamespace):
     """A custom namespace for socketio.AsyncServer."""
@@ -347,7 +348,7 @@ class Client:
 
     async def _send_in_chunks(self, data) -> None:
         """Sending a bytes object in fixed-sized chunks to the client."""
-        step = 1024 ** 2
+        step = 1024**2
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
 
         for chunk in chunks:

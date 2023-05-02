@@ -86,7 +86,7 @@ class Trainer(basic.Trainer):
                 self.full_labels = labels
 
             self.full_onehot_labels = label_to_onehot(
-                self.full_labels, num_classes=Config().trainer.num_classes
+                self.full_labels, num_classes=Config().parameters.model.num_classes
             )
 
         examples.requires_grad = True
@@ -215,7 +215,7 @@ class Trainer(basic.Trainer):
             grad = tuple(self.list_grad)
 
         # Update model weights with gradients and learning rate
-        for (param, grad_part) in zip(self.model.parameters(), grad):
+        for param, grad_part in zip(self.model.parameters(), grad):
             param.data = param.data - Config().parameters.optimizer.lr * grad_part
 
         # Sum up the gradients for each local update
