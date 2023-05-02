@@ -149,6 +149,7 @@ class Client(base.Client):
             if hasattr(self.trainer, "current_round"):
                 self.trainer.current_round = self.current_round
             training_time = self.trainer.train(self.trainset, self.sampler)
+
         except ValueError as exc:
             logging.info(
                 fonts.colourize(f"[{self}] Error occurred during training: {exc}")
@@ -167,6 +168,11 @@ class Client(base.Client):
 
             if accuracy == -1:
                 # The testing process failed, disconnect from the server
+                logging.info(
+                    fonts.colourize(
+                        f"[{self}] Accuracy is -1 when testing. Disconnecting from the server."
+                    )
+                )
                 await self.sio.disconnect()
 
             if hasattr(Config().trainer, "target_perplexity"):
