@@ -22,8 +22,6 @@ from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
-from lightly.loss import NegativeCosineSimilarity
-
 class Trainer(basic_ssl.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
 
@@ -81,7 +79,7 @@ class BYOL(nn.Module):
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
 
-        # define the encoder based on the model_name in config
+        # define the encoder
         self.encoder = (
             encoder
             if encoder is not None
