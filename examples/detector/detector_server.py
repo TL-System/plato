@@ -33,11 +33,13 @@ class Server(fedavg.Server):
         """Initialize defence related parameter"""
         super().configure()
 
-        self.attacker_list = Config().clients.attacker_ids
+        self.attacker_list = [
+            int(value) for value in Config().clients.attacker_ids.split(",")
+        ]
         self.attack_type = Config().clients.attack_type
 
-        logging.info(f"self.attacker_ids: ", self.attacker_list)
-        logging.info(f"attack_type: ", self.attack_type)
+        logging.info(f"self.attacker_ids: %s", self.attacker_list)
+        logging.info(f"attack_type: %s", self.attack_type)
 
     def choose_clients(self, clients_pool, clients_count):
         selected_clients = super().choose_clients(clients_pool, clients_count)
@@ -56,20 +58,17 @@ class Server(fedavg.Server):
         """
         Attacker server performs attack based on malicious clients' reports and aggregation server defences attacks.
         """
-        logging.info(f"in the weights_received function.")
         # Simulate the attacker server to perform model poisoning. Note that the attack server only accesses to malicious clients' updates.
-        weights_attacked = self.model_poisoning(weights_received, self.updates)
+        weights_attacked = self.weights_attacked(weights_received)
 
         # Simulate the aggregation server to filter out poisoned reports before performing aggregation.
         weights_approved = self.weights_filter(weights_attacked)
 
         return weights_approved
 
-    def model_poisoning(self, weights_received, updates):
+    def weights_attacked(self, weights_received):
         # Extract attackers' updates
-        logging.info(f"in the weights_attacked function")
         attacker_weights = []
-
         for weight, update in zip(weights_received, self.updates):
             if update.client_id in self.attacker_list:
                 attacker_weights.append(weight)
@@ -79,6 +78,7 @@ class Server(fedavg.Server):
         weights_attacked = attack(
             attacker_weights
         )  # weights and updates are different, think about which is more convenient?
+        # logging.info("what is in weights_attacked: %d", len(weights_attacked))
 
         return weights_attacked
 
@@ -87,10 +87,11 @@ class Server(fedavg.Server):
         # Identify poisoned updates and remove it from all received updates.
         defence = defence_registry.get()
 
-        weights_approved, attackers_detected = defence(weights_attacked)
+        weights_approved = defence(weights_attacked)
+        # get a balck list for attackers_detected this round
 
         # Remove identified attacker from clients pool. Never select that client again.
-        for attacker in attackers_detected:
-            self.clients_pool.remove(attacker)
+        # for attacker in attackers_detected:
+        #    self.clients_pool.remove(attacker)
 
         return weights_approved
