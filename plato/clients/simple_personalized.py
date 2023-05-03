@@ -14,6 +14,7 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.utils import fonts
 from plato.utils.filename_formatter import NameFormatter
+from plato.trainers import registry as trainers_registry
 
 
 class Client(simple.Client):
@@ -27,6 +28,8 @@ class Client(simple.Client):
         trainer=None,
         callbacks=None,
         personalized_model=None,
+        personalized_trainer=None,
+        personalized_trainer_callbacks=None,
     ):
         # pylint:disable=too-many-arguments
         super().__init__(
@@ -41,6 +44,12 @@ class Client(simple.Client):
         # personal needs.
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
+
+        # the personalized trainer
+        self.custom_personalized_trainer = personalized_trainer
+        self.personalized_trainer = None
+
+        self.personalized_trainer_callbacks = personalized_trainer_callbacks
 
         # the learning model to be performed in this client
         # by default, performing `normal` fl's local update
@@ -100,10 +109,32 @@ class Client(simple.Client):
             self.personalized_model = self.custom_personalized_model()
 
         logging.info(
-            "[Client #%d] defines the personalized model: %s",
+            "[Client #%d] defined the personalized model: %s",
             self.client_id,
             pers_model_name,
         )
+        logging.info(
+            "[Client #%d] defines the personalized trainer. %s", self.client_id
+        )
+        if (
+            self.personalized_trainer is None
+            and self.custom_personalized_trainer is None
+        ):
+            self.personalized_trainer = trainers_registry.get(
+                model=self.personalized_model,
+                callbacks=self.personalized_trainer_callbacks,
+                type=Config().trainer.personalized_type,
+            )
+        elif (
+            self.personalized_trainer is None
+            and self.custom_personalized_trainer is not None
+        ):
+            self.personalized_trainer = self.custom_personalized_trainer(
+                model=self.personalized_model,
+                callbacks=self.personalized_trainer_callbacks,
+            )
+
+        self.personalized_trainer.set_client_id(self.client_id)
 
         # assign the client's personalized model to its trainer
         # we need to know that in Plato, the personalized model here

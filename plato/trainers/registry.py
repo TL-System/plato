@@ -34,16 +34,21 @@ else:
     }
 
 
-def get(model=None, callbacks=None):
+def get(model=None, callbacks=None, **kwargs):
     """Get the trainer with the provided name."""
-    trainer_name = Config().trainer.type
+
+    trainer_name = kwargs["type"] if "type" in kwargs else Config().trainer.type
+    model_name = (
+        kwargs["model_name"] if "model_name" in kwargs else Config().trainer.model_name
+    )
+
     logging.info("Trainer: %s", trainer_name)
 
-    if Config().trainer.model_name == "yolov5":
+    if model_name == "yolov5":
         from plato.trainers import yolov5
 
         return yolov5.Trainer()
-    elif Config().trainer.type == "HuggingFace":
+    elif trainer_name == "HuggingFace":
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)
