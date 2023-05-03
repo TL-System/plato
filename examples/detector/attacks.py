@@ -62,11 +62,6 @@ def lie_attack(weights_received):
     total_clients = Config().clients.total_clients
     num_attackers = len(Config().clients.attacker_ids)
 
-    name_list = []
-    # logging.info(f" what in weights_received: %s", weights_received)
-    for name in weights_received[0].keys():  # [0].items():
-        name_list.append(name)
-
     attacker_grads = []
     # attacker_ids = []
 
@@ -76,7 +71,7 @@ def lie_attack(weights_received):
         delta_vector = []
         # attacker_ids.append(client_id)
         # delta_received = deltas_received[tmp_index]
-        for name in name_list:
+        for name in weight_received.keys():
             delta_vector = (
                 weight_received[name].view(-1)
                 if not len(delta_vector)
@@ -125,14 +120,10 @@ def min_max(weights_received, dev_type="unit_vec"):
         2. benign clients' updates are unknown to the attacker
     """
 
-    name_list = []
-    for name in weights_received[0].keys():
-        name_list.append(name)
-
     attacker_grads = []
     for weight_received in weights_received:
         delta_vector = []
-        for name in name_list:
+        for name in weight_received.keys():
             delta_vector = (
                 weight_received[name].view(-1)
                 if not len(delta_vector)
@@ -215,14 +206,10 @@ def min_sum(weights_received, dev_type="unit_vec"):
         2. benign clients' updates are unknown to the attacker
     """
 
-    name_list = []
-    for name in weights_received[0].keys():
-        name_list.append(name)
-
     attacker_grads = []
     for weight_received in weights_received:
         delta_vector = []
-        for name in name_list:
+        for name in weight_received.keys():
             delta_vector = (
                 weight_received[name].view(-1)
                 if not len(delta_vector)
