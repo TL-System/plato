@@ -11,7 +11,7 @@ Third-part code: https://github.com/lgcollins/FedRep
 
 import logging
 
-from examples.pfl.bases import simple_personalized
+from ..bases import simple_personalized
 
 
 class Client(simple_personalized.Client):
