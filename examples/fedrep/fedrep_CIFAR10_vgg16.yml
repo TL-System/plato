@@ -15,7 +15,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8000
     do_test: false
     random_seed: 1
 
@@ -32,10 +32,10 @@ data:
     # IID or non-IID?
     sampler: noniid
 
+    testset_sampler: noniid
+
     # The concentration parameter for the Dirichlet distribution
     concentration: 1
-
-    testset_sampler: noniid
 
     # The random seed for sampling data
     random_seed: 1
@@ -51,7 +51,7 @@ trainer:
     max_concurrency: 7
 
     # The target accuracy
-    target_accuracy: 0.87
+    target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
     epochs: 10
@@ -62,7 +62,7 @@ trainer:
     head_epochs: 9
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: vgg_16
     num_classes: 10
 
 algorithm:

@@ -20,18 +20,6 @@ class CheckpointTest(unittest.TestCase):
         self.model = models_registry.get()
         self.optimizer = optimizers.get(self.model)
 
-        # 2. define the personalized model to be normal resnet
-        self.personalized_model = models_registry.get(
-            model_type=Config().trainer.personalized_model_type,
-            model_name=Config().trainer.personalized_model_name,
-            model_params=Config().parameters.personalized_model._asdict(),
-        )
-        self.personalized_optimizer = optimizers.get(
-            self.personalized_model,
-            optimizer_name=Config().trainer.personalized_optimizer,
-            optimizer_params=Config().parameters.personalized_optimizer._asdict(),
-        )
-
     def test_checkpoint_saving(self):
         """Test operations for checkpoint saving."""
         ckp_operator = checkpoint_operator.CheckpointsOperator(
@@ -42,13 +30,8 @@ class CheckpointTest(unittest.TestCase):
             checkpoints_name=["model.pth", "checkpoint.pth"],
             optimizer_state_dict=self.optimizer.state_dict(),
         )
-        ckp_operator.save_checkpoint(
-            self.personalized_model.state_dict(),
-            checkpoints_name=["personalized_model.pth", "personalized_checkpoint.pth"],
-            optimizer_state_dict=self.personalized_optimizer.state_dict(),
-        )
+
         ckp_operator.load_checkpoint(checkpoint_name="model.pth")
-        ckp_operator.load_checkpoint(checkpoint_name="personalized_model.pth")
 
     def test_clients_checkpoint_saving(self):
         """Test operations for clients' checkpoint saving."""

@@ -1,6 +1,8 @@
 """
 A federated learning client using SCAFFOLD.
 
+The personalized federated learning of SCAFFOLD has been supported.
+
 Reference:
 
 Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
@@ -23,12 +25,7 @@ class Client(simple.Client):
     and client control variate."""
 
     def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
         super().__init__(
             model=model,
