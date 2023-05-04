@@ -11,73 +11,49 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 
-
-import logging
-
-from plato.config import Config
-from plato.utils import fonts
+from plato.clients import simple
 
 
-class Client(simple_personalized.Client):
-    """A FedBABU federated learning client."""
+class Client(simple.Client):
+    """A personalized federated learning client using the FedRep algorithm."""
 
-    def _load_payload(self, server_payload) -> None:
-        """Load the server model onto this client.
-
-        Each client will
-        1. recevie the global model (body)
-        2. load the personalized locally
-        The received body and the extracted head of personalized mdoel
-        will be combined to be assigned to the self.model for federated
-        training.
-        """
-        logging.info(
-            "[Client #%d] Received the global model (body) containing modules: %s.",
-            self.client_id,
-            self.algorithm.extract_modules_name(list(server_payload.keys())),
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        # pylint:disable=too-many-arguments
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
         )
 
-        # in FedBABU, the head of one model is not trained during the federated
-        # training stage, thus every time the client is selected, the initial
-        # personalized model will be loaded to be assigned to the self.model
-        # for federated training.
-        self.persist_initial_personalized_model()
-        # load the personalized model.
-        self.load_personalized_model()
+        # parameter names of the representation
+        #   As mentioned by Eq. 1 and Fig. 2 of the paper, the representation
+        #   behaves as the global model.
+        self.representation_param_names = []
 
-        # get the `head` from the personalized model head
-        head_modules_name = Config().trainer.head_modules_name
-        model_head_params = self.algorithm.extract_weights(
-            model=self.personalized_model, modules_name=head_modules_name
-        )
-        logging.info(
-            "[Client #%d] Extracted head modules: %s from its loaded personalized model.",
-            self.client_id,
-            self.algorithm.extract_modules_name(list(model_head_params.keys())),
-        )
-        server_payload.update(model_head_params)
-        logging.info(
-            "[Client #%d] Combined head modules to received modules.", self.client_id
+    def process_server_response(self, server_response) -> None:
+        """Additional client-specific processing on the server response."""
+        super().process_server_response(server_response)
+
+        # obtain the representation sent by the server
+        self.representation_param_names = server_response["representation_param_names"]
+
+        # The trainer responsible for optimizing the model should know
+        # which part parameters behave as the representation and which
+        # part of the parameters behave as the head. The main reason is
+        # that the head is optimized in the 'Client Update' while the
+        # representation is optimized in the 'Server Update', as mentioned
+        # in Section 3 of the FedRep paper.
+        self.trainer.set_representation_and_head(
+            representation_param_names=self.representation_param_names
         )
 
-        # therefore, everytime the client performs local update, the head of its initial
-        # personalized model is assigned to the self.model, making:
-        # the final global parameter and the initialized global parameter have the
-        # same head parameter. See page 6 of the paper.
-        # load the model
-        self.algorithm.load_weights(server_payload)
-
-        if self.is_personalized_learn() and self.personalized_model is not None:
-            # during the personalized learning, the received global modules will be
-            # assigned to the self.personalized_model
-            # the updated `server_payload` can be directly used here because this
-            # the combination of the received global modules and the head of its
-            # personalized model.
-            self.personalized_model.load_state_dict(server_payload, strict=True)
-            logging.info(
-                fonts.colourize(
-                    "[Client #%d] Assigned received global modules to its personalized model.",
-                    colour="blue",
-                ),
-                self.client_id,
-            )
+        # The algorithm only operates on the representation without
+        # considering the head as the head is solely known by each client
+        # because of personalization.
+        self.algorithm.set_representation_param_names(
+            representation_param_names=self.representation_param_names
+        )

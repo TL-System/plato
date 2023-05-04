@@ -1,8 +1,6 @@
 """
 A federated learning client using SCAFFOLD.
 
-The personalized federated learning of SCAFFOLD has been supported.
-
 Reference:
 
 Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
@@ -18,15 +16,15 @@ import pickle
 import torch
 
 from plato.config import Config
-from plato.trainers import basic_personalized
+from plato.trainers import basic
 
 
-class Trainer(basic_personalized.Trainer):
+class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
 
-    def __init__(self, model=None, callbacks=None):
+    def __init__(self, model=None):
         """Initializing the trainer with the provided model."""
-        super().__init__(model, callbacks=None)
+        super().__init__(model)
 
         self.server_control_variate = None
         self.client_control_variate = None

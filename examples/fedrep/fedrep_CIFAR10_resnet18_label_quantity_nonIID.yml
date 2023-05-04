@@ -15,7 +15,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8000
     do_test: false
     random_seed: 1
 
@@ -30,12 +30,13 @@ data:
     partition_size: 600
 
     # IID or non-IID?
-    sampler: noniid
+    sampler: label_quantity_noniid
+    per_client_classes_size: 2
 
     # The concentration parameter for the Dirichlet distribution
     concentration: 1
 
-    testset_sampler: noniid
+    testset_sampler: label_quantity_noniid
 
     # The random seed for sampling data
     random_seed: 1
