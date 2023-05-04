@@ -14,7 +14,7 @@ import torch
 
 from lightly.models.modules.heads import SimCLRProjectionHead
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config

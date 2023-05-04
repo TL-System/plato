@@ -14,7 +14,7 @@ Source code: https://github.com/lgcollins/FedRep
 import fedrep_trainer
 import fedrep_client
 
-from plato.servers.fedavg_personalized import Server
+from examples.pfl.bases.fedavg_personalized import Server
 
 
 def main():

@@ -12,7 +12,7 @@ from torch import nn
 
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 from plato.trainers import basic_ssl
 from examples.pfl.bases import simple_ssl
 from plato.trainers import loss_criterion

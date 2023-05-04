@@ -14,7 +14,7 @@ Third-part code: https://github.com/jhoon-oh/FedBABU
 import perfedavg_trainer
 import perfedavg_client
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 
 
 def main():

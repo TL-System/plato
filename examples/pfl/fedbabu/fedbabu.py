@@ -12,7 +12,7 @@ Source code: https://github.com/jhoon-oh/FedBABU
 from fedbabu_trainer import Trainer
 from fedbabu_client import Client
 
-from plato.servers.fedavg_personalized import Server
+from examples.pfl.bases.fedavg_personalized import Server
 
 
 def main():

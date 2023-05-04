@@ -10,7 +10,7 @@ Source code: https://github.com/facebookresearch/swav
 from torch import nn
 from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 from plato.trainers import basic_ssl
 from examples.pfl.bases import simple_ssl
 from plato.models.cnn_encoder import Model as encoder_registry

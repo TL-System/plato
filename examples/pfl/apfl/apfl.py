@@ -16,7 +16,7 @@ Third-part code:
 
 import apfl_trainer
 import apfl_client
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 
 
 def main():

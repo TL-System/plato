@@ -13,7 +13,7 @@ https://arxiv.org/pdf/1910.06378.pdf
 from collections import OrderedDict
 
 from plato.config import Config
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 
 
 class Server(fedavg_personalized.Server):

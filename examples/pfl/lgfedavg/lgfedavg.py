@@ -12,7 +12,7 @@ Official code: https://github.com/pliang279/LG-FedAvg
 import lgfedavg_trainer
 import lgfedavg_client
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 
 
 def main():

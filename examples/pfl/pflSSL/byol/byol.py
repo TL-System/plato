@@ -14,7 +14,7 @@ from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
 from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 from plato.trainers import basic_ssl
 from examples.pfl.bases import simple_ssl
 from plato.trainers import loss_criterion

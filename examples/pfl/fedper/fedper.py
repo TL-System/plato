@@ -11,7 +11,7 @@ Third-part code: https://github.com/jhoon-oh/FedBABU
 import fedper_client
 import fedper_trainer
 
-from plato.servers.fedavg_personalized import Server
+from examples.pfl.bases.fedavg_personalized import Server
 
 
 def main():

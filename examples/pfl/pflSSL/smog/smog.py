@@ -19,7 +19,7 @@ from lightly.models.modules.heads import (
 from lightly.models.utils import deactivate_requires_grad
 
 
-from plato.servers import fedavg_personalized
+from examples.pfl.bases import fedavg_personalized
 from examples.pfl.bases import simple_ssl
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
