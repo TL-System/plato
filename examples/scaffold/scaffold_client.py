@@ -16,7 +16,7 @@ import os
 
 import pickle
 
-from plato.clients import simple_personalized
+from examples.pfl.bases import simple_personalized
 from plato.config import Config
 from plato.utils import fonts
 

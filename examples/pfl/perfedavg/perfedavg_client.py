@@ -12,7 +12,7 @@ Third-part code: https://github.com/jhoon-oh/FedBABU
 
 """
 
-from plato.clients import simple_personalized
+from ..bases import simple_personalized
 
 
 class Client(simple_personalized.Client):

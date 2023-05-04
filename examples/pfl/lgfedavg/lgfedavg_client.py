@@ -12,7 +12,7 @@ Official code: https://github.com/pliang279/LG-FedAvg
 
 import logging
 
-from plato.clients import simple_personalized
+from examples.pfl.bases import simple_personalized
 from plato.config import Config
 from plato.utils import fonts
 

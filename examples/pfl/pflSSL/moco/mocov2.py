@@ -22,7 +22,7 @@ from lightly.utils.scheduler import cosine_schedule
 
 from plato.servers import fedavg_personalized
 from plato.trainers import basic_ssl
-from plato.clients import simple_ssl
+from examples.pfl.bases import simple_ssl
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 

@@ -14,7 +14,6 @@ Source code: https://github.com/lgcollins/FedRep
 
 import logging
 
-from plato.clients import simple_personalized
 from plato.config import Config
 from plato.utils import fonts
 
