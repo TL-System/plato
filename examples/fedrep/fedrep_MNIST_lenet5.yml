@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 100
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 40
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -15,16 +15,16 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8003
     do_test: false
     random_seed: 1
 
-    checkpoint_path: models/fedrep/cifar10
-    model_path: models/fedrep/cifar10
+    checkpoint_path: models/fedrep/mnist
+    model_path: models/fedrep/mnist
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: MNIST
 
     # Number of samples in each partition
     partition_size: 600
@@ -33,7 +33,7 @@ data:
     sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 1
+    concentration: 5
 
     testset_sampler: noniid
 
@@ -48,10 +48,10 @@ trainer:
     rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 7
+    max_concurrency: 10
 
     # The target accuracy
-    target_accuracy: 0.87
+    target_accuracy: 0.98
 
     # Number of epochs for local training in each communication round
     epochs: 10
@@ -62,7 +62,7 @@ trainer:
     head_epochs: 9
 
     # The machine learning model
-    model_name: resnet_18
+    model_name: lenet5
     num_classes: 10
 
 algorithm:

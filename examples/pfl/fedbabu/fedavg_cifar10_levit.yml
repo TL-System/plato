@@ -1,0 +1,113 @@
+clients:
+
+    # The total number of clients
+    total_clients: 10
+
+    # The number of clients selected in each round
+    per_round: 3
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+    # the ratio of clients participanting in training
+    participant_clients_ratio: 0.5
+    
+    # whether maintain and load the trained 
+    # personalied model
+    # set to be true, each client will load
+    # the latest trained personalized model
+    persist_personalized_model: False
+
+server:
+    address: 127.0.0.1
+    port: 8005
+    simulate_wall_time: false
+
+    do_test: false
+    
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 5000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+
+
+    # The maximum number of training rounds
+    rounds: 30
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 64
+    optimizer: AdamW
+    lr_scheduler: CosineAnnealingLR
+    global_lr_scheduler: true
+
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    personalized_epochs: 10
+    personalized_batch_size: 32
+    personalized_optimizer: SGD
+    personalized_lr_scheduler: StepLR
+    personalized_loss_criterion: CrossEntropyLoss
+
+    pers_epoch_log_interval: 2
+
+    # The machine learning model
+    model_type: vit
+    model_name: facebook@levit-128
+    personalized_model_type: vit
+    personalized_model_name: facebook@levit-128
+
+    global_modules_name:
+        - patch_embeddings
+        - encoder
+
+    head_modules_name:
+        - classifier
+
+    frozen_modules_name:
+        - patch_embeddings
+        - encoder
+
+    frozen_personalized_modules_name:
+        - features
+
+    module_level: 3
+
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg_partial
+
+parameters:
+    model:
+        num_labels: 10
+        pretrained: false
+
+    optimizer:
+        lr: 0.00004
+        weight_decay: 0.00000001
+
+    learning_rate:
+        eta_min: 0
+        T_max: 30
+
+    model:
+        num_classes: 10
+
+    personalized_model:
+        num_classes: 10

@@ -18,18 +18,6 @@ class ModelsTest(unittest.TestCase):
         self.model = models_registry.get()
         self.optimizer = optimizers.get(self.model)
 
-        # 2. define the personalized model to be normal resnet
-        self.personalized_model = models_registry.get(
-            model_type=Config().trainer.personalized_model_type,
-            model_name=Config().trainer.personalized_model_name,
-            model_params=Config().parameters.personalized_model._asdict(),
-        )
-        self.personalized_optimizer = optimizers.get(
-            self.personalized_model,
-            optimizer_name=Config().trainer.personalized_optimizer,
-            optimizer_params=Config().parameters.personalized_optimizer._asdict(),
-        )
-
     def test_model_config(self):
         """Test whether the models are defined based on the configuration files."""
         # test the defined models based on the
@@ -37,10 +25,6 @@ class ModelsTest(unittest.TestCase):
 
         # 1. whether the defined model is the encoder
         self.assertEqual(self.model.encoding_dim, 120)
-
-        # 2. test whether the defined personalized model is
-        # a normal resnet with output's dimension 'num_classes'
-        self.assertEqual(self.personalized_model.linear.out_features, 20)
 
 
 if __name__ == "__main__":

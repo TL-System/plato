@@ -18,7 +18,6 @@ elif hasattr(Config().trainer, "use_tensorflow"):
 else:
     from plato.trainers import (
         basic,
-        basic_personalized,
         diff_privacy,
         pascal_voc,
         gan,
@@ -26,7 +25,6 @@ else:
 
     registered_trainers = {
         "basic": basic.Trainer,
-        "basic_personalized": basic_personalized.Trainer,
         "timm_basic": basic.TrainerWithTimmScheduler,
         "diff_privacy": diff_privacy.Trainer,
         "pascal_voc": pascal_voc.Trainer,
