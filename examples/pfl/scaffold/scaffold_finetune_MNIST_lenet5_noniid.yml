@@ -1,6 +1,4 @@
 clients:
-    # Type
-    type: simple_personalized
 
     # The total number of clients
     total_clients: 10
@@ -21,16 +19,16 @@ clients:
     persist_personalized_model: False
 
 server:
-    type: fedavg_personalized
+
     address: 127.0.0.1
     port: 8000
 
     # do personalization 
     # for every `do_personalization_interval` rounds
     # set -1 to do personalized only after the final round
-    do_personalization_interval: -1
+    do_personalization_interval: 2
     # total, participant, nonparticipant
-    do_personalization_group: total
+    do_personalization_group: nonparticipant
 
 data:
     # The training and testing dataset
@@ -51,9 +49,6 @@ data:
     random_seed: 1
 
 trainer:
-    # The type of the trainer
-    type: basic_personalized
-    
 
     # The maximum number of training rounds
     rounds: 5
@@ -71,22 +66,20 @@ trainer:
     lr_scheduler: MultiStepLR
     loss_criterion: CrossEntropyLoss
 
+    # Number of epochs for local training in each communication round
+    #   The batch size for the downstream task can be larger as it
+    # does not utilize the
+    personalized_epochs: 10
+    personalized_batch_size: 32
+    personalized_optimizer: SGD
+    personalized_lr_scheduler: StepLR
+    personalized_loss_criterion: CrossEntropyLoss
+
+    pers_epoch_log_interval: 2
+
     # The machine learning model
     model_name: lenet5
-
-    personalized:
-        type: basic_personalized
-        # Number of epochs for local training in each communication round
-        #   The batch size for the downstream task can be larger as it
-        # does not utilize the
-        epochs: 10
-        batch_size: 12
-        optimizer: SGD
-        lr_scheduler: StepLR
-        loss_criterion: CrossEntropyLoss
-        model_name: lenet5
-
-    
+    personalized_model_name: lenet5
 
 algorithm:
     # Aggregation algorithm
@@ -94,34 +87,32 @@ algorithm:
 
 parameters:
     optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
+
+    personalized_optimizer:
         lr: 0.05
         momentum: 0.9
-        weight_decay: 0.000001
+        weight_decay: 0.0
 
     learning_rate:
         gamma: 0.1
         milestone_steps: 150ep,350ep
 
+    personalized_learning_rate:
+        gamma: 0.3
+        step_size: 10
+
     loss_criterion:
+        label_smoothing: 0.5
+
+    personalized_loss_criterion:
         label_smoothing: 0.5
 
     model:
         num_classes: 10
 
-    personalized:
-
-        optimizer:
-            lr: 0.1
-            momentum: 0.9
-            weight_decay: 0.0
-
-        learning_rate:
-            gamma: 0.3
-            step_size: 10
-
-        loss_criterion:
-            label_smoothing: 0.5
-
-        model:
-            num_classes: 10
+    personalized_model:
+        num_classes: 10
 
