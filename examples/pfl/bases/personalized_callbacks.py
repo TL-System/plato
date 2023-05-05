@@ -54,10 +54,9 @@ class ClientCallback(client.ClientCallback):
         """
         Event called before inbound processors start to process data.
 
-        Each client will refresh its personal variables.
+        Each client will process the payload data based on its
+        personal requirements.
         """
-        if client.is_personalized_learn() and client.personalized_model is not None:
-            client.load_personalized_model()
 
         # reload the personalized model saved locally from
         # previous round

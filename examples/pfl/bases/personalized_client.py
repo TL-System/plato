@@ -205,6 +205,11 @@ class Client(simple.Client):
         )
         return loaded_status
 
+    def inbound_received(self, inbound_processor):
+        """Reloading the personalized model for this client before any operations."""
+        if self.is_personalized_learn() and self.personalized_model is not None:
+            self.load_personalized_model()
+
     async def inbound_processed(
         self, processed_inbound_payload: Any
     ) -> Tuple[SimpleNamespace, Any]:
