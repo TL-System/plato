@@ -33,6 +33,43 @@ def get():
     raise ValueError(f"No such attack: {attack_type}")
 
 
+def perform_model_poisoning(weights_received, poison_value):
+    # Poison the reveiced weights based on calculated poison value.
+    weights_poisoned = []
+    for weight_received in weights_received:
+        start_index = 0
+        weight_poisoned = OrderedDict()
+
+        for name, weight in weight_received.items():
+            weight_poisoned[name] = poison_value[
+                start_index : start_index + len(weight.view(-1))
+            ].reshape(weight.shape)
+            start_index += len(weight.view(-1))
+
+        weights_poisoned.append(weight_poisoned)
+    return weights_poisoned
+
+
+def flatten_weights(weights):
+    flattened_weights = []
+
+    for weight in weights:
+        flattened_weight = []
+        for name in weight.keys():
+            flattened_weight = (
+                weight[name].view(-1)
+                if not len(flattened_weight)
+                else torch.cat((flattened_weight, weight[name].view(-1)))
+            )
+
+        flattened_weights = (
+            flattened_weight[None, :]
+            if not len(flattened_weights)
+            else torch.cat((flattened_weights, flattened_weight[None, :]), 0)
+        )
+    return flattened_weights
+
+
 def lie_attack(weights_received):
     """
     Attack name: Little is enough
@@ -47,47 +84,19 @@ def lie_attack(weights_received):
     total_clients = Config().clients.total_clients
     num_attackers = len(Config().clients.attacker_ids)
 
-    attacker_grads = []
-
-    for weight_received in weights_received:
-        delta_vector = []
-        for name in weight_received.keys():
-            delta_vector = (
-                weight_received[name].view(-1)
-                if not len(delta_vector)
-                else torch.cat((delta_vector, weight_received[name].view(-1)))
-            )
-
-        attacker_grads = (
-            delta_vector[None, :]
-            if not len(attacker_grads)
-            else torch.cat((attacker_grads, delta_vector[None, :]), 0)
-        )
+    attacker_weights = flatten_weights(weights_received)
 
     s_value = total_clients / 2 + 1 - num_attackers
     possibility = (total_clients - s_value) / total_clients
     z_value = norm.cdf(possibility)
 
     # calculate poisoning model
-    update_avg = torch.mean(attacker_grads, dim=0)
-    update_std = torch.std(attacker_grads, dim=0)
+    weights_avg = torch.mean(attacker_weights, dim=0)
+    weights_std = torch.std(attacker_weights, dim=0)
 
-    mal_update = update_avg + z_value * update_std
+    poison_value = weights_avg + z_value * weights_std
 
-    # perform model poisoning
-    weights_poisoned = []
-    for weight_received in weights_received:
-        start_index = 0
-        weight_poisoned = OrderedDict()
-
-        for name, weight in weight_received.items():
-
-            weight_poisoned[name] = mal_update[
-                start_index : start_index + len(weight.view(-1))
-            ].reshape(weight.shape)
-            start_index += len(weight.view(-1))
-
-        weights_poisoned.append(weight_poisoned)
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
 
     return weights_poisoned
 
@@ -102,25 +111,9 @@ def min_max(weights_received, dev_type="unit_vec"):
 
     https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
+    attacker_weights = flatten_weights(weights_received)
 
-    attacker_grads = []
-    for weight_received in weights_received:
-        delta_vector = []
-        for name in weight_received.keys():
-            delta_vector = (
-                weight_received[name].view(-1)
-                if not len(delta_vector)
-                else torch.cat((delta_vector, weight_received[name].view(-1)))
-            )
-
-        attacker_grads = (
-            delta_vector[None, :]
-            if not len(attacker_grads)
-            else torch.cat((attacker_grads, delta_vector[None, :]), 0)
-        )
-
-    agg_grads = torch.mean(attacker_grads, 0)
-
+    agg_grads = torch.mean(attacker_weights, 0)
     model_re = agg_grads
 
     if dev_type == "unit_vec":
@@ -128,7 +121,7 @@ def min_max(weights_received, dev_type="unit_vec"):
     elif dev_type == "sign":
         deviation = torch.sign(model_re)
     elif dev_type == "std":
-        deviation = torch.std(attacker_grads, 0)
+        deviation = torch.std(attacker_weights, 0)
 
     lamda = torch.Tensor([50.0]).float()
     threshold_diff = 1e-5
@@ -137,8 +130,8 @@ def min_max(weights_received, dev_type="unit_vec"):
 
     distances = []
 
-    for update in attacker_grads:
-        distance = torch.norm((attacker_grads - update), dim=1) ** 2
+    for attacker_weight in attacker_weights:
+        distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
         distances = (
             distance[None, :]
             if not len(distances)
@@ -149,12 +142,11 @@ def min_max(weights_received, dev_type="unit_vec"):
     del distances
 
     while torch.abs(lamda_succ - lamda) > threshold_diff:
-        mal_update = model_re - lamda * deviation
-        distance = torch.norm((attacker_grads - mal_update), dim=1) ** 2
+        poison_value = model_re - lamda * deviation
+        distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
         max_d = torch.max(distance)
 
         if max_d <= max_distance:
-            # print('successful lamda is ', lamda)
             lamda_succ = lamda
             lamda = lamda + lamda_fail / 2
         else:
@@ -162,22 +154,10 @@ def min_max(weights_received, dev_type="unit_vec"):
 
         lamda_fail = lamda_fail / 2
 
-    mal_update = model_re - lamda_succ * deviation
+    poison_value = model_re - lamda_succ * deviation
 
     # perform model poisoning
-    weights_poisoned = []
-    for weight_received in weights_received:
-        start_index = 0
-        weight_poisoned = OrderedDict()
-
-        for name, weight in weight_received.items():
-            weight_poisoned[name] = mal_update[
-                start_index : start_index + len(weight.view(-1))
-            ].reshape(weight.shape)
-            start_index += len(weight.view(-1))
-
-        weights_poisoned.append(weight_poisoned)
-
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
     return weights_poisoned
 
 
@@ -192,22 +172,9 @@ def min_sum(weights_received, dev_type="unit_vec"):
     https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
 
-    attacker_grads = []
-    for weight_received in weights_received:
-        delta_vector = []
-        for name in weight_received.keys():
-            delta_vector = (
-                weight_received[name].view(-1)
-                if not len(delta_vector)
-                else torch.cat((delta_vector, weight_received[name].view(-1)))
-            )
-        attacker_grads = (
-            delta_vector[None, :]
-            if not len(attacker_grads)
-            else torch.cat((attacker_grads, delta_vector[None, :]), 0)
-        )
+    attacker_weights = flatten_weights(weights_received)
 
-    agg_grads = torch.mean(attacker_grads, 0)
+    agg_grads = torch.mean(attacker_weights, 0)
 
     model_re = agg_grads
 
@@ -216,7 +183,7 @@ def min_sum(weights_received, dev_type="unit_vec"):
     elif dev_type == "sign":
         deviation = torch.sign(model_re)
     elif dev_type == "std":
-        deviation = torch.std(attacker_grads, 0)
+        deviation = torch.std(attacker_weights, 0)
 
     lamda = torch.Tensor([50.0]).float()
 
@@ -226,8 +193,8 @@ def min_sum(weights_received, dev_type="unit_vec"):
 
     distances = []
 
-    for update in attacker_grads:
-        distance = torch.norm((attacker_grads - update), dim=1) ** 2
+    for attacker_weight in attacker_weights:
+        distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
         distances = (
             distance[None, :]
             if not len(distances)
@@ -239,8 +206,8 @@ def min_sum(weights_received, dev_type="unit_vec"):
     del distances
 
     while torch.abs(lamda_succ - lamda) > threshold_diff:
-        mal_update = model_re - lamda * deviation
-        distance = torch.norm((attacker_grads - mal_update), dim=1) ** 2
+        poison_value = model_re - lamda * deviation
+        distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
         score = torch.sum(distance)
 
         if score <= min_score:
@@ -251,31 +218,19 @@ def min_sum(weights_received, dev_type="unit_vec"):
 
         lamda_fail = lamda_fail / 2
 
-    mal_update = model_re - lamda_succ * deviation
+    poison_value = model_re - lamda_succ * deviation
 
     # perform model poisoning
-    weights_poisoned = []
-    for weight_received in weights_received:
-        start_index = 0
-        weight_poisoned = OrderedDict()
-
-        for name, weight in weight_received.items():
-            weight_poisoned[name] = mal_update[
-                start_index : start_index + len(weight.view(-1))
-            ].reshape(weight.shape)
-            start_index += len(weight.view(-1))
-
-        weights_poisoned.append(weight_poisoned)
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
     return weights_poisoned
 
 
-def compute_lambda(all_updates, model_re, n_attackers):
+def compute_lambda(attacker_weights, model_re, num_attackers):
     """Compute lambda value for fang's attack"""
-
     distances = []
-    n_benign, d = all_updates.shape
-    for update in all_updates:
-        distance = torch.norm((all_updates - update), dim=1)
+    num_benign_clients, d = attacker_weights.shape  # ? total - num_attacker?
+    for update in attacker_weights:
+        distance = torch.norm((attacker_weights - update), dim=1)
         distances = (
             distance[None, :]
             if not len(distances)
@@ -284,26 +239,26 @@ def compute_lambda(all_updates, model_re, n_attackers):
 
     distances[distances == 0] = 10000
     distances = torch.sort(distances, dim=1)[0]
-    scores = torch.sum(distances[:, : n_benign - 2 - n_attackers], dim=1)
+    scores = torch.sum(distances[:, : num_benign_clients - 2 - num_attackers], dim=1)
     min_score = torch.min(scores)
     term_1 = min_score / (
-        (n_benign - n_attackers - 1) * torch.sqrt(torch.Tensor([d]))[0]
+        (num_benign_clients - num_attackers - 1) * torch.sqrt(torch.Tensor([d]))[0]
     )
-    max_wre_dist = torch.max(torch.norm((all_updates - model_re), dim=1)) / (
+    max_wre_dist = torch.max(torch.norm((attacker_weights - model_re), dim=1)) / (
         torch.sqrt(torch.Tensor([d]))[0]
     )
 
     return term_1 + max_wre_dist
 
 
-def multi_krum(all_updates, n_attackers, multi_k=False):
+def multi_krum(attacker_weights, num_attackers, multi_k=False):
     """multi krum defence method in secure server aggregation"""
     candidates = []
     candidate_indices = []
-    remaining_updates = all_updates
-    all_indices = np.arange(len(all_updates))
+    remaining_updates = attacker_weights
+    all_indices = np.arange(len(attacker_weights))
 
-    while len(remaining_updates) > 2 * n_attackers + 2:
+    while len(remaining_updates) > 2 * num_attackers + 2:
         distances = []
         for update in remaining_updates:
             distance = torch.norm((remaining_updates - update), dim=1) ** 2
@@ -315,9 +270,9 @@ def multi_krum(all_updates, n_attackers, multi_k=False):
 
         distances = torch.sort(distances, dim=1)[0]
         scores = torch.sum(
-            distances[:, : len(remaining_updates) - 2 - n_attackers], dim=1
+            distances[:, : len(remaining_updates) - 2 - num_attackers], dim=1
         )
-        indices = torch.argsort(scores)[: len(remaining_updates) - 2 - n_attackers]
+        indices = torch.argsort(scores)[: len(remaining_updates) - 2 - num_attackers]
 
         candidate_indices.append(all_indices[indices[0].cpu().numpy()])
         all_indices = np.delete(all_indices, indices[0].cpu().numpy())
@@ -346,37 +301,24 @@ def fang_attack(weights_received):
     https://arxiv.org/pdf/1911.11815.pdf
     """
     num_attackers = len(Config().clients.attacker_ids)
-    attacker_grads = []
 
-    for weight_received in weights_received:
-        delta_vector = []
-        for name in weight_received.keys():
-            delta_vector = (
-                weight_received[name].view(-1)
-                if not len(delta_vector)
-                else torch.cat((delta_vector, weight_received[name].view(-1)))
-            )
-        attacker_grads = (
-            delta_vector[None, :]
-            if not len(attacker_grads)
-            else torch.cat((attacker_grads, delta_vector[None, :]), 0)
-        )
+    attacker_weights = flatten_weights(weights_received)
 
-    agg_grads = torch.mean(attacker_grads, 0)
+    agg_grads = torch.mean(attacker_weights, 0)
     model_re = agg_grads
     deviation = torch.sign(agg_grads)
-    lamda = compute_lambda(attacker_grads, model_re, num_attackers)
+    lamda = compute_lambda(attacker_weights, model_re, num_attackers)
 
     threshold = 1e-5
-    mal_update = []
+    poison_value = []
 
     while lamda > threshold:
-        mal_update = -lamda * deviation
-        mal_updates = torch.stack([mal_update] * num_attackers)
-        mal_updates = torch.cat((mal_updates, attacker_grads), 0)
+        poison_value = -lamda * deviation
+        poison_values = torch.stack([poison_value] * num_attackers)
+        poison_values = torch.cat((poison_values, attacker_weights), 0)
 
         agg_grads, krum_candidate = multi_krum(
-            mal_updates, num_attackers, multi_k=False
+            poison_values, num_attackers, multi_k=False
         )
         if krum_candidate < num_attackers:
             # perform model poisoning
@@ -386,7 +328,7 @@ def fang_attack(weights_received):
                 weight_poisoned = OrderedDict()
 
                 for name, weight in weight_received.items():
-                    weight_poisoned[name] = mal_update[
+                    weight_poisoned[name] = poison_value[
                         start_index : start_index + len(weight.view(-1))
                     ].reshape(weight.shape)
                     start_index += len(weight.view(-1))
@@ -394,26 +336,15 @@ def fang_attack(weights_received):
                 weights_poisoned.append(weight_poisoned)
             return weights_poisoned
         else:
-            mal_update = []
+            poison_value = []
 
         lamda *= 0.5
 
-    if not len(mal_update):
-        mal_update = model_re - lamda * deviation
+    if not len(poison_value):
+        poison_value = model_re - lamda * deviation
 
     # perform model poisoning
-    weights_poisoned = []
-    for weight_received in weights_received:
-        start_index = 0
-        weight_poisoned = OrderedDict()
-
-        for name, weight in weight_received.items():
-            weight_poisoned[name] = mal_update[
-                start_index : start_index + len(weight.view(-1))
-            ].reshape(weight.shape)
-            start_index += len(weight.view(-1))
-
-        weights_poisoned.append(weight_poisoned)
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
     return weights_poisoned
 
 
