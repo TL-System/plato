@@ -37,15 +37,10 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        loss_criterion_type = (
-            Config().trainer.personalized_loss_criterion
-            if hasattr(Config.trainer, "personalized_loss_criterion")
-            else "CrossEntropyLoss"
-        )
+        loss_criterion_type = Config().algorithm.personalization.loss_criterion
+
         loss_criterion_params = (
-            Config().parameters.personalized_loss_criterion._asdict()
-            if hasattr(Config.parameters, "personalized_loss_criterion")
-            else {}
+            Config().parameters.personalization.loss_criterion._asdict()
         )
         return loss_criterion.get(
             loss_criterion=loss_criterion_type,
@@ -54,8 +49,8 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Returns the optimizer."""
-        optimizer_name = Config().trainer.personalized_optimizer
-        optimizer_params = Config().parameters.personalized_optimizer._asdict()
+        optimizer_name = Config().algorithm.personalization.optimizer
+        optimizer_params = Config().parameters.personalization.optimizer._asdict()
 
         return optimizers.get(
             model, optimizer_name=optimizer_name, optimizer_params=optimizer_params
@@ -63,15 +58,27 @@ class Trainer(basic.Trainer):
 
     def get_lr_scheduler(self, optimizer):
         """Returns the learning rate scheduler, if needed."""
-        lr_scheduler = Config().trainer.personalized_lr_scheduler
-        lr_params = Config().parameters.personalized_learning_rate._asdict()
+        lr_scheduler = Config().algorithm.personalization.lr_scheduler
+        lr_params = Config().parameters.personalization.learning_rate._asdict()
 
         return lr_schedulers.get(
             optimizer,
-            len(self.personalized_train_loader),
+            len(self.train_loader),
             lr_scheduler=lr_scheduler,
             lr_params=lr_params,
         )
+
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
+        """Obtain the batch size of personalization."""
+        personalized_config = Config().algorithm.personalization._asdict()
+        batch_size = personalized_config["batch_size"]
+        return super().get_train_loader(batch_size, trainset, sampler, **kwargs)
+
+    def train_run_start(self, config):
+        """Before running, convert the config to be ones for personalization."""
+        personalized_config = Config().algorithm.personalization._asdict()
+        config["batch_size"] = personalized_config["batch_size"]
+        config["epochs"] = personalized_config["epochs"]
 
     @staticmethod
     @torch.no_grad()
