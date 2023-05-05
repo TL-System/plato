@@ -11,9 +11,9 @@ import torch
 
 from plato.config import Config
 from plato.trainers import basic
-from plato.trainers import optimizers, lr_schedulers, loss_criterion, tracking
+from plato.trainers import optimizers, lr_schedulers, loss_criterion
 from plato.utils import checkpoint_operator
-from plato.utils.filename_formatter import NameFormatter
+from plato.models import registry as models_registry
 
 warnings.simplefilter("ignore")
 
@@ -24,11 +24,53 @@ class Trainer(basic.Trainer):
 
     def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
-        super().__init__(model=model, callbacks=callable)
+        super().__init__(model=model, callbacks=callbacks)
+
+        self.personalized_model = None
 
         # obtain the personalized model name
-        self.model_name = Config().algorithm.personalized.model_name
-        self.model_checkpointfile_prefix = "personalized"
+        self.personalized_model_name = Config().algorithm.personalization.model_name
+        self.personalized_model_checkpoint_prefix = "personalized"
+
+        # training mode
+        # the trainer should either perform the normal training
+        # or the personalized training
+        self.personalized_training = False
+
+    def set_training_mode(self, personalized_mode: bool):
+        """Set the learning model of this trainer.
+
+        The learning mode must be set by the client.
+        """
+        self.personalized_training = personalized_mode
+
+    def define_personalized_model(self, personalized_model):
+        """Define the personalized model to this trainer."""
+        if personalized_model is None:
+
+            pers_model_type = (
+                Config().algorithm.personalization.model_type
+                if hasattr(Config().algorithm.personalization, "model_type")
+                else self.personalized_model_name.split("_")[0]
+            )
+            pers_model_params = self.get_personalized_model_params()
+            self.personalized_model = models_registry.get(
+                model_name=self.personalized_model_name,
+                model_type=pers_model_type,
+                model_params=pers_model_params,
+            )
+        else:
+            self.personalized_model = personalized_model()
+
+        logging.info(
+            "[Client #%d] defined the personalized model: %s",
+            self.client_id,
+            self.personalized_model_name,
+        )
+
+    def get_personalized_model_params(self):
+        """Get the params of the personalized model."""
+        return Config().parameters.personalization.model._asdict()
 
     def get_checkpoint_dir_path(self):
         """Get the checkpoint path for current client."""
@@ -37,8 +79,10 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        loss_criterion_type = Config().algorithm.personalization.loss_criterion
+        if not self.personalized_training:
+            return super().get_loss_criterion()
 
+        loss_criterion_type = Config().algorithm.personalization.loss_criterion
         loss_criterion_params = (
             Config().parameters.personalization.loss_criterion._asdict()
         )
@@ -49,15 +93,23 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Returns the optimizer."""
+        if not self.personalized_training:
+            return super().get_optimizer(model)
+
         optimizer_name = Config().algorithm.personalization.optimizer
         optimizer_params = Config().parameters.personalization.optimizer._asdict()
 
         return optimizers.get(
-            model, optimizer_name=optimizer_name, optimizer_params=optimizer_params
+            self.personalized_model,
+            optimizer_name=optimizer_name,
+            optimizer_params=optimizer_params,
         )
 
     def get_lr_scheduler(self, optimizer):
         """Returns the learning rate scheduler, if needed."""
+        if not self.personalized_training:
+            return super().get_lr_scheduler(optimizer)
+
         lr_scheduler = Config().algorithm.personalization.lr_scheduler
         lr_params = Config().parameters.personalization.learning_rate._asdict()
 
@@ -70,15 +122,51 @@ class Trainer(basic.Trainer):
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the batch size of personalization."""
-        personalized_config = Config().algorithm.personalization._asdict()
-        batch_size = personalized_config["batch_size"]
+        batch_size = batch_size
+        if self.personalized_training:
+            personalized_config = Config().algorithm.personalization._asdict()
+            batch_size = personalized_config["batch_size"]
+
         return super().get_train_loader(batch_size, trainset, sampler, **kwargs)
 
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
-        personalized_config = Config().algorithm.personalization._asdict()
-        config["batch_size"] = personalized_config["batch_size"]
-        config["epochs"] = personalized_config["epochs"]
+        if self.personalized_training:
+            personalized_config = Config().algorithm.personalization._asdict()
+            config["batch_size"] = personalized_config["batch_size"]
+            config["epochs"] = personalized_config["epochs"]
+
+            self.personalized_model.to(self.device)
+            self.personalized_model.train()
+
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform forward and backward passes in the training loop.
+
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
+
+        Returns: loss values after the current batch has been processed.
+        """
+        self.optimizer.zero_grad()
+
+        if not self.personalized_training:
+            outputs = self.model(examples)
+        else:
+            outputs = self.personalized_model(examples)
+
+        loss = self._loss_criterion(outputs, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
 
     @staticmethod
     @torch.no_grad()
@@ -103,6 +191,8 @@ class Trainer(basic.Trainer):
     def rollback_model(
         self,
         rollback_round=None,
+        model_name=None,
+        modelfile_prefix=None,
         location=None,
     ):
         """Rollback the model to be the previously one.
@@ -112,10 +202,15 @@ class Trainer(basic.Trainer):
         rollback_round = (
             rollback_round if rollback_round is not None else self.current_round - 1
         )
-        model_name = self.model_name
-
+        model_name = (
+            model_name if model_name is not None else self.personalized_model_name
+        )
+        modelfile_prefix = (
+            modelfile_prefix
+            if modelfile_prefix is not None
+            else self.personalized_model_checkpoint_prefix
+        )
         location = location if location is not None else self.get_checkpoint_dir_path()
-        modelfile_prefix = self.model_checkpointfile_prefix
 
         filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
             client_id=self.client_id,
@@ -131,125 +226,26 @@ class Trainer(basic.Trainer):
         )
 
         rollback_status = ckpt_oper.load_checkpoint(checkpoint_name=filename)
-        self.model.load_state_dict(rollback_status["model"], strict=True)
-
         logging.info(
             "[Client #%d] Rolled back the model from %s under %s.",
             self.client_id,
             filename,
             location,
         )
-        # remove the weights for simplicity
-        del rollback_status["model"]
         return rollback_status
 
-    @staticmethod
-    def save_personalized_accuracy(
-        accuracy,
-        current_round=None,
-        epoch=None,
-        accuracy_type="test_accuracy",
-        filename=None,
-        location=None,
-    ):
-        # pylint:disable=too-many-arguments
-        """Saving the test accuracy to a file."""
-        to_save_dir, filename = Trainer.process_save_path(
-            filename,
-            location,
-            work_model_name="personalized_model_name",
-            desired_extenstion=".csv",
-        )
-        to_save_path = os.path.join(to_save_dir, filename)
-        current_round = current_round if current_round is not None else 0
-        current_epoch = epoch if epoch is not None else 0
-        acc_dataframe = pd.DataFrame(
-            {"round": current_round, "epoch": current_epoch, accuracy_type: accuracy},
-            index=[0],
-        )
-
-        is_use_header = not os.path.exists(to_save_path)
-        acc_dataframe.to_csv(to_save_path, index=False, mode="a", header=is_use_header)
-
-    @staticmethod
-    def load_personalized_accuracy(
-        current_round=None,
-        accuracy_type="test_accuracy",
-        filename=None,
-        location=None,
-    ):
-        """Loading the test accuracy from a file."""
-        to_save_dir, filename = Trainer.process_save_path(
-            filename,
-            location,
-            work_model_name="personalized_model_name",
-            desired_extenstion=".acc",
-        )
-        load_path = os.path.join(to_save_dir, filename)
-        loaded_rounds_accuracy = pd.read_csv(load_path)
-        if current_round is None:
-            # default use the last row
-            desired_row = loaded_rounds_accuracy.iloc[-1]
-        else:
-            desired_row = loaded_rounds_accuracy.loc[
-                loaded_rounds_accuracy["round"] == current_round
-            ]
-            desired_row = loaded_rounds_accuracy.iloc[-1]
-
-        accuracy = desired_row[accuracy_type]
-
-        return accuracy
-
-    def checkpoint_personalized_accuracy(self, accuracy, current_round, epoch, run_id):
-        """Save the personaliation accuracy to the results dir."""
-        result_path = Config().params["result_path"]
-
-        save_location = os.path.join(result_path, "client_" + str(self.client_id))
-
-        filename = NameFormatter.get_format_name(
-            client_id=self.client_id, suffix="personalized_accuracy", ext="csv"
-        )
-        os.makedirs(save_location, exist_ok=True)
-        self.save_personalized_accuracy(
-            accuracy,
-            current_round=current_round,
-            epoch=epoch,
-            accuracy_type="personalized_accuracy",
-            filename=filename,
-            location=save_location,
-        )
-
-    def is_exist_unique_initial_model(self):
-        """Whether the unique initial model exists."""
-        checkpoint_dir_path = self.get_checkpoint_dir_path()
-
-        filename = NameFormatter.get_format_name(
-            model_name=self.model_name,
-            client_id=self.client_id,
-            round_n=0,
-            epoch_n=None,
-            run_id=None,
-            prefix=self.model_checkpointfile_prefix,
-            ext="pth",
-        )
-        checkpoint_file_path = os.path.join(checkpoint_dir_path, filename)
-
-        is_existed = os.path.exists(checkpoint_file_path)
-
-        return is_existed, filename
-
-    def create_unique_initial_model(self, filename):
+    def create_unique_personalized_model(self, filename):
         """Reset the model parameters."""
         checkpoint_dir_path = self.get_checkpoint_dir_path()
         # reset the model for this client
         # thus, different clients have different init parameters
-        self.model.apply(self.reset_weight)
+        self.personalized_model.apply(self.reset_weight)
         self.save_model(
             filename=filename,
             location=checkpoint_dir_path,
         )
         logging.info(
-            "[Client #%d] Created the unique model as %s and saved to %s.",
+            "[Client #%d] Created the unique personalized model as %s and saved to %s.",
             self.client_id,
             filename,
             checkpoint_dir_path,
