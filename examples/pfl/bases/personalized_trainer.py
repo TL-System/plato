@@ -105,10 +105,10 @@ class Trainer(basic.Trainer):
             optimizer_params=optimizer_params,
         )
 
-    def get_lr_scheduler(self, optimizer):
+    def get_lr_scheduler(self, config, optimizer):
         """Returns the learning rate scheduler, if needed."""
         if not self.personalized_training:
-            return super().get_lr_scheduler(optimizer)
+            return super().get_lr_scheduler(config, optimizer)
 
         lr_scheduler = Config().algorithm.personalization.lr_scheduler
         lr_params = Config().parameters.personalization.learning_rate._asdict()

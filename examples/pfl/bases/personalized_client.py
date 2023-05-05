@@ -5,7 +5,6 @@ global learning and local learning.
 """
 import os
 import logging
-from types import SimpleNamespace, Any, Tuple
 
 from plato.clients import simple
 from plato.config import Config
@@ -23,6 +22,7 @@ class Client(simple.Client):
         algorithm=None,
         trainer=None,
         callbacks=None,
+        trainer_callbacks=None,
         personalized_model=None,
     ):
         # pylint:disable=too-many-arguments
@@ -32,6 +32,7 @@ class Client(simple.Client):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
         )
 
         # the personalized model here corresponds to the client's
@@ -156,21 +157,6 @@ class Client(simple.Client):
         """Reloading the personalized model for this client before any operations."""
         if self.is_personalized_learn() and self.personalized_model is not None:
             self.load_personalized_model()
-
-    async def inbound_processed(
-        self, processed_inbound_payload: Any
-    ) -> Tuple[SimpleNamespace, Any]:
-
-        if self.is_personalized_learn():
-            report, outbound_payload = await self.personalized_train(
-                processed_inbound_payload
-            )
-        else:
-            report, outbound_payload = await self._start_training(
-                processed_inbound_payload
-            )
-
-        return report, outbound_payload
 
     def is_personalized_learn(self):
         """Whether this client will perform personalization."""
