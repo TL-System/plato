@@ -1,12 +1,20 @@
+"""
+The registry that contains all available model poisoning attacks in federated learning.
+
+Having a registry of all available classes is convenient for retrieving an instance based
+on a configuration at run-time.
+"""
+
 import torch
 import logging
 from plato.config import Config
 from scipy.stats import norm
 from collections import OrderedDict
+import numpy as np
 
 
 def get():
-
+    """Get an attack for malicious clients based on the configuration file."""
     attack_type = (
         Config().clients.attack_type
         if hasattr(Config().clients, "attack_type")
@@ -26,51 +34,23 @@ def get():
 
 
 def lie_attack(weights_received):
-    """Little is enough"""
-    """https://proceedings.neurips.cc/paper_files/paper/2019/file/ec1c59141046cd1866bbbcdfb6ae31d4-Paper.pdf """
-
     """
-    deltas_received = self.compute_weight_deltas(updates)
-    reports = [report for (__, report, __, __) in updates]
-    clients_id = [client for (client, __, __, __) in updates]
+    Attack name: Little is enough
 
-    name_list = []
-    for name, delta in deltas_received[0].items():
-        name_list.append(name)
+    Reference:
 
-    all_updates = []
-    for i, delta_received in enumerate(deltas_received):
-        delta_vector = []
-        for name in name_list:
-            delta_vector = (
-                delta_received[name].view(-1)
-                if not len(delta_vector)
-                else torch.cat((delta_vector, delta_received[name].view(-1)))
-            )
-        all_updates = (
-            delta_vector[None, :]
-            if not len(all_updates)
-            else torch.cat((all_updates, delta_vector[None, :]), 0)
-        )
+    Baruch et al., "A little is enough: Circumventing defenses for distributed learning," in Proceedings of Advances in Neural Information Processing Systems (NeurIPS) 2019.
 
-    n_clients = all_updates.shape[0]
-    n_attackers = self.attacker_number
-    logging.info("[%s] n_clients: %d", self, n_clients)
-    logging.info("[%s] n_attackers: %d", self, n_attackers)
+    https://proceedings.neurips.cc/paper_files/paper/2019/file/ec1c59141046cd1866bbbcdfb6ae31d4-Paper.pdf
     """
 
     total_clients = Config().clients.total_clients
     num_attackers = len(Config().clients.attacker_ids)
 
     attacker_grads = []
-    # attacker_ids = []
 
-    # tmp_index = 0
     for weight_received in weights_received:
-        # if (client_id <= self.n_attackers) and (client_id != 0):
         delta_vector = []
-        # attacker_ids.append(client_id)
-        # delta_received = deltas_received[tmp_index]
         for name in weight_received.keys():
             delta_vector = (
                 weight_received[name].view(-1)
@@ -114,10 +94,13 @@ def lie_attack(weights_received):
 
 def min_max(weights_received, dev_type="unit_vec"):
     """
-    min_max attack
-    Two options:
-        1. benign clients' updates are known to the attacker
-        2. benign clients' updates are unknown to the attacker
+    Attack: Min-Max
+
+    Reference:
+
+    Shejwalkar et al., “Manipulating the Byzantine: Opti- mizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
+
+    https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
 
     attacker_grads = []
@@ -200,10 +183,13 @@ def min_max(weights_received, dev_type="unit_vec"):
 
 def min_sum(weights_received, dev_type="unit_vec"):
     """
-    min_sum attack
-    Two options:
-        1. benign clients' updates are known to the attacker
-        2. benign clients' updates are unknown to the attacker
+    Attack: Min-Max
+
+    Reference:
+
+    Shejwalkar et al., “Manipulating the Byzantine: Opti- mizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
+
+    https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
 
     attacker_grads = []
@@ -283,4 +269,157 @@ def min_sum(weights_received, dev_type="unit_vec"):
     return weights_poisoned
 
 
-registered_attacks = {"LIE": lie_attack, "Min-Max": min_max, "Min-Sum": min_sum}
+def compute_lambda(all_updates, model_re, n_attackers):
+    """Compute lambda value for fang's attack"""
+
+    distances = []
+    n_benign, d = all_updates.shape
+    for update in all_updates:
+        distance = torch.norm((all_updates - update), dim=1)
+        distances = (
+            distance[None, :]
+            if not len(distances)
+            else torch.cat((distances, distance[None, :]), 0)
+        )
+
+    distances[distances == 0] = 10000
+    distances = torch.sort(distances, dim=1)[0]
+    scores = torch.sum(distances[:, : n_benign - 2 - n_attackers], dim=1)
+    min_score = torch.min(scores)
+    term_1 = min_score / (
+        (n_benign - n_attackers - 1) * torch.sqrt(torch.Tensor([d]))[0]
+    )
+    max_wre_dist = torch.max(torch.norm((all_updates - model_re), dim=1)) / (
+        torch.sqrt(torch.Tensor([d]))[0]
+    )
+
+    return term_1 + max_wre_dist
+
+
+def multi_krum(all_updates, n_attackers, multi_k=False):
+    """multi krum defence method in secure server aggregation"""
+    candidates = []
+    candidate_indices = []
+    remaining_updates = all_updates
+    all_indices = np.arange(len(all_updates))
+
+    while len(remaining_updates) > 2 * n_attackers + 2:
+        distances = []
+        for update in remaining_updates:
+            distance = torch.norm((remaining_updates - update), dim=1) ** 2
+            distances = (
+                distance[None, :]
+                if not len(distances)
+                else torch.cat((distances, distance[None, :]), 0)
+            )
+
+        distances = torch.sort(distances, dim=1)[0]
+        scores = torch.sum(
+            distances[:, : len(remaining_updates) - 2 - n_attackers], dim=1
+        )
+        indices = torch.argsort(scores)[: len(remaining_updates) - 2 - n_attackers]
+
+        candidate_indices.append(all_indices[indices[0].cpu().numpy()])
+        all_indices = np.delete(all_indices, indices[0].cpu().numpy())
+        candidates = (
+            remaining_updates[indices[0]][None, :]
+            if not len(candidates)
+            else torch.cat((candidates, remaining_updates[indices[0]][None, :]), 0)
+        )
+        remaining_updates = torch.cat(
+            (remaining_updates[: indices[0]], remaining_updates[indices[0] + 1 :]), 0
+        )
+        if not multi_k:
+            break
+    aggregate = torch.mean(candidates, dim=0)
+    return aggregate, np.array(candidate_indices)
+
+
+def fang_attack(weights_received):
+    """
+    Attack: Fang's attack
+
+    Reference:
+
+    Fang et al., "Local Model Poisoning Attacks to Byzantine-Robust Federated Learning," in Proceedings of USENIX Security Symposium, 2020.
+
+    https://arxiv.org/pdf/1911.11815.pdf
+    """
+    num_attackers = len(Config().clients.attacker_ids)
+    attacker_grads = []
+
+    for weight_received in weights_received:
+        delta_vector = []
+        for name in weight_received.keys():
+            delta_vector = (
+                weight_received[name].view(-1)
+                if not len(delta_vector)
+                else torch.cat((delta_vector, weight_received[name].view(-1)))
+            )
+        attacker_grads = (
+            delta_vector[None, :]
+            if not len(attacker_grads)
+            else torch.cat((attacker_grads, delta_vector[None, :]), 0)
+        )
+
+    agg_grads = torch.mean(attacker_grads, 0)
+    model_re = agg_grads
+    deviation = torch.sign(agg_grads)
+    lamda = compute_lambda(attacker_grads, model_re, num_attackers)
+
+    threshold = 1e-5
+    mal_update = []
+
+    while lamda > threshold:
+        mal_update = -lamda * deviation
+        mal_updates = torch.stack([mal_update] * num_attackers)
+        mal_updates = torch.cat((mal_updates, attacker_grads), 0)
+
+        agg_grads, krum_candidate = multi_krum(
+            mal_updates, num_attackers, multi_k=False
+        )
+        if krum_candidate < num_attackers:
+            # perform model poisoning
+            weights_poisoned = []
+            for weight_received in weights_received:
+                start_index = 0
+                weight_poisoned = OrderedDict()
+
+                for name, weight in weight_received.items():
+                    weight_poisoned[name] = mal_update[
+                        start_index : start_index + len(weight.view(-1))
+                    ].reshape(weight.shape)
+                    start_index += len(weight.view(-1))
+
+                weights_poisoned.append(weight_poisoned)
+            return weights_poisoned
+        else:
+            mal_update = []
+
+        lamda *= 0.5
+
+    if not len(mal_update):
+        mal_update = model_re - lamda * deviation
+
+    # perform model poisoning
+    weights_poisoned = []
+    for weight_received in weights_received:
+        start_index = 0
+        weight_poisoned = OrderedDict()
+
+        for name, weight in weight_received.items():
+            weight_poisoned[name] = mal_update[
+                start_index : start_index + len(weight.view(-1))
+            ].reshape(weight.shape)
+            start_index += len(weight.view(-1))
+
+        weights_poisoned.append(weight_poisoned)
+    return weights_poisoned
+
+
+registered_attacks = {
+    "LIE": lie_attack,
+    "Min-Max": min_max,
+    "Min-Sum": min_sum,
+    "Fang": fang_attack,
+}
