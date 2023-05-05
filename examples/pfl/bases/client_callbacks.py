@@ -49,7 +49,7 @@ class ModelStatusProcessor(base.Processor):
         return data
 
 
-class ClientCallback(client.ClientCallback):
+class ClientModelCallback(client.ClientCallback):
     def on_inbound_received(self, client, inbound_processor):
         """
         Event called before inbound processors start to process data.
@@ -62,6 +62,6 @@ class ClientCallback(client.ClientCallback):
         # previous round
         inbound_processor.processors.append(
             ModelStatusProcessor(
-                trainer=client.personalized_trainer,
+                trainer=client.trainer,
             )
         )
