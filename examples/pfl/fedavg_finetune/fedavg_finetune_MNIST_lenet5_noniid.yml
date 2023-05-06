@@ -9,25 +9,11 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
-    # the ratio of clients participanting in training
-    participant_clients_ratio: 0.5
-    
-    # whether maintain and load the trained 
-    # personalied model
-    # set to be true, each client will load
-    # the latest trained personalized model
-    persist_personalized_model: False
 
 server:
     address: 127.0.0.1
     port: 8000
 
-    # do personalization 
-    # for every `do_personalization_interval` rounds
-    # set -1 to do personalized only after the final round
-    do_personalization_interval: -1
-    # total, participant, nonparticipant
-    do_personalization_group: total
 
 data:
     # The training and testing dataset
@@ -73,6 +59,22 @@ algorithm:
     type: fedavg_partial
 
     personalization:
+
+        # the ratio of clients participanting in training
+        participant_clients_ratio: 0.5
+        
+        # whether maintain and load the trained 
+        # personalied model
+        # set to be true, each client will load
+        # the latest trained personalized model
+        persist_personalized_model: False
+        # do personalization 
+        # for every `do_personalization_interval` rounds
+        # set -1 to do personalized only after the final round
+        do_personalization_interval: -1
+        # total, participant, nonparticipant
+        do_personalization_group: total
+
         # Number of epochs for local training in each communication round
         #   The batch size for the downstream task can be larger as it
         # does not utilize the

@@ -3,6 +3,7 @@ A basic personalized federated learning client who performs the
 global learning and local learning.
 
 """
+import sys
 import os
 import logging
 
@@ -70,7 +71,9 @@ class Client(simple.Client):
 
         # jump out if no personalized model is set
         if not hasattr(Config().algorithm, "personalization"):
-            return None
+            sys.exit(
+                "Error: personalization block must be provided under the algorithm."
+            )
 
         # define the personalized model
         if (
@@ -119,8 +122,8 @@ class Client(simple.Client):
         # that each client want to load its latest trained personalzied
         # model instead of using the initial one.
         if (
-            hasattr(Config().clients, "persist_personalized_model")
-            and Config().clients.persist_personalized_model
+            hasattr(Config().algorithm.personalization, "persist_personalized_model")
+            and Config().algorithm.personalization.persist_personalized_model
         ):
             # load the client's latest personalized model
             desired_round = self.current_round - 1

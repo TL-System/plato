@@ -80,8 +80,10 @@ class Server(fedavg.Server):
         # `the participant_clients_pool` and `participant_clients_ratio`
         # if these two hyper-parameters are set simutaneously
         #  they should correspond to each other.
-        if hasattr(loaded_config.clients, "participant_clients_ratio") and hasattr(
-            loaded_config.clients, "participant_clients_pool"
+        if hasattr(
+            loaded_config.algorithm.personalization, "participant_clients_ratio"
+        ) and hasattr(
+            loaded_config.algorithm.personalization, "participant_clients_pool"
         ):
             assert self.participant_clients == len(self.participant_clients_pool)
 
@@ -96,8 +98,10 @@ class Server(fedavg.Server):
 
         ## 1. initialize participanting clients
         self.participant_clients_ratio = (
-            loaded_config.clients.participant_clients_ratio
-            if hasattr(loaded_config.clients, "participant_clients_ratio")
+            loaded_config.algorithm.personalization.participant_clients_ratio
+            if hasattr(
+                loaded_config.algorithm.personalization, "participant_clients_ratio"
+            )
             else 1.0
         )
 
@@ -126,13 +130,17 @@ class Server(fedavg.Server):
         # will be performed
         # by default, this value is set to be 0.
         self.do_personalization_interval = (
-            loaded_config.server.do_personalization_interval
-            if hasattr(loaded_config.server, "do_personalization_interval")
+            loaded_config.algorithm.personalization.do_personalization_interval
+            if hasattr(
+                loaded_config.algorithm.personalization, "do_personalization_interval"
+            )
             else 0
         )
         self.do_personalization_group = (
-            loaded_config.server.do_personalization_group
-            if hasattr(loaded_config.server, "do_personalization_group")
+            loaded_config.algorithm.personalization.do_personalization_group
+            if hasattr(
+                loaded_config.algorithm.personalization, "do_personalization_group"
+            )
             else "total"
         )
 
@@ -219,8 +227,10 @@ class Server(fedavg.Server):
         # be utilized as participant clients.
         if self.participant_clients_pool is None:
             self.participant_clients_pool = (
-                loaded_config.clients.participant_clients_pool
-                if hasattr(loaded_config.clients, "participant_clients_pool")
+                loaded_config.algorithm.personalization.participant_clients_pool
+                if hasattr(
+                    loaded_config.algorithm.personalization, "participant_clients_pool"
+                )
                 else clients_pool[: self.participant_clients]
             )
             self.client_groups_pool["participant"] = self.participant_clients_pool
@@ -297,7 +307,6 @@ class Server(fedavg.Server):
         """
 
         if self.current_round % self.do_personalization_interval == 0:
-
             logging.info(
                 fonts.colourize(
                     "Starting Personalization mode during round %d", colour="blue"
@@ -324,7 +333,6 @@ class Server(fedavg.Server):
         """Operations to guarantee the personalization in the final."""
 
         if self.current_round > Config().trainer.rounds:
-
             logging.info(
                 fonts.colourize(
                     "Starting Personalization mode after the final round", colour="blue"
@@ -434,7 +442,6 @@ class Server(fedavg.Server):
                 self.do_personalization_interval >= 0
                 or self.to_terminate_personalization
             ):
-
                 logging.info(
                     "%s Completed.",
                     self.personalization_status_info[self.do_personalization_interval],
