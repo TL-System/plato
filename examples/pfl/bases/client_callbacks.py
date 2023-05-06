@@ -31,7 +31,8 @@ from typing import Any
 
 from plato.processors import base
 from plato.callbacks import client
-from plato.algorithms import fedavg_partial
+
+from bases import fedavg_partial
 
 
 class ModelStatusProcessor(base.Processor):
