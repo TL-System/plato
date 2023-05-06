@@ -101,7 +101,7 @@ def lie_attack(weights_received):
     return weights_poisoned
 
 
-def min_max(weights_received, dev_type="unit_vec"):
+def min_max_attack(weights_received, dev_type="unit_vec"):
     """
     Attack: Min-Max
 
@@ -161,7 +161,7 @@ def min_max(weights_received, dev_type="unit_vec"):
     return weights_poisoned
 
 
-def min_sum(weights_received, dev_type="unit_vec"):
+def min_sum_attack(weights_received, dev_type="unit_vec"):
     """
     Attack: Min-Max
 
@@ -350,7 +350,7 @@ def fang_attack(weights_received):
 
 registered_attacks = {
     "LIE": lie_attack,
-    "Min-Max": min_max,
-    "Min-Sum": min_sum,
+    "Min-Max": min_max_attack,
+    "Min-Sum": min_sum_attack,
     "Fang": fang_attack,
 }
