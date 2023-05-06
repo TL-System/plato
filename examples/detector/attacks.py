@@ -86,18 +86,19 @@ def lie_attack(weights_received):
 
     attacker_weights = flatten_weights(weights_received)
 
+    # Calculate perturbation range
     s_value = total_clients / 2 + 1 - num_attackers
     possibility = (total_clients - s_value) / total_clients
     z_value = norm.cdf(possibility)
 
-    # calculate poisoning model
     weights_avg = torch.mean(attacker_weights, dim=0)
     weights_std = torch.std(attacker_weights, dim=0)
 
+    # Calculate poisoning model
     poison_value = weights_avg + z_value * weights_std
-
+    # Perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
-
+    logging.info(f"Finished LIE model poisoning attack.")
     return weights_poisoned
 
 
@@ -125,13 +126,13 @@ def min_max_attack(weights_received, dev_type="unit_vec"):
     elif dev_type == "std":
         deviation = torch.std(attacker_weights, 0)
 
-    lamda = torch.Tensor([50.0]).float()
-    threshold_diff = 1e-5
-    lamda_fail = lamda
-    lamda_succ = 0
+    lambda_value = torch.Tensor([50.0]).float()
+    threshold = 1e-5
+    lambda_fail = lambda_value
+    lambda_succ = 0
 
+    # Search for maximal distance
     distances = []
-
     for attacker_weight in attacker_weights:
         distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
         distances = (
@@ -143,23 +144,25 @@ def min_max_attack(weights_received, dev_type="unit_vec"):
     max_distance = torch.max(distances)
     del distances
 
-    while torch.abs(lamda_succ - lamda) > threshold_diff:
-        poison_value = global_model_last_round - lamda * deviation
+    # Search for lambda
+    while torch.abs(lambda_succ - lambda_value) > threshold:
+        poison_value = global_model_last_round - lambda_value * deviation
         distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
         max_d = torch.max(distance)
 
         if max_d <= max_distance:
-            lamda_succ = lamda
-            lamda = lamda + lamda_fail / 2
+            lambda_succ = lambda_value
+            lambda_value = lambda_value + lambda_fail / 2
         else:
-            lamda = lamda - lamda_fail / 2
+            lambda_value = lambda_value - lambda_fail / 2
 
-        lamda_fail = lamda_fail / 2
+        lambda_fail = lambda_fail / 2
 
-    poison_value = global_model_last_round - lamda_succ * deviation
+    poison_value = global_model_last_round - lambda_succ * deviation
 
     # perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
+    logging.info(f"Finished Min-Max model poisoning attack.")
     return weights_poisoned
 
 
@@ -189,14 +192,8 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
     elif dev_type == "std":
         deviation = torch.std(attacker_weights, 0)
 
-    lamda = torch.Tensor([50.0]).float()
-
-    threshold_diff = 1e-5
-    lamda_fail = lamda
-    lamda_succ = 0
-
+    # Calculate minimal score
     distances = []
-
     for attacker_weight in attacker_weights:
         distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
         distances = (
@@ -206,35 +203,43 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
         )
 
     scores = torch.sum(distances, dim=1)
-    min_score = torch.min(scores)
+    score_min = torch.min(scores)
     del distances
 
-    while torch.abs(lamda_succ - lamda) > threshold_diff:
-        poison_value = global_model_last_round - lamda * deviation
+    # Search for lambda
+    lambda_value = torch.Tensor([50.0]).float()
+    threshold = 1e-5
+    lambda_fail = lambda_value
+    lambda_succ = 0
+
+    while torch.abs(lambda_succ - lambda_value) > threshold:
+        poison_value = global_model_last_round - lambda_value * deviation
         distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
         score = torch.sum(distance)
 
-        if score <= min_score:
-            lamda_succ = lamda
-            lamda = lamda + lamda_fail / 2
+        if score <= score_min:
+            lambda_succ = lambda_value
+            lambda_value = lambda_value + lambda_fail / 2
         else:
-            lamda = lamda - lamda_fail / 2
+            lambda_value = lambda_value - lambda_fail / 2
 
-        lamda_fail = lamda_fail / 2
+        lambda_fail = lambda_fail / 2
 
-    poison_value = global_model_last_round - lamda_succ * deviation
+    poison_value = global_model_last_round - lambda_succ * deviation
 
     # perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
+    logging.info(f"Finished Min-Sum model poisoning attack.")
     return weights_poisoned
 
 
 def compute_lambda(attacker_weights, global_model_last_round, num_attackers):
-    """Compute lambda value for fang's attack"""
+    """Compute the lambda value for fang's attack."""
     distances = []
     num_benign_clients, d = attacker_weights.shape  # ? total - num_attacker?
-    for update in attacker_weights:
-        distance = torch.norm((attacker_weights - update), dim=1)
+
+    for weight in attacker_weights:
+        distance = torch.norm((attacker_weights - weight), dim=1)
         distances = (
             distance[None, :]
             if not len(distances)
@@ -244,15 +249,18 @@ def compute_lambda(attacker_weights, global_model_last_round, num_attackers):
     distances[distances == 0] = 10000
     distances = torch.sort(distances, dim=1)[0]
     scores = torch.sum(distances[:, : num_benign_clients - 2 - num_attackers], dim=1)
-    min_score = torch.min(scores)
-    term_1 = min_score / (
+    score_min = torch.min(scores)
+
+    # Calculate lambda
+    term_1 = score_min / (
         (num_benign_clients - num_attackers - 1) * torch.sqrt(torch.Tensor([d]))[0]
     )
     max_wre_dist = torch.max(
         torch.norm((attacker_weights - global_model_last_round), dim=1)
     ) / (torch.sqrt(torch.Tensor([d]))[0])
+    lambda_value = term_1 + max_wre_dist
 
-    return term_1 + max_wre_dist
+    return lambda_value
 
 
 def multi_krum(attacker_weights, num_attackers, multi_k=False):
@@ -310,20 +318,27 @@ def fang_attack(weights_received):
 
     weights_avg = torch.mean(attacker_weights, 0)
     global_model_last_round = weights_avg
-    deviation = torch.sign(weights_avg)
-    lamda = compute_lambda(attacker_weights, global_model_last_round, num_attackers)
+    lambda_value = compute_lambda(
+        attacker_weights, global_model_last_round, num_attackers
+    )
 
+    # Search for lambda and calculate the poison value
     threshold = 1e-5
+    lambda_decay = 0.5
+    deviation = torch.sign(weights_avg)
     poison_value = []
 
-    while lamda > threshold:
-        poison_value = -lamda * deviation
+    while lambda_value > threshold:
+        poison_value = -lambda_value * deviation
         poison_values = torch.stack([poison_value] * num_attackers)
         poison_values = torch.cat((poison_values, attacker_weights), 0)
+        logging.info(f"poison_value: %s", poison_value)
+        logging.info(f"poison_values: %s", poison_values)
 
         weights_avg, krum_candidate = multi_krum(
             poison_values, num_attackers, multi_k=False
         )
+        logging.info(f"krum_candidate: ", krum_candidate)
         if krum_candidate < num_attackers:
             # perform model poisoning
             weights_poisoned = perform_model_poisoning(weights_received, poison_value)
@@ -331,13 +346,14 @@ def fang_attack(weights_received):
         else:
             poison_value = []
 
-        lamda *= 0.5
+        lambda_value *= lambda_decay
 
     if not len(poison_value):
-        poison_value = global_model_last_round - lamda * deviation
+        poison_value = global_model_last_round - lambda_value * deviation
 
     # perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
+    logging.info(f"Finished Fang model poisoning attack.")
     return weights_poisoned
 
 
