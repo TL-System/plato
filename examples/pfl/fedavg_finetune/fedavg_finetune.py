@@ -20,11 +20,14 @@ pfl_bases = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_bases))
 
 
-from bases.personalized_trainer import Trainer
-from bases.fedavg_personalized_server import Server
+from bases import personalized_trainer
+from bases import fedavg_personalized_server
 
 from bases.client_callbacks import ClientModelCallback
-from bases.trainer_callbacks import TrainerPersonalizationCallback
+from bases.trainer_callbacks import (
+    PersonalizedTrainerCallback,
+    PersonalizedLogProgressCallback,
+)
 
 
 import fedavg_finetune_client
@@ -35,13 +38,16 @@ def main():
     A Plato personalized federated learning training session using the FedAvg algorithm under the
     supervised learning setting.
     """
-    trainer = Trainer
+    trainer = personalized_trainer.Trainer
     client = fedavg_finetune_client.Client(
         trainer=trainer,
         callbacks=[ClientModelCallback],
-        trainer_callbacks=[TrainerPersonalizationCallback],
+        trainer_callbacks=[
+            PersonalizedTrainerCallback,
+            PersonalizedLogProgressCallback,
+        ],
     )
-    server = Server(trainer=trainer)
+    server = fedavg_personalized_server.Server(trainer=trainer)
 
     server.run(client)
 

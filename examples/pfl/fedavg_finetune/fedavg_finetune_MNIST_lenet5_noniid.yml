@@ -1,6 +1,4 @@
 clients:
-    # Type
-    type: simple_personalized
 
     # The total number of clients
     total_clients: 10
@@ -21,7 +19,6 @@ clients:
     persist_personalized_model: False
 
 server:
-    type: fedavg_personalized
     address: 127.0.0.1
     port: 8000
 
@@ -50,12 +47,9 @@ data:
     random_seed: 1
 
 trainer:
-    # The type of the trainer
-    type: basic_personalized
     
-
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 1
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -76,10 +70,9 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_partial
 
     personalization:
-        type: basic_personalized
         # Number of epochs for local training in each communication round
         #   The batch size for the downstream task can be larger as it
         # does not utilize the
@@ -90,6 +83,8 @@ algorithm:
         loss_criterion: CrossEntropyLoss
         model_name: lenet5
 
+        logging_iteration_interval: 50
+        logging_epoch_interval: 1
 parameters:
     optimizer:
         lr: 0.05

@@ -5,13 +5,13 @@ A personalized federated learning client using FedAvg.
 import logging
 
 
-from bases.personalized_client import Client
+from bases import personalized_client
 
 from plato.config import Config
 from plato.utils import fonts
 
 
-class Client(Client):
+class Client(personalized_client.Client):
     """A personalized federated learning trainer using the FedAvg algorithm."""
 
     def load_personalized_model(self) -> None:
@@ -20,6 +20,8 @@ class Client(Client):
         Each client of FedAvg will directly utilize the recevied global model as the
         personalized model.
         """
+        super().load_personalized_model()
+
         logging.info(
             fonts.colourize(
                 "[Client #%d] assings the received model [%s] to personalized model [%s].",
@@ -27,7 +29,7 @@ class Client(Client):
             ),
             self.client_id,
             Config().trainer.model_name,
-            Config().trainer.personalized_model_name,
+            Config().algorithm.personalization.model_name,
         )
 
         # load the received model to be personalized model
