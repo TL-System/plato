@@ -82,6 +82,7 @@ class Client(simple.Client):
         if self.trainer.personalized_model is None:
             self.trainer.define_personalized_model(self.personalized_model)
 
+        self.personalized_model = self.trainer.personalized_model
         self.trainer.set_training_mode(personalized_mode=self.is_personalized_learn())
 
     def load_personalized_model(self):
@@ -138,7 +139,8 @@ class Client(simple.Client):
             desired_round = 0
             logging.info(
                 fonts.colourize(
-                    "[Client #%d] Loading initial personalized model.", colour="blue"
+                    "[Client #%d] Loading initial unique personalized model.",
+                    colour="blue",
                 ),
                 self.client_id,
             )
@@ -155,7 +157,8 @@ class Client(simple.Client):
 
     def inbound_received(self, inbound_processor):
         """Reloading the personalized model for this client before any operations."""
-        if self.is_personalized_learn() and self.personalized_model is not None:
+        super().inbound_received(inbound_processor)
+        if self.is_personalized_learn() and self.trainer.personalized_model is not None:
             self.load_personalized_model()
 
     def is_personalized_learn(self):

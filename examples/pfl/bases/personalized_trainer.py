@@ -6,7 +6,6 @@ import logging
 import os
 import warnings
 
-import pandas as pd
 import torch
 
 from plato.config import Config
@@ -14,6 +13,7 @@ from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion
 from plato.utils import checkpoint_operator
 from plato.models import registry as models_registry
+from plato.utils import fonts
 
 warnings.simplefilter("ignore")
 
@@ -25,6 +25,14 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
+
+        # clear the original callbacks but only hold the
+        # desired ones
+
+        self.callbacks = self.callbacks[1:]
+        self.callback_handler.clear_callbacks()
+        # only add the customized callbacks
+        self.callback_handler.add_callbacks(self.callbacks)
 
         self.personalized_model = None
 
@@ -47,7 +55,6 @@ class Trainer(basic.Trainer):
     def define_personalized_model(self, personalized_model):
         """Define the personalized model to this trainer."""
         if personalized_model is None:
-
             pers_model_type = (
                 Config().algorithm.personalization.model_type
                 if hasattr(Config().algorithm.personalization, "model_type")
@@ -133,8 +140,7 @@ class Trainer(basic.Trainer):
         """Before running, convert the config to be ones for personalization."""
         if self.personalized_training:
             personalized_config = Config().algorithm.personalization._asdict()
-            config["batch_size"] = personalized_config["batch_size"]
-            config["epochs"] = personalized_config["epochs"]
+            config.update(personalized_config)
 
             self.personalized_model.to(self.device)
             self.personalized_model.train()
@@ -240,13 +246,55 @@ class Trainer(basic.Trainer):
         # reset the model for this client
         # thus, different clients have different init parameters
         self.personalized_model.apply(self.reset_weight)
-        self.save_model(
-            filename=filename,
-            location=checkpoint_dir_path,
-        )
+
         logging.info(
-            "[Client #%d] Created the unique personalized model as %s and saved to %s.",
+            fonts.colourize(
+                "[Client #%d] Created the unique personalized model as %s and saved to %s.",
+                colour="blue",
+            ),
             self.client_id,
             filename,
             checkpoint_dir_path,
+        )
+
+        self.save_personalized_model(
+            filename=filename,
+            location=checkpoint_dir_path,
+        )
+
+    def save_personalized_model(self, filename=None, location=None, **kwargs):
+        """Saving the model to a file."""
+
+        ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoints_dir=location)
+        ckpt_oper.save_checkpoint(
+            model_state_dict=self.personalized_model.state_dict(),
+            checkpoints_name=[filename],
+            **kwargs,
+        )
+
+        logging.info(
+            fonts.colourize(
+                "[Client #%d] Saved personalized model to %s under %s.", colour="blue"
+            ),
+            self.client_id,
+            filename,
+            location,
+        )
+
+    def load_personalized_model(self, filename=None, location=None):
+        """Loading pre-trained model weights from a file."""
+
+        ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoints_dir=location)
+        self.personalized_model.load_state_dict(
+            ckpt_oper.load_checkpoint(filename)["model"], strict=True
+        )
+
+        logging.info(
+            fonts.colourize(
+                "[Client #%d] Loading a Personalized model from %s under %s.",
+                colour="blue",
+            ),
+            self.client_id,
+            filename,
+            location,
         )
