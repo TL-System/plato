@@ -87,6 +87,7 @@ algorithm:
 
         logging_iteration_interval: 50
         logging_epoch_interval: 1
+        
 parameters:
     optimizer:
         lr: 0.05

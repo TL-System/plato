@@ -1,6 +1,6 @@
 """
-Customize the 
-
+Customize the payload processing by completing the global modules with modules of the 
+personalized model.
 """
 
 import logging

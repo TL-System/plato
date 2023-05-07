@@ -33,8 +33,7 @@ import fedbabu_trainer
 
 def main():
     """
-    A Plato personalized federated learning training session using the FedAvg algorithm under the
-    supervised learning setting.
+    A Plato personalized federated learning sesstion for FedBABU approach.
     """
     trainer = fedbabu_trainer.Trainer
     client = fedbabu_client.Client(
