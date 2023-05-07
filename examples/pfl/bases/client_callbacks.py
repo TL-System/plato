@@ -32,19 +32,21 @@ from typing import Any
 from plato.processors import base
 from plato.callbacks import client as client_callbacks
 
-from bases import fedavg_partial
-
 
 class ModelStatusProcessor(base.Processor):
     """
     A client processor used to reload the model status for current client.
     """
 
+    def __init__(self, algorithm, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.algorithm = algorithm
+
     def process(self, data: Any) -> Any:
         logging.info(
             "[Client #%d] Received the payload containing modules: %s.",
             self.trainer.client_id,
-            fedavg_partial.Algorithm.extract_modules_name(list(data.keys())),
+            self.algorithm.extract_modules_name(list(data.keys())),
         )
 
         return data
@@ -62,7 +64,5 @@ class ClientModelCallback(client_callbacks.ClientCallback):
         # reload the personalized model saved locally from
         # previous round
         inbound_processor.processors.append(
-            ModelStatusProcessor(
-                trainer=client.trainer,
-            )
+            ModelStatusProcessor(trainer=client.trainer, algorithm=client.algorithm)
         )

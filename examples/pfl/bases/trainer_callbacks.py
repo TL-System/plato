@@ -17,7 +17,7 @@ class PersonalizedTrainerCallback(trainer_callbacks.TrainerCallback):
     pass
 
 
-class PersonalizedLogMetricCallback(trainer_callbacks.LogProgressCallback):
+class PersonalizedLogMetricCallback(trainer_callbacks.TrainerCallback):
     def on_train_run_start(self, trainer, config, **kwargs):
         """
         Event called at the start of training run.
@@ -67,6 +67,7 @@ class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
             if "logging_iteration_interval" in config
             else 10
         )
+
         if batch % log_iter_interval == 0:
             super().on_train_step_end(trainer, config, batch, loss, **kwargs)
 
