@@ -57,7 +57,7 @@ class Algorithm(fedavg.Algorithm):
             modules_name
             if modules_name is not None
             else (
-                Config().algorithm.personalization.global_modules_name
+                Config().trainer.global_modules_name
                 if hasattr(Config().trainer, "global_modules_name")
                 else None
             )

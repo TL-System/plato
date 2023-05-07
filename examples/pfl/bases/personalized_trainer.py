@@ -165,7 +165,7 @@ class Trainer(basic.Trainer):
         """Before running, process the personalized model."""
         logging.info(
             fonts.colourize(
-                "[Client #%d] assings the received model [%s] to personalized model [%s].",
+                "[Client #%d] assings the model [%s] to personalized model [%s].",
                 colour="blue",
             ),
             self.client_id,
