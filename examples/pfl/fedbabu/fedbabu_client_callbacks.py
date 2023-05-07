@@ -47,7 +47,7 @@ class ModelCompletionProcessor(base.Processor):
         return data
 
 
-class ClientModelCallback(client_callbacks.ClientModelCallback):
+class ClientModelCompletionCallback(client_callbacks.ClientModelCallback):
     """
     A client callback for FedBABU approach to process the received payload.
     """

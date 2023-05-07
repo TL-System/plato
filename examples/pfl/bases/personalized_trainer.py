@@ -124,11 +124,8 @@ class Trainer(basic.Trainer):
             loss_criterion_params=loss_criterion_params,
         )
 
-    def get_optimizer(self, model):
-        """Returns the optimizer."""
-        if not self.personalized_learning:
-            return super().get_optimizer(model)
-
+    def get_personalized_optimizer(self):
+        """Getting the optimizer for personalized model."""
         optimizer_name = Config().algorithm.personalization.optimizer
         optimizer_params = Config().parameters.personalization.optimizer._asdict()
 
@@ -137,6 +134,13 @@ class Trainer(basic.Trainer):
             optimizer_name=optimizer_name,
             optimizer_params=optimizer_params,
         )
+
+    def get_optimizer(self, model):
+        """Returns the optimizer."""
+        if not self.personalized_learning:
+            return super().get_optimizer(model)
+
+        return self.get_personalized_optimizer()
 
     def get_lr_scheduler(self, config, optimizer):
         """Returns the learning rate scheduler, if needed."""

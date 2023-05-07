@@ -38,7 +38,7 @@ def main():
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[
-            fedbabu_client_callbacks.ClientModelCallback,
+            fedbabu_client_callbacks.ClientModelCompletionCallback,
         ],
         trainer_callbacks=[
             PersonalizedLogMetricCallback,

@@ -30,6 +30,8 @@ class PersonalizedLogMetricCallback(trainer_callbacks.TrainerCallback):
                 epoch=trainer.current_epoch,
                 run_id=None,
             )
+            trainer.personalized_model.to(trainer.device)
+            trainer.personalized_model.train()
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
         # perform test for the personalized model
