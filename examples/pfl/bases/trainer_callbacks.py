@@ -6,11 +6,43 @@ The callbacks of personalized trainer.
 import os
 import logging
 
+
 from plato.callbacks import trainer as trainer_callbacks
+from plato.config import Config
+
+from bases.trainer_utils import checkpoint_personalized_accuracy
 
 
 class PersonalizedTrainerCallback(trainer_callbacks.TrainerCallback):
     pass
+
+
+class PersonalizedLogMetricCallback(trainer_callbacks.LogProgressCallback):
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """
+        Event called at the start of training run.
+        """
+        super().on_train_run_start(trainer, config, **kwargs)
+        # performing the test for personalized learning
+        result_path = Config().params["result_path"]
+        if trainer.personalized_learning:
+            test_outputs = trainer.test_personalized_model(config)
+
+            checkpoint_personalized_accuracy(
+                result_path,
+                client_id=trainer.client_id,
+                accuracy=test_outputs["accuracy"],
+                current_round=trainer.current_round,
+                epoch=trainer.current_epoch,
+                run_id=None,
+            )
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        """
+        Event called at the end of a training epoch.
+        """
+        # perform the same accuracy computaton
+        self.on_train_run_start(trainer, config, **kwargs)
 
 
 class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
@@ -36,26 +68,7 @@ class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
             else 10
         )
         if batch % log_iter_interval == 0:
-            if trainer.client_id == 0:
-                logging.info(
-                    "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                    os.getpid(),
-                    trainer.current_epoch,
-                    config["epochs"],
-                    batch,
-                    len(trainer.train_loader),
-                    loss.data.item(),
-                )
-            else:
-                logging.info(
-                    "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
-                    trainer.client_id,
-                    trainer.current_epoch,
-                    config["epochs"],
-                    batch,
-                    len(trainer.train_loader),
-                    loss.data.item(),
-                )
+            super().on_train_step_end(trainer, config, batch, loss, **kwargs)
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
         log_epoch_interval = (

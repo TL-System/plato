@@ -30,7 +30,7 @@ import logging
 from typing import Any
 
 from plato.processors import base
-from plato.callbacks import client
+from plato.callbacks import client as client_callbacks
 
 from bases import fedavg_partial
 
@@ -50,7 +50,7 @@ class ModelStatusProcessor(base.Processor):
         return data
 
 
-class ClientModelCallback(client.ClientCallback):
+class ClientModelCallback(client_callbacks.ClientCallback):
     def on_inbound_received(self, client, inbound_processor):
         """
         Event called before inbound processors start to process data.

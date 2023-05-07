@@ -43,14 +43,40 @@ class Trainer(basic.Trainer):
         # training mode
         # the trainer should either perform the normal training
         # or the personalized training
-        self.personalized_training = False
+        self.personalized_learning = False
+
+        # personalized model evaluation
+        self.testset = None
+        self.testset_sampler = None
 
     def set_training_mode(self, personalized_mode: bool):
         """Set the learning model of this trainer.
 
         The learning mode must be set by the client.
         """
-        self.personalized_training = personalized_mode
+        self.personalized_learning = personalized_mode
+
+    def set_testset(self, dataset):
+        """set the testset."""
+        self.testset = dataset
+
+    def set_testset_sampler(self, sampler):
+        """set the sampler for the testset."""
+        self.testset_sampler = sampler
+
+    # pylint: disable=unused-argument
+    def get_test_loader(self, batch_size, testset, sampler, **kwargs):
+        """
+        Creates an instance of the testloader.
+
+        Arguments:
+        batch_size: the batch size.
+        testset: the training dataset.
+        sampler: the sampler for the testloader to use.
+        """
+        return torch.utils.data.DataLoader(
+            dataset=testset, shuffle=False, batch_size=batch_size, sampler=sampler
+        )
 
     def define_personalized_model(self, personalized_model):
         """Define the personalized model to this trainer."""
@@ -86,7 +112,7 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if not self.personalized_training:
+        if not self.personalized_learning:
             return super().get_loss_criterion()
 
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
@@ -100,7 +126,7 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Returns the optimizer."""
-        if not self.personalized_training:
+        if not self.personalized_learning:
             return super().get_optimizer(model)
 
         optimizer_name = Config().algorithm.personalization.optimizer
@@ -114,7 +140,7 @@ class Trainer(basic.Trainer):
 
     def get_lr_scheduler(self, config, optimizer):
         """Returns the learning rate scheduler, if needed."""
-        if not self.personalized_training:
+        if not self.personalized_learning:
             return super().get_lr_scheduler(config, optimizer)
 
         lr_scheduler = Config().algorithm.personalization.lr_scheduler
@@ -128,9 +154,8 @@ class Trainer(basic.Trainer):
         )
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        """Obtain the batch size of personalization."""
-        batch_size = batch_size
-        if self.personalized_training:
+        """Obtain the training loader for personalization."""
+        if self.personalized_learning:
             personalized_config = Config().algorithm.personalization._asdict()
             batch_size = personalized_config["batch_size"]
 
@@ -138,12 +163,22 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
-        if self.personalized_training:
+        if self.personalized_learning:
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
 
             self.personalized_model.to(self.device)
             self.personalized_model.train()
+
+    def model_forward(self, examples):
+        """Forward the input examples to the model."""
+
+        if not self.personalized_learning:
+            outputs = self.model(examples)
+        else:
+            outputs = self.personalized_model(examples)
+
+        return outputs
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop.
@@ -157,10 +192,7 @@ class Trainer(basic.Trainer):
         """
         self.optimizer.zero_grad()
 
-        if not self.personalized_training:
-            outputs = self.model(examples)
-        else:
-            outputs = self.personalized_model(examples)
+        outputs = self.model_forward(examples)
 
         loss = self._loss_criterion(outputs, labels)
         self._loss_tracker.update(loss, labels.size(0))
@@ -262,6 +294,40 @@ class Trainer(basic.Trainer):
             location=checkpoint_dir_path,
         )
 
+    def test_personalized_model(self, config, **kwargs):
+        """Test the personalized model."""
+        # Define the test phase of the eval stage
+
+        self.personalized_model.eval()
+        self.personalized_model.to(self.device)
+
+        data_loader = self.get_test_loader(
+            config["batch_size"],
+            testset=self.testset,
+            sampler=self.testset_sampler.get(),
+        )
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for _, (examples, labels) in enumerate(data_loader):
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                outputs = self.model_forward(examples)
+
+                outputs = self.process_personalized_outputs(outputs)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+
+        outputs = {"accuracy": accuracy}
+
+        return outputs
+
     def save_personalized_model(self, filename=None, location=None, **kwargs):
         """Saving the model to a file."""
 
@@ -298,3 +364,10 @@ class Trainer(basic.Trainer):
             filename,
             location,
         )
+
+    @staticmethod
+    def process_personalized_outputs(outputs):
+        """
+        Method called after the  model updates have been generated.
+        """
+        return outputs

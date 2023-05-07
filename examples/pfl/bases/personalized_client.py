@@ -161,8 +161,14 @@ class Client(simple.Client):
     def inbound_received(self, inbound_processor):
         """Reloading the personalized model for this client before any operations."""
         super().inbound_received(inbound_processor)
+
+        # load the personalized model before training
         if self.is_personalized_learn() and self.trainer.personalized_model is not None:
             self.load_personalized_model()
+
+        # assign the testset and testset sampler to the trainer
+        self.trainer.set_testset(self.testset)
+        self.trainer.set_testset_sampler(self.testset_sampler)
 
     def is_personalized_learn(self):
         """Whether this client will perform personalization."""

@@ -26,6 +26,7 @@ from bases import fedavg_personalized_server
 from bases.client_callbacks import ClientModelCallback
 from bases.trainer_callbacks import (
     PersonalizedTrainerCallback,
+    PersonalizedLogMetricCallback,
     PersonalizedLogProgressCallback,
 )
 
@@ -44,6 +45,7 @@ def main():
         callbacks=[ClientModelCallback],
         trainer_callbacks=[
             PersonalizedTrainerCallback,
+            PersonalizedLogMetricCallback,
             PersonalizedLogProgressCallback,
         ],
     )
