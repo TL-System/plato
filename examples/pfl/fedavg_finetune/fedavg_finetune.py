@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(pfl_bases))
 
 
 from bases import personalized_trainer
+from bases import personalized_client
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
 
@@ -31,15 +32,12 @@ from bases.trainer_callbacks import (
 )
 
 
-import fedavg_finetune_client
-
-
 def main():
     """
     A Plato personalized federated learning sesstion for FedAvg with fine-tuning.
     """
     trainer = personalized_trainer.Trainer
-    client = fedavg_finetune_client.Client(
+    client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[ClientModelCallback],

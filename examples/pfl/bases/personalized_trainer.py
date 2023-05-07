@@ -161,8 +161,24 @@ class Trainer(basic.Trainer):
 
         return super().get_train_loader(batch_size, trainset, sampler, **kwargs)
 
+    def preprocess_personalized_model(self, config):
+        """Before running, process the personalized model."""
+        logging.info(
+            fonts.colourize(
+                "[Client #%d] assings the received model [%s] to personalized model [%s].",
+                colour="blue",
+            ),
+            self.client_id,
+            Config().trainer.model_name,
+            Config().algorithm.personalization.model_name,
+        )
+
+        # load the received model to be personalized model
+        self.personalized_model.load_state_dict(self.model.state_dict(), strict=True)
+
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
+        self.preprocess_personalized_model(config)
         if self.personalized_learning:
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
