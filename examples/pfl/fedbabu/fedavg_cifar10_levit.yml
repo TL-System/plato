@@ -9,14 +9,6 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
-    # the ratio of clients participanting in training
-    participant_clients_ratio: 0.5
-    
-    # whether maintain and load the trained 
-    # personalied model
-    # set to be true, each client will load
-    # the latest trained personalized model
-    persist_personalized_model: False
 
 server:
     address: 127.0.0.1
@@ -40,13 +32,11 @@ data:
 
 trainer:
 
-
     # The maximum number of training rounds
     rounds: 30
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
-
 
     # Number of epoches for local training in each communication round
     epochs: 5
@@ -55,43 +45,60 @@ trainer:
     lr_scheduler: CosineAnnealingLR
     global_lr_scheduler: true
 
-    # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    personalized_epochs: 10
-    personalized_batch_size: 32
-    personalized_optimizer: SGD
-    personalized_lr_scheduler: StepLR
-    personalized_loss_criterion: CrossEntropyLoss
-
-    pers_epoch_log_interval: 2
-
     # The machine learning model
     model_type: vit
     model_name: facebook@levit-128
-    personalized_model_type: vit
-    personalized_model_name: facebook@levit-128
 
     global_modules_name:
         - patch_embeddings
         - encoder
 
-    head_modules_name:
-        - classifier
-
     frozen_modules_name:
         - patch_embeddings
         - encoder
-
-    frozen_personalized_modules_name:
-        - features
-
-    module_level: 3
 
 
 algorithm:
     # Aggregation algorithm
     type: fedavg_partial
+
+
+    head_modules_name:
+        - classifier
+
+    personalization:
+
+        # learning hyper-parameters for personalized learning
+        epochs: 10
+        batch_size: 32
+        optimizer: SGD
+        lr_scheduler: StepLR
+        loss_criterion: CrossEntropyLoss
+
+        model_type: vit
+        model_name: facebook@levit-128
+
+        frozen_modules_name:
+            - features
+
+        logging_iteration_interval: 50
+        logging_epoch_interval: 1
+
+        # the ratio of clients participanting in training
+        participant_clients_ratio: 0.5
+        
+        # whether maintain and load the trained 
+        # personalied model
+        # set to be true, each client will load
+        # the latest trained personalized model
+        persist_personalized_model: False
+
+        # do personalization 
+        # for every `do_personalization_interval` rounds
+        # set -1 to do personalized only after the final round
+        do_personalization_interval: -1
+        # total, participant, nonparticipant
+        do_personalization_group: nonparticipant
 
 parameters:
     model:

@@ -8,8 +8,6 @@ https://openreview.net/pdf?id=HuaYQfggn5u
 
 Source code: https://github.com/jhoon-oh/FedBABU
 """
-
-
 import os
 import sys
 

@@ -53,7 +53,6 @@ trainer:
     lr_scheduler: MultiStepLR
     loss_criterion: CrossEntropyLoss
 
-
     # The machine learning model
     model_name: lenet5
 
@@ -68,7 +67,7 @@ trainer:
         
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_partial
 
     head_modules_name:
         - fc4
