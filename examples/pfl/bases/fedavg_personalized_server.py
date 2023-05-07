@@ -1,13 +1,11 @@
 """
-A simple federated learning server capable of
-1.- performing personalized training.
-2.- utilizing a subset of clients for federated training while
-others for evaluation.
-
-The total clients are divided into two parts, referred to as
-1.- participant clients
-2.- nonparticipant clients
-
+A simple federated learning server capable of controling
+1. when to perform personalization 
+    - do_personalization_interval
+2. which part of clients will perform personalizaiton 
+    - do_personalization_group
+2. which part of clients will participant in the training
+    - participant_clients_ratio
 """
 
 from typing import List

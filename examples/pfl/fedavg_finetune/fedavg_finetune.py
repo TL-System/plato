@@ -22,10 +22,10 @@ sys.path.insert(0, os.path.dirname(pfl_bases))
 
 from bases import personalized_trainer
 from bases import fedavg_personalized_server
+from bases import fedavg_partial
 
 from bases.client_callbacks import ClientModelCallback
 from bases.trainer_callbacks import (
-    PersonalizedTrainerCallback,
     PersonalizedLogMetricCallback,
     PersonalizedLogProgressCallback,
 )
@@ -36,20 +36,22 @@ import fedavg_finetune_client
 
 def main():
     """
-    A Plato personalized federated learning training session using the FedAvg algorithm under the
-    supervised learning setting.
+    A Plato personalized federated learning sesstion for FedAvg with fine-tuning.
     """
     trainer = personalized_trainer.Trainer
     client = fedavg_finetune_client.Client(
         trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
         callbacks=[ClientModelCallback],
         trainer_callbacks=[
-            PersonalizedTrainerCallback,
             PersonalizedLogMetricCallback,
             PersonalizedLogProgressCallback,
         ],
     )
-    server = fedavg_personalized_server.Server(trainer=trainer)
+    server = fedavg_personalized_server.Server(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 

@@ -1,6 +1,5 @@
 """
-A personalized federated learning client using FedAvg.
-
+A personalized federated learning client with fine-tuning.
 """
 import logging
 
@@ -12,7 +11,7 @@ from plato.utils import fonts
 
 
 class Client(personalized_client.Client):
-    """A personalized federated learning trainer using the FedAvg algorithm."""
+    """A FedAvg client performing fine-tuning for personalization."""
 
     def load_personalized_model(self) -> None:
         """Load the personalized model.

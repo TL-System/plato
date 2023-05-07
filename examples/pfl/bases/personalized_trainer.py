@@ -1,5 +1,5 @@
 """
-The training and testing loops of PyTorch for personalized federated learning.
+The training and testing loops for personalized federated learning.
 
 """
 import logging
@@ -181,15 +181,6 @@ class Trainer(basic.Trainer):
         return outputs
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
-        """
         self.optimizer.zero_grad()
 
         outputs = self.model_forward(examples)
@@ -273,7 +264,7 @@ class Trainer(basic.Trainer):
         return rollback_status
 
     def create_unique_personalized_model(self, filename):
-        """Reset the model parameters."""
+        """Reset model parameters."""
         checkpoint_dir_path = self.get_checkpoint_dir_path()
         # reset the model for this client
         # thus, different clients have different init parameters
@@ -368,6 +359,6 @@ class Trainer(basic.Trainer):
     @staticmethod
     def process_personalized_outputs(outputs):
         """
-        Method called after the  model updates have been generated.
+        Method called to process outputs of the personalized model.
         """
         return outputs

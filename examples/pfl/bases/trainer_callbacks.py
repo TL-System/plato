@@ -1,11 +1,9 @@
 """
-The callbacks of personalized trainer.
-
+Callbacks for the personalized trainer.
 """
 
 import os
 import logging
-
 
 from plato.callbacks import trainer as trainer_callbacks
 from plato.config import Config
@@ -13,17 +11,13 @@ from plato.config import Config
 from bases.trainer_utils import checkpoint_personalized_accuracy
 
 
-class PersonalizedTrainerCallback(trainer_callbacks.TrainerCallback):
-    pass
-
-
 class PersonalizedLogMetricCallback(trainer_callbacks.TrainerCallback):
+    """A trainer callback to compute and record the test accuracy of the
+    personalized model."""
+
     def on_train_run_start(self, trainer, config, **kwargs):
-        """
-        Event called at the start of training run.
-        """
         super().on_train_run_start(trainer, config, **kwargs)
-        # performing the test for personalized learning
+        # perform test for the personalized model
         result_path = Config().params["result_path"]
         if trainer.personalized_learning:
             test_outputs = trainer.test_personalized_model(config)
@@ -38,26 +32,17 @@ class PersonalizedLogMetricCallback(trainer_callbacks.TrainerCallback):
             )
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
-        """
-        Event called at the end of a training epoch.
-        """
-        # perform the same accuracy computaton
+        # perform test for the personalized model
         self.on_train_run_start(trainer, config, **kwargs)
 
 
 class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
     """
-    A callback which controls the training logging.
+    A trainer logging callback which controls the frequent of logging for
+    both normal and personalized learning processes.
     """
 
     def on_train_step_end(self, trainer, config, batch=None, loss=None, **kwargs):
-        """
-        Event called at the end of a training step.
-
-        :param batch: the current batch of training data.
-        :param loss: the loss computed in the current batch.
-        """
-
         log_iter_interval = (
             (
                 config["logging_iteration_interval"]

@@ -2,6 +2,29 @@
 A basic personalized federated learning client who performs the 
 global learning and local learning.
 
+Note:
+    Plato simulates the client with multiple `processes`, which are started at the 
+    beginning of running. These The server will build fake connection with these `processes` 
+    - when the `processes` receive information from the server, the `configuration()` 
+    function is called the first time to perform necessary initialization 
+    (model, trainer, algorithm, personalized model). Server will solely select clients by 
+    sampling ids, which will be assigned to these `processes` to simulate that some clients 
+    are actually selected by the server. However, the model and any data of `processes` are 
+    reminded unchanged/outdated, thus makes no sense to those clients. For example, in round 
+    `r`, the first `process` is assigned with client id 10 to simulate the selection of 
+    client 10. But the model parameters and learning status of this `process` belong to the 
+    local update process of client 2 who are selected and simulated by this `process` in round
+    `r-1`.
+    
+    Therefore, only when each "client"/`process` receives payload holding model parameters from 
+    the server, the model of this "client"/`process` become meaningful to this
+    client becasue this term will be updated by the payload for current round.
+
+    This insight leads to a core conclusion:
+    Any membership variables of the client class should be updated in each round to hold this client's
+    own status. For example, in the personalized learning or scenarios containing local model, the client
+    should load its own previously saved status to refresh variables.
+
 """
 import sys
 import os
