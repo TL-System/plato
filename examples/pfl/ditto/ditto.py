@@ -13,16 +13,12 @@ import os
 import sys
 
 # Get the current directory of module1.py
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(pfl_bases))
+pfl_roots = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_roots))
 
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
-
-from bases.trainer_callbacks import (
-    PersonalizedLogMetricCallback,
-    PersonalizedLogProgressCallback,
-)
+from bases.trainer_callbacks import mixing_trainer_callbacks
 
 import ditto_trainer_callbacks
 import ditto_client
@@ -38,10 +34,8 @@ def main():
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         trainer_callbacks=[
-            PersonalizedLogMetricCallback,
-            PersonalizedLogProgressCallback,
-            ditto_trainer_callbacks.PersonalizedLogModelCallback,
-            ditto_trainer_callbacks.PersonalizedModelMetricCallback,
+            mixing_trainer_callbacks.PersonalizedModelMetricCallback,
+            ditto_trainer_callbacks.DittoStatusCallback,
         ],
     )
     server = fedavg_personalized_server.Server(

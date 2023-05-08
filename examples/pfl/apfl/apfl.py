@@ -17,17 +17,12 @@ import os
 import sys
 
 # Get the current directory of module1.py
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(pfl_bases))
+pfl_roots = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_roots))
 
 
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
-
-from bases.trainer_callbacks import (
-    PersonalizedLogMetricCallback,
-    PersonalizedLogProgressCallback,
-)
 
 import apfl_trainer_callbacks
 import apfl_client
@@ -42,12 +37,7 @@ def main():
     client = apfl_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        trainer_callbacks=[
-            PersonalizedLogMetricCallback,
-            PersonalizedLogProgressCallback,
-            apfl_trainer_callbacks.LearningStatusCallback,
-            apfl_trainer_callbacks.PersonalizedModelMetricCallback,
-        ],
+        trainer_callbacks=[apfl_trainer_callbacks.APFLStatusCallback],
     )
     server = fedavg_personalized_server.Server(
         trainer=trainer,

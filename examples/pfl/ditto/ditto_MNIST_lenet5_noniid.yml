@@ -83,6 +83,10 @@ algorithm:
         # from the https://github.com/lgcollins/FedRep
         ditto_lambda: 1.0
 
+        logging_iteration_interval: 50
+        logging_epoch_interval: 1
+        model_logging_epoch_interval: 2
+        
         # do personalization 
         # for every `do_personalization_interval` rounds
         # set -1 to do personalized only after the final round
