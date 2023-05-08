@@ -15,14 +15,10 @@ import sys
 pfl_bases = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_bases))
 
-
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
+from bases.trainer_callbacks import separate_trainer_callbacks
 
-from bases.trainer_callbacks import (
-    PersonalizedLogMetricCallback,
-    PersonalizedLogProgressCallback,
-)
 
 import fedbabu_client_callbacks
 import fedbabu_client
@@ -41,8 +37,8 @@ def main():
             fedbabu_client_callbacks.ClientModelCompletionCallback,
         ],
         trainer_callbacks=[
-            PersonalizedLogMetricCallback,
-            PersonalizedLogProgressCallback,
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
         ],
     )
     server = fedavg_personalized_server.Server(

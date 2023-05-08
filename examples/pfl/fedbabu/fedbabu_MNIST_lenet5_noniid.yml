@@ -86,8 +86,9 @@ algorithm:
     
         logging_iteration_interval: 50
         logging_epoch_interval: 1
-
-        model_name: lenet5
+        model_logging_epoch_interval: 2
+        
+        model_name: lenet5  
 
         frozen_modules_name:
             - conv1
