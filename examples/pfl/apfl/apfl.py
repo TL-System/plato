@@ -11,7 +11,6 @@ Third-part code:
 - https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
 - https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
 
-
 """
 import os
 import sys
@@ -20,9 +19,9 @@ import sys
 pfl_roots = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_roots))
 
-
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
+from bases.trainer_callbacks import mixing_trainer_callbacks
 
 import apfl_trainer_callbacks
 import apfl_client
@@ -37,7 +36,10 @@ def main():
     client = apfl_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        trainer_callbacks=[apfl_trainer_callbacks.APFLStatusCallback],
+        trainer_callbacks=[
+            mixing_trainer_callbacks.PersonalizedModelMetricCallback,
+            apfl_trainer_callbacks.APFLStatusCallback,
+        ],
     )
     server = fedavg_personalized_server.Server(
         trainer=trainer,

@@ -15,4 +15,4 @@ class APFLStatusCallback(mixing_trainer_callbacks.PersonalizedModelStatusCallbac
     def on_train_run_end(self, trainer, config, **kwargs):
         """Recording the personalized model and the updated alpha"""
         learning_dict = {"alpha": trainer.alpha}
-        super().on_train_run_end(trainer, config, learning_dict, **kwargs)
+        super().on_train_run_end(trainer, config, learning_dict=learning_dict)
