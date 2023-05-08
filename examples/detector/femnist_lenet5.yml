@@ -3,13 +3,14 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 200
+    total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 20
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test:
+        false
 
         # Whether client heterogeneity should be simulated
     speed_simulation: true
@@ -29,8 +30,8 @@ clients:
     avg_training_time: 10
 
     random_seed: 1
-    attack_type: LIE
-    attacker_ids: 1
+    attack_type: Min-Sum
+    attacker_ids: 1,2,3,4,5,6,7,8,9,10
 server:
     address: 127.0.0.1
     port: 2910
@@ -38,7 +39,6 @@ server:
     synchronous: true
     simulate_wall_time: true
     #defence_type:
-    
 
     checkpoint_path: results/FEMNIST/test/checkpoint
     model_path: results/FEMNIST/test/model
@@ -60,7 +60,7 @@ data:
     #testset_size: 1000
 
     # The random seed for sampling data
-    random_seed: 3
+    random_seed: 1
 
 trainer:
     # The type of the trainer
@@ -93,7 +93,7 @@ parameters:
         momentum: 0.9
         weight_decay: 0
     model:
-      num_classes: 62
+        num_classes: 62
 
 results:
     # Write the following parameter(s) into a CSV
