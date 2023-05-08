@@ -14,10 +14,13 @@ from plato.trainers import optimizers, lr_schedulers, loss_criterion
 from plato.utils import checkpoint_operator
 from plato.models import registry as models_registry
 from plato.utils import fonts
+from plato.utils.filename_formatter import NameFormatter
 
 from bases.trainer_callbacks.base_callbacks import (
     PersonalizedLogProgressCallback,
 )
+
+from bases.trainer_utils import checkpoint_personalized_accuracy
 
 warnings.simplefilter("ignore")
 
@@ -353,7 +356,45 @@ class Trainer(basic.Trainer):
 
         outputs = {"accuracy": accuracy}
 
+        self.personalized_model.train()
+
         return outputs
+
+    def perform_personalized_metric_checkpoint(self, config):
+        """Performing the test for the personalized model and saving the accuracy to
+        checkpoint file."""
+        result_path = Config().params["result_path"]
+        test_outputs = self.test_personalized_model(config)
+
+        checkpoint_personalized_accuracy(
+            result_path,
+            client_id=self.client_id,
+            accuracy=test_outputs["accuracy"],
+            current_round=self.current_round,
+            epoch=self.current_epoch,
+            run_id=None,
+        )
+
+    def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
+        """Performing the saving for the personalized model with
+        necessary learning parameters."""
+        current_round = self.current_round
+
+        personalized_model_name = self.personalized_model_name
+        save_location = self.get_checkpoint_dir_path()
+        filename = NameFormatter.get_format_name(
+            client_id=self.client_id,
+            model_name=personalized_model_name,
+            round_n=current_round,
+            epoch_n=epoch,
+            run_id=None,
+            prefix=self.personalized_model_checkpoint_prefix,
+            ext="pth",
+        )
+        os.makedirs(save_location, exist_ok=True)
+        self.save_personalized_model(
+            filename=filename, location=save_location, **kwargs
+        )
 
     def save_personalized_model(self, filename=None, location=None, **kwargs):
         """Saving the model to a file."""
