@@ -1,145 +1,76 @@
 clients:
+    # Type
+    type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 3
+    per_round: 40
 
     # Should the clients compute test accuracy locally?
     do_test: true
 
-    # the ratio of clients participanting in training
-    participant_clients_ratio: 0.5
-    
-    # whether maintain and load the trained 
-    # personalied model
-    # set to be true, each client will load
-    # the latest trained personalized model
-    persist_personalized_model: True
+    random_seed: 1
 
 server:
-
-    type: fedavg_personalized
     address: 127.0.0.1
-    port: 8000
-
+    port: 8001
     do_test: false
-    
-    # do personalization 
-    # for every `do_personalization_interval` rounds
-    # set -1 to do personalized only after the final round
-    do_personalization_interval: -1
-    # total, participant, nonparticipant
-    do_personalization_group: nonparticipant
+    random_seed: 1
+
+    checkpoint_path: models/fedrep/cifar10
+    model_path: models/fedrep/cifar10
 
 data:
     # The training and testing dataset
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 2000
+    partition_size: 600
 
-    
     # IID or non-IID?
     sampler: noniid
-    testset_sampler: noniid
 
     # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
+    concentration: 1
+
+    testset_sampler: noniid
 
     # The random seed for sampling data
     random_seed: 1
 
 trainer:
+    # The type of the trainer
+    type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 100
 
     # The maximum number of clients running concurrently
-    max_concurrency: 2
+    max_concurrency: 7
 
     # The target accuracy
-    target_accuracy: 0.94
-
-    # Number of epoches for local training in each communication round
-    epochs: 3
-    batch_size: 32
-    optimizer: SGD
-    lr_scheduler: MultiStepLR
-    loss_criterion: CrossEntropyLoss
+    target_accuracy: 0.87
 
     # Number of epochs for local training in each communication round
-    #   The batch size for the downstream task can be larger as it
-    # does not utilize the
-    personalized_epochs: 10
-    personalized_batch_size: 32
-    personalized_optimizer: SGD
-    personalized_lr_scheduler: StepLR
-    personalized_loss_criterion: CrossEntropyLoss
+    epochs: 10
+    batch_size: 10
+    optimizer: SGD
 
-    pers_epoch_log_interval: 2
+    # Number of epoches for head optimization
+    head_epochs: 9
 
     # The machine learning model
     model_name: resnet_18
-    personalized_model_name: resnet_18
-
-    head_epochs: 2
-
-    global_modules_name:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
-
-    head_modules_name:
-        - linear
-
-    frozen_modules_name:
-        - linear
-
-    frozen_personalized_modules_name:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
+    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg_partial
+    type: fedavg
 
 parameters:
     optimizer:
         lr: 0.03
-        momentum: 0.9
+        momentum: 0.0 # learning rate is fixed as in Appendix C.2
         weight_decay: 0.0
-
-    personalized_optimizer:
-        lr: 0.05
-        momentum: 0.9
-        weight_decay: 0.0
-
-    learning_rate:
-        gamma: 0.1
-        milestone_steps: 150ep,350ep
-
-    personalized_learning_rate:
-        gamma: 0.3
-        step_size: 10
-
-    loss_criterion:
-        label_smoothing: 0.5
-
-    personalized_loss_criterion:
-        label_smoothing: 0.5
-
-    model:
-        num_classes: 10
-
-    personalized_model:
-        num_classes: 10
-

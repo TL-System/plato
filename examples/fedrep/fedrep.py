@@ -13,18 +13,16 @@ Source code: https://github.com/lgcollins/FedRep
 
 import fedrep_trainer
 import fedrep_client
-
-from plato.servers.fedavg_personalized import Server
+import fedrep_server
+import fedrep_algorithm
 
 
 def main():
-    """
-    A Plato federated learning training session using the FedRep algorithm under the
-    supervised learning setting.
-    """
+    """A Plato federated learning training session using the FedRep algorithm."""
     trainer = fedrep_trainer.Trainer
-    client = fedrep_client.Client(trainer=trainer)
-    server = Server(trainer=trainer)
+    algorithm = fedrep_algorithm.Algorithm
+    client = fedrep_client.Client(algorithm=algorithm, trainer=trainer)
+    server = fedrep_server.Server(algorithm=algorithm, trainer=trainer)
 
     server.run(client)
 

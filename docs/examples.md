@@ -306,6 +306,16 @@ Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://a
 ```
 ````
 
+````{admonition} **FedPer**
+FedPer is a synchronous personalized federated learning algorithm that learns a global representation and personalized heads, but makes simultaneous local updates for both sets of parameters, therefore makes the same number of local updates for the head and the representation on each local round.
+
+```shell
+python examples/fedper/fedper.py -c examples/fedper/fedper_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Manoj Ghuhan Arivazhagan, et.al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
+&rdquo; in Arxiv, 2019.
 ````{admonition} **LG-FedAvg**
 LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
 
@@ -330,6 +340,73 @@ python examples/ditto/ditto.py -c examples/ditto/ditto_MNIST_lenet5_noniid.yml -
 ```{note}
 Tian Li, et.al, &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
 &rdquo; in Proc ICML, 2021.
+```
+````
+
+````{admonition} **PerFedAvg**
+PerFedAvg focuses the personalized federated learning in which our goal is to find an initial shared model that current or new users can easily adapt to their local dataset by performing one or a few steps of gradient descent with respect to their own data. Specifically, it introduces the Model-Agnostic Meta-Learning (MAML) framework into the local update of federated learning.
+
+```shell
+python examples/perfedavg/perfedavg.py -c examples/perfedavg/perfedavg_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```{note}
+Alireza Fallah, et.al, &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
+A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html),
+&rdquo; in Proc NeurIPS, 2020.
+```
+````
+
+````{admonition} **pFLSSL**
+pFLSSL achieves Personalized federated learning by introducing self-supervised learning (SSL) to the training schema. Specifically, there are two stages. In this first stage, one global model is trained based on SSL under the federated training paradigm. Each client, in the second stage, trains its personalized model based on the extracted features of the received global model. Therefore, due to the diversity of SSL approaches, pFLSSL includes:
+- SimCLR [1]
+- BYOL [2]
+- SimSiam [3]
+- MoCoV2 [4]
+- SwAV [5]
+- SMoG [6]
+
+```shell
+python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/simclr/simclr.py -c examples/pflSSL/simclr/simclr_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/byol/byol.py -c examples/pflSSL/byol/byol_MNIST_lenet5_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/simsiam/simsiam.py -c examples/pflSSL/simsiam/simsiam_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/moco/mocov2.py -c examples/pflSSL/moco/mocov2_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/swav/swav.py -c examples/pflSSL/swav/swav_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```shell
+python examples/pflSSL/smog/smog.py -c examples/pflSSL/smog/smog_CIFAR10_resnet18_noniid.yml -b NIPS
+```
+
+```{note}
+[1]. Ting Chen, et.al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
+
+[2]. Jean-Bastien Grill, et.al, &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
+
+[3]. Xinlei Chen, et.al, &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in ArXiv, 2020.
+
+[4]. Xinlei Chen, et.al, &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+
+[5]. Mathilde Caron, et.al, &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
+
+[6]. Bo Pang, et.al, &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
+
 ```
 ````
 
