@@ -1,5 +1,23 @@
 """
 Callbacks for the personalized trainer.
+
+The `PersonalizedLogProgressCallback` is provided as a default callback for
+the personalized trainer.
+
+The `PersonalizedModelCallback` is the base callback to 
+    1). record the personalized model at every `model_logging_epoch_interval`
+        of training.
+    2). record he personalized model at the end of training.
+ 
+
+The `PersonalizedMetricCallback` is the base callback to
+    1). test the personalized model before the training.
+    2). test the personalized model at every epoch.
+    3). test the personalized model after the training.
+
+
+The user is desired to inherit from these two basic callbacks to create
+customize ones.
 """
 
 import os
@@ -7,35 +25,9 @@ import logging
 
 from plato.callbacks import trainer as trainer_callbacks
 from plato.config import Config
+from plato.utils.filename_formatter import NameFormatter
 
 from bases.trainer_utils import checkpoint_personalized_accuracy
-
-
-class PersonalizedMetricCallback(trainer_callbacks.TrainerCallback):
-    """A trainer callback to compute and record the test accuracy of the
-    personalized model."""
-
-    def on_train_run_start(self, trainer, config, **kwargs):
-        super().on_train_run_start(trainer, config, **kwargs)
-        # perform test for the personalized model
-        result_path = Config().params["result_path"]
-        if trainer.personalized_learning:
-            test_outputs = trainer.test_personalized_model(config)
-
-            checkpoint_personalized_accuracy(
-                result_path,
-                client_id=trainer.client_id,
-                accuracy=test_outputs["accuracy"],
-                current_round=trainer.current_round,
-                epoch=trainer.current_epoch,
-                run_id=None,
-            )
-            trainer.personalized_model.to(trainer.device)
-            trainer.personalized_model.train()
-
-    def on_train_epoch_end(self, trainer, config, **kwargs):
-        # perform test for the personalized model
-        self.on_train_run_start(trainer, config, **kwargs)
 
 
 class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
@@ -85,3 +77,89 @@ class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
                     len(trainer.train_loader),
                     trainer.run_history.get_latest_metric("train_loss"),
                 )
+
+
+class PersonalizedMetricCallback(trainer_callbacks.TrainerCallback):
+    """A trainer callback to compute and record the test accuracy of the
+    personalized model."""
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        super().on_train_run_start(trainer, config, **kwargs)
+        # perform test for the personalized model
+        result_path = Config().params["result_path"]
+        test_outputs = trainer.test_personalized_model(config)
+
+        checkpoint_personalized_accuracy(
+            result_path,
+            client_id=trainer.client_id,
+            accuracy=test_outputs["accuracy"],
+            current_round=trainer.current_round,
+            epoch=trainer.current_epoch,
+            run_id=None,
+        )
+        trainer.personalized_model.to(trainer.device)
+        trainer.personalized_model.train()
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        # perform test for the personalized model
+        self.on_train_run_start(trainer, config, **kwargs)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        # perform test for the personalized model
+        self.on_train_run_start(trainer, config, **kwargs)
+
+
+class PersonalizedModelCallback(trainer_callbacks.TrainerCallback):
+    """A trainer callback to record the personalized model
+    every `model_logging_epoch_interval` epochs and at the end of
+    training."""
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        super().on_train_epoch_end(trainer, config, **kwargs)
+        log_epoch_interval = (
+            config["model_logging_epoch_interval"]
+            if "model_logging_epoch_interval" in config
+            else 1
+        )
+        current_epoch = trainer.current_epoch
+
+        if current_epoch % log_epoch_interval == 0:
+            if "max_concurrency" in config:
+                current_round = trainer.current_round
+
+                personalized_model_name = trainer.personalized_model_name
+                save_location = trainer.get_checkpoint_dir_path()
+                filename = NameFormatter.get_format_name(
+                    client_id=trainer.client_id,
+                    model_name=personalized_model_name,
+                    round_n=current_round,
+                    epoch_n=current_epoch,
+                    run_id=None,
+                    prefix=trainer.personalized_model_checkpoint_prefix,
+                    ext="pth",
+                )
+                os.makedirs(save_location, exist_ok=True)
+                trainer.save_personalized_model(
+                    filename=filename, location=save_location, **kwargs
+                )
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        super().on_train_run_end(trainer, config, **kwargs)
+
+        if "max_concurrency" in config:
+            current_round = trainer.current_round
+
+            personalized_model_name = trainer.personalized_model_name
+            save_location = trainer.get_checkpoint_dir_path()
+            filename = NameFormatter.get_format_name(
+                client_id=trainer.client_id,
+                model_name=personalized_model_name,
+                round_n=current_round,
+                run_id=None,
+                prefix=trainer.personalized_model_checkpoint_prefix,
+                ext="pth",
+            )
+            os.makedirs(save_location, exist_ok=True)
+            trainer.save_personalized_model(
+                filename=filename, location=save_location, **kwargs
+            )

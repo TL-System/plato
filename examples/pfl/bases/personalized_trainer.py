@@ -15,6 +15,10 @@ from plato.utils import checkpoint_operator
 from plato.models import registry as models_registry
 from plato.utils import fonts
 
+from bases.trainer_callbacks.base_callbacks import (
+    PersonalizedLogProgressCallback,
+)
+
 warnings.simplefilter("ignore")
 
 
@@ -28,8 +32,13 @@ class Trainer(basic.Trainer):
 
         # clear the original callbacks but only hold the
         # desired ones
-        self.callbacks = self.callbacks[1:]
         self.callback_handler.clear_callbacks()
+        self.callbacks = [
+            PersonalizedLogProgressCallback,
+        ]
+        if callbacks is not None:
+            self.callbacks.extend(callbacks)
+
         # only add the customized callbacks
         self.callback_handler.add_callbacks(self.callbacks)
 
@@ -192,17 +201,25 @@ class Trainer(basic.Trainer):
     def model_forward(self, examples):
         """Forward the input examples to the model."""
 
-        if not self.personalized_learning:
-            outputs = self.model(examples)
-        else:
-            outputs = self.personalized_model(examples)
+        return self.model(examples)
 
-        return outputs
+    def personalized_model_forward(self, examples):
+        """Forward the input examples to the personalized model."""
+
+        return self.personalized_model(examples)
+
+    def forward_examples(self, examples):
+        """Forward the examples through one model."""
+
+        if self.personalized_learning:
+            return self.personalized_model_forward(examples)
+        else:
+            return self.model_forward(examples)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         self.optimizer.zero_grad()
 
-        outputs = self.model_forward(examples)
+        outputs = self.forward_examples(examples)
 
         loss = self._loss_criterion(outputs, labels)
         self._loss_tracker.update(loss, labels.size(0))
@@ -324,7 +341,7 @@ class Trainer(basic.Trainer):
             for _, (examples, labels) in enumerate(data_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
-                outputs = self.model_forward(examples)
+                outputs = self.personalized_model_forward(examples)
 
                 outputs = self.process_personalized_outputs(outputs)
 
