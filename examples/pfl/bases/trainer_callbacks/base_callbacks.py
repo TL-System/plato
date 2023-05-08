@@ -77,7 +77,7 @@ class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
 
 
 class PersonalizedMetricCallback(trainer_callbacks.TrainerCallback):
-    """A trainer callback to compute and record the test accuracy of the
+    """A trainer callback to compute and record the metrics of the
     personalized model."""
 
     def on_train_run_start(self, trainer, config, **kwargs):

@@ -4,17 +4,56 @@ and personalized models. Typical approaches are FedBABU, FedRep.
 """
 
 
+from plato.config import Config
+
 from bases.trainer_callbacks import base_callbacks
 
 
 class PersonalizedModelStatusCallback(base_callbacks.PersonalizedModelCallback):
     """
-    A trainer callback to record learning status, including the
-    personalized model and additional variables after learning.
+    A trainer callback to record personalized learning status
+    1). at the end of any personalization.
+    2). every epochs interval only in the final personalization.
     """
 
-    def on_train_run_start(self, trainer, config, **kwargs):
-        """Performing the test for the personalized model only during
-        personalization."""
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        """Ensuring point 2)."""
+        if (
+            trainer.personalized_learning
+            and trainer.current_round == Config().trainer.rounds + 1
+        ):
+            super().on_train_epoch_end(trainer, config, **kwargs)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        """Ensuring point 1)."""
         if trainer.personalized_learning:
-            super().on_train_run_start(trainer, config, **kwargs)
+            learning_dict = kwargs["learning_dict"] if "learning_dict" in kwargs else {}
+            super().on_train_run_end(trainer, config, learning_dict=learning_dict)
+
+
+class PersonalizedModelMetricCallback(base_callbacks.PersonalizedMetricCallback):
+    """A trainer callback to compute and record the personalized metrics,
+        1). at the start of training process.
+        2). at each epoch only in the final personalization.
+        3). at the end of each personalization.
+    ."""
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """Ensuring point 3)."""
+        super().on_train_run_start(trainer, config, **kwargs)
+        # perform test for the personalized model
+        trainer.perform_personalized_metric_checkpoint(config)
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        """Ensuring point 2)."""
+        if (
+            trainer.personalized_learning
+            and trainer.current_round == Config().trainer.rounds + 1
+        ):
+            super().on_train_epoch_end(trainer, config, **kwargs)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        """Ensuring point 1)."""
+
+        if trainer.personalized_learning:
+            super().on_train_run_end(trainer, config, **kwargs)
