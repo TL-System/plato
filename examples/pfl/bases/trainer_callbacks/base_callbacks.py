@@ -11,7 +11,7 @@ from plato.config import Config
 from bases.trainer_utils import checkpoint_personalized_accuracy
 
 
-class PersonalizedLogMetricCallback(trainer_callbacks.TrainerCallback):
+class PersonalizedMetricCallback(trainer_callbacks.TrainerCallback):
     """A trainer callback to compute and record the test accuracy of the
     personalized model."""
 
