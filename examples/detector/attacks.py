@@ -108,59 +108,53 @@ def min_max_attack(weights_received, dev_type="unit_vec"):
 
     Reference:
 
-    Shejwalkar et al., “Manipulating the Byzantine: Opti- mizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
+    Shejwalkar et al., “Manipulating the Byzantine: Optimizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
 
     https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
     attacker_weights = flatten_weights(weights_received)
 
     weights_avg = torch.mean(attacker_weights, 0)
-    global_model_last_round = weights_avg
 
+    # Generate perturbation vectors (Inverse unit vector by default)
     if dev_type == "unit_vec":
-        deviation = global_model_last_round / torch.norm(
-            global_model_last_round
-        )  # unit vector, dir opp to good dir
+        # Inverse unit vector
+        perturbation_vector = weights_avg / torch.norm(weights_avg)
     elif dev_type == "sign":
-        deviation = torch.sign(global_model_last_round)
+        # Inverse sign
+        perturbation_vector = torch.sign(weights_avg)
     elif dev_type == "std":
-        deviation = torch.std(attacker_weights, 0)
+        # Inverse standard deviation
+        perturbation_vector = torch.std(attacker_weights, 0)
 
-    lambda_value = torch.Tensor([50.0]).float()
-    threshold = 1e-5
-    lambda_fail = lambda_value
-    lambda_succ = 0
-
-    # Search for maximal distance
-    distances = []
+    # Calculate the maximum distance between any two benign updates (unpoisoned)
+    max_distance = torch.tensor([0])
     for attacker_weight in attacker_weights:
         distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
-        distances = (
-            distance[None, :]
-            if not len(distances)
-            else torch.cat((distances, distance[None, :]), 0)
-        )
+        max_distance = torch.max(max_distance, torch.max(distance))
 
-    max_distance = torch.max(distances)
-    del distances
+    # Search for lambda such that its maximum distance from any other gradient is bounded
+    lambda_value = torch.Tensor([50.0]).float()
+    threshold = 1e-5
+    lambda_step = lambda_value
+    lambda_succ = 0
 
-    # Search for lambda
     while torch.abs(lambda_succ - lambda_value) > threshold:
-        poison_value = global_model_last_round - lambda_value * deviation
+        poison_value = weights_avg - lambda_value * perturbation_vector
         distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
         max_d = torch.max(distance)
 
         if max_d <= max_distance:
             lambda_succ = lambda_value
-            lambda_value = lambda_value + lambda_fail / 2
+            lambda_value = lambda_value + lambda_step / 2
         else:
-            lambda_value = lambda_value - lambda_fail / 2
+            lambda_value = lambda_value - lambda_step / 2
 
-        lambda_fail = lambda_fail / 2
+        lambda_step = lambda_step / 2
 
-    poison_value = global_model_last_round - lambda_succ * deviation
+    poison_value = weights_avg - lambda_succ * perturbation_vector
 
-    # perform model poisoning
+    # Perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
     logging.info(f"Finished Min-Max model poisoning attack.")
     return weights_poisoned
@@ -172,7 +166,7 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
 
     Reference:
 
-    Shejwalkar et al., “Manipulating the Byzantine: Opti- mizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
+    Shejwalkar et al., “Manipulating the Byzantine: Optimizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
 
     https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
@@ -181,51 +175,43 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
 
     weights_avg = torch.mean(attacker_weights, 0)
 
-    global_model_last_round = weights_avg
-
+    # Generate perturbation vectors (Inverse unit vector by default)
     if dev_type == "unit_vec":
-        deviation = global_model_last_round / torch.norm(
-            global_model_last_round
-        )  # unit vector, dir opp to good dir
+        # Inverse unit vector
+        perturbation_vector = weights_avg / torch.norm(weights_avg)
     elif dev_type == "sign":
-        deviation = torch.sign(global_model_last_round)
+        # Inverse sign
+        perturbation_vector = torch.sign(weights_avg)
     elif dev_type == "std":
-        deviation = torch.std(attacker_weights, 0)
+        # Inverse standard deviation
+        perturbation_vector = torch.std(attacker_weights, 0)
 
-    # Calculate minimal score
-    distances = []
+    # Calculate the minimal sum of squared distances of benign update from the other benign updates
+    min_sum_distance = torch.tensor([0])
     for attacker_weight in attacker_weights:
         distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
-        distances = (
-            distance[None, :]
-            if not len(distances)
-            else torch.cat((distances, distance[None, :]), 0)
-        )
-
-    scores = torch.sum(distances, dim=1)
-    score_min = torch.min(scores)
-    del distances
+        min_sum_distance = torch.min(min_sum_distance, torch.sum(distance))
 
     # Search for lambda
     lambda_value = torch.Tensor([50.0]).float()
     threshold = 1e-5
-    lambda_fail = lambda_value
+    lambda_step = lambda_value
     lambda_succ = 0
 
     while torch.abs(lambda_succ - lambda_value) > threshold:
-        poison_value = global_model_last_round - lambda_value * deviation
+        poison_value = weights_avg - lambda_value * perturbation_vector
         distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
         score = torch.sum(distance)
 
-        if score <= score_min:
+        if score <= min_sum_distance:
             lambda_succ = lambda_value
-            lambda_value = lambda_value + lambda_fail / 2
+            lambda_value = lambda_value + lambda_step / 2
         else:
-            lambda_value = lambda_value - lambda_fail / 2
+            lambda_value = lambda_value - lambda_step / 2
 
-        lambda_fail = lambda_fail / 2
+        lambda_step = lambda_step / 2
 
-    poison_value = global_model_last_round - lambda_succ * deviation
+    poison_value = weights_avg - lambda_succ * perturbation_vector
 
     # perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
@@ -236,7 +222,12 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
 def compute_lambda(attacker_weights, global_model_last_round, num_attackers):
     """Compute the lambda value for fang's attack."""
     distances = []
-    num_benign_clients, d = attacker_weights.shape  # ? total - num_attacker?
+    (
+        num_benign_clients,
+        d,
+    ) = (
+        attacker_weights.shape
+    )  # impractical, not sure how many benign clients are included.
 
     for weight in attacker_weights:
         distance = torch.norm((attacker_weights - weight), dim=1)
@@ -317,7 +308,7 @@ def fang_attack(weights_received):
     attacker_weights = flatten_weights(weights_received)
 
     weights_avg = torch.mean(attacker_weights, 0)
-    global_model_last_round = weights_avg
+    global_model_last_round = weights_avg  # ?
     lambda_value = compute_lambda(
         attacker_weights, global_model_last_round, num_attackers
     )
@@ -332,15 +323,12 @@ def fang_attack(weights_received):
         poison_value = -lambda_value * deviation
         poison_values = torch.stack([poison_value] * num_attackers)
         poison_values = torch.cat((poison_values, attacker_weights), 0)
-        logging.info(f"poison_value: %s", poison_value)
-        logging.info(f"poison_values: %s", poison_values)
 
         weights_avg, krum_candidate = multi_krum(
             poison_values, num_attackers, multi_k=False
         )
-        logging.info(f"krum_candidate: ", krum_candidate)
         if krum_candidate < num_attackers:
-            # perform model poisoning
+            # Perform model poisoning
             weights_poisoned = perform_model_poisoning(weights_received, poison_value)
             return weights_poisoned
         else:
