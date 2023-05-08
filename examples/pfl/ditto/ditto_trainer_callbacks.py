@@ -1,7 +1,7 @@
 """
-Customize callbacks to record the personalized model and alpha for APFL approach.
-
+Customize the model saving callback for Ditto approach.
 """
+
 import os
 
 from plato.callbacks import trainer as plato_trainer
@@ -11,10 +11,10 @@ from plato.config import Config
 from bases.trainer_utils import checkpoint_personalized_accuracy
 
 
-class LearningStatusCallback(plato_trainer.TrainerCallback):
+class PersonalizedLogModelCallback(plato_trainer.TrainerCallback):
     """
     A callback to record learning status, including the
-    personalized model and updated alpha after learning.
+    personalized model and updated lambda after learning.
     """
 
     def on_train_run_end(self, trainer, config, **kwargs):
@@ -25,7 +25,7 @@ class LearningStatusCallback(plato_trainer.TrainerCallback):
             if "max_concurrency" in config:
                 current_round = trainer.current_round
 
-                learning_dict = {"alpha": trainer.alpha}
+                learning_dict = {"ditto_lambda": trainer.ditto_lambda}
                 personalized_model_name = trainer.personalized_model_name
                 save_location = trainer.get_checkpoint_dir_path()
                 filename = NameFormatter.get_format_name(
@@ -64,6 +64,5 @@ class PersonalizedModelMetricCallback(plato_trainer.TrainerCallback):
                 epoch=trainer.current_epoch,
                 run_id=None,
             )
-
             trainer.personalized_model.to(trainer.device)
             trainer.personalized_model.train()

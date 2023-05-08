@@ -1,7 +1,7 @@
 clients:
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 5
 
     # The number of clients selected in each round
     per_round: 3

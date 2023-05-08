@@ -1,12 +1,9 @@
 """
 A personalized federated learning trainer For APFL.
 """
-
-
 import logging
 
 import numpy as np
-
 
 from bases import personalized_trainer
 

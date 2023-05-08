@@ -9,19 +9,45 @@ Third-part code: https://github.com/lgcollins/FedRep
 
 """
 
-# import ditto_trainer_v1 as ditto_trainer
-import ditto_trainer_v2 as ditto_trainer
-import ditto_client
+import os
+import sys
 
-from examples.pfl.bases import fedavg_personalized
+# Get the current directory of module1.py
+pfl_bases = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_bases))
+
+from bases import fedavg_personalized_server
+from bases import fedavg_partial
+
+from bases.trainer_callbacks import (
+    PersonalizedLogMetricCallback,
+    PersonalizedLogProgressCallback,
+)
+
+import ditto_trainer_callbacks
+import ditto_client
+import ditto_trainer_v2 as ditto_trainer
 
 
 def main():
-    """An interface for running the APFL method."""
-
+    """
+    A Plato personalized federated learning sesstion for FedBABU approach.
+    """
     trainer = ditto_trainer.Trainer
-    client = ditto_client.Client(trainer=trainer)
-    server = fedavg_personalized.Server(trainer=trainer)
+    client = ditto_client.Client(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        trainer_callbacks=[
+            PersonalizedLogMetricCallback,
+            PersonalizedLogProgressCallback,
+            ditto_trainer_callbacks.PersonalizedLogModelCallback,
+            ditto_trainer_callbacks.PersonalizedModelMetricCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 

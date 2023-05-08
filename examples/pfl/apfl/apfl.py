@@ -46,6 +46,7 @@ def main():
             PersonalizedLogMetricCallback,
             PersonalizedLogProgressCallback,
             apfl_trainer_callbacks.LearningStatusCallback,
+            apfl_trainer_callbacks.PersonalizedModelMetricCallback,
         ],
     )
     server = fedavg_personalized_server.Server(
