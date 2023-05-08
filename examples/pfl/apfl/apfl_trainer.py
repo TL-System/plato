@@ -20,7 +20,7 @@ class Trainer(personalized_trainer.Trainer):
 
         # the alpha used in the APFL paper
         self.alpha = 0.0
-        self.is_adaptive_alpha = False
+        self.adaptive_alpha = False
 
         # define the personalized optimizer
         # to update the personalized model
@@ -148,3 +148,43 @@ class Trainer(personalized_trainer.Trainer):
         super().perform_forward_and_backward_passes(config, examples, labels)
 
         return personalized_loss
+
+    def train_run_start(self, config):
+        """Defining items for personalization."""
+        super().train_run_start(config)
+
+        # define the personalized optimizer
+        self.personalized_optimizer = self.get_personalized_optimizer()
+
+        # set the personalized model to be trainable
+        self.personalized_model.to(self.device)
+        self.personalized_model.train()
+
+        # initialize the alpha
+        initial_alpha = config["alpha"]
+        self.adaptive_alpha = config["adaptive_alpha"]
+        self.alpha = initial_alpha if self.alpha == 0.0 else self.alpha
+
+    def train_epoch_start(self, config):
+        """Assigning the lr of optimizer to the personalized optimizer."""
+        super().train_epoch_start(config)
+        self.personalized_optimizer.param_groups[0]["lr"] = self.optimizer.param_groups[
+            0
+        ]["lr"]
+
+    def train_step_end(self, config, batch=None, loss=None):
+        """Updating the alpha of APFL before each iteration."""
+        super().train_step_end(config, batch, loss)
+        # update alpha based on the Eq. 10 of the paper.
+        if self.adaptive_alpha and self.current_epoch == 1 and batch == 0:
+            # 0.1/np.sqrt(1+args.local_index))
+            lr = self.lr_scheduler.get_lr()[0]
+            previous_alpha = self.alpha
+            self.update_alpha(lr)
+            logging.info(
+                "[Client #%d] in round#%d Update alpha from %.6f to %.6f.",
+                self.client_id,
+                self.current_round,
+                previous_alpha,
+                self.alpha,
+            )

@@ -38,7 +38,7 @@ data:
 trainer:
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 2
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -59,7 +59,7 @@ trainer:
     model_name: lenet5
     
     alpha: 0.75
-    is_adaptive_alpha: True
+    adaptive_alpha: True
 
 algorithm:
     # Aggregation algorithm
@@ -76,7 +76,7 @@ algorithm:
         model_name: lenet5
 
         alpha: 0.75
-        is_adaptive_alpha: True
+        adaptive_alpha: True
 
         # the ratio of clients participanting in training
         participant_clients_ratio: 1.0

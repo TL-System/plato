@@ -28,7 +28,6 @@ class Trainer(basic.Trainer):
 
         # clear the original callbacks but only hold the
         # desired ones
-
         self.callbacks = self.callbacks[1:]
         self.callback_handler.clear_callbacks()
         # only add the customized callbacks
