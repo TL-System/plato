@@ -38,12 +38,6 @@ class PersonalizedModelMetricCallback(base_callbacks.PersonalizedMetricCallback)
         3). at the end of each personalization.
     ."""
 
-    def on_train_run_start(self, trainer, config, **kwargs):
-        """Ensuring point 3)."""
-        super().on_train_run_start(trainer, config, **kwargs)
-        # perform test for the personalized model
-        trainer.perform_personalized_metric_checkpoint(config)
-
     def on_train_epoch_end(self, trainer, config, **kwargs):
         """Ensuring point 2)."""
         if (
@@ -53,7 +47,7 @@ class PersonalizedModelMetricCallback(base_callbacks.PersonalizedMetricCallback)
             super().on_train_epoch_end(trainer, config, **kwargs)
 
     def on_train_run_end(self, trainer, config, **kwargs):
-        """Ensuring point 1)."""
+        """Ensuring point 3)."""
 
         if trainer.personalized_learning:
             super().on_train_run_end(trainer, config, **kwargs)

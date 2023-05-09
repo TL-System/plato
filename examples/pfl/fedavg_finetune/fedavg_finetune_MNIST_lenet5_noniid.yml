@@ -35,7 +35,7 @@ data:
 trainer:
     
     # The maximum number of training rounds
-    rounds: 1
+    rounds: 3
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -87,7 +87,8 @@ algorithm:
 
         logging_iteration_interval: 50
         logging_epoch_interval: 1
-        
+        model_logging_epoch_interval: 2
+
 parameters:
     optimizer:
         lr: 0.05
