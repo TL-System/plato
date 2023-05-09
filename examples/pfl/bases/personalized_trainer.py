@@ -146,6 +146,18 @@ class Trainer(basic.Trainer):
             optimizer_params=optimizer_params,
         )
 
+    def get_personalized_lr_scheduler(self, config, optimizer):
+        """Getting the lr scheduler for personalized model."""
+        lr_scheduler = Config().algorithm.personalization.lr_scheduler
+        lr_params = Config().parameters.personalization.learning_rate._asdict()
+
+        return lr_schedulers.get(
+            optimizer,
+            len(self.train_loader),
+            lr_scheduler=lr_scheduler,
+            lr_params=lr_params,
+        )
+
     def get_optimizer(self, model):
         """Returns the optimizer."""
         if not self.personalized_learning:
@@ -158,15 +170,7 @@ class Trainer(basic.Trainer):
         if not self.personalized_learning:
             return super().get_lr_scheduler(config, optimizer)
 
-        lr_scheduler = Config().algorithm.personalization.lr_scheduler
-        lr_params = Config().parameters.personalization.learning_rate._asdict()
-
-        return lr_schedulers.get(
-            optimizer,
-            len(self.train_loader),
-            lr_scheduler=lr_scheduler,
-            lr_params=lr_params,
-        )
+        return self.get_personalized_lr_scheduler(config, optimizer)
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader for personalization."""
