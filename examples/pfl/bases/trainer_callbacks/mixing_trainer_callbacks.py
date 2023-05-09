@@ -3,8 +3,13 @@ Customize callbacks for trainer performing mixture optimization of the global mo
 and personalized models. Typical approaches are APFL, Ditto, LG-FedAvg.
 
 As the global model and personalized models are jointly trained during the normal 
-federated training process, the personalized model and its test accuracy will be 
+federated training process, the personalized model and its test metrics will be 
 saved after the local update.
+
+Therefore,
+1. personalized model will be saved and tested during the normal federated learning
+process.
+2. no personalization model will be optimized during the personalization.
 """
 
 
