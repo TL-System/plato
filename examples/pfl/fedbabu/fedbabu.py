@@ -18,9 +18,8 @@ sys.path.insert(0, os.path.dirname(pfl_bases))
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
 from bases.trainer_callbacks import separate_trainer_callbacks
+from bases.client_callbacks import completion_callbacks
 
-
-import fedbabu_client_callbacks
 import fedbabu_client
 import fedbabu_trainer
 
@@ -34,7 +33,7 @@ def main():
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[
-            fedbabu_client_callbacks.ClientModelCompletionCallback,
+            completion_callbacks.ClientModelCompletionCallback,
         ],
         trainer_callbacks=[
             separate_trainer_callbacks.PersonalizedModelMetricCallback,

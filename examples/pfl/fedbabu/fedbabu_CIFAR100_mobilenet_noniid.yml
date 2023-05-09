@@ -70,7 +70,7 @@ algorithm:
     # Aggregation algorithm
     type: fedavg_partial
 
-    head_modules_name:
+    completion_modules_name:
         - classifier
 
     personalization:
@@ -86,7 +86,8 @@ algorithm:
 
         logging_iteration_interval: 50
         logging_epoch_interval: 1
-
+        model_logging_epoch_interval: 2
+        
         model_type: torch_hub
         model_name: mobilenet_v2
 

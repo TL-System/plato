@@ -69,7 +69,7 @@ algorithm:
     # Aggregation algorithm
     type: fedavg_partial
 
-    head_modules_name:
+    completion_modules_name:
         - fc4
         - fc5
 
