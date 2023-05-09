@@ -53,9 +53,8 @@ trainer:
         - patch_embeddings
         - encoder
 
-    frozen_modules_name:
-        - patch_embeddings
-        - encoder
+    personalized_modules_name:
+        - classifier
 
 
 algorithm:

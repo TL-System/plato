@@ -10,21 +10,42 @@ https://arxiv.org/abs/2102.07078
 
 Source code: https://github.com/lgcollins/FedRep
 """
+import os
+import sys
 
-import fedrep_trainer
+# Get the current directory of module1.py
+pfl_bases = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_bases))
+
+from bases import fedavg_personalized_server
+from bases import fedavg_partial
+from bases.client_callbacks import completion_callbacks
+
+import fedrep_trainer_callbacks
 import fedrep_client
-
-from examples.pfl.bases.fedavg_personalized import Server
+import fedrep_trainer
 
 
 def main():
     """
-    A Plato federated learning training session using the FedRep algorithm under the
-    supervised learning setting.
+    A Plato personalized federated learning sesstion for FedBABU approach.
     """
     trainer = fedrep_trainer.Trainer
-    client = fedrep_client.Client(trainer=trainer)
-    server = Server(trainer=trainer)
+    client = fedrep_client.Client(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            completion_callbacks.ClientModelCompletionCallback,
+        ],
+        trainer_callbacks=[
+            fedrep_trainer_callbacks.PersonalizedModelMetricCallback,
+            fedrep_trainer_callbacks.PersonalizedModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 

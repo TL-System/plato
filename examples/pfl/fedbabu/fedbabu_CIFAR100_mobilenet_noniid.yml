@@ -63,7 +63,7 @@ trainer:
     global_modules_name:
         - features
 
-    frozen_modules_name:
+    personalized_modules_name:
         - classifier
 
 algorithm:

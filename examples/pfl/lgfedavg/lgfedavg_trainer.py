@@ -14,25 +14,12 @@ from bases import personalized_trainer
 class Trainer(personalized_trainer.Trainer):
     """A personalized federated learning trainer using the LG-FedAvg algorithm."""
 
-    def copy_model_to_personalized_model(self):
-        """Copying the model to the personalized model."""
-        self.personalized_model.load_state_dict(self.model.state_dict(), strict=True)
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] copied the model [%s] to personalized model [%s] for saving.",
-                colour="blue",
-            ),
-            self.client_id,
-            Config().trainer.model_name,
-            Config().algorithm.personalization.model_name,
-        )
-
     def preprocess_personalized_model(self, config):
         """In LG-FedAvg, only during the personalization process,
         the completed model will be assigned to the personalization model
         for direct evaluation."""
         if self.personalized_learning:
-            self.copy_model_to_personalized_model()
+            self.copy_model_to_personalized_model(config)
 
     def freeze_model(self, model, modules_name=None):
         """Freeze a part of the model."""
