@@ -10,10 +10,10 @@ from plato.processors import base
 from plato.callbacks import client as client_callbacks
 
 
-class ModelStatusProcessor(base.Processor):
+class PayloadStatusProcessor(base.Processor):
     """
-    A default model status processor to present what modules are
-    received by the client.
+    A default payload status processor to present what modules are
+    received contained in the payload.
     """
 
     def __init__(self, algorithm, **kwargs) -> None:
@@ -30,12 +30,12 @@ class ModelStatusProcessor(base.Processor):
         return data
 
 
-class ClientModelCallback(client_callbacks.ClientCallback):
+class ClientPayloadCallback(client_callbacks.ClientCallback):
     """
     A default client callback to process the received payload.
     """
 
     def on_inbound_received(self, client, inbound_processor):
         inbound_processor.processors.append(
-            ModelStatusProcessor(trainer=client.trainer, algorithm=client.algorithm)
+            PayloadStatusProcessor(trainer=client.trainer, algorithm=client.algorithm)
         )
