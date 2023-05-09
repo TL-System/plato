@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer for FedRep approach.
+A personalized federated learning trainer for FedPer approach.
 """
 
 import logging
@@ -77,7 +77,7 @@ class Trainer(personalized_trainer.Trainer):
         if self.personalized_learning:
             self.activate_model(self.personalized_model, config["frozen_modules_name"])
 
-        # load the trained model to the personalized model during
+        # assign the trained model to the personalized model during
         # the normal federated learning
         if not self.personalized_learning:
             self.copy_model_to_personalized_model(config)
