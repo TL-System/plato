@@ -70,41 +70,6 @@ def median(updates, baseline_weights, weights_attacked):
 
 def bulyan(updates, baseline_weights, weights_attacked):
     """Aggregate weight updates from the clients using bulyan."""
-    """
-        deltas_received = self.compute_weight_deltas(updates)
-        reports = [report for (__, report, __, __) in updates]
-        clients_id = [client for (client, __, __, __) in updates]
-
-        # The number of malicious clients is known to the server.
-        # This setting seems unreasonable
-        n_attackers = 0
-        for client_id in clients_id:
-            if client_id <= self.n_attackers:
-                n_attackers = n_attackers + 1
-
-        name_list = []
-        for name, delta in deltas_received[0].items():
-            name_list.append(name)
-
-        all_deltas_vector = []
-        for i, delta_received in enumerate(deltas_received):
-            delta_vector = []
-            for name in name_list:
-                delta_vector = (
-                    delta_received[name].view(-1)
-                    if not len(delta_vector)
-                    else torch.cat((delta_vector, delta_received[name].view(-1)))
-                )
-            all_deltas_vector = (
-                delta_vector[None, :]
-                if not len(all_deltas_vector)
-                else torch.cat((all_deltas_vector, delta_vector[None, :]), 0)
-            )
-
-        n_clients = all_deltas_vector.shape[0]
-        logging.info("[%s] n_clients: %d", self, n_clients)
-        logging.info("[%s] n_attackers: %d", self, n_attackers)
-        """
 
     total_clients = Config().clients.total_clients
     num_attackers = len(Config().clients.attacker_ids)
@@ -184,10 +149,6 @@ def krum(updates, baseline_weights, weights_attacked):
     remaining_weights = flatten_weights(weights_attacked)
 
     candidates_weights = []
-    # candidate_indices = []
-    # = flattened_weights # this is the remaining set in krum
-    # all_indices = np.arange(len(flattened_weights))
-    # logging.info(f"what's in the all_indices? %d",all_indices)
 
     while len(candidates_weights) < 1:
         distances = []
@@ -205,16 +166,7 @@ def krum(updates, baseline_weights, weights_attacked):
         scores = torch.sum(
             distances[:, : len(remaining_weights) - 2 - num_attackers_selected], dim=1
         )
-        sorted_scores = torch.argsort(
-            scores
-        )  # [:len(remaining_deltas_vector) - 2 - n_attackers]
-
-        # move from all indices into candidate
-        # candidate_indices.append(all_indices[indices[0].cpu().numpy()])
-        # logging.info(f"candidate_indices at line 282: %s", candidate_indices)
-        # all_indices = np.delete(all_indices, indices[0].cpu().numpy())
-        # logging.info(f"all_indices at line 284: %s",all_indices)
-        # put candidates' weights in to candidates (top1)
+        sorted_scores = torch.argsort(scores)
         candidates_weights = (
             remaining_weights[sorted_scores[0]][None, :]
             if not len(candidates_weights)
@@ -222,8 +174,7 @@ def krum(updates, baseline_weights, weights_attacked):
                 (candidates_weights, remaining_weights[sorted_scores[0]][None, :]), 0
             )
         )
-        logging.info(f"candidates_weights at line 292: %s", candidates_weights)
-        logging.info(f"remaining_weights at 293: %s", remaining_weights)
+
         remaining_weights = torch.cat(
             (
                 remaining_weights[: sorted_scores[0]],
@@ -231,7 +182,6 @@ def krum(updates, baseline_weights, weights_attacked):
             ),
             0,
         )
-    logging.info(f"remaining_weights at 301: %s", remaining_weights)
     mean_delta_vector = torch.mean(candidates_weights, dim=0)
 
     start_index = 0
