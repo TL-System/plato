@@ -20,7 +20,10 @@ class DataSource(base.DataSource):
         _val_dataset = Config().data.val_dataset
 
         self.trainset = CoCoDataset(
-            os.path.join(_path, "coco"), "train", condition=_condition
+            os.path.join(_path, "coco"),
+            "train",
+            condition=_condition,
+            dataset_size=50000,
         )
         if _val_dataset == "celeba":
             testset = CelebADataset(os.path.join(_path, "celeba"), "valid", _condition)
