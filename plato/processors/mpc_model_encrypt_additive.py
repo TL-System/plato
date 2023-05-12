@@ -67,8 +67,12 @@ class Processor(model.Processor):
         else:
             round_info_filename = "mpc_data/round_info"
             self.lock.acquire()
-            with open(round_info_filename, "rb") as round_info_file:
-                round_info = pickle.load(round_info_file)
+            try:
+                with open(round_info_filename, "rb") as round_info_file:
+                    round_info = pickle.load(round_info_file)
+            except FileNotFoundError:
+                logging.info("round info file has not been created")
+                round_info = None
 
         num_clients = len(round_info["selected_clients"])
 
