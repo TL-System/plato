@@ -6,19 +6,19 @@ https://github.com/lgcollins/FedRep.
 
 """
 
-import os
 import copy
 import logging
 
-from tqdm import tqdm
 
-from plato.trainers import basic_personalized
-from plato.utils.filename_formatter import NameFormatter
 from plato.trainers import tracking
 from plato.utils import fonts
+from plato.config import Config
 
 
-class Trainer(basic_personalized.Trainer):
+from bases import personalized_trainer
+
+
+class Trainer(personalized_trainer.Trainer):
     """A personalized federated learning trainer using the Ditto algorithm."""
 
     def __init__(self, model=None, callbacks=None):
@@ -28,16 +28,20 @@ class Trainer(basic_personalized.Trainer):
         self.ditto_lambda = 0.0
         self.initial_model_params = None
 
+        self.personalized_optimizer = None
+
+    def preprocess_personalized_model(self, config):
+        """Do nothing to the loaded personalized model in APFL."""
+
     def train_run_start(self, config):
-        """Define personalization before running."""
+        """Defining the personalization before running."""
+        super().train_run_start(config)
+
+        if self.personalized_learning:
+            config["epochs"] = 0
 
         # initialize the optimizer, lr_schedule, and loss criterion
-        self.personalized_optimizer = self.get_personalized_optimizer(
-            self.personalized_model
-        )
-        self.personalized_optimizer = self._adjust_lr(
-            config, self.lr_scheduler, self.personalized_optimizer
-        )
+        self.personalized_optimizer = self.get_personalized_optimizer()
 
         self.personalized_model.to(self.device)
         self.personalized_model.train()
@@ -48,27 +52,33 @@ class Trainer(basic_personalized.Trainer):
         # this is used as the baseline ditto weights in the Ditto solver
         self.initial_model_params = copy.deepcopy(self.model.state_dict())
 
+    def train_epoch_start(self, config):
+        """Assigning the lr of optimizer to the personalized optimizer."""
+        super().train_epoch_start(config)
+        self.personalized_optimizer.param_groups[0]["lr"] = self.optimizer.param_groups[
+            0
+        ]["lr"]
+
     def train_run_end(self, config):
-        """Perform the personalized learning of Ditto."""
+        """Performing the personalized learning of Ditto."""
         # save the personalized model for current round
         # to the model dir of this client
-        personalized_epochs = config["personalized_epochs"]
+        personalized_epochs = Config().algorithm.personalization.epochs
+        if self.personalized_learning:
+            return
 
-        show_str = logging.info(
-            fonts.colourize("[Client #%d] performing Ditto Solver: ", colour="blue"),
+        logging.info(
+            fonts.colourize(
+                "[Client #%d] performing Ditto Solver for personalizaiton: ",
+                colour="blue",
+            ),
             self.client_id,
         )
-        global_progress = tqdm(range(1, personalized_epochs + 1), desc=show_str)
         epoch_loss_meter = tracking.LossTracker()
 
-        for epoch in global_progress:
+        for epoch in range(1, personalized_epochs + 1):
             epoch_loss_meter.reset()
-            local_progress = tqdm(
-                self.train_loader,
-                desc=f"Epoch {epoch}/{personalized_epochs+1}",
-                disable=True,
-            )
-            for _, (examples, labels) in enumerate(local_progress):
+            for _, (examples, labels) in enumerate(self.train_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
                 # backup the params of defined model before optimization
                 # this is the v_k in the Algorithm. 1
@@ -109,76 +119,3 @@ class Trainer(basic_personalized.Trainer):
                 personalized_epochs,
                 epoch_loss_meter.average,
             )
-
-        if "max_concurrency" in config:
-
-            current_round = self.current_round
-
-            learning_dict = {"lambda": self.ditto_lambda}
-            personalized_model_name = config["personalized_model_name"]
-            save_location = self.get_checkpoint_dir_path()
-            filename = NameFormatter.get_format_name(
-                client_id=self.client_id,
-                model_name=personalized_model_name,
-                round_n=current_round,
-                run_id=None,
-                prefix="personalized",
-                ext="pth",
-            )
-            os.makedirs(save_location, exist_ok=True)
-            self.save_personalized_model(
-                filename=filename, location=save_location, learning_dict=learning_dict
-            )
-
-    # pylint: disable=unused-argument
-    def test_model(self, config, testset, sampler=None, **kwargs):
-        """
-        Evaluates the model with the provided test dataset and test sampler.
-        Auguments:
-        testset: the test dataset.
-        sampler: the test sampler. The default is None.
-        kwargs (optional): Additional keyword arguments.
-        """
-        trained_model_params = copy.deepcopy(self.model)
-        self.model.load_state_dict(self.personalized_model.state_dict(), strict=True)
-        accuracy = super().test_model(config, testset, sampler=None, **kwargs)
-        self.model.load_state_dict(trained_model_params, strict=True)
-        # save the personaliation accuracy to the results dir
-        self.checkpoint_personalized_accuracy(
-            accuracy=accuracy,
-            current_round=self.current_round,
-            epoch=config["epochs"],
-            run_id=None,
-        )
-
-        return accuracy
-
-    def personalized_train_model(self, config, trainset, sampler, **kwargs):
-        """Ditto will only evaluate the personalized model."""
-        batch_size = config["batch_size"]
-
-        testset = kwargs["testset"]
-        testset_sampler = kwargs["testset_sampler"]
-
-        personalized_test_loader = self.get_personalized_data_loader(
-            batch_size, testset, testset_sampler.get()
-        )
-
-        eval_outputs = self.perform_evaluation(
-            personalized_test_loader, self.personalized_model
-        )
-        accuracy = eval_outputs["accuracy"]
-
-        # save the personaliation accuracy to the results dir
-        self.checkpoint_personalized_accuracy(
-            accuracy=accuracy, current_round=self.current_round, epoch=0, run_id=None
-        )
-
-        if "max_concurrency" in config:
-
-            # save the accuracy directly for latter usage
-            # in the eval_test(...)
-            model_name = config["personalized_model_name"]
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-            self.save_accuracy(accuracy, filename)
-            return None

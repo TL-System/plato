@@ -1,17 +1,19 @@
 """
-A personalized federated learning trainer using FedBABU.
+A personalized federated learning trainer for FedBABU.
 
 """
 import logging
-from plato.trainers import basic_personalized
-from plato.algorithms import fedavg_partial
+
+from bases import personalized_trainer
+from bases import fedavg_partial
 
 
-class Trainer(basic_personalized.Trainer):
-    """A personalized federated learning trainer using the FedBABU algorithm."""
+class Trainer(personalized_trainer.Trainer):
+    """A trainer to freeze and activate modules of one model
+    for normal and personalized learning processes."""
 
     def freeze_model(self, model, modules_name=None):
-        """Freeze a part of the model."""
+        """Freezing a part of the model."""
         if modules_name is not None:
             frozen_params = []
             for name, param in model.named_parameters():
@@ -26,37 +28,27 @@ class Trainer(basic_personalized.Trainer):
             )
 
     def activate_model(self, model, modules_name=None):
-        """Defreeze a part of the model."""
+        """Defreezing a part of the model."""
         if modules_name is not None:
             for name, param in model.named_parameters():
                 if any([param_name in name for param_name in modules_name]):
                     param.requires_grad = True
 
     def train_run_start(self, config):
-        """According to FedBabu, freeze a partial of the model and
-        never update it in federated learning phase."""
-        self.freeze_model(self.model, config["frozen_modules_name"])
+        """According to FedBABU,
+        1. freeze head of the model during federated training phase.
+        2. freeze body of the personalized model during personalized learning phase.
+        """
+        super().train_run_start(config)
+        if self.personalized_learning:
+            self.freeze_model(self.personalized_model, config["frozen_modules_name"])
+        else:
+            self.freeze_model(self.model, config["frozen_modules_name"])
 
     def train_run_end(self, config):
-        """Activate the model."""
-        self.activate_model(self.model, config["frozen_modules_name"])
-
-    def personalized_train_run_start(self, config, **kwargs):
-        """According to FedBabu, freeze a partial of the model and
-        never update it during personalization."""
-        eval_outputs = super().personalized_train_run_start(config, **kwargs)
-        logging.info(
-            "[Client #%d] will freeze %s before performing personalization",
-            self.client_id,
-            config["frozen_personalized_modules_name"],
-        )
-        self.freeze_model(
-            self.personalized_model, config["frozen_personalized_modules_name"]
-        )
-        return eval_outputs
-
-    def personalized_train_run_end(self, config):
-        """Reactive the personalized model."""
-        self.activate_model(
-            self.personalized_model, config["frozen_personalized_modules_name"]
-        )
+        """Activating the model."""
+        super().train_run_end(config)
+        if self.personalized_learning:
+            self.activate_model(self.personalized_model, config["frozen_modules_name"])
+        else:
+            self.activate_model(self.model, config["frozen_modules_name"])

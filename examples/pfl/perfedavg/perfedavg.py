@@ -10,21 +10,42 @@ Official code: None
 Third-part code: https://github.com/jhoon-oh/FedBABU
 
 """
+import os
+import sys
+
+# Get the current directory of module1.py
+pfl_bases = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_bases))
+
+from bases import fedavg_personalized_server
+from bases import fedavg_partial
+from bases import personalized_client
+from bases.trainer_callbacks import separate_trainer_callbacks
+from bases.client_callbacks import completion_callbacks
 
 import perfedavg_trainer
-import perfedavg_client
-
-from examples.pfl.bases import fedavg_personalized
 
 
 def main():
-    """An interface for running the Per-FedAvg method under the
-    supervised learning setting.
     """
-
+    A Plato personalized federated learning sesstion for FedBABU approach.
+    """
     trainer = perfedavg_trainer.Trainer
-    client = perfedavg_client.Client(trainer=trainer)
-    server = fedavg_personalized.Server(trainer=trainer)
+    client = personalized_client.Client(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            completion_callbacks.ClientModelCompletionCallback,
+        ],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 

@@ -67,7 +67,6 @@ class Algorithm(fedavg.Algorithm):
         if modules_name is None:
             return model.cpu().state_dict()
         else:
-
             logging.info(
                 "[%s] Extracting parameters with names %s.",
                 self.get_algorithm_holder(),
@@ -78,7 +77,12 @@ class Algorithm(fedavg.Algorithm):
                 [
                     (name, param)
                     for name, param in model.cpu().state_dict().items()
-                    if any([param_name in name.strip().split(".") for param_name in modules_name])
+                    if any(
+                        [
+                            param_name in name.strip().split(".")
+                            for param_name in modules_name
+                        ]
+                    )
                 ]
             )
 

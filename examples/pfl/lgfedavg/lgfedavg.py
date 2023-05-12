@@ -8,19 +8,42 @@ https://arxiv.org/abs/2001.01523
 Official code: https://github.com/pliang279/LG-FedAvg
 
 """
+import os
+import sys
 
-import lgfedavg_trainer
+# Get the current directory of module1.py
+pfl_bases = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_bases))
+
+from bases import fedavg_personalized_server
+from bases import fedavg_partial
+from bases.client_callbacks import completion_callbacks
+from bases.trainer_callbacks import mixing_trainer_callbacks
+
 import lgfedavg_client
-
-from examples.pfl.bases import fedavg_personalized
+import lgfedavg_trainer
 
 
 def main():
-    """An interface for running the LG-FedAvg method."""
-
+    """
+    A Plato personalized federated learning sesstion for LG-FedAvg approach.
+    """
     trainer = lgfedavg_trainer.Trainer
-    client = lgfedavg_client.Client(trainer=trainer)
-    server = fedavg_personalized.Server(trainer=trainer)
+    client = lgfedavg_client.Client(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            completion_callbacks.ClientModelCompletionCallback,
+        ],
+        trainer_callbacks=[
+            mixing_trainer_callbacks.PersonalizedModelMetricCallback,
+            mixing_trainer_callbacks.PersonalizedModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 
