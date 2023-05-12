@@ -25,7 +25,6 @@ Valid values are `true` or `false`. The default value is `false`.
 ## clients
 
 ```{admonition} **type**
-<<<<<<< HEAD
 The type of the federated learning client. 
 
 - `simple` a basic client who sends weight updates to the server.
@@ -36,9 +35,6 @@ The type of the federated learning client.
 
 - `mpc` a client that encrypts model updates using multiparty computation. Raw and encrypted client model updates in each round are saved under `plato/mpc_data`.
 
-=======
-The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm;
->>>>>>> upstream/main
 ```
 
 ```{admonition} **total_clients**
