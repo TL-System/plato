@@ -9,9 +9,8 @@ import copy
 
 import torch
 
+from plato.trainers import basic_personalized
 from plato.utils.filename_formatter import NameFormatter
-
-from bases import personalized_trainer
 
 
 def get_data_batch(
@@ -75,7 +74,7 @@ def compute_gradients(
         return grads, loss
 
 
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic_personalized.Trainer):
     """A personalized federated learning trainer using the Per-FedAvg algorithm."""
 
     def __init__(self, model=None, callbacks=None):
@@ -83,13 +82,13 @@ class Trainer(personalized_trainer.Trainer):
 
         # the iterator for the dataloader
         self.iter_trainloader = None
+        self.iter_personalized_trainloader = None
 
     def train_epoch_start(self, config):
-        """Defining the iterator for the train dataloader."""
-        super().train_epoch_start(config)
+        """Method called at the beginning of a training epoch."""
         self.iter_trainloader = iter(self.train_loader)
 
-    def meta_forward_and_backward_passes_V2(self, config, examples, labels):
+    def perform_forward_and_backward_passes_v2(self, config, examples, labels):
         """Perform forward and backward passes in the training loop.
 
         This implementation derives from
@@ -195,55 +194,44 @@ class Trainer(personalized_trainer.Trainer):
 
         return loss
 
-    def meta_forward_and_backward_passes(self, config, examples, labels):
-        """Performing the meta training.        This implementation derives from
-        https://github.com/jhoon-oh/FedBABU
-        """
-        alpha = config["alpha"]
-        beta = config["beta"]
-        temp_net = copy.deepcopy(list(self.model.parameters()))
+    def train_run_end(self, config):
+        """Save the trained model to be the personalized model."""
+        # copy the trained model to the personalized model
+        self.personalized_model.load_state_dict(self.model.state_dict(), strict=True)
 
-        # Step 1
-        for g in self.optimizer.param_groups:
-            g["lr"] = alpha
+        current_round = self.current_round
 
-        self.model.zero_grad()
+        personalized_model_name = config["personalized_model_name"]
+        save_location = self.get_checkpoint_dir_path()
+        filename = NameFormatter.get_format_name(
+            client_id=self.client_id,
+            model_name=personalized_model_name,
+            round_n=current_round,
+            run_id=None,
+            prefix="personalized",
+            ext="pth",
+        )
+        os.makedirs(save_location, exist_ok=True)
+        self.save_personalized_model(filename=filename, location=save_location)
 
-        logits = self.model(examples)
+    def personalized_train_epoch_start(self, config):
+        """Operations before one epoch of training."""
+        super().personalized_train_epoch_start(config)
 
-        loss = self._loss_criterion(logits, labels)
-        loss.backward()
-        self.optimizer.step()
+        self.iter_personalized_trainloader = iter(self.personalized_train_loader)
 
-        # Step 2
-        for g in self.optimizer.param_groups:
-            g["lr"] = beta
-
-        examples, labels = next(self.iter_trainloader)
-        examples, labels = examples.to(self.device), labels.to(self.device)
-
-        self.model.zero_grad()
-
-        logits = self.model(examples)
-
-        loss = self._loss_criterion(logits, labels)
-        self._loss_tracker.update(loss, labels.size(0))
-        loss.backward()
-
-        # restore the model parameters to the one before first update
-        for old_p, new_p in zip(self.model.parameters(), temp_net):
-            old_p.data = new_p.data.clone()
-
-        self.optimizer.step()
-
-        return loss
-
-    def personalized_forward_and_backward_passes(self, config, examples, labels):
-        """Performing the forward pass for the personalized learning."""
-
+    def personalized_train_one_epoch(
+        self,
+        epoch,
+        config,
+        epoch_loss_meter,
+    ):
+        # pylint:disable=too-many-arguments
+        """Performing one epoch of learning for the personalization."""
         alpha = config["alpha"]
         beta = config["beta"]
 
+        epoch_loss_meter.reset()
         self.personalized_model.train()
         self.personalized_model.to(self.device)
 
@@ -258,7 +246,7 @@ class Trainer(personalized_trainer.Trainer):
 
         # Perfrom the training and compute the loss
         preds = self.personalized_model(examples)
-        loss = self._loss_criterion(preds, labels)
+        loss = self._personalized_loss_criterion(preds, labels)
 
         # Perfrom the optimization
         loss.backward()
@@ -283,4 +271,6 @@ class Trainer(personalized_trainer.Trainer):
         loss.backward()
         self.personalized_optimizer.step()
 
-        return loss
+        epoch_loss_meter.update(loss, labels.size(0))
+
+        return epoch_loss_meter

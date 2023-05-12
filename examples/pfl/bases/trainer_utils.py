@@ -1,6 +1,5 @@
 """
-The necessary tools used for the trainer.
-
+The necessary tools used by trainers.
 """
 
 import os

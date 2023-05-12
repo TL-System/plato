@@ -15,9 +15,8 @@ The `PersonalizedMetricCallback` is the base callback to
     2). test the personalized model at every epoch.
     3). test the personalized model after the training.
 
-
 The user is desired to inherit from these two basic callbacks to create
-customize ones.
+customized ones.
 """
 
 import os
