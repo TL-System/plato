@@ -548,7 +548,6 @@ Aggregation algorithm.
 
 The input should be:
 - `fedavg`:  the federated averaging algorithm
-- `fedavg_partial`:  the federated partial averaging algorithm (for aggregating partial sub-modules of one model).
 - `mistnet`: the MistNet algorithm
 ```
 
@@ -563,14 +562,6 @@ The total number of silos (edge servers). The input could be any positive intege
 The number of local aggregation rounds on edge servers before sending aggregated weights to the central server. The input could be any positive integer.
 ```
 ````
-
-```{note}
-When `fedavg_partial` is utilized as the algorithm, the hyper-parameter `global_submodules_name` should be set under the `trainer` of the
-configuration file. Otherwise, `global_submodules_name` will be defaulted as "whole", which makes the whole defined model utilize as the global model - All parameters of the defined model will be extracted for sending and global aggregation.
-
-Use two consecutive underscores `__` to separate sub-modules in `global_submodules_name`. For instance: "{submodule1_name}__{submodule2_name}__{submodule3_name}".
-
-```
 
 
 ## results

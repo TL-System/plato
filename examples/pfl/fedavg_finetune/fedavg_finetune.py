@@ -12,17 +12,41 @@ in the Proceedings of ICML 2021.
 
 """
 
-from fedavg_finetune_client import Client
-from plato.servers import registry as server_registry
+import os
+import sys
+
+# Get the current directory of module1.py
+pfl_bases = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(pfl_bases))
+
+
+from bases import personalized_trainer
+from bases import personalized_client
+from bases import fedavg_personalized_server
+from bases import fedavg_partial
+
+from bases.trainer_callbacks import separate_trainer_callbacks
+from bases.client_callbacks import base_callbacks
 
 
 def main():
     """
-    A Plato personalized federated learning training session using the FedAvg algorithm under the
-    supervised learning setting.
+    A Plato personalized federated learning sesstion for FedAvg with fine-tuning.
     """
-    client = Client()
-    server = server_registry.get()
+    trainer = personalized_trainer.Trainer
+    client = personalized_client.Client(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[base_callbacks.ClientPayloadCallback],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 
