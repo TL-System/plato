@@ -11,4 +11,6 @@ gym
 zstd
 torch-optimizer
 timm
+lightly
+scikit-learn
 kazoo

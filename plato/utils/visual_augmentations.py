@@ -39,33 +39,25 @@ Sources of normalizations:
 
 """
 
-from typing import Tuple, List, Union
+from typing import Tuple, List, Union, Dict
 
 from torchvision import transforms
 from PIL import Image, ImageOps
 
+MNIST_NORMALIZE = {"mean": [0.1307], "std": [0.3081]}
+FashionMNIST_NORMALIZE = {"mean": [0.1307], "std": [0.3081]}
+CIFAR10_NORMALIZE = {"mean": [0.491, 0.482, 0.447], "std": [0.247, 0.243, 0.262]}
+CIFAR100_NORMALIZE = {"mean": [0.491, 0.482, 0.447], "std": [0.247, 0.243, 0.262]}
+IMAGENET_NORMALIZE = {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}
+STL10_NORMALIZE = {"mean": [0.4914, 0.4823, 0.4466], "std": [0.247, 0.243, 0.261]}
 
-datasets_norm = {
-    "MNIST": [
-        [
-            0.1307,
-        ],
-        [
-            0.3081,
-        ],
-    ],
-    "FashionMNIST": [
-        [
-            0.1307,
-        ],
-        [
-            0.3081,
-        ],
-    ],
-    "CIFAR10": [[0.491, 0.482, 0.447], [0.247, 0.243, 0.262]],
-    "CIFAR100": [[0.491, 0.482, 0.447], [0.247, 0.243, 0.262]],
-    "IMAGENET": [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]],
-    "STL10": [[0.4914, 0.4823, 0.4466], [0.247, 0.243, 0.261]],
+datasets_normalization = {
+    "MNIST": MNIST_NORMALIZE,
+    "FashionMNIST": FashionMNIST_NORMALIZE,
+    "CIFAR10": CIFAR10_NORMALIZE,
+    "CIFAR100": CIFAR100_NORMALIZE,
+    "IMAGENET": IMAGENET_NORMALIZE,
+    "STL10": STL10_NORMALIZE,
 }
 
 
@@ -86,7 +78,6 @@ class Equalization:
 
 def get_visual_transform(
     image_size: Union[int, Tuple[int, int]],
-    normalize: List[list, list],
     brightness: float,
     contrast: float,
     saturation: float,
@@ -102,11 +93,12 @@ def get_visual_transform(
     min_scale: float = 0.08,
     max_scale: float = 1.0,
     crop_size: int = 32,
+    normalize: Union[None, Dict[str, List[float]]] = IMAGENET_NORMALIZE,
 ):
     """Get the target transformation.
 
     :param image_size: A tuple or integer containing the input image size.
-    :param normalize: A neste list containing the mean and std of the normalization.
+    :param normalize: A Dict containing the mean and std of the normalization.
     :param brightness: Sampled uniformly in [max(0, 1 - brightness), 1 + brightness].
     :param contrast: sampled uniformly in [max(0, 1 - contrast), 1 + contrast].
     :param saturation: sampled uniformly in [max(0, 1 - saturation), 1 + saturation].
@@ -153,7 +145,9 @@ def get_visual_transform(
         transforms.ToTensor(),
     ]
     if normalize is not None:
-        transform_funcs.append(transforms.Normalize(*normalize))
+        transform_funcs.append(
+            transforms.Normalize(mean=normalize["mean"], std=normalize["std"])
+        )
 
     return transforms.Compose(transform_funcs), transform_funcs
 
@@ -333,7 +327,7 @@ class SimSiamTransform:
         return x1, x2
 
 
-class SvAVTransform:
+class SwaVTransform:
     """This the contrastive data augmentation [1] used by the SWAV [2] method.
 
     [1]. https://github.com/facebookresearch/swav/blob/master/src/multicropdataset.py

@@ -407,6 +407,11 @@ class Server(fedavg.Server):
         else:
             server_response["learning_mode"] = "normal"
 
+        server_response["client_group"] = (
+            "participant"
+            if client_id in self.client_groups_pool["participant"]
+            else "nonparticipant"
+        )
         return server_response
 
     async def wrap_up(self):

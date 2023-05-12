@@ -5,7 +5,7 @@ A personalized federated learning client using FedAvg.
 import logging
 
 
-from plato.clients import simple_personalized
+from examples.pfl.bases import simple_personalized
 from plato.config import Config
 from plato.utils import fonts
 

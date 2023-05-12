@@ -1,6 +1,4 @@
 clients:
-    # Type
-    type: simple_personalized
 
     # The total number of clients
     total_clients: 10
@@ -21,16 +19,19 @@ clients:
     persist_personalized_model: False
 
 server:
+
     type: fedavg_personalized
     address: 127.0.0.1
     port: 8000
 
+    do_test: false
+    
     # do personalization 
     # for every `do_personalization_interval` rounds
     # set -1 to do personalized only after the final round
     do_personalization_interval: -1
     # total, participant, nonparticipant
-    do_personalization_group: total
+    do_personalization_group: nonparticipant
 
 data:
     # The training and testing dataset
@@ -51,8 +52,6 @@ data:
     random_seed: 1
 
 trainer:
-    # The type of the trainer
-    type: basic_personalized
 
     # The maximum number of training rounds
     rounds: 5
@@ -74,7 +73,7 @@ trainer:
     #   The batch size for the downstream task can be larger as it
     # does not utilize the
     personalized_epochs: 10
-    personalized_batch_size: 12
+    personalized_batch_size: 32
     personalized_optimizer: SGD
     personalized_lr_scheduler: StepLR
     personalized_loss_criterion: CrossEntropyLoss
@@ -85,18 +84,31 @@ trainer:
     model_name: lenet5
     personalized_model_name: lenet5
 
+    global_modules_name:
+        - fc4
+        - fc5
+
+    body_modules_name:
+        - conv1
+        - conv2
+        - conv3
+
+    frozen_personalized_modules_name:
+        - fc4
+        - fc5
+
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_partial
 
 parameters:
     optimizer:
-        lr: 0.05
+        lr: 0.01
         momentum: 0.9
-        weight_decay: 0.000001
+        weight_decay: 0.0
 
     personalized_optimizer:
-        lr: 0.1
+        lr: 0.05
         momentum: 0.9
         weight_decay: 0.0
 

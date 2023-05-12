@@ -1,8 +1,6 @@
 """
 A federated learning server using SCAFFOLD.
 
-The personalized federated learning of SCAFFOLD has been supported.
-
 Reference:
 
 Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning,"
@@ -13,10 +11,10 @@ https://arxiv.org/pdf/1910.06378.pdf
 from collections import OrderedDict
 
 from plato.config import Config
-from plato.servers import fedavg_personalized
+from plato.servers import fedavg
 
 
-class Server(fedavg_personalized.Server):
+class Server(fedavg.Server):
     """A federated learning server using the SCAFFOLD algorithm."""
 
     def __init__(
@@ -34,22 +32,20 @@ class Server(fedavg_personalized.Server):
 
     def weights_received(self, weights_received):
         """Compute control variates from clients' updated weights."""
-        if not self.performing_personalization:
-            self.received_client_control_variates = [
-                weight[1] for weight in weights_received
-            ]
+        self.received_client_control_variates = [
+            weight[1] for weight in weights_received
+        ]
 
         return [weight[0] for weight in weights_received]
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""
         # Update server control variate
-        if not self.performing_personalization:
-            for client_control_variate_delta in self.received_client_control_variates:
-                for name, param in client_control_variate_delta.items():
-                    self.server_control_variate[name] += param.to(
-                        device=Config().device()
-                    ) * (1 / Config().clients.total_clients)
+        for client_control_variate_delta in self.received_client_control_variates:
+            for name, param in client_control_variate_delta.items():
+                self.server_control_variate[name] += param.to(
+                    device=Config().device()
+                ) * (1 / Config().clients.total_clients)
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."

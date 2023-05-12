@@ -16,7 +16,6 @@ from plato.clients import (
 
 registered_clients = {
     "simple": simple.Client,
-    "simple_personalized": simple_personalized.Client,
     "mistnet": mistnet.Client,
     "mpc": mpc.Client,
 }

@@ -32,20 +32,10 @@ import torch
 
 from plato.algorithms import fedavg
 from plato.config import Config
-from plato.trainers.base import Trainer
 
 
 class Algorithm(fedavg.Algorithm):
     """Federated averaging algorithm for the partial aggregation, used by both the client and the server."""
-
-    def __init__(self, trainer: Trainer):
-        super().__init__(trainer=trainer)
-
-        # in this algorithm, the sub-module's name that is used as the global model
-        # shared among clients should be set.
-        # by default, the whole model will be used as the global model
-        # i.e., whole_model_name = "whole"
-        self.whole_model_name = "whole"
 
     def get_algorithm_holder(self):
         """Get who holds the defined algorithm."""
@@ -83,11 +73,12 @@ class Algorithm(fedavg.Algorithm):
                 self.get_algorithm_holder(),
                 modules_name,
             )
+
             return OrderedDict(
                 [
                     (name, param)
                     for name, param in model.cpu().state_dict().items()
-                    if any([param_name in name for param_name in modules_name])
+                    if any([param_name in name.strip().split(".") for param_name in modules_name])
                 ]
             )
 

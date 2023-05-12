@@ -1,6 +1,6 @@
 """
-A basic personalized federated learning client
-who performs the global learning and local learning.
+A basic personalized federated learning client who performs the 
+global learning and local learning.
 
 """
 
@@ -14,6 +14,7 @@ from plato.config import Config
 from plato.models import registry as models_registry
 from plato.utils import fonts
 from plato.utils.filename_formatter import NameFormatter
+from plato.trainers import registry as trainers_registry
 
 
 class Client(simple.Client):
@@ -27,6 +28,8 @@ class Client(simple.Client):
         trainer=None,
         callbacks=None,
         personalized_model=None,
+        personalized_trainer=None,
+        personalized_trainer_callbacks=None,
     ):
         # pylint:disable=too-many-arguments
         super().__init__(
@@ -42,6 +45,12 @@ class Client(simple.Client):
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
 
+        # the personalized trainer
+        self.custom_personalized_trainer = personalized_trainer
+        self.personalized_trainer = None
+
+        self.personalized_trainer_callbacks = personalized_trainer_callbacks
+
         # the learning model to be performed in this client
         # by default, performing `normal` fl's local update
         # there are two options:
@@ -49,11 +58,25 @@ class Client(simple.Client):
         # 2.- personalization
         self.learning_mode = "normal"
 
+        # which group that client belongs to
+        # there are two options:
+        # 1. participant
+        # 2. nonparticipant
+        self.client_group = "participant"
+
+        # whether this client contains the corresponding
+        # personalized model
+        self.novel_client = False
+
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
 
         super().process_server_response(server_response)
         self.learning_mode = server_response["learning_mode"]
+
+    def get_personalized_model_params(self):
+        """Get the params of the personalized model."""
+        return Config().parameters.personalized_model._asdict()
 
     def configure(self) -> None:
         """Performing the general client's configure and then initialize the
@@ -73,7 +96,7 @@ class Client(simple.Client):
         # assign the personalized model to the client
         if self.personalized_model is None and self.custom_personalized_model is None:
 
-            pers_model_params = Config().parameters.personalized_model._asdict()
+            pers_model_params = self.get_personalized_model_params()
             self.personalized_model = models_registry.get(
                 model_name=pers_model_name,
                 model_type=pers_model_type,
@@ -86,10 +109,32 @@ class Client(simple.Client):
             self.personalized_model = self.custom_personalized_model()
 
         logging.info(
-            "[Client #%d] defines the personalized model: %s",
+            "[Client #%d] defined the personalized model: %s",
             self.client_id,
             pers_model_name,
         )
+        logging.info(
+            "[Client #%d] defines the personalized trainer. %s", self.client_id
+        )
+        if (
+            self.personalized_trainer is None
+            and self.custom_personalized_trainer is None
+        ):
+            self.personalized_trainer = trainers_registry.get(
+                model=self.personalized_model,
+                callbacks=self.personalized_trainer_callbacks,
+                type=Config().trainer.personalized_type,
+            )
+        elif (
+            self.personalized_trainer is None
+            and self.custom_personalized_trainer is not None
+        ):
+            self.personalized_trainer = self.custom_personalized_trainer(
+                model=self.personalized_model,
+                callbacks=self.personalized_trainer_callbacks,
+            )
+
+        self.personalized_trainer.set_client_id(self.client_id)
 
         # assign the client's personalized model to its trainer
         # we need to know that in Plato, the personalized model here
@@ -128,6 +173,7 @@ class Client(simple.Client):
             ext="pth",
         )
         checkpoint_file_path = os.path.join(checkpoint_dir_path, filename)
+        self.novel_client = False
         # if the personalized model for current client does
         # not exist - this client is selected the first time
         if not os.path.exists(checkpoint_file_path):
@@ -152,6 +198,8 @@ class Client(simple.Client):
                 filename=filename,
                 location=checkpoint_dir_path,
             )
+            # set this client to be the novel one
+            self.novel_client = True
 
     def load_personalized_model(self):
         """Load the personalized model.
@@ -212,12 +260,13 @@ class Client(simple.Client):
             )
 
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
-        self.trainer.rollback_model(
+        loaded_status = self.trainer.rollback_model(
             model_name=personalized_model_name,
             modelfile_prefix="personalized",
             rollback_round=desired_round,
             location=checkpoint_dir_path,
         )
+        return loaded_status
 
     def _load_payload(self, server_payload) -> None:
         """Load the server model onto this client.
@@ -227,9 +276,9 @@ class Client(simple.Client):
         2. load its personalized model locally.
         """
         logging.info(
-            "[Client #%d] Received the model [%s].",
+            "[Client #%d] Received the payload containing modules: %s.",
             self.client_id,
-            Config().trainer.model_name,
+            self.algorithm.extract_modules_name(list(server_payload.keys())),
         )
         # load the model
         self.algorithm.load_weights(server_payload)
@@ -292,13 +341,13 @@ class Client(simple.Client):
             except ValueError:
                 await self.sio.disconnect()
 
-        if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
-            hasattr(Config().clients, "test_interval")
-            and self.current_round % Config().clients.test_interval == 0
-        ):
-            accuracy = self.trainer.test(self.testset, self.testset_sampler)
-        else:
-            accuracy = 0
+            if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
+                hasattr(Config().clients, "test_interval")
+                and self.current_round % Config().clients.test_interval == 0
+            ):
+                accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            else:
+                accuracy = 0
 
         # Extract model weights and biases
         weights = self.algorithm.extract_weights()
@@ -344,3 +393,7 @@ class Client(simple.Client):
     def is_personalized_learn(self):
         """Whether this client will perform personalization."""
         return self.learning_mode == "personalization"
+
+    def is_participant_group(self):
+        """Whether this client participants the federated training."""
+        return self.client_group == "participant"

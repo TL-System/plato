@@ -25,6 +25,7 @@ Valid values are `true` or `false`. The default value is `false`.
 ## clients
 
 ```{admonition} **type**
+<<<<<<< HEAD
 The type of the federated learning client. 
 
 - `simple` a basic client who sends weight updates to the server.
@@ -35,6 +36,9 @@ The type of the federated learning client.
 
 - `mpc` a client that encrypts model updates using multiparty computation. Raw and encrypted client model updates in each round are saved under `plato/mpc_data`.
 
+=======
+The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm;
+>>>>>>> upstream/main
 ```
 
 ```{admonition} **total_clients**
@@ -154,10 +158,6 @@ A list of processors for the client to apply on the payload before receiving it 
 Percentage of clients participating in federated training out of all clients. The value should range from 0 to 1.
 ```
 
-```{admonition} persist_personalized_model
-Whether the status of the trained personalized model will be persisted for subsequent training. Setting `True` will force each client to load the previously trained personalized model before any personalization learning. 
-
-```
 
 ## server
 
@@ -409,7 +409,6 @@ The number of samples in the server's test dataset when server-side evaluation i
 The type of the trainer. The following types are available:
 - `basic`: a basic trainer with a standard training loop.
 - `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
-- `basic_personalized`: a trainer supports all-purpose personalized federated learning by adding the personalized learning process.
 
 ```{admonition} max_physical_batch_size
 The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
@@ -570,38 +569,6 @@ If the `model_type` above specified a model repository, supply the name of the m
 For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
-
-````{admonition} **personalized learning**
-The variables used when the client performs the personalization locally:
-
-- `personalized_epochs` 
-- `personalized_batch_size`
-- `personalized_optimizer`
-- `personalized_lr_scheduler`
-- `personalized_loss_criterion`
-- `personalized_model_name`
-- `personalized_epoch_log_interval` (Logging the training details)
-
-
-````{note}
-The definitions, configurations, and applications of these variables for personalization align with those of traditional federated learning described previously.
-````
-
-The specific hyperparameters of certain variables, including `model`, `personalized_optimizer`, `personalized_lr_scheduler`, and `personalized_loss_criterion`, can be configured in the parameters section of the configuration file, as demonstrated below:
-
-```
-parameters:
-    model:
-        num_classes: 10
-    personalized_optimizer:
-        lr: 0.1
-        momentum: 0.9
-        weight_decay: 0.0
-```
-
-
-````
-
 
 
 ## algorithm
