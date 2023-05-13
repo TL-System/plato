@@ -42,13 +42,13 @@ def get(client_id: int = 0, **kwargs):
     data_transform_name = (
         kwargs["data_transform_name"]
         if "data_transform_name" in kwargs
-        else Config().data.train_transform
+        else Config().algorithm.train_transform.name
     )
     data_transform_params = (
         kwargs["data_transform_params"]
         if "data_transform_params" in kwargs
-        else Config().parameters.train_transform._asdict()
-        if hasattr(Config().parameters, "train_transform")
+        else Config().algorithm.train_transform.parameters._asdict()
+        if hasattr(Config().algorithm.train_transform, "parameters")
         else {}
     )
 
