@@ -4,8 +4,8 @@ A personalized federated learning trainer for FedPer.
 """
 import logging
 
-from bases import personalized_trainer
-from bases import fedavg_partial
+from pflbases import personalized_trainer
+from pflbases import fedavg_partial
 
 
 class Trainer(personalized_trainer.Trainer):

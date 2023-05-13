@@ -15,7 +15,7 @@ from plato.utils import fonts
 from plato.config import Config
 
 
-from bases import personalized_trainer
+from pflbases import personalized_trainer
 
 
 class Trainer(personalized_trainer.Trainer):

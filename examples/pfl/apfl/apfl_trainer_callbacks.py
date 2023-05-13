@@ -4,7 +4,7 @@ Customize callbacks to record the personalized model and alpha for APFL approach
 """
 
 
-from bases.trainer_callbacks import mixing_trainer_callbacks
+from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
 
 class APFLStatusCallback(mixing_trainer_callbacks.PersonalizedModelStatusCallback):

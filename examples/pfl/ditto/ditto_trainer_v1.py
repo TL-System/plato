@@ -10,7 +10,7 @@ https://github.com/litian96/ditto.
 import torch
 from torch.nn.functional import cross_entropy
 
-from bases import personalized_trainer
+from pflbases import personalized_trainer
 
 
 class Trainer(personalized_trainer.Trainer):

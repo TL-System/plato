@@ -11,7 +11,7 @@ import torch
 
 from plato.utils.filename_formatter import NameFormatter
 
-from bases import personalized_trainer
+from pflbases import personalized_trainer
 
 
 def get_data_batch(

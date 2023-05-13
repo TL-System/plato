@@ -13,7 +13,7 @@ process.
 """
 
 
-from bases.trainer_callbacks import base_callbacks
+from pflbases.trainer_callbacks import base_callbacks
 
 
 class PersonalizedModelStatusCallback(base_callbacks.PersonalizedModelCallback):

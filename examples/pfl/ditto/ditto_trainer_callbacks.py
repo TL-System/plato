@@ -2,7 +2,7 @@
 Customize the model saving callback for Ditto approach.
 """
 
-from bases.trainer_callbacks import mixing_trainer_callbacks
+from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
 
 class DittoStatusCallback(mixing_trainer_callbacks.PersonalizedModelStatusCallback):

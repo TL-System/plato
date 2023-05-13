@@ -27,16 +27,16 @@ from lightly.models.modules.heads import SimCLRProjectionHead
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
-from bases import fedavg_personalized_server
-from bases import fedavg_partial
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
 
-from bases.trainer_callbacks import separate_trainer_callbacks
-from bases.trainer_callbacks import ssl_trainer_callbacks
-from bases.client_callbacks import local_completion_callbacks
+from pflbases.trainer_callbacks import separate_trainer_callbacks
+from pflbases.trainer_callbacks import ssl_trainer_callbacks
+from pflbases.client_callbacks import local_completion_callbacks
 
-from bases import ssl_client
-from bases import ssl_trainer
-from bases import ssl_datasources
+from pflbases import ssl_client
+from pflbases import ssl_trainer
+from pflbases import ssl_datasources
 
 
 class SimCLR(torch.nn.Module):

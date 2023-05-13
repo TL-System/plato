@@ -16,9 +16,9 @@ import sys
 pfl_roots = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_roots))
 
-from bases import fedavg_personalized_server
-from bases import fedavg_partial
-from bases.trainer_callbacks import mixing_trainer_callbacks
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
+from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
 import ditto_trainer_callbacks
 import ditto_client

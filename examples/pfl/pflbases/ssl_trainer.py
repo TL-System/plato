@@ -16,7 +16,7 @@ from tqdm import tqdm
 from plato.trainers import loss_criterion
 from plato.config import Config
 
-from bases import personalized_trainer
+from pflbases import personalized_trainer
 
 
 class ExamplesList(UserList):

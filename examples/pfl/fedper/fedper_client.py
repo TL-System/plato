@@ -3,7 +3,7 @@ The personalized federated learning client for FedPer approach.
 """
 
 
-from bases import personalized_client
+from pflbases import personalized_client
 
 
 class Client(personalized_client.Client):

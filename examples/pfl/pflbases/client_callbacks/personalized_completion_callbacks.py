@@ -11,7 +11,7 @@ from typing import Any
 from plato.config import Config
 from plato.processors import base
 
-from bases.client_callbacks import base_callbacks
+from pflbases.client_callbacks import base_callbacks
 
 
 class PayloadCompletionProcessor(base.Processor):

@@ -13,7 +13,7 @@ personalization for mulitple epochs to train the personalized model.
 
 from plato.config import Config
 
-from bases.trainer_callbacks import base_callbacks
+from pflbases.trainer_callbacks import base_callbacks
 
 
 class PersonalizedModelStatusCallback(base_callbacks.PersonalizedModelCallback):

@@ -9,7 +9,7 @@ import logging
 from plato.samplers import registry as samplers_registry
 from plato.config import Config
 
-from bases import personalized_client
+from pflbases import personalized_client
 
 
 class Client(personalized_client.Client):

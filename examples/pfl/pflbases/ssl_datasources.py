@@ -7,7 +7,7 @@ from plato.datasources import base
 from plato.datasources import registry as datasources_registry
 from plato.config import Config
 
-from bases import transform_registry
+from pflbases import transform_registry
 
 
 def get_transform(transform_config: dict):

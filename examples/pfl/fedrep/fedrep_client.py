@@ -3,7 +3,7 @@ A personalized federated learning client for FedRep.
 """
 
 
-from bases import personalized_client
+from pflbases import personalized_client
 
 
 class Client(personalized_client.Client):

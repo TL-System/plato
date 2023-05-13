@@ -20,13 +20,13 @@ pfl_bases = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_bases))
 
 
-from bases import personalized_trainer
-from bases import personalized_client
-from bases import fedavg_personalized_server
-from bases import fedavg_partial
+from pflbases import personalized_trainer
+from pflbases import personalized_client
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
 
-from bases.trainer_callbacks import separate_trainer_callbacks
-from bases.client_callbacks import base_callbacks
+from pflbases.trainer_callbacks import separate_trainer_callbacks
+from pflbases.client_callbacks import base_callbacks
 
 
 def main():

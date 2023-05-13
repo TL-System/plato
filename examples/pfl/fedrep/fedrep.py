@@ -17,10 +17,10 @@ import sys
 pfl_bases = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_bases))
 
-from bases import fedavg_personalized_server
-from bases import fedavg_partial
-from bases.client_callbacks import personalized_completion_callbacks
-from bases.trainer_callbacks import semi_mixing_trainer_callbacks
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
+from pflbases.client_callbacks import personalized_completion_callbacks
+from pflbases.trainer_callbacks import semi_mixing_trainer_callbacks
 
 import fedrep_client
 import fedrep_trainer

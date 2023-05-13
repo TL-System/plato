@@ -5,7 +5,7 @@ import logging
 
 import numpy as np
 
-from bases import personalized_trainer
+from pflbases import personalized_trainer
 
 
 class Trainer(personalized_trainer.Trainer):

@@ -15,12 +15,12 @@ from plato.models import registry as models_registry
 from plato.utils import fonts
 from plato.utils.filename_formatter import NameFormatter
 
-from bases.trainer_callbacks.base_callbacks import (
+from pflbases.trainer_callbacks.base_callbacks import (
     PersonalizedLogProgressCallback,
 )
 
-from bases.trainer_utils import checkpoint_personalized_metrics
-from bases.trainer_utils import MetircsCollector
+from pflbases.trainer_utils import checkpoint_personalized_metrics
+from pflbases.trainer_utils import MetircsCollector
 
 warnings.simplefilter("ignore")
 

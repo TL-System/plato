@@ -2,7 +2,7 @@
 A personalized federated learning client For Ditto.
 """
 
-from bases import personalized_client
+from pflbases import personalized_client
 
 
 class Client(personalized_client.Client):
