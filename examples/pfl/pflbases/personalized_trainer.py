@@ -211,6 +211,11 @@ class Trainer(basic.Trainer):
         if self.personalized_learning:
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
+            # the model name is needed to be maintained here
+            # as Plato will use config["model_name"] to save the model
+            # and then load the saved model relying on
+            # Config().trainer.model_name
+            config["model_name"] = Config().trainer.model_name
 
             self.personalized_model.to(self.device)
             self.personalized_model.train()
