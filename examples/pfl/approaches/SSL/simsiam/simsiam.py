@@ -8,15 +8,6 @@ Source code: https://github.com/facebookresearch/simsiam
 Third-party code: https://github.com/PatrickHua/SimSiam
 """
 
-
-import os
-import sys
-
-# Add `bases` to the path
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-grandparent_directory = os.path.abspath(os.path.join(pfl_bases, os.pardir, os.pardir))
-sys.path.insert(1, grandparent_directory)
-
 from torch import nn
 
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead

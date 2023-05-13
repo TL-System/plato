@@ -8,13 +8,6 @@ Official code: None
 Third-part code: https://github.com/jhoon-oh/FedBABU
 """
 
-import os
-import sys
-
-# Add `bases` to the path
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(pfl_bases))
-
 from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 from pflbases.client_callbacks import personalized_completion_callbacks

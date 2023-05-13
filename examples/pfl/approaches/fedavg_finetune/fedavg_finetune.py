@@ -12,13 +12,6 @@ in the Proceedings of ICML 2021.
 
 """
 
-import os
-import sys
-
-# Add `bases` to the path
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(pfl_bases))
-
 
 from pflbases import personalized_trainer
 from pflbases import personalized_client

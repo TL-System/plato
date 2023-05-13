@@ -11,15 +11,6 @@ the work https://github.com/spijkervet/SimCLR.git.
 
 """
 
-
-import os
-import sys
-
-# Add `bases` to the path
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-grandparent_directory = os.path.abspath(os.path.join(pfl_bases, os.pardir, os.pardir))
-sys.path.insert(1, grandparent_directory)
-
 import torch
 
 from lightly.models.modules.heads import SimCLRProjectionHead

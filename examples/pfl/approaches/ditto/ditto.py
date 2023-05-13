@@ -9,13 +9,6 @@ Third-part code: https://github.com/lgcollins/FedRep
 
 """
 
-import os
-import sys
-
-# Add `bases` to the path
-pfl_roots = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(pfl_roots))
-
 from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 from pflbases.trainer_callbacks import mixing_trainer_callbacks

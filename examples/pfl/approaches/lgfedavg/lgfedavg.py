@@ -8,12 +8,6 @@ https://arxiv.org/abs/2001.01523
 Official code: https://github.com/pliang279/LG-FedAvg
 
 """
-import os
-import sys
-
-# Add `bases` to the path
-pfl_bases = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(pfl_bases))
 
 from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial

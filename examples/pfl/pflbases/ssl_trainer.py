@@ -11,7 +11,6 @@ from collections import UserList
 import torch
 from torch import Tensor
 from lightly.data.multi_view_collate import MultiViewCollate
-from tqdm import tqdm
 
 from plato.trainers import loss_criterion
 from plato.config import Config
