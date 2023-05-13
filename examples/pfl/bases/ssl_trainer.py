@@ -151,18 +151,22 @@ class Trainer(personalized_trainer.Trainer):
             sampler=sampler,
         )
 
+    def plato_ssl_loss_wrapper(self):
+        """A wrapper to connect ssl loss with plato."""
+        defined_ssl_loss = loss_criterion.get()
+
+        def compute_plato_loss(outputs, labels):
+            if isinstance(outputs, (list, tuple)):
+                return defined_ssl_loss(*outputs)
+            else:
+                return defined_ssl_loss(outputs)
+
+        return compute_plato_loss
+
     def get_loss_criterion(self):
         """Returns the loss criterion."""
         if not self.personalized_learning:
-            defined_ssl_loss = loss_criterion.get()
-
-            def compute_plato_loss(outputs, labels):
-                if isinstance(outputs, (list, tuple)):
-                    return defined_ssl_loss(*outputs)
-                else:
-                    return defined_ssl_loss(outputs)
-
-            return compute_plato_loss
+            return self.plato_ssl_loss_wrapper()
 
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
         loss_criterion_params = (

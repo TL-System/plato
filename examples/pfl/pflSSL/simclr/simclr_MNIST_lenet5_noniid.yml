@@ -85,6 +85,9 @@ algorithm:
             parameters:
                 input_size: 28
 
+    completion_modules_name:
+        -
+
     personalization:
 
         # Number of epochs for local training in each communication round

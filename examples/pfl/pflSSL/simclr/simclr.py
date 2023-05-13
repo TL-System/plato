@@ -29,8 +29,11 @@ from plato.config import Config
 
 from bases import fedavg_personalized_server
 from bases import fedavg_partial
+
 from bases.trainer_callbacks import separate_trainer_callbacks
-from bases.client_callbacks import completion_callbacks
+from bases.trainer_callbacks import ssl_trainer_callbacks
+from bases.client_callbacks import local_completion_callbacks
+
 from bases import ssl_client
 from bases import ssl_trainer
 from bases import ssl_datasources
@@ -89,11 +92,12 @@ def main():
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[
-            # completion_callbacks.ClientModelCompletionCallback,
+            local_completion_callbacks.ClientModelLocalCompletionCallback,
         ],
         trainer_callbacks=[
             separate_trainer_callbacks.PersonalizedModelMetricCallback,
             separate_trainer_callbacks.PersonalizedModelStatusCallback,
+            ssl_trainer_callbacks.ModelStatusCallback,
         ],
     )
     server = fedavg_personalized_server.Server(
