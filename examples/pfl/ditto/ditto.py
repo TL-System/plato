@@ -12,7 +12,7 @@ Third-part code: https://github.com/lgcollins/FedRep
 import os
 import sys
 
-# Get the current directory of module1.py
+# Add `bases` to the path
 pfl_roots = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_roots))
 

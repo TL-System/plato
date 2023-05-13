@@ -11,7 +11,7 @@ Source code: https://github.com/jhoon-oh/FedBABU
 import os
 import sys
 
-# Get the current directory of module1.py
+# Add `bases` to the path
 pfl_bases = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(pfl_bases))
 
