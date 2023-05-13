@@ -5,7 +5,6 @@ The training and testing loops for personalized federated learning.
 import logging
 import os
 import warnings
-
 import torch
 
 from plato.config import Config
@@ -20,7 +19,8 @@ from bases.trainer_callbacks.base_callbacks import (
     PersonalizedLogProgressCallback,
 )
 
-from bases.trainer_utils import checkpoint_personalized_accuracy
+from bases.trainer_utils import checkpoint_personalized_metrics
+from bases.trainer_utils import MetircsCollector
 
 warnings.simplefilter("ignore")
 
@@ -61,6 +61,10 @@ class Trainer(basic.Trainer):
         self.testset = None
         self.testset_sampler = None
 
+        # the collector for the test metrics
+        # only for personalization
+        self.test_metrics_collector = MetircsCollector()
+
     def set_training_mode(self, personalized_mode: bool):
         """Set the learning model of this trainer.
 
@@ -90,7 +94,7 @@ class Trainer(basic.Trainer):
             dataset=self.testset,
             shuffle=False,
             batch_size=batch_size,
-            sampler=self.sampler,
+            sampler=self.testset_sampler.get(),
         )
 
     def define_personalized_model(self, personalized_model):
@@ -216,18 +220,19 @@ class Trainer(basic.Trainer):
 
         return self.model(examples)
 
-    def personalized_model_forward(self, examples):
+    def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
+        # by default, there is no metric outputs
 
         return self.personalized_model(examples)
 
-    def forward_examples(self, examples):
+    def forward_examples(self, examples, **kwargs):
         """Forward the examples through one model."""
 
         if self.personalized_learning:
-            return self.personalized_model_forward(examples)
+            return self.personalized_model_forward(examples, **kwargs)
         else:
-            return self.model_forward(examples)
+            return self.model_forward(examples, **kwargs)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         self.optimizer.zero_grad()
@@ -334,6 +339,17 @@ class Trainer(basic.Trainer):
             location=checkpoint_dir_path,
         )
 
+    def collect_batch_outputs(self, metrics_collector: dict):
+        """Collecting the outputs of one batch samples."""
+
+        for metric_name, metric_data in self.personalized_metric_outputs.items():
+            if metric_name not in metrics_collector:
+                metrics_collector[metric_name] = [metric_data.detach().cpu().numpy()]
+            else:
+                metrics_collector[metric_name].append(
+                    metric_data.detach().cpu().numpy()
+                )
+
     def test_personalized_model(self, config, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
@@ -344,7 +360,7 @@ class Trainer(basic.Trainer):
         data_loader = self.get_test_loader(
             config["batch_size"],
         )
-
+        self.test_metrics_collector.reset()
         correct = 0
         total = 0
 
@@ -352,32 +368,32 @@ class Trainer(basic.Trainer):
             for _, (examples, labels) in enumerate(data_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
-                outputs = self.personalized_model_forward(examples)
-
+                outputs = self.personalized_model_forward(examples, split="test")
                 outputs = self.process_personalized_outputs(outputs)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
+                self.test_metrics_collector.add_labels(labels)
+                self.test_metrics_collector.add_predictions(predicted)
+
         accuracy = correct / total
 
-        test_outputs = {"accuracy": accuracy}
+        self.test_metrics_collector.set_accuracy(accuracy)
 
         self.personalized_model.train()
-
-        return test_outputs
 
     def perform_personalized_metric_checkpoint(self, config):
         """Performing the test for the personalized model and saving the accuracy to
         checkpoint file."""
         result_path = Config().params["result_path"]
-        test_outputs = self.test_personalized_model(config)
+        self.test_personalized_model(config)
 
-        checkpoint_personalized_accuracy(
+        checkpoint_personalized_metrics(
             result_path,
             client_id=self.client_id,
-            accuracy=test_outputs["accuracy"],
+            metrics_holder=self.test_metrics_collector,
             current_round=self.current_round,
             epoch=self.current_epoch,
             run_id=None,
