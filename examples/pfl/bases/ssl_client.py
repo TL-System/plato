@@ -22,6 +22,7 @@ class Client(personalized_client.Client):
         algorithm=None,
         trainer=None,
         callbacks=None,
+        trainer_callbacks=None,
         personalized_model=None,
         personalized_datasource=None,
     ):
@@ -31,6 +32,7 @@ class Client(personalized_client.Client):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
             personalized_model=personalized_model,
         )
 
@@ -54,9 +56,14 @@ class Client(personalized_client.Client):
         super().configure()
 
         if self.personalized_datasource is None:
-            logging.info("[%s] Define its personalized Dataset", self)
+            transforms_block = (
+                {}
+                if not hasattr(Config().algorithm.personalization, "data_transforms")
+                else Config().algorithm.personalization.data_transforms._asdict()
+            )
+            logging.info("Defining the personalized datasource:")
             self.personalized_datasource = self.custom_personalized_datasource(
-                transform_block=Config().algorithm.personalization.data_transforms._asdict()
+                transforms_block=transforms_block
             )
 
         # Setting up the data sampler for personalization
@@ -74,7 +81,7 @@ class Client(personalized_client.Client):
         sampler_type = (
             Config().algorithm.personalization.testset_sampler
             if hasattr(Config().algorithm.personalization, "testset_sampler")
-            else Config().algorithm.personalization.testset_sampler
+            else Config().data.testset_sampler
         )
         # Set the sampler for test set
         self.personalized_testset_sampler = samplers_registry.get(
@@ -87,6 +94,10 @@ class Client(personalized_client.Client):
         # obtain the train/test set for personalization
         self.personalized_trainset = self.personalized_datasource.get_train_set()
         self.personalized_testset = self.personalized_datasource.get_test_set()
+
+    def inbound_received(self, inbound_processor):
+        """Setting personalized datasets and the samplers to the trainer."""
+        super().inbound_received(inbound_processor)
 
         # set personalized terms for the trainer
         self.trainer.set_personalized_trainset(self.personalized_trainset)

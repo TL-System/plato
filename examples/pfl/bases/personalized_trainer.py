@@ -111,7 +111,7 @@ class Trainer(basic.Trainer):
             self.personalized_model = personalized_model()
 
         logging.info(
-            "[Client #%d] defined the personalized model: %s",
+            "[Client #%d] Defined the personalized model: %s",
             self.client_id,
             self.personalized_model_name,
         )
@@ -362,11 +362,11 @@ class Trainer(basic.Trainer):
 
         accuracy = correct / total
 
-        outputs = {"accuracy": accuracy}
+        test_outputs = {"accuracy": accuracy}
 
         self.personalized_model.train()
 
-        return outputs
+        return test_outputs
 
     def perform_personalized_metric_checkpoint(self, config):
         """Performing the test for the personalized model and saving the accuracy to

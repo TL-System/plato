@@ -10,10 +10,9 @@ from plato.config import Config
 from bases import transform_registry
 
 
-def get_transform(transform_config):
+def get_transform(transform_config: dict):
     """Getting transform for the desired transform_type."""
 
-    transform_config = transform_config._asdict()
     transform_name = transform_config["name"]
     transform_params = transform_config["parameters"]._asdict()
     defined_transform = transform_registry.get(
@@ -30,13 +29,13 @@ def get_data_transforms(transforms_block: dict):
     data_transforms = {}
 
     if "train_transform" in transforms_block:
-        transform_config = transforms_block["train_transform"]
+        transform_config = transforms_block["train_transform"]._asdict()
         train_transform = get_transform(transform_config)
         logging.info("Data train transform: %s", transform_config["name"])
         data_transforms.update({"train_transform": train_transform})
 
     if "test_transform" in transforms_block:
-        transform_config = transforms_block["test_transform"]
+        transform_config = transforms_block["test_transform"]._asdict()
         test_transform = get_transform(transform_config)
         logging.info("Data test transform: %s", transform_config["name"])
         data_transforms.update({"test_transform": test_transform})

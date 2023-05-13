@@ -104,13 +104,20 @@ class Trainer(personalized_trainer.Trainer):
         """set the sampler for the testset."""
         self.personalized_testset_sampler = sampler
 
+    def get_personalized_model_params(self):
+        """Getting parameters of the personalized model."""
+        pers_model_params = Config().parameters.personalization.model._asdict()
+        pers_model_params["input_dim"] = self.model.encoding_dim
+        pers_model_params["output_dim"] = pers_model_params["num_classes"]
+        return pers_model_params
+
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
         if self.personalized_learning:
             personalized_config = Config().algorithm.personalization._asdict()
             batch_size = personalized_config["batch_size"]
             trainset = self.personalized_trainset
-            sampler = self.personalized_sampler
+            sampler = self.personalized_sampler.get()
 
             return torch.utils.data.DataLoader(
                 dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -128,13 +135,14 @@ class Trainer(personalized_trainer.Trainer):
 
     # pylint: disable=unused-argument
     def get_test_loader(self, batch_size, **kwargs):
-        """Getting one test loader based on the learning mode."""
-        testset = self.testset
-        sampler = self.testset_sampler
+        """Getting one test loader based on the learning mode.
 
-        if self.personalized_learning:
-            testset = self.personalized_testset
-            sampler = self.personalized_testset_sampler
+        As this function is only utilized by the personalization
+        process, it can be safely converted to rely on the personalized
+        testset and sampler.
+        """
+        testset = self.personalized_testset
+        sampler = self.personalized_testset_sampler.get()
 
         return torch.utils.data.DataLoader(
             dataset=testset,
