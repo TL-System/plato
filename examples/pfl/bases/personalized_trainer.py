@@ -47,7 +47,8 @@ class Trainer(basic.Trainer):
 
         self.personalized_model = None
 
-        # obtain the personalized model name
+        # personalized model name and the file prefix
+        # used to save the model
         self.personalized_model_name = Config().algorithm.personalization.model_name
         self.personalized_model_checkpoint_prefix = "personalized"
 
@@ -56,7 +57,7 @@ class Trainer(basic.Trainer):
         # or the personalized training
         self.personalized_learning = False
 
-        # personalized model evaluation
+        # testset for the personalization process
         self.testset = None
         self.testset_sampler = None
 
@@ -76,7 +77,7 @@ class Trainer(basic.Trainer):
         self.testset_sampler = sampler
 
     # pylint: disable=unused-argument
-    def get_test_loader(self, batch_size, testset, sampler, **kwargs):
+    def get_test_loader(self, batch_size, **kwargs):
         """
         Creates an instance of the testloader.
 
@@ -86,7 +87,10 @@ class Trainer(basic.Trainer):
         sampler: the sampler for the testloader to use.
         """
         return torch.utils.data.DataLoader(
-            dataset=testset, shuffle=False, batch_size=batch_size, sampler=sampler
+            dataset=self.testset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=self.sampler,
         )
 
     def define_personalized_model(self, personalized_model):
@@ -339,8 +343,6 @@ class Trainer(basic.Trainer):
 
         data_loader = self.get_test_loader(
             config["batch_size"],
-            testset=self.testset,
-            sampler=self.testset_sampler.get(),
         )
 
         correct = 0
