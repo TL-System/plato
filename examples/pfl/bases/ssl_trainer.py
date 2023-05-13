@@ -14,6 +14,7 @@ from lightly.data.multi_view_collate import MultiViewCollate
 from tqdm import tqdm
 
 from plato.trainers import loss_criterion
+from plato.config import Config
 
 from bases import personalized_trainer
 
@@ -74,124 +75,107 @@ class MultiViewCollateWrapper(MultiViewCollate):
 class Trainer(personalized_trainer.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
 
-    # pylint: disable=unused-argument
-    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        """
-        Creates an instance of the trainloader.
+    def __init__(self, model=None, callbacks=None):
+        """Initializing the trainer with the provided model."""
+        super().__init__(model=model, callbacks=callbacks)
 
-        Arguments:
-        batch_size: the batch size.
-        trainset: the training dataset.
-        sampler: the sampler for the trainloader to use.
-        """
-        collate_fn = MultiViewCollateWrapper()
+        # dataset for personalization
+        self.personalized_trainset = None
+        self.personalized_testset = None
+
+        # By default, if `personalized_sampler` is not set up, it will
+        # be equal to the `sampler`.
+        self.personalized_sampler = None
+        self.personalized_testset_sampler = None
+
+    def set_personalized_trainset(self, dataset):
+        """set the testset."""
+        self.personalized_trainset = dataset
+
+    def set_personalized_trainset_sampler(self, dataset):
+        """set the sampler for personalized trainset."""
+        self.personalized_sampler = dataset
+
+    def set_personalized_testset(self, dataset):
+        """set the testset."""
+        self.personalized_testset = dataset
+
+    def set_personalized_testset_sampler(self, sampler):
+        """set the sampler for the testset."""
+        self.personalized_testset_sampler = sampler
+
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
+        """Obtain the training loader based on the learning mode."""
+        if self.personalized_learning:
+            personalized_config = Config().algorithm.personalization._asdict()
+            batch_size = personalized_config["batch_size"]
+            trainset = self.personalized_trainset
+            sampler = self.personalized_sampler
+
+            return torch.utils.data.DataLoader(
+                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+            )
+        else:
+            collate_fn = MultiViewCollateWrapper()
+
+            return torch.utils.data.DataLoader(
+                dataset=trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=sampler,
+                collate_fn=collate_fn,
+            )
+
+    # pylint: disable=unused-argument
+    def get_test_loader(self, batch_size, **kwargs):
+        """Getting one test loader based on the learning mode."""
+        testset = self.testset
+        sampler = self.testset_sampler
+
+        if self.personalized_learning:
+            testset = self.personalized_testset
+            sampler = self.personalized_testset_sampler
 
         return torch.utils.data.DataLoader(
-            dataset=trainset,
+            dataset=testset,
             shuffle=False,
             batch_size=batch_size,
             sampler=sampler,
-            collate_fn=collate_fn,
         )
 
     def get_loss_criterion(self):
-        """Returns the loss criterion.
-        As the loss functions derive from the lightly,
-        it is desired to create a interface
-        """
+        """Returns the loss criterion."""
+        if not self.personalized_learning:
+            defined_ssl_loss = loss_criterion.get()
 
-        defined_ssl_loss = loss_criterion.get()
+            def compute_plato_loss(outputs, labels):
+                if isinstance(outputs, (list, tuple)):
+                    return defined_ssl_loss(*outputs)
+                else:
+                    return defined_ssl_loss(outputs)
 
-        def compute_plato_loss(outputs, labels):
-            if isinstance(outputs, (list, tuple)):
-                return defined_ssl_loss(*outputs)
-            else:
-                return defined_ssl_loss(outputs)
+            return compute_plato_loss
 
-        return compute_plato_loss
-
-    def perform_evaluation(self, data_loader, defined_model=None, **kwargs):
-        """The operation of performing the evaluation on the testset with the defined model."""
-        # Define the test phase of the eval stage
-        defined_model = (
-            self.personalized_model if defined_model is None else defined_model
+        loss_criterion_type = Config().algorithm.personalization.loss_criterion
+        loss_criterion_params = (
+            Config().parameters.personalization.loss_criterion._asdict()
         )
-        defined_model.eval()
-        defined_model.to(self.device)
-        self.model.to(self.device)
+        return loss_criterion.get(
+            loss_criterion=loss_criterion_type,
+            loss_criterion_params=loss_criterion_params,
+        )
 
-        correct = 0
-        total = 0
+    def preprocess_personalized_model(self, config):
+        """Do nothing to the loaded personalized mdoel."""
 
+    def personalized_model_forward(self, examples):
+        """Forward the input examples to the personalized model."""
+
+        # Extract representation from the trained
+        # frozen encoder of ssl.
+        # No optimization is reuqired by this encoder.
         with torch.no_grad():
-            for _, (examples, labels) in enumerate(data_loader):
-                examples, labels = examples.to(self.device), labels.to(self.device)
+            features = self.model.encoder(examples)
 
-                features = self.model.encoder(examples)
-                outputs = defined_model(features)
-
-                outputs = self.process_personalized_outputs(outputs)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        accuracy = correct / total
-
-        eval_outputs = {"accuracy": accuracy}
-
-        return eval_outputs
-
-    def personalized_train_one_epoch(
-        self,
-        epoch,
-        config,
-        epoch_loss_meter,
-    ):
-        # pylint:disable=too-many-arguments
-        """Performing one epoch of learning for the personalization."""
-
-        epoch_loss_meter.reset()
-        self.personalized_model.train()
-        self.personalized_model.to(self.device)
-        self.model.to(self.device)
-
-        pers_epochs = config["personalized_epochs"]
-
-        local_progress = tqdm(
-            self.personalized_train_loader,
-            desc=f"Epoch {epoch}/{pers_epochs+1}",
-            disable=True,
-        )
-
-        for _, (examples, labels) in enumerate(local_progress):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            # Clear the previous gradient
-            self.personalized_optimizer.zero_grad()
-
-            # Extract representation from the trained
-            # frozen encoder of ssl.
-            # No optimization is reuqired by this encoder.
-            with torch.no_grad():
-                features = self.model.encoder(examples)
-
-            # Perfrom the training and compute the loss
-            preds = self.personalized_model(features)
-            loss = self._personalized_loss_criterion(preds, labels)
-
-            # Perfrom the optimization
-            loss.backward()
-            self.personalized_optimizer.step()
-
-            # Update the epoch loss container
-            epoch_loss_meter.update(loss, labels.size(0))
-
-            local_progress.set_postfix(
-                {
-                    "lr": self.personalized_lr_scheduler,
-                    "loss": epoch_loss_meter.loss_value,
-                    "loss_avg": epoch_loss_meter.average,
-                }
-            )
-
-        return epoch_loss_meter
+        # Perfrom the training and compute the loss
+        return self.personalized_model(features)
