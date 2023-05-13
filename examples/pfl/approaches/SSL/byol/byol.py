@@ -14,28 +14,32 @@ from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
 from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
-from examples.pfl.bases import fedavg_personalized
-from plato.trainers import basic_ssl
-from examples.pfl.bases import simple_ssl
 from plato.trainers import loss_criterion
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
 
-class Trainer(basic_ssl.Trainer):
-    """A personalized federated learning trainer with self-supervised learning."""
+from pflbases.trainer_callbacks import separate_trainer_callbacks
+from pflbases.trainer_callbacks import ssl_trainer_callbacks
+from pflbases.client_callbacks import local_completion_callbacks
+
+from pflbases import ssl_client
+from pflbases import ssl_trainer
+from pflbases import ssl_datasources
+
+
+class Trainer(ssl_trainer.Trainer):
+    """A trainer for BYOL to rewrite the loss wrappe."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
         self.momentum_val = 0
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion.
-        As the loss functions derive from the lightly,
-        it is desired to create a interface
-        """
-
+    def plato_ssl_loss_wrapper(self):
+        """A wrapper to connect ssl loss with plato."""
         defined_ssl_loss = loss_criterion.get()
 
         def compute_plato_loss(outputs, labels):
@@ -127,11 +131,30 @@ class BYOL(nn.Module):
 
 
 def main():
-    """A Plato federated learning training session using the BYOL algorithm."""
-
+    """
+    A Plato personalized federated learning sesstion for FedBABU approach.
+    """
     trainer = Trainer
-    client = simple_ssl.Client(model=BYOL, trainer=trainer)
-    server = fedavg_personalized.Server(model=BYOL, trainer=trainer)
+    client = ssl_client.Client(
+        model=BYOL,
+        datasource=ssl_datasources.TransformedDataSource,
+        personalized_datasource=ssl_datasources.TransformedDataSource,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            local_completion_callbacks.ClientModelLocalCompletionCallback,
+        ],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+            ssl_trainer_callbacks.ModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        model=BYOL,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 

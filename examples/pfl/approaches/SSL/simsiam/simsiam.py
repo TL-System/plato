@@ -13,7 +13,6 @@ from torch import nn
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 
 from plato.trainers import loss_criterion
-
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
@@ -30,7 +29,7 @@ from pflbases import ssl_datasources
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A personalized federated learning trainer with self-supervised learning."""
+    """A trainer for SimSiam to rewrite the loss wrapper."""
 
     def plato_ssl_loss_wrapper(self):
         """A wrapper to connect ssl loss with plato."""
