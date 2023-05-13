@@ -23,7 +23,6 @@ import os
 import logging
 
 from plato.callbacks import trainer as trainer_callbacks
-from plato.utils.filename_formatter import NameFormatter
 
 
 class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):

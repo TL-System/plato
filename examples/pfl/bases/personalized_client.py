@@ -136,7 +136,7 @@ class Client(simple.Client):
             self.client_id,
             personalized_model_name,
         )
-        filename = self.is_novel_client()
+        filename = self.set_is_novel_client()
 
         if not self.novel_client:
             self.trainer.create_unique_personalized_model(filename)
@@ -201,7 +201,7 @@ class Client(simple.Client):
         """Whether this client participants the federated training."""
         return self.client_group == "participant"
 
-    def is_novel_client(self):
+    def set_is_novel_client(self):
         """Whether this client is a novel one, which is never selected by the
         server, as a result, no unique personalized model is maintained."""
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()

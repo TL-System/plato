@@ -1,6 +1,6 @@
 """
-Customize client callbacks to complete the received payload with third-part 
-parameters. For instance, when payload contains the body of one model, the head 
+Customize client callbacks to complete the received payload with loaded 
+personalized model. For instance, when payload contains the body of one model, the head 
 of the loaded personalized model will be used to complete the payload.
 """
 
@@ -27,6 +27,8 @@ class PayloadCompletionProcessor(base.Processor):
         if provided."""
 
         # extract the `completion_modules_name` of the personalized model head
+        assert hasattr(Config().algorithm, "completion_modules_name")
+
         completion_modules_name = Config().algorithm.completion_modules_name
         model_modules = self.algorithm.extract_weights(
             model=self.trainer.personalized_model, modules_name=completion_modules_name
@@ -47,7 +49,7 @@ class PayloadCompletionProcessor(base.Processor):
         return data
 
 
-class ClientModelCompletionCallback(base_callbacks.ClientPayloadCallback):
+class ClientModelPersonalizedCompletionCallback(base_callbacks.ClientPayloadCallback):
     """
     A client callback for FedBABU approach to process the received payload.
     """
