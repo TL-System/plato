@@ -176,7 +176,7 @@ class Trainer(personalized_trainer.Trainer):
     def preprocess_personalized_model(self, config):
         """Do nothing to the loaded personalized mdoel."""
 
-    def personalized_model_forward(self, examples):
+    def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
 
         # Extract representation from the trained
@@ -184,6 +184,8 @@ class Trainer(personalized_trainer.Trainer):
         # No optimization is reuqired by this encoder.
         with torch.no_grad():
             features = self.model.encoder(examples)
+            if "split" in kwargs and kwargs["split"] == "test":
+                self.test_metrics_collector.add_encodings(features)
 
         # Perfrom the training and compute the loss
         return self.personalized_model(features)

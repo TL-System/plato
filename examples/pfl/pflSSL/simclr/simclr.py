@@ -10,14 +10,30 @@ The structure of our SimCLR and the classifier is the same as the ones used in
 the work https://github.com/spijkervet/SimCLR.git.
 
 """
+
+
+import os
+import sys
+
+# Add `bases` to the path
+pfl_bases = os.path.dirname(os.path.abspath(__file__))
+grandparent_directory = os.path.abspath(os.path.join(pfl_bases, os.pardir, os.pardir))
+sys.path.insert(1, grandparent_directory)
+
 import torch
 
 from lightly.models.modules.heads import SimCLRProjectionHead
 
-from examples.pfl.bases import fedavg_personalized
-
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
+
+from bases import fedavg_personalized_server
+from bases import fedavg_partial
+from bases.trainer_callbacks import separate_trainer_callbacks
+from bases.client_callbacks import completion_callbacks
+from bases import ssl_client
+from bases import ssl_trainer
+from bases import ssl_datasources
 
 
 class SimCLR(torch.nn.Module):
@@ -58,16 +74,33 @@ class SimCLR(torch.nn.Module):
 
     @staticmethod
     def get_model():
-
         return SimCLR()
 
 
 def main():
-    """A Plato personalized federated learning training session using the SimCLR approach."""
-
-    trainer = basic_ssl.Trainer
-    client = simple_ssl.Client(model=SimCLR, trainer=trainer)
-    server = fedavg_personalized.Server(model=SimCLR, trainer=trainer)
+    """
+    A Plato personalized federated learning sesstion for FedBABU approach.
+    """
+    trainer = ssl_trainer.Trainer
+    client = ssl_client.Client(
+        model=SimCLR,
+        datasource=ssl_datasources.TransformedDataSource,
+        personalized_datasource=ssl_datasources.TransformedDataSource,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            # completion_callbacks.ClientModelCompletionCallback,
+        ],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        model=SimCLR,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 
