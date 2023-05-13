@@ -3,8 +3,9 @@ Customize callbacks for trainer performing separate optimization of the global m
 and personalized models. Typical approaches are FedBABU, FedAvg-finetuning.
 
 Therefore,
-1. During the normal federated learning process, no personalized model is 
-to be tested and saved. 
+1. During the normal federated learning process, the personalized model is 
+to be tested only at the begininng of training and no personalized model 
+will besaved. 
 2. After the normal federated learning process, each client will perform 
 personalization for mulitple epochs to train the personalized model.
 """
