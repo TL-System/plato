@@ -18,16 +18,24 @@ from lightly.models.modules.heads import (
 )
 from lightly.models.utils import deactivate_requires_grad
 
-
-from examples.pfl.bases import fedavg_personalized
-from examples.pfl.bases import simple_ssl
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
+
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
+
+from pflbases.trainer_callbacks import separate_trainer_callbacks
+from pflbases.trainer_callbacks import ssl_trainer_callbacks
+from pflbases.client_callbacks import local_completion_callbacks
+
+from pflbases import ssl_client
+from pflbases import ssl_datasources
+
 
 from smog_trainer import Trainer
 
 
-class SMoGModel(nn.Module):
+class SMoG(nn.Module):
     def __init__(self, encoder=None):
         super().__init__()
         self.temperature = (
@@ -77,7 +85,7 @@ class SMoGModel(nn.Module):
         self.smog = SMoGPrototypes(
             group_features=torch.rand(self.n_groups, n_prototypes), beta=beta
         )
- 
+
         # current iteration
         self.n_iteration = 0
 
@@ -137,11 +145,30 @@ class SMoGModel(nn.Module):
 
 
 def main():
-    """A Plato federated learning training session using the BYOL algorithm."""
-
+    """
+    A personalized federated learning sesstion for SMoG approach.
+    """
     trainer = Trainer
-    client = simple_ssl.Client(model=SMoGModel, trainer=trainer)
-    server = fedavg_personalized.Server(model=SMoGModel, trainer=trainer)
+    client = ssl_client.Client(
+        model=SMoG,
+        datasource=ssl_datasources.TransformedDataSource,
+        personalized_datasource=ssl_datasources.TransformedDataSource,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            local_completion_callbacks.ClientModelLocalCompletionCallback,
+        ],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+            ssl_trainer_callbacks.ModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        model=SMoG,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 
