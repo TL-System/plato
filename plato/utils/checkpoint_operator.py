@@ -112,13 +112,14 @@ class CheckpointsOperator:
         checkpoint_files = [
             ckp_file
             for ckp_file in os.listdir(self.checkpoints_dir)
-            if not is_filterd_file(ckp_file) and is_required_file(ckp_file)
+            if not is_filterd_file(ckp_file)
+            and is_required_file(ckp_file)
+            and re.search(r"\.pth$", ckp_file)
         ]
 
         latest_checkpoint_filename = None
         latest_number = 0
         for ckp_file in checkpoint_files:
-
             pattern = re.escape(anchor_metric) + r"(\d+)"
             obtained_anchor = re.search(pattern, ckp_file, re.IGNORECASE)
             anchor_value = int(obtained_anchor.group(1))
