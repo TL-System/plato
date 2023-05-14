@@ -65,7 +65,6 @@ trainer:
 
     global_modules_name:
         - encoder
-        - projector
 
 
 algorithm:
@@ -81,7 +80,7 @@ algorithm:
                 input_size: 28
 
     completion_modules_name:
-        -
+        - projector
 
     personalization:
 
