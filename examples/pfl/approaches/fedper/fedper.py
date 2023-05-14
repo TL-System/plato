@@ -19,7 +19,7 @@ import fedper_trainer
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for FedPer approach.
     """
     trainer = fedper_trainer.Trainer
     client = fedper_client.Client(

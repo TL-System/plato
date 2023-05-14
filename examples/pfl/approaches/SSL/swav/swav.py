@@ -10,11 +10,20 @@ Source code: https://github.com/facebookresearch/swav
 from torch import nn
 from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
 
-from examples.pfl.bases import fedavg_personalized
-from plato.trainers import basic_ssl
-from examples.pfl.bases import simple_ssl
+from plato.trainers import loss_criterion
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
+
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
+
+from pflbases.trainer_callbacks import separate_trainer_callbacks
+from pflbases.trainer_callbacks import ssl_trainer_callbacks
+from pflbases.client_callbacks import local_completion_callbacks
+
+from pflbases import ssl_client
+from pflbases import ssl_trainer
+from pflbases import ssl_datasources
 
 
 class SwaV(nn.Module):
@@ -65,11 +74,30 @@ class SwaV(nn.Module):
 
 
 def main():
-    """A Plato federated learning training session using the BYOL algorithm."""
-
-    trainer = basic_ssl.Trainer
-    client = simple_ssl.Client(model=SwaV, trainer=trainer)
-    server = fedavg_personalized.Server(model=SwaV, trainer=trainer)
+    """
+    A pFL sesstion for SwaV approach.
+    """
+    trainer = ssl_trainer.Trainer
+    client = ssl_client.Client(
+        model=SwaV,
+        datasource=ssl_datasources.TransformedDataSource,
+        personalized_datasource=ssl_datasources.TransformedDataSource,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            local_completion_callbacks.ClientModelLocalCompletionCallback,
+        ],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+            ssl_trainer_callbacks.ModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        model=SwaV,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 

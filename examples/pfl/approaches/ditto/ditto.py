@@ -20,7 +20,7 @@ import ditto_trainer_v2 as ditto_trainer
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for Ditto approach.
     """
     trainer = ditto_trainer.Trainer
     client = ditto_client.Client(

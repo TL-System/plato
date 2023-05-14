@@ -22,7 +22,7 @@ import perfedavg_trainer
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for PerFedAvg approach.
     """
     trainer = perfedavg_trainer.Trainer
     client = personalized_client.Client(

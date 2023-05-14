@@ -1,6 +1,5 @@
 clients:
 
-    type: simple_ssl
 
     # The total number of clients
     total_clients: 10
@@ -14,7 +13,6 @@ clients:
 
 server:
 
-    type: fedavg_personalized
     address: 127.0.0.1
     port: 8000
 
@@ -44,7 +42,6 @@ data:
 
 trainer:
 
-    type: basic_ssl
 
     # The maximum number of training rounds
     rounds: 2

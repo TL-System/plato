@@ -23,7 +23,7 @@ import apfl_trainer
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for APFL approach.
     """
     trainer = apfl_trainer.Trainer
     client = apfl_client.Client(

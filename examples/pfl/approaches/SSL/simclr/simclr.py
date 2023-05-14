@@ -73,7 +73,7 @@ class SimCLR(torch.nn.Module):
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for SimCLR approach.
     """
     trainer = ssl_trainer.Trainer
     client = ssl_client.Client(

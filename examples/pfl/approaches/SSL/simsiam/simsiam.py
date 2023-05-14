@@ -92,7 +92,7 @@ class SimSiam(nn.Module):
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for SimSiam approach.
     """
     trainer = Trainer
     client = ssl_client.Client(
