@@ -58,19 +58,22 @@ class Trainer(ssl_trainer.Trainer):
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
-        self.momentum_val = cosine_schedule(epoch, total_epochs, 0.996, 1)
+        global_epoch = (self.current_round - 1) * config["epochs"] + epoch
+        if not self.personalized_learning:
+            self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
         """Operations before starting one iteration."""
         super().train_step_start(config)
-        update_momentum(
-            self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
-        )
-        update_momentum(
-            self.model.projection_head,
-            self.model.projection_head_momentum,
-            m=self.momentum_val,
-        )
+        if not self.personalized_learning:
+            update_momentum(
+                self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
+            )
+            update_momentum(
+                self.model.projection_head,
+                self.model.projection_head_momentum,
+                m=self.momentum_val,
+            )
 
 
 class BYOL(nn.Module):

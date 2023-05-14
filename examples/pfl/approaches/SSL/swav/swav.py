@@ -10,7 +10,6 @@ Source code: https://github.com/facebookresearch/swav
 from torch import nn
 from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
 
-from plato.trainers import loss_criterion
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 

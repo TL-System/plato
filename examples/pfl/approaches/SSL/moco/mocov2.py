@@ -20,14 +20,22 @@ from lightly.models.modules import MoCoProjectionHead
 from lightly.models.utils import deactivate_requires_grad, update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
-from examples.pfl.bases import fedavg_personalized
-from plato.trainers import basic_ssl
-from examples.pfl.bases import simple_ssl
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
+from pflbases import fedavg_personalized_server
+from pflbases import fedavg_partial
 
-class Trainer(basic_ssl.Trainer):
+from pflbases.trainer_callbacks import separate_trainer_callbacks
+from pflbases.trainer_callbacks import ssl_trainer_callbacks
+from pflbases.client_callbacks import local_completion_callbacks
+
+from pflbases import ssl_client
+from pflbases import ssl_trainer
+from pflbases import ssl_datasources
+
+
+class Trainer(ssl_trainer.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
 
     def __init__(self, model=None, callbacks=None):
@@ -40,19 +48,22 @@ class Trainer(basic_ssl.Trainer):
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
-        self.momentum_val = cosine_schedule(epoch, total_epochs, 0.996, 1)
+        global_epoch = (self.current_round - 1) * config["epochs"] + epoch
+        if not self.personalized_learning:
+            self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
         """Operations before starting one iteration."""
         super().train_step_start(config)
-        update_momentum(
-            self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
-        )
-        update_momentum(
-            self.model.projection_head,
-            self.model.projection_head_momentum,
-            m=self.momentum_val,
-        )
+        if not self.personalized_learning:
+            update_momentum(
+                self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
+            )
+            update_momentum(
+                self.model.projection_head,
+                self.model.projection_head_momentum,
+                m=self.momentum_val,
+            )
 
 
 class MoCoV2(nn.Module):
@@ -104,11 +115,30 @@ class MoCoV2(nn.Module):
 
 
 def main():
-    """A Plato personalized federated learning training session using the SimCLR approach."""
-
+    """
+    A personalized federated learning sesstion for BYOL approach.
+    """
     trainer = Trainer
-    client = simple_ssl.Client(model=MoCoV2, trainer=trainer)
-    server = fedavg_personalized.Server(model=MoCoV2, trainer=trainer)
+    client = ssl_client.Client(
+        model=MoCoV2,
+        datasource=ssl_datasources.TransformedDataSource,
+        personalized_datasource=ssl_datasources.TransformedDataSource,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+        callbacks=[
+            local_completion_callbacks.ClientModelLocalCompletionCallback,
+        ],
+        trainer_callbacks=[
+            separate_trainer_callbacks.PersonalizedModelMetricCallback,
+            separate_trainer_callbacks.PersonalizedModelStatusCallback,
+            ssl_trainer_callbacks.ModelStatusCallback,
+        ],
+    )
+    server = fedavg_personalized_server.Server(
+        model=MoCoV2,
+        trainer=trainer,
+        algorithm=fedavg_partial.Algorithm,
+    )
 
     server.run(client)
 
