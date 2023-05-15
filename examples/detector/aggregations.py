@@ -412,4 +412,4 @@ registered_aggregations = {
     "Afa": afa,
     "Trimmed-mean": trimmed_mean,
 }
-registered_aggregations = {"Median":median, "Bulyan": bulyan,"Krum":krum,"Afa": afa, "Trimmed-mean": trimmed_mean}
+registered_aggregations = {"Median":median, "Bulyan": bulyan,"Krum":krum,"Multi-krum":multi_krum,"Afa": afa, "Trimmed-mean": trimmed_mean}
