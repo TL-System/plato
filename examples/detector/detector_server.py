@@ -102,7 +102,7 @@ class Server(fedavg.Server):
         #    self.clients_pool.remove(attacker)
 
         return weights_approved
-    
+
     async def aggregate_weights(self, updates,baseline_weights, weights_received):
         """Aggregate the reported weight updates from the selected clients."""
 
@@ -114,11 +114,10 @@ class Server(fedavg.Server):
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
             updated_weights = self.algorithm.update_weights(deltas)
             return updated_weights
-        
+
         # if secure aggregation is applied.
         aggregation = aggregation_registry.get()
 
         weights_aggregated = aggregation(updates, baseline_weights, weights_received)
 
         return weights_aggregated
-
