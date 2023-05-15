@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import defences
 
-
+from typing import Mapping
 class Server(fedavg.Server):
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -106,10 +106,19 @@ class Server(fedavg.Server):
     async def aggregate_weights(self, updates,baseline_weights, weights_received):
         """Aggregate the reported weight updates from the selected clients."""
 
+        if not hasattr(Config().server, "secure_aggregation_type"):
+            logging.info(f"Fedavg is applied.")
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+            updated_weights = self.algorithm.update_weights(deltas)
+            return updated_weights
+        
+        # if secure aggregation is applied.
         aggregation = aggregation_registry.get()
 
         weights_aggregated = aggregation(updates, baseline_weights, weights_received)
 
-        updated_weights = self.algorithm.update_weights(weights_aggregated)
-        self.algorithm.load_weights(updated_weights)
+        return weights_aggregated
 
