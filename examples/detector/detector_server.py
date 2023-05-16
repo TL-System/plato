@@ -9,12 +9,13 @@ from plato.servers import fedavg
 from collections import OrderedDict
 import attacks as attack_registry
 import defences as defence_registry
+import aggregations as aggregation_registry
 
 import numpy as np
 import torch
 import defences
 
-
+from typing import Mapping
 class Server(fedavg.Server):
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -78,9 +79,15 @@ class Server(fedavg.Server):
         weights_attacked = attack(
             attacker_weights
         )  # weights and updates are different, think about which is more convenient?
-        # logging.info("what is in weights_attacked: %d", len(weights_attacked))
 
-        return weights_attacked
+        # Put poisoned model back to weights received for further aggregation
+        counter = 0
+        for i, update in enumerate(self.updates):
+            if update.client_id in self.attacker_list:
+                weights_received[i] = weights_attacked[counter]
+                counter += 1
+
+        return weights_received
 
     def weights_filter(self, weights_attacked):
 
@@ -95,3 +102,22 @@ class Server(fedavg.Server):
         #    self.clients_pool.remove(attacker)
 
         return weights_approved
+
+    async def aggregate_weights(self, updates,baseline_weights, weights_received):
+        """Aggregate the reported weight updates from the selected clients."""
+
+        if not hasattr(Config().server, "secure_aggregation_type"):
+            logging.info(f"Fedavg is applied.")
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received
+            )
+            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+            updated_weights = self.algorithm.update_weights(deltas)
+            return updated_weights
+
+        # if secure aggregation is applied.
+        aggregation = aggregation_registry.get()
+
+        weights_aggregated = aggregation(updates, baseline_weights, weights_received)
+
+        return weights_aggregated
