@@ -143,8 +143,11 @@ def lie_attack(weights_received):
 
 
 def oblivion_lie_attack(weights_received):
-    """Little is enough"""
-    """     LIE importance dynamic momentum attack   """
+    """
+    Attack name: Little is enough with Oblivion
+
+    """
+
     total_clients = Config().clients.total_clients
     num_attackers = len(Config().clients.attacker_ids)
 
@@ -228,13 +231,8 @@ def min_max_attack(weights_received, dev_type="unit_vec"):
 
 def oblivion_min_max_attack(weights_received, dev_type="unit_vec"):
     """
-    Attack: Min-Max
+    Attack name: Min-max with Oblivion
 
-    Reference:
-
-    Shejwalkar et al., “Manipulating the Byzantine: Optimizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
-
-    https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
 
     attacker_weights = flatten_weights(weights_received)
@@ -356,15 +354,9 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
 
 def oblivion_min_sum_attack(weights_received, dev_type="unit_vec"):
     """
-    Attack: Min-Max
+    Attack name: Min-sum with Oblivion
 
-    Reference:
-
-    Shejwalkar et al., “Manipulating the Byzantine: Optimizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
-
-    https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
     """
-
     attacker_weights = flatten_weights(weights_received)
 
     weights_avg = torch.mean(attacker_weights, 0)
