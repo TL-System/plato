@@ -8,12 +8,11 @@ from plato.config import Config
 from plato.servers import fedavg
 from collections import OrderedDict
 import attacks as attack_registry
-import defences as defence_registry
+import detectors as detector_registry
 import aggregations as aggregation_registry
 
 import numpy as np
 import torch
-import defences
 
 from typing import Mapping
 class Server(fedavg.Server):
@@ -92,7 +91,7 @@ class Server(fedavg.Server):
     def weights_filter(self, weights_attacked):
 
         # Identify poisoned updates and remove it from all received updates.
-        defence = defence_registry.get()
+        defence = detector_registry.get()
 
         weights_approved = defence(weights_attacked)
         # get a balck list for attackers_detected this round
