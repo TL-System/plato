@@ -11,6 +11,7 @@ from plato.config import Config
 from scipy.stats import norm
 from collections import OrderedDict
 import numpy as np
+import os
 
 
 def get():
@@ -70,6 +71,45 @@ def flatten_weights(weights):
     return flattened_weights
 
 
+def compute_sali_indicator():
+    # Add importance pruning to the attack
+    sali_map_vector = torch.load(Config().algorithm.map_path)
+
+    sparsity = Config().algorithm.sparsity
+    shrink_level = Config().algorithm.shrink_level
+    inflation_level = Config().algorithm.inflation_level
+
+    thresh = float(
+        sali_map_vector.kthvalue(int(sparsity * sali_map_vector.shape[0]))[0]
+    )
+
+    sali_indicators_vector = torch.zeros(sali_map_vector.shape)
+    sali_indicators_vector[sali_map_vector <= thresh] = shrink_level
+    sali_indicators_vector[sali_map_vector > thresh] = inflation_level
+
+    return sali_indicators_vector
+
+
+def smoothing(keywords, value):
+    total_clients = Config().clients.total_clients
+    num_attackers = len(Config().clients.attacker_ids)
+    clients_per_round = Config().clients.per_round
+
+    malicious_expectation = (num_attackers / total_clients) * clients_per_round
+    if num_attackers < malicious_expectation:  # how to know num_attackers?
+        momentum = Config().algorithm.high_momentum
+    else:
+        momentum = Config().algorithm.low_momentum
+    # Smooth poison value
+    file_path = "./" + keywords + "_model_updates_history.pt"
+    if os.path.exists(file_path):
+        last_model_re = torch.load(file_path)
+        value = (1 - momentum) * value + momentum * last_model_re
+
+    torch.save(value, file_path)
+    return value
+
+
 def lie_attack(weights_received):
     """
     Attack name: Little is enough
@@ -102,16 +142,45 @@ def lie_attack(weights_received):
     return weights_poisoned
 
 
+def oblivion_lie_attack(weights_received):
+    """
+    Attack name: Little is enough with Oblivion
+
+    """
+
+    total_clients = Config().clients.total_clients
+    num_attackers = len(Config().clients.attacker_ids)
+
+    attacker_weights = flatten_weights(weights_received)
+
+    # Calculate perturbation range
+    s_value = total_clients / 2 + 1 - num_attackers
+    possibility = (total_clients - s_value) / total_clients
+    z_value = norm.cdf(possibility)
+
+    weights_avg = torch.mean(attacker_weights, dim=0)
+    weights_std = torch.std(attacker_weights, dim=0)
+
+    # Smooth benign model updates
+    weights_avg = smoothing("benign", weights_avg)
+
+    # Importance pruning
+    sali_indicators_vector = compute_sali_indicator()
+    weights_std = weights_std * sali_indicators_vector.cpu()
+
+    poison_value = weights_avg + z_value * weights_std
+
+    # Smooth poison value
+    poison_value = smoothing("poisoned", poison_value)
+
+    # Perform model poisoning
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
+    logging.info(f"Finished LIE model poisoning attack (with Oblivion).")
+
+    return weights_poisoned
+
+
 def min_max_attack(weights_received, dev_type="unit_vec"):
-    """
-    Attack: Min-Max
-
-    Reference:
-
-    Shejwalkar et al., “Manipulating the Byzantine: Optimizing model poisoning attacks and defenses for federated learning,” in Proceedings of 28th Annual Network and Distributed System Security Symposium (NDSS), 2021
-
-    https://www.ndss-symposium.org/ndss-paper/manipulating-the-byzantine-optimizing-model-poisoning-attacks-and-defenses-for-federated-learning/
-    """
     attacker_weights = flatten_weights(weights_received)
 
     weights_avg = torch.mean(attacker_weights, 0)
@@ -157,6 +226,70 @@ def min_max_attack(weights_received, dev_type="unit_vec"):
     # Perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
     logging.info(f"Finished Min-Max model poisoning attack.")
+    return weights_poisoned
+
+
+def oblivion_min_max_attack(weights_received, dev_type="unit_vec"):
+    """
+    Attack name: Min-max with Oblivion
+
+    """
+
+    attacker_weights = flatten_weights(weights_received)
+
+    weights_avg = torch.mean(attacker_weights, 0)
+
+    # Smooth benign model updates
+    weights_avg = smoothing("benign", weights_avg)
+
+    # Generate perturbation vectors (Inverse unit vector by default)
+    if dev_type == "unit_vec":
+        # Inverse unit vector
+        perturbation_vector = weights_avg / torch.norm(weights_avg)
+    elif dev_type == "sign":
+        # Inverse sign
+        perturbation_vector = torch.sign(weights_avg)
+    elif dev_type == "std":
+        # Inverse standard deviation
+        perturbation_vector = torch.std(attacker_weights, 0)
+
+    # Importance pruning
+    sali_indicators_vector = compute_sali_indicator()
+    perturbation_vector = perturbation_vector * sali_indicators_vector
+
+    # Calculate the maximum distance between any two benign updates (unpoisoned)
+    max_distance = torch.tensor([0])
+    for attacker_weight in attacker_weights:
+        distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
+        max_distance = torch.max(max_distance, torch.max(distance))
+
+    # Search for lambda such that its maximum distance from any other gradient is bounded
+    lambda_value = torch.Tensor([50.0]).float()
+    threshold = 1e-5
+    lambda_step = lambda_value
+    lambda_succ = 0
+
+    while torch.abs(lambda_succ - lambda_value) > threshold:
+        poison_value = weights_avg - lambda_value * perturbation_vector
+        distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
+        max_d = torch.max(distance)
+
+        if max_d <= max_distance:
+            lambda_succ = lambda_value
+            lambda_value = lambda_value + lambda_step / 2
+        else:
+            lambda_value = lambda_value - lambda_step / 2
+
+        lambda_step = lambda_step / 2
+
+    poison_value = weights_avg - lambda_succ * perturbation_vector
+
+    # Smooth poison value
+    poison_value = smoothing("poisoned", poison_value)
+
+    # Perform model poisoning
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
+    logging.info(f"Finished Min-Max model poisoning attack (with Oblivion).")
     return weights_poisoned
 
 
@@ -216,6 +349,69 @@ def min_sum_attack(weights_received, dev_type="unit_vec"):
     # perform model poisoning
     weights_poisoned = perform_model_poisoning(weights_received, poison_value)
     logging.info(f"Finished Min-Sum model poisoning attack.")
+    return weights_poisoned
+
+
+def oblivion_min_sum_attack(weights_received, dev_type="unit_vec"):
+    """
+    Attack name: Min-sum with Oblivion
+
+    """
+    attacker_weights = flatten_weights(weights_received)
+
+    weights_avg = torch.mean(attacker_weights, 0)
+
+    # Smooth benign model updates
+    weights_avg = smoothing("benign", weights_avg)
+
+    # Generate perturbation vectors (Inverse unit vector by default)
+    if dev_type == "unit_vec":
+        # Inverse unit vector
+        perturbation_vector = weights_avg / torch.norm(weights_avg)
+    elif dev_type == "sign":
+        # Inverse sign
+        perturbation_vector = torch.sign(weights_avg)
+    elif dev_type == "std":
+        # Inverse standard deviation
+        perturbation_vector = torch.std(attacker_weights, 0)
+
+    # Importance pruning
+    sali_indicators_vector = compute_sali_indicator()
+    perturbation_vector = perturbation_vector * sali_indicators_vector
+
+    # Calculate the minimal sum of squared distances of benign update from the other benign updates
+    min_sum_distance = torch.tensor([0])
+    for attacker_weight in attacker_weights:
+        distance = torch.norm((attacker_weights - attacker_weight), dim=1) ** 2
+        min_sum_distance = torch.min(min_sum_distance, torch.sum(distance))
+
+    # Search for lambda
+    lambda_value = torch.Tensor([50.0]).float()
+    threshold = 1e-5
+    lambda_step = lambda_value
+    lambda_succ = 0
+
+    while torch.abs(lambda_succ - lambda_value) > threshold:
+        poison_value = weights_avg - lambda_value * perturbation_vector
+        distance = torch.norm((attacker_weights - poison_value), dim=1) ** 2
+        score = torch.sum(distance)
+
+        if score <= min_sum_distance:
+            lambda_succ = lambda_value
+            lambda_value = lambda_value + lambda_step / 2
+        else:
+            lambda_value = lambda_value - lambda_step / 2
+
+        lambda_step = lambda_step / 2
+
+    poison_value = weights_avg - lambda_succ * perturbation_vector
+
+    # Smooth poison value
+    poison_value = smoothing("poisoned", poison_value)
+
+    # perform model poisoning
+    weights_poisoned = perform_model_poisoning(weights_received, poison_value)
+    logging.info(f"Finished Min-Sum model poisoning attack (with Oblivion).")
     return weights_poisoned
 
 
@@ -347,7 +543,10 @@ def fang_attack(weights_received):
 
 registered_attacks = {
     "LIE": lie_attack,
+    "Oblivison-lie": oblivion_lie_attack,
     "Min-Max": min_max_attack,
+    "Oblivision-minmax": oblivion_min_max_attack,
     "Min-Sum": min_sum_attack,
+    "Oblivion-minsum": oblivion_min_sum_attack,
     "Fang": fang_attack,
 }
