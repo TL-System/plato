@@ -4,6 +4,7 @@ from plato.config import Config
 from scipy.stats import norm
 import numpy as np
 from mxnet import nd
+from sklearn.cluster import KMeans
 import pickle
 import os
 
@@ -68,7 +69,7 @@ def lbfgs(
     return approx_prod
 
 
-def gap_statistics(score, nobyz):
+def gap_statistics(score):
     nrefs = 10
     ks = range(1, 8)
     gaps = np.zeros(len(ks))
@@ -111,15 +112,21 @@ def gap_statistics(score, nobyz):
     else:
         print("Attack Detected!")
         return 1
-    
-def detection(score, nobyz):
+
+
+def detection(score):
     estimator = KMeans(n_clusters=2)
     estimator.fit(score.reshape(-1, 1))
     label_pred = estimator.labels_
-    if np.mean(score[label_pred==0])<np.mean(score[label_pred==1]):
-        #0 is the label of malicious clients
-        label_pred = 1 - label_pred
-    return malicious_id, clean_id
+    if np.mean(score[label_pred == 0]) < np.mean(score[label_pred == 1]):
+        # cluster with smaller mean value is clean clients
+        clean_ids = np.where(label_pred == 0)[0]
+        malicious_ids = np.where(label_pred == 1)[0]
+    else:
+        clean_ids = np.where(label_pred == 1)[0]
+        malicious_ids = np.where(label_pred == 0)[0]
+    return malicious_ids, clean_ids
+
 
 def fl_detector(weights_attacked):
     """https://arxiv.org/pdf/2207.09209.pdf"""
@@ -166,7 +173,7 @@ def fl_detector(weights_attacked):
     if malicious_score.shape[0] >= 11:
         if gap_statistics(np.sum(malicious_score[-10:], axis=0)):
             logging.info(f"malicious clients detected!")
-            malicious_id, clean_id = detection()
+            malicious_ids, clean_ids = detection(np.sum(malicious_score[-10:], axis=0))
             break
 
     # update record
@@ -181,6 +188,10 @@ def fl_detector(weights_attacked):
         pickle.dump(malicious_score, file)
 
     # remove poisoned weights
+    clean_weights=[]
+    for i, weight in enumerate(weights_attacked):
+        if i in clean_ids:
+            clean_weights.append(weight)
 
     return clean_weights
 
