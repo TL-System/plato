@@ -15,6 +15,8 @@ import numpy as np
 import torch
 
 from typing import Mapping
+
+
 class Server(fedavg.Server):
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -93,6 +95,14 @@ class Server(fedavg.Server):
         # Identify poisoned updates and remove it from all received updates.
         defence = detector_registry.get()
 
+        # Extract the current model updates (deltas)
+        baseline_weights = self.algorithm.extract_weights()
+        deltas_attacked = self.algorithm.compute_weight_deltas(
+            baseline_weights, weights_attacked
+        )
+
+        weights_approved = defence(baseline_weights, weights_attacked, deltas_attacked)
+
         weights_approved = defence(weights_attacked)
         # get a balck list for attackers_detected this round
 
@@ -102,7 +112,7 @@ class Server(fedavg.Server):
 
         return weights_approved
 
-    async def aggregate_weights(self, updates,baseline_weights, weights_received):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate the reported weight updates from the selected clients."""
 
         if not hasattr(Config().server, "secure_aggregation_type"):
