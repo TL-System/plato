@@ -61,7 +61,7 @@ def lbfgs(
     p_mat = torch.cat(
         [torch.dot(global_weights.T, sigma_k * v), torch.dot(gradients.T, v)], dim=0
     )
-    approx_prod -= nd.dot(
+    approx_prod -= torch.dot(
         torch.dot(torch.cat([sigma_k * global_weights, gradients], dim=1), mat_inv),
         p_mat,
     )
@@ -128,11 +128,8 @@ def detection(score):
     return malicious_ids, clean_ids
 
 
-def fl_detector(weights_attacked):
+def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
     """https://arxiv.org/pdf/2207.09209.pdf"""
-    # get model updates from weights_attacked
-    current_grad = weights_attacked  # calculated the model updates
-
     # prediction: need a history: use local files?
     file_path = "./records.pkl"
     if os.path.exists(file_path):
@@ -142,29 +139,21 @@ def fl_detector(weights_attacked):
             last_weights = pickle.load(file)
             last_gradients = pickle.load(file)
             malicious_score = pickle.load(file)
-    # approximation
-    hvp = lbfgs(
-        weights_attacked, global_weights_record, gradients_record, last_weights
-    )  # lbfgs(args, weight_record, grad_record, weight - last_weight)
-    # distance
-    pred_grad = []
-    distance = []
 
-    # make prediction by Cauchy mean value theorem
+    # Approximation
+    hvp = lbfgs(
+        deltas_attacked, global_weights_record, gradients_record, last_weights
+    )  
+
+    # Make prediction by Cauchy mean value theorem
+    pred_grad = []
     for i in range(len(last_gradients)):
         pred_grad.append(last_gradients[i] + hvp)
-        # distance.append((1 - nd.dot(pred_grad[i].T, param_list[i]) / (
-        # nd.norm(pred_grad[i]) * nd.norm(param_list[i]))).asnumpy().item())
 
-    pred = np.zeros(100)
-    b = 0
-    pred[:b] = 1
-    # distance = torch.norm((torch.cat(*old_gradients, dim=1) - torch.cat(*param_list, dim=1)), axis=0).asnumpy()
-    distance = nd.norm(
-        (torch.cat(pred_grad, dim=1) - torch.cat(current_grad, dim=1)), axis=0
+    # Calculate distance for scoring
+    distance = torch.norm(
+        (torch.cat(pred_grad, dim=1) - torch.cat(deltas_attacked, dim=1)), axis=0
     ).asnumpy()
-    # param_list is gradients in this round, used to make comparason
-
     # normalize distance
     distance = distance / np.sum(distance)
     # add new distance score into malicious score record
@@ -177,8 +166,11 @@ def fl_detector(weights_attacked):
             break
 
     # update record
-    global_weights_record.append()
-    gradients_record.append()
+    global_weights_record.append(baseline_weights)
+    gradients_record.append(deltas_attacked)
+    weights_attacked.append(weights_attacked)
+    last_gradients = deltas_attacked
+    # save into local file
     file_path = "./records.pkl"
     with open(file_path, "wb") as file:
         pickle.dump(global_weights_record, file)
