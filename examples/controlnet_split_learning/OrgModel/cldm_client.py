@@ -25,7 +25,8 @@ class OurControlledUnetModel(ControlledUnetModel):
                 hs.append(h)
             h = self.middle_block(h, emb, context)
 
-        return h
+        hs.append(h)
+        return hs
 
 
 class OurControlLDM(ControlLDM):
