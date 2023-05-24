@@ -61,7 +61,7 @@ class OurControlLDM(ControlLDM):
         noise = default(noise, lambda: torch.randn_like(x_start))
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
         control, sd_output = self.apply_model(x_noisy, t, cond)
-        return {"control_output": control, "sd_output": sd_output}
+        return {"control_output": control, "sd_output": sd_output, "noise": noise}
 
 
 class OurControlNet(ControlNet):
