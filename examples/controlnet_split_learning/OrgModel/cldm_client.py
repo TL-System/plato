@@ -54,14 +54,20 @@ class OurControlLDM(ControlLDM):
             context=cond_txt,
         )
 
-        return control, diffusion_encoder_output
+        return control, diffusion_encoder_output, cond_txt
 
     def p_losses(self, x_start, cond, t, noise=None):
         "Return p_losses."
         noise = default(noise, lambda: torch.randn_like(x_start))
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
-        control, sd_output = self.apply_model(x_noisy, t, cond)
-        return {"control_output": control, "sd_output": sd_output, "noise": noise}
+        control, sd_output, cond_txt = self.apply_model(x_noisy, t, cond)
+        return {
+            "control_output": control,
+            "sd_output": sd_output,
+            "noise": noise,
+            "timestep": t,
+            "cond_txt": cond_txt,
+        }
 
 
 class OurControlNet(ControlNet):

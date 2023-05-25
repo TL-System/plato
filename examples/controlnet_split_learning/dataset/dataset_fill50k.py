@@ -41,4 +41,4 @@ class Fill50KDataset(Dataset):
         # Normalize target images to [-1, 1].
         target = (target.astype(np.float32) / 127.5) - 1.0
 
-        return dict(jpg=target, txt=prompt, hint=source)
+        return dict(jpg=target, txt=prompt, hint=source), None

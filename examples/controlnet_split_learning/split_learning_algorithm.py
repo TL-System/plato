@@ -40,3 +40,13 @@ class Algorithm(split_learning_algorithm.Algorithm):
         )
 
         return features_dataset, toc - tic
+
+    def update_weights_before_cut(self, weights):
+        """Update the weights before cut layer, called when testing accuracy."""
+        current_weights = self.extract_weights()
+        # update the weights of client model
+        for key, _ in weights.items():
+            if "input_hint_block" in key or "input_blocks.0" in key:
+                current_weights[key] = weights[key]
+
+        self.load_weights(current_weights)
