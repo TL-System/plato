@@ -100,10 +100,9 @@ class Server(fedavg.Server):
         deltas_attacked = self.algorithm.compute_weight_deltas(
             baseline_weights, weights_attacked
         )
-
+        
         weights_approved = defence(baseline_weights, weights_attacked, deltas_attacked)
 
-        weights_approved = defence(weights_attacked)
         # get a balck list for attackers_detected this round
 
         # Remove identified attacker from clients pool. Never select that client again.
