@@ -3,7 +3,6 @@ import logging
 from plato.config import Config
 from scipy.stats import norm
 import numpy as np
-from mxnet import nd
 from sklearn.cluster import KMeans
 import pickle
 import os
@@ -23,13 +22,46 @@ def get():
 
     if detector_type in registered_detectors:
         registered_defence = registered_detectors[detector_type]
+        logging.info(f"Clients perform {detector_type} attack.")
         return registered_defence
 
     raise ValueError(f"No such defence: {detector_type}")
 
 
+def flatten_weights(weights):
+    flattened_weights = []
+
+    for weight in weights:
+        flattened_weight = []
+        for name in weight.keys():
+            flattened_weight = (
+                weight[name].view(-1)
+                if not len(flattened_weight)
+                else torch.cat((flattened_weight, weight[name].view(-1)))
+            )
+
+        flattened_weights = (
+            flattened_weight[None, :]
+            if not len(flattened_weights)
+            else torch.cat((flattened_weights, flattened_weight[None, :]), 0)
+        )
+    return flattened_weights
+
+
+def flatten_weight(weight):
+
+    flattened_weight = []
+    for name in weight.keys():
+        flattened_weight = (
+            weight[name].view(-1)
+            if not len(flattened_weight)
+            else torch.cat((flattened_weight, weight[name].view(-1)))
+        )
+    return flattened_weight
+
+
 def lbfgs(
-    weights_attacked, global_weights_record, gradients_record, last_weights
+    deltas_attacked, global_weights_record, gradients_record, last_weights
 ):  # args, S_k_list, Y_k_list, v):
     # Approximate integrated Hessian value based on weights
     # weights record; gradients record; weight-last_weight
@@ -38,31 +70,40 @@ def lbfgs(
 
     # could we read from local file within this function?
     # load info into the following variable? main function only update the record(history)
-
-    global_weights = torch.cat(
-        global_weights_record, dim=1
-    )  # curr_S_k=nd.concat(*S_k_list, dim=1)
-    gradients = torch.cat(gradients_record)  # curr_Y_k = nd.concat(*Y_k_list, dim=1)
-    global_times_gradients = torch.dot(global_weights.T, gradients)
-    global_times_global = torch.dot(global_weights.T, global_weights)
-    R_k = np.triu(global_times_gradients.asnumpy())
+    global_weights = torch.stack(global_weights_record)
+    gradients = torch.stack(gradients_record)
+    global_times_gradients = torch.matmul(global_weights.T, gradients)
+    global_times_global = torch.matmul(global_weights.T, global_weights)
+    R_k = np.triu(global_times_gradients.numpy())
     L_k = global_times_gradients - torch.tensor(R_k)
-    sigma_k = torch.dot(global_weights_record[-1].T, gradients_record[-1]) / (
-        torch.dot(gradients_record[-1].T, gradients_record[-1])
+    sigma_k = torch.matmul(global_weights_record[-1].T, gradients_record[-1]) / (
+        torch.matmul(gradients_record[-1].T, gradients_record[-1])
     )
+    logging.info(f"sigma_k: %s", sigma_k)
     D_k_diag = torch.diag(global_times_gradients)
-    upper_mat = torch.cat(*[sigma_k * global_times_global, L_k], dim=1)
-    lower_mat = torch.cat(*[L_k.T, -torch.diag(D_k_diag)], dim=1)
-    mat = torch.cat(*[upper_mat, lower_mat], dim=0)
-    mat_inv = torch.inverse(mat)
+    logging.info(f"DK diag %s", D_k_diag)
+    upper_mat = torch.cat((sigma_k * global_times_global, L_k), dim=1)
+    logging.info(f"upper_mat: %s", upper_mat)
+    logging.info(f"L_k.T: %s", L_k.T)
 
-    v = weights_attacked - last_weights
+    logging.info(f"len(D_k_diag): %s", len(D_k_diag))
+    lower_mat = torch.cat((L_k.T, -torch.diag(D_k_diag)), dim=1)
+    logging.info(f"lower_mat: %s", lower_mat)
+    mat = torch.cat((upper_mat, lower_mat), dim=0)
+    logging.info(f"mat: %s", mat)
+    mat_inv = torch.inverse(mat)
+    logging.info(f"mat_inv: %s", mat_inv)
+
+    v = deltas_attacked - last_weights
+    logging.info(f"v: %s", v)
     approx_prod = sigma_k * v
     p_mat = torch.cat(
-        [torch.dot(global_weights.T, sigma_k * v), torch.dot(gradients.T, v)], dim=0
+        (torch.matmul(global_weights.T, sigma_k * v), torch.matmul(gradients.T, v)),
+        dim=0,
     )
-    approx_prod -= torch.dot(
-        torch.dot(torch.cat([sigma_k * global_weights, gradients], dim=1), mat_inv),
+    logging.info(f"p_mat: ", p_mat)
+    approx_prod -= torch.matmul(
+        torch.matmul(torch.cat((sigma_k * global_weights, gradients), dim=1), mat_inv),
         p_mat,
     )
 
@@ -70,6 +111,7 @@ def lbfgs(
 
 
 def gap_statistics(score):
+    logging.info(f"in gap function")
     nrefs = 10
     ks = range(1, 8)
     gaps = np.zeros(len(ks))
@@ -101,7 +143,7 @@ def gap_statistics(score):
 
         if i > 0:
             gapDiff[i - 1] = gaps[i - 1] - gaps[i] + sdk[i]
-    # print(gapDiff)
+    logging.info(f"line 105")
     for i in range(len(gapDiff)):
         if gapDiff[i] >= 0:
             select_k = i + 1
@@ -115,6 +157,7 @@ def gap_statistics(score):
 
 
 def detection(score):
+    logging.info(f"in detection function")
     estimator = KMeans(n_clusters=2)
     estimator.fit(score.reshape(-1, 1))
     label_pred = estimator.labels_
@@ -125,14 +168,24 @@ def detection(score):
     else:
         clean_ids = np.where(label_pred == 1)[0]
         malicious_ids = np.where(label_pred == 0)[0]
+    logging.info(f"clean_ids: %s", clean_ids)
     return malicious_ids, clean_ids
 
 
-def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
+def fl_detector(baseline_weights, weights_attacked, deltas_attacked):
     """https://arxiv.org/pdf/2207.09209.pdf"""
+    # flatten inputs
+    flattened_weights = flatten_weights(weights_attacked)
+    baseline_weights = flatten_weight(baseline_weights)
+    deltas_attacked = flatten_weights(deltas_attacked)
+
+    malicious_ids = []
+    clean_weights = weights_attacked
+
     # prediction: need a history: use local files?
     file_path = "./records.pkl"
     if os.path.exists(file_path):
+        logging.info(f"fldetector loading parameters from file.")
         with open(file_path, "rb") as file:
             global_weights_record = pickle.load(file)
             gradients_record = pickle.load(file)
@@ -140,52 +193,73 @@ def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
             last_gradients = pickle.load(file)
             malicious_score = pickle.load(file)
 
-    # Approximation
-    hvp = lbfgs(
-        deltas_attacked, global_weights_record, gradients_record, last_weights
-    )  
+        if len(global_weights_record) >= 3:  # window
 
-    # Make prediction by Cauchy mean value theorem
-    pred_grad = []
-    for i in range(len(last_gradients)):
-        pred_grad.append(last_gradients[i] + hvp)
+            logging.info(f"line 151 before calculating hvp")
+            # Approximation
+            hvp = lbfgs(
+                deltas_attacked, global_weights_record, gradients_record, last_gradients
+            )
+            logging.info(f"line 156: the hvp is %s", hvp)
+            # Make prediction by Cauchy mean value theorem
+            pred_grad = []
+            for i in range(len(last_gradients)):
+                pred_grad.append(last_gradients[i] + hvp)
+            logging.info(f"the pred_grad is: %s", pred_grad)
 
-    # Calculate distance for scoring
-    distance = torch.norm(
-        (torch.cat(pred_grad, dim=1) - torch.cat(deltas_attacked, dim=1)), axis=0
-    ).asnumpy()
-    # normalize distance
-    distance = distance / np.sum(distance)
-    # add new distance score into malicious score record
-    malicious_score = np.row_stack((malicious_score, distance))
-    # clustering
-    if malicious_score.shape[0] >= 11:
-        if gap_statistics(np.sum(malicious_score[-10:], axis=0)):
-            logging.info(f"malicious clients detected!")
-            malicious_ids, clean_ids = detection(np.sum(malicious_score[-10:], axis=0))
-            break
+            # Calculate distance for scoring
+            distance = torch.norm(
+                (torch.cat(pred_grad, dim=1) - torch.cat(deltas_attacked, dim=1)),
+                axis=0,
+            ).asnumpy()
+            logging.info(f"the distance is: %s", distance)
+            # normalize distance
+            distance = distance / np.sum(distance)
+            logging.info(f"the distance after normalization: %s", distance)
+            # add new distance score into malicious score record
+            malicious_score = np.row_stack((malicious_score, distance))
+            logging.info(f"the malicious score: %s", malicious_score)
+            # clustering
+            if malicious_score.shape[0] >= 11:
+                logging.info(f"line 176 for checkpoint")
+                if gap_statistics(np.sum(malicious_score[-10:], axis=0)):
+                    logging.info(f"malicious clients detected!")
+                    malicious_ids, clean_ids = detection(
+                        np.sum(malicious_score[-10:], axis=0)
+                    )
+
+            # remove poisoned weights
+            clean_weights = []
+            for i, weight in enumerate(flattened_weights):
+                if i in clean_ids:
+                    clean_weights.append(weight)
+
+    else:
+        logging.info(f"initializing fl parameter record")
+        global_weights_record = []
+        gradients_record = []
+        last_gradients = torch.zeros(len(baseline_weights))
+        last_weights = torch.zeros(len(baseline_weights))
+        malicious_score = []
 
     # update record
-    global_weights_record.append(baseline_weights)
-    gradients_record.append(deltas_attacked)
-    weights_attacked.append(weights_attacked)
-    last_gradients = deltas_attacked
+    logging.info(f"line 183: updating record")
+    global_weights_record.append(baseline_weights - last_weights)
+    logging.info(f"len %d", len(global_weights_record))
+    gradients_record.append(torch.mean(deltas_attacked, dim=0) - last_gradients)
+    last_weights = baseline_weights
+    last_gradients = torch.mean(deltas_attacked, dim=0)
+
     # save into local file
     file_path = "./records.pkl"
     with open(file_path, "wb") as file:
         pickle.dump(global_weights_record, file)
         pickle.dump(gradients_record, file)
-        pickle.dump(weights_attacked, file)
+        pickle.dump(last_weights, file)
         pickle.dump(last_gradients, file)
         pickle.dump(malicious_score, file)
 
-    # remove poisoned weights
-    clean_weights=[]
-    for i, weight in enumerate(weights_attacked):
-        if i in clean_ids:
-            clean_weights.append(weight)
-
-    return clean_weights
+    return malicious_ids, clean_weights
 
 
 registered_detectors = {
