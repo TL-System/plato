@@ -60,7 +60,7 @@ class ClientModel(ControlNetModel):
         output_dict = self.model.shared_step(batch)
         return output_dict
 
-    @torch.no_grad
+    @torch.no_grad()
     def validation_step(self, batch):
         output_dict = self.model.shared_step(batch)
         return output_dict
@@ -77,7 +77,7 @@ class ServerModel(ControlNetModel):
         output_dict = self.model(batch)
         return output_dict
 
-    @torch.no_grad
+    @torch.no_grad()
     def validation_step(self, batch):
         output_dict = self.model(batch)
         return output_dict
