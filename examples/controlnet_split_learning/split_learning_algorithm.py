@@ -3,7 +3,7 @@ import time
 import logging
 import torch
 from plato.config import Config
-from examples.split_learning import split_learning_algorithm
+from split_learning import split_learning_algorithm
 
 
 class Algorithm(split_learning_algorithm.Algorithm):

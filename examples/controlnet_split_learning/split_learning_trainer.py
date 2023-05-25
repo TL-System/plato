@@ -3,10 +3,10 @@ import os
 import logging
 import torch
 from plato.config import Config
-from examples.split_learning import split_learning_trainer
+from split_learning import split_learning_trainer
 
 
-class Trainer(split_learning_trainer.Algorithm):
+class Trainer(split_learning_trainer.Trainer):
     """The split learning algorithm to train ControlNet."""
 
     def _client_train_loop(self, examples):
