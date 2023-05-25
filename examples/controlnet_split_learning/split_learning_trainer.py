@@ -54,3 +54,34 @@ class Trainer(split_learning_trainer.Algorithm):
 
     # test
     # test the validation mse
+    # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """
+        Evaluates the model with the provided test dataset and test sampler.
+
+        Auguments:
+        testset: the test dataset.
+        sampler: the test sampler. The default is None.
+        kwargs (optional): Additional keyword arguments.
+        """
+        batch_size = config["batch_size"]
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        mses = 0
+        total = 0
+
+        self.model.to(self.device)
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                outputs = self.model(examples)
+
+                outputs = self.process_outputs(outputs)
+
+                mses += torch.nn.functional.mse_loss(outputs, labels).item()
+
+        return mses / total
