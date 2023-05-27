@@ -64,7 +64,7 @@ class CelebADataset(BasicDataset):
         mask = mask.astype(np.float32) / 255.0
 
         sentence = "Good image"
-        return {"jpg": image, "hint": mask, "txt": sentence}, None
+        return {"jpg": image, "hint": mask, "txt": sentence}, 0
 
     def _load_csv(
         self,

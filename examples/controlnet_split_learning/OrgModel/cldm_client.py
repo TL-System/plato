@@ -40,8 +40,6 @@ class OurControlLDM(ControlLDM):
 
         cond_txt = torch.cat(cond["c_crossattn"], 1)
         hint = torch.cat(cond["c_concat"], 1)
-        hint = self.first_stage_model.encode(hint)
-        hint = self.get_first_stage_encoding(hint).detach()
         control = self.control_model(
             x=x_noisy,
             hint=hint,

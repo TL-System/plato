@@ -77,3 +77,5 @@ model:
 
     cond_stage_config:
       target: ldm.modules.encoders.modules.FrozenCLIPEmbedder
+      params:
+        version: /scratch/dixiyao/controlnet/models/openai/clip-vit-large-patch14

@@ -12,21 +12,22 @@ class Algorithm(split_learning_algorithm.Algorithm):
     def extract_features(self, dataset, sampler):
         """Extracting features using layers before the cut_layer."""
         self.model.to(self.trainer.device)
-        self.model.eval()
+        self.model.model.to(self.trainer.device)
+        self.model.model.eval()
 
         tic = time.perf_counter()
 
         features_dataset = []
 
-        batch = self.trainer.get_train_samples(
+        batch, _ = self.trainer.get_train_samples(
             Config().trainer.batch_size, dataset, sampler
         )
         with torch.no_grad():
-            batch = batch.to(self.trainer.device)
             output_dict = self.model.training_step(batch)
 
         output_dict["control_output"] = output_dict["control_output"].cpu()
-        output_dict["sd_output"] = output_dict["sd_output"].cpu()
+        for index, items in enumerate(output_dict["sd_output"]):
+            output_dict["sd_output"][index] = items.cpu()
         noise = output_dict["noise"].cpu()
         output_dict.pop("noise")
         features_dataset.append((output_dict, noise))

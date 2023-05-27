@@ -48,7 +48,7 @@ class OurControlLDM(ControlLDM):
         "Forward function"
         diffusion_model = self.model.diffusion_model
         control = self.control_model(
-            x=control,
+            h=control,
             timesteps=t,
             context=cond_txt,
         )

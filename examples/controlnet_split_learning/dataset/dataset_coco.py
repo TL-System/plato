@@ -64,7 +64,7 @@ class CoCoDataset(BasicDataset):
         mask = mask.astype(np.float32) / 255.0
 
         sentence = file["sentence"]
-        return {"jpg": image, "hint": mask, "txt": sentence}, None
+        return {"jpg": image, "hint": mask, "txt": sentence}, 0
 
     def __len__(self):
         return len(self.files)

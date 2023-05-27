@@ -55,7 +55,7 @@ class OmniglotDataset(
         mask = self.process(mask)
         mask = mask.astype(np.float32) / 255.0
 
-        return dict(jpg=image, txt="Good image", hint=mask), None
+        return dict(jpg=image, txt="Good image", hint=mask), 0
 
     def process(self, condition):
         """To generate the condition according to the task."""
