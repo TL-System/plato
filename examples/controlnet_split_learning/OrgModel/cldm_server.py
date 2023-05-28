@@ -11,7 +11,7 @@ class OurControlledUnetModel(ControlledUnetModel):
     """Client Unet."""
 
     # pylint:disable=unused-argument
-    def forward(
+    def forward_train(
         self,
         sd_output,
         timesteps=None,
@@ -44,18 +44,19 @@ class OurControlledUnetModel(ControlledUnetModel):
 class OurControlLDM(ControlLDM):
     """On the client."""
 
-    def forward(self, control, sd_output, cond_txt, t):
+    def forward_train(self, control, sd_output, cond_txt, t):
         "Forward function"
         diffusion_model = self.model.diffusion_model
-        control = self.control_model(
+        control = self.control_model.forward_train(
             h=control,
             timesteps=t,
             context=cond_txt,
         )
-        eps = diffusion_model(
+        eps = diffusion_model.forward_train(
             sd_output=sd_output,
             timesteps=t,
             context=cond_txt,
+            control=control,
         )
 
         return eps
@@ -65,7 +66,7 @@ class OurControlNet(ControlNet):
     """Our controlnet on the client"""
 
     # pylint:disable=unused-argument
-    def forward(self, h, timesteps, context, **kwargs):
+    def forward_train(self, h, timesteps, context, **kwargs):
         """Forward function."""
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
         emb = self.time_embed(t_emb)
@@ -80,4 +81,4 @@ class OurControlNet(ControlNet):
         h = self.middle_block(h, emb, context)
         outs.append(self.middle_block_out(h, emb, context))
 
-        return h
+        return outs

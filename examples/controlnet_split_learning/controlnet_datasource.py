@@ -29,7 +29,10 @@ class DataSource(base.DataSource):
             testset = CelebADataset(os.path.join(_path, "celeba"), "valid", _condition)
         elif _val_dataset == "coco":
             testset = CoCoDataset(
-                os.path.join(_path, "coco"), split="val", condition=_condition
+                os.path.join(_path, "coco"),
+                split="val",
+                condition=_condition,
+                dataset_size=1000,
             )
         elif _val_dataset == "fill50k":
             testset = Fill50KDataset(os.path.join(_path, "fill50k"))

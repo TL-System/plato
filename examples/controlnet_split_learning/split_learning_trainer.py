@@ -2,8 +2,16 @@
 import os
 import time
 import logging
+import numpy as np
 import torch
+import torchvision
+from PIL import Image
+from torchmetrics.image import fid
+from torchmetrics.multimodal import clip_score
+import einops
+from pytorch_msssim import SSIM
 from plato.config import Config
+from dataset.dataset_basic import process_condition
 from split_learning import split_learning_trainer
 
 
@@ -12,45 +20,46 @@ class Trainer(split_learning_trainer.Trainer):
 
     def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
+        self.model.model = self.model.model.to(self.device)
+        gradients = self.gradients[0].to(self.device)
         self.optimizer.zero_grad()
         outputs = self.model.forward(examples)
 
         # Back propagate with gradients from server
-        outputs["control_output"].backward(self.gradients["control"])
+        outputs["control_output"].backward(gradients)
         self.optimizer.step()
 
         # No loss value on the client side
         loss = torch.zeros(1)
-        self._loss_tracker.update(loss, examples.size(0))
+        self._loss_tracker.update(loss, examples["jpg"].size(0))
         return loss
 
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
-        control = examples["control_output"].detach().requires_grad_(True)
-
         self.model.model = self.model.model.to(self.device)
+        control = torch.nn.Parameter(
+            examples["control_output"].detach().to(self.model.model.device),
+            requires_grad=True,
+        )
+
         cond_txt = examples["cond_txt"].to(self.model.model.device)
         t = examples["timestep"].to(self.model.model.device)
-        control = control.to(self.model.model.device)
         sd_output = examples["sd_output"]
         for index, items in enumerate(sd_output):
             sd_output[index] = items.to(self.model.model.device)
-        self.optimizer.zero_grad()
-        outputs = self.model.model(
+        outputs = self.model.model.forward_train(
             control,
             sd_output,
             cond_txt,
             t,
         )
-        loss = self._loss_criterion(outputs, labels)
+        self.optimizer.zero_grad()
+        loss = self.customize_loss_criterion(outputs, labels, t)
+        loss.backward()
+        loss = loss.cpu().detach()
         self._loss_tracker.update(loss, labels.size(0))
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
-        print(control, control.grad)
         # Record gradients within the cut layer
-        self.cut_layer_grad = [control.grad.clone().detach()]
+        self.cut_layer_grad = [control.grad.cpu().clone().detach()]
         self.optimizer.step()
 
         logging.warning(
@@ -73,31 +82,89 @@ class Trainer(split_learning_trainer.Trainer):
         sampler: the test sampler. The default is None.
         kwargs (optional): Additional keyword arguments.
         """
+        torch.cuda.empty_cache()
         batch_size = config["batch_size"]
+        sim_cond_scores = 0
+        metric_ssim = SSIM(data_range=1.0, size_average=True, channel=3)
+        fidscore = fid.FrechetInceptionDistance(feature=64)
+        clipscore = clip_score.CLIPScore(
+            model_name_or_path=os.path.join(
+                Config().data.data_path,
+                "controlnet/models/openai/clip-vit-large-patch14",
+            )
+        )
 
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=batch_size, shuffle=False, sampler=sampler
         )
 
-        mses = 0
-        total = 0
-
         self.model.to(self.device)
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-
-                outputs = self.process_outputs(outputs)
-
-                mses += torch.nn.functional.mse_loss(outputs, labels).item()
-
-        return mses / total
+        self.model.model.to(self.device)
+        log_dir = Config().params["result_path"]
+        for batch, _ in test_loader:
+            with torch.no_grad():
+                generate = self.model.model.log_images(batch)
+                origin = batch["jpg"]
+                hint = batch["hint"]
+                origin = einops.rearrange(origin, "b h w c -> b c h w").clone()
+                self.log_condition(
+                    generate["samples_cfg_scale_9.00"].detach().cpu(),
+                    log_dir + "samples.png",
+                )
+                self.log_condition(origin, log_dir + "org.png")
+                generate = (
+                    torch.clip(
+                        generate["samples_cfg_scale_9.00"] * 127.5 + 127.5, 0, 255
+                    )
+                    .to(torch.uint8)
+                    .detach()
+                    .cpu()
+                )
+                origin = (
+                    torch.clip(origin * 127.5 + 127 / 5, 0, 255)
+                    .to(torch.uint8)
+                    .detach()
+                    .cpu()
+                )
+                fidscore.update(generate, real=False)
+                fidscore.update(origin, real=True)
+                clipscore.update(generate, batch["txt"])
+                generate_conditions = []
+                for index_img in range(generate.shape[0]):
+                    generate_condition_img = generate[index_img]
+                    generate_condition_img = einops.rearrange(
+                        generate_condition_img, "c h w -> h w c"
+                    )
+                    generate_condition_img = generate_condition_img.numpy()
+                    generate_condition_img = process_condition(
+                        Config().data.condition, generate_condition_img
+                    )
+                    generate_conditions.append(generate_condition_img.tolist())
+                generate_conditions = torch.tensor(
+                    np.array(generate_conditions).astype(np.float32) / 255.0
+                )
+                sim_cond = metric_ssim(
+                    einops.rearrange(generate_conditions, "b h w c-> b c h w"),
+                    einops.rearrange(hint, "b h w c->b c h w"),
+                ).item()
+                sim_cond_scores += sim_cond
+            sim_cond_scores /= len(test_loader)
+        fidscores = fidscore.compute().detach().item()
+        clipscores = clipscore.compute().detach().item() / 100
+        logging.info(
+            "[Server #%d] FID: %.4f, CLIP score: %.4f, condition MSE: %.4f",
+            os.getpid(),
+            fidscores,
+            clipscores,
+            sim_cond_scores,
+        )
+        torch.cuda.empty_cache()
+        return fidscores / 100
 
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
         """The default training loop when a custom training loop is not supplied."""
+        torch.cuda.empty_cache()
         batch_size = config["batch_size"]
         self.sampler = sampler
         tic = time.perf_counter()
@@ -122,6 +189,8 @@ class Trainer(split_learning_trainer.Trainer):
 
         total_epochs = config["epochs"]
 
+        self.model.to(self.device)
+        self.model.model.to(self.device)
         for self.current_epoch in range(1, total_epochs + 1):
             self._loss_tracker.reset()
             self.train_epoch_start(config)
@@ -176,3 +245,24 @@ class Trainer(split_learning_trainer.Trainer):
 
         self.train_run_end(config)
         self.callback_handler.call_event("on_train_run_end", self, config)
+        torch.cuda.empty_cache()
+
+    def customize_loss_criterion(self, outputs, labels, t):
+        "Customied loss criterion for diffusion model"
+        loss = self.model.model.get_loss(outputs, labels, mean=False).mean(
+            dim=[1, 2, 3]
+        )
+        loss_simple = loss.mean() * self.model.model.l_simple_weight
+        loss_vlb = (self.model.model.lvlb_weights[t] * loss).mean()
+        loss = loss_simple + self.model.model.original_elbo_weight * loss_vlb
+        return loss
+
+    def log_condition(self, img, path):
+        "log image"
+        grid = torchvision.utils.make_grid(img, nrow=4)
+        grid = grid.transpose(0, 1).transpose(1, 2).squeeze(-1)
+        grid = grid.numpy()
+        grid = np.clip(grid * 127.5 + 127.5, 0, 255).astype(np.uint8)
+        os.makedirs(os.path.split(path)[0], exist_ok=True)
+        Image.fromarray(grid).save(path)
+        return img

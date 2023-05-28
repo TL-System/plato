@@ -74,7 +74,7 @@ class ServerModel(ControlNetModel):
 
     # pylint:disable=invalid-name
     def training_step(self, batch):
-        output_dict = self.model(
+        output_dict = self.model.forward_train(
             batch["control_output"],
             batch["sd_output"],
             batch["cond_txt"],
@@ -84,10 +84,5 @@ class ServerModel(ControlNetModel):
 
     @torch.no_grad()
     def validation_step(self, batch):
-        output_dict = self.model(
-            batch["control_output"],
-            batch["sd_output"],
-            batch["cond_txt"],
-            batch["timestep"],
-        )
+        output_dict = self.model.test(batch)
         return output_dict

@@ -25,10 +25,12 @@ class Algorithm(split_learning_algorithm.Algorithm):
         with torch.no_grad():
             output_dict = self.model.training_step(batch)
 
-        output_dict["control_output"] = output_dict["control_output"].cpu()
+        output_dict["control_output"] = output_dict["control_output"].detach().cpu()
         for index, items in enumerate(output_dict["sd_output"]):
-            output_dict["sd_output"][index] = items.cpu()
-        noise = output_dict["noise"].cpu()
+            output_dict["sd_output"][index] = items.detach().cpu()
+        noise = output_dict["noise"].detach().cpu()
+        output_dict["timestep"] = output_dict["timestep"].detach().cpu()
+        output_dict["cond_txt"] = output_dict["cond_txt"].detach().cpu()
         output_dict.pop("noise")
         features_dataset.append((output_dict, noise))
 

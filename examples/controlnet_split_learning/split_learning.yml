@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 1
+    iteration: 12500
 
 server:
     type: split_learning
@@ -54,7 +54,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 4
+    batch_size: 3
     optimizer: AdamW
     
 algorithm:
