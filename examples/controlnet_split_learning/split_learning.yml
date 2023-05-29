@@ -22,6 +22,8 @@ server:
 
     # Server doesn't have to do test for every round in split learning
     do_test: false
+    # model_path: /scratch/dixiyao/controlnet/models/plato/models
+    # checkpoint_path: /scratch/dixiyao/controlnet/models/plato/checkpoints
 
 data:
     # The training and testing dataset

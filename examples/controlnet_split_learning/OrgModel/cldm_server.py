@@ -2,7 +2,6 @@
 import torch
 from ControlNet.cldm.cldm import ControlLDM, ControlNet, ControlledUnetModel
 from ControlNet.ldm.modules.diffusionmodules.util import timestep_embedding
-from ControlNet.ldm.util import default
 
 
 # pylint:disable=invalid-name
