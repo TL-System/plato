@@ -13,15 +13,17 @@ Deep Learning." arXiv preprint arXiv:2112.01637 (2021).
 
 https://arxiv.org/pdf/2112.01637.pdf
 """
-
+# pylint:disable=import-error
 import logging
 
+from split_learning import split_learning_server
 from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.utils import fonts
-from split_learning import split_learning_server
 
 
+# pylint:disable=attribute-defined-outside-init
+# pylint:disable=too-few-public-methods
 class Server(split_learning_server.Server):
     """The split learning server."""
 

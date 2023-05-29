@@ -1,10 +1,12 @@
 """Control Net on client"""
+# pylint:disable=import-error
 import torch
 from ControlNet.cldm.cldm import ControlLDM, ControlNet, ControlledUnetModel
 from ControlNet.ldm.modules.diffusionmodules.util import timestep_embedding
 from ControlNet.ldm.util import default
 
 
+# pylint:disable=no-member
 # pylint:disable=invalid-name
 # pylint:disable=too-few-public-methods
 class OurControlledUnetModel(ControlledUnetModel):

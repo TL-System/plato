@@ -1,9 +1,11 @@
 """Train the ControlNet model with split learning"""
+# pylint:disable=import-error
 import time
 import logging
 import torch
-from plato.config import Config
+
 from split_learning import split_learning_algorithm
+from plato.config import Config
 
 
 class Algorithm(split_learning_algorithm.Algorithm):

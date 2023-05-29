@@ -9,6 +9,7 @@ import numpy as np
 
 from torchvision.datasets import Omniglot
 
+# pylint:disable=import-error
 from ControlNet.annotator.uniformer import UniformerDetector
 from ControlNet.annotator.openpose import OpenposeDetector
 from ControlNet.annotator.midas import MidasDetector
@@ -18,11 +19,13 @@ from ControlNet.annotator.canny import CannyDetector
 from ControlNet.annotator.util import HWC3
 
 
+# pylint:disable=no-member
 class OmniglotDataset(
     Omniglot,
 ):
     """Fill 50k dataset"""
 
+    # pylint:disable=too-many-arguments
     def __init__(
         self,
         root: str,
@@ -55,7 +58,7 @@ class OmniglotDataset(
         mask = self.process(mask)
         mask = mask.astype(np.float32) / 255.0
 
-        return dict(jpg=image, txt="Good image", hint=mask), 0
+        return {"jpg": image, "txt": "Good image", "hint": mask}, 0
 
     def process(self, condition):
         """To generate the condition according to the task."""
@@ -86,7 +89,7 @@ class OmniglotDataset(
                 detected_map = operators[self.task]()(condition, 100, 200)
                 detected_map = HWC3(detected_map)
             else:
-                if self.task == "depth" or self.task == "pose":
+                if self.task in ["depth", "pose"]:
                     detected_map, _ = operators[self.task]()(condition)
                 elif self.task == "hough":
                     detected_map = operators[self.task]()(condition, 0.1, 0.1)

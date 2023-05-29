@@ -6,12 +6,15 @@ import random
 import cv2
 import numpy as np
 
+# pylint:disable=relative-beyond-top-level
 from .dataset_basic import BasicDataset
 
 
+# pylint:disable=no-member
 class CoCoDataset(BasicDataset):
     """Coco dataset"""
 
+    # pylint:disable=too-many-arguments
     def __init__(
         self,
         path,

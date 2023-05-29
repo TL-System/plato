@@ -1,6 +1,7 @@
 """
 Split learning with ControlNet.
 """
+# pylint:disable=import-error
 import os
 import sys
 
@@ -10,13 +11,13 @@ sys.path.append(
     )
 )
 sys.path.append(os.path.join(os.path.abspath(os.getcwd()), "examples"))
+# pylint:disable=wrong-import-position
+from split_learning.split_learning_client import Client
 from split_learning_algorithm import Algorithm
 from split_learning_trainer import Trainer
 from split_learning_server import Server
 from controlnet_datasource import DataSource
 from OrgModel.model import ClientModel, ServerModel
-
-from split_learning.split_learning_client import Client
 
 
 def main():

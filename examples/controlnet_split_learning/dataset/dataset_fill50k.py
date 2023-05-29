@@ -7,6 +7,7 @@ import numpy as np
 from torch.utils.data import Dataset
 
 
+# pylint:disable=no-member
 class Fill50KDataset(Dataset):
     """Fill 50k dataset"""
 
@@ -41,4 +42,4 @@ class Fill50KDataset(Dataset):
         # Normalize target images to [-1, 1].
         target = (target.astype(np.float32) / 127.5) - 1.0
 
-        return dict(jpg=target, txt=prompt, hint=source), 0
+        return {"jpg": target, "txt": prompt, "hint": source}, 0

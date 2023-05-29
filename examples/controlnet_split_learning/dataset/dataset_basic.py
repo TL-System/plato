@@ -7,6 +7,7 @@ import cv2
 from torch.utils.data import Dataset
 import numpy as np
 
+# pylint:disable=import-error
 from ControlNet.annotator.uniformer import UniformerDetector
 from ControlNet.annotator.openpose import OpenposeDetector
 from ControlNet.annotator.midas import MidasDetector
@@ -16,6 +17,7 @@ from ControlNet.annotator.canny import CannyDetector
 from ControlNet.annotator.util import HWC3
 
 
+# pylint:disable=no-member
 class BasicDataset(Dataset):
     """The basic dataset"""
 
@@ -74,7 +76,7 @@ def process_condition(task, condition):
             detected_map = operators[task]()(condition, 100, 200)
             detected_map = HWC3(detected_map)
         else:
-            if task == "depth" or task == "pose":
+            if task in ["depth", "pose"]:
                 detected_map, _ = operators[task]()(condition)
             elif task == "hough":
                 detected_map = operators[task]()(condition, 0.1, 0.1)

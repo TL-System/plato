@@ -1,23 +1,21 @@
 """Control Net on client"""
 import torch
+
+# pylint:disable=import-error
 from ControlNet.cldm.cldm import ControlLDM, ControlNet, ControlledUnetModel
 from ControlNet.ldm.modules.diffusionmodules.util import timestep_embedding
 
 
+# pylint:disable=no-member
 # pylint:disable=invalid-name
 # pylint:disable=too-few-public-methods
 class OurControlledUnetModel(ControlledUnetModel):
     """Client Unet."""
 
     # pylint:disable=unused-argument
+    # pylint:disable
     def forward_train(
-        self,
-        sd_output,
-        timesteps=None,
-        context=None,
-        control=None,
-        only_mid_control=False,
-        **kwargs
+        self, sd_output, timesteps=None, context=None, control=None, **kwargs
     ):
         "Forward function"
         with torch.no_grad():
@@ -31,7 +29,7 @@ class OurControlledUnetModel(ControlledUnetModel):
             h += control.pop()
 
         for _, module in enumerate(self.output_blocks):
-            if only_mid_control or control is None:
+            if control is None:
                 h = torch.cat([h, sd_output.pop()], dim=1)
             else:
                 h = torch.cat([h, sd_output.pop() + control.pop()], dim=1)

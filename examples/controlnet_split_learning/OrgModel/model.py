@@ -1,8 +1,9 @@
 """The server and client model of the original ControlNet."""
+# pylint:disable=import-error
 from abc import abstractmethod
 import torch
-from ControlNet.cldm.model import create_model, load_state_dict
 from plato.config import Config
+from ControlNet.cldm.model import create_model, load_state_dict
 
 
 class ControlNetModel(torch.nn.Module):

@@ -9,12 +9,15 @@ import cv2
 from torchvision.datasets.utils import verify_str_arg
 import torch
 import numpy as np
+
+# pylint:disable=relative-beyond-top-level
 from .dataset_basic import BasicDataset
 
 
 CSV = namedtuple("CSV", ["header", "index", "data"])
 
 
+# pylint:disable=no-member
 class CelebADataset(BasicDataset):
     """Coco dataset"""
 

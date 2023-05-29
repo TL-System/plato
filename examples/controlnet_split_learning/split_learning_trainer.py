@@ -1,4 +1,5 @@
 """Train the ControlNet model with split learning"""
+# pylint:disable=import-error
 import os
 import time
 import logging
@@ -10,11 +11,14 @@ from torchmetrics.image import fid
 from torchmetrics.multimodal import clip_score
 import einops
 from pytorch_msssim import SSIM
+
 from plato.config import Config
-from dataset.dataset_basic import process_condition
 from split_learning import split_learning_trainer
+from dataset.dataset_basic import process_condition
 
 
+# pylint:disable=attribute-defined-outside-init
+# pylint:disable=no-member
 class Trainer(split_learning_trainer.Trainer):
     """The split learning algorithm to train ControlNet."""
 
@@ -34,6 +38,7 @@ class Trainer(split_learning_trainer.Trainer):
         self._loss_tracker.update(loss, examples["jpg"].size(0))
         return loss
 
+    # pylint:disable=unused-argument
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
         self.model.model = self.model.model.to(self.device)
@@ -43,7 +48,7 @@ class Trainer(split_learning_trainer.Trainer):
         )
 
         cond_txt = examples["cond_txt"].to(self.model.model.device)
-        t = examples["timestep"].to(self.model.model.device)
+        timestep = examples["timestep"].to(self.model.model.device)
         sd_output = examples["sd_output"]
         for index, items in enumerate(sd_output):
             sd_output[index] = items.to(self.model.model.device)
@@ -51,10 +56,10 @@ class Trainer(split_learning_trainer.Trainer):
             control,
             sd_output,
             cond_txt,
-            t,
+            timestep,
         )
         self.optimizer.zero_grad()
-        loss = self.customize_loss_criterion(outputs, labels, t)
+        loss = self.customize_loss_criterion(outputs, labels, timestep)
         loss.backward()
         loss = loss.cpu().detach()
         self._loss_tracker.update(loss, labels.size(0))
@@ -73,6 +78,7 @@ class Trainer(split_learning_trainer.Trainer):
     # test
     # test the validation mse
     # pylint: disable=unused-argument
+    # pylint:disable=too-many-locals
     def test_model(self, config, testset, sampler=None, **kwargs):
         """
         Evaluates the model with the provided test dataset and test sampler.
@@ -247,13 +253,13 @@ class Trainer(split_learning_trainer.Trainer):
         self.callback_handler.call_event("on_train_run_end", self, config)
         torch.cuda.empty_cache()
 
-    def customize_loss_criterion(self, outputs, labels, t):
+    def customize_loss_criterion(self, outputs, labels, timestep):
         "Customied loss criterion for diffusion model"
         loss = self.model.model.get_loss(outputs, labels, mean=False).mean(
             dim=[1, 2, 3]
         )
         loss_simple = loss.mean() * self.model.model.l_simple_weight
-        loss_vlb = (self.model.model.lvlb_weights[t] * loss).mean()
+        loss_vlb = (self.model.model.lvlb_weights[timestep] * loss).mean()
         loss = loss_simple + self.model.model.original_elbo_weight * loss_vlb
         return loss
 
