@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 2
 
     # The number of clients selected in each round
     per_round: 2
@@ -31,14 +31,14 @@ clients:
 
     random_seed: 1
     attack_type: Min-Sum
-    attacker_ids: 1,2,3,4,5,6,7,8,9,10
+    attacker_ids: 1,2,3,4,5
 server:
     address: 127.0.0.1
-    port: 2910
+    port: 2212
     random_seed: 1
     synchronous: true
     simulate_wall_time: true
-    #defence_type:
+    detector_type: FLDetector
 
     checkpoint_path: results/FEMNIST/test/checkpoint
     model_path: results/FEMNIST/test/model
