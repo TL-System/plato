@@ -8,15 +8,14 @@ from plato.config import Config
 from plato.servers import fedavg
 from collections import OrderedDict
 import attacks as attack_registry
-import detectors as detector_registry
+import detectors as defence_registry
 import aggregations as aggregation_registry
 
 import numpy as np
 import torch
+import defences
 
 from typing import Mapping
-
-
 class Server(fedavg.Server):
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -30,6 +29,7 @@ class Server(fedavg.Server):
         )
         self.attacker_list = None
         self.attack_type = None
+        self.blacklist = []
 
     def configure(self):
         """Initialize defence related parameter"""
@@ -93,25 +93,25 @@ class Server(fedavg.Server):
     def weights_filter(self, weights_attacked):
 
         # Identify poisoned updates and remove it from all received updates.
-        defence = detector_registry.get()
+        defence = defence_registry.get()
 
         # Extract the current model updates (deltas)
         baseline_weights = self.algorithm.extract_weights()
         deltas_attacked = self.algorithm.compute_weight_deltas(
-            baseline_weights, weights_attacked
-        )
-        
-        weights_approved = defence(baseline_weights, weights_attacked, deltas_attacked)
+                baseline_weights, weights_attacked
+            )
 
+        malicious_ids, weights_approved = defence(baseline_weights, weights_attacked, deltas_attacked)
         # get a balck list for attackers_detected this round
+        self.blacklist.append(malicious_ids)
 
         # Remove identified attacker from clients pool. Never select that client again.
         # for attacker in attackers_detected:
         #    self.clients_pool.remove(attacker)
 
         return weights_approved
-
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+    
+    async def aggregate_weights(self, updates,baseline_weights, weights_received):
         """Aggregate the reported weight updates from the selected clients."""
 
         if not hasattr(Config().server, "secure_aggregation_type"):
@@ -122,10 +122,11 @@ class Server(fedavg.Server):
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
             updated_weights = self.algorithm.update_weights(deltas)
             return updated_weights
-
+        
         # if secure aggregation is applied.
         aggregation = aggregation_registry.get()
 
         weights_aggregated = aggregation(updates, baseline_weights, weights_received)
 
         return weights_aggregated
+
