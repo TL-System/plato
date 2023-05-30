@@ -275,8 +275,11 @@ def spectral_anomaly_detection(baseline_weights, weights_attacked, deltas_attack
 
     return malicious_id, clean_weights
 
+def mab_rfl(baseline_weights, weights_attacked, deltas_attacked):
+    return malicious_id, clean_weights
 
 registered_detectors = {
     "FLDetector": fl_detector,
     "Spectral_anomaly": spectral_anomaly_detection,
+    "MAB- RFL": mab_rfl
 }
