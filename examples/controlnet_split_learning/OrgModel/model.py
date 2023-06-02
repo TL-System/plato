@@ -24,6 +24,7 @@ class ControlNetModel(torch.nn.Module):
             config_name = ".yaml"
         else:
             config_name = "_safe.yaml"
+        print(config_name)
         model = create_model(
             Config().parameters.model.model_structure + "_" + class_name + config_name
         ).cpu()

@@ -28,8 +28,7 @@ class Trainer(split_learning_trainer.Trainer):
             hasattr(Config().parameters.model, "safe")
             and Config().parameters.model.safe
         ) and not (
-            hasattr(Config().parameters.trainer, "jump_client")
-            and Config().parameters.trainer.jump_client
+            hasattr(Config().trainer, "jump_client") and Config().trainer.jump_client
         ):
             self.model.model = self.model.model.to(self.device)
             gradients = self.gradients[0].to(self.device)
@@ -49,8 +48,7 @@ class Trainer(split_learning_trainer.Trainer):
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
         if not (
-            hasattr(Config().parameters.trainer, "jump_server")
-            and Config().parameters.trainer.jump_server
+            hasattr(Config().trainer, "jump_server") and Config().trainer.jump_server
         ):
             self.model.model = self.model.model.to(self.device)
             if not (
@@ -107,6 +105,9 @@ class Trainer(split_learning_trainer.Trainer):
             )
         else:
             loss = torch.tensor([0])
+            self.cut_layer_grad = [
+                examples["control_output"].detach().grad.cpu().clone()
+            ]
 
         return loss
 
