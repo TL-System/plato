@@ -41,7 +41,7 @@ class OurControlledUnetModel(ControlledUnetModel):
 class OurControlLDM(ControlLDM):
     """On the client."""
 
-    def forward_train(self, control, sd_output, cond_txt, t):
+    def forward_train(self, control, sd_output, t, cond_txt=None):
         "Forward function"
         diffusion_model = self.model.diffusion_model
         control = self.control_model.forward_train(
@@ -70,8 +70,8 @@ class OurControlNet(ControlNet):
 
         outs = []
 
-        outs.append(self.zero_convs[0](h, emb, context))
-        for module, zero_conv in zip(self.input_blocks[1:], self.zero_convs[1:]):
+        h = h.to(torch.float32)
+        for module, zero_conv in zip(self.input_blocks, self.zero_convs):
             h = module(h, emb, context)
             outs.append(zero_conv(h, emb, context))
 
