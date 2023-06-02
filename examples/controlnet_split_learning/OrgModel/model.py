@@ -17,7 +17,7 @@ class ControlNetModel(torch.nn.Module):
         only_mid_control = False
 
         # First use cpu to load models. Pytorch Lightning will automatically move it to GPUs.
-        if (
+        if not (
             hasattr(Config().parameters.model, "safe")
             and Config().parameters.model.safe
         ):

@@ -41,7 +41,7 @@ class OurControlledUnetModel(ControlledUnetModel):
 class OurControlLDM(ControlLDM):
     """On the client."""
 
-    def forward_train(self, control, sd_output, t, cond_txt=None):
+    def forward_train(self, control, sd_output, cond_txt, t):
         "Forward function"
         diffusion_model = self.model.diffusion_model
         control = self.control_model.forward_train(

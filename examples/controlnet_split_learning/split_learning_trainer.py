@@ -105,9 +105,16 @@ class Trainer(split_learning_trainer.Trainer):
             )
         else:
             loss = torch.tensor([0])
-            self.cut_layer_grad = [
-                examples["control_output"].detach().grad.cpu().clone()
-            ]
+            self._loss_tracker.update(loss, labels.size(0))
+            if not (
+                hasattr(Config().parameters.model, "safe")
+                and Config().parameters.model.safe
+            ):
+                self.cut_layer_grad = [
+                    examples["control_output"].detach().cpu().clone()
+                ]
+            else:
+                self.cut_layer_grad = [None]
 
         return loss
 
