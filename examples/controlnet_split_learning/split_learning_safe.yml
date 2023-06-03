@@ -75,4 +75,4 @@ parameters:
         lr: 0.00001
 
 results: 
-    types: round, accuracy, elapsed_time, comm_overhead
+    types: round, accuracy, elapsed_time, comm_overhead, server_time, client_time, server_mem, client_mem
