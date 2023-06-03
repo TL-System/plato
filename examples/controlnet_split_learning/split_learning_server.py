@@ -15,6 +15,8 @@ https://arxiv.org/pdf/2112.01637.pdf
 """
 # pylint:disable=import-error
 import logging
+import torch
+import time
 
 from split_learning import split_learning_server
 from plato.datasources import feature
@@ -27,18 +29,31 @@ from plato.utils import fonts
 class Server(split_learning_server.Server):
     """The split learning server."""
 
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(model, datasource, algorithm, trainer, callbacks)
+        self.server_time = 0
+        self.client_time = 0
+
     # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate weight updates from the clients or train the model."""
         update = updates[0]
         report = update.report
+        self.client_time = report.training_time
         if report.type == "features":
             logging.warning("[%s] Features received, compute gradients.", self)
             feature_dataset = feature.DataSource([update.payload])
 
             # Training the model using all the features received from the client
             sampler = all_inclusive.Sampler(feature_dataset)
+            torch.cuda.synchronize()
+            tic = time.perf_counter()
             self.algorithm.train(feature_dataset, sampler)
+            torch.cuda.synchronize()
+            toc = time.perf_counter()
+            self.server_time = toc - tic
 
             self.phase = "gradient"
         elif report.type == "weights":
@@ -67,3 +82,10 @@ class Server(split_learning_server.Server):
 
         updated_weights = self.algorithm.extract_weights()
         return updated_weights
+
+    def get_logged_items(self) -> dict:
+        """Log more information including server and client computation time and the flops and memory on client."""
+        logged_items = super().get_logged_items()
+        logged_items["server_time"] = self.server_time
+        logged_items["client_time"] = self.client_time
+        return logged_items
