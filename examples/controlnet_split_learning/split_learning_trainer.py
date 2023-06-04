@@ -95,7 +95,7 @@ class Trainer(split_learning_trainer.Trainer):
             ):
                 self.cut_layer_grad = [control.grad.cpu().clone().detach()]
             else:
-                self.cut_layer_grad = []
+                self.cut_layer_grad = [None]
             self.optimizer.step()
 
             logging.warning(

@@ -21,7 +21,6 @@ import torch
 
 
 from split_learning import split_learning_client
-
 from plato.config import Config
 
 
@@ -41,7 +40,7 @@ class Client(split_learning_client.Client):
             # Server prompts a new client to conduct split learning
             self._load_context(self.client_id)
             report, payload = self._extract_features()
-            if "cuda" in Config().device:
+            if "cuda" in Config().device():
                 gpu_mem = torch.cuda.max_memory_allocated() / (1024**3)
                 torch.cuda.reset_max_memory_allocated()
                 report.gpu_mem = gpu_mem
@@ -71,7 +70,7 @@ class Client(split_learning_client.Client):
                 # Continue feature extraction
                 report, payload = self._extract_features()
                 report.training_time += training_time
-                if "cuda" in Config().device:
+                if "cuda" in Config().device():
                     gpu_mem = torch.cuda.max_memory_allocated() / (1024**3)
                     torch.cuda.reset_max_memory_allocated()
                     report.gpu_mem = gpu_mem

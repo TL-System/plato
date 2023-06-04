@@ -46,7 +46,7 @@ class Server(split_learning_server.Server):
         update = updates[0]
         report = update.report
         self.client_time = report.training_time
-        if "cuda" in Config().device:
+        if "cuda" in Config().device():
             self.client_mem = report.gpu_mem
         if report.type == "features":
             logging.warning("[%s] Features received, compute gradients.", self)
