@@ -8,6 +8,7 @@ import pickle
 import os
 from sklearn.decomposition import PCA
 import torch.nn.functional as F
+from collections import OrderedDict
 
 
 def get():
@@ -29,6 +30,7 @@ def get():
 
     raise ValueError(f"No such defence: {detector_type}")
 
+
 def flatten_weights(weights):
     flattened_weights = []
 
@@ -48,6 +50,7 @@ def flatten_weights(weights):
         )
     return flattened_weights
 
+
 def flatten_weight(weight):
 
     flattened_weight = []
@@ -59,10 +62,9 @@ def flatten_weight(weight):
         )
     return flattened_weight
 
-def lbfgs(
-    weights_attacked, global_weights_record, gradients_record, last_weights
-):  
-    """Approximate integrated Hessian value """
+
+def lbfgs(weights_attacked, global_weights_record, gradients_record, last_weights):
+    """Approximate integrated Hessian value"""
     # Transfer lists of tensor into tensor matrix
     global_weights = torch.stack(global_weights_record)
     gradients = torch.stack(gradients_record)
@@ -72,27 +74,33 @@ def lbfgs(
 
     # Get its diagonal matrix and lower triangular submatrix
     R_k = np.triu(global_times_gradients.numpy())
-    L_k = (global_times_gradients - torch.tensor(R_k))
+    L_k = global_times_gradients - torch.tensor(R_k)
     # Step 3 in Algorithm 1
-    sigma_k = torch.matmul(torch.transpose(global_weights_record[-1],0,-1), gradients_record[-1]) / (
-        torch.matmul(torch.transpose(gradients_record[-1],0,-1), gradients_record[-1])
+    sigma_k = torch.matmul(
+        torch.transpose(global_weights_record[-1], 0, -1), gradients_record[-1]
+    ) / (
+        torch.matmul(torch.transpose(gradients_record[-1], 0, -1), gradients_record[-1])
     )
     D_k_diag = torch.diag(global_times_gradients)
-    
-    #upper_mat = (sigma_k * global_times_global)
-    upper_mat = torch.cat(((sigma_k * global_times_global), L_k), dim=1)   
-    lower_mat = torch.cat((L_k.T, -torch.diag(D_k_diag)), dim=1)  
+
+    # upper_mat = (sigma_k * global_times_global)
+    upper_mat = torch.cat(((sigma_k * global_times_global), L_k), dim=1)
+    lower_mat = torch.cat((L_k.T, -torch.diag(D_k_diag)), dim=1)
     mat = torch.cat((upper_mat, lower_mat), dim=0)
     mat_inv = torch.inverse(mat)
-    
-    v = torch.mean(weights_attacked) - last_weights # deltas_attacked from selected clients
-    
+
+    v = (
+        torch.mean(weights_attacked) - last_weights
+    )  # deltas_attacked from selected clients
+
     approx_prod = sigma_k * v
     p_mat = torch.cat(
         (torch.matmul(global_weights, sigma_k * v), torch.matmul(gradients, v)), dim=0
     )
     approx_prod -= torch.matmul(
-        torch.matmul(torch.cat((sigma_k * global_weights.T, gradients.T), dim=1), mat_inv),
+        torch.matmul(
+            torch.cat((sigma_k * global_weights.T, gradients.T), dim=1), mat_inv
+        ),
         p_mat,
     )
 
@@ -107,7 +115,7 @@ def gap_statistics(score):
     gapDiff = np.zeros(len(ks) - 1)
     sdk = np.zeros(len(ks))
     min = np.min(score)
-    max = np.max(score)+1 #!
+    max = np.max(score) + 1  #!
     score = (score - min) / (max - min)
     for i, k in enumerate(ks):
         estimator = KMeans(n_clusters=k)
@@ -164,7 +172,7 @@ def detection(score):
     return malicious_ids, clean_ids
 
 
-def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
+def fl_detector(baseline_weights, weights_attacked, deltas_attacked):
     """https://arxiv.org/pdf/2207.09209.pdf"""
     clean_weights = weights_attacked
 
@@ -185,12 +193,15 @@ def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
             last_gradients = pickle.load(file)
             malicious_score = pickle.load(file)
 
-        if len(global_weights_record)>= window_size+1: 
+        if len(global_weights_record) >= window_size + 1:
             # Make predication by Cauchy mean value theorem
             hvp = lbfgs(
-                flattened_weights_attacked, global_weights_record, gradients_record, last_weights
-            )  
-            
+                flattened_weights_attacked,
+                global_weights_record,
+                gradients_record,
+                last_weights,
+            )
+
             # it assumes all clients get selected at each round.
             pred_grad = torch.add(last_gradients, hvp)
             logging.info(f"shape of stack(pred_grad): %s", pred_grad.shape)
@@ -204,40 +215,46 @@ def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
             distance = distance / np.sum(distance)
             logging.info(f"the distance after normalization: %s", distance)
             # add new distance score into malicious score record
-            #malicious_score = np.row_stack((malicious_score, distance))
+            # malicious_score = np.row_stack((malicious_score, distance))
             # Prepare for moving averaging
-            malicious_score = distance#np.row_stack((malicious_score, distance))
+            malicious_score = distance  # np.row_stack((malicious_score, distance))
             logging.info(f"the malicious score: %s", malicious_score)
             # clustering
-            #if malicious_score.shape[0] >= 1:
+            # if malicious_score.shape[0] >= 1:
             logging.info(f"line 176 for checkpoint")
-            
-            if gap_statistics(malicious_score): # np.sum(malicious_score[-10:], axis=0)):
+
+            if gap_statistics(
+                malicious_score
+            ):  # np.sum(malicious_score[-10:], axis=0)):
                 logging.info(f"malicious clients detected!")
-                malicious_ids, clean_ids = detection(malicious_score)#np.sum(malicious_score[-10:], axis=0))
-        
+                malicious_ids, clean_ids = detection(
+                    malicious_score
+                )  # np.sum(malicious_score[-10:], axis=0))
+
             # remove poisoned weights
-            clean_weights=[]
+            clean_weights = []
             for i, weight in enumerate(weights_attacked):
                 if i not in malicious_ids:
                     clean_weights.append(weight)
-        
-    else: 
+
+    else:
         logging.info(f"initializing fl parameter record")
         global_weights_record = []
         gradients_record = []
         last_gradients = torch.zeros(len(flattened_baseline_weights))
         last_weights = torch.zeros(len(flattened_baseline_weights))
         malicious_score = []
-    
+
     # update record
     logging.info(f"line 183: updating record")
-    global_weights_record.append(flattened_baseline_weights-last_weights)
-    logging.info(f"len %d",len(global_weights_record))
-    gradients_record.append(torch.mean(flattened_deltas_attacked, dim=0)-last_gradients)
-    last_weights = flattened_baseline_weights 
-    last_gradients = torch.mean(flattened_deltas_attacked,dim=0)
-        
+    global_weights_record.append(flattened_baseline_weights - last_weights)
+    logging.info(f"len %d", len(global_weights_record))
+    gradients_record.append(
+        torch.mean(flattened_deltas_attacked, dim=0) - last_gradients
+    )
+    last_weights = flattened_baseline_weights
+    last_gradients = torch.mean(flattened_deltas_attacked, dim=0)
+
     # save into local file
     file_path = "./records.pkl"
     with open(file_path, "wb") as file:
@@ -246,15 +263,17 @@ def fl_detector( baseline_weights, weights_attacked, deltas_attacked):
         pickle.dump(last_weights, file)
         pickle.dump(last_gradients, file)
         pickle.dump(malicious_score, file)
-    logging.info(f"malicious_ids: %s",malicious_ids)
+    logging.info(f"malicious_ids: %s", malicious_ids)
     return malicious_ids, clean_weights
+
 
 def encoder_decoder(weights_attacked):
 
     # load pre-trained encoder and decoder model
     # apply it to weights attacked
-    # obtain reconstruction error for all weights attacked 
+    # obtain reconstruction error for all weights attacked
     return reconstruction_errors
+
 
 def spectral_anomaly_detection(baseline_weights, weights_attacked, deltas_attacked):
     """https://arxiv.org/pdf/2002.00211.pdf"""
@@ -266,12 +285,13 @@ def spectral_anomaly_detection(baseline_weights, weights_attacked, deltas_attack
 
     malicious_ids = np.where(reconstruction_errors > threshold)
 
-    clean_weights=[]
-        for i, weight in enumerate(weights_attacked):
-            if i not in malicious_ids:
-                clean_weights.append(weight)
+    clean_weights = []
+    for i, weight in enumerate(weights_attacked):
+        if i not in malicious_ids:
+            clean_weights.append(weight)
 
     return malicious_ids, clean_weights
+
 
 def mab_rfl(baseline_weights, weights_attacked, deltas_attacked):
     alpha = 0.9
@@ -284,52 +304,84 @@ def mab_rfl(baseline_weights, weights_attacked, deltas_attacked):
         logging.info(f"mab-rfl loading parameters from file.")
         with open(file_path, "rb") as file:
             last_weights = pickle.load(file)
-    
+    else:
+        # Initilization
+        last_weights = torch.zeros(len(flattened_weights))
+
+    logging.info(f"start calculating momentum and normalization...")
     # calculate momentum avg and normalization
     weights_mom = []
     weights_norm = []
-    for new_weight, last_weight in zip(flattened_weights,last_weights):
+    for new_weight, last_weight in zip(flattened_weights, last_weights):
         weights_temp = new_weight + alpha * last_weight
         weights_mom.append(weights_temp)
-        weights_norm.append(weights_temp/torch.linalg.norm(weights_temp))
-
+        weights_norm.append(weights_temp / torch.linalg.norm(weights_temp))
+    logging.info(f"weights_norm: %s", weights_norm)
+    logging.info(f"Finished calculating momentum and normalization...")
     # update history
     file_path = "./records.pkl"
     with open(file_path, "wb") as file:
         pickle.dump(weights_mom, file)
 
     # Apply PCA
-    key_weights = []
-    for weight in weights_norm:
-        pca = PCA(n_components=10)  # adjust as needed
-        key_weights.append(pca.fit_transform(weight))
+    """
+    weights_for_pca = []
+    for j, weight in enumerate(weights_attacked):
+        start_index = 0
+        weight_temp = OrderedDict()
+        logging.info(f"j: %d", j)
+        for name, weight in weight.items():
+            weight_norm = weights_norm[j]
+            #logging.info(f"weight_norm: %s ", weight_norm[start_index : start_index + len(weight.view(-1))])
+            weight_temp[name] = weight_norm[start_index : start_index + len(weight.view(-1))]#.reshape(weight.shape)
+            start_index += len(weight.view(-1))
 
-    #applying agglomerative clustering algorithm
+        weights_for_pca.append(weight_temp)
+
+    key_weights = []
+    for weight in weights_for_pca:
+        pca = PCA(n_components=3)  # adjust as needed
+        logging.info(f"np.array(weight.values()): %s", np.array(weight.values()))
+        key_weights.append(pca.fit_transform(np.array(weight.values())))
+    """
+    # pca = PCA(n_components=3)  # adjust as needed
+    # logging.info(f"np.array(weight.values()): %s", np.array(weight.values()))
+    # key_weights.append(pca.fit_transform(np.array(weight.values())))
+    logging.info(f"applying PCA.")
+    # logging.info(f"key_weights are %s",key_weights)
+    # applying agglomerative clustering algorithm
     clustering = AgglomerativeClustering(n_clusters=2)
-    clustering.fit(key_weights)
+    weights_norm = torch.stack(weights_norm)
+    clustering.fit(weights_norm)
 
     # Calculate the mean of each cluster
-    cluster_points = key_weights[clustering.labels_ == 0]
-    cluster_mean_smaller = np.mean(cluster_points, axis=0)
-    cluster_points = key_weights[clustering.labels_ == 1]
-    cluster_mean_larger = np.mean(cluster_points, axis=0)
+    cluster_points1 = weights_norm[clustering.labels_ == 0]
+    cluster_mean1 = cluster_points1.mean(dim=0)
+    cluster_points2 = weights_norm[clustering.labels_ == 1]
+    cluster_mean2 = cluster_points2.mean(dim=0)
 
     # calculate cosine similarity and compare to a threshold alpha; and return malicious ones
-    if F.cosine_similarity(cluster_mean_smaller, cluster_mean_larger, dim=0) < alpha: 
+    if F.cosine_similarity(cluster_mean1, cluster_mean2, dim=0) < alpha:
         logging.info(f"No malicious clients detected.")
         return [], weights_attacked
-    else: 
-        malicious_ids = min(key_weights[clustering.labels_ == 0],key_weights[clustering.labels_ == 1] )
-    
+    else:
+        if cluster_points1.dim() < cluster_points2.dim():
+            malicious_ids = np.where(clustering.labels_ == 0)
+        else:
+            malicious_ids = np.where(clustering.labels_ == 1)
+        logging.info(f"malicious: %s", malicious_ids)
+        # malicious_ids = min(weights_norm[clustering.labels_ == 0],weights_norm[clustering.labels_ == 1] )
+    # logging.info(f"cosine similarity: %s: ",F.cosine_similarity(cluster_mean_smaller, cluster_mean_larger, dim=0))
     # calculate clean weights
-    clean_weights=[]
-        for i, weight in enumerate(weights_attacked):
-            if i not in malicious_ids:
-                clean_weights.append(weight)
+    clean_weights = []
+    for i, weight in enumerate(weights_attacked):
+        if i not in malicious_ids:
+            clean_weights.append(weight)
     return malicious_ids, clean_weights
+
 
 registered_detectors = {
     "FLDetector": fl_detector,
     "Spectral_anomaly": spectral_anomaly_detection,
-    "MAB- RFL": mab_rfl
+    "MAB-RFL": mab_rfl,
 }
