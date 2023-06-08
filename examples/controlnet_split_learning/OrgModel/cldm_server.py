@@ -24,7 +24,12 @@ class OurControlledUnetModel(ControlledUnetModel):
             )
             emb = self.time_embed(t_emb)
 
-        h = sd_output.pop()
+            h = sd_output[0]
+            for module in self.input_blocks[1:]:
+                h = module(h, emb, context)
+                sd_output.append(h)
+            h = self.middle_block(h, emb, context)
+
         if control is not None:
             h += control.pop()
 

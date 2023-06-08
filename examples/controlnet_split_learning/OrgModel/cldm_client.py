@@ -22,10 +22,7 @@ class OurControlledUnetModel(ControlledUnetModel):
             )
             emb = self.time_embed(t_emb)
             h = x.type(self.dtype)
-            for module in self.input_blocks:
-                h = module(h, emb, context)
-                hs.append(h)
-            h = self.middle_block(h, emb, context)
+            h = self.input_blocks[0](h, emb, context)
 
         hs.append(h)
         return hs
