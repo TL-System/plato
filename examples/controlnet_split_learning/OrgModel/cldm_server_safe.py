@@ -22,11 +22,12 @@ class OurControlledUnetModel(ControlledUnetModel):
             t_emb = timestep_embedding(
                 timesteps, self.model_channels, repeat_only=False
             )
+            emb = self.time_embed(t_emb)
             h = sd_output[0]
             for module in self.input_blocks[1:]:
-                h = module(h, t_emb, context)
+                h = module(h, emb, context)
                 sd_output.append(h)
-            h = self.middle_block(h, t_emb, context)
+            h = self.middle_block(h, emb, context)
 
         if control is not None:
             h += control.pop()
@@ -36,7 +37,7 @@ class OurControlledUnetModel(ControlledUnetModel):
                 h = torch.cat([h, sd_output.pop()], dim=1)
             else:
                 h = torch.cat([h, sd_output.pop() + control.pop()], dim=1)
-            h = module(h, t_emb, context)
+            h = module(h, emb, context)
 
         return self.out(h)
 
