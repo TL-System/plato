@@ -426,6 +426,10 @@ def fl_filter(baseline_weights, weights_attacked, deltas_attacked):
         if i in clean_ids:
             clean_weights.append(weights)
 
+    # update history
+    file_path = "./flfilter_records.pkl"
+    with open(file_path, "wb") as file:
+        pickle.dump(clean_weights, file)
     return malicious_ids, clean_weights
 
 
