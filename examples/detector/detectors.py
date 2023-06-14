@@ -380,8 +380,58 @@ def mab_rfl(baseline_weights, weights_attacked, deltas_attacked):
     return malicious_ids, clean_weights
 
 
+def fl_filter(baseline_weights, weights_attacked, deltas_attacked):
+    # self consistency for pred
+    flattened_weights = flatten_weights(weights_attacked)
+    # download from history
+    file_path = "./flfilter_records.pkl"
+    if os.path.exists(file_path):
+        logging.info(f"flfilter is loading parameters from file.")
+        with open(file_path, "rb") as file:
+            last_weights = pickle.load(file)
+    else:
+        # Initilization
+        last_weights = torch.zeros(len(flattened_weights))
+    # make pre
+    alpha = 0.1  # could be adaptive
+    self_consistency_pre = alpha * last_weights + flattened_weights
+    # group consistency
+    # group average
+    group_consistency_avg = torch.mean(flattened_weights)
+    # group pre
+    group_consistency_pre = group_consistency_avg + flattened_weights
+    # joint pre
+    beta = 0.5
+    joint_pre = beta * self_consistency_pre + (1 - beta) * group_consistency_pre
+    # distancing
+    distances = torch.norm((joint_pre - flattened_weights), dim=1) ** 2
+
+    # threshold: if large, block it and drag into blacklist; middle, delay aggregation; small, classify into clean clients
+    clean_ids = []
+    malicious_ids = []
+    suspicious_ids = []
+    threshold1 = 1
+    threshold2 = 0.1
+    for i, dis in enumerate(distances):
+        if dis > threshold1:
+            malicious_ids.append(i)
+        elif dis < threshold2:
+            clean_ids.append(i)
+        else:
+            suspicious_ids.append(i)
+
+    # get clean weights
+    clean_weights = []
+    for i, weights in enumerate(weights_attacked):
+        if i in clean_ids:
+            clean_weights.append(weights)
+
+    return malicious_ids, clean_weights
+
+
 registered_detectors = {
     "FLDetector": fl_detector,
     "Spectral_anomaly": spectral_anomaly_detection,
     "MAB-RFL": mab_rfl,
+    "FLFilter": fl_filter,
 }
