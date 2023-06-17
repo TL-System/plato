@@ -19,8 +19,8 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A personalized federated learning trainer using the FedRep algorithm."""
 
-    def __init__(self, model=None):
-        super().__init__(model)
+    def __init__(self, model=None, callbacks=None):
+        super().__init__(model=model, callbacks=callbacks)
 
         self.representation_param_names = []
         self.head_param_names = []
