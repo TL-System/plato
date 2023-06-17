@@ -11,8 +11,8 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """The trainer with gradient computation when local training is finished."""
 
-    def __init__(self, model=None):
-        super().__init__(model=model)
+    def __init__(self, model=None, callbacks=None):
+        super().__init__(model=model, callbacks=callbacks)
         self.gradient = OrderedDict()
 
     def train_run_end(self, config):
