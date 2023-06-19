@@ -75,7 +75,7 @@ class S3:
                 raise ValueError("Fail to create a bucket.") from s3_exception
 
     def send_to_s3(self, object_key, object_to_send) -> str:
-        """ Sends an object to an S3-compatible object storage service.
+        """ Sends an object to an S3-compatible object storage service if the key does not exist.
 
             Returns: A presigned URL for use later to retrieve the data.
         """
@@ -107,6 +107,35 @@ class S3:
 
             except botocore.exceptions.ParamValidationError as error:
                 raise ValueError(f'Incorrect parameters: {error}') from error
+
+    def put_to_s3(self, object_key, object_to_put) -> str:
+        """ Puts an object to an S3-compatible object storage service.
+            Overwrite the object if the key already exists.
+            Returns: A presigned URL for use later to retrieve the data.
+        """
+        object_key = self.key_prefix + "/" + object_key
+        try:
+            data = pickle.dumps(object_to_put)
+            put_url = self.s3_client.generate_presigned_url(
+                ClientMethod='put_object',
+                Params={
+                    'Bucket': self.bucket,
+                    'Key': object_key
+                },
+                ExpiresIn=300)
+            response = requests.put(put_url, data=data)
+
+            if response.status_code != 200:
+                raise ValueError(
+                    f'Error occurred sending data: status code = {response.status_code}'
+                ) from None
+
+        except botocore.exceptions.ClientError as error:
+            raise ValueError(
+                f'Error occurred sending data to S3: {error}') from error
+
+        except botocore.exceptions.ParamValidationError as error:
+            raise ValueError(f'Incorrect parameters: {error}') from error
 
     def receive_from_s3(self, object_key) -> Any:
         """ Retrieves an object from an S3-compatible object storage service.
