@@ -4,8 +4,6 @@ FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ord
 Samuel Horváth, Stefanos Laskaridis, Mario Almeida, Ilias Leontiadis, Stylianos Venieris, Nicholas Lane
 in NeurIPS, 2021.
 """
-
-from mobilenetv3 import MobileNetV3
 import resnet
 import vit
 
@@ -19,14 +17,16 @@ from plato.config import Config
 
 def main():
     """A Plato federated learning training session using the FjORD algorithm."""
-    if "mobilenet" in Config().trainer.model_name:
-        model = MobileNetV3
-    elif "vit" in Config().trainer.model_name:
+    if "vit" in Config().trainer.model_name:
         model = vit.ViT
-    else:
+    elif Config().trainer.model_name == "resnet18":
         model = resnet.resnet18
+    elif Config().trainer.model_name == "resnet34":
+        model = resnet.resnet34
+    else:
+        model = resnet.resnet152
     server = Server(trainer=ServerTrainer, model=model, algorithm=Algorithm)
-    client = Client(trainer=ClientTrainer, model=model, algorithm=Algorithm)
+    client = Client(trainer=ClientTrainer, model=model)
     server.run(client)
 
 

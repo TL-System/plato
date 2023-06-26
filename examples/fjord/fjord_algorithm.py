@@ -49,9 +49,13 @@ class Algorithm(fedavg.Algorithm):
                     payload = pre_model.state_dict()
                     size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
                     self.size_complexities[index] = size
+                    if hasattr(Config().parameters.model, "channels"):
+                        channel_width = Config().parameters.model.channels
+                    else:
+                        channel_width = 3
                     macs, _ = ptflops.get_model_complexity_info(
                         pre_model,
-                        (3, 32, 32),
+                        (channel_width, 32, 32),
                         as_strings=False,
                         print_per_layer_stat=False,
                         verbose=False,

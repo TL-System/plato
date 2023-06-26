@@ -16,27 +16,15 @@ def init_param(model):
     return model
 
 
-class Scaler(nn.Module):
-    "The scaler module for different rates of the models."
-
-    def __init__(self, rate):
-        super().__init__()
-        self.rate = rate
-
-    def forward(self, feature):
-        "Forward function."
-        output = feature / self.rate if self.training else feature
-        return output
-
-
 class Block(nn.Module):
     """
     ResNet block.
     """
 
     expansion = 1
+
     # pylint:disable=too-many-arguments
-    def __init__(self, in_planes, planes, stride, rate, track):
+    def __init__(self, in_planes, planes, stride, track):
         super().__init__()
         bn1 = nn.BatchNorm2d(in_planes, momentum=None, track_running_stats=track)
         bn2 = nn.BatchNorm2d(planes, momentum=None, track_running_stats=track)
@@ -48,7 +36,6 @@ class Block(nn.Module):
         self.conv2 = nn.Conv2d(
             planes, planes, kernel_size=3, stride=1, padding=1, bias=False
         )
-        self.scaler = Scaler(rate)
 
         if stride != 1 or in_planes != self.expansion * planes:
             self.shortcut = nn.Conv2d(
@@ -61,10 +48,10 @@ class Block(nn.Module):
 
     def forward(self, feature):
         "Forward function."
-        out = F.relu(self.batchnorm1(self.scaler(feature)))
+        out = F.relu(self.batchnorm1(feature))
         shortcut = self.shortcut(out) if hasattr(self, "shortcut") else feature
         out = self.conv1(out)
-        out = self.conv2(F.relu(self.batchnorm2(self.scaler(out))))
+        out = self.conv2(F.relu(self.batchnorm2(out)))
         out += shortcut
         return out
 
@@ -76,8 +63,9 @@ class Bottleneck(nn.Module):
     """
 
     expansion = 4
+
     # pylint:disable=too-many-arguments
-    def __init__(self, in_planes, planes, stride, rate, track):
+    def __init__(self, in_planes, planes, stride, track):
         super().__init__()
         bn1 = nn.BatchNorm2d(in_planes, momentum=None, track_running_stats=track)
         bn2 = nn.BatchNorm2d(planes, momentum=None, track_running_stats=track)
@@ -92,7 +80,6 @@ class Bottleneck(nn.Module):
         self.conv3 = nn.Conv2d(
             planes, self.expansion * planes, kernel_size=1, bias=False
         )
-        self.scaler = Scaler(rate)
 
         if stride != 1 or in_planes != self.expansion * planes:
             self.shortcut = nn.Conv2d(
@@ -107,11 +94,11 @@ class Bottleneck(nn.Module):
         """
         Forward function
         """
-        out = F.relu(self.bn1(self.scaler(feature)))
+        out = F.relu(self.bn1(feature))
         shortcut = self.shortcut(out) if hasattr(self, "shortcut") else feature
         out = self.conv1(out)
-        out = self.conv2(F.relu(self.bn2(self.scaler(out))))
-        out = self.conv3(F.relu(self.bn3(self.scaler(out))))
+        out = self.conv2(F.relu(self.bn2(out)))
+        out = self.conv3(F.relu(self.bn3(out)))
         out += shortcut
         return out
 
@@ -153,14 +140,13 @@ class ResNet(nn.Module):
             track_running_stats=track,
         )
         self.bn4 = bn4
-        self.scaler = Scaler(rate)
         self.linear = nn.Linear(hidden_size[3] * block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride, rate, track):
         strides = [stride] + [1] * (num_blocks - 1)
         layers = []
         for stride_index in strides:
-            layers.append(block(self.in_planes, planes, stride_index, rate, track))
+            layers.append(block(self.in_planes, planes, stride_index, track))
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layers)
 
@@ -173,7 +159,7 @@ class ResNet(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
-        out = F.relu(self.bn4(self.scaler(out)))
+        out = F.relu(self.bn4(out))
         out = F.adaptive_avg_pool2d(out, 1)
         out = out.view(out.size(0), -1)
         out = self.linear(out)
