@@ -28,6 +28,8 @@ from plato.config import Config
 
 # pylint:disable=attribute-defined-outside-init
 # pylint:disable=too-few-public-methods
+# pylint:disable=too-many-arguments
+# pylint:disable=too-many-instance-attributes
 class Server(split_learning_server.Server):
     """The split learning server."""
 
@@ -93,7 +95,7 @@ class Server(split_learning_server.Server):
         return updated_weights
 
     def get_logged_items(self) -> dict:
-        """Log more information including server and client computation time and the flops and memory on client."""
+        """Log more information including computation time and the flops and memory."""
         logged_items = super().get_logged_items()
         logged_items["server_time"] = self.server_time
         logged_items["client_time"] = self.client_time

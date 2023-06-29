@@ -66,25 +66,9 @@ class OurControlLDM(ControlLDM):
             "timestep": t,
         }
 
-    def forward(self, x, c, *args, **kwargs):
-        t = torch.randint(
-            5,
-            self.num_timesteps,
-            (x.shape[0],),
-            device=self.device,
-        ).long()
-        if self.model.conditioning_key is not None:
-            assert c is not None
-            if self.cond_stage_trainable:
-                c = self.get_learned_conditioning(c)
-            if self.shorten_cond_schedule:  # TODO: drop this option
-                tc = self.cond_ids[t].to(self.device)
-                c = self.q_sample(x_start=c, t=tc, noise=torch.randn_like(c.float()))
-        return self.p_losses(x, c, t, *args, **kwargs)
-
 
 def symsigmoid(x):
-    "Symmetric sigmoid function $|x|*(2\sigma(x)-1)$"
+    "Symmetric sigmoid function $|x|*(2/sigma(x)-1)$"
     return torch.abs(x) * (2 * torch.nn.functional.sigmoid(x) - 1)
 
 

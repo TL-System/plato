@@ -61,7 +61,9 @@ class OurControlLDM(ControlLDM):
         )
         return eps
 
+    # pylint:disable=unused-argument
     def apply_model(self, x_noisy, t, cond, *args, **kwargs):
+        """The inner function during forward."""
         assert isinstance(cond, dict)
         diffusion_model = self.model.diffusion_model
 
@@ -100,7 +102,7 @@ class OurControlLDM(ControlLDM):
 
 
 def symsigmoid(x):
-    "Symmetric sigmoid function $|x|*(2\sigma(x)-1)$"
+    "Symmetric sigmoid function $|x|*(2/sigma(x)-1)$"
     return torch.abs(x) * (2 * torch.nn.functional.sigmoid(x) - 1)
 
 
@@ -126,6 +128,7 @@ class OurControlNet(ControlNet):
         return outs
 
     def forward(self, x, hint, timesteps, context, **kwargs):
+        "Forward function"
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
         emb = self.time_embed(t_emb)
         outs = []

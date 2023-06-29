@@ -26,8 +26,15 @@ from plato.config import Config
 
 # pylint:disable=attribute-defined-outside-init
 # pylint:disable=too-few-public-methods
+# pylint:disable=too-many-arguments
 class Client(split_learning_client.Client):
     """The split learning client."""
+
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(model, datasource, algorithm, trainer, callbacks)
+        self.iter_left = self.iterations
 
     async def inbound_processed(self, processed_inbound_payload):
         """Extract features or complete the training using split learning."""
