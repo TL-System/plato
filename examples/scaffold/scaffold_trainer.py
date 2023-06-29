@@ -21,10 +21,9 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
-
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
-        super().__init__(model)
+        super().__init__(model=model, callbacks=callbacks)
 
         self.server_control_variate = None
         self.client_control_variate = None
