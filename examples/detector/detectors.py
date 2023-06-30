@@ -380,38 +380,56 @@ def mab_rfl(baseline_weights, weights_attacked, deltas_attacked):
     return malicious_ids, clean_weights
 
 
-def fl_filter(baseline_weights, weights_attacked, deltas_attacked):
+def fl_filter(baseline_weights, weights_attacked, deltas_attacked, received_ids):
     # self consistency for pred
     flattened_weights = flatten_weights(weights_attacked)
-    # download from history
+    # download dictionary from history
     file_path = "./flfilter_records.pkl"
     if os.path.exists(file_path):
         logging.info(f"flfilter is loading parameters from file.")
         with open(file_path, "rb") as file:
-            last_weights = pickle.load(file)
+            last_weights_dict = pickle.load(file)
     else:
         # Initilization
-        last_weights = torch.zeros(len(flattened_weights))
+        last_weights_dict = {
+            client_id + 1: torch.zeros(len(flattened_weights[0]))
+            for client_id in range(Config().clients.total_clients)
+        }  # torch.zeros(len(flattened_weights[0]))
+
+    # get last weights for received client from all_dict and make it as list
+    last_weights = []
+    for received_id in received_ids:
+        last_weights.append(last_weights_dict[received_id])
+    last_weights = torch.stack(last_weights)
+
     # make pre
     alpha = 0.1  # could be adaptive
-    self_consistency_pre = alpha * last_weights + flattened_weights
+    logging.info(f"last weights dictionary: %s", last_weights_dict)
+    logging.info(f"last_weights: %s", last_weights)
+    logging.info(f"flattened weights (targeted): %s", flattened_weights)
+    self_consistency_pre = alpha * last_weights + (1 - alpha) * flattened_weights
+    logging.info(f"self consistency pre: %s", self_consistency_pre)
     # group consistency
     # group average
-    group_consistency_avg = torch.mean(flattened_weights)
+    group_consistency_avg = torch.mean(flattened_weights, dim=0)  # axis?
+    logging.info(f"group consistency avg: %s", group_consistency_avg)
     # group pre
-    group_consistency_pre = group_consistency_avg + flattened_weights
+    group_consistency_pre = 0.5 * group_consistency_avg + 0.5 * flattened_weights
+    logging.info(f"group consistency pre: %s", group_consistency_pre)
     # joint pre
     beta = 0.5
     joint_pre = beta * self_consistency_pre + (1 - beta) * group_consistency_pre
+    logging.info(f"joint_pre: %s", joint_pre)
     # distancing
-    distances = torch.norm((joint_pre - flattened_weights), dim=1) ** 2
-
+    logging.info(f"joint_pre - flattened_weights : %s", joint_pre - flattened_weights)
+    distances = torch.norm((joint_pre - flattened_weights), dim=1)  # ** 2
+    logging.info(f"distance: %s", distances)
     # threshold: if large, block it and drag into blacklist; middle, delay aggregation; small, classify into clean clients
     clean_ids = []
     malicious_ids = []
     suspicious_ids = []
-    threshold1 = 1
-    threshold2 = 0.1
+    threshold1 = 30
+    threshold2 = 10
     for i, dis in enumerate(distances):
         if dis > threshold1:
             malicious_ids.append(i)
@@ -426,10 +444,17 @@ def fl_filter(baseline_weights, weights_attacked, deltas_attacked):
         if i in clean_ids:
             clean_weights.append(weights)
 
-    # update history
+    # update history for all clients
+    # or just use dictionary with client id as key instead of list
+    # update the dictionary as self consistency history
+    for index, received_id in enumerate(received_ids):  # self_consistency_pre):
+        last_weights_dict[received_id] = self_consistency_pre[index]
+
+    # save the update dictionary to .pkl file
     file_path = "./flfilter_records.pkl"
     with open(file_path, "wb") as file:
-        pickle.dump(clean_weights, file)
+        pickle.dump(last_weights_dict, file)
+
     return malicious_ids, clean_weights
 
 
