@@ -14,7 +14,7 @@ import aggregations as aggregation_registry
 import numpy as np
 import torch
 import defences
-
+import csv
 from typing import Mapping
 class Server(fedavg.Server):
     def __init__(
@@ -89,6 +89,26 @@ class Server(fedavg.Server):
                 counter += 1
 
         return weights_received
+    
+    def detect_analysis(detected_malicious_ids, received_ids):
+        "print out detect accuracy, positive rate and negative rate"
+        all_malicious_ids = Config().clients.attacker_ids
+        real_malicious_ids = [i if i in all_malicious_ids for i in received_ids]
+        
+        correct = 0
+        wrong = 0
+        for i in detected_malicious_ids:
+            if i in real_malicious_ids: 
+                correct += 1
+            else:
+                wrong += 1
+        detection_accuracy = correct / len(real_malicious_ids)
+        #false_positive_rate = 
+        #false_negative_rate = 
+        with open('detection_accuracy.csv', 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([detection_accuracy])
+        logging.info(f"detection_accuracy is: %d",detection_accuracy)
 
     def weights_filter(self, weights_attacked):
 
@@ -104,7 +124,9 @@ class Server(fedavg.Server):
         malicious_ids, weights_approved = defence(baseline_weights, weights_attacked, deltas_attacked)
         # get a balck list for attackers_detected this round
         self.blacklist.append(malicious_ids)
-
+        # 
+        received_ids = [update.client_id for update in self.updates]
+        detect_analysis(malicious_ids, received_ids)
         # Remove identified attacker from clients pool. Never select that client again.
         # for attacker in attackers_detected:
         #    self.clients_pool.remove(attacker)
