@@ -12,7 +12,7 @@ sys.path.append(
 )
 sys.path.append(os.path.join(os.path.abspath(os.getcwd()), "examples"))
 # pylint:disable=wrong-import-position
-from split_learning.split_learning_client import Client
+from split_learning_client import Client
 from split_learning_algorithm import Algorithm
 from split_learning_trainer import Trainer
 from split_learning_server import Server
