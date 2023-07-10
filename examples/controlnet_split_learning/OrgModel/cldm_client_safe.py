@@ -39,11 +39,12 @@ class OurControlLDM(ControlLDM):
 
         cond_txt = torch.cat(cond["c_crossattn"], 1)
         hint = torch.cat(cond["c_concat"], 1)
+        hint = 2 * hint - 1
+        hint = self.first_stage_model.encode(hint)
+        hint = self.get_first_stage_encoding(hint).detach()
         control = self.control_model(
             x=x_noisy,
             hint=hint,
-            timesteps=t,
-            context=cond_txt,
         )
         diffusion_encoder_output = diffusion_model(
             x=x_noisy,
@@ -51,35 +52,34 @@ class OurControlLDM(ControlLDM):
             context=cond_txt,
         )
 
-        return control, diffusion_encoder_output, cond_txt
+        return control, diffusion_encoder_output
 
     def p_losses(self, x_start, cond, t, noise=None):
         "Return p_losses."
         noise = default(noise, lambda: torch.randn_like(x_start))
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
-        control, sd_output, cond_txt = self.apply_model(x_noisy, t, cond)
+        control, sd_output = self.apply_model(x_noisy, t, cond)
         return {
             "control_output": control,
             "sd_output": sd_output,
             "noise": noise,
             "timestep": t,
-            "cond_txt": cond_txt,
         }
+
+
+def symsigmoid(x):
+    "Symmetric sigmoid function $|x|*(2/sigma(x)-1)$"
+    return torch.abs(x) * (2 * torch.nn.functional.sigmoid(x) - 1)
 
 
 class OurControlNet(ControlNet):
     """Our controlnet on the client"""
 
     # pylint:disable=unused-argument
-    def forward(self, x, hint, timesteps, context, **kwargs):
+    def forward(self, x, hint, **kwargs):
         """Forward function."""
-        t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
-        emb = self.time_embed(t_emb)
-
-        guided_hint = self.input_hint_block(hint, emb, context)
-
-        h = x.type(self.dtype)
-        h = self.input_blocks[0](h, emb, context)
-        h += guided_hint
-
+        h = hint + x.type(self.dtype)
+        h = symsigmoid(h)
+        # Here we need to quantizde fp16 and try it.
+        h = h.half()
         return h

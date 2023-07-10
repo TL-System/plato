@@ -70,6 +70,7 @@ parameters:
     model:
         init_model_path: /scratch/dixiyao/controlnet/models/control_sd15_ini.ckpt
         model_structure: examples/controlnet_split_learning/OrgModel/cldm_v15
+        safe: true
     optimizer:
         lr: 0.00001
 

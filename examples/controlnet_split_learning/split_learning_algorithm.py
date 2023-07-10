@@ -13,11 +13,12 @@ class Algorithm(split_learning_algorithm.Algorithm):
 
     def extract_features(self, dataset, sampler):
         """Extracting features using layers before the cut_layer."""
+
+        tic = time.perf_counter()
+
         self.model.to(self.trainer.device)
         self.model.model.to(self.trainer.device)
         self.model.model.eval()
-
-        tic = time.perf_counter()
 
         features_dataset = []
 
@@ -32,7 +33,11 @@ class Algorithm(split_learning_algorithm.Algorithm):
             output_dict["sd_output"][index] = items.detach().cpu()
         noise = output_dict["noise"].detach().cpu()
         output_dict["timestep"] = output_dict["timestep"].detach().cpu()
-        output_dict["cond_txt"] = output_dict["cond_txt"].detach().cpu()
+        if not (
+            hasattr(Config().parameters.model, "safe")
+            and Config().parameters.model.safe
+        ):
+            output_dict["cond_txt"] = output_dict["cond_txt"].detach().cpu()
         output_dict.pop("noise")
         features_dataset.append((output_dict, noise))
 
