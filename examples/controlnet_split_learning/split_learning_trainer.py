@@ -24,14 +24,20 @@ class Trainer(split_learning_trainer.Trainer):
 
     def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
-        self.model.model = self.model.model.to(self.device)
-        gradients = self.gradients[0].to(self.device)
-        self.optimizer.zero_grad()
-        outputs = self.model.forward(examples)
+        if not (
+            hasattr(Config().parameters.model, "safe")
+            and Config().parameters.model.safe
+        ) and not (
+            hasattr(Config().trainer, "jump_client") and Config().trainer.jump_client
+        ):
+            self.model.model = self.model.model.to(self.device)
+            gradients = self.gradients[0].to(self.device)
+            self.optimizer.zero_grad()
+            outputs = self.model.forward(examples)
 
-        # Back propagate with gradients from server
-        outputs["control_output"].backward(gradients)
-        self.optimizer.step()
+            # Back propagate with gradients from server
+            outputs["control_output"].backward(gradients)
+            self.optimizer.step()
 
         # No loss value on the client side
         loss = torch.zeros(1)
@@ -41,37 +47,74 @@ class Trainer(split_learning_trainer.Trainer):
     # pylint:disable=unused-argument
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
-        self.model.model = self.model.model.to(self.device)
-        control = torch.nn.Parameter(
-            examples["control_output"].detach().to(self.model.model.device),
-            requires_grad=True,
-        )
+        if not (
+            hasattr(Config().trainer, "jump_server") and Config().trainer.jump_server
+        ):
+            self.model.model = self.model.model.to(self.device)
+            if not (
+                hasattr(Config().parameters.model, "safe")
+                and Config().parameters.model.safe
+            ):
+                control = torch.nn.Parameter(
+                    examples["control_output"].detach().to(self.model.model.device),
+                    requires_grad=True,
+                )
+            else:
+                control = (
+                    examples["control_output"].detach().to(self.model.model.device)
+                )
 
-        cond_txt = examples["cond_txt"].to(self.model.model.device)
-        timestep = examples["timestep"].to(self.model.model.device)
-        sd_output = examples["sd_output"]
-        for index, items in enumerate(sd_output):
-            sd_output[index] = items.to(self.model.model.device)
-        outputs = self.model.model.forward_train(
-            control,
-            sd_output,
-            cond_txt,
-            timestep,
-        )
-        self.optimizer.zero_grad()
-        loss = self.customize_loss_criterion(outputs, labels, timestep)
-        loss.backward()
-        loss = loss.cpu().detach()
-        self._loss_tracker.update(loss, labels.size(0))
-        # Record gradients within the cut layer
-        self.cut_layer_grad = [control.grad.cpu().clone().detach()]
-        self.optimizer.step()
+            if not (
+                hasattr(Config().parameters.model, "safe")
+                and Config().parameters.model.safe
+            ):
+                cond_txt = examples["cond_txt"].to(self.model.model.device)
+            else:
+                cond_txt = torch.zeros((control.shape[0], 1, 768)).to(
+                    self.model.model.device
+                )
+            timestep = examples["timestep"].to(self.model.model.device)
+            sd_output = examples["sd_output"]
+            for index, items in enumerate(sd_output):
+                sd_output[index] = items.to(self.model.model.device)
+            outputs = self.model.model.forward_train(
+                control,
+                sd_output,
+                cond_txt,
+                timestep,
+            )
+            self.optimizer.zero_grad()
+            loss = self.customize_loss_criterion(outputs, labels, timestep)
+            loss.backward()
+            loss = loss.cpu().detach()
+            self._loss_tracker.update(loss, labels.size(0))
+            # Record gradients within the cut layer
+            if not (
+                hasattr(Config().parameters.model, "safe")
+                and Config().parameters.model.safe
+            ):
+                self.cut_layer_grad = [control.grad.cpu().clone().detach()]
+            else:
+                self.cut_layer_grad = [None]
+            self.optimizer.step()
 
-        logging.warning(
-            "[Server #%d] Gradients computed with training loss: %.4f",
-            os.getpid(),
-            loss,
-        )
+            logging.warning(
+                "[Server #%d] Gradients computed with training loss: %.4f",
+                os.getpid(),
+                loss,
+            )
+        else:
+            loss = torch.tensor([0])
+            self._loss_tracker.update(loss, labels.size(0))
+            if not (
+                hasattr(Config().parameters.model, "safe")
+                and Config().parameters.model.safe
+            ):
+                self.cut_layer_grad = [
+                    examples["control_output"].detach().cpu().clone()
+                ]
+            else:
+                self.cut_layer_grad = [None]
 
         return loss
 
