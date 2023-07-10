@@ -34,7 +34,7 @@ jobs:
           conda activate plato
           conda install mindspore-cpu -c mindspore -c conda-forge -y
           pip3 install numpy python-socketio aiohttp requests boto3 pyyaml datasets
-
+          pip3 install Pillow==9.5.0
       - name: Training workloads
         shell: bash -l {0}
         run: |
