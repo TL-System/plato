@@ -168,7 +168,10 @@ class DataSource(base.DataSource):
 class Algorithm(fedavg.Algorithm):
     def extract_weights(self, model=None):
         # Extract LoRA wegiths
-        return get_peft_model_state_dict(self.model.base_model)
+        return {
+            k: v.cpu()
+            for k, v in get_peft_model_state_dict(self.model.base_model).items()
+        }
 
     def load_weights(self, weights):
         # Load LoRA weights
