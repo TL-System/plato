@@ -28,6 +28,9 @@ class CustomServer(fedavg.Server):
         )
         logging.info("A custom server has been initialized.")
 
+    def save_to_checkpoint(self):
+        logging.info("Skipping checkpoint.")
+
 
 def main():
     server = CustomServer(

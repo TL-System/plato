@@ -130,9 +130,6 @@ class Trainer(huggingface.Trainer):
 
         return perplexity
 
-    def save_to_checkpoint(self):
-        logging.info("Skipping checkpoint.")
-
 
 class DataSource(base.DataSource):
     """A custom datasource with custom training and validation datasets."""
