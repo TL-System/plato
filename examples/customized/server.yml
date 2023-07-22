@@ -11,12 +11,16 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
+
+    comm_simulation: false
 server:
     address: 127.0.0.1
     port: 8000
 
     # No client processes will be launched by the server
     disable_clients: true
+
+    comm_simulation: false
 
 data:
     # The training and testing dataset
