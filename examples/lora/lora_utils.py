@@ -158,8 +158,8 @@ class DataSource(base.DataSource):
 
         tokenized_datasets = dataset.map(tokenize_function)
 
-        train_data = tokenized_datasets["train"].shuffle(seed=42).select(range(5))
-        val_data = tokenized_datasets["validation"].shuffle(seed=42).select(range(2))
+        train_data = tokenized_datasets["train"].shuffle(seed=42)
+        val_data = tokenized_datasets["validation"].shuffle(seed=42)
 
         self.trainset = train_data
         self.testset = val_data
