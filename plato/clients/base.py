@@ -189,6 +189,8 @@ class Client:
         self.configure()
         self._allocate_data()
 
+        self.server_payload = None
+
         if self.comm_simulation:
             payload_filename = response["payload_filename"]
             with open(payload_filename, "rb") as payload_file:
