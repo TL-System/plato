@@ -3,15 +3,15 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 1
+    total_clients: 2
 
     # The number of clients selected in each round
-    per_round: 1
+    per_round: 2
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
-    comm_simulation: true
+    comm_simulation: false
 
 server:
     address: 206.12.94.164
@@ -19,7 +19,7 @@ server:
 
 data:
     # Number of samples in each partition
-    partition_size: 100
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: iid
@@ -42,8 +42,8 @@ trainer:
     model_type: huggingface
 
     # Number of epoches for local training in each communication round
-    epochs: 1
-    batch_size: 5
+    epochs: 2
+    batch_size: 32
     optimizer: SGD
 
 algorithm:
@@ -51,10 +51,10 @@ algorithm:
     type: fedavg
 
 parameters:
-    optimizer:
-        lr: 0.01
-        momentum: 0.9
-        weight_decay: 0.0
+    # optimizer:
+    #     lr: 0.01
+    #     momentum: 0.9
+    #     weight_decay: 0.0
     
     lora:
         r: 8
