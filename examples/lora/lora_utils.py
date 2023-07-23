@@ -78,7 +78,6 @@ class Trainer(huggingface.Trainer):
 
         self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
-        self.training_args.max_steps = 4
 
         self.trainer = huggingface.SampledHuggingFaceTrainer(
             model=self.model,
@@ -129,6 +128,9 @@ class Trainer(huggingface.Trainer):
             perplexity = float("inf")
 
         return perplexity
+
+    def save_model(self):
+        logging.info("Skip trainer saving.")
 
 
 class DataSource(base.DataSource):
