@@ -75,6 +75,8 @@ class Trainer(huggingface.Trainer):
         trainset: The training dataset.
         sampler: the sampler that extracts a partition for this client.
         """
+        self.tokenizer.pad_token_id = 0
+        self.tokenizer.padding_side = "left"
 
         self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
@@ -104,6 +106,9 @@ class Trainer(huggingface.Trainer):
             config: Configuration parameters as a dictionary.
             testset: The test dataset.
         """
+        self.tokenizer.pad_token_id = 0
+        self.tokenizer.padding_side = "left"
+        
         self.training_args.per_device_eval_batch_size = config["batch_size"]
 
         self.trainer = huggingface.SampledHuggingFaceTrainer(
