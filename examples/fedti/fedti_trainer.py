@@ -12,11 +12,12 @@ from plato.config import Config
 from accelerate import Accelerator
 import torch.nn.functional as F
 
-from auxfl.trainers import fed_prompt_trainer
-from auxfl.datasources.text_inversion_dataset import TextualInversionDataset
+import fedti_stable_diffusion
+from plato.trainers import basic
+from text_inversion_dataset import TextualInversionDataset
 
 
-class Trainer(fed_prompt_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A trainer to perform learning of Text-to-Image model."""
 
     def __init__(self, model=None, callbacks=None):
@@ -24,6 +25,9 @@ class Trainer(fed_prompt_trainer.Trainer):
 
         super().__init__(model, callbacks)
 
+        # the model maintained only by the client
+        self.personalized_model = None
+        self.personalized_model_name: str = None
         # what is it that you are teaching?
         # `object` enables you to teach the model a new object to be used,
         # `style` allows you to teach the model a new style one can use.
@@ -61,16 +65,6 @@ class Trainer(fed_prompt_trainer.Trainer):
         self.gradient_accumulation_steps = None
         self.train_batch_size = None
 
-    def create_init_prompts_tokens(self):
-        """Creating the tokens for initial prompts."""
-        self.initial_prompts_context_tokens = None
-
-    def create_init_prompts_embeddings(
-        self,
-    ):
-        """Creating the init prompts embeddings."""
-        self.initial_prompts_context_embeddings = None
-
     def create_what_to_teach(self):
         """Getting what_to_teach."""
         self.what_to_teach = Config().algorithm.what_to_teach
@@ -89,13 +83,13 @@ class Trainer(fed_prompt_trainer.Trainer):
         as the starting point."""
         self.initializer_token = Config().algorithm.initializer_token
 
-    def define_personalized_model(self, personalized_model):
+    def define_personalized_model(self):
         """Define the personalized model to this trainer."""
 
         model_type = Config().algorithm.personalization.model_type
         model_name = Config().algorithm.personalization.model_name
 
-        self.personalized_model = personalized_model(
+        self.personalized_model = fedti_stable_diffusion.Text2ImageSDPipeline(
             model_type=model_type, model_name=model_name
         )
         self.personalized_model_name = model_name
@@ -116,7 +110,11 @@ class Trainer(fed_prompt_trainer.Trainer):
 
         self.learning_rate = config["learning_rate"]
 
-        self.preprocess_personalized_model(config)
+        self.model.to(self.device)
+        self.personalized_model.to(self.device)
+        self.model.train()
+        self.personalized_model.eval()
+
         if self.accelerator is None:
             if torch.cuda.is_available():
                 self.accelerator = Accelerator(
@@ -131,15 +129,6 @@ class Trainer(fed_prompt_trainer.Trainer):
         if gradient_checkpointing:
             self.model.text_encoder.gradient_checkpointing_enable()
             self.personalized_model.unet.enable_gradient_checkpointing()
-
-        if self.personalized_learning:
-            personalized_config = Config().algorithm.personalization._asdict()
-            config.update(personalized_config)
-            # the model name is needed to be maintained here
-            # as Plato will use config["model_name"] to save the model
-            # and then load the saved model relying on
-            # Config().trainer.model_name
-            config["model_name"] = Config().trainer.model_name
 
         self.personalized_model.prepare_status(accelerator=self.accelerator)
         self.train_batch_size = batch_size

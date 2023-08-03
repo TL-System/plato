@@ -17,7 +17,7 @@ from plato.datasources import base
 
 
 class Flowers102OneClass(datasets.Flowers102):
-    """Warpping the OxfordIIITPet for stable diffusion."""
+    """Warpping the Flower102 for stable diffusion."""
 
     def __init__(
         self,
@@ -38,7 +38,7 @@ class Flowers102OneClass(datasets.Flowers102):
         # extract the specific class
         target_class = Config().algorithm.target_class
 
-        with open(os.path.join(self._base_folder, "cat_to_name.json")) as json_file:
+        with open(os.path.join("examples/fedti", "cat_to_name.json")) as json_file:
             self.id_to_class = json.load(json_file)
         self.class_to_idx = {
             label_class: int(label_id) - 1

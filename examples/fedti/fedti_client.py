@@ -1,20 +1,17 @@
 """
-Implementation of the client for Prompt Federated Learning.
+Implementation of the client for Federated Textual Inversion.
 """
 import logging
 
-from auxfl.clients import fed_prompt_client
+from plato.clients import simple
 
 
-class Client(fed_prompt_client.Client):
-    """A client for Prompt Federated Learning."""
+class Client(simple.Client):
+    """A client for Federated Textual Inversion."""
 
     def configure(self) -> None:
         """Defining the prompts."""
         super().configure()
-
-        if self.prompts is None and self.customize_prompts is not None:
-            self.prompts = self.customize_prompts
 
         self.trainer.create_what_to_teach()
         self.trainer.create_concept()
@@ -44,3 +41,5 @@ class Client(fed_prompt_client.Client):
             self.trainer.placeholder_token,
             self.trainer.initializer_token,
         )
+        if self.trainer.personalized_model is None:
+            self.trainer.define_personalized_model()

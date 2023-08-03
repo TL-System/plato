@@ -1,5 +1,5 @@
 """
-Implementation for text-to-image prompt tuning.
+Implementation for text-to-image with textual inversion.
 """
 import itertools
 import logging
