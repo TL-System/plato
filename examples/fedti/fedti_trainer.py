@@ -1,5 +1,5 @@
 """
-Implementation of the trainer for Prompt Learning with federated learning.
+Implementation of the trainer for Federated Textual Inversion.
 
 """
 import os
