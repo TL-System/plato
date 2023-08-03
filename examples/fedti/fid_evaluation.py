@@ -12,7 +12,7 @@ from torch import Tensor
 from torchmetrics.image.fid import FrechetInceptionDistance
 from PIL import Image
 
-from auxfl.models import stable_diffusion_gen
+import stable_diffusion_gen
 
 
 def generate_images(
