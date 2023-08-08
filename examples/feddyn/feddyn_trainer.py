@@ -4,6 +4,7 @@ from plato.config import Config
 from plato.trainers import basic
 
 import copy
+import os
 import numpy as np
 
 
@@ -35,13 +36,17 @@ class Trainer(basic.Trainer):
                 local_par_list = param.reshape(-1)
             else:
                 local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
-
-        loss_algo = alpha_coef * torch.sum(
-            local_par_list * (-avg_mdl_param + local_grad_vector)
-        )
+        loss_algo = torch.tensor(alpha_coef * 0).to(loss_f_i.device)
+        if not local_grad_vector == 0:
+            for avg_param, local_param in zip(avg_mdl_param, local_grad_vector):
+                loss_algo = torch.tensor(alpha_coef).to(loss_f_i.device) * torch.sum(
+                    local_par_list * (-avg_param + local_param)
+                )
+        loss_algo = torch.mean(loss_algo)
         loss = loss_f_i + loss_algo
-
+        loss.backward()
         self.optimizer.step()
+        self._loss_tracker.update(loss, labels.size(0))
 
         return loss
 
@@ -69,8 +74,8 @@ class Trainer(basic.Trainer):
         self.model.train()
 
         total_epochs = config["epochs"]
-        n_clnt = config["total_clients"]
-        alpha_coef = config["alpha_coef"]
+        n_clnt = Config().clients.total_clients
+        alpha_coef = Config().parameters.alpha_coef
 
         for self.current_epoch in range(1, total_epochs + 1):
             self._loss_tracker.reset()
@@ -85,30 +90,34 @@ class Trainer(basic.Trainer):
 
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
+                if not self.model_state_dict:
+                    self.model_state_dict = self.model.state_dict()
+                cld_mdl_param = []
+                if self.model_state_dict:
+                    cld_mdl_param = copy.deepcopy(self.model_state_dict)
+
                 model_path = Config().params["model_path"]
                 filename = f"{model_path}_{self.client_id}.pth"
-                local_model = torch.load(filename)
-                local_param_list = copy.deepcopy(local_model.model_state_dict)
-                local_param_list_tensor = torch.tensor(
-                    local_param_list, dtype=torch.float32, device=self.device
+                local_param_list = []
+                if self.model_state_dict:
+                    local_param_list = 0
+                if os.path.exists(filename):
+                    local_model = torch.load(filename)
+                    local_param_list = copy.deepcopy(local_model.state_dict())
+
+                clnt_y = labels.cpu().numpy()
+                weight_list = clnt_y / np.sum(clnt_y) * n_clnt
+                alpha_coef_adpt = alpha_coef / np.where(
+                    weight_list != 0, weight_list, 1.0
                 )
 
-                cld_mdl_param = copy.deepcopy(self.model_state_dict)
-                cld_mdl_param_tensor = torch.tensor(
-                    cld_mdl_param, dtype=torch.float32, device=self.device
-                )
-
-                clnt_y = labels
-                weight_list = np.asarray([len(clnt_y[i]) for i in range(n_clnt)])
-                weight_list = weight_list / np.sum(weight_list) * n_clnt
-                alpha_coef_adpt = alpha_coef / weight_list[self.client_id]
                 loss = self.perform_forward_and_backward_passes(
                     config,
                     examples,
                     labels,
                     alpha_coef_adpt,
-                    cld_mdl_param_tensor,
-                    local_param_list_tensor,
+                    cld_mdl_param,
+                    local_param_list,
                 )
 
                 self.train_step_end(config, batch=batch_id, loss=loss)

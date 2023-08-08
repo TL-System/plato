@@ -67,7 +67,11 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: feddyn
+    type: fedavg
 
 parameters:
-    alpha_coef: 1e-2
+    optimizer:
+        lr: 0.03
+        momentum: 0.0 # learning rate is fixed as in Appendix C.2
+        weight_decay: 0.0
+    alpha_coef: 0.01
