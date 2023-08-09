@@ -1,7 +1,17 @@
-import feddyn_trainer
+"""
+An implementation of the FedDyn algorithm.
 
+D. Acar, et al., "Federated Learning Based on Dynamic Regularization ,"
+in the Proceedings of ICLR 2021.
+
+https://openreview.net/forum?id=B7v4QMR6Z9w
+
+Source code: https://github.com/alpemreacar/FedDyn
+"""
 from plato.servers import fedavg
 from plato.clients import simple
+
+import feddyn_trainer
 
 
 def main():
