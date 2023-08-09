@@ -22,6 +22,17 @@ T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federa
 ```
 ````
 
+````{admonition} **FedDyn**
+FedDyn is proposed to provide communication savings by dynamically updating each participating device's regularizer in each round of training. It is a method proposed to solve data heterogeneity in federated learning.
+```shell
+python examples/feddyn/feddyn.py -c examples/feddyn/feddyn_MNIST_lenet5.yml
+```
+
+```{note}
+Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations, 2021.
+```
+````
+
 ````{admonition} **FedAsync**
 FedAsync is one of the first algorithms proposed in the literature towards operating federated learning training sessions in *asynchronous* mode, which Plato supports natively. It advocated aggregating aggressively whenever only *one* client reported its local updates to the server.
 
