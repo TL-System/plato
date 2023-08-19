@@ -443,6 +443,19 @@ Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolli
 ```
 ````
 
+````{admonition} **FjORD**
+FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
+
+```shell
+python3 examples/fjord/fjord.py -c examples/fjord/fjord_resnet18_dynamic.yml
+```
+
+```{note}
+Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
+&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2021.
+```
+````
+
 ````{admonition} **AnyCostFL**
 AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
 
