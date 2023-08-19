@@ -1,7 +1,7 @@
 """
 FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout
 
-Samuel Horváth, Stefanos Laskaridis, Mario Almeida, Ilias Leontiadis, Stylianos Venieris, Nicholas Lane
+Samuel Horváth, et at.
 in NeurIPS, 2021.
 """
 import resnet

@@ -1,12 +1,10 @@
 """
 FjORD algorithm trainer.
 """
-import copy
 import numpy as np
 
 from plato.config import Config
 from plato.servers import fedavg
-from plato.samplers import all_inclusive
 
 
 class Server(fedavg.Server):
