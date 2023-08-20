@@ -468,6 +468,20 @@ Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with 
 ````
 
 
+````{admonition} **FedTI**
+FedTI is to perform textual inversion under federated learning, which we can simply refer
+to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
+
+```shell
+python examples/fedti/fedti.py -c examples/fedti/StableDiffusionFed_iid_50.yml -b FedTI
+```
+```{note}
+Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
+    Textual Inversion],
+&rdquo; 
+````
+
+
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |                                                                Method                                                                | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tested |
