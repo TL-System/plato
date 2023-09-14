@@ -17,11 +17,11 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer used by the client."""
 
-    def __init__(self, model=None):
-        """Initialize the trainer with the provided model."""
-        super().__init__(model=model)
+    def __init__(self, model=None, callbacks=None):
+        """Initializes the trainer with the provided model."""
+        super().__init__(model=model, callbacks=callbacks)
 
-        # The threshold for determining whether or not an update is significant
+        # The threshold for determining whether an update is significant or not
         self.update_threshold = (
             Config().clients.update_threshold
             if hasattr(Config().clients, "update_threshold")
@@ -43,7 +43,7 @@ class Trainer(basic.Trainer):
         self.orig_weights = None
 
     def prune_update(self):
-        """Prune the weight update by setting some parameters in update to 0."""
+        """Prunes the weight update by setting some parameters in update to 0."""
         self.load_acc_grads()
 
         conv_updates = OrderedDict()
@@ -84,7 +84,7 @@ class Trainer(basic.Trainer):
         self.save_acc_grads()
 
     def aggregate_channels(self, delta):
-        """Aggregate the sum of a certain channel from all filters."""
+        """Aggregates the sum of a certain channel from all filters."""
         num_channels = delta.shape[1]
         num_filters = delta.shape[0]
         aggregated_channels = [None] * num_channels
@@ -101,7 +101,7 @@ class Trainer(basic.Trainer):
         return aggregated_channels
 
     def aggregate_filters(self, delta):
-        """Aggregate the sum of all channels from a single filter."""
+        """Aggregates the sum of all channels from a single filter."""
         num_channels = delta.shape[1]
         num_filters = delta.shape[0]
         aggregated_filters = [None] * num_filters
@@ -118,7 +118,7 @@ class Trainer(basic.Trainer):
         return aggregated_filters
 
     def prune_channels(self, aggregated_channels, delta):
-        """Prune the channels in update that lie below the FedSCR threshold."""
+        """Prunes the channels in update that lie below the FedSCR threshold."""
         for i, norm in enumerate(aggregated_channels):
             if norm < self.update_threshold:
                 delta[:, i, :, :] = 0
@@ -126,7 +126,7 @@ class Trainer(basic.Trainer):
         return delta
 
     def prune_filters(self, aggregated_filters, delta):
-        """Prune the filters in update that lie below the FedSCR threshold."""
+        """Prunes the filters in update that lie below the FedSCR threshold."""
         for i, norm in enumerate(aggregated_filters):
             if norm < self.update_threshold:
                 delta[i, :, :, :] = 0
@@ -134,7 +134,7 @@ class Trainer(basic.Trainer):
         return delta
 
     def save_acc_grads(self):
-        """Save the accumulated client gradients for the next communication round."""
+        """Saves the accumulated client gradients for the next communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
@@ -145,7 +145,7 @@ class Trainer(basic.Trainer):
             pickle.dump(self.acc_grads, payload_file)
 
     def load_acc_grads(self):
-        """Load the accumulated gradients from a previous communication round."""
+        """Loads the accumulated gradients from a previous communication round."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
@@ -166,7 +166,7 @@ class Trainer(basic.Trainer):
             self.acc_grads = [0] * count
 
     def compute_pruned_amount(self):
-        """Compute the pruned percentage of the entire model."""
+        """Computes the pruned percentage of the entire model."""
         nonzero = 0
         total = 0
         for key in sorted(self.total_grad.keys()):
@@ -201,7 +201,7 @@ class Trainer(basic.Trainer):
             self.div_from_global = self.compute_weight_divergence()
 
             # Calculate average local weight updates
-            self.avg_update = self.local_update_significance()
+            self.avg_update = self.compute_local_update_significance()
 
             logging.info(
                 "[Client #%d] Average local weight updates: %.2f",
@@ -220,7 +220,7 @@ class Trainer(basic.Trainer):
         self.model.load_state_dict(self.total_grad, strict=True)
 
     def compute_weight_divergence(self):
-        """Calculate the divergence of the locally trained model from the global model."""
+        """Calculates the divergence of the locally trained model from the global model."""
         div_from_global = 0
         for (__, orig_module), (__, trained_module) in zip(
             self.orig_weights.named_modules(), self.model.named_modules()
@@ -237,8 +237,8 @@ class Trainer(basic.Trainer):
 
         return np.sqrt(div_from_global)
 
-    def local_update_significance(self):
-        """Calculate the average weight update."""
+    def compute_local_update_significance(self):
+        """Calculates the average weight update."""
         delta = 0
         total = 0
 

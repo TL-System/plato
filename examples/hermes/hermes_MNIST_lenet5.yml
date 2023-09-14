@@ -26,7 +26,7 @@ clients:
 
     compute_comm_time: true
 
-    comm_simulation: false
+    comm_simulation: true
 
 server:
     address: 127.0.0.1
@@ -66,13 +66,13 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 3
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 3
     batch_size: 10
     optimizer: SGD
 

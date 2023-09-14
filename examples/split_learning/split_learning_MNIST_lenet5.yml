@@ -3,7 +3,7 @@ clients:
     type: split_learning
 
     # The total number of clients
-    total_clients: 3
+    total_clients: 5
 
     # The number of clients selected in each round
     per_round: 1
@@ -11,18 +11,24 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    # Split learning iterations for each client
+    iteration: 20
+
 server:
     type: split_learning
-
+    random_seed: 1
     address: 127.0.0.1
-    port: 8000
+    port: 8001
+
+    # Server doesn't have to do test for every round in split learning
+    do_test: false
 
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Number of samples in each partition
-    partition_size: 20000
+    partition_size: 12000
 
     # Fixed random seed
     random_seed: 1
@@ -35,10 +41,7 @@ trainer:
     type: split_learning
 
     # The maximum number of training rounds
-    rounds: 6
-
-    # The maximum number of clients running concurrently
-    max_concurrency: 3
+    rounds: 50000
 
     # The target accuracy
     target_accuracy: 0.95
@@ -47,24 +50,26 @@ trainer:
     model_name: lenet5
 
     # Number of epoches for local training in each communication round
-    epochs: 10
-    batch_size: 32
+    epochs: 1
+    batch_size: 128
     optimizer: SGD
-
+    
 algorithm:
     # Aggregation algorithm
     type: split_learning
 
     # Split learning flag
     split_learning: true
-    epsilon: null
 
 parameters:
     model:
         num_classes: 10
-        cut_layer: relu4
+        cut_layer: relu2
 
     optimizer:
         lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
+
+results: 
+    types: round, accuracy, elapsed_time, comm_overhead

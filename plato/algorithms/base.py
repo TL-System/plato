@@ -34,5 +34,5 @@ class Algorithm(ABC):
     def load_weights(self, weights):
         """Loads the model weights passed in as a parameter."""
 
-    def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
+    async def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
         """Aggregates the weights received into baseline weights (optional)."""

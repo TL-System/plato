@@ -81,7 +81,10 @@ class Config:
                 help="The server hostname and port number.",
             )
             parser.add_argument(
-                "-u", "--cpu", action="store_true", help="Use the CPU as the device."
+                "-u", "--cpu", action="store_true", help="Use CPU as the device."
+            )
+            parser.add_argument(
+                "-m", "--mps", action="store_true", help="Use MPS as the device."
             )
             parser.add_argument(
                 "-d",
@@ -277,7 +280,6 @@ class Config:
         sleep_times = []
 
         if hasattr(Config.clients, "simulation_distribution"):
-
             if dist.distribution.lower() == "normal":
                 sleep_times = np.random.normal(dist.mean, dist.sd, size=total_clients)
             if dist.distribution.lower() == "pareto":
@@ -310,11 +312,17 @@ class Config:
         if hasattr(Config().trainer, "use_mindspore"):
             return 0
 
+        if hasattr(Config().trainer, "use_tensorflow"):
+            import tensorflow as tf
+
+            gpus = tf.config.experimental.list_physical_devices("GPU")
+            return len(gpus)
+
         import torch
 
         if torch.cuda.is_available():
             return torch.cuda.device_count()
-        elif torch.has_mps:
+        elif Config.args.mps and torch.has_mps:
             return 1
         else:
             return 0
@@ -348,7 +356,7 @@ class Config:
                 else:
                     device = "cuda:0"
 
-            if torch.has_mps:
+            if Config.args.mps and torch.has_mps:
                 device = "mps"
 
         return device

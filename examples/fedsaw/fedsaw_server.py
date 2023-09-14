@@ -18,84 +18,89 @@ class Server(fedavg_cs.Server):
     def __init__(self, model=None, algorithm=None, trainer=None):
         super().__init__(model=model, algorithm=algorithm, trainer=trainer)
 
-        # The central server uses a list to store each institution's clients' pruning amount
+        # The central server uses a list to store each edge server's clients' pruning amount
         self.pruning_amount_list = None
-        self.comm_overhead = 0
 
         if Config().is_central_server():
-            self.pruning_amount_list = [
+            init_pruning_amount = (
                 Config().clients.pruning_amount
-                for i in range(Config().algorithm.total_silos)
-            ]
+                if hasattr(Config().clients, "pruning_amount")
+                else 0.4
+            )
+            self.pruning_amount_list = {
+                client_id: init_pruning_amount
+                for client_id in range(
+                    1 + Config().clients.total_clients,
+                    Config().algorithm.total_silos + 1 + Config().clients.total_clients,
+                )
+            }
 
-        if Config().is_edge_server() and hasattr(Config(), "results"):
-            if "pruning_amount" not in self.recorded_items:
-                self.recorded_items = self.recorded_items + ["pruning_amount"]
+        if Config().is_edge_server():
+            self.edge_pruning_amount = 0
 
-    def customize_server_response(self, server_response: dict) -> dict:
-        """Wrap up generating the server response with any additional information."""
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
+        """Wraps up generating the server response with any additional information."""
+        server_response = super().customize_server_response(
+            server_response, client_id=client_id
+        )
         if Config().is_central_server():
             server_response["pruning_amount"] = self.pruning_amount_list
         if Config().is_edge_server():
-            # At this point, an edge server already updated Config().clients.pruning_amount
-            # to the number received from the central server.
-            # Now it could pass the new pruning amount to its clients.
-            server_response["pruning_amount"] = Config().clients.pruning_amount
+            server_response["pruning_amount"] = self.edge_pruning_amount
 
         return server_response
 
-    def compute_weight_deltas(self, weights_received):
-        """Extract the model weight updates from client updates."""
-        return weights_received
+    # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+        """Aggregates the reported weight updates from the selected clients."""
+        deltas = await self.aggregate_deltas(updates, weights_received)
+        updated_weights = self.algorithm.update_weights(deltas)
+        return updated_weights
 
     def update_pruning_amount_list(self):
-        """Update the list of each institution's clients' pruning_amount."""
-        weights_diff_list = self.get_weights_differences()
-
-        self.compute_pruning_amount(weights_diff_list)
-
-    def compute_pruning_amount(self, weights_diff_list):
-        """A method to compute pruning amount."""
+        """Updates the list of each institution's clients' pruning_amount."""
+        weights_diff_dict, weights_diff_list = self.get_weights_differences()
 
         median = statistics.median(weights_diff_list)
 
-        for i, weight_diff in enumerate(weights_diff_list):
-            if weight_diff >= median:
-                self.pruning_amount_list[i] = Config().clients.pruning_amount * (
-                    1 + math.tanh(weight_diff / sum(weights_diff_list))
-                )
-            else:
-                self.pruning_amount_list[i] = Config().clients.pruning_amount * (
-                    1 - math.tanh(weight_diff / sum(weights_diff_list))
+        for client_id in weights_diff_dict:
+            if weights_diff_dict[client_id]:
+                self.pruning_amount_list[client_id] = 1 / (
+                    1 + math.exp((median - weights_diff_dict[client_id]) / median)
                 )
 
     def get_weights_differences(self):
         """
-        Get the weights differences of each edge server's aggregated model
+        Gets the weights differences of each edge server's aggregated model
         and the global model.
         """
-        weights_diff_list = []
-        for i in range(Config().algorithm.total_silos):
-            client_id = i + 1 + Config().clients.total_clients
+        weights_diff_dict = {
+            client_id: None
+            for client_id in range(
+                1 + Config().clients.total_clients,
+                Config().algorithm.total_silos + 1 + Config().clients.total_clients,
+            )
+        }
 
-            (report, received_updates) = [
-                (update.report, update.payload)
-                for update in self.updates
-                if int(update.report.client_id) == client_id
-            ][0]
-            num_samples = report.num_samples
+        weights_diff_list = []
+
+        for update in self.updates:
+            client_id = update.report.client_id
+            num_samples = update.report.num_samples
+            received_updates = update.payload
 
             weights_diff = self.compute_weights_difference(
                 received_updates, num_samples
             )
 
+            weights_diff_dict[client_id] = weights_diff
             weights_diff_list.append(weights_diff)
 
-        return weights_diff_list
+        return weights_diff_dict, weights_diff_list
 
     def compute_weights_difference(self, received_updates, num_samples):
         """
-        Compute the weight difference of an edge server's aggregated model
+        Computes the weight difference of an edge server's aggregated model
         and the global model.
         """
         weights_diff = 0
@@ -108,12 +113,14 @@ class Server(fedavg_cs.Server):
 
         return weights_diff
 
-    def get_record_items_values(self):
-        """Get values will be recorded in result csv file."""
-        record_items_values = super().get_record_items_values()
-        record_items_values["pruning_amount"] = Config().clients.pruning_amount
+    def get_logged_items(self) -> dict:
+        """Gets items to be logged by the LogProgressCallback class in a .csv file."""
+        logged_items = super().get_logged_items()
+        logged_items["pruning_amount"] = (
+            self.edge_pruning_amount if Config().is_edge_server() else 0
+        )
 
-        return record_items_values
+        return logged_items
 
     def clients_processed(self):
         """Additional work to be performed after client reports have been processed."""

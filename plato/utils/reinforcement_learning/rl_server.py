@@ -11,8 +11,22 @@ from plato.servers import fedavg
 class RLServer(fedavg.Server):
     """A federated learning server with an RL Agent."""
 
-    def __init__(self, agent, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self,
+        agent,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.agent = agent
 
     def reset(self):
@@ -78,7 +92,7 @@ class RLServer(fedavg.Server):
         self.agent.new_state = self.prep_state()
         self.agent.process_env_update()
 
-    async def wrap_up(self):
+    async def wrap_up(self) -> None:
         """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 
@@ -86,7 +100,7 @@ class RLServer(fedavg.Server):
             self.agent.reset_env = False
             self.reset()
         if self.agent.finished:
-            await self.close()
+            await self._close()
 
     @abstractmethod
     def prep_state(self):

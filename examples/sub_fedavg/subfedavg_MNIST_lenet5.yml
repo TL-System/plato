@@ -1,3 +1,6 @@
+general:
+    base_path: ./test
+
 clients:
     # Type
     type: simple
@@ -25,15 +28,12 @@ server:
     inbound_processors:
         - model_decompress
 
-    checkpoint_path: results/test/checkpoint
-    model_path: results/test/model
-
 data:
     # The training and testing dataset
     datasource: MNIST
 
     # Where the dataset is located
-    data_path: ../../data
+    data_path: ../../../data
 
     # Number of samples in each partition
     partition_size: 100
@@ -71,14 +71,12 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-results:
-    # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time
-
-    result_path: results/test
-
 parameters:
     optimizer:
         lr: 0.01
         momentum: 0.9
         weight_decay: 0.0
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead

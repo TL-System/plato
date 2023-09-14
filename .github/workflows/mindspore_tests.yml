@@ -11,11 +11,13 @@ on:
 
 jobs:
   MindSpore-Tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Setting up Conda
         uses: conda-incubator/setup-miniconda@v2
@@ -31,8 +33,8 @@ jobs:
           sudo apt install -y python3-pip
           conda activate plato
           conda install mindspore-cpu -c mindspore -c conda-forge -y
-          pip3 install numpy python-socketio aiohttp requests boto3 pyyaml pynvml psutil datasets
-
+          pip3 install numpy python-socketio aiohttp requests boto3 pyyaml datasets
+          pip3 install Pillow==9.5.0
       - name: Training workloads
         shell: bash -l {0}
         run: |

@@ -68,10 +68,10 @@ class S3:
         # Does the bucket exist?
         try:
             self.s3_client.head_bucket(Bucket=self.bucket)
-        except botocore.exception.ClientError:
+        except botocore.exceptions.ClientError:
             try:
                 self.s3_client.create_bucket(Bucket=self.bucket)
-            except botocore.exception.ClientError as s3_exception:
+            except botocore.exceptions.ClientError as s3_exception:
                 raise ValueError("Fail to create a bucket.") from s3_exception
 
     def send_to_s3(self, object_key, object_to_send) -> str:

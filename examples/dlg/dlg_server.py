@@ -63,8 +63,16 @@ dlg_result_headers = [
 class Server(fedavg.Server):
     """An honest-but-curious federated learning server with gradient leakage attack."""
 
-    def __init__(self, model, trainer):
-        super().__init__(model=model, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
         self.attack_method = None
         self.share_gradients = True
         if (
@@ -104,13 +112,14 @@ class Server(fedavg.Server):
         """
         Perform attack in attack around after the updated weights have been aggregated.
         """
+        weights_received = [payload[0] for payload in weights_received]
         if (
             self.current_round == Config().algorithm.attack_round
             and Config().algorithm.attack_method in ["DLG", "iDLG", "csDLG"]
         ):
             self.attack_method = Config().algorithm.attack_method
             self._deep_leakage_from_gradients(weights_received)
-        
+
         return weights_received
 
     async def aggregate_deltas(self, updates, deltas_received):
@@ -167,14 +176,15 @@ class Server(fedavg.Server):
         deltas_received = self.algorithm.compute_weight_deltas(
             baseline_weights, weights_received
         )
-        target_weights = self.updates[Config().algorithm.victim_client].payload
+        update = self.updates[Config().algorithm.victim_client]
+        target_weights = update.payload[0]
         if not self.share_gradients and self.match_weights and self.use_updates:
             target_weights = deltas_received[Config().algorithm.victim_client]
-        report = self.updates[Config().algorithm.victim_client].report
+
         gt_data, gt_labels, target_grad = (
-            report.gt_data,
-            report.gt_labels,
-            report.target_grad,
+            update.payload[1],
+            update.payload[2],
+            update.payload[3],
         )
 
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
@@ -512,7 +522,6 @@ class Server(fedavg.Server):
         if self.use_updates:
             patched_model_origin = deepcopy(patched_model)
 
-        # TODO: optional parameters: lr_schedule, create_graph...
         for epoch in range(epochs):
             if batch_size == 1:
                 dummy_pred = patched_model(dummy_data, patched_model.parameters)

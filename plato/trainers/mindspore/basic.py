@@ -24,11 +24,10 @@ class Trainer(base.Trainer):
     the client and the server.
     """
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, **kwargs):
         """Initializing the trainer with the provided model.
 
         Arguments:
-        client_id: The ID of the client using this trainer (optional).
         model: The model to train.
         """
         super().__init__()

@@ -17,22 +17,27 @@ class Client(simple.Client):
     A federated learning client prunes its update before sending out.
     """
 
-    async def train(self):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+        super().__init__(
+            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+        )
+        self.pruning_amount = 0
+
+    async def _train(self):
         """The training process on a FedSaw client."""
         previous_weights = copy.deepcopy(self.algorithm.extract_weights())
 
         # Perform model training
-        self._report, _ = await super().train()
+        self._report, new_weights = await super()._train()
 
-        weight_updates = self.prune_updates(previous_weights)
+        weight_updates = self.prune_updates(previous_weights, new_weights)
         logging.info("[Client #%d] Pruned its weight updates.", self.client_id)
 
         return self._report, weight_updates
 
-    def prune_updates(self, previous_weights):
-        """Prune locally trained updates."""
-
-        updates = self.compute_weight_deltas(previous_weights)
+    def prune_updates(self, previous_weights, new_weights):
+        """Prunes locally trained updates."""
+        updates = self.compute_weight_updates(previous_weights, new_weights)
         self.algorithm.load_weights(updates)
         updates_model = self.algorithm.model
 
@@ -54,7 +59,7 @@ class Client(simple.Client):
         prune.global_unstructured(
             parameters_to_prune,
             pruning_method=pruning_method,
-            amount=Config().clients.pruning_amount,
+            amount=self.pruning_amount,
         )
 
         for module, name in parameters_to_prune:
@@ -62,11 +67,8 @@ class Client(simple.Client):
 
         return updates_model.cpu().state_dict()
 
-    def compute_weight_deltas(self, previous_weights):
-        """Compute the weight deltas."""
-        # Extract trained model weights
-        new_weights = self.algorithm.extract_weights()
-
+    def compute_weight_updates(self, previous_weights, new_weights):
+        """Compute the weight updates."""
         # Calculate deltas from the received weights
         deltas = OrderedDict()
         for name, new_weight in new_weights.items():
@@ -80,8 +82,5 @@ class Client(simple.Client):
 
     def process_server_response(self, server_response):
         """Additional client-specific processing on the server response."""
-        if "pruning_amount" in server_response:
-            # Update pruning amount
-            Config().clients = Config().clients._replace(
-                pruning_amount=server_response["pruning_amount"]
-            )
+        # Update pruning amount
+        self.pruning_amount = server_response["pruning_amount"]

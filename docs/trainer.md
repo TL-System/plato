@@ -4,8 +4,10 @@
 
 The common practice is to customize the training loop using inheritance for important features that change the state of the training process. To customize the training loop using inheritance, subclass the `basic.Trainer` class in `plato.trainers`, and override the following methods:
 
-````{admonition} **get_train_loader(self, batch_size, trainset, sampler, \*\*kwargs)**
-This is a class method that is called to create an instance of the trainloader to be used in the training loop.
+````{admonition} **get_train_loader()**
+**`def get_train_loader(self, batch_size, trainset, sampler, **kwargs)`**
+
+Returns an instance of the trainloader to be used in the training loop.
 
 `batch_size` the batch size.
 
@@ -21,23 +23,33 @@ def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
 ```
 ````
 
-```{admonition} **get_optimizer(self, model)**
+```{admonition} **get_optimizer()**
+**`def get_optimizer(self, model)`**
+
 Returns a custom optimizer.
 ```
 
-```{admonition} **get_lr_scheduler(self, config, optimizer)**
+```{admonition} **get_lr_scheduler()**
+**`def get_lr_scheduler(self, config, optimizer)`**
+
 Returns a custom learning rate scheduler.
 ```
 
-```{admonition} **get_loss_criterion(self)**
+```{admonition} **get_loss_criterion()**
+**`def get_loss_criterion(self)`**
+
 Returns a custom loss criterion.
 ```
 
-```{admonition} **lr_scheduler_step(self)**
+```{admonition} **lr_scheduler_step()**
+**`def lr_scheduler_step(self)`**
+
 Performs a single learning rate scheduler step if ``self.lr_scheduler`` has been assigned.
 ```
 
-````{admonition} **train_run_start(self, config)**
+````{admonition} **train_run_start()**
+**`def train_run_start(self, config)`**
+
 Override this method to complete additional tasks before the training loop starts.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -50,7 +62,9 @@ def train_run_start(self, config):
 ```
 ````
 
-````{admonition} **train_run_end(self, config)**
+````{admonition} **train_run_end()**
+**`def train_run_end(self, config)`**
+
 Override this method to complete additional tasks after the training loop ends.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -63,7 +77,9 @@ def train_run_end(self, config):
 ```
 ````
 
-````{admonition} **train_epoch_start(self, config)**
+````{admonition} **train_epoch_start()**
+**`def train_epoch_start(self, config)`**
+
 Override this method to complete additional tasks at the starting point of each training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -76,7 +92,9 @@ def train_epoch_start(self, config):
 ```
 ````
 
-````{admonition} **train_epoch_end(self, config)**
+````{admonition} **train_epoch_end()**
+**`def train_epoch_end(self, config)`**
+
 Override this method to complete additional tasks at the end of each training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -89,7 +107,9 @@ def train_epoch_end(self, config):
 ```
 ````
 
-````{admonition} **train_step_start(self, config, batch=None)**
+````{admonition} **train_step_start()**
+**`def train_step_start(self, config, batch=None)`**
+
 Override this method to complete additional tasks at the beginning of each step within a training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -103,7 +123,9 @@ def train_step_start(self, config, batch):
     logging.info("[Client #%d] Started training epoch %d batch %d.", self.client_id, self.current_epoch, batch)
 ````
 
-````{admonition} **train_step_end(self, config, batch=None, loss=None)**
+````{admonition} **train_step_end()**
+**`def train_step_end(self, config, batch=None, loss=None)`**
+
 Override this method to complete additional tasks at the end of each step within a training epoch.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -127,7 +149,9 @@ def train_step_end(self, config, batch, loss):
     )
 ````
 
-````{admonition} **perform_forward_and_backward_passes(self, config, examples, labels)**
+````{admonition} **perform_forward_and_backward_passes()**
+**`def perform_forward_and_backward_passes(self, config, examples, labels)`**
+
 Override this method to perform custom forward and backward passes within each training step.
 
 `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
@@ -157,10 +181,14 @@ def perform_forward_and_backward_passes(self, config, examples, labels):
     return loss
 ````
 
-````{admonition} **process_outputs(outputs)**
-Override this method to further process model outputs in `test_model()` .
+````{admonition} **process_outputs()**
+**`def process_outputs(outputs)`**
 
-`outputs` the model outputs, which may contain features or other information depending on the custom model.
+Override this method to further process outputs, produced after the model is applied to test data samples in `test_model()`.
+
+The method returns the processed outputs.
+
+`outputs` the outputs after the model is applied to test data samples, which may contain features or other information depending on the model.
 
 **Example:**
 
@@ -175,9 +203,12 @@ For infrastructure changes, such as logging, recording metrics, and stopping the
 
 Within the implementation of these callback methods, one can access additional information about the training loop by using the `trainer` instance. For example, `trainer.sampler` can be used to access the sampler used by the train dataloader, `trainer.trainloader` can be used to access the current train dataloader, and `trainer.current_epoch` can be used to access the current epoch number.
 
-To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods:
+To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods, then pass it to the trainer when it is initialized, or call `trainer.add_callbacks` after initialization. For built-in trainers that user has no access to the initialization, one can also pass the trainer callbacks to client through parameter `trainer_callbacks`, which will be delivered to trainers later. Examples can be found in `examples/callbacks`.
 
-````{admonition} **on_train_run_start(self, trainer, config)**
+
+````{admonition} **on_train_run_start()**
+**`def on_train_run_start(self, trainer, config)`**
+
 Override this method to complete additional tasks before the training loop starts.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
@@ -196,7 +227,9 @@ def on_train_run_start(self, trainer, config):
 ```
 ````
 
-````{admonition} **on_train_run_end(self, trainer, config)**
+````{admonition} **on_train_run_end()**
+**`def on_train_run_end(self, trainer, config)`**
+
 Override this method to complete additional tasks after the training loop ends.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
@@ -211,7 +244,9 @@ def on_train_run_end(self, trainer, config):
 ```
 ````
 
-````{admonition} **on_train_epoch_start(self, trainer, config)**
+````{admonition} **on_train_epoch_start()**
+**`def on_train_epoch_start(self, trainer, config)`**
+
 Override this method to complete additional tasks at the starting point of each training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
@@ -226,7 +261,9 @@ def train_epoch_start(self, trainer, config):
 ```
 ````
 
-````{admonition} **on_train_epoch_end(self, trainer, config)**
+````{admonition} **on_train_epoch_end()**
+**`def on_train_epoch_end(self, trainer, config)`**
+
 Override this method to complete additional tasks at the end of each training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
@@ -241,7 +278,9 @@ def on_train_epoch_end(self, trainer, config):
 ```
 ````
 
-````{admonition} **on_train_step_start(self, trainer, config, batch=None)**
+````{admonition} **on_train_step_start()**
+**`def on_train_step_start(self, trainer, config, batch=None)`**
+
 Override this method to complete additional tasks at the beginning of each step within a training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
@@ -257,7 +296,9 @@ def on_train_step_start(self, trainer, config, batch):
     logging.info("[Client #%d] Started training epoch %d batch %d.", trainer.client_id, trainer.current_epoch, batch)
 ````
 
-````{admonition} **on_train_step_end(self, trainer, config, batch=None, loss=None)**
+````{admonition} **on_train_step_end()**
+**`def on_train_step_end(self, trainer, config, batch=None, loss=None)`**
+
 Override this method to complete additional tasks at the end of each step within a training epoch.
 
 `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
@@ -296,22 +337,32 @@ def train_step_end(self, config, batch=None, loss=None):
 
 Here is a list of all the methods available in the `RunHistory` class:
 
-```{admonition} **get_metric_names(self)**
+```{admonition} **get_metric_names()**
+**`def get_metric_names(self)`**
+
 Returns an iterable set containing of all unique metric names which are being tracked.
 ```
 
-```{admonition} **get_metric_values(self, metric_name)**
+```{admonition} **get_metric_values()**
+**`def get_metric_values(self, metric_name)`**
+
 Returns an ordered iterable list of values that has been stored since the last reset corresponding to the provided metric name.
 ```
 
-```{admonition} **get_latest_metric(self, metric_name)**
+```{admonition} **get_latest_metric()**
+**`def get_latest_metric(self, metric_name)`**
+
 Returns the most recent value that has been recorded for the given metric.
 ```
 
-```{admonition} **update_metric(self, metric_name, metric_value)**
+```{admonition} **update_metric()**
+**`def update_metric(self, metric_name, metric_value)`**
+
 Records a new value for the given metric.
 ```
 
-```{admonition} **reset(self)**
+```{admonition} **reset()**
+**`def reset(self)`**
+
 Resets the run history.
 ```

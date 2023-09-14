@@ -1,6 +1,6 @@
 """
 A cross-silo federated learning server that tunes
-clients' local epoch numbers of each institution.
+clients' local epoch numbers of each edge server (institution).
 """
 
 import math
@@ -14,25 +14,24 @@ from plato.servers import fedavg_cs
 class Server(fedavg_cs.Server):
     """
     A cross-silo federated learning server that tunes
-    clients' local epoch numbers of each institution.
+    clients' local epoch numbers of each edge server.
     """
 
     def __init__(self):
         super().__init__()
 
-        # The central server uses a list to store each institution's clients' local epoch numbers
+        # The central server uses a list to store each edge server's clients' local epoch numbers
         self.local_epoch_list = None
         if Config().is_central_server():
             self.local_epoch_list = [
                 Config().trainer.epochs for i in range(Config().algorithm.total_silos)
             ]
 
-        if Config().is_edge_server():
-            if "local_epoch_num" not in self.recorded_items:
-                self.recorded_items = self.recorded_items + ["local_epoch_num"]
-
-    def customize_server_response(self, server_response: dict) -> dict:
-        """Wrap up generating the server response with any additional information."""
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
+        """Wraps up generating the server response with any additional information."""
+        server_response = super().customize_server_response(
+            server_response, client_id=client_id
+        )
         if Config().is_central_server():
             server_response["local_epoch_num"] = self.local_epoch_list
         if Config().is_edge_server():
@@ -47,18 +46,18 @@ class Server(fedavg_cs.Server):
         super().clients_processed()
 
         if Config().is_central_server():
-            self.update_local_epoch_list()
+            self._update_local_epoch_list()
 
-    def update_local_epoch_list(self):
+    def _update_local_epoch_list(self):
         """
-        Update the local epoch list:
-        decide clients' local epoch numbers of each institution.
+        Updates the local epoch list:
+        decide clients' local epoch numbers of each edge server.
         """
         weights_diff_list = self.get_weights_differences()
 
-        self.compute_local_epoch(weights_diff_list)
+        self._compute_local_epoch(weights_diff_list)
 
-    def compute_local_epoch(self, weights_diff_list):
+    def _compute_local_epoch(self, weights_diff_list):
         """A method to compute local epochs."""
         log_list = [math.log(i) for i in weights_diff_list]
         min_log = min(log_list)
@@ -77,7 +76,7 @@ class Server(fedavg_cs.Server):
 
     def get_weights_differences(self):
         """
-        Get the weights divergence of each edge server's aggregated model
+        Gets the weights divergence of each edge server's aggregated model
         and the global model accuracy.
         """
         weights_diff_list = []
@@ -98,7 +97,7 @@ class Server(fedavg_cs.Server):
 
     def compute_weights_difference(self, local_weights, num_samples):
         """
-        Compute the weight difference of an edge server's aggregated model
+        Computes the weight difference of an edge server's aggregated model
         and the global model.
         """
         weights_diff = 0
