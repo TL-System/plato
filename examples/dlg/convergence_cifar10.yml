@@ -52,7 +52,6 @@ trainer:
 
     # The machine learning model
     model_name: dlg
-    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
@@ -110,6 +109,9 @@ algorithm:
     epsilon: 0.1
 
 parameters:
+    model:
+        num_classes: 10
+    
     optimizer:
         lr: 0.01
 

@@ -1,104 +1,167 @@
 """
-The training loop for split learning.
+A federated learning trainer using split learning.
+
+Reference:
+
+Vepakomma, et al., "Split Learning for Health: Distributed Deep Learning without Sharing
+Raw Patient Data," in Proc. AI for Social Good Workshop, affiliated with ICLR 2018.
+
+https://arxiv.org/pdf/1812.00564.pdf
+
+Chopra, Ayush, et al. "AdaSplit: Adaptive Trade-offs for Resource-constrained Distributed
+Deep Learning." arXiv preprint arXiv:2112.01637 (2021).
+
+https://arxiv.org/pdf/2112.01637.pdf
 """
+
 import logging
 import os
 
-import numpy as np
 import torch
-import torch.nn as nn
 from plato.config import Config
 
 from plato.trainers import basic
+from plato.datasources import feature
+from plato.samplers import all_inclusive
 
 
 class Trainer(basic.Trainer):
-    def __init__(self, model=None):
-        super().__init__(model)
+    """The split learning trainer."""
 
-        # Record the gradients of the cut layer
+    def __init__(self, model=None, callbacks=None):
+        """Initializing the trainer with the provided model.
+
+        Arguments:
+        model: The model to train.
+        callbacks: The callbacks that this trainer uses.
+        """
+        super().__init__(model=model, callbacks=callbacks)
+        self.last_client_id = None
+        self.last_optimizer = None
+
+        # Client side variables
+        self.training_samples = None
+        self.gradients = None
+        self.data_loader = None
+
+        # Server side variables
         self.cut_layer_grad = []
 
-    # pylint: disable=unused-argument
-    def train_model(self, config, trainset, sampler, **kwargs):
-        batch_size = config["batch_size"]
+    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
+        """
+        Creates an instance of the trainloader.
 
-        logging.info("[Client #%d] Loading the dataset.", self.client_id)
-        _train_loader = getattr(self, "train_loader", None)
+        Arguments:
+        batch_size: the batch size.
+        trainset: the training dataset.
+        sampler: the sampler for the trainloader to use.
+        """
+        return trainset
 
-        if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler)
-        else:
-            train_loader = torch.utils.data.DataLoader(
-                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
-            )
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform forward and backward passes in the training loop.
 
-        iterations_per_epoch = np.ceil(len(trainset) / batch_size).astype(int)
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
 
-        # Sending the model to the device used for training
-        self.model.to(self.device)
-        self.model.train()
+        Returns: loss values after the current batch has been processed.
+        """
+        if self.client_id == 0:
+            return self._server_train_loop(config, examples, labels)
 
-        # Initializing the loss criterion
-        _loss_criterion = getattr(self, "loss_criterion", None)
-        if callable(_loss_criterion):
-            loss_criterion = self.loss_criterion(self.model)
-        else:
-            loss_criterion = nn.CrossEntropyLoss()
+        return self._client_train_loop(examples)
 
-        # Initializing the optimizer
-        get_optimizer = getattr(self, "get_optimizer", optimizers.get_optimizer)
-        optimizer = get_optimizer(self.model)
+    def train_run_end(self, config):
+        """Additional tasks after training."""
+        if self.client_id == 0:
+            # Server needs to save gradients, clients not
+            self.save_gradients(config)
 
-        # Initializing the learning rate schedule, if necessary
-        if hasattr(Config().trainer, "lr_schedule"):
-            lr_schedule = optimizers.get_lr_schedule(
-                optimizer, iterations_per_epoch, train_loader
-            )
-        else:
-            lr_schedule = None
+    def get_optimizer(self, model):
+        """Return the optimizer used in the last round to avoid reconfiguration."""
+        if self.last_optimizer is None or self.last_client_id != self.client_id:
+            self.last_optimizer = super().get_optimizer(model)
+            self.last_client_id = self.client_id
 
-        logging.info("[Client #%d] Begining to train.", self.client_id)
-        for __, (examples, labels) in enumerate(train_loader):
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            optimizer.zero_grad()
+        return self.last_optimizer
 
-            examples = examples.detach().requires_grad_(True)
+    def get_train_samples(self, batch_size, trainset, sampler):
+        """
+        Get a batch of training samples to extract feature, the trainer has to save these
+        samples to complete training later.
+        """
+        data_loader = torch.utils.data.DataLoader(
+            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+        )
+        data_loader = iter(data_loader)
+        self.training_samples = next(data_loader)
+        return self.training_samples
 
-            outputs = self.model(examples)
+    def retrieve_train_samples(self):
+        """Retrieve the training samples to complete client training."""
+        # Wrap the training samples with datasource and sampler to be fed into Plato trainer
+        samples = feature.DataSource([[self.training_samples]])
+        sampler = all_inclusive.Sampler(samples)
+        return samples, sampler
 
-            loss = loss_criterion(outputs, labels)
-            logging.info(
-                "[Client #{}] \tLoss: {:.6f}".format(self.client_id, loss.data.item())
-            )
-            loss.backward()
+    def load_gradients(self, gradients):
+        """Load the gradients which will be used to complete client training."""
+        self.gradients = gradients
 
-            # Record gradients within the cut layer
-            self.cut_layer_grad.append(examples.grad.clone().detach())
+    def _client_train_loop(self, examples):
+        """Complete the client side training with gradients from server."""
+        self.optimizer.zero_grad()
+        outputs = self.model.forward_to(examples)
 
-            optimizer.step()
+        # Back propagate with gradients from server
+        outputs.backward(self.gradients)
+        self.optimizer.step()
 
-            if lr_schedule is not None:
-                lr_scheduler.step()
+        # No loss value on the client side
+        loss = torch.zeros(1)
+        self._loss_tracker.update(loss, examples.size(0))
+        return loss
 
-        if hasattr(optimizer, "params_state_update"):
-            optimizer.params_state_update()
+    def _server_train_loop(self, config, examples, labels):
+        """The training loop on the server."""
+        examples = examples.detach().requires_grad_(True)
 
-        self.save_gradients()
+        loss = super().perform_forward_and_backward_passes(config, examples, labels)
+        logging.warning(
+            "[Server #%d] Gradients computed with training loss: %.4f",
+            os.getpid(),
+            loss,
+        )
+        # Record gradients within the cut layer
+        self.cut_layer_grad = [examples.grad.clone().detach()]
 
-    def save_gradients(self):
-        """Saving gradients to a file."""
-        model_name = Config().trainer.model_name
+        return loss
+
+    def save_gradients(self, config):
+        """Server saves recorded gradients to a file."""
+        model_name = config["model_name"]
         model_path = Config().params["model_path"]
 
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
         model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
-        if os.path.exists(model_gradients_path):
-            os.remove(model_gradients_path)
         torch.save(self.cut_layer_grad, model_gradients_path)
 
         logging.info(
             "[Server #%d] Gradients saved to %s.", os.getpid(), model_gradients_path
         )
+
+    def get_gradients(self):
+        """Read gradients from a file."""
+        model_path = Config().params["model_path"]
+        model_name = Config().trainer.model_name
+
+        model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
+        logging.info(
+            "[Server #%d] Loading gradients from %s.", os.getpid(), model_gradients_path
+        )
+
+        return torch.load(model_gradients_path)

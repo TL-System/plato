@@ -12,6 +12,8 @@ Retraining," in Proc. INFOCOM, 2022.
 Reference: https://arxiv.org/abs/2203.07320
 """
 import numpy as np
+import torch
+from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
 from plato.samplers import iid
@@ -53,4 +55,11 @@ class Sampler(iid.Sampler):
         deleted_index = np.random.choice(
             range(subset_length), deleted_subset_length, replace=False
         )
+        self.deleted_subset_indices = [self.subset_indices[i] for i in deleted_index]
         self.subset_indices = list(np.delete(self.subset_indices, deleted_index))
+
+    def get_negative(self):
+        """Obtains an instance of the sampler for the data to be deleted (unlearned)."""
+        gen = torch.Generator()
+        gen.manual_seed(self.random_seed)
+        return SubsetRandomSampler(self.deleted_subset_indices, generator=gen)

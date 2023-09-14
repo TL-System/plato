@@ -19,32 +19,37 @@ class CelebA(datasets.CelebA):
     identity, which is used for non-IID samplers.
     """
 
-    def __init__(self,
-                 root: str,
-                 split: str = "train",
-                 target_type: Union[List[str], str] = "attr",
-                 transform: Optional[Callable] = None,
-                 target_transform: Optional[Callable] = None,
-                 download: bool = False) -> None:
-        super().__init__(root, split, target_type, transform, target_transform,
-                         download)
+    def __init__(
+        self,
+        root: str,
+        split: str = "train",
+        target_type: Union[List[str], str] = "attr",
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        download: bool = False,
+    ) -> None:
+        super().__init__(
+            root, split, target_type, transform, target_transform, download
+        )
         self.targets = self.identity.flatten().tolist()
-        self.classes = [f'Celebrity #{i}' for i in range(10177 + 1)]
+        self.classes = [f"Celebrity #{i}" for i in range(10177 + 1)]
 
 
 class DataSource(base.DataSource):
     """The CelebA dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
-        _path = Config().params['data_path']
+        _path = Config().params["data_path"]
 
-        if not os.path.exists(os.path.join(_path, 'celeba')):
-            celeba_url = 'http://iqua.ece.toronto.edu/baochun/celeba.tar.gz'
+        if not os.path.exists(os.path.join(_path, "celeba")):
+            celeba_url = "http://iqua.ece.toronto.edu/baochun/celeba.tar.gz"
             DataSource.download(celeba_url, _path)
         else:
-            logging.info("CelebA data already decompressed under %s",
-                         os.path.join(_path, 'celeba'))
+            logging.info(
+                "CelebA data already decompressed under %s",
+                os.path.join(_path, "celeba"),
+            )
 
         target_types = []
         if hasattr(Config().data, "celeba_targets"):
@@ -54,34 +59,51 @@ class DataSource(base.DataSource):
             if hasattr(targets, "identity") and targets.identity:
                 target_types.append("identity")
         else:
-            target_types = ['attr', 'identity']
+            target_types = ["attr", "identity"]
 
         image_size = 64
-        if hasattr(Config().data, 'celeba_img_size'):
+        if hasattr(Config().data, "celeba_img_size"):
             image_size = Config().data.celeba_img_size
 
-        _transform = transforms.Compose([
-            transforms.Resize(image_size),
-            transforms.CenterCrop(image_size),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-        ])
-        _target_transform = None
-        if target_types:
-            _target_transform = DataSource._target_transform
+        train_transform = (
+            kwargs["train_transform"]
+            if "train_transform" in kwargs
+            else (
+                transforms.Compose(
+                    [
+                        transforms.Resize(image_size),
+                        transforms.CenterCrop(image_size),
+                        transforms.ToTensor(),
+                        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                    ]
+                )
+            )
+        )
 
-        self.trainset = CelebA(root=_path,
-                               split='train',
-                               target_type=target_types,
-                               download=False,
-                               transform=_transform,
-                               target_transform=_target_transform)
-        self.testset = CelebA(root=_path,
-                              split='test',
-                              target_type=target_types,
-                              download=False,
-                              transform=_transform,
-                              target_transform=_target_transform)
+        test_transform = train_transform
+
+        target_transform = (
+            kwargs["target_transform"]
+            if "target_transform" in kwargs
+            else (DataSource._target_transform if target_types else None)
+        )
+
+        self.trainset = CelebA(
+            root=_path,
+            split="train",
+            target_type=target_types,
+            download=False,
+            transform=train_transform,
+            target_transform=target_transform,
+        )
+        self.testset = CelebA(
+            root=_path,
+            split="test",
+            target_type=target_types,
+            download=False,
+            transform=test_transform,
+            target_transform=target_transform,
+        )
 
     @staticmethod
     def _target_transform(label):
@@ -96,18 +118,27 @@ class DataSource(base.DataSource):
                 return label[0]
             elif len(label) == 2:
                 attr, identity = label
-                return torch.cat((attr.reshape([
-                    -1,
-                ]), identity.reshape([
-                    -1,
-                ])))
+                return torch.cat(
+                    (
+                        attr.reshape(
+                            [
+                                -1,
+                            ]
+                        ),
+                        identity.reshape(
+                            [
+                                -1,
+                            ]
+                        ),
+                    )
+                )
         else:
             return label
 
     @staticmethod
     def input_shape():
         image_size = 64
-        if hasattr(Config().data, 'celeba_img_size'):
+        if hasattr(Config().data, "celeba_img_size"):
             image_size = Config().data.celeba_img_size
         return [162770, 3, image_size, image_size]
 

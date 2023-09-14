@@ -21,8 +21,16 @@ from plato.servers import fedavg
 class Server(fedavg.Server):
     """A federated learning server using the AFL algorithm."""
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model, algorithm, trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         self.local_values = {}
 
@@ -79,8 +87,10 @@ class Server(fedavg.Server):
         # 2. Sample a subset of the remaining clients uniformly at random
         num2 = clients_count - num1
         remaining = clients_pool.copy()
+
         for client_id in subset1:
             remaining.remove(client_id)
+
         subset2 = random.sample(remaining, num2)
 
         # 3. Selected clients are the union of these two subsets

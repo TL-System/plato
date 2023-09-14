@@ -46,7 +46,6 @@ trainer:
 
     # The machine learning model
     model_name: dlg
-    num_classes: 10
 
 algorithm:
     # Aggregation algorithm
@@ -107,6 +106,9 @@ algorithm:
     random_seed: 2
 
 parameters:
+    model:
+        num_classes: 10
+
     optimizer:
         lr: 0.01
 

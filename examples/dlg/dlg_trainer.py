@@ -25,7 +25,7 @@ class Trainer(basic.Trainer):
 
         Arguments:
         model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
+        callbacks: The callbacks that this trainer uses.
         """
 
         def weights_init(m):
@@ -75,7 +75,7 @@ class Trainer(basic.Trainer):
         self.target_grad = None
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform the forward and backward passes of the training loop."""
+        """Perform forward and backward passes in the training loop."""
         # Store data in the first epoch (later epochs will still have the same partitioned data)
         if self.current_epoch == 1:
             try:
@@ -86,7 +86,7 @@ class Trainer(basic.Trainer):
                 self.full_labels = labels
 
             self.full_onehot_labels = label_to_onehot(
-                self.full_labels, num_classes=Config().trainer.num_classes
+                self.full_labels, num_classes=Config().parameters.model.num_classes
             )
 
         examples.requires_grad = True
@@ -215,7 +215,7 @@ class Trainer(basic.Trainer):
             grad = tuple(self.list_grad)
 
         # Update model weights with gradients and learning rate
-        for (param, grad_part) in zip(self.model.parameters(), grad):
+        for param, grad_part in zip(self.model.parameters(), grad):
             param.data = param.data - Config().parameters.optimizer.lr * grad_part
 
         # Sum up the gradients for each local update

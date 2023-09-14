@@ -1,6 +1,6 @@
 # Gradient Leakage in Production Federated Learning
 
-Research on gradient leakage attack and defense using Plato framework.
+Research on gradient leakage attack and defense using the Plato framework.
 
 --- 
 # Ported Algorithms
@@ -24,13 +24,13 @@ Research on gradient leakage attack and defense using Plato framework.
 ---
 
 # Running Plato with DLG attack
-Try replacing `rec_emnist.yml` below with custom config files:
+Try replacing `reconstruction_emnist.yml` below with custom configuration files:
 ```
-python examples/dlg.py -c examples/dlg/reconstruction_emnist.yml
+python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
 ```
 
 ## DLG Related Configurations
-Try tuning the following hyperparameters in .yml configuration files.
+Try tuning the following hyperparameters in `.yml` configuration files.
 
 ### under `algorithm`
 

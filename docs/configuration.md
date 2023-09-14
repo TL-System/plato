@@ -15,11 +15,17 @@ The path prefix for datasets, models, checkpoints, and results.
 The default value is `./`.
 ```
 
+```{admonition} debug
+When `debug` is turned off, the server will try to recover from a failed client by using client processes that are still alive for training. If it's turned on, the server will terminate itself immediately when a client fails.
+
+Valid values are `true` or `false`. The default value is `false`.
+```
+
 
 ## clients
 
 ```{admonition} **type**
-The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm.
+The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm;
 ```
 
 ```{admonition} **total_clients**
@@ -39,7 +45,7 @@ If this setting is `true` and the configuration file has a `results` section, te
 ````
 
 ````{admonition} comm_simulation
-Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem. 
+Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem.
 
 The default value is `true`.
 
@@ -54,13 +60,13 @@ Whether or not the training speed of the clients are simulated. Simulating the t
 If `speed_simulation` is `true`, we need to specify the probability distribution used for generating a sleep time (in seconds per epoch) for each client, using the following setting:
 
 ```{admonition} random_seed
-This random seed is used exclusively for generating the sleep time (in seconds per epoch). 
+This random seed is used exclusively for generating the sleep time (in seconds per epoch).
 
 The default value is `1`.
 ```
 
 ```{admonition} max_sleep_time
-This is used to specify the longest possible sleep time in seconds. 
+This is used to specify the longest possible sleep time in seconds.
 
 The default value is `60`.
 ```
@@ -72,7 +78,7 @@ For the normal distribution, we can specify `mean` for its mean value and `sd` f
 
 ```yaml
 speed_simulation: true
-simulation_distribution: pareto
+simulation_distribution:
     distribution: pareto
     alpha: 1
 ```
@@ -108,20 +114,32 @@ A list of processors for the client to apply on the payload before sending it ou
 
 - `model_randomized_response` Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
 
-- `model_quantize` Quantize features for model parameters for PyTorch.
+- `model_quantize` Quantize model parameters for PyTorch.
+
+- `model_quantize_qsgd` Quantize model parameters for PyTorch with QSGD.
 
 - `unstructured_pruning` Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `structured_pruning` Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
 
 - `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
+
+- `model_encrypt` Encrypts the model parameters using homomorphic encyrption.
 ```
 
 ```{admonition} inbound_processors
 A list of processors for the client to apply on the payload before receiving it from the server.
 
 - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
+
+- `model_decrypt` Decrypts the model parameters using homomorphic encyrption.
+
 ```
+
+```{admonition} participant_clients_ratio
+Percentage of clients participating in federated training out of all clients. The value should range from 0 to 1.
+```
+
 
 ## server
 
@@ -135,6 +153,11 @@ The type of the server.
 - `mistnet` a MistNet server.
 
 - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
+
+- `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates.
+
+- `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
+
 ```
 
 ```{admonition} **address**
@@ -224,7 +247,9 @@ A list of processors to apply on the payload right after receiving. Multiple pro
 
 - `feature_dequantize`: Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
 
-- `model_dequantize`: Dequantize features for PyTorch model parameters.
+- `model_dequantize`: Dequantize PyTorch model parameters back to the 32-bit floating number format.
+
+- `model_dequantize_qsgd`: Dequantize PyTorch model parameters quantized with QSGD.
 ```
 
 ```{admonition} downlink_bandwidth
@@ -243,6 +268,14 @@ The edge server's estimated downlink capacity (an edge server to its clients) in
 The edge server's estimated uplink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section). The default value is same as `uplink_bandwidth`.
 ```
 
+```{admonition} do_personalization_interval
+The round interval for a server commanding when to perform personalization. The default value is 0, meaning that no personalization will be performed.
+```
+
+```{admonition} do_personalization_group
+The group of clients that is required by the server to perform personalization. There are three options, including "total", "participant", and "nonparticipant". The default value is "participant", meaning the clients participating in training will be used to perform the personalization.
+```
+
 ## data
 
 ```{admonition} **dataset**
@@ -252,7 +285,7 @@ The training and test datasets. The following options are available:
 - `FashionMNIST`
 - `EMNIST`
 - `CIFAR10`
-- `CIFAR100`-
+- `CIFAR100`
 - `CINIC10`
 - `YOLO`
 - `HuggingFace`
@@ -261,6 +294,7 @@ The training and test datasets. The following options are available:
 - `CelebA`
 - `Purchase`
 - `Texas`
+- `STL10`
 ```
 
 ````{admonition} data_path
@@ -319,8 +353,8 @@ If the sampler is `mixed`, the indices of clients whose datasets are non-i.i.d. 
 ```
 ````
 
-````{admonition} test_set_sampler
-How the test dataset is sampled when clients test locally. Any sampler type is valid. 
+````{admonition} testset_sampler
+How the test dataset is sampled when clients test locally. Any sampler type is valid.
 
 ```{note}
 Without this parameter, the test dataset on either the client or the server is the entire test dataset of the datasource.
@@ -367,7 +401,7 @@ The maximum norm of the per-sample gradients with the `diff_privacy` trainer. An
 
 
 ```{admonition} **rounds**
-The maximum number of training rounds. 
+The maximum number of training rounds.
 
 `round` could be any positive integer.
 ```
@@ -471,10 +505,22 @@ If `true`, the learning rate of the first epoch in the next communication round 
 ````{admonition} **model_type**
 The repository where the machine learning model should be retrieved from. The following options are available:
 
-- `huggingface`
-- `torch_hub`
+- `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
+- `general_multilayer` (for generateing a multi-layer perceptron using a provided configuration)
+- `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
+- `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
+- `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
 
 The name of the model should be specified below, in `model_name`.
+
+````{note}
+For `vit`, please replace the `/` in model name from [https://huggingface.co/models](https://huggingface.co/models) with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained weights, set `parameters -> model -> pretrained` to `false`, as in the following example:
+
+```
+parameters:
+    model:
+        pretrained: false
+```
 ````
 
 ````{admonition} **model_name**
@@ -494,10 +540,11 @@ For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
 ```
 ````
 
+
 ## algorithm
 
 ```{admonition} **type**
-Aggregation algorithm. 
+Aggregation algorithm.
 
 The input should be:
 - `fedavg`:  the federated averaging algorithm
@@ -516,10 +563,11 @@ The number of local aggregation rounds on edge servers before sending aggregated
 ```
 ````
 
+
 ## results
 
 ````{admonition} types
-The set of columns that will be written into a .csv file. 
+The set of columns that will be written into a .csv file.
 
 The valid values are:
 - `round`
@@ -532,7 +580,7 @@ The valid values are:
 - `edge_agg_num`
 
 ```{note}
-Use comma `,` to seperate them. The default is `round, accuracy, elapsed_time`.
+Use comma `,` to separate them. The default is `round, accuracy, elapsed_time`.
 ```
 ````
 

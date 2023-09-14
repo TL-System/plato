@@ -8,99 +8,127 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 
 https://arxiv.org/pdf/1910.06378.pdf
 """
+from collections import OrderedDict
+
+import copy
 import logging
-import os
+import pickle
 import torch
 
 from plato.config import Config
 from plato.trainers import basic
 
-import scaffold_optimizer
-
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
-
-    def __init__(self, model=None):
-        """Initializing the trainer with the provided model.
-
-        Arguments:
-        model: The model to train.
-        client_id: The ID of the client using this trainer (optional).
-        """
-        super().__init__(model)
+    def __init__(self, model=None, callbacks=None):
+        """Initializing the trainer with the provided model."""
+        super().__init__(model=model, callbacks=callbacks)
 
         self.server_control_variate = None
         self.client_control_variate = None
 
+        # Save the global model weights for computing new control variate
+        # using the Option 2 in the paper
+        self.global_model_weights = None
+
+        # Path to the client control variate
+        self.client_control_variate_path = None
+
+        self.additional_data = None
+        self.param_groups = None
+
     def get_optimizer(self, model):
-        """Initialize the SCAFFOLD optimizer."""
-        optimizer = scaffold_optimizer.ScaffoldOptimizer(
-            model.parameters(),
-            lr=Config().parameters.optimizer.lr,
-            momentum=Config().parameters.optimizer.momentum,
-            weight_decay=Config().parameters.optimizer.weight_decay,
-        )
-
-        optimizer.server_control_variate = self.server_control_variate
-        optimizer.client_control_variate = self.client_control_variate
-        optimizer.device = self.device
-
+        """Gets the parameter groups from the optimizer"""
+        optimizer = super().get_optimizer(model)
+        self.param_groups = optimizer.param_groups
         return optimizer
 
-    def save_model(self, filename=None, location=None):
-        """Saving the model to a file."""
-        super().save_model(filename=filename, location=location)
-
-        if self.client_id == 0:
-            # Also save the control variate
-            model_path = Config().params["model_path"] if location is None else location
-
-            if filename is not None:
-                control_variate_path = f"{model_path}/{filename}".replace(
-                    ".pth", "_control_variate.pth"
+    def train_run_start(self, config):
+        """Initializes the client control variate to 0 if the client
+        is participating for the first time.
+        """
+        self.server_control_variate = self.additional_data
+        if self.client_control_variate is None:
+            self.client_control_variate = {}
+            for variate in self.server_control_variate:
+                self.client_control_variate[variate] = torch.zeros(
+                    self.server_control_variate[variate].shape
                 )
-            else:
-                model_name = Config().trainer.model_name
-                control_variate_path = f"{model_path}/{model_name}_control_variate.pth"
+        self.global_model_weights = copy.deepcopy(self.model.state_dict())
 
-            logging.info(
-                "[Server #%d] Saving the control variate to %s.",
-                os.getpid(),
-                control_variate_path,
-            )
-            torch.save(self.server_control_variate, control_variate_path)
-            logging.info(
-                "[Server #%d] Control variate saved to %s.",
-                os.getpid(),
-                control_variate_path,
-            )
+    def train_step_end(self, config, batch=None, loss=None):
+        """Modifies the weights based on the server and client control variates."""
+        for group in self.param_groups:
+            learning_rate = -group["lr"]
+            counter = 0
+            for name in self.server_control_variate:
+                if "weight" in name or "bias" in name:
+                    server_control_variate = self.server_control_variate[name].to(
+                        self.device
+                    )
+                    param = group["params"][counter]
+                    if self.client_control_variate is not None:
+                        param.data.add_(
+                            torch.sub(
+                                server_control_variate,
+                                self.client_control_variate[name].to(self.device),
+                            ),
+                            alpha=learning_rate,
+                        )
+                    else:
+                        param.data.add_(server_control_variate, alpha=learning_rate)
+                    counter += 1
 
-    def load_model(self, filename=None, location=None):
-        """Loading pre-trained model weights from a file."""
-        super().load_model(filename=filename, location=location)
+    def train_run_end(self, config):
+        """Compute deltas of this client's control variate and deltas of the model"""
 
-        # The server loads its control variate
-        if self.client_id == 0:
-            model_path = Config().params["model_path"] if location is None else location
-
-            if filename is not None:
-                control_variate_path = f"{model_path}/{filename}".replace(
-                    ".pth", "_control_variate.pth"
+        # Compute deltas of control variate to be used for the next time that
+        # the client is selected
+        new_client_control_variate = OrderedDict()
+        control_variate_deltas = OrderedDict()
+        if self.client_control_variate is not None:
+            for name, previous_weight in self.global_model_weights.items():
+                new_client_control_variate[name] = torch.sub(
+                    self.client_control_variate[name].to(device=self.device),
+                    self.server_control_variate[name].to(device=self.device),
+                ).to(device=self.device)
+                new_client_control_variate[name].add_(
+                    torch.sub(
+                        previous_weight.to(device=self.device),
+                        self.model.state_dict()[name],
+                    ),
+                    alpha=1 / Config().trainer.epochs,
                 )
-            else:
-                model_name = Config().trainer.model_name
-                control_variate_path = f"{model_path}/{model_name}_control_variate.pth"
 
-            if os.path.exists(control_variate_path):
-                logging.info(
-                    "[Server #%d] Loading a control variate from %s.",
-                    os.getpid(),
-                    control_variate_path,
+                control_variate_deltas[name] = torch.sub(
+                    new_client_control_variate[name],
+                    self.client_control_variate[name].to(self.device),
                 )
-                self.server_control_variate = torch.load(control_variate_path)
-                logging.info(
-                    "[Server #%d] Loaded its control variate from %s.",
-                    os.getpid(),
-                    control_variate_path,
+        else:
+            for name, previous_weight in self.global_model_weights.items():
+                new_client_control_variate[name] = -self.server_control_variate[name]
+                new_client_control_variate[name].add_(
+                    torch.sub(previous_weight, self.model.state_dict()[name]),
+                    alpha=1 / Config().trainer.epochs,
                 )
+
+                control_variate_deltas[name] = new_client_control_variate[name]
+
+        # Update client control variate
+        self.client_control_variate = new_client_control_variate
+
+        # Save client control variate
+        logging.info(
+            "[Client #%d] Saving the control variate to %s.",
+            self.client_id,
+            self.client_control_variate_path,
+        )
+        with open(self.client_control_variate_path, "wb") as path:
+            pickle.dump(self.client_control_variate, path)
+
+        logging.info(
+            "[Client #%d] Control variate saved to %s.",
+            self.client_id,
+            self.client_control_variate_path,
+        )

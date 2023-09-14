@@ -91,7 +91,7 @@ class Sampler(base.Sampler):
             concentration=client_quantity_concentration,
             min_partition_size=None,
             number_partitions=total_clients,
-        )[client_id]
+        )[client_id - 1]
 
         self.client_partition_size = int(total_data_size * self.client_partition)
         self.client_partition_size = max(self.client_partition_size, min_partition_size)

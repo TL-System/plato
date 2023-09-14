@@ -15,10 +15,10 @@ import logging
 import os
 
 from plato.config import Config
-from plato.servers import fedavg
+from plato.utils.lib_mia import mia_server
 
 
-class Server(fedavg.Server):
+class Server(mia_server.Server):
     """A federated unlearning server that implements the federated unlearning baseline algorithm.
 
     When 'data_deletion_round' specified in the configuration, the server will enter a retraining
@@ -33,23 +33,31 @@ class Server(fedavg.Server):
     in the configuration.
     """
 
-    def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+    def __init__(
+        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
 
         self.retraining = False
 
         # A dictionary that maps client IDs to the first round when the server selected it
         self.round_first_selected = {}
+        # A dictionary that maps client IDs to their sample indices
+        self.sample_indices = {}
 
-    async def select_clients(self, for_next_batch=False):
+    def clients_selected(self, selected_clients):
         """Remembers the first round that a particular client ID was selected."""
-        await super().select_clients(for_next_batch)
-
-        for client_id in self.selected_clients:
+        for client_id in selected_clients:
             if not client_id in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
-    def training_will_start(self):
+    def training_will_start(self) -> None:
         """Additional tasks before selecting clients for the first round of training."""
         super().training_will_start()
 
@@ -83,6 +91,15 @@ class Server(fedavg.Server):
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
         super().clients_processed()
+
+        # MIA evaluation after unlearning
+        if (
+            hasattr(Config().server, "mia_eval")
+            and Config().server.mia_eval
+            and self.current_round == Config().server.mia_eval_round
+            and self.retraining
+        ):
+            self._perform_mia()
 
         clients_to_delete = Config().clients.clients_requesting_deletion
 
@@ -137,4 +154,5 @@ class Server(fedavg.Server):
                         os.getpid(),
                         self.current_round,
                     )
-                    self.restore_random_states(self.current_round, checkpoint_path)
+
+                    self._restore_random_states(self.current_round, checkpoint_path)

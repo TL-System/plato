@@ -1,0 +1,72 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 2
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+server:
+    address: 127.0.0.1
+    port: 8001
+    simulate_wall_time: false
+    checkpoint_path: checkpoints/huggingface/fedavg
+    model_path: models/huggingface/fedavg
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 5000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 30
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+    # The machine learning model
+    model_type: vit
+    model_name: t2t_vit_14
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 64
+    optimizer: AdamW
+    lr_scheduler: CosineAnnealingLR
+    global_lr_scheduler: true
+
+    num_classes: 10
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    model:
+        num_labels: 10
+        pretrained: false
+
+    optimizer:
+        lr: 0.00004
+        weight_decay: 0.00000001
+
+    learning_rate:
+        eta_min: 0
+        T_max: 30

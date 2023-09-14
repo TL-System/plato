@@ -19,8 +19,19 @@ from plato.utils import fonts
 class Client(base.Client):
     """A basic federated learning client who sends simple weight updates."""
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__()
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
+    ):
+        super().__init__(callbacks=callbacks)
+        # Save the callbacks that will be passed to trainer later
+        self.trainer_callbacks = trainer_callbacks
+
         self.custom_model = model
         self.model = None
 
@@ -48,9 +59,13 @@ class Client(base.Client):
             self.model = self.custom_model
 
         if self.trainer is None and self.custom_trainer is None:
-            self.trainer = trainers_registry.get(model=self.model)
+            self.trainer = trainers_registry.get(
+                model=self.model, callbacks=self.trainer_callbacks
+            )
         elif self.trainer is None and self.custom_trainer is not None:
-            self.trainer = self.custom_trainer(model=self.model)
+            self.trainer = self.custom_trainer(
+                model=self.model, callbacks=self.trainer_callbacks
+            )
 
         self.trainer.set_client_id(self.client_id)
 
@@ -67,30 +82,44 @@ class Client(base.Client):
             "Client", client_id=self.client_id, trainer=self.trainer
         )
 
-    def load_data(self) -> None:
-        """Generates data and loads them onto this client."""
-        logging.info("[%s] Loading its data source...", self)
+        # Setting up the data sampler
+        if self.datasource:
+            self.sampler = samplers_registry.get(self.datasource, self.client_id)
 
+            if (
+                hasattr(Config().clients, "do_test")
+                and Config().clients.do_test
+                and hasattr(Config().data, "testset_sampler")
+            ):
+                # Set the sampler for test set
+                self.testset_sampler = samplers_registry.get(
+                    self.datasource, self.client_id, testing=True
+                )
+
+    def _load_data(self) -> None:
+        """Generates data and loads them onto this client."""
+        # The only case where Config().data.reload_data is set to true is
+        # when clients with different client IDs need to load from different datasets,
+        # such as in the pre-partitioned Federated EMNIST dataset. We do not support
+        # reloading data from a custom datasource at this time.
         if (
             self.datasource is None
-            and self.custom_datasource is None
-            or (hasattr(Config().data, "reload_data") and Config().data.reload_data)
+            or hasattr(Config().data, "reload_data")
+            and Config().data.reload_data
         ):
-            # The only case where Config().data.reload_data is set to true is
-            # when clients with different client IDs need to load from different datasets,
-            # such as in the pre-partitioned Federated EMNIST dataset. We do not support
-            # reloading data from a custom datasource at this time.
-            self.datasource = datasources_registry.get(client_id=self.client_id)
-        elif self.datasource is None and self.custom_datasource is not None:
-            self.datasource = self.custom_datasource()
+            logging.info("[%s] Loading its data source...", self)
 
-        logging.info(
-            "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
-        )
+            if self.custom_datasource is None:
+                self.datasource = datasources_registry.get(client_id=self.client_id)
+            elif self.custom_datasource is not None:
+                self.datasource = self.custom_datasource()
 
-        # Setting up the data sampler
-        self.sampler = samplers_registry.get(self.datasource, self.client_id)
+            logging.info(
+                "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
+            )
 
+    def _allocate_data(self) -> None:
+        """Allocate training or testing dataset of this client."""
         if hasattr(Config().trainer, "use_mindspore"):
             # MindSpore requires samplers to be used while constructing
             # the dataset
@@ -102,17 +131,12 @@ class Client(base.Client):
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Set the testset if local testing is needed
             self.testset = self.datasource.get_test_set()
-            if hasattr(Config().data, "testset_sampler"):
-                # Set the sampler for test set
-                self.testset_sampler = samplers_registry.get(
-                    self.datasource, self.client_id, testing=True
-                )
 
-    def load_payload(self, server_payload) -> None:
+    def _load_payload(self, server_payload) -> None:
         """Loads the server model onto this client."""
         self.algorithm.load_weights(server_payload)
 
-    async def train(self):
+    async def _train(self):
         """The machine learning training workload on a client."""
         logging.info(
             fonts.colourize(
@@ -125,6 +149,7 @@ class Client(base.Client):
             if hasattr(self.trainer, "current_round"):
                 self.trainer.current_round = self.current_round
             training_time = self.trainer.train(self.trainset, self.sampler)
+
         except ValueError as exc:
             logging.info(
                 fonts.colourize(f"[{self}] Error occurred during training: {exc}")
@@ -143,6 +168,11 @@ class Client(base.Client):
 
             if accuracy == -1:
                 # The testing process failed, disconnect from the server
+                logging.info(
+                    fonts.colourize(
+                        f"[{self}] Accuracy is -1 when testing. Disconnecting from the server."
+                    )
+                )
                 await self.sio.disconnect()
 
             if hasattr(Config().trainer, "target_perplexity"):
@@ -166,6 +196,7 @@ class Client(base.Client):
             ) * Config().trainer.epochs
 
         report = SimpleNamespace(
+            client_id=self.client_id,
             num_samples=self.sampler.num_samples(),
             accuracy=accuracy,
             training_time=training_time,
@@ -177,22 +208,15 @@ class Client(base.Client):
 
         return self._report, weights
 
-    async def obtain_model_update(self, wall_time):
+    async def _obtain_model_update(self, client_id, requested_time):
         """Retrieves a model update corresponding to a particular wall clock time."""
-        model = self.trainer.obtain_model_update(wall_time)
+        model = self.trainer.obtain_model_update(client_id, requested_time)
         weights = self.algorithm.extract_weights(model)
         self._report.comm_time = time.time()
+        self._report.client_id = client_id
         self._report.update_response = True
 
         return self._report, weights
-
-    def save_model(self, model_checkpoint):
-        """Saves the model to a model checkpoint."""
-        self.trainer.save_model(model_checkpoint)
-
-    def load_model(self, model_checkpoint):
-        """Loads the model from a model checkpoint."""
-        self.trainer.load_model(model_checkpoint)
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with any additional information."""

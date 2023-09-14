@@ -7,7 +7,7 @@ from typing import Optional
 
 from torch.utils.data import RandomSampler, Sampler
 
-from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
+from transformers import AutoConfig, AutoTokenizer, HfArgumentParser, TrainerCallback
 from transformers import Trainer as HuggingFaceTrainer
 from transformers import TrainingArguments, default_data_collator
 
@@ -30,6 +30,7 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
         tokenizer,
         data_collator,
         sampler,
+        callbacks,
     ):
         super().__init__(
             model=model,
@@ -38,6 +39,7 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
             eval_dataset=eval_dataset,
             tokenizer=tokenizer,
             data_collator=data_collator,
+            callbacks=callbacks,
         )
         self.sampler = sampler
 
@@ -47,14 +49,25 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
 
         return self.sampler
 
+    def _get_eval_sampler(self, eval_dataset) -> Optional[Sampler]:
+        if self.sampler is None:
+            return super()._get_eval_sampler(eval_dataset)
+
+        return self.sampler
+
 
 class Trainer(basic.Trainer):
     """The trainer for HuggingFace transformer models for natural language processing."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         super().__init__(model)
 
         self.trainer = None
+        self.trainer_callbacks = []
+        if callbacks:
+            # Huggingface needs to check callback types
+            self.add_callbacks(callbacks)
+
         self.model.train()
 
         parser = HfArgumentParser(TrainingArguments)
@@ -90,7 +103,7 @@ class Trainer(basic.Trainer):
         sampler: the sampler that extracts a partition for this client.
         """
 
-        self.training_args.num_train_epoches = config["epochs"]
+        self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
 
         self.trainer = SampledHuggingFaceTrainer(
@@ -101,24 +114,31 @@ class Trainer(basic.Trainer):
             tokenizer=self.tokenizer,
             data_collator=default_data_collator,
             sampler=sampler,
+            callbacks=self.trainer_callbacks,
         )
 
         self.trainer.train()
 
-    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
+    def test_model(
+        self, config, testset, sampler=None, **kwargs
+    ):  # pylint: disable=unused-argument
         """The testing loop for HuggingFace models.
 
         Arguments:
             config: Configuration parameters as a dictionary.
             testset: The test dataset.
         """
-        self.trainer = HuggingFaceTrainer(
+        self.training_args.per_device_eval_batch_size = config["batch_size"]
+
+        self.trainer = SampledHuggingFaceTrainer(
             model=self.model,
             args=self.training_args,
             train_dataset=None,
             eval_dataset=testset,
             tokenizer=self.tokenizer,
             data_collator=default_data_collator,
+            sampler=sampler,
+            callbacks=None,
         )
 
         metrics = self.trainer.evaluate()
@@ -129,3 +149,12 @@ class Trainer(basic.Trainer):
             perplexity = float("inf")
 
         return perplexity
+
+    def add_callbacks(self, callbacks):
+        """Callbacks will be handled by Huggingface instead of Plato."""
+        for callback in callbacks:
+            if not issubclass(callback, TrainerCallback):
+                raise ValueError(
+                    f"Huggingface trainer expects subclass of {TrainerCallback}, got {callback} instead."
+                )
+        self.trainer_callbacks.extend(callbacks)

@@ -18,7 +18,7 @@ from plato.clients import simple
 class Client(simple.Client):
     """A federated learning client for MistNet."""
 
-    async def train(self):
+    async def _train(self):
         """A MistNet client only uses the first several layers in a forward pass."""
         logging.info("Training on MistNet client #%d", self.client_id)
 
@@ -37,6 +37,7 @@ class Client(simple.Client):
         comm_time = time.time()
         return (
             SimpleNamespace(
+                client_id=self.client_id,
                 num_samples=self.sampler.num_samples(),
                 accuracy=0,
                 training_time=training_time,

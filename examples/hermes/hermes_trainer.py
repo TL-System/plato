@@ -16,9 +16,9 @@ from plato.trainers import basic
 class Trainer(basic.Trainer):
     """A federated learning trainer of Hermes, used by both the client and the server."""
 
-    def __init__(self, model=None):
+    def __init__(self, model=None, callbacks=None):
         """Initializes the global model."""
-        super().__init__(model=model)
+        super().__init__(model=model, callbacks=callbacks)
         self.mask = None
         self.pruning_target = Config().clients.pruning_target * 100
         self.pruned_amount = 0
@@ -33,8 +33,7 @@ class Trainer(basic.Trainer):
         )
 
     def train_run_start(self, config):
-        """Conduct pruning if needed before training."""
-
+        """Conducts pruning if needed before training."""
         # Evaluate if structured pruning should be conducted
         self.datasource = datasources_registry.get(client_id=self.client_id)
         self.testset = self.datasource.get_test_set()
@@ -78,7 +77,7 @@ class Trainer(basic.Trainer):
 
     def train_run_end(self, config):
         """Method called at the end of training run."""
-        # The pruning is made permanent if it was conducted
+        # Make pruning permanent if it was conducted
         if self.need_prune or self.pruned_amount > 0:
             pruning.remove(self.model)
 
@@ -90,7 +89,7 @@ class Trainer(basic.Trainer):
             )
 
     def merge_model(self, model):
-        """Apply the mask onto the incoming personalized model."""
+        """Applies the mask onto the incoming personalized model."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 
@@ -104,8 +103,7 @@ class Trainer(basic.Trainer):
         return pruning.apply_mask(model, mask, self.device)
 
     def save_mask(self, mask):
-        """If pruning has occured, the mask is saved for merging in future rounds."""
-
+        """Saves the mask for merging in future rounds if pruning has occured."""
         model_name = Config().trainer.model_name
         checkpoint_path = Config().params["checkpoint_path"]
 

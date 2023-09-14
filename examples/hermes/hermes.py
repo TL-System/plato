@@ -1,5 +1,9 @@
 """
 A federated learning training session using Hermes
+
+A. Li, J. Sun, P. Li, Y. Pu, H. Li, and Y. Chen, 
+“Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients,”
+in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
 """
 
 import hermes_trainer

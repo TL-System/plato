@@ -1,0 +1,82 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 2
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+server:
+    address: 127.0.0.1
+    port: 8000
+    simulate_wall_time: false
+    checkpoint_path: checkpoints/huggingface/fedavg
+    model_path: models/huggingface/fedavg
+
+data:
+    # The training and testing dataset
+    datasource: TinyImageNet
+    data_path: data/tiny-imagenet-200
+
+    # Number of samples in each partition
+    partition_size: 10000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: timm_basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+    # The machine learning model
+    model_type: vit
+    model_name: facebook@levit-128
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 256
+    optimizer: AdamW
+    lr_scheduler: timm
+    global_lr_scheduler: true
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    #model:
+    #    num_labels: 200
+
+    optimizer:
+        lr: 0.0005
+        weight_decay: 0.025
+        eps: 0.00000001
+
+    learning_rate:
+        sched: cosine
+        num_epochs: 100
+        min_lr: 0.00001
+        warmup_lr: 0.000001
+        warmup_epochs: 5
+        cooldown_epochs: 10
+        noise_pct: 0.67
+        noise_std: 1.0
+        decay_epochs: 30
+        decay_rate: 0.1
+        patience_epochs: 10 
+        
+

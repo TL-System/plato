@@ -9,7 +9,7 @@
 project = "Plato"
 copyright = "The Plato developers"
 author = "Baochun Li"
-release = "0.4.4"
+release = "0.5.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -47,7 +47,7 @@ html_theme_options = {
     },
 }
 html_css_files = [
-    'css/css-style.css',
+    "css/css-style.css",
 ]
 
-html_static_path = ['_static']
+html_static_path = ["_static"]

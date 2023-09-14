@@ -150,7 +150,7 @@ class ReferItGameDataset(multimodal_base.MultiModalDataset):
 class DataSource(multimodal_base.MultiModalDataSource):
     """The ReferItGame dataset."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
 
         self.split_configs = ["refcoco", "refcoco+", "refcocog"]
