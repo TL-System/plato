@@ -251,7 +251,7 @@ class Server(fedavg.Server):
         dummy_data = torch.randn(data_size).to(Config().device()).requires_grad_(True)
 
         dummy_labels = (
-            torch.randn((num_images, Config().trainer.num_classes))
+            torch.randn((num_images, Config().parameters.model.num_classes))
             .to(Config().device())
             .requires_grad_(True)
         )
