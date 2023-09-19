@@ -17,14 +17,14 @@ class Model(nn.Module):
     :param num_classes: The number of classes. The default value is 10.
     """
 
-    def __init__(self, num_classes: int = 10, cut_layer=None):
+    def __init__(self, num_classes: int = 10, in_channels=1, cut_layer=None):
         super().__init__()
         self.cut_layer = cut_layer
-
+        
         # We pad the image to get an input size of 32x32 as for the
         # original network in the LeCun paper
         self.conv1 = nn.Conv2d(
-            in_channels=1, out_channels=6, kernel_size=5, stride=1, padding=2, bias=True
+            in_channels=in_channels, out_channels=6, kernel_size=5, stride=1, padding=2, bias=True
         )
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
@@ -42,7 +42,15 @@ class Model(nn.Module):
             in_channels=16, out_channels=120, kernel_size=5, bias=True
         )
         self.relu3 = nn.ReLU()
-        self.fc4 = nn.Linear(120, 84)
+        # EMNIST
+        if in_channels == 1:
+            self.fc4 = nn.Linear(120, 84)
+        # CIFAR10
+        elif in_channels == 3 and num_classes == 10:
+            self.fc4 = nn.Linear(480, 84)
+        # Tiny-ImageNet
+        elif in_channels == 3 and num_classes == 200:
+            self.fc4 = nn.Linear(554880, 84)
         self.relu4 = nn.ReLU()
         self.fc5 = nn.Linear(84, num_classes)
 
@@ -98,9 +106,10 @@ class Model(nn.Module):
             x = self.flatten(x)
             x = self.fc4(x)
             x = self.relu4(x)
+            feature = x
             x = self.fc5(x)
 
-        return F.log_softmax(x, dim=1)
+        return F.log_softmax(x, dim=1), feature
 
     def forward_to(self, x):
         """Forward pass, but only to the layer specified by cut_layer."""
