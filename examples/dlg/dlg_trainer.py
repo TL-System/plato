@@ -32,7 +32,7 @@ class Trainer(basic.Trainer):
             """Initializing the weights and biases in the model."""
             if hasattr(m, "weight"):
                 m.weight.data.uniform_(-0.5, 0.5)
-            if hasattr(m, "bias"):
+            if hasattr(m, "bias") and m.bias is not None:
                 m.bias.data.uniform_(-0.5, 0.5)
 
         super().__init__(model=model, callbacks=callbacks)
