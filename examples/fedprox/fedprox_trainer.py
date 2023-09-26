@@ -8,7 +8,7 @@ been quite widely cited and compared with in the federated learning literature.
 Reference:
 Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., & Smith, V. (2020).
 "Federated optimization in heterogeneous networks." Proceedings of Machine
-Learning and Systems, 2, 429-450.
+Learning and Systems (MLSys), vol. 2, 429-450.
 
 https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf
 """
