@@ -56,14 +56,16 @@ algorithm:
 
     ## Data reconstruction related configurations
     # Choose from DLG (default), iDLG, csDLG
-    attack_method: csDLG
+    attack_method: iDLG
     # For calculating the loss between dummy and target gradients/updates
     # Choose from l2, l1, max, sim, simlocal
     cost_fn: l2
     # Weight for adding total data variation to the loss
-    total_variation: 0
+    total_variation: 0.5
+    # Optimizer used for reconstructing data
+    rec_optim: Adam
     # Learning rate of the optimizer to reconstruct data
-    lr: 1
+    rec_lr: 1
 
     # in a particular communication round (starting from 1)
     attack_round: 1

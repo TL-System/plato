@@ -257,9 +257,18 @@ class Server(fedavg.Server):
         )
 
         if self.attack_method == "DLG":
-            match_optimizer = torch.optim.LBFGS(
-                [dummy_data, dummy_labels], lr=Config().algorithm.lr
-            )
+            param = [dummy_data, dummy_labels]
+        elif self.attack_method in ["iDLG", "csDLG"]:
+            param = [dummy_data,]
+            
+        if Config().algorithm.rec_optim == 'Adam':
+            match_optimizer = torch.optim.Adam(param, lr=Config().algorithm.rec_lr)
+        elif Config().algorithm.rec_optim == 'SGD':
+            match_optimizer = torch.optim.SGD(param, lr=0.01, momentum=0.9, nesterov=True)
+        elif Config().algorithm.rec_optim == 'LBFGS':
+            match_optimizer = torch.optim.LBFGS(param, lr=Config().algorithm.rec_lr)
+
+        if self.attack_method == "DLG":
             labels_ = dummy_labels
             for i in range(num_images):
                 logging.info(
@@ -271,12 +280,6 @@ class Server(fedavg.Server):
                 )
 
         elif self.attack_method == "iDLG":
-            match_optimizer = torch.optim.LBFGS(
-                [
-                    dummy_data,
-                ],
-                lr=Config().algorithm.lr,
-            )
             # Estimate the gt label
             est_labels = (
                 torch.argmin(torch.sum(target_grad[-2], dim=-1), dim=-1)
@@ -294,12 +297,6 @@ class Server(fedavg.Server):
                     est_labels.item(),
                 )
         elif self.attack_method == "csDLG":
-            match_optimizer = torch.optim.LBFGS(
-                [
-                    dummy_data,
-                ],
-                lr=Config().algorithm.lr,
-            )
             labels_ = gt_labels
             for i in range(num_images):
                 logging.info(
