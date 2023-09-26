@@ -59,8 +59,10 @@ algorithm:
     cost_fn: l2
     # Weight for adding total data variation to the loss
     total_variation: 0
+    # Optimizer used for reconstructing data
+    rec_optim: LBFGS
     # Learning rate of the optimizer to reconstruct data
-    lr: 1
+    rec_lr: 1
 
     # in a particular communication round (starting from 1)
     attack_round: 1
