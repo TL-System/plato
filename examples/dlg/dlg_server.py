@@ -340,6 +340,9 @@ class Server(fedavg.Server):
         if Config().data.datasource == "CIFAR10":
             data_mean = consts.cifar10_mean
             data_std = consts.cifar10_std
+        elif Config().data.datasource == "CIFAR100":
+            data_mean = consts.cifar100_mean
+            data_std = consts.cifar100_std
         elif Config().data.datasource == "TinyImageNet":
             data_mean = consts.imagenet_mean
             data_std = consts.imagenet_std
