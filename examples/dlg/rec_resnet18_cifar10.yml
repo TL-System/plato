@@ -27,7 +27,7 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    random_seed: 1
+    random_seed: 5
 
 trainer:
     # The maximum number of training rounds
@@ -60,9 +60,12 @@ algorithm:
     # Weight for adding total data variation to the loss
     total_variation: 0.01
     # Optimizer used for reconstructing data
-    rec_optim: Adam
+    rec_optim: Adam # ["Adam", "SGD", "LBFGS"]
     # Learning rate of the optimizer to reconstruct data
     rec_lr: 0.1
+    lr_decay: true
+    cost_weights: equal # ["linear", "exp", "equal"]
+    boxed: true
 
     # in a particular communication round (starting from 1)
     attack_round: 1

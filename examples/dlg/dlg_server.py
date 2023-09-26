@@ -39,8 +39,9 @@ from utils.evaluations import get_evaluation_dict
 from utils.modules import PatchedModule
 from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
+from utils import consts
 
-cross_entropy = torch.nn.CrossEntropyLoss()
+cross_entropy = torch.nn.CrossEntropyLoss(reduction='mean')
 tt = transforms.ToPILImage()
 
 partition_size = Config().data.partition_size
@@ -259,14 +260,31 @@ class Server(fedavg.Server):
         if self.attack_method == "DLG":
             param = [dummy_data, dummy_labels]
         elif self.attack_method in ["iDLG", "csDLG"]:
-            param = [dummy_data,]
-            
-        if Config().algorithm.rec_optim == 'Adam':
+            param = [
+                dummy_data,
+            ]
+
+        # Init reconstruction optimizer
+        if Config().algorithm.rec_optim == "Adam":
             match_optimizer = torch.optim.Adam(param, lr=Config().algorithm.rec_lr)
-        elif Config().algorithm.rec_optim == 'SGD':
-            match_optimizer = torch.optim.SGD(param, lr=0.01, momentum=0.9, nesterov=True)
-        elif Config().algorithm.rec_optim == 'LBFGS':
+        elif Config().algorithm.rec_optim == "SGD":
+            match_optimizer = torch.optim.SGD(
+                param, lr=0.01, momentum=0.9, nesterov=True
+            )
+        elif Config().algorithm.rec_optim == "LBFGS":
             match_optimizer = torch.optim.LBFGS(param, lr=Config().algorithm.rec_lr)
+        # Init learning rate scheduler
+        max_iterations = Config().algorithm.num_iters
+        if Config().algorithm.lr_decay:
+            scheduler = torch.optim.lr_scheduler.MultiStepLR(
+                match_optimizer,
+                milestones=[
+                    max_iterations // 2.667,
+                    max_iterations // 1.6,
+                    max_iterations // 1.142,
+                ],
+                gamma=0.1,
+            )  # 3/8 5/8 7/8
 
         if self.attack_method == "DLG":
             labels_ = dummy_labels
@@ -318,6 +336,14 @@ class Server(fedavg.Server):
         )
         avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
 
+        # Mean and std of data
+        dm = torch.as_tensor(
+            consts.cifar10_mean, device=Config().device(), dtype=torch.float
+        )[:, None, None]
+        ds = torch.as_tensor(
+            consts.cifar10_std, device=Config().device(), dtype=torch.float
+        )[:, None, None]
+
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
             model = deepcopy(self.trainer.model.to(Config().device()))
@@ -333,6 +359,15 @@ class Server(fedavg.Server):
             match_optimizer.step(closure)
             current_loss = closure().item()
             losses.append(current_loss)
+
+            if Config().algorithm.lr_decay:
+                scheduler.step()
+
+            # Project into image space
+            if Config().algorithm.boxed:
+                dummy_data.data = torch.max(
+                    torch.min(dummy_data, (1 - dm) / ds), -dm / ds
+                )
 
             if math.isnan(current_loss):
                 logging.info("Not a number, ending attack")
@@ -465,6 +500,7 @@ class Server(fedavg.Server):
         def closure():
             match_optimizer.zero_grad()
             self.trainer.model.to(Config().device())
+            self.trainer.model.zero_grad()
             try:
                 dummy_pred, _ = self.trainer.model(dummy_data)
             except:
@@ -487,6 +523,8 @@ class Server(fedavg.Server):
             ):
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
+            if self.attack_method == "csDLG":
+                dummy_data.grad.sign_()
             return rec_loss
 
         return closure
@@ -573,6 +611,19 @@ class Server(fedavg.Server):
     @staticmethod
     def _reconstruction_costs(dummy, target):
         indices = torch.arange(len(target))
+
+        ex = target[0]
+        if Config().algorithm.cost_weights == "linear":
+            weights = torch.arange(
+                len(target), 0, -1, dtype=ex.dtype, device=ex.device
+            ) / len(target)
+        elif Config().algorithm.cost_weights == "exp":
+            weights = torch.arange(len(target), 0, -1, dtype=ex.dtype, device=ex.device)
+            weights = weights.softmax(dim=0)
+            weights = weights / weights[0]
+        else:
+            weights = target[0].new_ones(len(target))
+
         cost_fn = Config().algorithm.cost_fn
 
         total_costs = 0
@@ -581,18 +632,22 @@ class Server(fedavg.Server):
             costs = 0
             for i in indices:
                 if cost_fn == "l2":
-                    costs += ((trial[i] - target[i]).pow(2)).sum()
+                    costs += ((trial[i] - target[i]).pow(2)).sum() * weights[i]
                 elif cost_fn == "l1":
-                    costs += ((trial[i] - target[i]).abs()).sum()
+                    costs += ((trial[i] - target[i]).abs()).sum() * weights[i]
                 elif cost_fn == "max":
-                    costs += ((trial[i] - target[i]).abs()).max()
+                    costs += ((trial[i] - target[i]).abs()).max() * weights[i]
                 elif cost_fn == "sim":
-                    costs -= (trial[i] * target[i]).sum()
-                    pnorm[0] += trial[i].pow(2).sum()
-                    pnorm[1] += target[i].pow(2).sum()
+                    costs -= (trial[i] * target[i]).sum() * weights[i]
+                    pnorm[0] += trial[i].pow(2).sum() * weights[i]
+                    pnorm[1] += target[i].pow(2).sum() * weights[i]
                 elif cost_fn == "simlocal":
-                    costs += 1 - torch.nn.functional.cosine_similarity(
-                        trial[i].flatten(), target[i].flatten(), 0, 1e-10
+                    costs += (
+                        1
+                        - torch.nn.functional.cosine_similarity(
+                            trial[i].flatten(), target[i].flatten(), 0, 1e-10
+                        )
+                        * weights[i]
                     )
             if cost_fn == "sim":
                 costs = 1 + costs / pnorm[0].sqrt() / pnorm[1].sqrt()
