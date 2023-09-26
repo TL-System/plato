@@ -41,7 +41,7 @@ from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
 from utils import consts
 
-cross_entropy = torch.nn.CrossEntropyLoss(reduction='mean')
+cross_entropy = torch.nn.CrossEntropyLoss(reduction="mean")
 tt = transforms.ToPILImage()
 
 partition_size = Config().data.partition_size
@@ -337,12 +337,21 @@ class Server(fedavg.Server):
         avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
 
         # Mean and std of data
-        dm = torch.as_tensor(
-            consts.cifar10_mean, device=Config().device(), dtype=torch.float
-        )[:, None, None]
-        ds = torch.as_tensor(
-            consts.cifar10_std, device=Config().device(), dtype=torch.float
-        )[:, None, None]
+        if Config().data.datasource == "CIFAR10":
+            data_mean = consts.cifar10_mean
+            data_std = consts.cifar10_std
+        elif Config().data.datasource == "TinyImageNet":
+            data_mean = consts.imagenet_mean
+            data_std = consts.imagenet_std
+        elif Config().data.datasource == "MNIST":
+            data_mean = consts.mnist_mean
+            data_std = consts.mnist_std
+        dm = torch.as_tensor(data_mean, device=Config().device(), dtype=torch.float)[
+            :, None, None
+        ]
+        ds = torch.as_tensor(data_std, device=Config().device(), dtype=torch.float)[
+            :, None, None
+        ]
 
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
