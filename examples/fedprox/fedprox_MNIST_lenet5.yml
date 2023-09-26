@@ -34,3 +34,7 @@ algorithm:
 parameters:
     # LeNet-5 training params
     !include lenet5_params.yml
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, round_time
