@@ -5,84 +5,100 @@ Reference:
 
 https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
 """
-import collections
-
+import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torchvision
 
 
-class BasicBlock(nn.Module):
-    expansion = 1
+class Model(torchvision.models.ResNet):
+    """ResNet generalization for CIFAR thingies."""
 
-    def __init__(self, in_planes, planes, stride=1):
-        super().__init__()
+    def __init__(
+        self,
+        block,
+        layers,
+        num_classes=10,
+        zero_init_residual=False,
+        groups=1,
+        base_width=64,
+        replace_stride_with_dilation=None,
+        norm_layer=None,
+        strides=[1, 2, 2, 2],
+        pool="avg",
+    ):
+        """Initialize as usual. Layers and strides are scriptable."""
+        super(torchvision.models.ResNet, self).__init__()  # nn.Module
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+        self._norm_layer = norm_layer
+
+        self.dilation = 1
+        if replace_stride_with_dilation is None:
+            # each element in the tuple indicates if we should replace
+            # the 2x2 stride with a dilated convolution instead
+            replace_stride_with_dilation = [False, False, False, False]
+        if len(replace_stride_with_dilation) != 4:
+            raise ValueError(
+                "replace_stride_with_dilation should be None "
+                "or a 4-element tuple, got {}".format(replace_stride_with_dilation)
+            )
+        self.groups = groups
+
+        self.inplanes = base_width
+        self.base_width = 64  # Do this to circumvent BasicBlock errors. The value is not actually used.
         self.conv1 = nn.Conv2d(
-            in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False
+            3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False
         )
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(
-            planes, planes, kernel_size=3, stride=1, padding=1, bias=False
-        )
-        self.bn2 = nn.BatchNorm2d(planes)
+        self.bn1 = norm_layer(self.inplanes)
+        self.relu = nn.ReLU(inplace=True)
 
-        self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(
-                    in_planes,
-                    self.expansion * planes,
-                    kernel_size=1,
-                    stride=stride,
-                    bias=False,
-                ),
-                nn.BatchNorm2d(self.expansion * planes),
+        self.layers = torch.nn.ModuleList()
+        width = self.inplanes
+        for idx, layer in enumerate(layers):
+            self.layers.append(
+                self._make_layer(
+                    block,
+                    width,
+                    layer,
+                    stride=strides[idx],
+                    dilate=replace_stride_with_dilation[idx],
+                )
             )
+            width *= 2
+
+        self.pool = (
+            nn.AdaptiveAvgPool2d((1, 1))
+            if pool == "avg"
+            else nn.AdaptiveMaxPool2d((1, 1))
+        )
+        self.fc = nn.Linear(width // 2 * block.expansion, num_classes)
+
+        # TODO: move initialization?
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+        # Zero-initialize the last BN in each residual branch,
+        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
+        if zero_init_residual:
+            for m in self.modules():
+                if isinstance(m, torchvision.models.resnet.Bottleneck):
+                    nn.init.constant_(m.bn3.weight, 0)
+                elif isinstance(m, torchvision.models.resnet.BasicBlock):
+                    nn.init.constant_(m.bn2.weight, 0)
 
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = self.bn2(self.conv2(out))
-        out += self.shortcut(x)
-        out = F.relu(out)
-        return out
+        # See note [TorchScript super()]
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
 
-
-class Bottleneck(nn.Module):
-    expansion = 4
-
-    def __init__(self, in_planes, planes, stride=1):
-        super().__init__()
-        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(
-            planes, planes, kernel_size=3, stride=stride, padding=1, bias=False
-        )
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(
-            planes, self.expansion * planes, kernel_size=1, bias=False
-        )
-        self.bn3 = nn.BatchNorm2d(self.expansion * planes)
-
-        self.shortcut = nn.Sequential()
-        if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(
-                    in_planes,
-                    self.expansion * planes,
-                    kernel_size=1,
-                    stride=stride,
-                    bias=False,
-                ),
-                nn.BatchNorm2d(self.expansion * planes),
-            )
-
-    def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = F.relu(self.bn2(self.conv2(out)))
-        out = self.bn3(self.conv3(out))
-        out += self.shortcut(x)
-        out = F.relu(out)
-        return out
-
+        for layer in self.layers:
+            x = layer(x)
 
 class Model(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10, cut_layer=None):
@@ -167,7 +183,7 @@ class Model(nn.Module):
         return (
             model_type.startswith("resnet_")
             and len(model_type.split("_")) == 2
-            and int(model_type.split("_")[1]) in [18, 34, 50, 101, 152]
+            and int(model_type.split("_")[1]) in [18, 34, 50, 101, 152, 32]
         )
 
     @staticmethod
