@@ -12,14 +12,17 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8005
+    port: 8011
     simulate_wall_time: true
 
     random_seed: 1
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: TinyImageNet
+
+    # Where the dataset is located
+    data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
     partition_size: 1
@@ -27,7 +30,7 @@ data:
     # IID or non-IID?
     sampler: iid
 
-    random_seed: 2
+    random_seed: 1
 
 trainer:
     # The maximum number of training rounds
@@ -45,7 +48,7 @@ trainer:
     optimizer: SGD
 
     # The machine learning model
-    model_name: lenet5
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
@@ -56,13 +59,13 @@ algorithm:
     attack_method: csDLG
     # For calculating the loss between dummy and target gradients/updates
     # Choose from l2, l1, max, sim, simlocal
-    cost_fn: l2
+    cost_fn: sim
     # Weight for adding total data variation to the loss
-    total_variation: 0
+    total_variation: 0.01
     # Optimizer used for reconstructing data
-    rec_optim: LBFGS
+    rec_optim: Adam
     # Learning rate of the optimizer to reconstruct data
-    rec_lr: 1
+    rec_lr: 0.1
 
     # in a particular communication round (starting from 1)
     attack_round: 1
@@ -79,7 +82,7 @@ algorithm:
     # otherwise by matching gradients calculated from updates
     match_weights: true
     # Matching weights (absolute) or weight updates (delta)
-    use_updates: true
+    use_updates: false
     # The number of times the attack will be attempted
     trials: 5
 
@@ -109,14 +112,13 @@ algorithm:
 
 parameters:
     model:
-        num_classes: 10
-        in_channels: 3
+        num_classes: 200
 
     optimizer:
         lr: 0.01
 
 results:
-    result_path: results/lenet5_cifar10
+    result_path: results/resnet18_imagenet
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
