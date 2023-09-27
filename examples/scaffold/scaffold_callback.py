@@ -23,10 +23,9 @@ class ExtractControlVariatesProcessor(base.Processor):
         self.trainer = trainer
 
     def process(self, data: List) -> List:
+        if len(data) > 1:
+            self.trainer.additional_data = data[1]
 
-        self.trainer.additional_data = data[1]
-
-        if data[1] is not None:
             logging.info(
                 "[Client #%d] Control variates extracted from the payload.",
                 self.client_id,
