@@ -12,7 +12,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8011
     simulate_wall_time: true
 
     random_seed: 1
@@ -118,7 +118,7 @@ parameters:
         lr: 0.01
 
 results:
-    result_path: results/resnet18_cifar10
+    result_path: results/resnet32_cifar100
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
