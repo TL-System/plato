@@ -58,7 +58,7 @@ algorithm:
     # Choose from l2, l1, max, sim, simlocal
     cost_fn: sim
     # Weight for adding total data variation to the loss
-    total_variation: 0.01
+    total_variation: 0.1
     # Optimizer used for reconstructing data
     rec_optim: Adam # ["Adam", "SGD", "LBFGS"]
     # Learning rate of the optimizer to reconstruct data
@@ -71,8 +71,8 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 1000
-    log_interval: 50
+    num_iters: 10000
+    log_interval: 100
 
     # Whether or not use customized initialization for model weights
     init_params: true
