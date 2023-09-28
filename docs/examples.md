@@ -22,6 +22,17 @@ T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federa
 ```
 ````
 
+````{admonition} **FedDyn**
+FedDyn is proposed to provide communication savings by dynamically updating each participating device's regularizer in each round of training. It is a method proposed to solve data heterogeneity in federated learning.
+```shell
+python examples/feddyn/feddyn.py -c examples/feddyn/feddyn_MNIST_lenet5.yml
+```
+
+```{note}
+Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations, 2021.
+```
+````
+
 ````{admonition} **FedAsync**
 FedAsync is one of the first algorithms proposed in the literature towards operating federated learning training sessions in *asynchronous* mode, which Plato supports natively. It advocated aggregating aggressively whenever only *one* client reported its local updates to the server.
 
@@ -443,6 +454,19 @@ Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolli
 ```
 ````
 
+````{admonition} **FjORD**
+FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
+
+```shell
+python3 examples/fjord/fjord.py -c examples/fjord/fjord_resnet18_dynamic.yml
+```
+
+```{note}
+Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
+&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2021.
+```
+````
+
 ````{admonition} **AnyCostFL**
 AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
 
@@ -464,6 +488,20 @@ python3 examples/polaris/polaris.py -c examples/polaris/polaris_LeNet5.yml
 ```
 ```{note}
 Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
+&rdquo; 
+````
+
+
+````{admonition} **FedTI**
+FedTI is to perform textual inversion under federated learning, which we can simply refer
+to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
+
+```shell
+python examples/fedti/fedti.py -c examples/fedti/StableDiffusionFed_iid_50.yml -b FedTI
+```
+```{note}
+Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
+    Textual Inversion],
 &rdquo; 
 ````
 
