@@ -118,7 +118,7 @@ parameters:
         lr: 0.01
 
 results:
-    result_path: results/resnet18_cifar10
+    result_path: results/resnet32_cifar100
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
