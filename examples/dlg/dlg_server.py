@@ -706,7 +706,7 @@ class Server(fedavg.Server):
 
         if num_images == 1:
             gt_figure = plt.figure(figsize=(8, 8))
-            plt.imshow(image_data[0])
+            plt.imshow(image_data.cpu()[0])
             plt.axis("off")
         else:
             fig, axes = plt.subplots(
