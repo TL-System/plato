@@ -53,11 +53,11 @@ dlg_result_path = f"{Config().params['result_path']}/{os.getpid()}"
 dlg_result_headers = [
     "Iteration",
     "Loss",
-    "Average MSE",
+    "Average Data MSE",
+    "Average Feature MSE",
     "Average LPIPS",
     "Average PSNR (dB)",
     "Average SSIM",
-    "Average Library SSIM",
 ]
 
 
@@ -348,16 +348,8 @@ class Server(fedavg.Server):
                     torch.argmax(gt_labels[i], dim=-1).item(),
                 )
 
-        history, losses, mses, lpipss, psnrs, ssims, library_ssims = (
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-        )
-        avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
+        history, losses = [], []
+        avg_data_mses, avg_feat_mses, avg_lpips, avg_psnr, avg_ssim = [], [], [], [], []
 
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
@@ -385,61 +377,37 @@ class Server(fedavg.Server):
                 )
 
             if math.isnan(current_loss):
-                logging.info("Not a number, ending attack")
-                # should make these lines into a function to prevent repetition, but not sure how to
-                # without having too many parameters
-                eval_dict = get_evaluation_dict(dummy_data, gt_data, num_images)
-                mses.append(eval_dict["mses"])
-                lpipss.append(eval_dict["lpipss"])
-                psnrs.append(eval_dict["psnrs"])
-                ssims.append(eval_dict["ssims"])
-                library_ssims.append(eval_dict["library_ssims"])
-                avg_mses.append(eval_dict["avg_mses"])
-                avg_lpips.append(eval_dict["avg_lpips"])
-                avg_psnr.append(eval_dict["avg_psnr"])
-                avg_ssim.append(eval_dict["avg_ssim"])
-                avg_library_ssim.append(eval_dict["avg_library_ssim"])
-
-                new_row = [
-                    iters,
-                    round(losses[-1], 8),
-                    round(avg_mses[-1], 8),
-                    round(avg_lpips[-1], 8),
-                    round(avg_psnr[-1], 4),
-                    round(avg_ssim[-1], 3),
-                    round(avg_library_ssim[-1], 3),
-                ]
-                csv_processor.write_csv(trial_csv_file, new_row)
+                logging.info("Not a number, ending this attack attempt")
                 break
 
             if iters % log_interval == 0:
                 # Finding evaluation metrics
                 # should make these lines into a function to prevent repetition, but not sure how to
                 # without having too many parameters
-                eval_dict = get_evaluation_dict(dummy_data, gt_data, num_images)
-                mses.append(eval_dict["mses"])
-                lpipss.append(eval_dict["lpipss"])
-                psnrs.append(eval_dict["psnrs"])
-                ssims.append(eval_dict["ssims"])
-                library_ssims.append(eval_dict["library_ssims"])
-                avg_mses.append(eval_dict["avg_mses"])
+                eval_dict = get_evaluation_dict(
+                    dummy_data,
+                    gt_data,
+                    num_images,
+                    self.trainer.model.to(Config().device()),
+                )
+                avg_data_mses.append(eval_dict["avg_data_mses"])
+                avg_feat_mses.append(eval_dict["avg_feat_mses"])
                 avg_lpips.append(eval_dict["avg_lpips"])
                 avg_psnr.append(eval_dict["avg_psnr"])
                 avg_ssim.append(eval_dict["avg_ssim"])
-                avg_library_ssim.append(eval_dict["avg_library_ssim"])
 
                 logging.info(
-                    "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.10f, avg MSE = %.8f, avg LPIPS = %.8f, avg PSNR = %.4f dB, avg SSIM = %.3f, avg library SSIM = %.3f",
+                    "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
                     self.attack_method,
                     (trial_number + 1),
                     self.defense_method,
                     iters,
                     losses[-1],
-                    avg_mses[-1],
+                    avg_data_mses[-1],
+                    avg_feat_mses[-1],
                     avg_lpips[-1],
                     avg_psnr[-1],
                     avg_ssim[-1],
-                    avg_library_ssim[-1],
                 )
 
                 if self.attack_method == "DLG":
@@ -475,17 +443,18 @@ class Server(fedavg.Server):
 
                 new_row = [
                     iters,
-                    round(losses[-1], 8),
-                    round(avg_mses[-1], 8),
-                    round(avg_lpips[-1], 8),
+                    round(losses[-1], 4),
+                    round(avg_data_mses[-1], 4),
+                    round(avg_feat_mses[-1], 4),
+                    round(avg_lpips[-1], 4),
                     round(avg_psnr[-1], 4),
                     round(avg_ssim[-1], 3),
-                    round(avg_library_ssim[-1], 3),
                 ]
                 csv_processor.write_csv(trial_csv_file, new_row)
 
-        if self.best_mse > avg_mses[-1]:
-            self.best_mse = avg_mses[-1]
+        # TODO: use other scoring criteria
+        if self.best_mse > avg_data_mses[-1]:
+            self.best_mse = avg_data_mses[-1]
             self.best_trial = (
                 trial_number + 1
             )  # the +1 is because we index from 1 and not 0

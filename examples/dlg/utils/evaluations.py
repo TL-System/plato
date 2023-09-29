@@ -38,28 +38,26 @@ def find_ssim_library(dummy_data, ground_truth):
     return ssim(dummy_data, ground_truth).item()
 
 
-def get_evaluation_dict(dummy_data, ground_truth, num_images):
+def get_evaluation_dict(dummy_data, ground_truth, num_images, model):
     eval_dict = {}
     (
-        eval_dict["mses"],
+        eval_dict["data_mses"],
         eval_dict["lpipss"],
         eval_dict["psnrs"],
         eval_dict["ssims"],
-        eval_dict["library_ssims"],
-    ) = ([], [], [], [], [])
+    ) = ([], [], [], [])
     for i in range(num_images):
-        # Initialize MSE and LPIPS values to be infinite
-        eval_dict["mses"].append(math.inf)
+        # Initialize image data MSE and LPIPS values to be infinite
+        eval_dict["data_mses"].append(math.inf)
         eval_dict["lpipss"].append(math.inf)
         # Initialize SSIM to be -1 (minimum value possible)
         eval_dict["ssims"].append(-1.0)
-        eval_dict["library_ssims"].append(-1.0)
         # Find the closest ground truth data after the misordering
         for j in range(num_images):
-            # MSEs, LPIPSs, PSNRs and SSIMs are stored in lists
+            # Image data MSEs, LPIPSs, PSNRs and SSIMs are stored in lists
             # where the ith entry is for the ith dummy data
-            eval_dict["mses"][i] = min(
-                eval_dict["mses"][i],
+            eval_dict["data_mses"][i] = min(
+                eval_dict["data_mses"][i],
                 torch.mean((dummy_data[i] - ground_truth[j]) ** 2).item(),
             )
             eval_dict["lpipss"][i] = min(
@@ -67,22 +65,22 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images):
                 loss_fn.forward(dummy_data[i], ground_truth[j]).item(),
             )
             eval_dict["ssims"][i] = max(
-                eval_dict["ssims"][i], find_ssim(dummy_data[i], ground_truth[j])
-            )
-            eval_dict["library_ssims"][i] = max(
-                eval_dict["library_ssims"][i],
+                eval_dict["ssims"][i],
                 find_ssim_library(
                     torch.unsqueeze(dummy_data[i], dim=0),
                     torch.unsqueeze(ground_truth[j], dim=0),
                 ),
             )
-        eval_dict["psnrs"].append(-10 * math.log10(eval_dict["mses"][i]))
+        eval_dict["psnrs"].append(-10 * math.log10(eval_dict["data_mses"][i]))
         # Find the mean for the MSE, LPIPS and PSNR
-        eval_dict["avg_mses"] = mean(eval_dict["mses"])
+        eval_dict["avg_data_mses"] = mean(eval_dict["data_mses"])
         eval_dict["avg_lpips"] = mean(eval_dict["lpipss"])
         eval_dict["avg_psnr"] = mean(eval_dict["psnrs"])
         eval_dict["avg_ssim"] = mean(eval_dict["ssims"])
-        eval_dict["avg_library_ssim"] = mean(eval_dict["library_ssims"])
+        with torch.no_grad():
+            eval_dict["avg_feat_mses"] = torch.mean(
+                (model(dummy_data)[0] - model(ground_truth)[0]) ** 2
+            ).item()
 
     return eval_dict
 
