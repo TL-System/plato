@@ -102,7 +102,7 @@ class Model(torchvision.models.ResNet):
 
         x = self.pool(x)
         x = torch.flatten(x, 1)
-        feature = x
+        feature = x.clone().detach()
         x = self.fc(x)
 
         return x, feature
