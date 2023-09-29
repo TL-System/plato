@@ -38,14 +38,13 @@ def find_ssim_library(dummy_data, ground_truth):
     return ssim(dummy_data, ground_truth).item()
 
 
-def get_evaluation_dict(dummy_data, ground_truth, num_images, model):
+def get_evaluation_dict(dummy_data, ground_truth, num_images, model, ds):
     eval_dict = {}
     (
         eval_dict["data_mses"],
         eval_dict["lpipss"],
-        eval_dict["psnrs"],
         eval_dict["ssims"],
-    ) = ([], [], [], [])
+    ) = ([], [], [])
     for i in range(num_images):
         # Initialize image data MSE and LPIPS values to be infinite
         eval_dict["data_mses"].append(math.inf)
@@ -71,11 +70,10 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images, model):
                     torch.unsqueeze(ground_truth[j], dim=0),
                 ),
             )
-        eval_dict["psnrs"].append(-10 * math.log10(eval_dict["data_mses"][i]))
         # Find the mean for the MSE, LPIPS and PSNR
         eval_dict["avg_data_mses"] = mean(eval_dict["data_mses"])
         eval_dict["avg_lpips"] = mean(eval_dict["lpipss"])
-        eval_dict["avg_psnr"] = mean(eval_dict["psnrs"])
+        eval_dict["avg_psnr"] = psnr(dummy_data, ground_truth, factor=1 / ds)
         eval_dict["avg_ssim"] = mean(eval_dict["ssims"])
         with torch.no_grad():
             eval_dict["avg_feat_mses"] = torch.mean(
@@ -83,6 +81,35 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images, model):
             ).item()
 
     return eval_dict
+
+
+def psnr(img_batch, ref_batch, batched=False, factor=1.0):
+    """This code based on https://github.com/JonasGeiping/invertinggradients.
+    Standard PSNR."""
+
+    def get_psnr(img_in, img_ref):
+        mse = ((img_in - img_ref) ** 2).mean()
+        if mse > 0 and torch.isfinite(mse):
+            return 10 * torch.log10(factor**2 / mse)
+        elif not torch.isfinite(mse):
+            return img_batch.new_tensor(float("nan"))
+        else:
+            return img_batch.new_tensor(float("inf"))
+
+    if batched:
+        psnr = get_psnr(img_batch.detach(), ref_batch)
+    else:
+        [B, C, m, n] = img_batch.shape
+        psnrs = []
+        for sample in range(B):
+            psnrs.append(
+                get_psnr(
+                    img_batch.detach()[sample, :, :, :], ref_batch[sample, :, :, :]
+                )
+            )
+        psnr = torch.stack(psnrs, dim=0).mean()
+
+    return psnr.item()
 
 
 def covar(a, b):

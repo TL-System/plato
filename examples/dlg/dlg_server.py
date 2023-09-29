@@ -296,15 +296,15 @@ class Server(fedavg.Server):
             )
         elif Config().algorithm.rec_optim == "LBFGS":
             match_optimizer = torch.optim.LBFGS(param, lr=Config().algorithm.rec_lr)
+
         # Init learning rate scheduler
-        max_iterations = Config().algorithm.num_iters
         if Config().algorithm.lr_decay:
             scheduler = torch.optim.lr_scheduler.MultiStepLR(
                 match_optimizer,
                 milestones=[
-                    max_iterations // 2.667,
-                    max_iterations // 1.6,
-                    max_iterations // 1.142,
+                    num_iters // 2.667,
+                    num_iters // 1.6,
+                    num_iters // 1.142,
                 ],
                 gamma=0.1,
             )  # 3/8 5/8 7/8
@@ -389,6 +389,7 @@ class Server(fedavg.Server):
                     gt_data,
                     num_images,
                     self.trainer.model.to(Config().device()),
+                    ds,
                 )
                 avg_data_mses.append(eval_dict["avg_data_mses"])
                 avg_feat_mses.append(eval_dict["avg_feat_mses"])
