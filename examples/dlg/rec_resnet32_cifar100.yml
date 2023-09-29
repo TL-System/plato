@@ -12,7 +12,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8001
+    port: 8011
     simulate_wall_time: true
 
     random_seed: 1
