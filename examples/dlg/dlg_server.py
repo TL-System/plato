@@ -363,9 +363,8 @@ class Server(fedavg.Server):
             )
 
         for iters in range(num_iters):
-            match_optimizer.step(closure)
-            current_loss = closure().item()
-            losses.append(current_loss)
+            current_loss = match_optimizer.step(closure)
+            losses.append(current_loss.item())
 
             if Config().algorithm.lr_decay:
                 scheduler.step()
@@ -461,7 +460,7 @@ class Server(fedavg.Server):
             )  # the +1 is because we index from 1 and not 0
 
         reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
-        self._plot_reconstructed(num_images, history, reconstructed_path)
+        self._plot_reconstructed(num_images, history, reconstructed_path, dm, ds)
         final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
         final_result_path = f"{trial_result_path}/final_attack_result.pdf"
         self._make_plot(num_images, final_tensor, None, final_result_path, dm, ds)
@@ -698,7 +697,7 @@ class Server(fedavg.Server):
         plt.savefig(path)
 
     @staticmethod
-    def _plot_reconstructed(num_images, history, reconstructed_result_path):
+    def _plot_reconstructed(num_images, history, reconstructed_result_path, dm, ds):
         """Plot the reconstructed data."""
         for i in range(num_images):
             logging.info("Reconstructed label is %d.", history[-1][i][1])
@@ -719,7 +718,14 @@ class Server(fedavg.Server):
             for j in range(num_images):
                 innerplot = plt.Subplot(fig, inner[j])
                 innerplot.imshow(
-                    history[i][j][0].cpu().permute(1, 2, 0).detach().clone()
+                    history[i][j][0]
+                    .detach()
+                    .clone()
+                    .mul_(ds)
+                    .add_(dm)
+                    .clamp_(0, 1)
+                    .permute(1, 2, 0)
+                    .cpu()
                 )
                 innerplot.axis("off")
                 fig.add_subplot(innerplot)
