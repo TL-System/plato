@@ -191,10 +191,29 @@ class Server(fedavg.Server):
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
         num_images = partition_size
         data_size = [num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]]
-        gt_data_plot = gt_data.detach().clone()
-        gt_data_plot = gt_data_plot.permute(0, 2, 3, 1)
+
+        # Mean and std of data
+        if Config().data.datasource == "CIFAR10":
+            data_mean = consts.cifar10_mean
+            data_std = consts.cifar10_std
+        elif Config().data.datasource == "CIFAR100":
+            data_mean = consts.cifar100_mean
+            data_std = consts.cifar100_std
+        elif Config().data.datasource == "TinyImageNet":
+            data_mean = consts.imagenet_mean
+            data_std = consts.imagenet_std
+        elif Config().data.datasource == "MNIST":
+            data_mean = consts.mnist_mean
+            data_std = consts.mnist_std
+        dm = torch.as_tensor(data_mean, device=Config().device(), dtype=torch.float)[
+            :, None, None
+        ]
+        ds = torch.as_tensor(data_std, device=Config().device(), dtype=torch.float)[
+            :, None, None
+        ]
+
         gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
-        self._make_plot(num_images, gt_data_plot, gt_labels, gt_result_path)
+        self._make_plot(num_images, gt_data, gt_labels, gt_result_path, dm, ds)
 
         # The number of restarts
         trials = 1
@@ -224,6 +243,8 @@ class Server(fedavg.Server):
                 target_grad,
                 gt_data,
                 gt_labels,
+                dm,
+                ds,
             )
 
         self._save_best()
@@ -237,6 +258,8 @@ class Server(fedavg.Server):
         target_grad,
         gt_data,
         gt_labels,
+        dm,
+        ds,
     ):
         """Run the attack for one trial."""
         logging.info("Starting Attack Number %d", (trial_number + 1))
@@ -336,26 +359,6 @@ class Server(fedavg.Server):
         )
         avg_mses, avg_lpips, avg_psnr, avg_ssim, avg_library_ssim = [], [], [], [], []
 
-        # Mean and std of data
-        if Config().data.datasource == "CIFAR10":
-            data_mean = consts.cifar10_mean
-            data_std = consts.cifar10_std
-        elif Config().data.datasource == "CIFAR100":
-            data_mean = consts.cifar100_mean
-            data_std = consts.cifar100_std
-        elif Config().data.datasource == "TinyImageNet":
-            data_mean = consts.imagenet_mean
-            data_std = consts.imagenet_std
-        elif Config().data.datasource == "MNIST":
-            data_mean = consts.mnist_mean
-            data_std = consts.mnist_std
-        dm = torch.as_tensor(data_mean, device=Config().device(), dtype=torch.float)[
-            :, None, None
-        ]
-        ds = torch.as_tensor(data_std, device=Config().device(), dtype=torch.float)[
-            :, None, None
-        ]
-
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
             model = deepcopy(self.trainer.model.to(Config().device()))
@@ -443,9 +446,8 @@ class Server(fedavg.Server):
                     history.append(
                         [
                             [
-                                dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
-                                torch.argmax(dummy_labels[i], dim=-1).item(),
                                 dummy_data[i],
+                                torch.argmax(dummy_labels[i], dim=-1).item(),
                             ]
                             for i in range(num_images)
                         ]
@@ -454,9 +456,8 @@ class Server(fedavg.Server):
                     history.append(
                         [
                             [
-                                dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
-                                est_labels[i].item(),
                                 dummy_data[i],
+                                est_labels[i].item(),
                             ]
                             for i in range(num_images)
                         ]
@@ -465,9 +466,8 @@ class Server(fedavg.Server):
                     history.append(
                         [
                             [
-                                dummy_data[i].cpu().permute(1, 2, 0).detach().clone(),
-                                torch.argmax(gt_labels[i], dim=-1),
                                 dummy_data[i],
+                                torch.argmax(gt_labels[i], dim=-1),
                             ]
                             for i in range(num_images)
                         ]
@@ -494,12 +494,16 @@ class Server(fedavg.Server):
         self._plot_reconstructed(num_images, history, reconstructed_path)
         final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
         final_result_path = f"{trial_result_path}/final_attack_result.pdf"
-        self._make_plot(num_images, final_tensor, None, final_result_path)
+        self._make_plot(num_images, final_tensor, None, final_result_path, dm, ds)
 
         # Save the tensors into a .pt file
         tensor_file_path = f"{trial_result_path}/tensors.pt"
         result = {
-            i * log_interval: {j: history[i][j][0] for j in range(num_images)}
+            i
+            * log_interval: {
+                j: history[i][j][0].cpu().permute(1, 2, 0).detach().clone()
+                for j in range(num_images)
+            }
             for i in range(len(history))
         }
         torch.save(result, tensor_file_path)
@@ -670,8 +674,8 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def _make_plot(num_images, image_data, image_labels, path):
-        """Plot ground truth data."""
+    def _make_plot(num_images, image_data, image_labels, path, dm, ds):
+        """Plot image data."""
 
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
@@ -704,16 +708,18 @@ class Server(fedavg.Server):
         image_width = 16 * cols / scale_factor
         product = rows * cols
 
+        image_data = image_data.detach().clone()
+        image_data.mul_(ds).add_(dm).clamp_(0, 1)
         if num_images == 1:
             gt_figure = plt.figure(figsize=(8, 8))
-            plt.imshow(image_data.cpu()[0])
+            plt.imshow(image_data[0].permute(1, 2, 0).cpu())
             plt.axis("off")
         else:
             fig, axes = plt.subplots(
                 nrows=rows, ncols=cols, figsize=(image_width, image_height)
             )
             for i, title in enumerate(image_data):
-                axes.ravel()[i].imshow(image_data[i].cpu())
+                axes.ravel()[i].imshow(image_data[i].permute(1, 2, 0).cpu())
                 axes.ravel()[i].set_axis_off()
             for i in range(num_images, product):
                 axes.ravel()[i].set_axis_off()
@@ -742,7 +748,9 @@ class Server(fedavg.Server):
 
             for j in range(num_images):
                 innerplot = plt.Subplot(fig, inner[j])
-                innerplot.imshow(history[i][j][0])
+                innerplot.imshow(
+                    history[i][j][0].cpu().permute(1, 2, 0).detach().clone()
+                )
                 innerplot.axis("off")
                 fig.add_subplot(innerplot)
         fig.savefig(reconstructed_result_path)
