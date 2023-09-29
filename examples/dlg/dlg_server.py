@@ -41,7 +41,7 @@ from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
 from utils import consts
 
-cross_entropy = torch.nn.CrossEntropyLoss()
+cross_entropy = torch.nn.CrossEntropyLoss(reduce="mean")
 tt = transforms.ToPILImage()
 
 partition_size = Config().data.partition_size
@@ -272,7 +272,20 @@ class Server(fedavg.Server):
             trial_csv_file, dlg_result_headers, trial_result_path
         )
 
-        dummy_data = torch.randn(data_size).to(Config().device()).requires_grad_(True)
+        if Config().algorithm.init_data == "randn":
+            dummy_data = (
+                torch.randn(data_size).to(Config().device()).requires_grad_(True)
+            )
+        elif Config().algorithm.init_data == "rand":
+            dummy_data = (
+                ((torch.rand(data_size) - 0.5) * 2)
+                .to(Config().device())
+                .requires_grad_(True)
+            )
+        elif Config().algorithm.init_data == "zeros":
+            dummy_data = (
+                torch.zeros(data_size).to(Config().device()).requires_grad_(True)
+            )
 
         dummy_labels = (
             torch.randn((num_images, Config().parameters.model.num_classes))
@@ -495,7 +508,7 @@ class Server(fedavg.Server):
                 dummy_onehot_label = F.softmax(labels, dim=-1)
                 dummy_loss = cross_entropy_for_onehot(dummy_pred, dummy_onehot_label)
             elif self.attack_method in ["iDLG", "csDLG"]:
-                dummy_loss = cross_entropy(dummy_pred, labels)
+                dummy_loss = cross_entropy(dummy_pred, torch.argmax(labels, dim=-1))
 
             dummy_grad = torch.autograd.grad(
                 dummy_loss, self.trainer.model.parameters(), create_graph=True
