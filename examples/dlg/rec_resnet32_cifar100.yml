@@ -22,12 +22,12 @@ data:
     datasource: CIFAR100
 
     # Number of samples in each partition
-    partition_size: 1
+    partition_size: 2
 
     # IID or non-IID?
     sampler: iid
 
-    random_seed: 5
+    random_seed: 1
 
 trainer:
     # The maximum number of training rounds
@@ -71,9 +71,11 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 1000
-    log_interval: 50
+    num_iters: 500
+    log_interval: 10
 
+    # Dummy data initialization
+    init_data: randn
     # Whether or not use customized initialization for model weights
     init_params: false
     # Whether sharing gradients or model weights
@@ -84,7 +86,7 @@ algorithm:
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
     # The number of times the attack will be attempted
-    trials: 5
+    trials: 3
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
@@ -108,7 +110,7 @@ algorithm:
     epsilon: 0.1
 
     # The random seed for dummy data and label
-    random_seed: 2
+    random_seed: 10
 
 parameters:
     model:
