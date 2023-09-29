@@ -41,7 +41,7 @@ from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
 from utils import consts
 
-cross_entropy = torch.nn.CrossEntropyLoss(reduction="mean")
+cross_entropy = torch.nn.CrossEntropyLoss()
 tt = transforms.ToPILImage()
 
 partition_size = Config().data.partition_size
