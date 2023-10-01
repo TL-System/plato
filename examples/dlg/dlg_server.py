@@ -286,6 +286,10 @@ class Server(fedavg.Server):
             dummy_data = (
                 torch.zeros(data_size).to(Config().device()).requires_grad_(True)
             )
+        elif Config().algorithm.init_data == "half":
+            dummy_data = (
+                (torch.ones(data_size) - 0.5).to(Config().device()).requires_grad_(True)
+            )
 
         dummy_labels = (
             torch.randn((num_images, Config().parameters.model.num_classes))
