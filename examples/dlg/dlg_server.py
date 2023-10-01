@@ -502,6 +502,8 @@ class Server(fedavg.Server):
         def closure():
             match_optimizer.zero_grad()
             self.trainer.model.to(Config().device())
+            # self.trainer.model.eval()
+            """Should reconstruction be conducted in train() or eval() mode?"""
             self.trainer.model.zero_grad()
             try:
                 dummy_pred, _ = self.trainer.model(dummy_data)
