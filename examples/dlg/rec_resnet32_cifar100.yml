@@ -71,11 +71,11 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 500
+    num_iters: 100
     log_interval: 10
 
     # Dummy data initialization
-    init_data: randn
+    init_data: half
     # Whether or not use customized initialization for model weights
     init_params: false
     # Whether sharing gradients or model weights
