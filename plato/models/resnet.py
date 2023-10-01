@@ -8,6 +8,18 @@ https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
 import torch
 import torch.nn as nn
 import torchvision
+import random
+import numpy as np
+
+
+def set_random_seed(seed=233):
+    """233 = 144 + 89 is my favorite number."""
+    torch.manual_seed(seed + 1)
+    torch.cuda.manual_seed(seed + 2)
+    torch.cuda.manual_seed_all(seed + 3)
+    np.random.seed(seed + 4)
+    torch.cuda.manual_seed_all(seed + 5)
+    random.seed(seed + 6)
 
 
 class Model(torchvision.models.ResNet):
@@ -91,7 +103,7 @@ class Model(torchvision.models.ResNet):
                 elif isinstance(m, torchvision.models.resnet.BasicBlock):
                     nn.init.constant_(m.bn2.weight, 0)
 
-    def forward(self, x):
+    def _forward_impl(self, x):
         # See note [TorchScript super()]
         x = self.conv1(x)
         x = self.bn1(x)
@@ -118,6 +130,8 @@ class Model(torchvision.models.ResNet):
     @staticmethod
     def get(model_name=None, num_classes=None, **kwargs):
         """Returns a suitable ResNet model according to its type."""
+        set_random_seed(1)
+
         if not Model.is_valid_model_type(model_name):
             raise ValueError(f"Invalid Resnet model name: {model_name}")
 
