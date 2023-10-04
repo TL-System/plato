@@ -24,6 +24,11 @@ class Trainer(basic.Trainer):
     FedDyn Trainer class
     """
 
+    def __init__(self, model=None, callbacks=None):
+        super().__init__(model, callbacks)
+        self.cld_mdl_param = None
+        self.local_param_list = None
+
     def perform_forward_and_backward_passes(
         self,
         config,
@@ -31,8 +36,14 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        avg_mdl_param = self.avg_mdl_param
-        local_grad_vector = self.local_grade_vector
+        clnt_y = labels.cpu().numpy()
+        weight_list = clnt_y / np.sum(clnt_y) * Config().clients.total_clients
+        alpha_coef_adpt = Config().parameters.alphda_coef / np.where(
+            weight_list != 0, weight_list, 1.0
+        )
+        # according to original source code, they use cld_mdl_param_tensor as avg_mdl_param in the train_feddyn_mdl function
+        avg_mdl_param = self.cld_mdl_param
+        local_grad_vector = self.local_param_list
 
         model = self.model.to(self.device)
         loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
@@ -53,10 +64,10 @@ class Trainer(basic.Trainer):
                 local_par_list = param.reshape(-1)
             else:
                 local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
-        loss_algo = torch.tensor(self.alpha_coef_adapt * 0).to(loss_f_i.device)
+        loss_algo = torch.tensor(alpha_coef_adpt * 0).to(loss_f_i.device)
         if not local_grad_vector == 0:
             for avg_param, local_param in zip(avg_mdl_param, local_grad_vector):
-                loss_algo = torch.tensor(self.alpha_coef_adpt).to(
+                loss_algo = torch.tensor(alpha_coef_adpt).to(
                     loss_f_i.device
                 ) * torch.sum(local_par_list * (-avg_param + local_param))
         loss_algo = torch.mean(loss_algo)
@@ -75,9 +86,6 @@ class Trainer(basic.Trainer):
         cld_mdl_param = []
         if self.model_state_dict:
             cld_mdl_param = copy.deepcopy(self.model_state_dict)
-        cld_mdl_param_tensor = torch.tensor(
-            cld_mdl_param, dtype=torch.float32, device=self.device
-        )
 
         model_path = Config().params["model_path"]
         filename = f"{model_path}_{self.client_id}.pth"
@@ -87,14 +95,6 @@ class Trainer(basic.Trainer):
         if os.path.exists(filename):
             local_model = torch.load(filename)
             local_param_list = copy.deepcopy(local_model.state_dict())
-        local_param_list_tensor = torch.tensor(
-            local_param_list, dtype=torch.float32, device=self.device
-        )
 
-        clnt_y = labels.cpu().numpy()
-        weight_list = clnt_y / np.sum(clnt_y) * n_clnt
-        alpha_coef_adpt = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
-
-        self.alpha_coef_adpt = alpha_coef_adpt
         self.cld_mdl_param = cld_mdl_param
         self.local_param_list = local_param_list
