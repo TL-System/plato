@@ -39,7 +39,7 @@ class Trainer(basic.Trainer):
         """Perform forward and backward passes in the training loop."""
         clnt_y = labels.cpu().numpy()
         weight_list = clnt_y / np.sum(clnt_y) * Config().clients.total_clients
-        alpha_coef_adpt = Config().parameters.alphda_coef / np.where(
+        alpha_coef_adpt = Config().parameters.alpha_coef / np.where(
             weight_list != 0, weight_list, 1.0
         )
         # According to original source code, they use cld_mdl_param_tensor
