@@ -53,10 +53,10 @@ class Trainer(basic.Trainer):
                 local_par_list = param.reshape(-1)
             else:
                 local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
-        loss_algo = torch.tensor(self.alpha_coef * 0).to(loss_f_i.device)
+        loss_algo = torch.tensor(self.alpha_coef_adapt * 0).to(loss_f_i.device)
         if not local_grad_vector == 0:
             for avg_param, local_param in zip(avg_mdl_param, local_grad_vector):
-                loss_algo = torch.tensor(self.alpha_coef).to(
+                loss_algo = torch.tensor(self.alpha_coef_adpt).to(
                     loss_f_i.device
                 ) * torch.sum(local_par_list * (-avg_param + local_param))
         loss_algo = torch.mean(loss_algo)
@@ -67,111 +67,34 @@ class Trainer(basic.Trainer):
 
         return loss
 
-    # pylint: disable=too-many-locals
-    # pylint: disable=too-many-statements
-    # pylint: disable=attribute-defined-outside-init
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """The default training loop when a custom training loop is not supplied."""
-        batch_size = config["batch_size"]
-        self.sampler = sampler
+    def train_step_start(self, config, batch=None):
+        super().train_step_start(config, batch)
 
-        self.run_history.reset()
+        if not self.model_state_dict:
+            self.model_state_dict = self.model.state_dict()
+        cld_mdl_param = []
+        if self.model_state_dict:
+            cld_mdl_param = copy.deepcopy(self.model_state_dict)
+        cld_mdl_param_tensor = torch.tensor(
+            cld_mdl_param, dtype=torch.float32, device=self.device
+        )
 
-        self.train_run_start(config)
-        self.callback_handler.call_event("on_train_run_start", self, config)
+        model_path = Config().params["model_path"]
+        filename = f"{model_path}_{self.client_id}.pth"
+        local_param_list = []
+        if self.model_state_dict:
+            local_param_list = 0
+        if os.path.exists(filename):
+            local_model = torch.load(filename)
+            local_param_list = copy.deepcopy(local_model.state_dict())
+        local_param_list_tensor = torch.tensor(
+            local_param_list, dtype=torch.float32, device=self.device
+        )
 
-        self.train_loader = self.get_train_loader(batch_size, trainset, sampler)
+        clnt_y = labels.cpu().numpy()
+        weight_list = clnt_y / np.sum(clnt_y) * n_clnt
+        alpha_coef_adpt = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
 
-        # Initializing the loss criterion
-        self._loss_criterion = self.get_loss_criterion()
-
-        # Initializing the optimizer
-        self.optimizer = self.get_optimizer(self.model)
-        self.lr_scheduler = self.get_lr_scheduler(config, self.optimizer)
-        self.optimizer = self._adjust_lr(config, self.lr_scheduler, self.optimizer)
-
-        self.model.to(self.device)
-        self.model.train()
-
-        total_epochs = config["epochs"]
-        n_clnt = Config().clients.total_clients
-        alpha_coef = Config().parameters.alpha_coef
-
-        for self.current_epoch in range(1, total_epochs + 1):
-            self._loss_tracker.reset()
-            self.train_epoch_start(config)
-            self.callback_handler.call_event("on_train_epoch_start", self, config)
-
-            for batch_id, (examples, labels) in enumerate(self.train_loader):
-                self.train_step_start(config, batch=batch_id)
-                self.callback_handler.call_event(
-                    "on_train_step_start", self, config, batch=batch_id
-                )
-
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                if not self.model_state_dict:
-                    self.model_state_dict = self.model.state_dict()
-                cld_mdl_param = []
-                if self.model_state_dict:
-                    cld_mdl_param = copy.deepcopy(self.model_state_dict)
-
-                model_path = Config().params["model_path"]
-                filename = f"{model_path}_{self.client_id}.pth"
-                local_param_list = []
-                if self.model_state_dict:
-                    local_param_list = 0
-                if os.path.exists(filename):
-                    local_model = torch.load(filename)
-                    local_param_list = copy.deepcopy(local_model.state_dict())
-
-                clnt_y = labels.cpu().numpy()
-                weight_list = clnt_y / np.sum(clnt_y) * n_clnt
-                alpha_coef_adpt = alpha_coef / np.where(
-                    weight_list != 0, weight_list, 1.0
-                )
-
-                self.alpha_coef_adpt = alpha_coef_adpt
-                self.cld_mdl_param = cld_mdl_param
-                self.local_param_list = local_param_list
-                loss = self.perform_forward_and_backward_passes(
-                    config, examples, labels
-                )
-
-                self.train_step_end(config, batch=batch_id, loss=loss)
-                self.callback_handler.call_event(
-                    "on_train_step_end", self, config, batch=batch_id, loss=loss
-                )
-
-            self.lr_scheduler_step()
-
-            if hasattr(self.optimizer, "params_state_update"):
-                self.optimizer.params_state_update()
-
-            # Simulate client's speed
-            if (
-                self.client_id != 0
-                and hasattr(Config().clients, "speed_simulation")
-                and Config().clients.speed_simulation
-            ):
-                self.simulate_sleep_time()
-
-            # Saving the model at the end of this epoch to a file so that
-            # it can later be retrieved to respond to server requests
-            # in asynchronous mode when the wall clock time is simulated
-            if (
-                hasattr(Config().server, "request_update")
-                and Config().server.request_update
-            ):
-                self.model.cpu()
-                model_path = Config().params["model_path"]
-                filename = f"{model_path}_{self.client_id}.pth"
-                self.save_model(filename)
-                self.model.to(self.device)
-
-            self.run_history.update_metric("train_loss", self._loss_tracker.average)
-            self.train_epoch_end(config)
-            self.callback_handler.call_event("on_train_epoch_end", self, config)
-
-        self.train_run_end(config)
-        self.callback_handler.call_event("on_train_run_end", self, config)
+        self.alpha_coef_adpt = alpha_coef_adpt
+        self.cld_mdl_param = cld_mdl_param
+        self.local_param_list = local_param_list
