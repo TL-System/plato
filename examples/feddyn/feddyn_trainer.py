@@ -29,6 +29,7 @@ class Trainer(basic.Trainer):
         self.cld_mdl_param = None
         self.local_param_list = None
 
+    # pylint:disable=too-many-locals
     def perform_forward_and_backward_passes(
         self,
         config,
@@ -41,7 +42,8 @@ class Trainer(basic.Trainer):
         alpha_coef_adpt = Config().parameters.alphda_coef / np.where(
             weight_list != 0, weight_list, 1.0
         )
-        # according to original source code, they use cld_mdl_param_tensor as avg_mdl_param in the train_feddyn_mdl function
+        # According to original source code, they use cld_mdl_param_tensor
+        #   as avg_mdl_param in the train_feddyn_mdl function
         avg_mdl_param = self.cld_mdl_param
         local_grad_vector = self.local_param_list
 
