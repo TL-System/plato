@@ -14,4 +14,3 @@ timm
 lightly
 scikit-learn
 pytest
-ultralytics
