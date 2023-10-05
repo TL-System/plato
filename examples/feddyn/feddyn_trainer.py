@@ -51,17 +51,17 @@ class Trainer(basic.Trainer):
         local_grad_vector = self.local_param_list
 
         model = self.model.to(self.device)
-        loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
+        loss_function = torch.nn.CrossEntropyLoss()
 
         self.optimizer.zero_grad()
 
         examples = examples.to(self.device)
         labels = labels.to(self.device)
-        ## Get f_i estimate
-        loss_f_i = loss_fn(model(examples), labels.reshape(-1).long())
-        loss_f_i = loss_f_i / list(labels.size())[0]
+        ## Get esimated client loss
+        loss_client = loss_function(model(examples), labels)
 
-        # Get linear penalty on the current parameter estimates
+        # Get linear penalty on the current client parameters
+        # Calculate the regularization term
         local_par_list = None
 
         for param in model.parameters():
@@ -71,15 +71,15 @@ class Trainer(basic.Trainer):
             else:
                 local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
 
-        loss_algo = torch.tensor(adaptive_alpha_coef * 0).to(loss_f_i.device)
+        loss_penalty = torch.tensor(adaptive_alpha_coef * 0).to(self.device)
 
         if not local_grad_vector == 0:
             for avg_param, local_param in zip(server_model_param, local_grad_vector):
-                loss_algo = torch.tensor(adaptive_alpha_coef).to(
-                    loss_f_i.device
+                loss_penalty = torch.tensor(adaptive_alpha_coef).to(
+                    self.device
                 ) * torch.sum(local_par_list * (-avg_param + local_param))
-        loss_algo = torch.mean(loss_algo)
-        loss = loss_f_i + loss_algo
+        loss_penalty = torch.mean(loss_penalty)
+        loss = loss_client + loss_penalty
         loss.backward()
 
         self.optimizer.step()
