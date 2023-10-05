@@ -37,8 +37,10 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        labels = labels.cpu().numpy()
-        weight_list = labels / np.sum(labels) * Config().clients.total_clients
+        labels_numpy = labels.cpu().numpy()
+        weight_list = (
+            labels_numpy / np.sum(labels_numpy) * Config().clients.total_clients
+        )
 
         alpha_coef = (
             Config().algorithm.alpha_coef
@@ -62,23 +64,22 @@ class Trainer(basic.Trainer):
 
         # Get linear penalty on the current client parameters
         # Calculate the regularization term
-        local_par_list = None
+        local_parms = None
 
         for param in model.parameters():
-            if not isinstance(local_par_list, torch.Tensor):
+            if not isinstance(local_parms, torch.Tensor):
                 # Initially nothing to concatenate
-                local_par_list = param.reshape(-1)
+                local_parms = param.reshape(-1)
             else:
-                local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
+                local_parms = torch.cat((local_parms, param.reshape(-1)), 0)
 
         loss_penalty = torch.tensor(adaptive_alpha_coef * 0).to(self.device)
 
-        if not local_grad_vector == 0:
-            for avg_param, local_param in zip(server_model_param, local_grad_vector):
-                loss_penalty = torch.tensor(adaptive_alpha_coef).to(
-                    self.device
-                ) * torch.sum(local_par_list * (-avg_param + local_param))
-        loss_penalty = torch.mean(loss_penalty)
+        for server_param, local_grad in zip(server_model_param, local_grad_vector):
+            loss_penalty += torch.tensor(adaptive_alpha_coef).to(
+                self.device
+            ) * torch.sum(local_parms * (-server_param + local_grad))
+        loss_penalty = torch.sum(loss_penalty)
         loss = loss_client + loss_penalty
         loss.backward()
 
