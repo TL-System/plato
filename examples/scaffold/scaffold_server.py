@@ -43,17 +43,13 @@ class Server(fedavg.Server):
         # Update server control variate
         for client_control_variate_delta in self.received_client_control_variates:
             for name, param in client_control_variate_delta.items():
-                self.server_control_variate[name] += param.to(
-                    device=Config().device()
-                ) * (1 / Config().clients.total_clients)
+                self.server_control_variate[name] += param * (1 / Config().clients.total_clients)
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."
         if self.server_control_variate is None:
             self.server_control_variate = OrderedDict()
             for name, weight in self.algorithm.extract_weights().items():
-                self.server_control_variate[name] = self.trainer.zeros(weight.shape).to(
-                    device=Config().device()
-                )
+                self.server_control_variate[name] = self.trainer.zeros(weight.shape)
 
         return [payload, self.server_control_variate]
