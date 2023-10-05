@@ -37,14 +37,14 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        _labels = labels.cpu().numpy()
-        weight_list = _labels / np.sum(_labels) * Config().clients.total_clients
+        labels = labels.cpu().numpy()
+        weight_list = labels / np.sum(labels) * Config().clients.total_clients
 
         alpha_coef = (
-                Config().algorithm.alpha_coef
-                if hasattr(Config().algorithm, "alpha_coef")
-                else 0.01
-            )
+            Config().algorithm.alpha_coef
+            if hasattr(Config().algorithm, "alpha_coef")
+            else 0.01
+        )
         adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
 
         # According to original source code, they use cld_mdl_param_tensor
