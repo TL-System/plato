@@ -54,7 +54,7 @@ class Trainer(basic.Trainer):
 
         # Get linear penalty on the current client parameters
         local_params = self.model.state_dict()
-        loss_penalty = torch.tensor(adaptive_alpha_coef * 0).to(self.device)
+        loss_penalty = torch.zeros(adaptive_alpha_coef.shape).to(self.device)
         adaptive_alpha_coef = torch.tensor(adaptive_alpha_coef).to(self.device)
         for parameter_name in local_params:
             loss_penalty += adaptive_alpha_coef * torch.sum(
@@ -76,7 +76,8 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         super().train_run_start(config)
-        # Before running, the client model weights are the same as the server model weights
+        # At the beginning of each round,
+        # the client model weights are the same as the server model weights
         self.server_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
