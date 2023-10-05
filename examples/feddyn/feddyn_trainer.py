@@ -26,7 +26,7 @@ class Trainer(basic.Trainer):
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
-        self.cld_mdl_param = None
+        self.server_model_param = None
         self.local_param_list = None
 
     # pylint:disable=too-many-locals
@@ -47,9 +47,7 @@ class Trainer(basic.Trainer):
         )
         adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
 
-        # According to original source code, they use cld_mdl_param_tensor
-        # as avg_mdl_param in the train_feddyn_mdl function
-        avg_mdl_param = self.cld_mdl_param
+        server_model_param = self.server_model_param
         local_grad_vector = self.local_param_list
 
         model = self.model.to(self.device)
@@ -76,7 +74,7 @@ class Trainer(basic.Trainer):
         loss_algo = torch.tensor(adaptive_alpha_coef * 0).to(loss_f_i.device)
 
         if not local_grad_vector == 0:
-            for avg_param, local_param in zip(avg_mdl_param, local_grad_vector):
+            for avg_param, local_param in zip(server_model_param, local_grad_vector):
                 loss_algo = torch.tensor(adaptive_alpha_coef).to(
                     loss_f_i.device
                 ) * torch.sum(local_par_list * (-avg_param + local_param))
@@ -94,9 +92,10 @@ class Trainer(basic.Trainer):
 
         if not self.model_state_dict:
             self.model_state_dict = self.model.state_dict()
-        cld_mdl_param = []
+
+        server_model_param = []
         if self.model_state_dict:
-            cld_mdl_param = copy.deepcopy(self.model_state_dict)
+            server_model_param = copy.deepcopy(self.model_state_dict)
 
         model_path = Config().params["model_path"]
         filename = f"{model_path}_{self.client_id}.pth"
@@ -107,5 +106,5 @@ class Trainer(basic.Trainer):
             local_model = torch.load(filename)
             local_param_list = copy.deepcopy(local_model.state_dict())
 
-        self.cld_mdl_param = cld_mdl_param
+        self.server_model_param = server_model_param
         self.local_param_list = local_param_list
