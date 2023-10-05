@@ -47,18 +47,13 @@ class Trainer(basic.Trainer):
         )
         adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
 
-        model = self.model.to(self.device)
-        loss_function = torch.nn.CrossEntropyLoss()
-
         self.optimizer.zero_grad()
-
-        examples = examples.to(self.device)
-        labels = labels.to(self.device)
+        outputs = self.model(examples)
         ## Get esimated client loss
-        loss_client = loss_function(model(examples), labels)
+        loss_client = self._loss_criterion(outputs, labels)
 
         # Get linear penalty on the current client parameters
-        local_params = model.state_dict()
+        local_params = self.model.state_dict()
         loss_penalty = torch.tensor(adaptive_alpha_coef * 0).to(self.device)
         adaptive_alpha_coef = torch.tensor(adaptive_alpha_coef).to(self.device)
         for parameter_name in local_params:
@@ -89,6 +84,6 @@ class Trainer(basic.Trainer):
         if os.path.exists(filename):
             self.local_param_last_epoch = torch.load(filename).state_dict()
         else:
-            # If it does not exist,  we are at the first round.
+            # If it does not exist,  this client has not trained any model yet.
             # The client model weights last epoch are the same as the global model weights.
             self.local_param_last_epoch = copy.deepcopy(self.model.state_dict())
