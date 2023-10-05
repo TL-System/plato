@@ -1,10 +1,10 @@
 """
 An implementation of the FedDyn algorithm.
 
-D. Acar, et al., "Federated Learning Based on Dynamic Regularization ,"
-in the Proceedings of ICLR 2021.
+D. Acar, et al., "Federated Learning Based on Dynamic Regularization," in the
+Proceedings of ICLR 2021.
 
-https://openreview.net/forum?id=B7v4QMR6Z9w
+Paper: https://openreview.net/forum?id=B7v4QMR6Z9w
 
 Source code: https://github.com/alpemreacar/FedDyn
 """
@@ -21,7 +21,7 @@ from plato.trainers import basic
 # pylint:disable=too-many-instance-attributes
 class Trainer(basic.Trainer):
     """
-    FedDyn Trainer class
+    FedDyn's Trainer.
     """
 
     def __init__(self, model=None, callbacks=None):
