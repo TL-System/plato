@@ -37,10 +37,8 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        labels_numpy = labels.cpu().numpy()
-        weight_list = (
-            labels_numpy / np.sum(labels_numpy) * Config().clients.total_clients
-        )
+        _labels = labels.cpu().numpy()
+        weight_list = _labels / np.sum(_labels) * Config().clients.total_clients
 
         alpha_coef = (
             Config().algorithm.alpha_coef
@@ -62,10 +60,9 @@ class Trainer(basic.Trainer):
         # Get linear penalty on the current client parameters
         local_params = model.state_dict()
         loss_penalty = torch.tensor(adaptive_alpha_coef * 0).to(self.device)
+        adaptive_alpha_coef = torch.tensor(adaptive_alpha_coef).to(self.device)
         for parameter_name in local_params:
-            loss_penalty += torch.tensor(adaptive_alpha_coef).to(
-                self.device
-            ) * torch.sum(
+            loss_penalty += adaptive_alpha_coef * torch.sum(
                 local_params[parameter_name]
                 * (
                     -self.server_model_param[parameter_name].to(self.device)
@@ -84,16 +81,14 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         super().train_run_start(config)
-        # Before running, the client model weights is the same as the server model weights
+        # Before running, the client model weights are the same as the server model weights
         self.server_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
         filename = f"{model_path}_{self.client_id}.pth"
         if os.path.exists(filename):
-            self.local_param_last_epoch = copy.deepcopy(
-                torch.load(filename).state_dict()
-            )
+            self.local_param_last_epoch = torch.load(filename).state_dict()
         else:
-            # If not exists, it is the first round.
-            # The client model weights last epoch is the same as the global model weights.
+            # If it does not exist,  we are at the first round.
+            # The client model weights last epoch are the same as the global model weights.
             self.local_param_last_epoch = copy.deepcopy(self.model.state_dict())
