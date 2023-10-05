@@ -39,11 +39,16 @@ class Trainer(basic.Trainer):
         """Perform forward and backward passes in the training loop."""
         clnt_y = labels.cpu().numpy()
         weight_list = clnt_y / np.sum(clnt_y) * Config().clients.total_clients
-        alpha_coef_adpt = Config().parameters.alpha_coef / np.where(
-            weight_list != 0, weight_list, 1.0
-        )
+
+        alpha_coef = (
+                Config().algorithm.alpha_coef
+                if hasattr(Config().algorithm, "alpha_coef")
+                else 0.01
+            )
+        adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
+
         # According to original source code, they use cld_mdl_param_tensor
-        #   as avg_mdl_param in the train_feddyn_mdl function
+        # as avg_mdl_param in the train_feddyn_mdl function
         avg_mdl_param = self.cld_mdl_param
         local_grad_vector = self.local_param_list
 
@@ -60,21 +65,25 @@ class Trainer(basic.Trainer):
 
         # Get linear penalty on the current parameter estimates
         local_par_list = None
+
         for param in model.parameters():
             if not isinstance(local_par_list, torch.Tensor):
                 # Initially nothing to concatenate
                 local_par_list = param.reshape(-1)
             else:
                 local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
-        loss_algo = torch.tensor(alpha_coef_adpt * 0).to(loss_f_i.device)
+
+        loss_algo = torch.tensor(adaptive_alpha_coef * 0).to(loss_f_i.device)
+
         if not local_grad_vector == 0:
             for avg_param, local_param in zip(avg_mdl_param, local_grad_vector):
-                loss_algo = torch.tensor(alpha_coef_adpt).to(
+                loss_algo = torch.tensor(adaptive_alpha_coef).to(
                     loss_f_i.device
                 ) * torch.sum(local_par_list * (-avg_param + local_param))
         loss_algo = torch.mean(loss_algo)
         loss = loss_f_i + loss_algo
         loss.backward()
+
         self.optimizer.step()
         self._loss_tracker.update(loss, labels.size(0))
 
