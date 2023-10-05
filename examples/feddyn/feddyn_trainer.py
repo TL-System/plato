@@ -37,8 +37,8 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        clnt_y = labels.cpu().numpy()
-        weight_list = clnt_y / np.sum(clnt_y) * Config().clients.total_clients
+        _labels = labels.cpu().numpy()
+        weight_list = _labels / np.sum(_labels) * Config().clients.total_clients
 
         alpha_coef = (
                 Config().algorithm.alpha_coef
