@@ -27,7 +27,7 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
         self.server_model_param = None
-        self.local_param_list = None
+        self.local_param_last_epoch = None
 
     # pylint:disable=too-many-locals
     def perform_forward_and_backward_passes(
@@ -49,9 +49,6 @@ class Trainer(basic.Trainer):
         )
         adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
 
-        server_model_param = self.server_model_param
-        local_grad_vector = self.local_param_list
-
         model = self.model.to(self.device)
         loss_function = torch.nn.CrossEntropyLoss()
 
@@ -63,22 +60,19 @@ class Trainer(basic.Trainer):
         loss_client = loss_function(model(examples), labels)
 
         # Get linear penalty on the current client parameters
-        # Calculate the regularization term
-        local_parms = None
-
-        for param in model.parameters():
-            if not isinstance(local_parms, torch.Tensor):
-                # Initially nothing to concatenate
-                local_parms = param.reshape(-1)
-            else:
-                local_parms = torch.cat((local_parms, param.reshape(-1)), 0)
-
+        local_params = model.state_dict()
         loss_penalty = torch.tensor(adaptive_alpha_coef * 0).to(self.device)
-
-        for server_param, local_grad in zip(server_model_param, local_grad_vector):
+        for parameter_name in local_params:
             loss_penalty += torch.tensor(adaptive_alpha_coef).to(
                 self.device
-            ) * torch.sum(local_parms * (-server_param + local_grad))
+            ) * torch.sum(
+                local_params[parameter_name]
+                * (
+                    -self.server_model_param[parameter_name].to(self.device)
+                    + self.local_param_last_epoch[parameter_name].to(self.device)
+                )
+            )
+
         loss_penalty = torch.sum(loss_penalty)
         loss = loss_client + loss_penalty
         loss.backward()
@@ -88,24 +82,18 @@ class Trainer(basic.Trainer):
 
         return loss
 
-    def train_step_start(self, config, batch=None):
-        super().train_step_start(config, batch)
-
-        if not self.model_state_dict:
-            self.model_state_dict = self.model.state_dict()
-
-        server_model_param = []
-        if self.model_state_dict:
-            server_model_param = copy.deepcopy(self.model_state_dict)
+    def train_run_start(self, config):
+        super().train_run_start(config)
+        # Before running, the client model weights is the same as the server model weights
+        self.server_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
         filename = f"{model_path}_{self.client_id}.pth"
-        local_param_list = []
-        if self.model_state_dict:
-            local_param_list = 0
         if os.path.exists(filename):
-            local_model = torch.load(filename)
-            local_param_list = copy.deepcopy(local_model.state_dict())
-
-        self.server_model_param = server_model_param
-        self.local_param_list = local_param_list
+            self.local_param_last_epoch = copy.deepcopy(
+                torch.load(filename).state_dict()
+            )
+        else:
+            # If not exists, it is the first round.
+            # The client model weights last epoch is the same as the global model weights.
+            self.local_param_last_epoch = copy.deepcopy(self.model.state_dict())
