@@ -3,9 +3,6 @@ A personalized federated learning trainer using LG-FedAvg.
 
 """
 
-import logging
-
-from plato.utils import fonts
 from plato.config import Config
 
 from pflbases import personalized_trainer
@@ -53,8 +50,8 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        self.freeze_model(self.model, config["head_modules_name"])
-        self.activate_model(self.model, config["body_modules_name"])
+        self.freeze_model(self.model, Config().algorithm.head_modules_name)
+        self.activate_model(self.model, Config().algorithm.body_modules_name)
         self.optimizer.step()
 
         # repeat the same optimization relying the optimized
@@ -72,15 +69,9 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        self.freeze_model(self.model, config["body_modules_name"])
-        self.activate_model(self.model, config["head_modules_name"])
+        self.freeze_model(self.model, Config().algorithm.body_modules_name)
+        self.activate_model(self.model, Config().algorithm.head_modules_name)
 
         self.optimizer.step()
 
         return loss
-
-    def train_run_end(self, config):
-        """Copying the trained model to the personalized model."""
-
-        # load the trained model to the personalized model
-        self.copy_model_to_personalized_model()

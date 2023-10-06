@@ -35,18 +35,22 @@ algorithm:
     type: fedavg
 
     global_modules_name:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
+        - fc4
+        - fc5
 
     head_modules_name:
-        - linear
+        - fc4
+        - fc5
 
+    body_modules_name:
+        - conv1
+        - conv2
+        - conv3
+        
     completion_modules_name:
-        - linear
+        - conv1
+        - conv2
+        - conv3
 
     personalization:
 

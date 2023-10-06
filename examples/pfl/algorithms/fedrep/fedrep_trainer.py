@@ -7,7 +7,6 @@ import logging
 from pflbases import personalized_trainer
 from pflbases import fedavg_partial
 
-
 from plato.config import Config
 
 
