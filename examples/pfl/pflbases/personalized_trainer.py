@@ -204,7 +204,8 @@ class Trainer(basic.Trainer):
             Config().algorithm, "personalization"
         ):
             personalized_config = Config().algorithm.personalization._asdict()
-            batch_size = personalized_config["batch_size"]
+            if "batch_size" in personalized_config:
+                batch_size = personalized_config["batch_size"]
 
         return super().get_train_loader(batch_size, trainset, sampler, **kwargs)
 

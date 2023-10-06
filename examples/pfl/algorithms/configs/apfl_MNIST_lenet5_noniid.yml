@@ -36,7 +36,7 @@ algorithm:
 
     alpha: 0.75
     adaptive_alpha: True
-    
+
     personalization:
 
         model_name: resnet_18
