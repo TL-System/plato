@@ -1,11 +1,12 @@
- """
+"""
 A personalized federated learning trainer for FedBABU.
-
 """
 import logging
 
 from pflbases import personalized_trainer
 from pflbases import fedavg_partial
+
+from plato.config import Config
 
 
 class Trainer(personalized_trainer.Trainer):
@@ -43,14 +44,20 @@ class Trainer(personalized_trainer.Trainer):
         """
         super().train_run_start(config)
         if self.personalized_learning:
-            self.freeze_model(self.personalized_model, config["frozen_modules_name"])
+            self.freeze_model(
+                self.personalized_model, Config().algorithm.global_modules_name
+            )
         else:
-            self.freeze_model(self.model, config["frozen_modules_name"])
+            self.freeze_model(self.model, Config().algorithm.personalized_modules_name)
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
         if self.personalized_learning:
-            self.activate_model(self.personalized_model, config["frozen_modules_name"])
+            self.activate_model(
+                self.personalized_model, Config().algorithm.global_modules_name
+            )
         else:
-            self.activate_model(self.model, config["frozen_modules_name"])
+            self.activate_model(
+                self.model, Config().algorithm.personalized_modules_name
+            )

@@ -25,7 +25,7 @@ class Trainer(personalized_trainer.Trainer):
         super().__init__(model, callbacks)
 
         # the lambda used in the Ditto paper
-        self.ditto_lambda = 0.0
+        self.ditto_lambda = Config().algorithm.ditto_lambda
         self.initial_model_params = None
 
         self.personalized_optimizer = None
@@ -46,8 +46,6 @@ class Trainer(personalized_trainer.Trainer):
         self.personalized_model.to(self.device)
         self.personalized_model.train()
 
-        # initialize the lambda
-        self.ditto_lambda = config["ditto_lambda"]
         # backup the unoptimized global model
         # this is used as the baseline ditto weights in the Ditto solver
         self.initial_model_params = copy.deepcopy(self.model.state_dict())

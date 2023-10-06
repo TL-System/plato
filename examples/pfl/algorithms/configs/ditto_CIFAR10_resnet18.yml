@@ -34,19 +34,10 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    global_modules_name:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
-
-    personalized_modules_name:
-        - linear
-
-    completion_modules_name:
-        - linear
+    # the chosen of lambda derives from 
+    # the appendix D.2 of the paper and 
+    # from the https://github.com/lgcollins/FedRep
+    ditto_lambda: 1.0
 
     personalization:
 

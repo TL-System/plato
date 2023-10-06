@@ -154,7 +154,9 @@ class Trainer(basic.Trainer):
     def get_personalized_optimizer(self):
         """Getting the optimizer for personalized model."""
 
-        if not hasattr(Config().algorithm, "personalization"):
+        if not hasattr(Config().algorithm, "personalization") or not hasattr(
+            Config().algorithm.personalization, "optimizer"
+        ):
             return super().get_optimizer(self.personalized_model)
 
         optimizer_name = Config().algorithm.personalization.optimizer
@@ -225,8 +227,9 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
-        self.preprocess_personalized_model(config)
+
         if self.personalized_learning:
+            self.preprocess_personalized_model(config)
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
             # the model name is needed to be maintained here
@@ -245,7 +248,6 @@ class Trainer(basic.Trainer):
 
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
-        # by default, there is no metric outputs
 
         return self.personalized_model(examples)
 
@@ -428,6 +430,14 @@ class Trainer(basic.Trainer):
             ext="pth",
         )
         os.makedirs(save_location, exist_ok=True)
+
+        if not self.personalized_learning:
+            # if the trainer is not in the personalized learning mode
+            # then, the self.model has been optimized, to save the
+            # personalized model, the model should be copied to the
+            # self.personalized_model
+            self.copy_model_to_personalized_model(config={})
+
         self.save_personalized_model(
             filename=filename, location=save_location, **kwargs
         )
