@@ -1,14 +1,13 @@
 """
 An implementation of the personalized learning variant of FedAvg.
 
-Such an variant of FedAvg is recently mentioned and discussed in work [1].
+The core idea is to achieve personalized FL in two stages:
+First, it trains a global model using conventional FedAvg until convergence. 
+Second, each client fine-tunes the trained global model using its local data by several epochs.
 
-[1] Liam Collins, et al., "Exploiting shared representations for personalized federated learning,"
-in the Proceedings of ICML 2021.
+Due to its simplicity, no work has been proposed that specifically discusses this algorithm.
 
-    Address: https://proceedings.mlr.press/v139/collins21a.html
-
-    Code: https://github.com/lgcollins/FedRep
+Therefore, the performance of this algorithm works as the baseline for personalized federated learning.
 
 """
 
