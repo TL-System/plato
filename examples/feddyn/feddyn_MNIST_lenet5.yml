@@ -13,13 +13,6 @@ clients:
 
     random_seed: 1
 
-    # FedProx hyperparameters
-    proximal_term_penalty_constant: 1
-
-    # FedProx parameters for experiment
-    straggler_simulation: true
-    straggler_percentage: 50
-
 server:
     address: 127.0.0.1
     port: 8000
