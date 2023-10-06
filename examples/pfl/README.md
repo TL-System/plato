@@ -33,7 +33,11 @@ A model-agnostic meta-learning approach"](https://proceedings.neurips.cc/paper/2
 pip install .
 ```
 
-3. Perfrom the algorithm, such as fedrep by running
+3. Perfrom the algorithms by running:
+
+```bash
+python algorithms/fedavg_finetune/fedavg_finetune.py -c algorithms/configs/fedavg_finetune_CIFAR10_resnet18.yml -b pflExperiments
+```
 
 ```bash
 python algorithms/fedrep/fedrep.py -c algorithms/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
