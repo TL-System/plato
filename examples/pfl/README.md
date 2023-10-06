@@ -51,3 +51,14 @@ python algorithms/fedbabu/fedbabu.py -c algorithms/configs/fedbabu_CIFAR10_resne
 python algorithms/ditto/ditto.py -c algorithms/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
+```bash
+python algorithms/fedper/fedper.py -c algorithms/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/lgfedavg/lgfedavg.py -c algorithms/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
+```
