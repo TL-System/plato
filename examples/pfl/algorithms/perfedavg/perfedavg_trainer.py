@@ -2,16 +2,14 @@
 A personalized federated learning trainer using Per-FedAvg
 """
 
-import os
 from typing import Iterator, Tuple, Union
 from collections import OrderedDict
 import copy
 
 import torch
 
-from plato.utils.filename_formatter import NameFormatter
-
 from pflbases import personalized_trainer
+from plato.config import Config
 
 
 def get_data_batch(
@@ -95,9 +93,9 @@ class Trainer(personalized_trainer.Trainer):
         This implementation derives from
         https://github.com/KarhouTam/Per-FedAvg
         """
-        alpha = config["alpha"]
-        beta = config["beta"]
-        if config["hessian_free"]:  # Per-FedAvg(HF)
+        alpha = Config().algorithm.alpha
+        beta = Config().algorithm.beta
+        if Config().algorithm.hessian_free:  # Per-FedAvg(HF)
             temp_model = copy.deepcopy(self.model)
 
             grads, _ = compute_gradients(
@@ -156,8 +154,8 @@ class Trainer(personalized_trainer.Trainer):
         This implementation derives from
         https://github.com/jhoon-oh/FedBABU
         """
-        alpha = config["alpha"]
-        beta = config["beta"]
+        alpha = Config().algorithm.alpha
+        beta = Config().algorithm.beta
         temp_net = copy.deepcopy(list(self.model.parameters()))
 
         # Step 1

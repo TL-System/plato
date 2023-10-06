@@ -9,8 +9,9 @@ import copy
 
 import torch
 
-from plato.trainers import basic_personalized
+from pflbases import personalized_trainer
 from plato.utils.filename_formatter import NameFormatter
+from plato.config import Config
 
 
 def get_data_batch(
@@ -74,7 +75,7 @@ def compute_gradients(
         return grads, loss
 
 
-class Trainer(basic_personalized.Trainer):
+class Trainer(personalized_trainer.Trainer):
     """A personalized federated learning trainer using the Per-FedAvg algorithm."""
 
     def __init__(self, model=None, callbacks=None):
@@ -94,9 +95,9 @@ class Trainer(basic_personalized.Trainer):
         This implementation derives from
         https://github.com/KarhouTam/Per-FedAvg
         """
-        alpha = config["alpha"]
-        beta = config["beta"]
-        if config["hessian_free"]:  # Per-FedAvg(HF)
+        alpha = Config().algorithm.alpha
+        beta = Config().algorithm.beta
+        if Config().algorithm.hessian_free:  # Per-FedAvg(HF)
             temp_model = copy.deepcopy(self.model)
 
             grads, _ = compute_gradients(
@@ -155,8 +156,9 @@ class Trainer(basic_personalized.Trainer):
         This implementation derives from
         https://github.com/jhoon-oh/FedBABU
         """
-        alpha = config["alpha"]
-        beta = config["beta"]
+        alpha = Config().algorithm.alpha
+        beta = Config().algorithm.beta
+
         temp_net = copy.deepcopy(list(self.model.parameters()))
 
         # Step 1

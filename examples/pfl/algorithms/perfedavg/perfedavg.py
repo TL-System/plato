@@ -15,7 +15,7 @@ from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 from pflbases import personalized_client
 from pflbases.trainer_callbacks import separate_trainer_callbacks
-from pflbases.client_callbacks import personalized_completion_callbacks
+from pflbases.client_callbacks import base_callbacks
 
 import perfedavg_trainer
 
@@ -28,9 +28,7 @@ def main():
     client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        callbacks=[
-            personalized_completion_callbacks.ClientModelPersonalizedCompletionCallback,
-        ],
+        callbacks=[base_callbacks.ClientPayloadCallback],
         trainer_callbacks=[
             separate_trainer_callbacks.PersonalizedModelMetricCallback,
             separate_trainer_callbacks.PersonalizedModelStatusCallback,
