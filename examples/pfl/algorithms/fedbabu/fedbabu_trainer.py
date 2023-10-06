@@ -17,7 +17,7 @@ class Trainer(personalized_trainer.Trainer):
         if modules_name is not None:
             frozen_params = []
             for name, param in model.named_parameters():
-                # For each module name in the model, if it contains the keyword
+                # For each module in the model, if it contains the keyword
                 # listed in required frozen modules list, we will freeze this module.
                 if any(param_name in name for param_name in modules_name):
                     param.requires_grad = False
