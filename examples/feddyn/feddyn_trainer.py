@@ -52,7 +52,7 @@ class Trainer(basic.Trainer):
         # The second one is the linear penalty, we need to calculate the
         # dot multiplication between the current parameters and
         # the model updates in the last round.
-        # The thrid part is L2 loss, which is reliazed by weight decay in optimizer.
+        # The third part is L2 loss, which is realized by weight decay in optimizer.
 
         # Get oridinary loss of the task.
         loss_task = self._loss_criterion(outputs, labels)
