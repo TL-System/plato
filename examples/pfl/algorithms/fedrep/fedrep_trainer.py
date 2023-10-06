@@ -42,7 +42,7 @@ class Trainer(personalized_trainer.Trainer):
         super().train_run_start(config)
         if self.personalized_learning:
             self.freeze_model(
-                self.personalized_model, Config().algorithm.frozen_modules_name
+                self.personalized_model, Config().algorithm.global_modules_name
             )
 
     def train_epoch_start(self, config):
@@ -81,7 +81,7 @@ class Trainer(personalized_trainer.Trainer):
         super().train_run_end(config)
         if self.personalized_learning:
             self.activate_model(
-                self.personalized_model, Config().algorithm.frozen_modules_name
+                self.personalized_model, Config().algorithm.global_modules_name
             )
 
         # assign the trained model to the personalized model during

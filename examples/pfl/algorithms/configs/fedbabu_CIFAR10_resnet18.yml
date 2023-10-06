@@ -34,7 +34,6 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    head_epochs: 2
 
     global_modules_name:
         - conv1
@@ -44,10 +43,13 @@ algorithm:
         - layer3
         - layer4
 
-    head_modules_name:
+    personalized_modules_name:
         - linear
 
     completion_modules_name:
+        - linear
+
+    frozen_modules_name:
         - linear
 
     personalization:

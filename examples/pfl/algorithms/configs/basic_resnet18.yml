@@ -2,7 +2,7 @@
   type: basic
 
   # The maximum number of training rounds
-  rounds: 40
+  rounds: 5
 
   # The maximum number of clients running concurrently
   max_concurrency: 4
