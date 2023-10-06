@@ -24,7 +24,7 @@ class Trainer(basic.Trainer):
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
-        self.server_model_param = None
+        self.global_model_param = None
         self.local_param_last_epoch = None
 
     def perform_forward_and_backward_passes(
@@ -47,17 +47,17 @@ class Trainer(basic.Trainer):
 
         self.optimizer.zero_grad()
         outputs = self.model(examples)
-        # In the paper's formulation onem the loss has three parts.
+        # In the paper's formulation (1), the loss has three parts.
         # The first one is the ordinary loss such as CrossEntropy
-        # The second one is the linear penalty, using client model parameters
-        # in the last epoch, the global model parameters
-        # and the current client model parameters.
+        # The second one is the linear penalty, we need to calculate the
+        # dot multiplication between the current parameters and
+        # the model updates in the last round.
         # The thrid part is L2 loss, which is reliazed by weight decay in optimizer.
 
-        # Get esimated client loss
+        # Get oridinary loss of the task.
         loss_task = self._loss_criterion(outputs, labels)
 
-        # Get linear penalty on the current client parameters
+        # Get linear penalty on the current client parameters.
         local_params = self.model.state_dict()
         loss_penalty = torch.zeros(adaptive_alpha_coef.shape).to(self.device)
         adaptive_alpha_coef = torch.Tensor(adaptive_alpha_coef).to(self.device)
@@ -65,7 +65,7 @@ class Trainer(basic.Trainer):
             loss_penalty += adaptive_alpha_coef * torch.sum(
                 local_params[parameter_name]
                 * (
-                    -self.server_model_param[parameter_name].to(self.device)
+                    -self.global_model_param[parameter_name].to(self.device)
                     + self.local_param_last_epoch[parameter_name].to(self.device)
                 )
             )
@@ -82,8 +82,8 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         super().train_run_start(config)
         # At the beginning of each round,
-        # the client model parameters are the same as the server model parameters
-        self.server_model_param = copy.deepcopy(self.model.state_dict())
+        # the client model parameters are the same as the global model parameters.
+        self.global_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
         filename = f"{model_path}_{self.client_id}.pth"
