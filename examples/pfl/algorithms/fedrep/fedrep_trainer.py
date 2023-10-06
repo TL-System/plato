@@ -8,6 +8,9 @@ from pflbases import personalized_trainer
 from pflbases import fedavg_partial
 
 
+from plato.config import Config
+
+
 class Trainer(personalized_trainer.Trainer):
     """A trainer to freeze and activate modules of one model
     for normal and personalized learning processes."""
@@ -38,7 +41,9 @@ class Trainer(personalized_trainer.Trainer):
         """Freezing the body"""
         super().train_run_start(config)
         if self.personalized_learning:
-            self.freeze_model(self.personalized_model, config["frozen_modules_name"])
+            self.freeze_model(
+                self.personalized_model, Config().algorithm.frozen_modules_name
+            )
 
     def train_epoch_start(self, config):
         """
@@ -63,19 +68,21 @@ class Trainer(personalized_trainer.Trainer):
             )
 
             if self.current_epoch <= head_epochs:
-                self.freeze_model(self.model, config["global_modules_name"])
-                self.activate_model(self.model, config["head_modules_name"])
+                self.freeze_model(self.model, Config().algorithm.global_modules_name)
+                self.activate_model(self.model, Config().algorithm.head_modules_name)
 
             # The representation will then be optimized for only one epoch
             if self.current_epoch > head_epochs:
-                self.freeze_model(self.model, config["head_modules_name"])
-                self.activate_model(self.model, config["global_modules_name"])
+                self.freeze_model(self.model, Config().algorithm.head_modules_name)
+                self.activate_model(self.model, Config().algorithm.global_modules_name)
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
         if self.personalized_learning:
-            self.activate_model(self.personalized_model, config["frozen_modules_name"])
+            self.activate_model(
+                self.personalized_model, Config().algorithm.frozen_modules_name
+            )
 
         # assign the trained model to the personalized model during
         # the normal federated learning
