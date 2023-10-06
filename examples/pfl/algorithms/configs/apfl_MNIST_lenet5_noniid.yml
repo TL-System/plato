@@ -37,25 +37,9 @@ algorithm:
     alpha: 0.75
     adaptive_alpha: True
     
-
     personalization:
 
-        alpha: 0.75
-        adaptive_alpha: True
-
-        logging_iteration_interval: 50
-        logging_epoch_interval: 1
-        model_logging_epoch_interval: 2
-
         model_name: resnet_18
-
-        frozen_modules_name:
-            - conv1
-            - bn1
-            - layer1
-            - layer2
-            - layer3
-            - layer4
 
         # the ratio of clients participanting in training
         participant_clients_ratio: 1.0

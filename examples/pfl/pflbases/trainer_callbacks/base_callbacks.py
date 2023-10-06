@@ -23,6 +23,7 @@ import os
 import logging
 
 from plato.callbacks import trainer as trainer_callbacks
+from plato.config import Config
 
 
 class PersonalizedLogProgressCallback(trainer_callbacks.LogProgressCallback):
@@ -80,18 +81,30 @@ class PersonalizedMetricCallback(trainer_callbacks.TrainerCallback):
 
     def on_train_run_start(self, trainer, config, **kwargs):
         super().on_train_run_start(trainer, config, **kwargs)
-        # perform test for the personalized model
-        trainer.perform_personalized_metric_checkpoint(config)
+        if (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
+        ):
+            # perform test for the personalized model
+            trainer.perform_personalized_metric_checkpoint(config)
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
         super().on_train_epoch_end(trainer, config, **kwargs)
-        # perform test for the personalized model
-        trainer.perform_personalized_metric_checkpoint(config)
+        if (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
+        ):
+            # perform test for the personalized model
+            trainer.perform_personalized_metric_checkpoint(config)
 
     def on_train_run_end(self, trainer, config, **kwargs):
         super().on_train_run_end(trainer, config, **kwargs)
-        # perform test for the personalized model
-        trainer.perform_personalized_metric_checkpoint(config)
+        if (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
+        ):
+            # perform test for the personalized model
+            trainer.perform_personalized_metric_checkpoint(config)
 
 
 class PersonalizedModelCallback(trainer_callbacks.TrainerCallback):
@@ -101,16 +114,20 @@ class PersonalizedModelCallback(trainer_callbacks.TrainerCallback):
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
         super().on_train_epoch_end(trainer, config, **kwargs)
-        log_epoch_interval = (
-            config["model_logging_epoch_interval"]
-            if "model_logging_epoch_interval" in config
-            else 1
-        )
-        current_epoch = trainer.current_epoch
+        if (
+            hasattr(Config().algorithm.personalization, "log_model_per_epoch")
+            and Config().algorithm.personalization.log_model_per_epoch
+        ):
+            log_epoch_interval = (
+                config["model_logging_epoch_interval"]
+                if "model_logging_epoch_interval" in config
+                else 1
+            )
+            current_epoch = trainer.current_epoch
 
-        if current_epoch % log_epoch_interval == 0:
-            if "max_concurrency" in config:
-                trainer.perform_personalized_model_checkpoint(config, current_epoch)
+            if current_epoch % log_epoch_interval == 0:
+                if "max_concurrency" in config:
+                    trainer.perform_personalized_model_checkpoint(config, current_epoch)
 
     def on_train_run_end(self, trainer, config, **kwargs):
         super().on_train_run_end(trainer, config, **kwargs)

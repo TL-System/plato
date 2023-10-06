@@ -362,17 +362,6 @@ class Trainer(basic.Trainer):
             location=checkpoint_dir_path,
         )
 
-    def collect_batch_outputs(self, metrics_collector: dict):
-        """Collecting the outputs of one batch samples."""
-
-        for metric_name, metric_data in self.personalized_metric_outputs.items():
-            if metric_name not in metrics_collector:
-                metrics_collector[metric_name] = [metric_data.detach().cpu().numpy()]
-            else:
-                metrics_collector[metric_name].append(
-                    metric_data.detach().cpu().numpy()
-                )
-
     def test_personalized_model(self, config, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
