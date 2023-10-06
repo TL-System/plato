@@ -43,7 +43,7 @@ class Server(fedavg.Server):
         # Update server control variate
         for client_control_variate_delta in self.received_client_control_variates:
             for name, param in client_control_variate_delta.items():
-                self.server_control_variate[name] += param * (1 / Config().clients.total_clients)
+                self.server_control_variate[name] += param.cpu() * (1 / Config().clients.total_clients)
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."
