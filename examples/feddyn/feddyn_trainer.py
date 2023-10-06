@@ -11,14 +11,12 @@ Source code: https://github.com/alpemreacar/FedDyn
 import copy
 import os
 import torch
-import numpy as np
 
 from plato.config import Config
 from plato.trainers import basic
 
 
 # pylint:disable=no-member
-# pylint:disable=too-many-instance-attributes
 class Trainer(basic.Trainer):
     """
     FedDyn's Trainer.
@@ -36,7 +34,7 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        weight_list = labels / np.sum(labels) * Config().clients.total_clients
+        weight_list = labels / torch.sum(labels) * Config().clients.total_clients
 
         alpha_coef = (
             Config().algorithm.alpha_coef
@@ -62,7 +60,7 @@ class Trainer(basic.Trainer):
         # Get linear penalty on the current client parameters
         local_params = self.model.state_dict()
         loss_penalty = torch.zeros(adaptive_alpha_coef.shape).to(self.device)
-        adaptive_alpha_coef = torch.tensor(adaptive_alpha_coef).to(self.device)
+        adaptive_alpha_coef = torch.Tensor(adaptive_alpha_coef).to(self.device)
         for parameter_name in local_params:
             loss_penalty += adaptive_alpha_coef * torch.sum(
                 local_params[parameter_name]
