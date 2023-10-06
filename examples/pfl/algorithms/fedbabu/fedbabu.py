@@ -20,7 +20,7 @@ import fedbabu_trainer
 
 def main():
     """
-    A personalized federated learning sesstion for FedBABU approach.
+    A personalized federated learning sesstion for FedBABU algorithm under the supervised setting.
     """
     trainer = fedbabu_trainer.Trainer
     client = fedbabu_client.Client(
