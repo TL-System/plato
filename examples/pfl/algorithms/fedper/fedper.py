@@ -9,11 +9,11 @@ Third-part code: https://github.com/jhoon-oh/FedBABU
 """
 
 from pflbases import fedavg_personalized_server
+from pflbases import personalized_client
 from pflbases import fedavg_partial
 from pflbases.client_callbacks import personalized_completion_callbacks
 from pflbases.trainer_callbacks import semi_mixing_trainer_callbacks
 
-import fedper_client
 import fedper_trainer
 
 
@@ -22,7 +22,7 @@ def main():
     A personalized federated learning sesstion for FedPer approach.
     """
     trainer = fedper_trainer.Trainer
-    client = fedper_client.Client(
+    client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[

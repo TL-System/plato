@@ -11,11 +11,11 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 from pflbases import fedavg_personalized_server
+from pflbases import personalized_client
 from pflbases import fedavg_partial
 from pflbases.client_callbacks import personalized_completion_callbacks
 from pflbases.trainer_callbacks import semi_mixing_trainer_callbacks
 
-import fedrep_client
 import fedrep_trainer
 
 
@@ -24,7 +24,7 @@ def main():
     A personalized federated learning sesstion for PerFedAvg approach.
     """
     trainer = fedrep_trainer.Trainer
-    client = fedrep_client.Client(
+    client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[

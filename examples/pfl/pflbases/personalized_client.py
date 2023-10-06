@@ -179,15 +179,15 @@ class Client(simple.Client):
         self.trainer.personalized_model.load_state_dict(
             loaded_status["model"], strict=True
         )
-        return loaded_status
 
     def inbound_received(self, inbound_processor):
         """Reloading the personalized model for this client before any operations."""
         super().inbound_received(inbound_processor)
 
         # load the personalized model before training
-        if self.is_personalized_learn() and self.trainer.personalized_model is not None:
-            self.load_personalized_model()
+        # if self.is_personalized_learn() and self.trainer.personalized_model is not None:
+        #     self.load_personalized_model()
+        self.load_personalized_model()
 
         # assign the testset and testset sampler to the trainer
         self.trainer.set_testset(self.testset)

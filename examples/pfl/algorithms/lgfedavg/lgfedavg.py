@@ -10,11 +10,11 @@ Official code: https://github.com/pliang279/LG-FedAvg
 """
 
 from pflbases import fedavg_personalized_server
+from pflbases import personalized_client
 from pflbases import fedavg_partial
 from pflbases.client_callbacks import personalized_completion_callbacks
 from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
-import lgfedavg_client
 import lgfedavg_trainer
 
 
@@ -23,7 +23,7 @@ def main():
     A Plato personalized federated learning sesstion for LG-FedAvg approach.
     """
     trainer = lgfedavg_trainer.Trainer
-    client = lgfedavg_client.Client(
+    client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[

@@ -10,11 +10,11 @@ Third-part code: https://github.com/lgcollins/FedRep
 """
 
 from pflbases import fedavg_personalized_server
+from pflbases import personalized_client
 from pflbases import fedavg_partial
 from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
 import ditto_trainer_callbacks
-import ditto_client
 import ditto_trainer_v2 as ditto_trainer
 
 
@@ -23,7 +23,7 @@ def main():
     A personalized federated learning sesstion for Ditto approach.
     """
     trainer = ditto_trainer.Trainer
-    client = ditto_client.Client(
+    client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         trainer_callbacks=[
