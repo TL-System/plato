@@ -42,7 +42,7 @@ class DataSource:
         if not os.path.exists(file_name.replace('.gz', '')):
             logging.info("Downloading %s.", url)
 
-            res = requests.get(url, stream=True)
+            res = requests.get(url, verify=False, stream=True)
             total_size = int(res.headers["Content-Length"])
             downloaded_size = 0
 
