@@ -122,7 +122,13 @@ class Trainer(basic.Trainer):
 
     def get_personalized_model_params(self):
         """Get the params of the personalized model."""
-        return Config().parameters.personalization.model._asdict()
+        if hasattr(Config().parameters, "personalization"):
+            return Config().parameters.personalization.model._asdict()
+        else:
+            if hasattr(Config().parameters, "model"):
+                return Config().parameters.model._asdict()
+            else:
+                return {}
 
     def get_checkpoint_dir_path(self):
         """Get the checkpoint path for current client."""
@@ -131,7 +137,9 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if not self.personalized_learning:
+        if not self.personalized_learning or not hasattr(
+            Config().algorithm, "personalization"
+        ):
             return super().get_loss_criterion()
 
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
@@ -145,6 +153,10 @@ class Trainer(basic.Trainer):
 
     def get_personalized_optimizer(self):
         """Getting the optimizer for personalized model."""
+
+        if not hasattr(Config().algorithm, "personalization"):
+            return super().get_optimizer(self.personalized_model)
+
         optimizer_name = Config().algorithm.personalization.optimizer
         optimizer_params = Config().parameters.personalization.optimizer._asdict()
 
@@ -156,6 +168,10 @@ class Trainer(basic.Trainer):
 
     def get_personalized_lr_scheduler(self, config, optimizer):
         """Getting the lr scheduler for personalized model."""
+
+        if not hasattr(Config().algorithm, "personalization"):
+            return super().get_lr_scheduler(config, optimizer)
+
         lr_scheduler = Config().algorithm.personalization.lr_scheduler
         lr_params = Config().parameters.personalization.learning_rate._asdict()
 
@@ -182,7 +198,9 @@ class Trainer(basic.Trainer):
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader for personalization."""
-        if self.personalized_learning:
+        if self.personalized_learning and hasattr(
+            Config().algorithm, "personalization"
+        ):
             personalized_config = Config().algorithm.personalization._asdict()
             batch_size = personalized_config["batch_size"]
 

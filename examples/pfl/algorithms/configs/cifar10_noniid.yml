@@ -6,6 +6,7 @@ partition_size: 1000
 
 # IID or non-IID?
 sampler: noniid
+testset_sampler: noniid
 concentration: 1
 
 # The random seed for sampling data

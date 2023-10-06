@@ -8,7 +8,6 @@ Second, each client fine-tunes the trained global model using its local data by 
 Due to its simplicity, no work has been proposed that specifically discusses this algorithm.
 
 Therefore, the performance of this algorithm works as the baseline for personalized federated learning.
-
 """
 
 
