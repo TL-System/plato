@@ -1,8 +1,8 @@
 """
 An implementation of the FedDyn algorithm.
 
-D. Acar, et al., "Federated Learning Based on Dynamic Regularization ,"
-in the Proceedings of ICLR 2021.
+D. Acar, et al., "Federated Learning Based on Dynamic Regularization," in the
+Proceedings of ICLR 2021.
 
 https://openreview.net/forum?id=B7v4QMR6Z9w
 
@@ -15,10 +15,10 @@ import feddyn_trainer
 
 
 def main():
-    """A Plato federated learning training session using FedProx."""
+    """A Plato federated learning training session using FedDyn."""
     trainer = feddyn_trainer.Trainer
     client = simple.Client(trainer=trainer)
-    server = fedavg.Server(trainer=trainer)
+    server = fedavg.Server()
     server.run(client)
 
 

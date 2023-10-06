@@ -11,14 +11,12 @@ Source code: https://github.com/alpemreacar/FedDyn
 import copy
 import os
 import torch
-import numpy as np
 
 from plato.config import Config
 from plato.trainers import basic
 
 
 # pylint:disable=no-member
-# pylint:disable=too-many-instance-attributes
 class Trainer(basic.Trainer):
     """
     FedDyn's Trainer.
@@ -26,10 +24,9 @@ class Trainer(basic.Trainer):
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
-        self.cld_mdl_param = None
-        self.local_param_list = None
+        self.global_model_param = None
+        self.local_param_last_epoch = None
 
-    # pylint:disable=too-many-locals
     def perform_forward_and_backward_passes(
         self,
         config,
@@ -37,51 +34,45 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        _labels = labels.cpu().numpy()
-        weight_list = _labels / np.sum(_labels) * Config().clients.total_clients
+        weight_list = labels / torch.sum(labels) * Config().clients.total_clients
 
         alpha_coef = (
-                Config().algorithm.alpha_coef
-                if hasattr(Config().algorithm, "alpha_coef")
-                else 0.01
-            )
-        adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
-
-        # According to original source code, they use cld_mdl_param_tensor
-        # as avg_mdl_param in the train_feddyn_mdl function
-        avg_mdl_param = self.cld_mdl_param
-        local_grad_vector = self.local_param_list
-
-        model = self.model.to(self.device)
-        loss_fn = torch.nn.CrossEntropyLoss(reduction="sum")
+            Config().algorithm.alpha_coef
+            if hasattr(Config().algorithm, "alpha_coef")
+            else 0.01
+        )
+        adaptive_alpha_coef = alpha_coef / torch.where(
+            weight_list != 0, weight_list, 1.0
+        )
 
         self.optimizer.zero_grad()
+        outputs = self.model(examples)
 
-        examples = examples.to(self.device)
-        labels = labels.to(self.device)
-        ## Get f_i estimate
-        loss_f_i = loss_fn(model(examples), labels.reshape(-1).long())
-        loss_f_i = loss_f_i / list(labels.size())[0]
+        # In the paper's formulation (1), the loss has three parts.
+        # (1) The ordinary loss such as CrossEntropy.
+        # (2) The linear penalty, we need to calculate the dot product between the
+        # current model parameters and model updates in the previous round.
+        # (3) The L2 loss, which is realized by the weight decay in the optimizer.
 
-        # Get linear penalty on the current parameter estimates
-        local_par_list = None
+        # Get oridinary loss of the task
+        loss_task = self._loss_criterion(outputs, labels)
 
-        for param in model.parameters():
-            if not isinstance(local_par_list, torch.Tensor):
-                # Initially nothing to concatenate
-                local_par_list = param.reshape(-1)
-            else:
-                local_par_list = torch.cat((local_par_list, param.reshape(-1)), 0)
+        # Get linear penalty on the current client parameters.
+        local_params = self.model.state_dict()
+        loss_penalty = torch.zeros(adaptive_alpha_coef.shape).to(self.device)
+        adaptive_alpha_coef = torch.Tensor(adaptive_alpha_coef).to(self.device)
 
-        loss_algo = torch.tensor(adaptive_alpha_coef * 0).to(loss_f_i.device)
+        for parameter_name in local_params:
+            loss_penalty += adaptive_alpha_coef * torch.sum(
+                local_params[parameter_name]
+                * (
+                    -self.global_model_param[parameter_name].to(self.device)
+                    + self.local_param_last_epoch[parameter_name].to(self.device)
+                )
+            )
 
-        if not local_grad_vector == 0:
-            for avg_param, local_param in zip(avg_mdl_param, local_grad_vector):
-                loss_algo = torch.tensor(adaptive_alpha_coef).to(
-                    loss_f_i.device
-                ) * torch.sum(local_par_list * (-avg_param + local_param))
-        loss_algo = torch.mean(loss_algo)
-        loss = loss_f_i + loss_algo
+        loss_penalty = torch.sum(loss_penalty)
+        loss = loss_task + loss_penalty
         loss.backward()
 
         self.optimizer.step()
@@ -89,23 +80,18 @@ class Trainer(basic.Trainer):
 
         return loss
 
-    def train_step_start(self, config, batch=None):
-        super().train_step_start(config, batch)
-
-        if not self.model_state_dict:
-            self.model_state_dict = self.model.state_dict()
-        cld_mdl_param = []
-        if self.model_state_dict:
-            cld_mdl_param = copy.deepcopy(self.model_state_dict)
+    def train_run_start(self, config):
+        super().train_run_start(config)
+        # At the beginning of each round, the client model parameters are the same as the
+        # global model parameters.
+        self.global_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
         filename = f"{model_path}_{self.client_id}.pth"
-        local_param_list = []
-        if self.model_state_dict:
-            local_param_list = 0
         if os.path.exists(filename):
-            local_model = torch.load(filename)
-            local_param_list = copy.deepcopy(local_model.state_dict())
-
-        self.cld_mdl_param = cld_mdl_param
-        self.local_param_list = local_param_list
+            self.local_param_last_epoch = torch.load(filename).state_dict()
+        else:
+            # If it does not exist, this client has not trained any model yet.
+            # The client model parameters in last epoch are the same as the global model
+            # parameters.
+            self.local_param_last_epoch = copy.deepcopy(self.model.state_dict())
