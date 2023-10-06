@@ -34,10 +34,6 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    # the chosen of lambda derives from 
-    # the appendix D.2 of the paper and 
-    # from the https://github.com/lgcollins/FedRep
-    ditto_lambda: 1.0
 
     personalization:
 
@@ -47,13 +43,12 @@ algorithm:
         participant_clients_ratio: 1.0
         
         # whether load the personalized each round
-        load_model_per_round: true
-        
+        load_model_per_round: false
         # whether maintain and load the trained 
         # personalied model
         # set to be true, each client will load
         # the latest trained personalized model
-        persist_personalized_model: True
+        persist_personalized_model: False
 
         # do personalization 
         # for every `do_personalization_interval` rounds

@@ -185,9 +185,13 @@ class Client(simple.Client):
         super().inbound_received(inbound_processor)
 
         # load the personalized model before training
-        # if self.is_personalized_learn() and self.trainer.personalized_model is not None:
-        #     self.load_personalized_model()
-        self.load_personalized_model()
+        if (
+            hasattr(Config().algorithm.personalization, "load_model_per_round")
+            and Config().algorithm.personalization.load_model_per_round
+        ) or (
+            self.is_personalized_learn() and self.trainer.personalized_model is not None
+        ):
+            self.load_personalized_model()
 
         # assign the testset and testset sampler to the trainer
         self.trainer.set_testset(self.testset)

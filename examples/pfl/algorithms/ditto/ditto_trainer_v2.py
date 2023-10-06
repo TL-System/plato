@@ -61,7 +61,10 @@ class Trainer(personalized_trainer.Trainer):
         """Performing the personalized learning of Ditto."""
         # save the personalized model for current round
         # to the model dir of this client
-        personalized_epochs = Config().algorithm.personalization.epochs
+        personalized_epochs = config["epochs"]
+        if hasattr(Config().algorithm.personalization, "epochs"):
+            personalized_epochs = Config().algorithm.personalization.epochs
+
         if self.personalized_learning:
             return
 
