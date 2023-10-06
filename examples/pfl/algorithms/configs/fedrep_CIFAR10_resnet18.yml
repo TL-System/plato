@@ -9,7 +9,7 @@ clients:
     per_round: 100
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     random_seed: 1
 
@@ -33,6 +33,64 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
+
+    head_epochs: 2
+
+    global_modules_name:
+        - conv1
+        - bn1
+        - layer1
+        - layer2
+        - layer3
+        - layer4
+
+    head_modules_name:
+        - linear
+
+    completion_modules_name:
+        - linear
+
+    personalization:
+
+        # # Number of epochs for local training in each communication round
+        # #   The batch size for the downstream task can be larger as it
+        # # does not utilize the
+        # epochs: 10
+        # batch_size: 32
+        # optimizer: SGD
+        # lr_scheduler: StepLR
+        # loss_criterion: CrossEntropyLoss
+
+        logging_iteration_interval: 50
+        logging_epoch_interval: 1
+        model_logging_epoch_interval: 2
+
+        model_name: resnet_18
+
+        frozen_modules_name:
+            - conv1
+            - bn1
+            - layer1
+            - layer2
+            - layer3
+            - layer4
+
+        # the ratio of clients participanting in training
+        participant_clients_ratio: 1.0
+        
+        # whether maintain and load the trained 
+        # personalied model
+        # set to be true, each client will load
+        # the latest trained personalized model
+        persist_personalized_model: True
+
+        # do personalization 
+        # for every `do_personalization_interval` rounds
+        # set -1 to do personalized only after the final round
+        do_personalization_interval: -1
+        # total, participant, nonparticipant
+        do_personalization_group: total
+
 
 parameters:
     # ResNet-18 training params
