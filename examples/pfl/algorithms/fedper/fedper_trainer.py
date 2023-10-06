@@ -7,6 +7,8 @@ import logging
 from pflbases import personalized_trainer
 from pflbases import fedavg_partial
 
+from plato.config import Config
+
 
 class Trainer(personalized_trainer.Trainer):
     """A trainer to freeze and activate modules of one model
@@ -40,15 +42,14 @@ class Trainer(personalized_trainer.Trainer):
         """
         super().train_run_start(config)
         if self.personalized_learning:
-            self.freeze_model(self.personalized_model, config["frozen_modules_name"])
+            self.freeze_model(
+                self.personalized_model, Config().algorithm.global_modules_name
+            )
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
         if self.personalized_learning:
-            self.activate_model(self.personalized_model, config["frozen_modules_name"])
-
-        # assign the trained model to the personalized model during
-        # the normal federated learning
-        if not self.personalized_learning:
-            self.copy_model_to_personalized_model(config)
+            self.activate_model(
+                self.personalized_model, Config().algorithm.global_modules_name
+            )
