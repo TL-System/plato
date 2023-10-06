@@ -47,20 +47,21 @@ class Trainer(basic.Trainer):
 
         self.optimizer.zero_grad()
         outputs = self.model(examples)
-        # In the paper's formulation (1), the loss has three parts.
-        # The first one is the ordinary loss such as CrossEntropy
-        # The second one is the linear penalty, we need to calculate the
-        # dot multiplication between the current parameters and
-        # the model updates in the last round.
-        # The third part is L2 loss, which is realized by weight decay in optimizer.
 
-        # Get oridinary loss of the task.
+        # In the paper's formulation (1), the loss has three parts.
+        # (1) The ordinary loss such as CrossEntropy.
+        # (2) The linear penalty, we need to calculate the dot product between the
+        # current model parameters and model updates in the previous round.
+        # (3) The L2 loss, which is realized by the weight decay in the optimizer.
+
+        # Get oridinary loss of the task
         loss_task = self._loss_criterion(outputs, labels)
 
         # Get linear penalty on the current client parameters.
         local_params = self.model.state_dict()
         loss_penalty = torch.zeros(adaptive_alpha_coef.shape).to(self.device)
         adaptive_alpha_coef = torch.Tensor(adaptive_alpha_coef).to(self.device)
+
         for parameter_name in local_params:
             loss_penalty += adaptive_alpha_coef * torch.sum(
                 local_params[parameter_name]
@@ -81,8 +82,8 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         super().train_run_start(config)
-        # At the beginning of each round,
-        # the client model parameters are the same as the global model parameters.
+        # At the beginning of each round, the client model parameters are the same as the
+        # global model parameters.
         self.global_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
@@ -91,5 +92,6 @@ class Trainer(basic.Trainer):
             self.local_param_last_epoch = torch.load(filename).state_dict()
         else:
             # If it does not exist, this client has not trained any model yet.
-            # The client model parameters last epoch are the same as the global model parameters.
+            # The client model parameters in last epoch are the same as the global model
+            # parameters.
             self.local_param_last_epoch = copy.deepcopy(self.model.state_dict())
