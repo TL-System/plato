@@ -29,7 +29,6 @@ class Trainer(basic.Trainer):
         self.server_model_param = None
         self.local_param_last_epoch = None
 
-    # pylint:disable=too-many-locals
     def perform_forward_and_backward_passes(
         self,
         config,
@@ -37,20 +36,28 @@ class Trainer(basic.Trainer):
         labels,
     ):
         """Perform forward and backward passes in the training loop."""
-        _labels = labels.cpu().numpy()
-        weight_list = _labels / np.sum(_labels) * Config().clients.total_clients
+        weight_list = labels / np.sum(labels) * Config().clients.total_clients
 
         alpha_coef = (
             Config().algorithm.alpha_coef
             if hasattr(Config().algorithm, "alpha_coef")
             else 0.01
         )
-        adaptive_alpha_coef = alpha_coef / np.where(weight_list != 0, weight_list, 1.0)
+        adaptive_alpha_coef = alpha_coef / torch.where(
+            weight_list != 0, weight_list, 1.0
+        )
 
         self.optimizer.zero_grad()
         outputs = self.model(examples)
-        ## Get esimated client loss
-        loss_client = self._loss_criterion(outputs, labels)
+        # In the paper's formulation onem the loss has three parts.
+        # The first one is the ordinary loss such as CrossEntropy
+        # The second one is the linear penalty, using client model parameters
+        # in the last epoch, the global model parameters
+        # and the current client model parameters.
+        # The thrid part is L2 loss, which is reliazed by weight decay in optimizer.
+
+        # Get esimated client loss
+        loss_task = self._loss_criterion(outputs, labels)
 
         # Get linear penalty on the current client parameters
         local_params = self.model.state_dict()
@@ -66,7 +73,7 @@ class Trainer(basic.Trainer):
             )
 
         loss_penalty = torch.sum(loss_penalty)
-        loss = loss_client + loss_penalty
+        loss = loss_task + loss_penalty
         loss.backward()
 
         self.optimizer.step()
@@ -77,7 +84,7 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         super().train_run_start(config)
         # At the beginning of each round,
-        # the client model weights are the same as the server model weights
+        # the client model parameters are the same as the server model parameters
         self.server_model_param = copy.deepcopy(self.model.state_dict())
 
         model_path = Config().params["model_path"]
@@ -85,6 +92,6 @@ class Trainer(basic.Trainer):
         if os.path.exists(filename):
             self.local_param_last_epoch = torch.load(filename).state_dict()
         else:
-            # If it does not exist,  this client has not trained any model yet.
-            # The client model weights last epoch are the same as the global model weights.
+            # If it does not exist, this client has not trained any model yet.
+            # The client model parameters last epoch are the same as the global model parameters.
             self.local_param_last_epoch = copy.deepcopy(self.model.state_dict())
