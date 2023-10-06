@@ -36,5 +36,5 @@ pip install .
 3. Perfrom the algorithm, such as fedrep by running
 
 ```bash
-python algorithms/fedrep/fedrep.py -c algorithms/fedrep/fedrep_MNIST_lenet5_noniid.yml
+python algorithms/fedrep/fedrep.py -c algorithms/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
 ```
