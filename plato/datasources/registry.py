@@ -102,6 +102,10 @@ def get(client_id: int = 0, **kwargs):
         from plato.datasources import yolo
 
         return yolo.DataSource(**kwargs)
+    if datasource_name == "YOLOv8":
+        from plato.datasources import yolov8
+
+        return yolov8.DataSource(**kwargs)
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:

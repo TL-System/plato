@@ -88,7 +88,7 @@ class DataSource(base.DataSource):
                 train_path,
                 self.image_size,
                 Config().trainer.batch_size,
-                augment=False,  # augment images
+                augment=True,  # augment images
                 hyp=None,  # augmentation hyperparameters
                 rect=False,  # rectangular training
                 cache_images=False,
@@ -111,7 +111,7 @@ class DataSource(base.DataSource):
                 test_path,
                 self.image_size,
                 Config().trainer.batch_size,
-                augment=False,  # augment images
+                augment=True,  # augment images
                 hyp=None,  # augmentation hyperparameters
                 rect=False,  # rectangular training
                 cache_images=False,

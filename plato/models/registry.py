@@ -88,4 +88,9 @@ def get(**kwargs: Union[str, dict]):
 
         return yolov5.Model(**model_params)
 
+    if model_name == "yolov8":
+        from plato.models import yolov8
+
+        return yolov8.Model.get()
+
     raise ValueError(f"No such model: {model_name}")
