@@ -82,12 +82,7 @@ def get(**kwargs: Union[str, dict]):
             model_name=model_name, **model_params
         )
 
-    # The YOLOv5 model needs special handling as it needs to import third-party packages
-    if model_name == "yolov5":
-        from plato.models import yolov5
-
-        return yolov5.Model(**model_params)
-
+    # The YOLOv8 model needs special handling as it needs to import third-party packages
     if model_name == "yolov8":
         from plato.models import yolov8
 

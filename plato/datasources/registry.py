@@ -98,10 +98,6 @@ def get(client_id: int = 0, **kwargs):
 
         return coco.DataSource(**kwargs)
 
-    if datasource_name == "YOLO":
-        from plato.datasources import yolo
-
-        return yolo.DataSource(**kwargs)
     if datasource_name == "YOLOv8":
         from plato.datasources import yolov8
 
