@@ -81,30 +81,21 @@ class PersonalizedMetricCallback(trainer_callbacks.TrainerCallback):
 
     def on_train_run_start(self, trainer, config, **kwargs):
         super().on_train_run_start(trainer, config, **kwargs)
-        if (
-            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
-            and Config().algorithm.personalization.do_test_per_epoch
-        ):
-            # perform test for the personalized model
-            trainer.perform_personalized_metric_checkpoint(config)
+
+        # perform test for the personalized model
+        trainer.perform_personalized_metric_checkpoint(config)
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
         super().on_train_epoch_end(trainer, config, **kwargs)
-        if (
-            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
-            and Config().algorithm.personalization.do_test_per_epoch
-        ):
-            # perform test for the personalized model
-            trainer.perform_personalized_metric_checkpoint(config)
+
+        # perform test for the personalized model
+        trainer.perform_personalized_metric_checkpoint(config)
 
     def on_train_run_end(self, trainer, config, **kwargs):
         super().on_train_run_end(trainer, config, **kwargs)
-        if (
-            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
-            and Config().algorithm.personalization.do_test_per_epoch
-        ):
-            # perform test for the personalized model
-            trainer.perform_personalized_metric_checkpoint(config)
+
+        # perform test for the personalized model
+        trainer.perform_personalized_metric_checkpoint(config)
 
 
 class PersonalizedModelCallback(trainer_callbacks.TrainerCallback):

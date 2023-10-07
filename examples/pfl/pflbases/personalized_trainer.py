@@ -227,6 +227,19 @@ class Trainer(basic.Trainer):
             Config().algorithm.personalization.model_name,
         )
 
+    def copy_personalized_model_to_model(self, config):
+        """Copying the model to the personalized model."""
+        self.model.load_state_dict(self.personalized_model.state_dict(), strict=True)
+        logging.info(
+            fonts.colourize(
+                "[Client #%d] copied the personalized model [%s] to model [%s].",
+                colour="blue",
+            ),
+            self.client_id,
+            Config().algorithm.personalization.model_name,
+            Config().trainer.model_name,
+        )
+
     def preprocess_personalized_model(self, config):
         """Before running, process the personalized model."""
         self.copy_model_to_personalized_model(config)
@@ -246,6 +259,15 @@ class Trainer(basic.Trainer):
 
             self.personalized_model.to(self.device)
             self.personalized_model.train()
+
+    def train_run_end(self, config):
+        """Copy the trained model to the untrained one."""
+        super().train_run_end(config)
+
+        if self.personalized_learning:
+            self.copy_personalized_model_to_model(config)
+        else:
+            self.copy_model_to_personalized_model(config)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
@@ -436,13 +458,6 @@ class Trainer(basic.Trainer):
             ext="pth",
         )
         os.makedirs(save_location, exist_ok=True)
-
-        if not self.personalized_learning:
-            # if the trainer is not in the personalized learning mode
-            # then, the self.model has been optimized, to save the
-            # personalized model, the model should be copied to the
-            # self.personalized_model
-            self.copy_model_to_personalized_model(config={})
 
         self.save_personalized_model(
             filename=filename, location=save_location, **kwargs
