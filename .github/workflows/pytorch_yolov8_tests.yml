@@ -28,7 +28,7 @@ jobs:
           pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
           pip3 install -r requirements.txt --upgrade
           pip3 install .
-          pip3 install yolov5
+          pip3 install ultralytics
 
       - name: Unit tests
         shell: bash -l {0}
@@ -38,5 +38,4 @@ jobs:
       - name: Training workloads
         shell: bash -l {0}
         run: |
-          ./run --config=.github/workflows/configs/fedavg_yolov5.yml
-          ./run --config=.github/workflows/configs/mistnet_yolov5.yml
+          ./run --config=.github/workflows/configs/fedavg_yolov8.yml
