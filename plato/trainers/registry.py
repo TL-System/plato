@@ -37,11 +37,7 @@ def get(model=None, callbacks=None):
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
 
-    if Config().trainer.model_name == "yolov5":
-        from plato.trainers import yolov5
-
-        return yolov5.Trainer()
-    elif Config().trainer.model_name == "yolov8":
+    if Config().trainer.model_name == "yolov8":
         from plato.trainers import yolov8
 
         return yolov8.Trainer()
