@@ -174,7 +174,9 @@ class Trainer(basic.Trainer):
     def get_personalized_lr_scheduler(self, config, optimizer):
         """Getting the lr scheduler for personalized model."""
 
-        if not hasattr(Config().algorithm, "personalization"):
+        if not hasattr(Config().algorithm, "personalization") or not hasattr(
+            Config().parameters, "personalization"
+        ):
             return super().get_lr_scheduler(config, optimizer)
 
         lr_scheduler = Config().algorithm.personalization.lr_scheduler
