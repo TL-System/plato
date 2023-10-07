@@ -79,5 +79,5 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
-    result_path: results/fedrep
+    result_path: results/fedbabu
 
