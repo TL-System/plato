@@ -41,6 +41,10 @@ def get(model=None, callbacks=None):
         from plato.trainers import yolov5
 
         return yolov5.Trainer()
+    elif Config().trainer.model_name == "yolov8":
+        from plato.trainers import yolov8
+
+        return yolov8.Trainer()
     elif Config().trainer.type == "HuggingFace":
         from plato.trainers import huggingface
 
