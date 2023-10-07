@@ -6,7 +6,7 @@ A personalized federated learning trainer using LG-FedAvg.
 from plato.config import Config
 
 from pflbases import personalized_trainer
-from pflbases.trainer_utils import freeze_model, activate_model
+from pflbases import trainer_utils
 
 
 class Trainer(personalized_trainer.Trainer):
@@ -33,12 +33,12 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        freeze_model(
+        trainer_utils.freeze_model(
             self.model,
             Config().algorithm.head_modules_name,
-            log_info=f"[Client #{self.client_id}]",
+            log_info=None,
         )
-        activate_model(self.model, Config().algorithm.body_modules_name)
+        trainer_utils.activate_model(self.model, Config().algorithm.body_modules_name)
         self.optimizer.step()
 
         # repeat the same optimization relying the optimized
@@ -56,12 +56,12 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        freeze_model(
+        trainer_utils.freeze_model(
             self.model,
             Config().algorithm.body_modules_name,
-            log_info=f"[Client #{self.client_id}]",
+            log_info=None,
         )
-        activate_model(self.model, Config().algorithm.head_modules_name)
+        trainer_utils.activate_model(self.model, Config().algorithm.head_modules_name)
 
         self.optimizer.step()
 

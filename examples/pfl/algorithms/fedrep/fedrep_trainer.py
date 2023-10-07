@@ -3,7 +3,7 @@ A personalized federated learning trainer for FedPer approach.
 """
 
 from pflbases import personalized_trainer
-from pflbases.trainer_utils import freeze_model, activate_model
+from pflbases import trainer_utils
 
 from plato.config import Config
 
@@ -16,7 +16,7 @@ class Trainer(personalized_trainer.Trainer):
         """Freezing the body"""
         super().train_run_start(config)
         if self.personalized_learning:
-            freeze_model(
+            trainer_utils.freeze_model(
                 self.personalized_model,
                 Config().algorithm.global_modules_name,
                 log_info=f"[Client #{self.client_id}]",
@@ -45,26 +45,30 @@ class Trainer(personalized_trainer.Trainer):
             )
 
             if self.current_epoch <= head_epochs:
-                freeze_model(
+                trainer_utils.freeze_model(
                     self.model,
                     Config().algorithm.global_modules_name,
                     log_info=f"[Client #{self.client_id}]",
                 )
-                activate_model(self.model, Config().algorithm.head_modules_name)
+                trainer_utils.activate_model(
+                    self.model, Config().algorithm.head_modules_name
+                )
 
             # The representation will then be optimized for only one epoch
             if self.current_epoch > head_epochs:
-                freeze_model(
+                trainer_utils.freeze_model(
                     self.model,
                     Config().algorithm.head_modules_name,
                     log_info=f"[Client #{self.client_id}]",
                 )
-                activate_model(self.model, Config().algorithm.global_modules_name)
+                trainer_utils.activate_model(
+                    self.model, Config().algorithm.global_modules_name
+                )
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
         if self.personalized_learning:
-            activate_model(
+            trainer_utils.activate_model(
                 self.personalized_model, Config().algorithm.global_modules_name
             )

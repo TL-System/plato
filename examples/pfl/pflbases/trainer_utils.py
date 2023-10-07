@@ -167,11 +167,12 @@ def freeze_model(model, modules_name=None, log_info: str = ""):
                 param.requires_grad = False
                 frozen_params.append(name)
 
-        logging.info(
-            "%s has frozen %s",
-            log_info,
-            fedavg_partial.Algorithm.extract_modules_name(frozen_params),
-        )
+        if log_info is not None:
+            logging.info(
+                "%s has frozen %s",
+                log_info,
+                fedavg_partial.Algorithm.extract_modules_name(frozen_params),
+            )
 
 
 def activate_model(model, modules_name=None):
