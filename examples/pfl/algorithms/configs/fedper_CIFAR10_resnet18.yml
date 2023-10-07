@@ -36,12 +36,14 @@ algorithm:
 
     global_modules_name:
         - conv1
-        - conv2
-        - conv3
+        - bn1
+        - layer1
+        - layer2
+        - layer3
+        - layer4
         
     completion_modules_name:
-        - fc4
-        - fc5
+        - linear
 
     personalization:
 

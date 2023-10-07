@@ -34,6 +34,8 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
+    # ['conv1', 'bn1', 'layer1', 'layer2', 'layer3', 'layer4', 'linear']
+
     global_modules_name:
         - conv1
         - bn1
