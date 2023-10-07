@@ -6,6 +6,7 @@ A personalized federated learning trainer using LG-FedAvg.
 from plato.config import Config
 
 from pflbases import personalized_trainer
+from pflbases.trainer_utils import freeze_model, activate_model
 
 
 class Trainer(personalized_trainer.Trainer):
@@ -17,24 +18,6 @@ class Trainer(personalized_trainer.Trainer):
         for direct evaluation."""
         if self.personalized_learning:
             self.copy_model_to_personalized_model(config)
-
-    def freeze_model(self, model, modules_name=None):
-        """Freeze a part of the model."""
-        if modules_name is not None:
-            frozen_params = []
-            for name, param in model.named_parameters():
-                if any([param_name in name for param_name in modules_name]):
-                    param.requires_grad = False
-                    frozen_params.append(name)
-
-    def activate_model(self, model, modules_name=None):
-        """Unfrozen a part of the model."""
-        if modules_name is not None:
-            unfrozen_params = []
-            for name, param in model.named_parameters():
-                if any([param_name in name for param_name in modules_name]):
-                    param.requires_grad = True
-                    unfrozen_params.append(name)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing one iteration of LG-FedAvg."""
@@ -50,8 +33,12 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        self.freeze_model(self.model, Config().algorithm.head_modules_name)
-        self.activate_model(self.model, Config().algorithm.body_modules_name)
+        freeze_model(
+            self.model,
+            Config().algorithm.head_modules_name,
+            log_info=f"[Client #{self.client_id}]",
+        )
+        activate_model(self.model, Config().algorithm.body_modules_name)
         self.optimizer.step()
 
         # repeat the same optimization relying the optimized
@@ -69,8 +56,12 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        self.freeze_model(self.model, Config().algorithm.body_modules_name)
-        self.activate_model(self.model, Config().algorithm.head_modules_name)
+        freeze_model(
+            self.model,
+            Config().algorithm.body_modules_name,
+            log_info=f"[Client #{self.client_id}]",
+        )
+        activate_model(self.model, Config().algorithm.head_modules_name)
 
         self.optimizer.step()
 

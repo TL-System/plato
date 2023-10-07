@@ -1,10 +1,10 @@
 """
 A personalized federated learning trainer for FedBABU.
 """
-import logging
+
 
 from pflbases import personalized_trainer
-from pflbases import fedavg_partial
+from pflbases.trainer_utils import freeze_model, activate_model
 
 from plato.config import Config
 
@@ -13,30 +13,6 @@ class Trainer(personalized_trainer.Trainer):
     """A trainer to freeze and activate modules of one model
     for normal and personalized learning processes."""
 
-    def freeze_model(self, model, modules_name=None):
-        """Freezing a part of the model."""
-        if modules_name is not None:
-            frozen_params = []
-            for name, param in model.named_parameters():
-                # For each module in the model, if it contains the keyword
-                # listed in required frozen modules list, we will freeze this module.
-                if any(param_name in name for param_name in modules_name):
-                    param.requires_grad = False
-                    frozen_params.append(name)
-
-            logging.info(
-                "[Client #%d] has frozen %s",
-                self.client_id,
-                fedavg_partial.Algorithm.extract_modules_name(frozen_params),
-            )
-
-    def activate_model(self, model, modules_name=None):
-        """Defreezing a part of the model."""
-        if modules_name is not None:
-            for name, param in model.named_parameters():
-                if any(param_name in name for param_name in modules_name):
-                    param.requires_grad = True
-
     def train_run_start(self, config):
         """According to FedBABU,
         1. freeze head of the model during federated training phase.
@@ -44,20 +20,24 @@ class Trainer(personalized_trainer.Trainer):
         """
         super().train_run_start(config)
         if self.personalized_learning:
-            self.freeze_model(
-                self.personalized_model, Config().algorithm.global_modules_name
+            freeze_model(
+                self.personalized_model,
+                Config().algorithm.global_modules_name,
+                log_info=f"[Client #{self.client_id}]",
             )
         else:
-            self.freeze_model(self.model, Config().algorithm.personalized_modules_name)
+            freeze_model(
+                self.model,
+                Config().algorithm.personalized_modules_name,
+                log_info=f"[Client #{self.client_id}]",
+            )
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
         if self.personalized_learning:
-            self.activate_model(
+            activate_model(
                 self.personalized_model, Config().algorithm.global_modules_name
             )
         else:
-            self.activate_model(
-                self.model, Config().algorithm.personalized_modules_name
-            )
+            activate_model(self.model, Config().algorithm.personalized_modules_name)
