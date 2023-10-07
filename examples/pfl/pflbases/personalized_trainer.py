@@ -137,12 +137,15 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if not self.personalized_learning or not hasattr(
-            Config().algorithm, "personalization"
+        if (
+            not self.personalized_learning
+            or not hasattr(Config().algorithm, "personalization")
+            or not hasattr(Config().parameters, "personalization")
         ):
             return super().get_loss_criterion()
 
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
+
         loss_criterion_params = (
             Config().parameters.personalization.loss_criterion._asdict()
         )
