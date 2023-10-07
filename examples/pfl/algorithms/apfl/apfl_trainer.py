@@ -1,11 +1,15 @@
 """
 A personalized federated learning trainer For APFL.
 """
+import os
 import logging
 
 import numpy as np
 
+import torch
 from pflbases import personalized_trainer
+
+from plato.config import Config
 
 
 class Trainer(personalized_trainer.Trainer):
@@ -19,27 +23,30 @@ class Trainer(personalized_trainer.Trainer):
         self.alpha = 0.0
         self.adaptive_alpha = False
 
+        # the filename of the alpha
+        # for saving and loading
+        self.alpha_filename = "alpha.npy"
+
         # define the personalized optimizer
         # to update the personalized model
         self.personalized_optimizer = None
 
-    def extract_alpha(self, loaded_status):
+    def extract_alpha(self):
         """Extracting the alpha."""
 
-        if (
-            "learning" in loaded_status
-            and loaded_status["learning"] is not None
-            and "alpha" in loaded_status["learning"]
-        ):
-            self.alpha = loaded_status["learning"]["alpha"]
+        save_dir_path = self.get_checkpoint_dir_path()
+        save_path = os.path.join(save_dir_path, self.alpha_filename)
+
+        if os.path.exists(save_path):
+            self.alpha = torch.load(save_path)
             logging.info(
-                "[Client #%d] Loaded the alpha %s along with the personalized model",
+                "[Client #%d] Loaded the alpha %s",
                 self.client_id,
                 self.alpha,
             )
         else:
             logging.info(
-                "[Client #%d] uses the initial alpha as no updated alpha exists.",
+                "[Client #%d] uses the initial alpha.",
                 self.client_id,
             )
 
@@ -158,9 +165,18 @@ class Trainer(personalized_trainer.Trainer):
         self.personalized_model.train()
 
         # initialize the alpha
-        initial_alpha = config["alpha"]
-        self.adaptive_alpha = config["adaptive_alpha"]
+        initial_alpha = Config().algorithm.alpha
+        self.adaptive_alpha = Config().algorithm.adaptive_alpha
         self.alpha = initial_alpha if self.alpha == 0.0 else self.alpha
+
+    def train_run_end(self, config):
+        """Saving the alpha."""
+        save_dir_path = self.get_checkpoint_dir_path()
+        save_path = os.path.join(save_dir_path, self.alpha_filename)
+        torch.save(self.alpha, save_path)
+
+        # do not copy model to personalized model or vice versa
+        # return super().train_run_end(config)
 
     def train_epoch_start(self, config):
         """Assigning the lr of optimizer to the personalized optimizer."""

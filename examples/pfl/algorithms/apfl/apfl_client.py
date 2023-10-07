@@ -11,12 +11,7 @@ class Client(personalized_client.Client):
     def inbound_received(self, inbound_processor):
         """Reloading the personalized model."""
         super().inbound_received(inbound_processor)
-        # always load the personalized model and the corresponding
-        # ALPF's alpha for the subsequent learning
-        loaded_status = self.load_personalized_model()
 
-        self.trainer.extract_alpha(loaded_status)
-
-        # assign the testset and testset sampler to the trainer
-        self.trainer.set_testset(self.testset)
-        self.trainer.set_testset_sampler(self.testset_sampler)
+        # loading previously saved ALPF's alpha for
+        # the subsequent learning
+        self.trainer.extract_alpha()

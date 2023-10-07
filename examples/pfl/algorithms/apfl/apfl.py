@@ -16,7 +16,7 @@ from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
-import apfl_trainer_callbacks
+
 import apfl_client
 import apfl_trainer
 
@@ -31,7 +31,7 @@ def main():
         algorithm=fedavg_partial.Algorithm,
         trainer_callbacks=[
             mixing_trainer_callbacks.PersonalizedModelMetricCallback,
-            apfl_trainer_callbacks.APFLStatusCallback,
+            mixing_trainer_callbacks.PersonalizedModelStatusCallback,
         ],
     )
     server = fedavg_personalized_server.Server(

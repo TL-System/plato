@@ -40,6 +40,10 @@ python algorithms/fedavg_finetune/fedavg_finetune.py -c algorithms/configs/fedav
 ```
 
 ```bash
+python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
 python algorithms/fedrep/fedrep.py -c algorithms/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
