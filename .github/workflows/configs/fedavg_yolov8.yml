@@ -3,7 +3,7 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -11,14 +11,16 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: true
 
+    random_seed: 1
+
 server:
     address: 127.0.0.1
     port: 8000
 
 data:
     # The training and testing dataset
-    datasource: YOLO
-    data_params: configs/yolov5/data/coco128.yaml
+    datasource: YOLOv8
+    data_params: configs/yolov8/data/coco128.yaml
 
     # Where the dataset is located
     data_path: data/COCO
@@ -28,7 +30,7 @@ data:
     # download command/URL (optional)
     download_urls:
         [
-            "https://github.com/ultralytics/yolov5/releases/download/v1.0/coco128.zip",
+            "https://ultralytics.com/assets/coco128.zip",
         ]
 
     # number of training examples
@@ -136,7 +138,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: yolov5
+    type: yolov8
 
     # test function
     testtype: map
@@ -151,22 +153,27 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 10
+    epochs: 1
     batch_size: 4
     optimizer: Adam
     linear_lr: false
 
     # The machine learning model
-    model_name: yolov5
+    model_name: yolov8
 
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 parameters:
+    grid_size: 32
+
     model:
-        model_config: configs/yolov5/models/yolov5s.yaml
+        type: yolov8n.pt
+        cfg: yolov8n.yaml
         num_classes: 80
 
-    trainer:
-        train_params: configs/yolov5/data/hyps/hyp.scratch.yaml
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
