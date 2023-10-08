@@ -281,7 +281,7 @@ python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerF
 FedRep is an algorithm for learning a shared data representation across clients and unique, personalized local ``heads'' for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
 
 FedRep belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/fedrep/fedrep.py -c algorithms/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
@@ -297,7 +297,7 @@ Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Feder
 FedBABU argued that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during FL training. In this implementation, the head is frozen at the beginning of each local training epoch through the API ```train_run_start```.
 
 FedBABU belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/fedbabu/fedbabu.py -c algorithms/configs/fedbabu_CIFAR10_resnet18.yml -b pflExperiments
@@ -314,7 +314,7 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 APFL is a synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by interpolating between local and personalized models. It has been quite widely cited and compared with in the personalized federated learning literature. In this example, once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
 
 APFL belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
@@ -330,7 +330,7 @@ Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://a
 FedPer is a synchronous personalized federated learning algorithm that learns a global representation and personalized heads, but makes simultaneous local updates for both sets of parameters, therefore makes the same number of local updates for the head and the representation on each local round.
 
 FedPer belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/fedper/fedper.py -c algorithms/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
@@ -343,7 +343,7 @@ Manoj Ghuhan Arivazhagan, et.al., &ldquo;[Federated learning with personalizatio
 LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
 
 LG-FedAvg belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/lgfedavg/lgfedavg.py -c algorithms/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
@@ -360,7 +360,7 @@ Paul Pu Liang, et.al., &ldquo;[Think Locally, Act Globally: Federated Learning w
 Ditto is another synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by learning local models that are encouraged to be close together by global regularization. In this example, once the global model is received, each client will carry out a regular local update followed by a Ditto solver to optimize the personalized model. 
 
 Ditto belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/ditto/ditto.py -c algorithms/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
@@ -376,7 +376,7 @@ Tian Li, et.al, &ldquo;[Ditto: Fair and robust federated learning through person
 PerFedAvg focuses the personalized federated learning in which our goal is to find an initial shared model that current or new users can easily adapt to their local dataset by performing one or a few steps of gradient descent with respect to their own data. Specifically, it introduces the Model-Agnostic Meta-Learning (MAML) framework into the local update of federated learning.
 
 PerFedAvg belongs to personalized federated learning.
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
@@ -398,7 +398,7 @@ pFLSSL achieves Personalized federated learning by introducing self-supervised l
 - SwAV [5]
 - SMoG [6]
 
-Please read `examples/pfl/README.md` for more details about how to run the code.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
 python algorithms/SSL/simclr/simclr.py -c algorithms/SSL/simclr/simclr_MNIST_lenet5_noniid.yml -b pflExperiments
