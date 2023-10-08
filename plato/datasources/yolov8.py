@@ -6,8 +6,6 @@ COCO 2017 dataset, refer to https://www.kaggle.com/ultralytics/coco128.
 
 For more information about the COCO 2017 dataset, refer to http://cocodataset.org.
 """
-import logging
-import os
 
 from ultralytics.data.dataset import YOLODataset
 from ultralytics.cfg import DEFAULT_CFG
@@ -47,7 +45,7 @@ class DataSource(base.DataSource):
                 use_segments=False,
                 use_keypoints=False,
                 classes=Config().data.classes,
-                data=self.data
+                data=self.data,
             )
 
         return self.train_set
@@ -71,7 +69,7 @@ class DataSource(base.DataSource):
                 use_segments=False,
                 use_keypoints=False,
                 classes=Config().data.classes,
-                data=self.data
+                data=self.data,
             )
 
         return self.test_set

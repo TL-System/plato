@@ -18,4 +18,5 @@ class Model:
     def get(model_name=None, **kwargs):
         """Returns the YOLOV8 model loaded from the Ultralytics."""
         model_type = Config().parameters.model.type
-        return YOLO(model_type).model
+
+        return YOLO(model_type)
