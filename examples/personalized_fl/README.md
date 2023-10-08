@@ -26,7 +26,7 @@ A model-agnostic meta-learning approach"](https://proceedings.neurips.cc/paper/2
 
 ## Algorithms Running
 
-1. Go to the folder `examples/pfl`.
+1. Go to the folder `examples/personalized_fl`.
 2. Install pflbases by running 
 
 ```bash
