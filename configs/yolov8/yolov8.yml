@@ -6,7 +6,7 @@ clients:
     total_clients: 100
 
     # The number of clients selected in each round
-    per_round: 5
+    per_round: 1
 
     # Do client side validation.
     do_test: false 
@@ -23,17 +23,17 @@ server:
 data:
     # The training and testing dataset
     datasource: YOLOv8
-    data_params: configs/yolov8/data/coco128.yaml
+    data_params: configs/yolov8/coco128.yaml
 
     # Where the dataset is located
-    data_path: data/COCO
-    train_path: data/COCO/coco128/images/train2017/
-    test_path: data/COCO/coco128/images/train2017/
+    data_path: data
+    train_path: data/coco128
+    test_path: data/coco128
 
     # download command/URL (optional)
     download_urls:
         [
-            "https://ultralytics.com/assets/coco128.zip",
+            "https://iqua.ece.toronto.edu/baochun/coco128.zip",
         ]
 
     # number of training examples

@@ -163,3 +163,4 @@ tensorflow_datasets/
 
 # Homomorphic encryption
 .ckks_context/
+yolov8n.pt
