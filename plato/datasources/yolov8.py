@@ -22,33 +22,18 @@ class DataSource(base.DataSource):
     # pylint: disable=unused-argument
     def __init__(self, **kwargs):
         super().__init__()
-        _path = Config().params["data_path"]
-
-        if not os.path.exists(_path):
-            os.makedirs(_path)
-
-            logging.info("Downloading the YOLO dataset. This may take a while.")
-
-            urls = Config().data.download_urls
-            for url in urls:
-                if not os.path.exists(_path + url.split("/")[-1]):
-                    DataSource.download(url, _path)
-
 
         self.grid_size = Config().parameters.grid_size
-
+        self.data = check_det_dataset(Config().data.data_params)
         self.train_set = None
         self.test_set = None
-        self.data = check_det_dataset(Config().data.data_params)
 
     def get_train_set(self):
         single_class = Config().parameters.model.num_classes == 1
 
-        train_path = os.path.join(Config.params["base_path"], Config().data.train_path)
-
         if self.train_set is None:
             self.train_set = YOLODataset(
-                img_path=train_path,
+                img_path=self.data["train"],
                 imgsz=Config().data.image_size,
                 batch_size=Config().trainer.batch_size,
                 augment=False,
@@ -70,11 +55,9 @@ class DataSource(base.DataSource):
     def get_test_set(self):
         single_class = Config().parameters.model.num_classes == 1
 
-        test_path = os.path.join(Config.params["base_path"], Config().data.test_path)
-
         if self.test_set is None:
             self.test_set = YOLODataset(
-                img_path=test_path,
+                img_path=self.data["val"],
                 imgsz=Config().data.image_size,
                 batch_size=Config().trainer.batch_size,
                 augment=True,

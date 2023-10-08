@@ -155,7 +155,7 @@ class Trainer(basic.Trainer):
         validator = trainer.get_validator()
         # "metrics/precision(B)", "metrics/recall(B)",
         # "metrics/mAP50(B)", "metrics/mAP50-95(B)"
-        stats = validator(trainer=None, model=self.model)
+        stats = validator(model=self.model)
 
         map50 = stats["metrics/mAP50(B)"]
         validator.print_results()

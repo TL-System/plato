@@ -23,18 +23,7 @@ server:
 data:
     # The training and testing dataset
     datasource: YOLOv8
-    data_params: configs/yolov8/coco128.yaml
-
-    # Where the dataset is located
-    data_path: data
-    train_path: data/coco128
-    test_path: data/coco128
-
-    # download command/URL (optional)
-    download_urls:
-        [
-            "https://iqua.ece.toronto.edu/baochun/coco128.zip",
-        ]
+    data_params: coco128.yaml
 
     # number of training examples
     num_train_examples: 128
@@ -155,7 +144,7 @@ trainer:
     target_accuracy: 0.99
 
     # Number of epoches for local training in each communication round
-    epochs: 5
+    epochs: 1
 
     # The machine learning model
     model_name: yolov8
