@@ -1,6 +1,11 @@
-import pkg_resources
-from subprocess import call
+"""
+Upgrades all existing packages in the current conda environment.
+"""
+import subprocess
+from importlib import metadata
 
-packages = [dist.project_name for dist in pkg_resources.working_set]
-
-call("pip install --upgrade " + ' '.join(packages), shell=True)
+for dist in metadata.distributions():
+    if dist.metadata["Name"] is not None:
+        dist_name = dist.metadata['Name']
+        print(f"Upgrading package {dist_name}...")
+        subprocess.call("pip install -U " + dist_name, shell=1)
