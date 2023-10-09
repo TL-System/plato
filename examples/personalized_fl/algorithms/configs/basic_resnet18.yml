@@ -1,0 +1,20 @@
+# The type of the trainer
+  type: basic
+
+  # The maximum number of training rounds
+  rounds: 5
+
+  # The maximum number of clients running concurrently
+  max_concurrency: 4
+
+  # The target accuracy
+  target_accuracy: 0.80
+
+  # The machine learning model
+  model_name: resnet_18
+
+  # Number of epoches for local training in each communication round
+  epochs: 5
+  batch_size: 10
+  optimizer: SGD
+  lr_scheduler: LambdaLR
