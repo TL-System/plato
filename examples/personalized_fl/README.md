@@ -11,6 +11,8 @@ We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as th
 
 - {apfl} [Deng et.al, "Adaptive Personalized Federated Learning"](https://arxiv.org/pdf/2003.13461.pdf) - None
 
+- {fedper} [Arivazhagan et.al, "Federated Learning with Personalization Layers"](https://browse.arxiv.org/pdf/1912.00818.pdf) - [Third-part Code](https://github.com/ki-ljl/FedPer)
+
 - {ditto} [Li et.al "Ditto: Fair and robust federated learning through personalization"](https://proceedings.mlr.press/v139/li21h.html) - [Office code](https://github.com/litian96/ditto)
 
 - {fedbabu} [Oh et.al "FedBABU: Toward Enhanced Representation for Federated Image Classification"](https://openreview.net/pdf?id=HuaYQfggn5u) - [Office code](https://github.com/jhoon-oh/FedBABU)
