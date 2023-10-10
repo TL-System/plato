@@ -25,6 +25,8 @@ Learning"](https://arxiv.org/abs/2102.07078) - [Office code](https://github.com/
 - {perfedavg} [Fallah et.al, "Personalized federated learning with theoretical guarantees:
 A model-agnostic meta-learning approach"](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html) - [Third-part code](https://github.com/jhoon-oh/FedBABU)
 
+- {hermes} [Li et.al, "Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients"](https://www.ang-li.com/assets/pdf/hermes.pdf) - None (Ying Chen initially implemented this approach. Due to the specificity of Hermes, such an implementation does not need to rely on the `pflbases` framework.)
+
 
 ## Algorithms Running
 
@@ -67,4 +69,8 @@ python algorithms/lgfedavg/lgfedavg.py -c algorithms/configs/lgfedavg_CIFAR10_re
 
 ```bash
 python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
 ```
