@@ -1,7 +1,7 @@
 """
 The implementation of Ditto method based on the pFL framework of Plato.
 
-Tian Li, et.al, Ditto: Fair and robust federated learning through personalization, 2021:
+Tian Li, et al., Ditto: Fair and robust federated learning through personalization, 2021:
  https://proceedings.mlr.press/v139/li21h.html
 
 Official code: https://github.com/litian96/ditto

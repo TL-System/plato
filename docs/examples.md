@@ -325,7 +325,7 @@ python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -
 ```
 
 ```{note}
-Yuyang Deng, et.al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
+Yuyang Deng, et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
 &rdquo; in Arxiv, 2021.
 ```
 ````
@@ -341,7 +341,7 @@ python algorithms/fedper/fedper.py -c algorithms/configs/fedper_CIFAR10_resnet18
 ```
 
 ```{note}
-Manoj Ghuhan Arivazhagan, et.al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
+Manoj Ghuhan Arivazhagan, et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
 &rdquo; in Arxiv, 2019.
 ````{admonition} **LG-FedAvg**
 LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
@@ -354,7 +354,7 @@ python algorithms/lgfedavg/lgfedavg.py -c algorithms/configs/lgfedavg_CIFAR10_re
 ```
 
 ```{note}
-Paul Pu Liang, et.al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
+Paul Pu Liang, et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
 &rdquo; in Proc. NeurIPS, 2019.
 ```
 ````
@@ -371,7 +371,7 @@ python algorithms/ditto/ditto.py -c algorithms/configs/ditto_CIFAR10_resnet18.ym
 ```
 
 ```{note}
-Tian Li, et.al, &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
+Tian Li, et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
 &rdquo; in Proc ICML, 2021.
 ```
 ````
@@ -387,7 +387,7 @@ python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10
 ```
 
 ```{note}
-Alireza Fallah, et.al, &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
+Alireza Fallah, et al., &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
 A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html),
 &rdquo; in Proc NeurIPS, 2020.
 ```
@@ -433,17 +433,17 @@ python algorithms/SSL/smog/smog.py -c algorithms/SSL/smog/smog_CIFAR10_resnet18_
 ```
 
 ```{note}
-[1]. Ting Chen, et.al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
+[1]. Ting Chen, et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
 
-[2]. Jean-Bastien Grill, et.al, &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
+[2]. Jean-Bastien Grill, et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
 
-[3]. Xinlei Chen, et.al, &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in ArXiv, 2020.
+[3]. Xinlei Chen, et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in ArXiv, 2020.
 
-[4]. Xinlei Chen, et.al, &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+[4]. Xinlei Chen, et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
 
-[5]. Mathilde Caron, et.al, &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
+[5]. Mathilde Caron, et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
 
-[6]. Bo Pang, et.al, &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
+[6]. Bo Pang, et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
 
 ```
 ````
