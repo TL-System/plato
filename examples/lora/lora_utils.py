@@ -58,7 +58,7 @@ class LoraModel(torch.nn.Module):
 
 
 class Trainer(huggingface.Trainer):
-    """A custom trainer with custom training and testing loops."""
+    """A trainer with custom training and testing loops for LoRA fine-tuning."""
 
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):
@@ -133,7 +133,7 @@ class Trainer(huggingface.Trainer):
 
 
 class DataSource(base.DataSource):
-    """A custom datasource with custom training and validation datasets."""
+    """A datasource with custom training and validation datasets for LoRA fine-tuning."""
 
     def __init__(self):
         super().__init__()
