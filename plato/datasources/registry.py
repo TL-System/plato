@@ -98,10 +98,10 @@ def get(client_id: int = 0, **kwargs):
 
         return coco.DataSource(**kwargs)
 
-    if datasource_name == "YOLO":
-        from plato.datasources import yolo
+    if datasource_name == "YOLOv8":
+        from plato.datasources import yolov8
 
-        return yolo.DataSource(**kwargs)
+        return yolov8.DataSource(**kwargs)
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:

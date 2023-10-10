@@ -13,13 +13,6 @@ clients:
 
     random_seed: 1
 
-    # FedProx hyperparameters
-    proximal_term_penalty_constant: 1
-
-    # FedProx parameters for experiment
-    straggler_simulation: true
-    straggler_percentage: 50
-
 server:
     address: 127.0.0.1
     port: 8000
@@ -68,10 +61,10 @@ trainer:
 algorithm:
     # Aggregation algorithm
     type: fedavg
-
+    alpha_coef: 0.01
+    
 parameters:
     optimizer:
         lr: 0.03
         momentum: 0.0 # learning rate is fixed as in Appendix C.2
         weight_decay: 0.0
-    alpha_coef: 0.01
