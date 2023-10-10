@@ -51,7 +51,7 @@ class PayloadCompletionProcessor(base.Processor):
 
 class ClientModelPersonalizedCompletionCallback(base_callbacks.ClientPayloadCallback):
     """
-    A client callback for FedBABU approach to process the received payload.
+    A client callback to process the received payload.
     """
 
     def on_inbound_received(self, client, inbound_processor):
