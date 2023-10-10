@@ -2,7 +2,7 @@
 The implementation of LG-FedAvg method based on the plato's
 pFL code.
 
-Paul Pu Liang, et.al, Think Locally, Act Globally: Federated Learning with Local and Global Representations
+Paul Pu Liang, et al., Think Locally, Act Globally: Federated Learning with Local and Global Representations
 https://arxiv.org/abs/2001.01523
 
 Official code: https://github.com/pliang279/LG-FedAvg

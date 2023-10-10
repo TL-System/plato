@@ -1,7 +1,7 @@
 """
 The implementation for the SwAV [1] method.
 
-[1]. Mathilde Caron, et.al, Unsupervised Learning of Visual Features by Contrasting Cluster Assignments.
+[1]. Mathilde Caron, et al., Unsupervised Learning of Visual Features by Contrasting Cluster Assignments.
 https://arxiv.org/abs/2006.09882, NeurIPS 2020.
 
 Source code: https://github.com/facebookresearch/swav

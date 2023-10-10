@@ -20,7 +20,8 @@ from pflbases.client_callbacks import base_callbacks
 
 class PayloadCompletionProcessor(base.Processor):
     """A processor relying on the hyper-parameter `completion_modules_name`
-    to complete parameters of payload with the loaded personalized model."""
+    to complete parameters of payload with the loaded local model, which
+    is the updated global model in the previous round."""
 
     def __init__(self, current_round, algorithm, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -28,7 +29,7 @@ class PayloadCompletionProcessor(base.Processor):
         self.algorithm = algorithm
 
     def process(self, data: Any) -> Any:
-        """Processing the received payload by assigning modules of personalized model
+        """Processing the received payload by assigning modules of local updated model
         if provided."""
         model_name = Config().trainer.model_name
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
@@ -90,7 +91,8 @@ class ClientModelLocalCompletionCallback(base_callbacks.ClientPayloadCallback):
     """
 
     def on_inbound_received(self, client, inbound_processor):
-        """Completing the recevied payload with the personalized model."""
+        """Completing the recevied payload with the local updated model,
+        which is the locally updated global model in the previous round."""
         super().on_inbound_received(client, inbound_processor)
 
         inbound_processor.processors.append(

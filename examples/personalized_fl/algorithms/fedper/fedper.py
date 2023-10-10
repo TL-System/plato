@@ -1,7 +1,7 @@
 """
 The implementation of FedPer method based on the plato's pFL code.
 
-Manoj Ghuhan Arivazhagan, et.al, Federated learning with personalization layers, 2019.
+Manoj Ghuhan Arivazhagan, et al., Federated learning with personalization layers, 2019.
 https://arxiv.org/abs/1912.00818
 
 Official code: None

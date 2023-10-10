@@ -2,7 +2,7 @@
 Implementation of Textual Inversion [1] under the federated learning,
 referred to as Federated Textual Inversion (FedTI).
 
-[1]. Rinon, et.al, An Image is Worth One Word: Personalizing Text-to-Image Generation using 
+[1]. Rinon, et al., An Image is Worth One Word: Personalizing Text-to-Image Generation using 
     Textual Inversion, ICLR23.
 
 Textual inversion is a technique that allows us to add new styles or objects 

@@ -1,7 +1,7 @@
 """
 The implementation for the SMoG [1] method.
 
-[1]. Bo Pang, et.al, Unsupervised Visual Representation Learning by Synchronous Momentum Grouping.
+[1]. Bo Pang, et al., Unsupervised Visual Representation Learning by Synchronous Momentum Grouping.
 ECCV, 2022. https://arxiv.org/pdf/2006.07733.pdf.
 
 Source code: None

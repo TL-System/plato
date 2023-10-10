@@ -35,7 +35,7 @@ class Server(fedavg.Server):
         # utilized clients during federated training
         self.participant_clients = 0
         # unused clients during federated training
-        self.nonparticipant_clients = 0
+        self.nonparticipating_clients = 0
 
         # participanted clients as a percentage of all clients
         # by default, all clients will participant
@@ -43,7 +43,7 @@ class Server(fedavg.Server):
 
         # clients id of two types of clients
         self.participant_clients_pool = None
-        self.nonparticipant_clients_pool = None
+        self.nonparticipating_clients_pool = None
 
         # client pool of three groups of clients
         # i.e., total, participant, nonparticipant
@@ -86,7 +86,8 @@ class Server(fedavg.Server):
             assert self.participant_clients == len(self.participant_clients_pool)
 
         assert (
-            self.total_clients == self.participant_clients + self.nonparticipant_clients
+            self.total_clients
+            == self.participant_clients + self.nonparticipating_clients
         )
 
     def initialize_personalization(self):
@@ -107,17 +108,19 @@ class Server(fedavg.Server):
         self.participant_clients = int(
             self.total_clients * self.participant_clients_ratio
         )
-        self.nonparticipant_clients = int(self.total_clients - self.participant_clients)
+        self.nonparticipating_clients = int(
+            self.total_clients - self.participant_clients
+        )
 
         logging.info(
             fonts.colourize(
-                "[%s] Total clients (%d), participanting clients (%d), nonparticipant_clients (%d). participanting ratio (%.3f).",
+                "[%s] Total clients (%d), participanting clients (%d), nonparticipating_clients (%d). participanting ratio (%.3f).",
                 colour="blue",
             ),
             self,
             self.total_clients,
             self.participant_clients,
-            self.nonparticipant_clients,
+            self.nonparticipating_clients,
             self.participant_clients_ratio,
         )
 
@@ -155,14 +158,14 @@ class Server(fedavg.Server):
             ).format(pers_interval)
 
         self.personalization_group_type_info = {
-            "total": "Personalization on total clients",
-            "participant": "Personalization on participanting clients",
-            "nonparticipant": "Personalization on non-participanting clients",
+            "total": "Personalization on all clients",
+            "participant": "Personalization on participanting clients only",
+            "nonparticipant": "Personalization on non-participanting clients only",
         }
         self.client_groups_pool = {
             "total": self.clients_pool,
             "participant": self.participant_clients_pool,
-            "nonparticipant": self.nonparticipant_clients_pool,
+            "nonparticipant": self.nonparticipating_clients_pool,
         }
 
         if pers_interval == 0:
@@ -175,7 +178,7 @@ class Server(fedavg.Server):
         elif pers_interval == -1:
             logging.info(
                 fonts.colourize(
-                    "[%s] Personalization will be performed after final rounds.",
+                    "[%s] Personalization will be performed after the final round.",
                     colour="blue",
                 ),
                 self,
@@ -243,8 +246,8 @@ class Server(fedavg.Server):
         # if this is not provided,
         # Then reminding clients of clients_pool apart from the
         # participant_clients will be utilized as non-participant clients.
-        if self.nonparticipant_clients_pool is None:
-            self.nonparticipant_clients_pool = [
+        if self.nonparticipating_clients_pool is None:
+            self.nonparticipating_clients_pool = [
                 client_id
                 for client_id in clients_pool
                 if client_id not in self.participant_clients_pool
@@ -255,9 +258,11 @@ class Server(fedavg.Server):
                     "[%s] Prepared non-participanting clients pool: %s", colour="blue"
                 ),
                 self,
-                self.nonparticipant_clients_pool,
+                self.nonparticipating_clients_pool,
             )
-            self.client_groups_pool["nonparticipant"] = self.nonparticipant_clients_pool
+            self.client_groups_pool[
+                "nonparticipant"
+            ] = self.nonparticipating_clients_pool
 
         if not self.client_groups_pool["total"]:
             self.client_groups_pool["total"] = self.clients_pool

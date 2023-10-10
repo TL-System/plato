@@ -1,5 +1,6 @@
 """
 The training loop that takes place on clients.
+
 """
 
 import logging
@@ -10,10 +11,10 @@ import pickle
 import hermes_pruning as pruning
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
-from plato.trainers import basic
+from pflbases import personalized_trainer
 
 
-class Trainer(basic.Trainer):
+class Trainer(personalized_trainer.Trainer):
     """A federated learning trainer of Hermes, used by both the client and the server."""
 
     def __init__(self, model=None, callbacks=None):
@@ -35,6 +36,7 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         """Conducts pruning if needed before training."""
         # Evaluate if structured pruning should be conducted
+        super().train_run_start(config)
         self.datasource = datasources_registry.get(client_id=self.client_id)
         self.testset = self.datasource.get_test_set()
         accuracy = self.test_model(config, self.testset, None)

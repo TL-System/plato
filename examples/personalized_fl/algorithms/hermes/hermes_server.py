@@ -2,18 +2,15 @@
 A federated learning server using Hermes.
 """
 
-import logging
-import os
-import pickle
 import numpy as np
 import torch
 
 import hermes_pruning as pruning
-from plato.servers import fedavg
-from plato.config import Config
+
+from pflbases import fedavg_personalized_server
 
 
-class Server(fedavg.Server):
+class Server(fedavg_personalized_server.Server):
     """A federated learning server using the Hermes algorithm."""
 
     def __init__(
@@ -26,8 +23,8 @@ class Server(fedavg.Server):
             trainer=trainer,
             callbacks=callbacks,
         )
-        self.clients_first_time = [True for _ in range(Config().clients.total_clients)]
         self.masks_received = []
+        self.aggregated_clients_model = {}
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregates weight updates from the clients using personalized aggregating."""
@@ -84,7 +81,7 @@ class Server(fedavg.Server):
                 for model in weights_received:
                     model[layer_name] = new_tensor
 
-        self.save_personalized_models(weights_received, updates)
+        self.update_clients_model(weights_received, updates)
 
         deltas_received = self.algorithm.compute_weight_deltas(
             baseline_weights, weights_received
@@ -96,27 +93,13 @@ class Server(fedavg.Server):
 
         return updated_weights
 
-    def save_personalized_models(self, personalized_models, updates):
-        """Saves each client's personalized model."""
+    def update_clients_model(self, aggregated_clients_models, updates):
+        """Update clients' models."""
 
-        for (personalized_model, update) in zip(personalized_models, updates):
-            model_name = (
-                Config().trainer.model_name
-                if hasattr(Config().trainer, "model_name")
-                else "custom"
-            )
-            model_path = Config().params["model_path"]
-            filename = (
-                f"{model_path}/personalized_{model_name}_client{update.client_id}.pth"
-            )
-            with open(filename, "wb") as payload_file:
-                pickle.dump(personalized_model, payload_file)
-            logging.info(
-                "[%s] Saved client #%d's personalized model in: %s",
-                self,
-                update.client_id,
-                filename,
-            )
+        for client_model, update in zip(aggregated_clients_models, updates):
+            received_client_id = update.client_id
+            if received_client_id in self.aggregated_clients_model:
+                self.aggregated_clients_model[received_client_id] = client_model
 
     def customize_server_payload(self, payload):
         """Customizes the server payload before sending to the client."""
@@ -125,24 +108,10 @@ class Server(fedavg.Server):
         # in a previous communication round, the personalized file is loaded and
         # sent to the client for continued training. Otherwise, if the client is
         # selected for the first time, it receives the pre-initialized model.
-        model_name = (
-            Config().trainer.model_name
-            if hasattr(Config().trainer, "model_name")
-            else "custom"
-        )
 
-        model_path = Config().params["model_path"]
-        if not self.clients_first_time[self.selected_client_id - 1]:
-            filename = f"{model_path}/personalized_{model_name}_client{self.selected_client_id}.pth"
-            with open(filename, "rb") as payload_file:
-                payload = pickle.load(payload_file)
-            logging.info(
-                "[%s] Loaded client #%d's personalized model",
-                self,
-                self.selected_client_id,
-            )
-        else:
-            self.clients_first_time[self.selected_client_id - 1] = False
+        if self.selected_client_id in self.aggregated_clients_model:
+            # replace the payload for the current client with the personalized model
+            payload = self.aggregated_clients_model[self.selected_client_id]
 
         return payload
 
@@ -157,13 +126,3 @@ class Server(fedavg.Server):
                 self.masks_received[step] = mask
 
         return weights
-
-    def server_will_close(self) -> None:
-        """Method called at the start of closing the server."""
-        # Delete pruning masks created by clients
-        model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
-        for client_id in range(1, self.total_clients + 1):
-            mask_path = f"{checkpoint_path}/{model_name}_client{client_id}_mask.pth"
-            if os.path.exists(mask_path):
-                os.remove(mask_path)
