@@ -43,7 +43,8 @@ class Trainer(personalized_trainer.Trainer):
     def set_training_mode(self, personalized_mode: bool):
         """Set the learning model of this trainer.
 
-        The learning mode must be set by the client.
+        As the received model is the personalized model of the client,
+        the personalized_learning will be set to False all the time.
         """
         self.personalized_learning = False
 
