@@ -1,18 +1,12 @@
-"""Entities needed to conduct federated learning with LoRA adapters using Plato."""
+"""Entities needed to conduct federated learning with LoRA adapters."""
 
 import logging
-from functools import partial
 import math
 
 import torch
-from torch import nn
-from torchvision.datasets import MNIST
-from torchvision.transforms import ToTensor
 from transformers import (
-    AutoConfig,
     AutoTokenizer,
     LlamaTokenizer,
-    HfArgumentParser,
     DataCollatorForLanguageModeling,
 )
 from datasets import load_dataset
@@ -108,7 +102,7 @@ class Trainer(huggingface.Trainer):
         """
         self.tokenizer.pad_token_id = 0
         self.tokenizer.padding_side = "left"
-        
+
         self.training_args.per_device_eval_batch_size = config["batch_size"]
 
         self.trainer = huggingface.SampledHuggingFaceTrainer(

@@ -1,11 +1,11 @@
 """
-This example uses a very simple model to show how the model and the server
-be customized in Plato and executed in a standalone fashion.
+A federated learning server using LoRA fine-tuning.
 
 To run this example:
 
-python examples/customized/custom_server.py -c examples/customized/server.yml
+python examples/lora/lora_server.py -c examples/lora/server.yml
 """
+
 import logging
 
 from plato.servers import fedavg
@@ -13,8 +13,8 @@ from plato.servers import fedavg
 from lora_utils import LoraModel, DataSource, Trainer, Algorithm
 
 
-class CustomServer(fedavg.Server):
-    """A custom federated learning server."""
+class Server(fedavg.Server):
+    """A federated learning server using LoRA fine-tuning."""
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -26,14 +26,14 @@ class CustomServer(fedavg.Server):
             trainer=trainer,
             callbacks=callbacks,
         )
-        logging.info("A custom server has been initialized.")
+        logging.info("A LoRA server has been initialized.")
 
     def save_to_checkpoint(self):
         logging.info("Skipping checkpoint.")
 
 
 def main():
-    server = CustomServer(
+    server = Server(
         model=LoraModel, datasource=DataSource, trainer=Trainer, algorithm=Algorithm
     )
     server.run()

@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: true
@@ -14,7 +14,7 @@ clients:
     comm_simulation: false
 
 server:
-    address: 206.12.94.164
+    address: 127.0.0.1
     port: 8000
 
 data:
@@ -55,7 +55,7 @@ parameters:
     #     lr: 0.01
     #     momentum: 0.9
     #     weight_decay: 0.0
-    
+
     lora:
         r: 8
         lora_alpha: 16

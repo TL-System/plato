@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 2
+    total_clients: 1
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 1
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -19,7 +19,7 @@ server:
 
     # No client processes will be launched by the server
     disable_clients: true
-    
+
     comm_simulation: false
 
     do_test: false
@@ -62,7 +62,7 @@ parameters:
     #     lr: 0.01
     #     momentum: 0.9
     #     weight_decay: 0.0
-    
+
     lora:
         r: 8
         lora_alpha: 16
