@@ -157,7 +157,7 @@ class BYOLTransform:
 
     [1]. https://github.com/lucidrains/byol-pytorch
     [2]. https://github.com/PatrickHua/SimSiam
-    [3]. Grill, et.al, Bootstrap your own latent: A new approach
+    [3]. Grill, et al., Bootstrap your own latent: A new approach
         to self-supervised Learning, 2021.
     """
 
@@ -214,7 +214,7 @@ class MoCoTransform:
     """This the contrastive data augmentation [1] used by the MoCo [2] method.
 
     [1]. https://github.com/facebookresearch/moco
-    [3]. He, et.al, Momentum Contrast for Unsupervised Visual Representation
+    [3]. He, et al., Momentum Contrast for Unsupervised Visual Representation
         Learning, 2020.
     """
 
@@ -254,7 +254,7 @@ class SimCLRTransform:
 
     [1]. https://github.com/google-research/simclr
     [2]. https://github.com/PatrickHua/SimSiam
-    [3]. Chen, et.al, A Simple Framework for Contrastive Learning of
+    [3]. Chen, et al., A Simple Framework for Contrastive Learning of
         Visual Representations, 2020.
     """
 
@@ -331,7 +331,7 @@ class SwaVTransform:
     """This the contrastive data augmentation [1] used by the SWAV [2] method.
 
     [1]. https://github.com/facebookresearch/swav/blob/master/src/multicropdataset.py
-    [2]. Caron, et.al, Unsupervised Learning of Visual Features by Contrasting
+    [2]. Caron, et al., Unsupervised Learning of Visual Features by Contrasting
         Cluster Assignments, 2020.
     """
 

@@ -1,7 +1,7 @@
 """
 The implementation for the SimCLR [1] method for personalized federated learning.
 
-[1]. Ting Chen, et.al., A Simple Framework for Contrastive Learning of Visual Representations, 
+[1]. Ting Chen, et al., A Simple Framework for Contrastive Learning of Visual Representations, 
 ICML 2020. https://arxiv.org/abs/2002.05709
 
 The official code: https://github.com/google-research/simclr

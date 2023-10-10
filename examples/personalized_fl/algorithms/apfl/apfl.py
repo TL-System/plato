@@ -1,7 +1,7 @@
 """
 The implementation of APFL method based on the plato's pFL code.
 
-Yuyang Deng, et.al, Adaptive Personalized Federated Learning
+Yuyang Deng, et al., Adaptive Personalized Federated Learning
 
 paper address: https://arxiv.org/pdf/2003.13461.pdf
 
