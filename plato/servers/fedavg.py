@@ -229,9 +229,14 @@ class Server(base.Server):
             "round": self.current_round,
             "accuracy": self.accuracy,
             "elapsed_time": self.wall_time - self.initial_wall_time,
+            "processing_time": max(
+                update.report.processing_time for update in self.updates
+            ),
             "comm_time": max(update.report.comm_time for update in self.updates),
             "round_time": max(
-                update.report.training_time + update.report.comm_time
+                update.report.training_time
+                + update.report.processing_time
+                + update.report.comm_time
                 for update in self.updates
             ),
             "comm_overhead": self.comm_overhead,

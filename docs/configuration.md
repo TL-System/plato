@@ -574,6 +574,7 @@ The valid values are:
 - `accuracy`
 - `elapsed_time`
 - `comm_time`
+- `processing_time`
 - `round_time`
 - `comm_overhead`
 - `local_epoch_num`
