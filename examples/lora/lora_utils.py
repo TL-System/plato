@@ -138,6 +138,11 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
+        dataset_name = Config().data.dataset_name
+        logging.info("Dataset: %s", dataset_name)
+
+        dataset = load_dataset(dataset_name)
+
         # tokenizer.add_special_tokens({"pad_token": "[PAD]"})
         model_name = Config().trainer.model_name
         if "llama" in model_name:
@@ -154,8 +159,6 @@ class DataSource(base.DataSource):
                 padding="max_length",
                 truncation=True,
             )
-
-        dataset = load_dataset("srivatsavaasista/textgenerator-ds-mini")
 
         tokenized_datasets = dataset.map(tokenize_function)
 

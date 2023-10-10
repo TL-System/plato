@@ -25,6 +25,8 @@ server:
     do_test: false
 
 data:
+    dataset_name: srivatsavaasista/textgenerator-ds-mini
+
     # Number of samples in each partition
     partition_size: 1000
 
