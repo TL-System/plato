@@ -180,7 +180,7 @@ python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_len
 Hermes utilizes structured pruning to improve both communication efficiency and inference efficiency of federated learning. It prunes channels with the lowest magnitudes in each local model and adjusts the pruning amount based on each local model’s test accuracy and its previous pruning amount. When the server aggregates pruned updates, it only averages parameters that were not pruned on all clients.
 
 
-FedRep belongs to personalized federated learning.
+Hermes belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
