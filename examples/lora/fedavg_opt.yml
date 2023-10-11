@@ -1,0 +1,73 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    comm_simulation: false
+
+server:
+    address: 127.0.0.1
+    port: 8000
+
+    comm_simulation: false
+
+    do_test: false
+
+data:
+    dataset_name: srivatsavaasista/textgenerator-ds-mini
+
+    # Number of samples in each partition
+    partition_size: 1000
+
+    # IID or non-IID?
+    sampler: iid
+
+    # The random seed for sampling data
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: HuggingFace
+
+    # The maximum number of training rounds
+    rounds: 5
+
+    # The target perplexity
+    target_perplexity: 20
+
+    # The machine learning model
+    model_name: facebook/opt-1.3b
+    model_type: huggingface
+
+    # Number of epoches for local training in each communication round
+    epochs: 2
+    batch_size: 32
+    optimizer: SGD
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    # optimizer:
+    #     lr: 0.01
+    #     momentum: 0.9
+    #     weight_decay: 0.0
+
+    lora:
+        r: 8
+        lora_alpha: 16
+        target_modules:
+            - q_proj
+            - v_proj
+        lora_dropout: 0.05
+        bias: none
+        task_type: CAUSAL_LM
