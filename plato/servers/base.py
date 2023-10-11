@@ -877,7 +877,10 @@ class Server:
 
         start_time = self.training_clients[client_id]["start_time"]
         finish_time = (
-            self.reports[sid].training_time + self.reports[sid].comm_time + start_time
+            self.reports[sid].training_time
+            + self.reports[sid].processing_time
+            + self.reports[sid].comm_time
+            + start_time
         )
         starting_round = self.training_clients[client_id]["starting_round"]
 
