@@ -41,8 +41,8 @@ trainer:
     batch_size: 128
     optimizer: SGD
     lr_scheduler: MultiStepLR
-
     loss_criterion: NTXentLoss
+
     # The machine learning model
     model_name: SimCLR
     encoder_name: lenet5
@@ -107,7 +107,7 @@ algorithm:
 
 
 parameters:
-    # ResNet-18 training params
+    # LeNet5 training params
     !include lenet5_ssl_params.yml
 
 results:
