@@ -1,0 +1,19 @@
+    # The training and testing dataset
+    datasource: MNIST
+    personalized_datasource: MNIST
+
+    # Number of samples in each partition
+    partition_size: 1000
+
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 1.0
+    
+    # personalized_sampler: noniid
+    # personalized_testset_sampler: noniid
+
+
+    # The random seed for sampling data
+    random_seed: 1

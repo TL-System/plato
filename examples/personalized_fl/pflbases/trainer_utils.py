@@ -104,14 +104,19 @@ def checkpoint_personalized_metrics(
         filename=acc_filename,
         location=save_location,
     )
-    np.save(os.path.join(save_location, labels_filename), metrics_holder.labels)
     np.save(
-        os.path.join(save_location, predictions_filename), metrics_holder.predictions
+        os.path.join(save_location, labels_filename),
+        metrics_holder.labels.detach().cpu().numpy(),
+    )
+    np.save(
+        os.path.join(save_location, predictions_filename),
+        metrics_holder.predictions.detach().cpu().numpy(),
     )
 
     if metrics_holder.encodings is not None:
         np.save(
-            os.path.join(save_location, encodings_filename), metrics_holder.encodings
+            os.path.join(save_location, encodings_filename),
+            metrics_holder.encodings.detach().cpu().numpy(),
         )
 
 

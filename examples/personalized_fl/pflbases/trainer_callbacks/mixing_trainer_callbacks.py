@@ -14,6 +14,7 @@ process.
 
 
 from pflbases.trainer_callbacks import base_callbacks
+from plato.config import Config
 
 
 class PersonalizedModelStatusCallback(base_callbacks.PersonalizedModelCallback):
@@ -37,11 +38,21 @@ class PersonalizedModelMetricCallback(base_callbacks.PersonalizedMetricCallback)
     1). at the end of each round of normal federated training.
     2). at the start of any local update."""
 
+    def on_train_run_start(self, trainer, config, **kwargs):
+        if (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
+        ):
+            return super().on_train_run_start(trainer, config, **kwargs)
+
     def on_train_epoch_end(self, trainer, config, **kwargs):
         """Do not perform test for the personalized model during training."""
 
     def on_train_run_end(self, trainer, config, **kwargs):
         """Ensuring point 1)."""
 
-        if not trainer.personalized_learning:
+        if not trainer.personalized_learning and (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
+        ):
             super().on_train_run_end(trainer, config, **kwargs)

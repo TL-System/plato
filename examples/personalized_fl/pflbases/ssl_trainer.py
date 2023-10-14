@@ -164,7 +164,11 @@ class Trainer(personalized_trainer.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if not self.personalized_learning:
+        if (
+            not self.personalized_learning
+            or not hasattr(Config().algorithm, "personalization")
+            or not hasattr(Config().parameters, "personalization")
+        ):
             return self.plato_ssl_loss_wrapper()
 
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
@@ -178,6 +182,9 @@ class Trainer(personalized_trainer.Trainer):
 
     def preprocess_personalized_model(self, config):
         """Do nothing to the loaded personalized mdoel."""
+
+    def train_run_end(self, config):
+        """Do nothing in the end of the training run."""
 
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""

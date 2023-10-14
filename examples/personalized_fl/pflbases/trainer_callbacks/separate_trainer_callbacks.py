@@ -12,7 +12,6 @@ personalization for mulitple epochs to train the personalized model.
 
 
 from plato.config import Config
-
 from pflbases.trainer_callbacks import base_callbacks
 
 
@@ -40,21 +39,37 @@ class PersonalizedModelStatusCallback(base_callbacks.PersonalizedModelCallback):
 
 class PersonalizedModelMetricCallback(base_callbacks.PersonalizedMetricCallback):
     """A trainer callback to compute and record the personalized metrics,
-        1). at the start of training process.
+        1). at the start of the final personalization.
         2). at each epoch only in the final personalization.
         3). at the end of each personalization.
     ."""
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        if (
+            trainer.personalized_learning
+            and trainer.current_round == Config().trainer.rounds + 1
+        ) and (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
+        ):
+            return super().on_train_run_start(trainer, config, **kwargs)
 
     def on_train_epoch_end(self, trainer, config, **kwargs):
         """Ensuring point 2)."""
         if (
             trainer.personalized_learning
             and trainer.current_round == Config().trainer.rounds + 1
+        ) and (
+            hasattr(Config().algorithm.personalization, "do_test_per_epoch")
+            and Config().algorithm.personalization.do_test_per_epoch
         ):
             super().on_train_epoch_end(trainer, config, **kwargs)
 
     def on_train_run_end(self, trainer, config, **kwargs):
         """Ensuring point 3)."""
 
-        if trainer.personalized_learning:
+        if (
+            trainer.personalized_learning
+            and trainer.current_round == Config().trainer.rounds + 1
+        ):
             super().on_train_run_end(trainer, config, **kwargs)
