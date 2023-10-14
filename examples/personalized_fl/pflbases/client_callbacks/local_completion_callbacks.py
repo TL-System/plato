@@ -51,6 +51,13 @@ class PayloadCompletionProcessor(base.Processor):
         # if the desired of trained model is not saved by this client
         # this client is never selected to perform the training
         if not os.path.exists(checkpoint_file_path):
+            logging.info("[Client #%d] No local model found.", self.trainer.client_id)
+            logging.info(
+                "[Client #%d] Creating an initial local model and save to %s with filename %s.",
+                self.trainer.client_id,
+                checkpoint_dir_path,
+                filename,
+            )
             self.trainer.model.apply(self.trainer.reset_weight)
             self.trainer.save_model(filename=filename, location=checkpoint_dir_path)
         else:

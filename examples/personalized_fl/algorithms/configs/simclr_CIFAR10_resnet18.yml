@@ -9,35 +9,20 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    random_seed: 1
 
 server:
-
     address: 127.0.0.1
-    port: 8000
-
+    port: 8009
     do_test: false
-    
+    random_seed: 1
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
 
 data:
-    # The training and testing dataset
-    datasource: MNIST
-    personalized_datasource: MNIST
-
-    # Number of samples in each partition
-    partition_size: 2000
-
-    # IID or non-IID?
-    sampler: noniid
-    testset_sampler: noniid
-
-    # personalized_sampler: noniid
-    # personalized_testset_sampler: noniid
-
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
-
-    # The random seed for sampling data
-    random_seed: 1
+    # cifar10 non-iid distribution
+    !include cifar10_ssl_noniid.yml
 
 trainer:
 
@@ -59,12 +44,9 @@ trainer:
 
     # The machine learning model
     model_name: SimCLR
-    encoder_name: lenet5
+    encoder_name: resnet_18
     projection_hidden_dim: 2048
     projection_out_dim: 256
-
-    global_modules_name:
-        - encoder
 
 
 algorithm:
@@ -77,17 +59,20 @@ algorithm:
         train_transform:
             name: SimCLR
             parameters:
-                input_size: 28
+                input_size: 32
 
+    global_modules_name:
+        - encoder
+        
     completion_modules_name:
         - projector
-
+        
     personalization:
 
         # Number of epochs for local training in each communication round
         #   The batch size for the downstream task can be larger as it
         # does not utilize the
-        epochs: 10
+        epochs: 5
         batch_size: 32
         optimizer: SGD
         lr_scheduler: StepLR
@@ -101,8 +86,11 @@ algorithm:
         model_logging_epoch_interval: 2
 
         # the ratio of clients participanting in training
-        participant_clients_ratio: 0.5
+        participant_clients_ratio: 1.0
         
+        # whether load the personalized each round
+        load_model_per_round: false
+
         # whether maintain and load the trained 
         # personalied model
         # set to be true, each client will load
@@ -118,37 +106,13 @@ algorithm:
 
 
 parameters:
+    # ResNet-18 ssl training params
+    !include resnet18_ssl_params.yml
 
-    optimizer:
-        lr: 0.01
-        momentum: 0.9
-        weight_decay: 0.0
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, round_time
+    result_path: results/pfl-simclr
 
-    learning_rate:
-        gamma: 0.1
-        milestone_steps: 150ep,350ep
-
-    loss_criterion:
-        temperature: 0.2
-
-    model:
-        num_classes: 10
-
-
-    personalization:
-
-        optimizer:
-            lr: 0.01 
-            momentum: 0.9
-            weight_decay: 0.0
-
-        learning_rate:
-            gamma: 0.3
-            step_size: 10
-
-        loss_criterion:
-            label_smoothing: 0.5
-
-        model:
-            num_classes: 10
+    
 

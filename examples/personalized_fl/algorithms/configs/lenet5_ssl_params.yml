@@ -1,0 +1,32 @@
+optimizer:
+    lr: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+
+learning_rate:
+    gamma: 0.1
+    milestone_steps: 150ep,350ep
+
+loss_criterion:
+    temperature: 0.2
+
+model:
+    num_classes: 10
+
+
+personalization:
+
+    optimizer:
+        lr: 0.01 
+        momentum: 0.9
+        weight_decay: 0.0
+
+    learning_rate:
+        gamma: 0.3
+        step_size: 10
+
+    loss_criterion:
+        label_smoothing: 0.5
+
+    model:
+        num_classes: 10
