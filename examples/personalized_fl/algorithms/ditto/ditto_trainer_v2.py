@@ -104,7 +104,12 @@ class Trainer(personalized_trainer.Trainer):
                 #   the corresponding equation in Algorithm. 1.
                 w_net = copy.deepcopy(self.personalized_model.state_dict())
                 lr = self.lr_scheduler.get_lr()[0]
+
                 for key in w_net.keys():
+                    self.initial_model_params[key] = self.initial_model_params[key].to(
+                        self.device
+                    )
+
                     w_net[key] = w_net[key] - lr * self.ditto_lambda * (
                         v_initial[key] - self.initial_model_params[key]
                     )
