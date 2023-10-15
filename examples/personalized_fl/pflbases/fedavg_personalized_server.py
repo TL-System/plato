@@ -92,10 +92,10 @@ class Server(fedavg.Server):
 
     def initialize_personalization(self):
         """Initialize two types of clients."""
-        # set participant and nonparticipant clients
+        # Set participant and nonparticipating clients
         loaded_config = Config()
 
-        ## 1. initialize participanting clients
+        ## 1. Initialize participanting clients
         self.participating_clients_ratio = (
             loaded_config.algorithm.personalization.participating_clients_ratio
             if hasattr(
@@ -114,7 +114,8 @@ class Server(fedavg.Server):
 
         logging.info(
             fonts.colourize(
-                "[%s] Total clients (%d), participanting clients (%d), nonparticipating_clients (%d). participanting ratio (%.3f).",
+                "[%s] Total clients (%d), participanting clients (%d), "
+                "nonparticipating_clients (%d), participanting ratio (%.3f).",
                 colour="blue",
             ),
             self,
@@ -124,7 +125,7 @@ class Server(fedavg.Server):
             self.participating_clients_ratio,
         )
 
-        ## 2. initialize personalization interval and types
+        ## 2. Initialize personalization interval and types
         # if the value is set to be -1, thus the personalization
         # will be perform at the end of full communication rounds.
         # if do_personalization_interval is 0, no personalization
@@ -154,7 +155,7 @@ class Server(fedavg.Server):
         )
         if pers_interval not in self.personalization_status_info:
             self.personalization_status_info[pers_interval] = (
-                "Personalization every {} rounds."
+                "Personalizing every {} rounds."
             ).format(pers_interval)
 
         self.personalization_group_type_info = {
@@ -213,7 +214,7 @@ class Server(fedavg.Server):
         :param clients_pool: A list holding the id of all possible
             clients.
 
-        Note, the participant clients pool will be set in the first round and no
+        Note, the participating clients pool will be set in the first round and no
             modification is performed afterwards.
         """
         loaded_config = Config()
@@ -222,10 +223,10 @@ class Server(fedavg.Server):
 
         # only set the clients pool when they are empty.
 
-        # load the participant clients pool from configuration
+        # load the participating clients pool from configuration
         # if this is not provided,
         # The first `self.participating_clients` in clients_pool will
-        # be utilized as participant clients.
+        # be utilized as participating clients.
         if self.participating_clients_pool is None:
             self.participating_clients_pool = (
                 loaded_config.algorithm.personalization.participating_clients_pool
@@ -242,10 +243,10 @@ class Server(fedavg.Server):
                 self,
                 self.participating_clients_pool,
             )
-        # load the non-participant clients pool from configuration
+        # load the non-participating clients pool from configuration
         # if this is not provided,
         # Then reminding clients of clients_pool apart from the
-        # participating_clients will be utilized as non-participant clients.
+        # participating_clients will be utilized as non-participating clients.
         if self.nonparticipating_clients_pool is None:
             self.nonparticipating_clients_pool = [
                 client_id
@@ -292,7 +293,7 @@ class Server(fedavg.Server):
         )
 
         # by default, we run the general federated training
-        # the clients pool should be participant clients
+        # the clients pool should be participating clients
         assert clients_count <= len(self.participating_clients_pool)
 
         return clients_pool, clients_count
