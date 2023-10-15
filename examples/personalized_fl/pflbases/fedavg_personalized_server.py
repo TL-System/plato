@@ -69,7 +69,6 @@ class Server(fedavg.Server):
         self.to_terminate_personalization = False
 
         self.initialize_personalization()
-        self.check_hyper_parameters()
 
     def check_hyper_parameters(self):
         """Check whether hyper-parameters are set correctly."""
@@ -402,6 +401,7 @@ class Server(fedavg.Server):
         else:
             logging.info("[%s] Selected clients: %s", self, selected_clients)
 
+        self.check_hyper_parameters()
         return selected_clients
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
