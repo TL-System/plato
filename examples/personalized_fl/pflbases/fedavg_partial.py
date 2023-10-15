@@ -78,10 +78,8 @@ class Algorithm(fedavg.Algorithm):
                     (name, param)
                     for name, param in model.cpu().state_dict().items()
                     if any(
-                        [
-                            param_name in name.strip().split(".")
-                            for param_name in modules_name
-                        ]
+                        param_name in name.strip().split(".")
+                        for param_name in modules_name
                     )
                 ]
             )
