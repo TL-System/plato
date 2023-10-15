@@ -103,9 +103,7 @@ class Server(fedavg.Server):
         self.participating_clients = int(
             self.total_clients * self.participating_clients_ratio
         )
-        self.nonparticipating_clients = int(
-            self.total_clients - self.participating_clients
-        )
+        self.nonparticipating_clients = self.total_clients - self.participating_clients
 
         logging.info(
             fonts.colourize(
