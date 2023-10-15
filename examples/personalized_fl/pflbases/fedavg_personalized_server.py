@@ -85,11 +85,6 @@ class Server(fedavg.Server):
         ):
             assert self.participating_clients == len(self.participating_clients_pool)
 
-        assert (
-            self.total_clients
-            == self.participating_clients + self.nonparticipating_clients
-        )
-
     def initialize_personalization(self):
         """Initialize two types of clients."""
         # Set participant and nonparticipating clients
@@ -231,7 +226,8 @@ class Server(fedavg.Server):
             self.participating_clients_pool = (
                 loaded_config.algorithm.personalization.participating_clients_pool
                 if hasattr(
-                    loaded_config.algorithm.personalization, "participating_clients_pool"
+                    loaded_config.algorithm.personalization,
+                    "participating_clients_pool",
                 )
                 else clients_pool[: self.participating_clients]
             )
