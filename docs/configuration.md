@@ -136,7 +136,7 @@ A list of processors for the client to apply on the payload before receiving it 
 
 ```
 
-```{admonition} participant_clients_ratio
+```{admonition} participating_clients_ratio
 Percentage of clients participating in federated training out of all clients. The value should range from 0 to 1.
 ```
 

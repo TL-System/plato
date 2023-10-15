@@ -107,7 +107,7 @@ algorithm:
         model_logging_epoch_interval: 2
 
         # the ratio of clients participanting in training
-        participant_clients_ratio: 0.5
+        participating_clients_ratio: 0.5
         
         # whether maintain and load the trained 
         # personalied model
