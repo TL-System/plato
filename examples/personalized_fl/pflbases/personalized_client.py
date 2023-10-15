@@ -79,7 +79,7 @@ class Client(simple.Client):
 
         # whether this client contains the corresponding
         # personalized model
-        self.novel_client = False
+        self.new_client = False
 
     def process_server_response(self, server_response) -> None:
         """Additional client-specific processing on the server response."""
@@ -136,9 +136,9 @@ class Client(simple.Client):
             self.client_id,
             personalized_model_name,
         )
-        filename = self.set_is_novel_client()
+        filename = self.is_new_client()
 
-        if not self.novel_client:
+        if not self.new_client:
             self.trainer.create_unique_personalized_model(filename)
 
         # when `persist_personalized_model` is set to be True, it means
@@ -205,8 +205,8 @@ class Client(simple.Client):
         """Whether this client participants the federated training."""
         return self.client_group == "participant"
 
-    def set_is_novel_client(self):
-        """Whether this client is a novel one, which is never selected by the
+    def is_new_client(self):
+        """Whether this client is a new one, which is never selected by the
         server, as a result, no unique personalized model is maintained."""
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
@@ -221,6 +221,6 @@ class Client(simple.Client):
         )
         checkpoint_file_path = os.path.join(checkpoint_dir_path, filename)
 
-        self.novel_client = os.path.exists(checkpoint_file_path)
+        self.new_client = os.path.exists(checkpoint_file_path)
 
         return filename
