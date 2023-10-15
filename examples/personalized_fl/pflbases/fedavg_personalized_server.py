@@ -146,9 +146,9 @@ class Server(fedavg.Server):
             }
         )
         if pers_interval not in self.personalization_status_info:
-            self.personalization_status_info[pers_interval] = (
-                "Personalizing every {} rounds."
-            ).format(pers_interval)
+            self.personalization_status_info[
+                pers_interval
+            ] = f"Personalizing every {pers_interval} rounds."
 
         self.personalization_group_type_info = {
             "total": "Personalization on all clients",
