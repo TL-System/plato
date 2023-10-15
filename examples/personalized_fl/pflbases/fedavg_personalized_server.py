@@ -5,7 +5,7 @@ A simple federated learning server capable of controling
 2. which part of clients will perform personalizaiton 
     - do_personalization_group
 2. which part of clients will participant in the training
-    - participant_clients_ratio
+    - participating_clients_ratio
 """
 
 from typing import List
@@ -33,16 +33,16 @@ class Server(fedavg.Server):
 
         # two types of client groups
         # utilized clients during federated training
-        self.participant_clients = 0
+        self.participating_clients = 0
         # unused clients during federated training
         self.nonparticipating_clients = 0
 
         # participanted clients as a percentage of all clients
         # by default, all clients will participant
-        self.participant_clients_ratio = 1.0
+        self.participating_clients_ratio = 1.0
 
         # clients id of two types of clients
-        self.participant_clients_pool = None
+        self.participating_clients_pool = None
         self.nonparticipating_clients_pool = None
 
         # client pool of three groups of clients
@@ -75,19 +75,19 @@ class Server(fedavg.Server):
         """Check whether hyper-parameters are set correctly."""
         loaded_config = Config()
 
-        # `the participant_clients_pool` and `participant_clients_ratio`
+        # `the participating_clients_pool` and `participating_clients_ratio`
         # if these two hyper-parameters are set simutaneously
         #  they should correspond to each other.
         if hasattr(
-            loaded_config.algorithm.personalization, "participant_clients_ratio"
+            loaded_config.algorithm.personalization, "participating_clients_ratio"
         ) and hasattr(
-            loaded_config.algorithm.personalization, "participant_clients_pool"
+            loaded_config.algorithm.personalization, "participating_clients_pool"
         ):
-            assert self.participant_clients == len(self.participant_clients_pool)
+            assert self.participating_clients == len(self.participating_clients_pool)
 
         assert (
             self.total_clients
-            == self.participant_clients + self.nonparticipating_clients
+            == self.participating_clients + self.nonparticipating_clients
         )
 
     def initialize_personalization(self):
@@ -96,20 +96,20 @@ class Server(fedavg.Server):
         loaded_config = Config()
 
         ## 1. initialize participanting clients
-        self.participant_clients_ratio = (
-            loaded_config.algorithm.personalization.participant_clients_ratio
+        self.participating_clients_ratio = (
+            loaded_config.algorithm.personalization.participating_clients_ratio
             if hasattr(
-                loaded_config.algorithm.personalization, "participant_clients_ratio"
+                loaded_config.algorithm.personalization, "participating_clients_ratio"
             )
             else 1.0
         )
 
         #  clients will / will not participant in federated training
-        self.participant_clients = int(
-            self.total_clients * self.participant_clients_ratio
+        self.participating_clients = int(
+            self.total_clients * self.participating_clients_ratio
         )
         self.nonparticipating_clients = int(
-            self.total_clients - self.participant_clients
+            self.total_clients - self.participating_clients
         )
 
         logging.info(
@@ -119,9 +119,9 @@ class Server(fedavg.Server):
             ),
             self,
             self.total_clients,
-            self.participant_clients,
+            self.participating_clients,
             self.nonparticipating_clients,
-            self.participant_clients_ratio,
+            self.participating_clients_ratio,
         )
 
         ## 2. initialize personalization interval and types
@@ -164,7 +164,7 @@ class Server(fedavg.Server):
         }
         self.client_groups_pool = {
             "total": self.clients_pool,
-            "participant": self.participant_clients_pool,
+            "participant": self.participating_clients_pool,
             "nonparticipant": self.nonparticipating_clients_pool,
         }
 
@@ -218,39 +218,39 @@ class Server(fedavg.Server):
         """
         loaded_config = Config()
 
-        assert self.participant_clients <= len(clients_pool)
+        assert self.participating_clients <= len(clients_pool)
 
         # only set the clients pool when they are empty.
 
         # load the participant clients pool from configuration
         # if this is not provided,
-        # The first `self.participant_clients` in clients_pool will
+        # The first `self.participating_clients` in clients_pool will
         # be utilized as participant clients.
-        if self.participant_clients_pool is None:
-            self.participant_clients_pool = (
-                loaded_config.algorithm.personalization.participant_clients_pool
+        if self.participating_clients_pool is None:
+            self.participating_clients_pool = (
+                loaded_config.algorithm.personalization.participating_clients_pool
                 if hasattr(
-                    loaded_config.algorithm.personalization, "participant_clients_pool"
+                    loaded_config.algorithm.personalization, "participating_clients_pool"
                 )
-                else clients_pool[: self.participant_clients]
+                else clients_pool[: self.participating_clients]
             )
-            self.client_groups_pool["participant"] = self.participant_clients_pool
+            self.client_groups_pool["participant"] = self.participating_clients_pool
             logging.info(
                 fonts.colourize(
                     "[%s] Prepared participanting clients pool: %s", colour="blue"
                 ),
                 self,
-                self.participant_clients_pool,
+                self.participating_clients_pool,
             )
         # load the non-participant clients pool from configuration
         # if this is not provided,
         # Then reminding clients of clients_pool apart from the
-        # participant_clients will be utilized as non-participant clients.
+        # participating_clients will be utilized as non-participant clients.
         if self.nonparticipating_clients_pool is None:
             self.nonparticipating_clients_pool = [
                 client_id
                 for client_id in clients_pool
-                if client_id not in self.participant_clients_pool
+                if client_id not in self.participating_clients_pool
             ]
 
             logging.info(
@@ -276,8 +276,8 @@ class Server(fedavg.Server):
         # reset `clients_per_round` to the predefined hyper-parameter
         self.clients_per_round = Config().clients.per_round
 
-        # set the clients_pool to be participant_clients_pool
-        clients_pool = self.participant_clients_pool
+        # set the clients_pool to be participating_clients_pool
+        clients_pool = self.participating_clients_pool
 
         # However, as we modified the membership `clients_per_round` previously,
         # the clients_count here may be the modified `clients_per_round`.
@@ -293,7 +293,7 @@ class Server(fedavg.Server):
 
         # by default, we run the general federated training
         # the clients pool should be participant clients
-        assert clients_count <= len(self.participant_clients_pool)
+        assert clients_count <= len(self.participating_clients_pool)
 
         return clients_pool, clients_count
 
