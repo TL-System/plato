@@ -11,7 +11,6 @@ Utilization condition:
 
 The format of this hyper-parameter should be a list containing the name of desired layers.
 
-
 For example, when utilizing the "LeNet5" as the target model, the `global_modules_name` can
 be defined as:
 
@@ -89,7 +88,8 @@ class Algorithm(fedavg.Algorithm):
 
         model_params_name = self.model.state_dict().keys()
 
-        search_func = lambda x, y: [x_i for x_i in x if x_i not in y]
+        def search_func(x, y):
+            return [x_i for x_i in x if x_i not in y]
 
         inconsistent_params = []
         if len(model_params_name) > len(weights_param_name):
@@ -98,14 +98,6 @@ class Algorithm(fedavg.Algorithm):
             inconsistent_params = search_func(weights_param_name, model_params_name)
 
         return len(inconsistent_params) == 0, inconsistent_params
-
-    def load_weights(
-        self,
-        weights: dict,
-        strict: bool = False,
-    ):
-        """Load the model weights passed in as a parameter."""
-        self.model.load_state_dict(weights, strict=strict)
 
     @staticmethod
     def extract_modules_name(parameters_name):
