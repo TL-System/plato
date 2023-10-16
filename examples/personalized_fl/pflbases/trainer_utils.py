@@ -184,5 +184,5 @@ def activate_model(model, modules_name=None):
     """Defreezing a part of the model."""
     if modules_name is not None:
         for name, param in model.named_parameters():
-            if any([param_name in name for param_name in modules_name]):
+            if any(param_name in name for param_name in modules_name):
                 param.requires_grad = True
