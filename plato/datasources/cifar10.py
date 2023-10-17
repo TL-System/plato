@@ -48,41 +48,32 @@ class DataSource(base.DataSource):
                 )
             )
         )
+
         _path = Config().params["data_path"]
 
         if not os.path.exists(_path):
             if hasattr(Config().clients, "do_test") and Config().clients.do_test:
                 # If clients are performing local tests for accuracy, concurrent
                 # downloading may lead to PyTorch errors
-                if Config().args.download:
-                    self.trainset = datasets.CIFAR10(
-                        root=_path, train=True, download=True, transform=train_transform
-                    )
-                    self.testset = datasets.CIFAR10(
-                        root=_path, train=False, download=True, transform=test_transform
-                    )
-                    logging.info(
-                        "The dataset has been successfully downloaded. "
-                        "Re-run the experiment without '-d' or '--download'."
-                    )
-                    sys.exit()
-                else:
-                    if Config().clients.total_clients > 1:
-                        if (
-                            not hasattr(Config().data, "concurrent_download")
-                            or not Config().data.concurrent_download
-                        ):
-                            raise ValueError(
-                                "The dataset has not yet been downloaded from the Internet. "
-                                "Please re-run with '-d' or '--download' first. "
-                            )
+                if Config().clients.total_clients > 1:
+                    if not hasattr(Config().data, 'concurrent_download'
+                                ) or not Config().data.concurrent_download:
+                        raise ValueError(
+                            "The dataset has not yet been downloaded from the Internet. "
+                            "Please re-run with '-d' or '--download' first. ") 
 
         self.trainset = datasets.CIFAR10(
             root=_path, train=True, download=True, transform=train_transform
         )
         self.testset = datasets.CIFAR10(
             root=_path, train=False, download=True, transform=test_transform
-        )
+                        )
+
+        if Config().args.download:
+            logging.info("The dataset has been successfully downloaded. "
+                        "Re-run the experiment without '-d' or '--download'.")
+            sys.exit()
+
 
     def num_train_examples(self):
         return 50000
