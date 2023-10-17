@@ -16,7 +16,6 @@ class DataSource(base.DataSource):
 
     def __init__(self, **kwargs):
         super().__init__()
-        _path = Config().params["data_path"]
 
         train_transform = (
             kwargs["train_transform"]
@@ -62,24 +61,28 @@ class DataSource(base.DataSource):
                     self.testset = datasets.CIFAR10(
                         root=_path, train=False, download=True, transform=test_transform
                     )
-                    logging.info("The dataset has been successfully downloaded. "
-                                "Re-run the experiment without '-d' or '--download'.")
+                    logging.info(
+                        "The dataset has been successfully downloaded. "
+                        "Re-run the experiment without '-d' or '--download'."
+                    )
                     sys.exit()
                 else:
                     if Config().clients.total_clients > 1:
-                        if not hasattr(Config().data, 'concurrent_download'
-                                    ) or not Config().data.concurrent_download:
+                        if (
+                            not hasattr(Config().data, "concurrent_download")
+                            or not Config().data.concurrent_download
+                        ):
                             raise ValueError(
                                 "The dataset has not yet been downloaded from the Internet. "
-                                "Please re-run with '-d' or '--download' first. ") 
+                                "Please re-run with '-d' or '--download' first. "
+                            )
 
         self.trainset = datasets.CIFAR10(
             root=_path, train=True, download=True, transform=train_transform
         )
         self.testset = datasets.CIFAR10(
             root=_path, train=False, download=True, transform=test_transform
-                        )
-
+        )
 
     def num_train_examples(self):
         return 50000
