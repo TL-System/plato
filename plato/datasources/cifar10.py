@@ -52,9 +52,9 @@ class DataSource(base.DataSource):
         _path = Config().params["data_path"]
 
         if not os.path.exists(_path):
-            if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-                # If clients are performing local tests for accuracy, concurrent
-                # downloading may lead to PyTorch errors
+            if hasattr(Config().server, "do_test") and not Config().server.do_test:
+                # If the server is not performing local tests for accuracy, concurrent
+                # downloading on the clients may lead to PyTorch errors
                 if Config().clients.total_clients > 1:
                     if not hasattr(Config().data, 'concurrent_download'
                                 ) or not Config().data.concurrent_download:
