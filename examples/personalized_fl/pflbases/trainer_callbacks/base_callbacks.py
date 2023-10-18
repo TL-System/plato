@@ -8,12 +8,6 @@ The `PersonalizedModelCallback` is the base callback to
     1). record the personalized model at every `model_logging_epoch_interval`
         of training.
     2). record he personalized model at the end of training.
- 
-
-The `PersonalizedMetricCallback` is the base callback to
-    1). test the personalized model before the training.
-    2). test the personalized model at every epoch.
-    3). test the personalized model after the training.
 
 The user is desired to inherit from these two basic callbacks to create
 customized ones.
