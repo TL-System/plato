@@ -115,7 +115,7 @@ class Trainer(basic.Trainer):
         """Complete the client side training with gradients from server."""
         self.optimizer.zero_grad()
         self.training_samples = examples
-        self.callback_handler.call_event("on_client_forward_to", self, examples)
+        self.callback_handler.call_event("on_client_forward_to", self)
         examples = self.training_samples
         outputs = self.model.forward_to(examples)
 
@@ -130,16 +130,27 @@ class Trainer(basic.Trainer):
 
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
-        examples = examples.detach().requires_grad_(True)
+        self.optimizer.zero_grad()
+        self.training_samples = (examples, labels)
+        self.callback_handler.call_event(
+            "on_server_forward_from", self, self._loss_criterion, config
+        )
+        examples = self.training_samples
+        loss, grad = self.loss_grad_pair
+        loss = loss.cpu().detach()
+        self._loss_tracker.update(loss, examples.size(0))
 
-        loss = super().perform_forward_and_backward_passes(config, examples, labels)
+        # Record gradients within the cut layer
+        if grad is not None:
+            grad = grad.cpu().clone().detach()
+        self.cut_layer_grad = [grad]
+        self.optimizer.step()
+
         logging.warning(
             "[Server #%d] Gradients computed with training loss: %.4f",
             os.getpid(),
             loss,
         )
-        # Record gradients within the cut layer
-        self.cut_layer_grad = [examples.grad.clone().detach()]
 
         return loss
 
