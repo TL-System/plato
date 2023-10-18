@@ -19,8 +19,6 @@ from pflbases.trainer_callbacks.base_callbacks import (
     PersonalizedLogProgressCallback,
 )
 
-from pflbases.trainer_utils import checkpoint_personalized_metrics
-from pflbases.trainer_utils import MetircsCollector
 
 warnings.simplefilter("ignore")
 
@@ -57,45 +55,12 @@ class Trainer(basic.Trainer):
         # or the personalized training
         self.personalized_learning = False
 
-        # testset for the personalization process
-        self.testset = None
-        self.testset_sampler = None
-
-        # the collector for the test metrics
-        # only for personalization
-        self.test_metrics_collector = MetircsCollector()
-
     def set_training_mode(self, personalized_mode: bool):
         """Set the learning model of this trainer.
 
         The learning mode must be set by the client.
         """
         self.personalized_learning = personalized_mode
-
-    def set_testset(self, dataset):
-        """set the testset."""
-        self.testset = dataset
-
-    def set_testset_sampler(self, sampler):
-        """set the sampler for the testset."""
-        self.testset_sampler = sampler
-
-    # pylint: disable=unused-argument
-    def get_test_loader(self, batch_size, **kwargs):
-        """
-        Creates an instance of the testloader.
-
-        Arguments:
-        batch_size: the batch size.
-        testset: the training dataset.
-        sampler: the sampler for the testloader to use.
-        """
-        return torch.utils.data.DataLoader(
-            dataset=self.testset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=self.testset_sampler.get(),
-        )
 
     def define_personalized_model(self, personalized_model):
         """Define the personalized model to this trainer."""
@@ -392,22 +357,23 @@ class Trainer(basic.Trainer):
             location=checkpoint_dir_path,
         )
 
-    def test_personalized_model(self, config, **kwargs):
+    def test_personalized_model(self, config, testset, sampler=None, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
 
         self.personalized_model.eval()
         self.personalized_model.to(self.device)
 
-        data_loader = self.get_test_loader(
-            config["batch_size"],
+        batch_size = config["batch_size"]
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
         )
-        self.test_metrics_collector.reset()
+
         correct = 0
         total = 0
 
         with torch.no_grad():
-            for _, (examples, labels) in enumerate(data_loader):
+            for _, (examples, labels) in enumerate(test_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
                 outputs = self.personalized_model_forward(examples, split="test")
@@ -417,29 +383,20 @@ class Trainer(basic.Trainer):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-                self.test_metrics_collector.add_labels(labels)
-                self.test_metrics_collector.add_predictions(predicted)
-
         accuracy = correct / total
-
-        self.test_metrics_collector.set_accuracy(accuracy)
 
         self.personalized_model.train()
 
-    def perform_personalized_metric_checkpoint(self, config):
-        """Performing the test for the personalized model and saving the accuracy to
-        checkpoint file."""
-        result_path = Config().params["result_path"]
-        self.test_personalized_model(config)
+        return accuracy
 
-        checkpoint_personalized_metrics(
-            result_path,
-            client_id=self.client_id,
-            metrics_holder=self.test_metrics_collector,
-            current_round=self.current_round,
-            epoch=self.current_epoch,
-            run_id=None,
-        )
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """Testing the model to report the accuracy of the local model or the
+        personalized model."""
+
+        if self.personalized_learning:
+            return self.test_personalized_model(config, testset, sampler=None, **kwargs)
+        else:
+            return super().test_model(config, testset, sampler, **kwargs)
 
     def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
         """Performing the saving for the personalized model with
