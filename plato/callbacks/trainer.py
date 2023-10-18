@@ -8,6 +8,7 @@ import logging
 import os
 from abc import ABC
 
+import torch
 from plato.utils import fonts
 
 
@@ -121,3 +122,28 @@ class LogProgressCallback(TrainerCallback):
                     len(trainer.train_loader),
                     loss.data.item(),
                 )
+
+
+class SplitLearningCallback(LogProgressCallback):
+    """A callback for split learning handling model specific operations."""
+
+    def on_retrieve_train_samples(self, trainer):
+        """The event befor retrieviing tianing samples."""
+
+    def on_client_forward_to(self, trainer):
+        """The event befor client conducting forwarding."""
+
+    def on_server_forward_from(self, trainer, loss_criterion, input_target_pair):
+        "Hook the rules of training on the server to the trainer.model."
+
+        inputs, target = input_target_pair
+        inputs = inputs.detach().requires_grad_(True)
+        outputs = trainer.model.forward_from(inputs)
+        loss = loss_criterion(outputs, target)
+        loss.backward()
+        grad = inputs.grad
+        trainer.loss_grad_pair = (loss, grad)
+
+    def on_test_model(self, trainer, config, testset, sampler):
+        """The rules of testing models, depending on the specific models"""
+        trainer.accuracy = trainer.super().test_model(config, testset, sampler)
