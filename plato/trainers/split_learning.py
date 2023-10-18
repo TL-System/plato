@@ -27,6 +27,7 @@ from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import SplitLearningCallback
 
 
+# pylint:disable=too-many-instance-attributes
 class Trainer(basic.Trainer):
     """The split learning trainer."""
 
