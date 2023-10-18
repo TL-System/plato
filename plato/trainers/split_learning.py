@@ -102,6 +102,7 @@ class Trainer(basic.Trainer):
     def retrieve_train_samples(self):
         """Retrieve the training samples to complete client training."""
         # Wrap the training samples with datasource and sampler to be fed into Plato trainer
+        self.callback_handler.call_event("on_retrieve_train_samples", self)
         samples = feature.DataSource([[self.training_samples]])
         sampler = all_inclusive.Sampler(samples)
         return samples, sampler
@@ -113,6 +114,9 @@ class Trainer(basic.Trainer):
     def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
         self.optimizer.zero_grad()
+        self.training_samples = examples
+        self.callback_handler.call_event("on_client_forward_to", self, examples)
+        examples = self.training_samples
         outputs = self.model.forward_to(examples)
 
         # Back propagate with gradients from server
