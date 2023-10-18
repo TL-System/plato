@@ -23,6 +23,8 @@ from plato.config import Config
 from plato.trainers import basic
 from plato.datasources import feature
 from plato.samplers import all_inclusive
+from plato.callbacks.handler import CallbackHandler
+from plato.callbacks.trainer import SplitLearningCallback
 
 
 class Trainer(basic.Trainer):
@@ -46,6 +48,12 @@ class Trainer(basic.Trainer):
 
         # Server side variables
         self.cut_layer_grad = []
+
+        # Reset the callback
+        self.callbacks = [SplitLearningCallback]
+        if callbacks is not None:
+            self.callbacks.extend(callbacks)
+        self.callback_handler = CallbackHandler(self.callbacks)
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """
