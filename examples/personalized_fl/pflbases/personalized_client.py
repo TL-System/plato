@@ -28,11 +28,9 @@ Note:
 """
 import sys
 import os
-import logging
 
 from plato.clients import simple
 from plato.config import Config
-from plato.utils import fonts
 from plato.utils.filename_formatter import NameFormatter
 
 from pflbases import checkpoint_operator
@@ -65,6 +63,8 @@ class Client(simple.Client):
         # personal needs.
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
+        # this the class of the personalized model
+        self.personalized_model_cls = None
 
         # the path of the initial personalized model of this client
         self.init_personalized_model_path = None
@@ -78,27 +78,30 @@ class Client(simple.Client):
         personalized model for the client."""
         super().configure()
 
-        # jump out if no personalized model is set
+        # jump out if no personalization info is provided
         if not hasattr(Config().algorithm, "personalization"):
             sys.exit(
                 "Error: personalization block must be provided under the algorithm."
             )
 
-        # define the personalized model
+        # set the personalized model class
         if (
             self.personalized_model is None
             and self.custom_personalized_model is not None
         ):
-            self.personalized_model = self.custom_personalized_model
+            self.personalized_model_cls = self.custom_personalized_model
 
         # get the initial personalized model path
         self.init_personalized_model_path = self.get_init_personalized_model_path()
 
         # if this client does not a personalized model yet.
         # define a an initial one and save to the disk
-        if not self.exist_init_personalized_model():
+        if not self.exist_init_personalized_model() and (
+            self.trainer.is_round_personalization()
+            or self.trainer.is_final_personalization()
+        ):
             # define its personalized model
-            self.trainer.define_personalized_model(self.personalized_model)
+            self.trainer.define_personalized_model(self.personalized_model_cls)
             self.trainer.save_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=self.trainer.get_checkpoint_dir_path(),
@@ -114,7 +117,7 @@ class Client(simple.Client):
         # 2. the current round is larger than the total rounds,
         #   which means the final personalization.
         if (
-            self.train.is_round_personalization()
+            self.trainer.is_round_personalization()
             or self.trainer.is_final_personalization()
         ):
             self.get_personalized_model()
@@ -124,7 +127,7 @@ class Client(simple.Client):
 
         # always get the latest personalized model.
         desired_round = self.current_round - 1
-        location = self.get_checkpoint_dir_path()
+        location = self.trainer.get_checkpoint_dir_path()
 
         filename, is_searched = checkpoint_operator.search_client_checkpoint(
             client_id=self.client_id,
@@ -143,7 +146,7 @@ class Client(simple.Client):
         else:
             self.trainer.load_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
-                location=self.trainer.get_checkpoint_dir_path(),
+                location=location,
             )
 
     def get_init_personalized_model_path(self):
@@ -166,4 +169,4 @@ class Client(simple.Client):
     def exist_init_personalized_model(self):
         """Whether this client is unselected on."""
 
-        return not os.path.exists(self.init_personalized_model_path)
+        return os.path.exists(self.init_personalized_model_path)

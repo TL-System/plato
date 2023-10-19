@@ -35,17 +35,11 @@ class Trainer(basic.Trainer):
         self.personalized_model_name = Config().algorithm.personalization.model_name
         self.personalized_model_checkpoint_prefix = "personalized"
 
-    def define_personalized_model(self, personalized_model):
-        """Define the personalized model to this trainer.
-
-        This function will achieve the condition that:
-        self.personalized_model will be defined as the new one once the
-        client is newly selected, otherwise, the personalized model will
-        be loaded from the checkpoint.
-        """
+    def define_personalized_model(self, personalized_model_cls):
+        """Define the personalized model to this trainer."""
         trainer_utils.set_random_seeds(self.client_id)
 
-        if personalized_model is None:
+        if personalized_model_cls is None:
             pers_model_type = (
                 Config().algorithm.personalization.model_type
                 if hasattr(Config().algorithm.personalization, "model_type")
@@ -58,7 +52,7 @@ class Trainer(basic.Trainer):
                 model_params=pers_model_params,
             )
         else:
-            self.personalized_model = personalized_model()
+            self.personalized_model = personalized_model_cls.get()
 
         logging.info(
             "[Client #%d] Defined the personalized model: %s",
@@ -206,14 +200,17 @@ class Trainer(basic.Trainer):
             self.personalized_model.to(self.device)
             self.personalized_model.train()
 
+    def postprocess_personalized_model(self, config):
+        """Before running, process the personalized model."""
+        self.copy_personalized_model_to_model(config)
+
     def train_run_end(self, config):
         """Copy the trained model to the untrained one."""
         super().train_run_end(config)
 
         if self.is_round_personalization() or self.is_final_personalization():
-            self.copy_personalized_model_to_model(config)
-        else:
-            self.copy_model_to_personalized_model(config)
+            self.postprocess_personalized_model(config)
+            self.perform_personalized_model_checkpoint(config)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
