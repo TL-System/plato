@@ -63,15 +63,12 @@ class Client(simple.Client):
         # personal needs.
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
+
         # this the class of the personalized model
         self.personalized_model_cls = None
 
         # the path of the initial personalized model of this client
         self.init_personalized_model_path = None
-
-        # whether this client contains the corresponding
-        # personalized model
-        self.new_client = False
 
     def configure(self) -> None:
         """Performing the general client's configure and then initialize the
