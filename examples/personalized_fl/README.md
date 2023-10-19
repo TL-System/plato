@@ -2,7 +2,7 @@
 
 Implementations of existing approaches for personalized federated learning using the Plato framework.
 
-## Tow Basic Learning Modes
+## Two Basic Learning Modes
 `pflbases` contains two basic learning modes, i.e., performing personalization in each round or the next round of the final round. The indicator is `do_personalization_per_round` (see hyper-parameters below).
 
 When `do_personalization_per_round: true`, the personalized model will be 1. Loaded; 2. Obtained; 3. Saved, in each round. Otherwise, the personalized model will only be processed in the next round of the final round. 
