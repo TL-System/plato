@@ -145,6 +145,18 @@ class SplitLearningCallback(LogProgressCallback):
         grad = inputs.grad
         trainer.loss_grad_pair = (loss, grad)
 
-    def on_test_model(self, trainer, config, testset, sampler):
+    def on_test_model(self, trainer, test_loader):
         """The rules of testing models, depending on the specific models"""
-        trainer.accuracy = trainer.super().test_model(config, testset, sampler)
+        correct = 0
+        total = 0
+        for examples, labels in test_loader:
+            examples, labels = examples.to(trainer.device), labels.to(trainer.device)
+
+            outputs = trainer.model(examples)
+
+            outputs = trainer.process_outputs(outputs)
+
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+        trainer.accuracy = correct / total
