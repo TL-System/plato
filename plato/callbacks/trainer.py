@@ -128,14 +128,14 @@ class SplitLearningCallback(LogProgressCallback):
     """A callback for split learning handling model specific operations."""
 
     def on_retrieve_train_samples(self, trainer):
-        """The event befor retrieviing tianing samples."""
+        """The event befor retrieving tianing samples."""
 
     def on_client_forward_to(self, trainer):
         """The event befor client conducting forwarding."""
 
     # pylint:disable=unused-argument
     def on_server_forward_from(self, trainer, loss_criterion, config):
-        "Hook the rules of training on the server to the trainer.model."
+        "The event for server completing training by forwarding from intermediate features."
 
         inputs, target = trainer.training_samples
         inputs = inputs.detach().requires_grad_(True)
