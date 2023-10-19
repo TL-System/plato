@@ -9,7 +9,7 @@ When `do_personalization_per_round: true`, the personalized model will be 1. Loa
 
 We believe that these two modes can cover all personalized FL algorithms. For example, 
 - APFL, Ditto, LG-FedAvg, FedPer, FedRep, and FedBABU follows `do_personalization_per_round: true`. 
-- FedAvg with finetuning (fedavg_finetune) and PerFeAavg follows `do_personalization_per_round: false`.
+- FedAvg with finetuning (fedavg_finetune) and PerFeAvg follows `do_personalization_per_round: false`.
 
 --- 
 ## Baseline Algorithm
