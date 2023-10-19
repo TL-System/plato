@@ -113,11 +113,12 @@ algorithm:
 
 All hyper-parameters related to personalization should be placed under the `personalization` sub-block of the `algorithm` block. 
 
-- model_name: A string to indicate the personalized model name. For example, 
+- model_name: A string to indicate the personalized model name. This is not mandatory as if it is omitted, it will be assumed to be the same as the global model. Default: `model_name` under the `trainer` block.  For example, 
 ```yaml
 algorithm:
     personalization:
-
+        # the personalized model name
+        # this can be omitted
         model_name: resnet_18
 ```
 

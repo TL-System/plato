@@ -32,7 +32,11 @@ class Trainer(basic.Trainer):
 
         # personalized model name and the file prefix
         # used to save the model
-        self.personalized_model_name = Config().algorithm.personalization.model_name
+        self.personalized_model_name = (
+            Config().algorithm.personalization.model_name
+            if hasattr(Config().algorithm.personalization, "model_name")
+            else Config().trainer.model_name
+        )
         self.personalized_model_checkpoint_prefix = "personalized"
 
     def define_personalized_model(self, personalized_model_cls):
