@@ -133,10 +133,11 @@ class SplitLearningCallback(LogProgressCallback):
     def on_client_forward_to(self, trainer):
         """The event befor client conducting forwarding."""
 
-    def on_server_forward_from(self, trainer, loss_criterion, input_target_pair):
+    # pylint:disable=unused-argument
+    def on_server_forward_from(self, trainer, loss_criterion, config):
         "Hook the rules of training on the server to the trainer.model."
 
-        inputs, target = input_target_pair
+        inputs, target = trainer.training_samples
         inputs = inputs.detach().requires_grad_(True)
         outputs = trainer.model.forward_from(inputs)
         loss = loss_criterion(outputs, target)
