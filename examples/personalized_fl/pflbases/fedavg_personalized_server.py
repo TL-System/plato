@@ -37,9 +37,6 @@ class Server(fedavg.Server):
         self.participating_clients_pool = None
         self.nonparticipating_clients_pool = None
 
-        # these two variables are used for reminder purposes
-        self.personalization_status_info = {}
-
         # whether stop the terminate personalization
         # afterwards
         self.to_terminate_personalization = False
@@ -198,7 +195,9 @@ class Server(fedavg.Server):
 
             if self.to_terminate_personalization:
                 logging.info(
-                    "%s Completed.",
-                    self.personalization_status_info[self.do_personalization_per_round],
+                    "%s has completed.",
+                    fonts.colourize(
+                        "Personalization after the final round", colour="blue"
+                    ),
                 )
                 await self._close()
