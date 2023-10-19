@@ -14,9 +14,6 @@ from plato.models import registry as models_registry
 from plato.utils import fonts
 from plato.utils.filename_formatter import NameFormatter
 
-from pflbases.trainer_callbacks.base_callbacks import (
-    PersonalizedLogProgressCallback,
-)
 from pflbases import trainer_utils
 from pflbases import checkpoint_operator
 
@@ -30,18 +27,6 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
-
-        # clear the original callbacks but only hold the
-        # desired ones
-        self.callback_handler.clear_callbacks()
-        self.callbacks = [
-            PersonalizedLogProgressCallback,
-        ]
-        if callbacks is not None:
-            self.callbacks.extend(callbacks)
-
-        # only add the customized callbacks
-        self.callback_handler.add_callbacks(self.callbacks)
 
         self.personalized_model = None
 
