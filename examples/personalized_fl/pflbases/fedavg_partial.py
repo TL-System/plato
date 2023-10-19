@@ -132,3 +132,7 @@ class Algorithm(fedavg.Algorithm):
                 extracted_names.append(module_name)
 
         return extracted_names
+
+    def load_weights(self, weights):
+        """Loads the model weights passed in as a parameter."""
+        self.model.load_state_dict(weights, strict=False)
