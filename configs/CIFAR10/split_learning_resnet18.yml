@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 20
+    iteration: 100
 
 server:
     type: split_learning
@@ -28,7 +28,7 @@ data:
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 10000
+    partition_size: 1000
 
     # Fixed random seed
     random_seed: 1
@@ -51,7 +51,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 32
+    batch_size: 128
     optimizer: SGD
     lr_scheduler: LambdaLR
     
