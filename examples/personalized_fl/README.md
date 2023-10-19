@@ -87,7 +87,7 @@ python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18
 
 ## Hyper-parameters
 
-All hyper-parameters of `pflbases` should be placed under the `algorithm` block of the configuration file. There are only three 
+All hyper-parameters of `pflbases` should be placed under the `algorithm` block of the configuration file. 
 
 ### For `fedavg_partial`
 - global_modules_name: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_partial.py` as the algorithm, the `global_modules_name` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `global_modules_name` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
