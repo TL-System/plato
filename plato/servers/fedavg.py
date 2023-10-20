@@ -106,7 +106,8 @@ class Server(base.Server):
             hasattr(Config().clients, "do_test")
             and Config().clients.do_test
             and (
-                hasattr(Config().results, "record_clients_accuracy")
+                hasattr(Config(), "results")
+                and hasattr(Config().results, "record_clients_accuracy")
                 and Config().results.record_clients_accuracy
             )
         ):
