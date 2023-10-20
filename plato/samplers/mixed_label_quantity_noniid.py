@@ -51,13 +51,16 @@ class Sampler(base.Sampler):
 
         per_client_classes_size = Config().data.per_client_classes_size
         anchor_classes = Config().data.anchor_classes
-        consistent_clients_size = Config().data.consistent_clients_size
         keep_anchor_classes_size = Config().data.keep_anchor_classes_size
         total_clients = Config().clients.total_clients
 
         assert per_client_classes_size == len(anchor_classes)
 
-        self.consistent_clients = np.random.choice(
+        if hasattr(Config().data, "consistent_clients"):
+            self.consistent_clients = Config().data.consistent_clients
+        else:
+            consistent_clients_size = Config().data.consistent_clients_size
+            self.consistent_clients = np.random.choice(
             list(range(total_clients)), size=consistent_clients_size, replace=False
         )
         self.anchor_classes = anchor_classes
