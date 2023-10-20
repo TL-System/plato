@@ -23,8 +23,6 @@ from plato.config import Config
 from plato.trainers import basic
 from plato.datasources import feature
 from plato.samplers import all_inclusive
-from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.trainer import SplitLearningCallback
 
 
 # pylint:disable=too-many-instance-attributes
@@ -49,12 +47,6 @@ class Trainer(basic.Trainer):
 
         # Server side variables
         self.cut_layer_grad = []
-
-        # Reset the callback
-        self.callbacks = [SplitLearningCallback]
-        if callbacks is not None:
-            self.callbacks.extend(callbacks)
-        self.callback_handler = CallbackHandler(self.callbacks)
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """
@@ -111,7 +103,9 @@ class Trainer(basic.Trainer):
     def retrieve_train_samples(self):
         """Retrieve the training samples to complete client training."""
         # Wrap the training samples with datasource and sampler to be fed into Plato trainer
-        self.callback_handler.call_event("on_retrieve_train_samples", self)
+        self.training_samples = self.process_training_samples_beofre_retreiving(
+            self.training_samples
+        )
         samples = feature.DataSource([[self.training_samples]])
         sampler = all_inclusive.Sampler(samples)
         return samples, sampler
@@ -123,9 +117,7 @@ class Trainer(basic.Trainer):
     def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
         self.optimizer.zero_grad()
-        self.training_samples = examples
-        self.callback_handler.call_event("on_client_forward_to", self)
-        examples = self.training_samples
+        examples = self.process_samples_before_client_forwarding(examples)
         outputs = self.model.forward_to(examples)
 
         # Back propagate with gradients from server
@@ -140,13 +132,9 @@ class Trainer(basic.Trainer):
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
         self.optimizer.zero_grad()
-        self.training_samples = (examples, labels)
-        self.callback_handler.call_event(
-            "on_server_forward_from", self, self._loss_criterion, config
-        )
-        loss, grad = self.loss_grad_pair
+        loss, grad, batch_size = self.server_forward_from((examples, labels), config)
         loss = loss.cpu().detach()
-        self._loss_tracker.update(loss, self.training_samples[0].size(0))
+        self._loss_tracker.update(loss, batch_size)
 
         # Record gradients within the cut layer
         if grad is not None:
@@ -189,23 +177,35 @@ class Trainer(basic.Trainer):
 
         return torch.load(model_gradients_path)
 
-    # pylint: disable=unused-argument
-    def test_model(self, config, testset, sampler=None, **kwargs):
+    # API functions for split learning
+    def process_training_samples_beofre_retreiving(self, training_samples):
+        """Process training samples before completing retreiving samples."""
+        return training_samples
+
+    def process_samples_before_client_forwarding(self, examples):
+        """Process the examples befor client conducting forwarding."""
+        return examples
+
+    # pylint:disable=unused-argument
+    def server_forward_from(self, batch, config):
         """
-        Evaluates the model with the provided test dataset and test sampler.
+        The event for server completing training by forwarding from intermediate features.
+        Uses may override this function for training different models with split learning.
 
-        Auguments:
-        testset: the test dataset.
-        sampler: the test sampler. The default is None.
-        kwargs (optional): Additional keyword arguments.
+        Inputs:
+            batch: the batch of inputs for forwarding.
+            config: training configuration.
+        Returns:
+            loss: the calculated loss.
+            grad: the gradients over the intermediate feature.
+            batch_size: the batch size of the current sample.
         """
-        batch_size = config["batch_size"]
 
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
-
-        self.model.to(self.device)
-        with torch.no_grad():
-            self.callback_handler.call_event("on_test_model", self, test_loader)
-        return self.accuracy
+        inputs, target = batch
+        batch_size = inputs.size(0)
+        inputs = inputs.detach().requires_grad_(True)
+        outputs = self.model.forward_from(inputs)
+        loss = self._loss_criterion(outputs, target)
+        loss.backward()
+        grad = inputs.grad
+        return loss, grad, batch_size
