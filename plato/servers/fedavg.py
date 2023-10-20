@@ -195,7 +195,7 @@ class Server(base.Server):
         # Testing the global model accuracy
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
             # Compute the average accuracy from client reports
-            self.accuracy = self.accuracy_averaging(self.updates)
+            self.accuracy, self.accuracy_std = self.get_accuracy_mean_std(self.updates)
             logging.info(
                 "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
             )
@@ -228,6 +228,7 @@ class Server(base.Server):
         return {
             "round": self.current_round,
             "accuracy": self.accuracy,
+            "accuracy_std": self.accuracy_std,
             "elapsed_time": self.wall_time - self.initial_wall_time,
             "processing_time": max(
                 update.report.processing_time for update in self.updates
@@ -243,19 +244,22 @@ class Server(base.Server):
         }
 
     @staticmethod
-    def accuracy_averaging(updates):
-        """Compute the average accuracy across clients."""
+    def get_accuracy_mean_std(updates):
+        """Compute the accuracy mean and standard deviation across clients."""
         # Get total number of samples
         total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging
-        accuracy = 0
-        for update in updates:
-            accuracy += update.report.accuracy * (
-                update.report.num_samples / total_samples
-            )
+        updates_accuracy = [update.report.accuracy for update in updates]
+        weights = [update.report.num_samples / total_samples for update in updates]
 
-        return accuracy
+        mean = sum(acc * weights[idx] for idx, acc in enumerate(updates_accuracy))
+        variance = sum(
+            (acc - mean) ** 2 * weights[idx] for idx, acc in enumerate(updates_accuracy)
+        )
+        std = variance**0.5
+
+        return mean, std
 
     def weights_received(self, weights_received):
         """
