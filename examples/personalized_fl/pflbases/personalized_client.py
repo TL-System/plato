@@ -88,14 +88,18 @@ class Client(simple.Client):
         ):
             self.personalized_model_cls = self.custom_personalized_model
 
+        # set the indicators for personalization of the trainer
+        self.trainer.do_round_personalization = self.is_round_personalization()
+        self.trainer.do_final_personalization = self.is_final_personalization()
+
         # get the initial personalized model path
         self.init_personalized_model_path = self.get_init_personalized_model_path()
 
         # if this client does not a personalized model yet.
         # define a an initial one and save to the disk
         if not self.exist_init_personalized_model() and (
-            self.trainer.is_round_personalization()
-            or self.trainer.is_final_personalization()
+            self.trainer.do_round_personalization
+            or self.trainer.do_final_personalization
         ):
             # define its personalized model
             self.trainer.define_personalized_model(self.personalized_model_cls)
@@ -103,6 +107,7 @@ class Client(simple.Client):
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=self.trainer.get_checkpoint_dir_path(),
             )
+
         self.personalized_model = self.trainer.personalized_model
 
     def inbound_received(self, inbound_processor):
@@ -114,8 +119,8 @@ class Client(simple.Client):
         # 2. the current round is larger than the total rounds,
         #   which means the final personalization.
         if (
-            self.trainer.is_round_personalization()
-            or self.trainer.is_final_personalization()
+            self.trainer.do_round_personalization
+            or self.trainer.do_final_personalization
         ):
             self.get_personalized_model()
 
@@ -167,3 +172,26 @@ class Client(simple.Client):
         """Whether this client is unselected on."""
 
         return os.path.exists(self.init_personalized_model_path)
+
+    def is_final_personalization(self):
+        """Get whether the client is performing the final personalization.
+        whether the client is performing the final personalization
+        the final personalization is mandatory
+        """
+        if self.current_round > Config().trainer.rounds:
+            return True
+        return False
+
+    def is_round_personalization(self):
+        """Get whether the client is performing the round personalization.
+        whether the client is perfomring the personalization in the current round
+        this round personalization should be determined by the user
+        depending on the algorithm.
+        """
+
+        if (
+            hasattr(Config().algorithm.personalization, "do_personalization_per_round")
+            and Config().algorithm.personalization.do_personalization_per_round
+        ):
+            return True
+        return False

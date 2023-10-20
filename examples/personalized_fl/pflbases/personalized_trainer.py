@@ -39,6 +39,10 @@ class Trainer(basic.Trainer):
         )
         self.personalized_model_checkpoint_prefix = "personalized"
 
+        # two indicators for personalization
+        self.do_round_personalization = False
+        self.do_final_personalization = False
+
     def define_personalized_model(self, personalized_model_cls):
         """Define the personalized model to this trainer."""
         trainer_utils.set_random_seeds(self.client_id)
@@ -134,7 +138,7 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Returns the optimizer."""
-        if not self.is_final_personalization():
+        if not self.do_final_personalization:
             return super().get_optimizer(model)
 
         logging.info("[Client #%d] Using the personalized optimizer.", self.client_id)
@@ -143,7 +147,7 @@ class Trainer(basic.Trainer):
 
     def get_lr_scheduler(self, config, optimizer):
         """Returns the learning rate scheduler, if needed."""
-        if not self.is_final_personalization():
+        if not self.do_final_personalization:
             return super().get_lr_scheduler(config, optimizer)
 
         logging.info(
@@ -154,7 +158,7 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if not self.is_final_personalization():
+        if not self.do_final_personalization:
             return super().get_loss_criterion()
 
         logging.info(
@@ -165,7 +169,7 @@ class Trainer(basic.Trainer):
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader for personalization."""
-        if self.is_final_personalization() and hasattr(
+        if self.do_final_personalization and hasattr(
             Config().algorithm, "personalization"
         ):
             personalized_config = Config().algorithm.personalization._asdict()
@@ -197,7 +201,7 @@ class Trainer(basic.Trainer):
         # before performing the final personalization to optimized the personalized model,
         # each client has to copy the global model to the personalized model by default.
 
-        if self.is_final_personalization():
+        if self.do_final_personalization:
             self.copy_model_to_personalized_model(config)
 
     def train_run_start(self, config):
@@ -205,7 +209,7 @@ class Trainer(basic.Trainer):
 
         self.preprocess_models(config)
 
-        if self.is_final_personalization():
+        if self.do_final_personalization:
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
             # the model name is needed to be maintained here
@@ -227,7 +231,7 @@ class Trainer(basic.Trainer):
         # as one part of the local update.
         # By default:
         # the updated global model will be copied to the personalized model
-        if self.is_round_personalization() and not self.is_final_personalization():
+        if self.do_round_personalization and not self.do_final_personalization:
             self.copy_model_to_personalized_model(config)
 
     def train_run_end(self, config):
@@ -236,7 +240,7 @@ class Trainer(basic.Trainer):
 
         self.postprocess_models(config)
 
-        if self.is_round_personalization() or self.is_final_personalization():
+        if self.do_round_personalization or self.do_final_personalization:
             self.perform_personalized_model_checkpoint(config)
 
     def model_forward(self, examples):
@@ -252,7 +256,7 @@ class Trainer(basic.Trainer):
     def forward_examples(self, examples, **kwargs):
         """Forward the examples through one model."""
 
-        if self.is_final_personalization():
+        if self.do_final_personalization:
             return self.personalized_model_forward(examples, **kwargs)
         else:
             return self.model_forward(examples, **kwargs)
@@ -312,7 +316,7 @@ class Trainer(basic.Trainer):
         """Testing the model to report the accuracy of the local model or the
         personalized model."""
 
-        if self.is_round_personalization() or self.is_final_personalization():
+        if self.do_round_personalization or self.do_final_personalization:
             return self.test_personalized_model(config, testset, sampler=None, **kwargs)
         else:
             return super().test_model(config, testset, sampler, **kwargs)
@@ -382,26 +386,3 @@ class Trainer(basic.Trainer):
         Method called to process outputs of the personalized model.
         """
         return outputs
-
-    def is_final_personalization(self):
-        """Get whether the client is performing the final personalization.
-        whether the client is performing the final personalization
-        the final personalization is mandatory
-        """
-        if self.current_round > Config().trainer.rounds:
-            return True
-        return False
-
-    def is_round_personalization(self):
-        """Get whether the client is performing the round personalization.
-        whether the client is perfomring the personalization in the current round
-        this round personalization should be determined by the user
-        depending on the algorithm.
-        """
-
-        if (
-            hasattr(Config().algorithm.personalization, "do_personalization_per_round")
-            and Config().algorithm.personalization.do_personalization_per_round
-        ):
-            return True
-        return False
