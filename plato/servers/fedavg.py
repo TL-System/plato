@@ -102,7 +102,14 @@ class Server(base.Server):
                 )
 
         # Initialize the test accuracy csv file if clients compute locally
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
+        if (
+            hasattr(Config().clients, "do_test")
+            and Config().clients.do_test
+            and (
+                hasattr(Config().results, "record_clients_accuracy")
+                and Config().results.record_clients_accuracy
+            )
+        ):
             accuracy_csv_file = (
                 f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
             )
