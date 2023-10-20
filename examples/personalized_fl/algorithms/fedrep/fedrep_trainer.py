@@ -15,7 +15,8 @@ class Trainer(personalized_trainer.Trainer):
     def train_run_start(self, config):
         """Freezing the body"""
         super().train_run_start(config)
-        if self.is_round_personalization():
+        if self.is_final_personalization():
+            # only optimize the head for the final personalization
             trainer_utils.freeze_model(
                 self.personalized_model,
                 Config().algorithm.global_modules_name,
@@ -65,15 +66,10 @@ class Trainer(personalized_trainer.Trainer):
                     self.model, Config().algorithm.global_modules_name
                 )
 
-    def postprocess_personalized_model(self, config):
-        """For Fedrep, we should copy the trained model to the personalized model as
-        the training was performed in the local model."""
-        self.copy_model_to_personalized_model(config)
-
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
-        if self.is_round_personalization():
+        if self.is_round_personalization() and not self.is_final_personalization():
             trainer_utils.activate_model(
-                self.personalized_model, Config().algorithm.global_modules_name
+                self.model, Config().algorithm.global_modules_name
             )
