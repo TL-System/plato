@@ -79,12 +79,11 @@ class Trainer(basic.Trainer):
         checkpoint_path = Config.params["checkpoint_path"]
         return os.path.join(checkpoint_path, f"client_{self.client_id}")
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
-        if (
-            not self.is_final_personalization()
-            or not hasattr(Config().algorithm, "personalization")
-            or not hasattr(Config().parameters, "personalization")
+    def get_personalized_loss_criterion(self):
+        """Getting the loss_criterion for personalized model."""
+
+        if not hasattr(Config().algorithm, "personalization") or not hasattr(
+            Config().algorithm.personalization, "loss_criterion"
         ):
             return super().get_loss_criterion()
 
@@ -138,6 +137,8 @@ class Trainer(basic.Trainer):
         if not self.is_final_personalization():
             return super().get_optimizer(model)
 
+        logging.info("[Client #%d] Using the personalized optimizer.", self.client_id)
+
         return self.get_personalized_optimizer()
 
     def get_lr_scheduler(self, config, optimizer):
@@ -145,7 +146,22 @@ class Trainer(basic.Trainer):
         if not self.is_final_personalization():
             return super().get_lr_scheduler(config, optimizer)
 
+        logging.info(
+            "[Client #%d] Using the personalized lr_scheduler.", self.client_id
+        )
+
         return self.get_personalized_lr_scheduler(config, optimizer)
+
+    def get_loss_criterion(self):
+        """Returns the loss criterion."""
+        if not self.is_final_personalization():
+            return super().get_loss_criterion()
+
+        logging.info(
+            "[Client #%d] Using the personalized loss_criterion.", self.client_id
+        )
+
+        return self.get_personalized_loss_criterion()
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader for personalization."""
@@ -171,28 +187,25 @@ class Trainer(basic.Trainer):
             Config().algorithm.personalization.model_name,
         )
 
-    def copy_personalized_model_to_model(self, config):
-        """Copying the model to the personalized model."""
-        self.model.load_state_dict(self.personalized_model.state_dict(), strict=True)
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] copied the personalized model [%s] to model [%s].",
-                colour="blue",
-            ),
-            self.client_id,
-            Config().algorithm.personalization.model_name,
-            Config().trainer.model_name,
-        )
+    def preprocess_models(self, config):
+        """Before running, we need to process the model and the personalized model.
 
-    def preprocess_personalized_model(self, config):
-        """Before running, process the personalized model."""
-        self.copy_model_to_personalized_model(config)
+        This function is required to be revised based on the specific condition of the
+        personalized FL algorithm.
+        """
+        # By default:
+        # before performing the final personalization to optimized the personalized model,
+        # each client has to copy the global model to the personalized model by default.
+
+        if self.is_final_personalization():
+            self.copy_model_to_personalized_model(config)
 
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
 
+        self.preprocess_models(config)
+
         if self.is_final_personalization():
-            self.preprocess_personalized_model(config)
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
             # the model name is needed to be maintained here
@@ -204,16 +217,26 @@ class Trainer(basic.Trainer):
             self.personalized_model.to(self.device)
             self.personalized_model.train()
 
-    def postprocess_personalized_model(self, config):
+    def postprocess_models(self, config):
         """Before running, process the personalized model."""
-        self.copy_personalized_model_to_model(config)
+
+        # pflbases will always copy the trained model to the personalized model as
+        # the local update performed on the received global model is the core of
+        # federated learning and should be Mandatory.
+        # Therefore, pflbases assumes that the personalized model is optimized
+        # as one part of the local update.
+        # By default:
+        # the updated global model will be copied to the personalized model
+        if self.is_round_personalization() and not self.is_final_personalization():
+            self.copy_model_to_personalized_model(config)
 
     def train_run_end(self, config):
         """Copy the trained model to the untrained one."""
         super().train_run_end(config)
 
+        self.postprocess_models(config)
+
         if self.is_round_personalization() or self.is_final_personalization():
-            self.postprocess_personalized_model(config)
             self.perform_personalized_model_checkpoint(config)
 
     def model_forward(self, examples):
@@ -254,6 +277,8 @@ class Trainer(basic.Trainer):
     def test_personalized_model(self, config, testset, sampler=None, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
+
+        logging.info("[Client #%d] Testing the personalized model.", self.client_id)
 
         self.personalized_model.eval()
         self.personalized_model.to(self.device)
