@@ -205,7 +205,7 @@ def save_client_checkpoint(
     return filename
 
 
-def load_client_checkpoint(
+def search_client_checkpoint(
     client_id: int,
     model_name: str,
     checkpoints_dir: str,
@@ -219,7 +219,7 @@ def load_client_checkpoint(
 ) -> CheckpointsOperator:
     # pylint:disable=too-many-arguments
 
-    """Performing checkpoint loading.
+    """Search for the target checkpoint of the client.
 
     :param use_latest: A boolean to show whether utilize the latest checkpoint file
         if the required file does not exist.
@@ -242,7 +242,7 @@ def load_client_checkpoint(
     )
 
     if cpk_oper.vaild_checkpoint_file(filename):
-        return filename, cpk_oper
+        return filename, True
     else:
         if use_latest:
             # Loading the latest checkpoint file
@@ -252,6 +252,6 @@ def load_client_checkpoint(
                 anchor_metric=anchor_metric,
                 filter_words=mask_words,
             )
-            return filename, cpk_oper
+            return filename, True
 
-    return filename, None
+    return filename, False

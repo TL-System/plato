@@ -101,7 +101,15 @@ class LogProgressCallback(ServerCallback):
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
         csv_processor.write_csv(result_csv_file, new_row)
 
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
+        if (
+            hasattr(Config().clients, "do_test")
+            and Config().clients.do_test
+            and (
+                hasattr(Config(), "results")
+                and hasattr(Config().results, "record_clients_accuracy")
+                and Config().results.record_clients_accuracy
+            )
+        ):
             # Updates the log for client test accuracies
             accuracy_csv_file = (
                 f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"

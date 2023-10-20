@@ -10,17 +10,12 @@ import torch
 from plato.config import Config
 from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion
-from plato.utils import checkpoint_operator
 from plato.models import registry as models_registry
 from plato.utils import fonts
 from plato.utils.filename_formatter import NameFormatter
 
-from pflbases.trainer_callbacks.base_callbacks import (
-    PersonalizedLogProgressCallback,
-)
-
-from pflbases.trainer_utils import checkpoint_personalized_metrics
-from pflbases.trainer_utils import MetircsCollector
+from pflbases import trainer_utils
+from pflbases import checkpoint_operator
 
 warnings.simplefilter("ignore")
 
@@ -33,73 +28,26 @@ class Trainer(basic.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
 
-        # clear the original callbacks but only hold the
-        # desired ones
-        self.callback_handler.clear_callbacks()
-        self.callbacks = [
-            PersonalizedLogProgressCallback,
-        ]
-        if callbacks is not None:
-            self.callbacks.extend(callbacks)
-
-        # only add the customized callbacks
-        self.callback_handler.add_callbacks(self.callbacks)
-
         self.personalized_model = None
 
         # personalized model name and the file prefix
         # used to save the model
-        self.personalized_model_name = Config().algorithm.personalization.model_name
+        self.personalized_model_name = (
+            Config().algorithm.personalization.model_name
+            if hasattr(Config().algorithm.personalization, "model_name")
+            else Config().trainer.model_name
+        )
         self.personalized_model_checkpoint_prefix = "personalized"
 
-        # training mode
-        # the trainer should either perform the normal training
-        # or the personalized training
-        self.personalized_learning = False
+        # two indicators for personalization
+        self.do_round_personalization = False
+        self.do_final_personalization = False
 
-        # testset for the personalization process
-        self.testset = None
-        self.testset_sampler = None
-
-        # the collector for the test metrics
-        # only for personalization
-        self.test_metrics_collector = MetircsCollector()
-
-    def set_training_mode(self, personalized_mode: bool):
-        """Set the learning model of this trainer.
-
-        The learning mode must be set by the client.
-        """
-        self.personalized_learning = personalized_mode
-
-    def set_testset(self, dataset):
-        """set the testset."""
-        self.testset = dataset
-
-    def set_testset_sampler(self, sampler):
-        """set the sampler for the testset."""
-        self.testset_sampler = sampler
-
-    # pylint: disable=unused-argument
-    def get_test_loader(self, batch_size, **kwargs):
-        """
-        Creates an instance of the testloader.
-
-        Arguments:
-        batch_size: the batch size.
-        testset: the training dataset.
-        sampler: the sampler for the testloader to use.
-        """
-        return torch.utils.data.DataLoader(
-            dataset=self.testset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=self.testset_sampler.get(),
-        )
-
-    def define_personalized_model(self, personalized_model):
+    def define_personalized_model(self, personalized_model_cls):
         """Define the personalized model to this trainer."""
-        if personalized_model is None:
+        trainer_utils.set_random_seeds(self.client_id)
+
+        if personalized_model_cls is None:
             pers_model_type = (
                 Config().algorithm.personalization.model_type
                 if hasattr(Config().algorithm.personalization, "model_type")
@@ -112,7 +60,7 @@ class Trainer(basic.Trainer):
                 model_params=pers_model_params,
             )
         else:
-            self.personalized_model = personalized_model()
+            self.personalized_model = personalized_model_cls.get()
 
         logging.info(
             "[Client #%d] Defined the personalized model: %s",
@@ -135,12 +83,11 @@ class Trainer(basic.Trainer):
         checkpoint_path = Config.params["checkpoint_path"]
         return os.path.join(checkpoint_path, f"client_{self.client_id}")
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
-        if (
-            not self.personalized_learning
-            or not hasattr(Config().algorithm, "personalization")
-            or not hasattr(Config().parameters, "personalization")
+    def get_personalized_loss_criterion(self):
+        """Getting the loss_criterion for personalized model."""
+
+        if not hasattr(Config().algorithm, "personalization") or not hasattr(
+            Config().algorithm.personalization, "loss_criterion"
         ):
             return super().get_loss_criterion()
 
@@ -191,21 +138,38 @@ class Trainer(basic.Trainer):
 
     def get_optimizer(self, model):
         """Returns the optimizer."""
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             return super().get_optimizer(model)
+
+        logging.info("[Client #%d] Using the personalized optimizer.", self.client_id)
 
         return self.get_personalized_optimizer()
 
     def get_lr_scheduler(self, config, optimizer):
         """Returns the learning rate scheduler, if needed."""
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             return super().get_lr_scheduler(config, optimizer)
+
+        logging.info(
+            "[Client #%d] Using the personalized lr_scheduler.", self.client_id
+        )
 
         return self.get_personalized_lr_scheduler(config, optimizer)
 
+    def get_loss_criterion(self):
+        """Returns the loss criterion."""
+        if not self.do_final_personalization:
+            return super().get_loss_criterion()
+
+        logging.info(
+            "[Client #%d] Using the personalized loss_criterion.", self.client_id
+        )
+
+        return self.get_personalized_loss_criterion()
+
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader for personalization."""
-        if self.personalized_learning and hasattr(
+        if self.do_final_personalization and hasattr(
             Config().algorithm, "personalization"
         ):
             personalized_config = Config().algorithm.personalization._asdict()
@@ -227,28 +191,25 @@ class Trainer(basic.Trainer):
             Config().algorithm.personalization.model_name,
         )
 
-    def copy_personalized_model_to_model(self, config):
-        """Copying the model to the personalized model."""
-        self.model.load_state_dict(self.personalized_model.state_dict(), strict=True)
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] copied the personalized model [%s] to model [%s].",
-                colour="blue",
-            ),
-            self.client_id,
-            Config().algorithm.personalization.model_name,
-            Config().trainer.model_name,
-        )
+    def preprocess_models(self, config):
+        """Before running, we need to process the model and the personalized model.
 
-    def preprocess_personalized_model(self, config):
-        """Before running, process the personalized model."""
-        self.copy_model_to_personalized_model(config)
+        This function is required to be revised based on the specific condition of the
+        personalized FL algorithm.
+        """
+        # By default:
+        # before performing the final personalization to optimized the personalized model,
+        # each client has to copy the global model to the personalized model by default.
+
+        if self.do_final_personalization:
+            self.copy_model_to_personalized_model(config)
 
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
 
-        if self.personalized_learning:
-            self.preprocess_personalized_model(config)
+        self.preprocess_models(config)
+
+        if self.do_final_personalization:
             personalized_config = Config().algorithm.personalization._asdict()
             config.update(personalized_config)
             # the model name is needed to be maintained here
@@ -260,14 +221,27 @@ class Trainer(basic.Trainer):
             self.personalized_model.to(self.device)
             self.personalized_model.train()
 
+    def postprocess_models(self, config):
+        """Before running, process the personalized model."""
+
+        # pflbases will always copy the trained model to the personalized model as
+        # the local update performed on the received global model is the core of
+        # federated learning and should be Mandatory.
+        # Therefore, pflbases assumes that the personalized model is optimized
+        # as one part of the local update.
+        # By default:
+        # the updated global model will be copied to the personalized model
+        if self.do_round_personalization and not self.do_final_personalization:
+            self.copy_model_to_personalized_model(config)
+
     def train_run_end(self, config):
         """Copy the trained model to the untrained one."""
         super().train_run_end(config)
 
-        if self.personalized_learning:
-            self.copy_personalized_model_to_model(config)
-        else:
-            self.copy_model_to_personalized_model(config)
+        self.postprocess_models(config)
+
+        if self.do_round_personalization or self.do_final_personalization:
+            self.perform_personalized_model_checkpoint(config)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
@@ -282,7 +256,7 @@ class Trainer(basic.Trainer):
     def forward_examples(self, examples, **kwargs):
         """Forward the examples through one model."""
 
-        if self.personalized_learning:
+        if self.do_final_personalization:
             return self.personalized_model_forward(examples, **kwargs)
         else:
             return self.model_forward(examples, **kwargs)
@@ -304,110 +278,25 @@ class Trainer(basic.Trainer):
 
         return loss
 
-    @staticmethod
-    @torch.no_grad()
-    def reset_weight(module: torch.nn.Module):
-        """
-        refs:
-        - https://discuss.pytorch.org/t/how-to-re-set-alll-parameters-in-a-network/20819/6
-        - https://stackoverflow.com/questions/63627997/reset-parameters-of-a-neural-network-in-pytorch
-        - https://pytorch.org/docs/stable/generated/torch.nn.Module.html
-
-        One model can be reset by
-        # Applying fn recursively to every submodule see:
-        # https://pytorch.org/docs/stable/generated/torch.nn.Module.html
-        model.apply(fn=weight_reset)
-        """
-
-        # - check if the current module has reset_parameters & if it's callabed called it on m
-        reset_parameters = getattr(module, "reset_parameters", None)
-        if callable(reset_parameters):
-            module.reset_parameters()
-
-    def rollback_model(
-        self,
-        rollback_round=None,
-        model_name=None,
-        modelfile_prefix=None,
-        location=None,
-    ):
-        """Rollback the model to be the previously one.
-        By default, this functon rollbacks the personalized model.
-
-        """
-        rollback_round = (
-            rollback_round if rollback_round is not None else self.current_round - 1
-        )
-        model_name = (
-            model_name if model_name is not None else self.personalized_model_name
-        )
-        modelfile_prefix = (
-            modelfile_prefix
-            if modelfile_prefix is not None
-            else self.personalized_model_checkpoint_prefix
-        )
-        location = location if location is not None else self.get_checkpoint_dir_path()
-
-        filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
-            client_id=self.client_id,
-            checkpoints_dir=location,
-            model_name=model_name,
-            current_round=rollback_round,
-            run_id=None,
-            epoch=None,
-            prefix=modelfile_prefix,
-            anchor_metric="round",
-            mask_words=["epoch"],
-            use_latest=True,
-        )
-
-        rollback_status = ckpt_oper.load_checkpoint(checkpoint_name=filename)
-        logging.info(
-            "[Client #%d] Rolled back the model from %s under %s.",
-            self.client_id,
-            filename,
-            location,
-        )
-        return rollback_status
-
-    def create_unique_personalized_model(self, filename):
-        """Reset model parameters."""
-        checkpoint_dir_path = self.get_checkpoint_dir_path()
-        # reset the model for this client
-        # thus, different clients have different init parameters
-        self.personalized_model.apply(self.reset_weight)
-
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] Created the unique personalized model as %s and saved to %s.",
-                colour="blue",
-            ),
-            self.client_id,
-            filename,
-            checkpoint_dir_path,
-        )
-
-        self.save_personalized_model(
-            filename=filename,
-            location=checkpoint_dir_path,
-        )
-
-    def test_personalized_model(self, config, **kwargs):
+    def test_personalized_model(self, config, testset, sampler=None, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
+
+        logging.info("[Client #%d] Testing the personalized model.", self.client_id)
 
         self.personalized_model.eval()
         self.personalized_model.to(self.device)
 
-        data_loader = self.get_test_loader(
-            config["batch_size"],
+        batch_size = config["batch_size"]
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
         )
-        self.test_metrics_collector.reset()
+
         correct = 0
         total = 0
 
         with torch.no_grad():
-            for _, (examples, labels) in enumerate(data_loader):
+            for _, (examples, labels) in enumerate(test_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
                 outputs = self.personalized_model_forward(examples, split="test")
@@ -417,29 +306,20 @@ class Trainer(basic.Trainer):
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-                self.test_metrics_collector.add_labels(labels)
-                self.test_metrics_collector.add_predictions(predicted)
-
         accuracy = correct / total
-
-        self.test_metrics_collector.set_accuracy(accuracy)
 
         self.personalized_model.train()
 
-    def perform_personalized_metric_checkpoint(self, config):
-        """Performing the test for the personalized model and saving the accuracy to
-        checkpoint file."""
-        result_path = Config().params["result_path"]
-        self.test_personalized_model(config)
+        return accuracy
 
-        checkpoint_personalized_metrics(
-            result_path,
-            client_id=self.client_id,
-            metrics_holder=self.test_metrics_collector,
-            current_round=self.current_round,
-            epoch=self.current_epoch,
-            run_id=None,
-        )
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """Testing the model to report the accuracy of the local model or the
+        personalized model."""
+
+        if self.do_round_personalization or self.do_final_personalization:
+            return self.test_personalized_model(config, testset, sampler=None, **kwargs)
+        else:
+            return super().test_model(config, testset, sampler, **kwargs)
 
     def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
         """Performing the saving for the personalized model with
@@ -492,7 +372,7 @@ class Trainer(basic.Trainer):
 
         logging.info(
             fonts.colourize(
-                "[Client #%d] Loading a Personalized model from %s under %s.",
+                "[Client #%d] Loaded a Personalized model from %s under %s.",
                 colour="blue",
             ),
             self.client_id,
