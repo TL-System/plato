@@ -22,6 +22,10 @@ We believe that these two modes can cover all personalized FL algorithms. For ex
 
 ## Core Functions
 
+Illustration of the core pipeline of the structure of`pflbases` is shown below.
+
+![](core_pipeline.png)
+
 In response to the abovementioned principle and learning modes, `pflbases` will always execute the code to 1). load the configuration within `trainer` block; 2). execute the Plato's code to operate on `self.model`, 3). train the `self.model` before reaching the total rounds (i.e., before the final personalization). Even though one set `do_personalization_per_round: true`, __no specific code towards training personalized models will be executed__. 
 
 To make `pflbases` general enough as a personalized FL platform, two code parts in the structure should be emphasized. Thus, the user can simply adjust them to implement a customized algorithm. 
