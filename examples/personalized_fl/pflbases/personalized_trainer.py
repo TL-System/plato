@@ -318,8 +318,7 @@ class Trainer(basic.Trainer):
 
         if self.do_round_personalization or self.do_final_personalization:
             return self.test_personalized_model(config, testset, sampler=None, **kwargs)
-        else:
-            return super().test_model(config, testset, sampler, **kwargs)
+        return super().test_model(config, testset, sampler, **kwargs)
 
     def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
         """Performing the saving for the personalized model with
