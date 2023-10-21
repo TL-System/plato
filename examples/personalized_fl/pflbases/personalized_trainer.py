@@ -188,7 +188,7 @@ class Trainer(basic.Trainer):
             ),
             self.client_id,
             Config().trainer.model_name,
-            Config().algorithm.personalization.model_name,
+            self.personalized_model_name,
         )
 
     def preprocess_models(self, config):
