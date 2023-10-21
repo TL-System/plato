@@ -222,7 +222,11 @@ class Trainer(basic.Trainer):
             self.personalized_model.train()
 
     def postprocess_models(self, config):
-        """Before running, process the personalized model."""
+        """After running, process the trained model and the personalized model.
+
+        This function is required to be revised based on the specific condition of the
+        personalized FL algorithm.
+        """
 
         # pflbases will always copy the trained model to the personalized model as
         # the local update performed on the received global model is the core of

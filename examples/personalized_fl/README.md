@@ -36,7 +36,7 @@ To make `pflbases` general enough as a personalized FL platform, two code parts 
 
     - The default operation of `postprocess_models()` is to copy the `self.model` to the `self.personalized_model` only when `do_personalization_per_round: true` and not the final personalization.
 
-        >FedRep uses this default logic. It merges the `self.personalized_model` into `self.model` as submodules with _completion_. Thus, after training `self.model`, the trained submodules should be copied back to the `self.personalized_model`, equivalent to training the personalized model. 
+        >FedRep uses this default logic. It merges the `self.personalized_model` into `self.model` as submodules with _completion_. Thus, after training `self.model`, the trained submodules should be copied back to the `self.personalized_model`, __equivalent to training the personalized model__. 
 
 
 --- 
