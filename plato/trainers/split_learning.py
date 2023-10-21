@@ -103,11 +103,13 @@ class Trainer(basic.Trainer):
     def retrieve_train_samples(self):
         """Retrieve the training samples to complete client training."""
         # Wrap the training samples with datasource and sampler to be fed into Plato trainer
-        self.training_samples = self.process_training_samples_beofre_retreiving(
+        self.training_samples = self.process_training_samples_before_retreiving(
             self.training_samples
         )
+
         samples = feature.DataSource([[self.training_samples]])
         sampler = all_inclusive.Sampler(samples)
+
         return samples, sampler
 
     def load_gradients(self, gradients):
@@ -120,7 +122,7 @@ class Trainer(basic.Trainer):
         examples = self.process_samples_before_client_forwarding(examples)
         outputs = self.model.forward_to(examples)
 
-        # Back propagate with gradients from server
+        # Backpropagate with gradients from the server
         outputs.backward(self.gradients)
         self.optimizer.step()
 
@@ -178,7 +180,7 @@ class Trainer(basic.Trainer):
         return torch.load(model_gradients_path)
 
     # API functions for split learning
-    def process_training_samples_beofre_retreiving(self, training_samples):
+    def process_training_samples_before_retreiving(self, training_samples):
         """Process training samples before completing retreiving samples."""
         return training_samples
 
