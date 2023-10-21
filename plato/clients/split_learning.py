@@ -26,6 +26,7 @@ from plato.utils import fonts
 class Client(simple.Client):
     """A split learning client."""
 
+    # pylint:disable=too-many-arguments
     def __init__(
         self,
         model=None,

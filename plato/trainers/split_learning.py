@@ -25,6 +25,7 @@ from plato.datasources import feature
 from plato.samplers import all_inclusive
 
 
+# pylint:disable=too-many-instance-attributes
 class Trainer(basic.Trainer):
     """The split learning trainer."""
 
@@ -102,8 +103,13 @@ class Trainer(basic.Trainer):
     def retrieve_train_samples(self):
         """Retrieve the training samples to complete client training."""
         # Wrap the training samples with datasource and sampler to be fed into Plato trainer
+        self.training_samples = self.process_training_samples_before_retreiving(
+            self.training_samples
+        )
+
         samples = feature.DataSource([[self.training_samples]])
         sampler = all_inclusive.Sampler(samples)
+
         return samples, sampler
 
     def load_gradients(self, gradients):
@@ -113,9 +119,10 @@ class Trainer(basic.Trainer):
     def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
         self.optimizer.zero_grad()
+        examples = self.process_samples_before_client_forwarding(examples)
         outputs = self.model.forward_to(examples)
 
-        # Back propagate with gradients from server
+        # Backpropagate with gradients from the server
         outputs.backward(self.gradients)
         self.optimizer.step()
 
@@ -126,16 +133,22 @@ class Trainer(basic.Trainer):
 
     def _server_train_loop(self, config, examples, labels):
         """The training loop on the server."""
-        examples = examples.detach().requires_grad_(True)
+        self.optimizer.zero_grad()
+        loss, grad, batch_size = self.server_forward_from((examples, labels), config)
+        loss = loss.cpu().detach()
+        self._loss_tracker.update(loss, batch_size)
 
-        loss = super().perform_forward_and_backward_passes(config, examples, labels)
+        # Record gradients within the cut layer
+        if grad is not None:
+            grad = grad.cpu().clone().detach()
+        self.cut_layer_grad = [grad]
+        self.optimizer.step()
+
         logging.warning(
             "[Server #%d] Gradients computed with training loss: %.4f",
             os.getpid(),
             loss,
         )
-        # Record gradients within the cut layer
-        self.cut_layer_grad = [examples.grad.clone().detach()]
 
         return loss
 
@@ -165,3 +178,36 @@ class Trainer(basic.Trainer):
         )
 
         return torch.load(model_gradients_path)
+
+    # API functions for split learning
+    def process_training_samples_before_retreiving(self, training_samples):
+        """Process training samples before completing retreiving samples."""
+        return training_samples
+
+    def process_samples_before_client_forwarding(self, examples):
+        """Process the examples befor client conducting forwarding."""
+        return examples
+
+    # pylint:disable=unused-argument
+    def server_forward_from(self, batch, config):
+        """
+        The event for server completing training by forwarding from intermediate features.
+        Uses may override this function for training different models with split learning.
+
+        Inputs:
+            batch: the batch of inputs for forwarding.
+            config: training configuration.
+        Returns:
+            loss: the calculated loss.
+            grad: the gradients over the intermediate feature.
+            batch_size: the batch size of the current sample.
+        """
+
+        inputs, target = batch
+        batch_size = inputs.size(0)
+        inputs = inputs.detach().requires_grad_(True)
+        outputs = self.model.forward_from(inputs)
+        loss = self._loss_criterion(outputs, target)
+        loss.backward()
+        grad = inputs.grad
+        return loss, grad, batch_size
