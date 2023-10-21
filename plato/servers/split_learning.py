@@ -24,9 +24,11 @@ from plato.utils import fonts
 from plato.datasources import registry as datasources_registry
 
 
+# pylint:disable=too-many-instance-attributes
 class Server(fedavg.Server):
     """The split learning server."""
 
+    # pylint:disable=too-many-arguments
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
@@ -44,7 +46,7 @@ class Server(fedavg.Server):
         if len(self.clients_list) == 0 and self.next_client:
             # Shuffle the client list
             self.clients_list = super().choose_clients(clients_pool, len(clients_pool))
-            logging.warning(f"Client order: {self.clients_list}")
+            logging.warning("Client order: %s", str(self.clients_list))
 
         if self.next_client:
             # Sequentially select clients
@@ -57,9 +59,7 @@ class Server(fedavg.Server):
         if self.phase == "prompt":
             # Split learning server doesn't send weights to client
             return (None, "prompt")
-        else:
-            # Send gradients back to client to complete the training
-            return (self.trainer.get_gradients(), "gradients")
+        return (self.trainer.get_gradients(), "gradients")
 
     # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
