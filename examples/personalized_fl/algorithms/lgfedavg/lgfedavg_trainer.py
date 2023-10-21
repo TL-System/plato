@@ -12,13 +12,6 @@ from pflbases import trainer_utils
 class Trainer(personalized_trainer.Trainer):
     """A personalized federated learning trainer using the LG-FedAvg algorithm."""
 
-    def preprocess_personalized_model(self, config):
-        """In LG-FedAvg, only during the personalization process,
-        the completed model will be assigned to the personalization model
-        for direct evaluation."""
-        if self.personalized_learning:
-            self.copy_model_to_personalized_model(config)
-
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing one iteration of LG-FedAvg."""
         self.optimizer.zero_grad()
