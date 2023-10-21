@@ -64,20 +64,9 @@ algorithm:
         # the ratio of clients participanting in training
         participating_clients_ratio: 1.0
         
-        # whether load the personalized each round
-        load_model_per_round: false
-        # whether maintain and load the trained 
-        # personalied model
-        # set to be true, each client will load
-        # the latest trained personalized model
-        persist_personalized_model: False
-
-        # do personalization 
-        # for every `do_personalization_interval` rounds
-        # set -1 to do personalized only after the final round
-        do_personalization_interval: -1
-        # total, participant, nonparticipant
-        do_personalization_group: total
+        # whether the personalized model will be
+        # obtained in each round
+        do_personalization_per_round: false
 
 parameters:
     # ResNet-18 training params
