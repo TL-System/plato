@@ -25,7 +25,13 @@ Valid values are `true` or `false`. The default value is `false`.
 ## clients
 
 ```{admonition} **type**
-The type of the federated learning client. Valid values include `simple`, which represents a basic client who sends weight updates to the server; and `mistnet`, which is client following the MistNet algorithm;
+The type of the server.
+
+- `simple` a basic client who sends weight updates to the server.
+
+- `mistnet` a client following the MistNet algorithm.
+
+- `split_learning` a client following the Split Learning algorithm. When this client is used, `clients.do_test` in configuration should be set as `False` because in split learning, we conduct the test on the server.
 ```
 
 ```{admonition} **total_clients**
@@ -136,7 +142,7 @@ A list of processors for the client to apply on the payload before receiving it 
 
 ```
 
-```{admonition} participant_clients_ratio
+```{admonition} participating_clients_ratio
 Percentage of clients participating in federated training out of all clients. The value should range from 0 to 1.
 ```
 
@@ -158,6 +164,7 @@ The type of the server.
 
 - `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
 
+- `split_learning` a Split Learning server that supports training different kinds of models in split learning framework. When this server is used, the `clients.per_round` in the configuration should be set to 1. Users should define the rules for updating models weights before cut from the clients to the server in the callback function `on_update_weights_before_cut`, depending on the specific model they use.
 ```
 
 ```{admonition} **address**
@@ -379,6 +386,7 @@ The number of samples in the server's test dataset when server-side evaluation i
 The type of the trainer. The following types are available:
 - `basic`: a basic trainer with a standard training loop.
 - `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
+- `split_learning`: a trainer that supports the split learning framework.
 
 ```{admonition} max_physical_batch_size
 The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
@@ -549,6 +557,7 @@ Aggregation algorithm.
 The input should be:
 - `fedavg`:  the federated averaging algorithm
 - `mistnet`: the MistNet algorithm
+- `split_learning`: the Split Learning algorithm
 ```
 
 ````{admonition} cross_silo

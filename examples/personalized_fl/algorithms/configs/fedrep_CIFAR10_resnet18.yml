@@ -35,7 +35,6 @@ algorithm:
     type: fedavg
 
     # ['conv1', 'bn1', 'layer1', 'layer2', 'layer3', 'layer4', 'linear']
-
     global_modules_name:
         - conv1
         - bn1
@@ -55,23 +54,12 @@ algorithm:
         model_name: resnet_18
 
         # the ratio of clients participanting in training
-        participant_clients_ratio: 1.0
+        participating_clients_ratio: 1.0
         
-        # whether load the personalized each round
-        load_model_per_round: true
-        
-        # whether maintain and load the trained 
-        # personalied model
-        # set to be true, each client will load
-        # the latest trained personalized model
-        persist_personalized_model: True
+        # whether the personalized model will be
+        # obtained in each round
+        do_personalization_per_round: true
 
-        # do personalization 
-        # for every `do_personalization_interval` rounds
-        # set -1 to do personalized only after the final round
-        do_personalization_interval: -1
-        # total, participant, nonparticipant
-        do_personalization_group: total
 
 
 parameters:
@@ -80,6 +68,6 @@ parameters:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, round_time
+    types: round, accuracy, accuracy_std, elapsed_time, round_time
     result_path: results/fedrep
 

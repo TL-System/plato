@@ -1,6 +1,15 @@
-# Approaches for Personalized Federated Learning
+# Algorithms for Personalized Federated Learning
 
 Implementations of existing approaches for personalized federated learning using the Plato framework.
+
+## Two Basic Learning Modes
+`pflbases` contains two basic learning modes, i.e., performing personalization in each round or the next round of the final round. The indicator is `do_personalization_per_round` (see hyper-parameters below).
+
+When `do_personalization_per_round: true`, the personalized model will be 1. Loaded; 2. Obtained; 3. Saved, in each round. Otherwise, the personalized model will only be processed in the next round of the final round. 
+
+We believe that these two modes can cover all personalized FL algorithms. For example, 
+- APFL, Ditto, LG-FedAvg, FedPer, FedRep, and FedBABU follows `do_personalization_per_round: true`. 
+- FedAvg with finetuning (fedavg_finetune) and PerFeAvg follows `do_personalization_per_round: false`.
 
 --- 
 
@@ -88,10 +97,57 @@ python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18
 ```
 
 
-```bash
-python algorithms/SSL/simclr/simclr.py -c algorithms/configs/simclr_MNIST_lenet5.yml -b pflExperiments
-python algorithms/SSL/simclr/simclr.py -c algorithms/configs/simclr_CIFAR10_resnet18.yml -b pflExperiments
+## Hyper-parameters
+
+All hyper-parameters of `pflbases` should be placed under the `algorithm` block of the configuration file. 
+
+### For `fedavg_partial`
+- global_modules_name: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_partial.py` as the algorithm, the `global_modules_name` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `global_modules_name` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
+```yaml
+algorithm:
+    global_modules_name:
+        - conv1
+        - bn1
+        - layer1
+        - layer2
+        - layer3
+        - layer4
 ```
 
+- completion_modules_name: This is a list in which each item is a string presenting the parameter name. Once you set the `global_modules_name`, the client receives a portion of the model from the server. To embrace all parameters (i.e., the whole model) during the local update, you should set `completion_modules_name` to indicate which parts parameters will be loaded from the local side to merge with the received ones. This is more like: the whole model is A+B. The client receives A from the server. Then, the client loads B from the local side to merge with A. For example, 
+```yaml
+algorithm:
+    completion_modules_name:
+        - linear
+```
 
+### For Personalization
 
+All hyper-parameters related to personalization should be placed under the `personalization` sub-block of the `algorithm` block. 
+
+- model_name: A string to indicate the personalized model name. This is not mandatory as if it is omitted, it will be assumed to be the same as the global model. Default: `model_name` under the `trainer` block.  For example, 
+```yaml
+algorithm:
+    personalization:
+        # the personalized model name
+        # this can be omitted
+        model_name: resnet_18
+```
+
+- participating_clients_ratio: A float to show the proporation of clients participating in the federated training process. The value ranges from 0.0 to 1.0 while 1.0 means that all clients will participant in training. Default: 1.0. For example, 
+```yaml
+algorithm:
+    personalization:
+        # the ratio of clients participanting in training
+        participating_clients_ratio: 0.6
+```
+
+- do_personalization_per_round: A boolean to indicate whether to perform personalization per round. Default: True. For example, 
+```yaml
+algorithm:
+    personalization:
+
+        # whether the personalized model will be
+        # obtained in each round
+        do_personalization_per_round: true
+```

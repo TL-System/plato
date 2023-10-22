@@ -24,12 +24,13 @@ elif hasattr(Config().trainer, "use_tensorflow"):
 
     registered_algorithms = {"fedavg": fedavg_tensorflow.Algorithm}
 else:
-    from plato.algorithms import fedavg, mistnet, fedavg_gan
+    from plato.algorithms import fedavg, mistnet, fedavg_gan, split_learning
 
     registered_algorithms = {
         "fedavg": fedavg.Algorithm,
         "mistnet": mistnet.Algorithm,
         "fedavg_gan": fedavg_gan.Algorithm,
+        "split_learning": split_learning.Algorithm,
     }
 
 

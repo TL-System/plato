@@ -87,6 +87,7 @@ class Server:
         self.algorithm = None
         self.trainer = None
         self.accuracy = 0
+        self.accuracy_std = 0
         self.reports = {}
         self.updates = []
         self.client_payload = {}
