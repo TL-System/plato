@@ -22,7 +22,7 @@ def make_init_mask(model):
     """
     mask = []
     for __, module in model.named_modules():
-        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
+        if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
             tensor = module.weight.detach().cpu().numpy()
             mask.append(np.ones_like(tensor))
 
