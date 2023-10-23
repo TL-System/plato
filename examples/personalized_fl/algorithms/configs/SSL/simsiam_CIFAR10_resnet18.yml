@@ -38,16 +38,18 @@ trainer:
     # Number of epoches for local training in each communication round
     epochs: 3
     batch_size: 128
-    optimizer: SGD
+    optimizer: LARS
     lr_scheduler: MultiStepLR
-    loss_criterion: NTXentLoss
+    loss_criterion: NegativeCosineSimilarity
 
     # The machine learning model
     model_name: SimCLR
     encoder_name: resnet_18
-    projection_hidden_dim: 2048
-    projection_out_dim: 256
 
+    projection_hidden_dim: 512
+    projection_out_dim: 128
+    prediction_hidden_dim: 512
+    prediction_out_dim: 128
 
 algorithm:
     # Aggregation algorithm
@@ -57,29 +59,48 @@ algorithm:
     #  - MNIST (Image size=28)
     data_transforms:
         train_transform:
-            name: SimCLR
+            name: SimSiam
             parameters:
                 input_size: 32
 
     global_modules_name:
         - encoder
-        
+        - projection_head
+        - prediction_head
+
     completion_modules_name:
-        - projector
+        - projection_head
+        - prediction_head
         
     personalization:
-
         !include ssl_personalization.yml
 
-
 parameters:
-    # ResNet-18 ssl training params
-    !include resnet18_pers_params.yml
+
+    optimizer:
+        lr: 0.5
+        momentum: 0.9
+        trust_coeff: 0.001
+        weight_decay: 0.00001
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 150ep,350ep
+
+    loss_criterion:
+        eps: 1.0E-8
+
+    model:
+        num_classes: 10
+
+    personalization:
+        # ResNet-18 ssl's personalization params
+        !include resnet18_pers_params.yml
 
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
-    result_path: results/pfl-simclr
+    result_path: results/pfl-simsiam
 
     
 
