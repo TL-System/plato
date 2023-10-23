@@ -34,7 +34,7 @@ class PayloadCompletionProcessor(base.Processor):
         model_name = Config().trainer.model_name
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
-        # local the locally saved model from the previous round
+        # locate the locally saved model from the previous round
         desired_round = self.current_round - 1
         filename = NameFormatter.get_format_name(
             model_name=model_name,
