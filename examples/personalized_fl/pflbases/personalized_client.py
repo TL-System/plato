@@ -64,8 +64,9 @@ class Client(simple.Client):
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
 
-        # this the class of the personalized model
-        self.personalized_model_cls = None
+        # the class of the local model
+        # this is used to re-define a new local model
+        self.local_model_cls = None
 
         # the path of the initial personalized model of this client
         self.init_personalized_model_path = None
@@ -73,6 +74,7 @@ class Client(simple.Client):
     def configure(self) -> None:
         """Performing the general client's configure and then initialize the
         personalized model for the client."""
+
         super().configure()
 
         # jump out if no personalization info is provided
@@ -80,13 +82,6 @@ class Client(simple.Client):
             sys.exit(
                 "Error: personalization block must be provided under the algorithm."
             )
-
-        # set the personalized model class
-        if (
-            self.personalized_model is None
-            and self.custom_personalized_model is not None
-        ):
-            self.personalized_model_cls = self.custom_personalized_model
 
         # set the indicators for personalization of the trainer
         self.trainer.do_round_personalization = self.is_round_personalization()
@@ -102,7 +97,9 @@ class Client(simple.Client):
             or self.trainer.do_final_personalization
         ):
             # define its personalized model
-            self.trainer.define_personalized_model(self.personalized_model_cls)
+            self.trainer.define_personalized_model(
+                custom_model=self.custom_personalized_model
+            )
             self.trainer.save_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=self.trainer.get_checkpoint_dir_path(),
@@ -138,7 +135,7 @@ class Client(simple.Client):
             current_round=desired_round,
             run_id=None,
             epoch=None,
-            prefix=self.trainer.personalized_model_checkpoint_prefix,
+            prefix=self.trainer.personalized_model_prefix,
             anchor_metric="round",
             mask_words=["epoch"],
             use_latest=True,
@@ -147,6 +144,38 @@ class Client(simple.Client):
             self.trainer.load_personalized_model(filename, location=location)
         else:
             self.trainer.load_personalized_model(
+                filename=os.path.basename(self.init_personalized_model_path),
+                location=location,
+            )
+
+    def get_local_model(self):
+        """Getting the saved local model.
+
+        After the local update, each client will save the local
+        model (i.e., the updated global model) to the disk.
+        This function is to get the saved local model.
+        """
+
+        # always get the latest local model.
+        desired_round = self.current_round - 1
+        location = self.trainer.get_checkpoint_dir_path()
+
+        filename, is_searched = checkpoint_operator.search_client_checkpoint(
+            client_id=self.client_id,
+            checkpoints_dir=location,
+            model_name=self.trainer.model_name,
+            current_round=desired_round,
+            run_id=None,
+            epoch=None,
+            prefix="local",
+            anchor_metric="round",
+            mask_words=["epoch"],
+            use_latest=True,
+        )
+        if is_searched:
+            self.trainer.load_model(filename, location=location)
+        else:
+            self.trainer.load_model(
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=location,
             )
@@ -161,7 +190,7 @@ class Client(simple.Client):
             round_n=0,
             epoch_n=None,
             run_id=None,
-            prefix=self.trainer.personalized_model_checkpoint_prefix,
+            prefix=self.trainer.personalized_model_prefix,
             ext="pth",
         )
         model_path = os.path.join(checkpoint_dir_path, filename)

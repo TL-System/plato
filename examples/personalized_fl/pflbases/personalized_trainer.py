@@ -30,6 +30,8 @@ class Trainer(basic.Trainer):
 
         self.personalized_model = None
 
+        # get the model name
+        self.model_name = Config().trainer.model_name
         # personalized model name and the file prefix
         # used to save the model
         self.personalized_model_name = (
@@ -37,17 +39,17 @@ class Trainer(basic.Trainer):
             if hasattr(Config().algorithm.personalization, "model_name")
             else Config().trainer.model_name
         )
-        self.personalized_model_checkpoint_prefix = "personalized"
+        self.personalized_model_prefix = "personalized"
 
         # two indicators for personalization
         self.do_round_personalization = False
         self.do_final_personalization = False
 
-    def define_personalized_model(self, personalized_model_cls):
+    def define_personalized_model(self, custom_model):
         """Define the personalized model to this trainer."""
         trainer_utils.set_random_seeds(self.client_id)
 
-        if personalized_model_cls is None:
+        if custom_model is None:
             pers_model_type = (
                 Config().algorithm.personalization.model_type
                 if hasattr(Config().algorithm.personalization, "model_type")
@@ -60,13 +62,21 @@ class Trainer(basic.Trainer):
                 model_params=pers_model_params,
             )
         else:
-            self.personalized_model = personalized_model_cls.get()
+            self.personalized_model = custom_model.get()
 
         logging.info(
             "[Client #%d] Defined the personalized model: %s",
             self.client_id,
             self.personalized_model_name,
         )
+
+    def define_local_model(self, custom_model):
+        """Define the local model to this trainer."""
+        trainer_utils.set_random_seeds(self.client_id)
+        if custom_model is None:
+            self.model = models_registry.get()
+        else:
+            self.model = custom_model.get()
 
     def get_personalized_model_params(self):
         """Get the params of the personalized model."""
@@ -337,7 +347,7 @@ class Trainer(basic.Trainer):
             round_n=current_round,
             epoch_n=epoch,
             run_id=None,
-            prefix=self.personalized_model_checkpoint_prefix,
+            prefix=self.personalized_model_prefix,
             ext="pth",
         )
         os.makedirs(save_location, exist_ok=True)
