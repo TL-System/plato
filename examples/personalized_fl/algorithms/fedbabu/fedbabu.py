@@ -12,7 +12,6 @@ Source code: https://github.com/jhoon-oh/FedBABU
 from pflbases import fedavg_personalized_server
 from pflbases import personalized_client
 from pflbases import fedavg_partial
-from pflbases.trainer_callbacks import separate_trainer_callbacks
 from pflbases.client_callbacks import personalized_completion_callbacks
 
 
@@ -29,10 +28,6 @@ def main():
         algorithm=fedavg_partial.Algorithm,
         callbacks=[
             personalized_completion_callbacks.ClientModelPersonalizedCompletionCallback,
-        ],
-        trainer_callbacks=[
-            separate_trainer_callbacks.PersonalizedModelMetricCallback,
-            separate_trainer_callbacks.PersonalizedModelStatusCallback,
         ],
     )
     server = fedavg_personalized_server.Server(

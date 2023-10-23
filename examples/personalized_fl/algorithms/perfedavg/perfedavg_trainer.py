@@ -154,51 +154,14 @@ class Trainer(personalized_trainer.Trainer):
         This implementation derives from
         https://github.com/jhoon-oh/FedBABU
         """
+
+        if self.do_final_personalization:
+            return self.personalized_forward_and_backward_passes(
+                config, examples, labels
+            )
+
         alpha = Config().algorithm.alpha
         beta = Config().algorithm.beta
-        temp_net = copy.deepcopy(list(self.model.parameters()))
-
-        # Step 1
-        for g in self.optimizer.param_groups:
-            g["lr"] = alpha
-
-        self.model.zero_grad()
-
-        logits = self.model(examples)
-
-        loss = self._loss_criterion(logits, labels)
-        loss.backward()
-        self.optimizer.step()
-
-        # Step 2
-        for g in self.optimizer.param_groups:
-            g["lr"] = beta
-
-        examples, labels = next(self.iter_trainloader)
-        examples, labels = examples.to(self.device), labels.to(self.device)
-
-        self.model.zero_grad()
-
-        logits = self.model(examples)
-
-        loss = self._loss_criterion(logits, labels)
-        self._loss_tracker.update(loss, labels.size(0))
-        loss.backward()
-
-        # restore the model parameters to the one before first update
-        for old_p, new_p in zip(self.model.parameters(), temp_net):
-            old_p.data = new_p.data.clone()
-
-        self.optimizer.step()
-
-        return loss
-
-    def meta_forward_and_backward_passes(self, config, examples, labels):
-        """Performing the meta training.        This implementation derives from
-        https://github.com/jhoon-oh/FedBABU
-        """
-        alpha = config["alpha"]
-        beta = config["beta"]
         temp_net = copy.deepcopy(list(self.model.parameters()))
 
         # Step 1
@@ -239,17 +202,15 @@ class Trainer(personalized_trainer.Trainer):
     def personalized_forward_and_backward_passes(self, config, examples, labels):
         """Performing the forward pass for the personalized learning."""
 
-        alpha = config["alpha"]
-        beta = config["beta"]
+        alpha = Config().algorithm.alpha
+        beta = Config().algorithm.beta
 
         self.personalized_model.train()
         self.personalized_model.to(self.device)
 
         # Step 1
-        for g in self.personalized_optimizer.param_groups:
+        for g in self.optimizer.param_groups:
             g["lr"] = alpha
-        examples, labels = next(self.iter_personalized_trainloader)
-        examples, labels = examples.to(self.device), labels.to(self.device)
 
         # Clear the previous gradient
         self.personalized_model.zero_grad()
@@ -260,14 +221,14 @@ class Trainer(personalized_trainer.Trainer):
 
         # Perfrom the optimization
         loss.backward()
-        self.personalized_optimizer.step()
+        self.optimizer.step()
 
         # Step 2
         # Update the epoch loss container
-        for g in self.personalized_optimizer.param_groups:
+        for g in self.optimizer.param_groups:
             g["lr"] = beta
 
-        examples, labels = next(self.iter_personalized_trainloader)
+        examples, labels = next(self.iter_trainloader)
         examples, labels = examples.to(self.device), labels.to(self.device)
 
         # Clear the previous gradient
@@ -275,10 +236,11 @@ class Trainer(personalized_trainer.Trainer):
 
         # Perfrom the training and compute the loss
         preds = self.personalized_model(examples)
-        loss = self._personalized_loss_criterion(preds, labels)
+        loss = self._loss_criterion(preds, labels)
+        self._loss_tracker.update(loss, labels.size(0))
 
         # Perfrom the optimization
         loss.backward()
-        self.personalized_optimizer.step()
+        self.optimizer.step()
 
         return loss
