@@ -1,5 +1,5 @@
 """
-The training and testing loops for personalized federated learning.
+A trainer to support the personalized federated learning.
 
 """
 import logging
@@ -30,8 +30,6 @@ class Trainer(basic.Trainer):
 
         self.personalized_model = None
 
-        # get the model name
-        self.model_name = Config().trainer.model_name
         # personalized model name and the file prefix
         # used to save the model
         self.personalized_model_name = (
@@ -69,14 +67,6 @@ class Trainer(basic.Trainer):
             self.client_id,
             self.personalized_model_name,
         )
-
-    def define_local_model(self, custom_model):
-        """Define the local model to this trainer."""
-        trainer_utils.set_random_seeds(self.client_id)
-        if custom_model is None:
-            self.model = models_registry.get()
-        else:
-            self.model = custom_model.get()
 
     def get_personalized_model_params(self):
         """Get the params of the personalized model."""

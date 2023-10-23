@@ -64,10 +64,6 @@ class Client(simple.Client):
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
 
-        # the class of the local model
-        # this is used to re-define a new local model
-        self.local_model_cls = None
-
         # the path of the initial personalized model of this client
         self.init_personalized_model_path = None
 
@@ -137,7 +133,7 @@ class Client(simple.Client):
         model_name = self.trainer.personalized_model_name
         prefix = self.trainer.personalized_model_prefix
         save_location, filename = self.trainer.get_model_checkpoint_path(
-            model_name=self.trainer.personalized_model_name,
+            model_name=model_name,
             prefix=prefix,
             round_n=desired_round,
             epoch_n=None,
@@ -157,38 +153,6 @@ class Client(simple.Client):
             self.trainer.load_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=save_location,
-            )
-
-    def get_local_model(self):
-        """Getting the saved local model.
-
-        After the local update, each client will save the local
-        model (i.e., the updated global model) to the disk.
-        This function is to get the saved local model.
-        """
-
-        # always get the latest local model.
-        desired_round = self.current_round - 1
-        location = self.trainer.get_checkpoint_dir_path()
-
-        filename, is_searched = checkpoint_operator.search_client_checkpoint(
-            client_id=self.client_id,
-            checkpoints_dir=location,
-            model_name=self.trainer.model_name,
-            current_round=desired_round,
-            run_id=None,
-            epoch=None,
-            prefix="local",
-            anchor_metric="round",
-            mask_words=["epoch"],
-            use_latest=True,
-        )
-        if is_searched:
-            self.trainer.load_model(filename, location=location)
-        else:
-            self.trainer.load_model(
-                filename=os.path.basename(self.init_personalized_model_path),
-                location=location,
             )
 
     def get_init_model_path(self, model_name: str, prefix: str):

@@ -1,22 +1,15 @@
 """
-Customize client callbacks for self-supervised learning to complete the received 
-payload with parameters of local model. The local model is the locally 
-trained global model in the previous round.
-For instance, when payload contains the body of one model, the head 
-of the loaded local model trained in the previous round will be used to 
-complete the payload.
+Customize client callbacks for assigning the modules of client's local model
+to the received payload.
 """
-import os
 
 import logging
 from typing import Any
 
 from plato.config import Config
 from plato.processors import base
-from plato.utils.filename_formatter import NameFormatter
 
 from pflbases.client_callbacks import base_callbacks
-from pflbases import checkpoint_operator
 
 
 class PayloadCompletionProcessor(base.Processor):
@@ -30,60 +23,23 @@ class PayloadCompletionProcessor(base.Processor):
         self.algorithm = algorithm
 
     def process(self, data: Any) -> Any:
-        """Processing the received payload by assigning modules of local updated model
-        if provided."""
-        model_name = Config().trainer.model_name
-        checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
-
-        # locate the locally saved model from the previous round
-        desired_round = self.current_round - 1
-        filename = NameFormatter.get_format_name(
-            model_name=model_name,
-            client_id=self.trainer.client_id,
-            round_n=0,
-            epoch_n=None,
-            run_id=None,
-            prefix=None,
-            ext="pth",
-        )
-
-        checkpoint_file_path = os.path.join(checkpoint_dir_path, filename)
-
-        # if the desired of trained model is not saved by this client
-        # this client is never selected to perform the training
-        if not os.path.exists(checkpoint_file_path):
-            logging.info("[Client #%d] No local model found.", self.trainer.client_id)
-            logging.info(
-                "[Client #%d] Creating an initial local model and save to %s with filename %s.",
-                self.trainer.client_id,
-                checkpoint_dir_path,
-                filename,
-            )
-            self.trainer.model.apply(self.trainer.reset_weight)
-            self.trainer.save_model(filename=filename, location=checkpoint_dir_path)
-        else:
-            loaded_model = self.trainer.rollback_model(
-                rollback_round=desired_round,
-                location=checkpoint_dir_path,
-                model_name=model_name,
-                modelfile_prefix="",
-            )
-            self.trainer.model.load_state_dict(loaded_model, strict=True)
+        """Processing the received payload by assigning modules of local model of
+        each client."""
 
         # extract the `completion_modules_name` of the model head
         assert hasattr(Config().algorithm, "completion_modules_name")
 
         completion_modules_name = Config().algorithm.completion_modules_name
-        model_modules = self.algorithm.extract_weights(
+        local_model_modules = self.algorithm.extract_weights(
             model=self.trainer.model, modules_name=completion_modules_name
         )
         logging.info(
             "[Client #%d] Extracted modules: %s from its loaded local model.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(model_modules.keys())),
+            self.algorithm.extract_modules_name(list(local_model_modules.keys())),
         )
 
-        data.update(model_modules)
+        data.update(local_model_modules)
 
         logging.info(
             "[Client #%d] Completed the payload with extracted modules.",
@@ -95,7 +51,8 @@ class PayloadCompletionProcessor(base.Processor):
 
 class ClientModelLocalCompletionCallback(base_callbacks.ClientPayloadCallback):
     """
-    A client callback for FedBABU approach to process the received payload.
+    A client callback for processing payload by assigning parameters of the local
+    model to it.
     """
 
     def on_inbound_received(self, client, inbound_processor):
