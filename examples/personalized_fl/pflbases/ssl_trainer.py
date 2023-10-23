@@ -15,7 +15,7 @@ from lightly.data.multi_view_collate import MultiViewCollate
 from plato.trainers import loss_criterion
 from plato.config import Config
 
-from pflbases import personalized_trainer
+from pflbases import separate_local_trainer
 
 
 class ExamplesList(UserList):
@@ -71,7 +71,7 @@ class MultiViewCollateWrapper(MultiViewCollate):
             return views, labels
 
 
-class Trainer(personalized_trainer.Trainer):
+class Trainer(separate_local_trainer.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
 
     def __init__(self, model=None, callbacks=None):

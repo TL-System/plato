@@ -16,8 +16,6 @@ model A + B to be trained subsequently.
 
 import os
 
-from plato.config import Config
-from plato.utils.filename_formatter import NameFormatter
 
 from pflbases import personalized_client
 from pflbases import checkpoint_operator

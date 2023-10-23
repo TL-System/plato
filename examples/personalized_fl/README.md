@@ -96,6 +96,8 @@ pip install .
 python algorithms/fedavg_finetune/fedavg_finetune.py -c algorithms/configs/fedavg_finetune_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
+---
+
 ```bash
 python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
 ```
@@ -128,10 +130,16 @@ python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10
 python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
+---
+
+```bash
+python algorithms/SSL/simclr/simclr.py -c algorithms/configs/SSL/simclr_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+
 ```bash
 python algorithms/SSL/simclr/simclr.py -c algorithms/configs/simclr_CIFAR10_resnet18.yml -b pflExperiments
 ```
-
 
 ## Hyper-parameters
 

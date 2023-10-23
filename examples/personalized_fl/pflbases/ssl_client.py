@@ -9,10 +9,10 @@ import logging
 from plato.samplers import registry as samplers_registry
 from plato.config import Config
 
-from pflbases import personalized_client
+from pflbases import separate_local_client
 
 
-class Client(personalized_client.Client):
+class Client(separate_local_client.Client):
     """A basic personalized federated learning client for self-supervised learning."""
 
     def __init__(
