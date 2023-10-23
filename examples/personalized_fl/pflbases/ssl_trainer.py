@@ -180,9 +180,6 @@ class Trainer(separate_local_trainer.Trainer):
     def postprocess_models(self, config):
         """Do nothing to the personalized mdoel."""
 
-    def train_run_end(self, config):
-        """Do nothing in the end of the training run."""
-
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
 

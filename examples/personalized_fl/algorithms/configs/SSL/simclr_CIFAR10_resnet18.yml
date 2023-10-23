@@ -74,7 +74,23 @@ algorithm:
 
 parameters:
     # ResNet-18 ssl training params
-    !include resnet18_pers_params.yml
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0001
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 150ep,350ep
+
+    loss_criterion:
+        temperature: 0.2
+
+    model:
+        num_classes: 10
+
+    personalization:
+        !include resnet18_pers_params.yml
 
 results:
     # Write the following parameter(s) into a CSV

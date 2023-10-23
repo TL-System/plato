@@ -9,7 +9,11 @@ learning_rate:
     step_size: 10
 
 loss_criterion:
-    label_smoothing: 0.5
+    # we cannot use lable smoothing as
+    # 'aten::masked_scatter_' has not been 
+    # supported in the MPS device
+    # label_smoothing: 0.5
 
 model:
     num_classes: 10
+    
