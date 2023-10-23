@@ -22,7 +22,7 @@ def make_init_mask(model):
     """
     mask = []
     for __, module in model.named_modules():
-        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
+        if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
             tensor = module.weight.detach().cpu().numpy()
             mask.append(np.ones_like(tensor))
 
@@ -71,9 +71,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
 
     if adjust_rate == 0:
         for __, module in model.named_modules():
-            if isinstance(module, torch.nn.Conv2d) or isinstance(
-                module, torch.nn.Linear
-            ):
+            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
                 pruning_rates.append(pruning_rate)
     else:
         total_params = 0
@@ -85,9 +83,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
         total_prune = floor(pruning_rate * total_params)
 
         for module in model.modules():
-            if isinstance(module, torch.nn.Conv2d) or isinstance(
-                module, torch.nn.Linear
-            ):
+            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
                 weight_nums.append(module.weight.numel())
                 pruning_rates.append(0)
         total_weight_params = sum(weight_nums)
@@ -102,7 +98,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
 
     step = 0
     for __, module in model.named_modules():
-        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
+        if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
             amount = pruning_rates[step]
             prune.ln_structured(module, "weight", amount, norm, dim)
             step += 1
@@ -119,7 +115,7 @@ def remove(model):
     Removes the original unpruned weight tensors in the model
     """
     for __, module in model.named_modules():
-        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
+        if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
             prune.remove(module, "weight")
 
 
@@ -133,7 +129,7 @@ def apply_mask(model, mask, device):
 
     step = 0
     for module in masked_model.modules():
-        if isinstance(module, torch.nn.Conv2d) or isinstance(module, torch.nn.Linear):
+        if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
             device = module.weight.device
             prune.custom_from_mask(module, "weight", mask[step].to(device))
             step += 1

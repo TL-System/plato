@@ -18,7 +18,7 @@ class Trainer(personalized_trainer.Trainer):
         1. freeze body of the model during personalization.
         """
         super().train_run_start(config)
-        if self.personalized_learning:
+        if self.do_final_personalization:
             trainer_utils.freeze_model(
                 self.personalized_model,
                 Config().algorithm.global_modules_name,
@@ -28,7 +28,7 @@ class Trainer(personalized_trainer.Trainer):
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
-        if self.personalized_learning:
+        if self.do_final_personalization:
             trainer_utils.activate_model(
                 self.personalized_model, Config().algorithm.global_modules_name
             )

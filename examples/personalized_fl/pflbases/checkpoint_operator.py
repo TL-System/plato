@@ -99,7 +99,7 @@ class CheckpointsOperator:
         """
 
         if filter_words is None:
-            filter_words = ["epohs"]
+            filter_words = ["epochs"]
 
         def is_filterd_file(ckp_file):
             return any(word in ckp_file for word in filter_words)

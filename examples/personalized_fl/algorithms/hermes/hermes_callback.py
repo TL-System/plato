@@ -1,22 +1,28 @@
 """
-Processor for attaching a pruning mask to the payload if pruning
-had been conducted
+Callback for attaching a pruning mask to the payload if pruning had been conducted.
 """
 
 import os
 import pickle
 import logging
 from typing import OrderedDict
-import torch
-from plato.processors import model
+
+
+from plato.callbacks.client import ClientCallback
+from plato.processors import base
 from plato.config import Config
 
 
-class Processor(model.Processor):
+class SendMaskProcessor(base.Processor):
     """
     Implements a processor for attaching a pruning mask to the payload if pruning
     had been conducted
     """
+
+    def __init__(self, client_id, **kwargs) -> None:
+        super().__init__(**kwargs)
+
+        self.client_id = client_id
 
     def process(self, data: OrderedDict):
         model_name = (
@@ -47,7 +53,26 @@ class Processor(model.Processor):
                 )
         return data
 
-    def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
+
+class HermesCallback(ClientCallback):
+    """
+    A client callback that dynamically inserts processors into the current list of inbound
+    processors.
+    """
+
+    def on_outbound_ready(self, client, report, outbound_processor):
         """
-        Process individual layer of the model
+        Insert a SendMaskProcessor to the list of outbound processors.
         """
+        send_payload_processor = SendMaskProcessor(
+            client_id=client.client_id,
+            name="SendMaskProcessor",
+        )
+
+        outbound_processor.processors.insert(0, send_payload_processor)
+
+        logging.info(
+            "[%s] List of outbound processors: %s.",
+            client,
+            outbound_processor.processors,
+        )

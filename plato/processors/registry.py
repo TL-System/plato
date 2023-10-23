@@ -35,7 +35,6 @@ if not (
         model_compress,
         model_decompress,
         model_randomized_response,
-        send_mask,
         structured_pruning,
         unstructured_pruning,
     )
@@ -60,7 +59,6 @@ if not (
         "model_decompress": model_decompress.Processor,
         "model_dequantize_qsgd": model_dequantize_qsgd.Processor,
         "model_randomized_response": model_randomized_response.Processor,
-        "send_mask": send_mask.Processor,
         "structured_pruning": structured_pruning.Processor,
         "unstructured_pruning": unstructured_pruning.Processor,
     }

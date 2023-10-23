@@ -70,9 +70,9 @@ class Server(fedavg_personalized_server.Server):
                 avg = np.zeros_like(weights_received[0][layer_name].reshape([-1]))
                 if "int" in str(avg.dtype):
                     avg = avg.astype(np.float64)
-                for index, __ in enumerate(weights_received):
+                for index, weight_received in enumerate(weights_received):
                     num_samples = updates[index].report.num_samples
-                    avg += weights_received[index][layer_name].reshape([-1]) * (
+                    avg += weight_received[layer_name].reshape([-1]) * (
                         num_samples / self.total_samples
                     )
 

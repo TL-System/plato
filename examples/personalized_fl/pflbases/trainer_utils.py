@@ -26,7 +26,7 @@ def freeze_model(model, modules_name=None, log_info: str = ""):
     if modules_name is not None:
         frozen_params = []
         for name, param in model.named_parameters():
-            if any([param_name in name for param_name in modules_name]):
+            if any(param_name in name for param_name in modules_name):
                 param.requires_grad = False
                 frozen_params.append(name)
 

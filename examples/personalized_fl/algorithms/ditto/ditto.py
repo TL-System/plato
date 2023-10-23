@@ -12,9 +12,7 @@ Third-part code: https://github.com/lgcollins/FedRep
 from pflbases import fedavg_personalized_server
 from pflbases import personalized_client
 from pflbases import fedavg_partial
-from pflbases.trainer_callbacks import mixing_trainer_callbacks
 
-import ditto_trainer_callbacks
 import ditto_trainer_v2 as ditto_trainer
 
 
@@ -26,10 +24,6 @@ def main():
     client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        trainer_callbacks=[
-            mixing_trainer_callbacks.PersonalizedModelMetricCallback,
-            ditto_trainer_callbacks.DittoStatusCallback,
-        ],
     )
     server = fedavg_personalized_server.Server(
         trainer=trainer,

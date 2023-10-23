@@ -188,7 +188,7 @@ class Trainer(basic.Trainer):
             ),
             self.client_id,
             Config().trainer.model_name,
-            Config().algorithm.personalization.model_name,
+            self.personalized_model_name,
         )
 
     def preprocess_models(self, config):
@@ -222,7 +222,11 @@ class Trainer(basic.Trainer):
             self.personalized_model.train()
 
     def postprocess_models(self, config):
-        """Before running, process the personalized model."""
+        """After running, process the trained model and the personalized model.
+
+        This function is required to be revised based on the specific condition of the
+        personalized FL algorithm.
+        """
 
         # pflbases will always copy the trained model to the personalized model as
         # the local update performed on the received global model is the core of
@@ -318,8 +322,7 @@ class Trainer(basic.Trainer):
 
         if self.do_round_personalization or self.do_final_personalization:
             return self.test_personalized_model(config, testset, sampler=None, **kwargs)
-        else:
-            return super().test_model(config, testset, sampler, **kwargs)
+        return super().test_model(config, testset, sampler, **kwargs)
 
     def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
         """Performing the saving for the personalized model with
