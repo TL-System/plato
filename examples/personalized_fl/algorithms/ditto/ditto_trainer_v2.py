@@ -30,14 +30,14 @@ class Trainer(personalized_trainer.Trainer):
 
         self.personalized_optimizer = None
 
-    def preprocess_personalized_model(self, config):
-        """Do nothing to the loaded personalized model in APFL."""
+    def preprocess_models(self, config):
+        """Do nothing to the loaded personalized model in Ditto."""
 
     def train_run_start(self, config):
         """Defining the personalization before running."""
         super().train_run_start(config)
 
-        if self.personalized_learning:
+        if self.do_final_personalization:
             config["epochs"] = 0
 
         # initialize the optimizer, lr_schedule, and loss criterion
@@ -65,7 +65,8 @@ class Trainer(personalized_trainer.Trainer):
         if hasattr(Config().algorithm.personalization, "epochs"):
             personalized_epochs = Config().algorithm.personalization.epochs
 
-        if self.personalized_learning:
+        # do nothing in the final personalization
+        if self.do_final_personalization:
             return
 
         logging.info(
@@ -125,3 +126,8 @@ class Trainer(personalized_trainer.Trainer):
                 personalized_epochs,
                 epoch_loss_meter.average,
             )
+
+        super().train_run_end(config)
+
+    def postprocess_models(self, config):
+        """Do nothing to the personalized model in Ditto."""

@@ -77,7 +77,7 @@ class Trainer(personalized_trainer.Trainer):
         alpha_n = self.alpha - eta * grad_alpha
         self.alpha = np.clip(alpha_n.item(), 0.0, 1.0)
 
-    def preprocess_personalized_model(self, config):
+    def preprocess_models(self, config):
         """Do nothing to the loaded personalized model in APFL."""
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
@@ -169,14 +169,16 @@ class Trainer(personalized_trainer.Trainer):
         self.adaptive_alpha = Config().algorithm.adaptive_alpha
         self.alpha = initial_alpha if self.alpha == 0.0 else self.alpha
 
+    def postprocess_models(self, config):
+        """Do nothing to the model."""
+
     def train_run_end(self, config):
         """Saving the alpha."""
+        super().train_run_end(config)
+
         save_dir_path = self.get_checkpoint_dir_path()
         save_path = os.path.join(save_dir_path, self.alpha_filename)
         torch.save(self.alpha, save_path)
-
-        # do not copy model to personalized model or vice versa
-        # return super().train_run_end(config)
 
     def train_epoch_start(self, config):
         """Assigning the lr of optimizer to the personalized optimizer."""
