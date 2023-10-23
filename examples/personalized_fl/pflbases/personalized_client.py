@@ -71,24 +71,14 @@ class Client(simple.Client):
         # the path of the initial personalized model of this client
         self.init_personalized_model_path = None
 
-    def configure(self) -> None:
-        """Performing the general client's configure and then initialize the
-        personalized model for the client."""
-
-        super().configure()
-
-        # jump out if no personalization info is provided
-        if not hasattr(Config().algorithm, "personalization"):
-            sys.exit(
-                "Error: personalization block must be provided under the algorithm."
-            )
-
-        # set the indicators for personalization of the trainer
-        self.trainer.do_round_personalization = self.is_round_personalization()
-        self.trainer.do_final_personalization = self.is_final_personalization()
+    def create_initial_personalized_model(self):
+        """Create the initial personalized model once there is not one."""
 
         # get the initial personalized model path
-        self.init_personalized_model_path = self.get_init_personalized_model_path()
+        self.init_personalized_model_path = self.get_init_model_path(
+            model_name=self.trainer.personalized_model_name,
+            prefix=self.trainer.personalized_model_prefix,
+        )
 
         # if this client does not a personalized model yet.
         # define a an initial one and save to the disk
@@ -105,6 +95,23 @@ class Client(simple.Client):
                 location=self.trainer.get_checkpoint_dir_path(),
             )
 
+    def configure(self) -> None:
+        """Performing the general client's configure and then initialize the
+        personalized model for the client."""
+
+        super().configure()
+
+        # jump out if no personalization info is provided
+        if not hasattr(Config().algorithm, "personalization"):
+            sys.exit(
+                "Error: personalization block must be provided under the algorithm."
+            )
+
+        # set the indicators for personalization of the trainer
+        self.trainer.do_round_personalization = self.is_round_personalization()
+        self.trainer.do_final_personalization = self.is_final_personalization()
+
+        self.create_initial_personalized_model()
         self.personalized_model = self.trainer.personalized_model
 
     def inbound_received(self, inbound_processor):
@@ -122,30 +129,34 @@ class Client(simple.Client):
             self.get_personalized_model()
 
     def get_personalized_model(self):
-        """Getting the personalized model of the client."""
-
+        """Getting the personalized model of the client.
+        Default, the latest personalized model is obtained.
+        """
         # always get the latest personalized model.
         desired_round = self.current_round - 1
-        location = self.trainer.get_checkpoint_dir_path()
-
-        filename, is_searched = checkpoint_operator.search_client_checkpoint(
-            client_id=self.client_id,
-            checkpoints_dir=location,
+        model_name = self.trainer.personalized_model_name
+        prefix = self.trainer.personalized_model_prefix
+        save_location, filename = self.trainer.get_model_checkpoint_path(
             model_name=self.trainer.personalized_model_name,
-            current_round=desired_round,
-            run_id=None,
-            epoch=None,
-            prefix=self.trainer.personalized_model_prefix,
+            prefix=prefix,
+            round_n=desired_round,
+            epoch_n=None,
+        )
+
+        filename, is_searched = checkpoint_operator.search_checkpoint_file(
+            filename=filename,
+            checkpoints_dir=save_location,
+            key_words=[model_name, prefix],
             anchor_metric="round",
             mask_words=["epoch"],
             use_latest=True,
         )
         if is_searched:
-            self.trainer.load_personalized_model(filename, location=location)
+            self.trainer.load_personalized_model(filename, location=save_location)
         else:
             self.trainer.load_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
-                location=location,
+                location=save_location,
             )
 
     def get_local_model(self):
@@ -180,17 +191,17 @@ class Client(simple.Client):
                 location=location,
             )
 
-    def get_init_personalized_model_path(self):
-        """Get the path of the personalized model."""
+    def get_init_model_path(self, model_name: str, prefix: str):
+        """Get the path of saved initial model (untrained)."""
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
         filename = NameFormatter.get_format_name(
-            model_name=self.trainer.personalized_model_name,
+            model_name=model_name,
             client_id=self.client_id,
             round_n=0,
             epoch_n=None,
             run_id=None,
-            prefix=self.trainer.personalized_model_prefix,
+            prefix=prefix,
             ext="pth",
         )
         model_path = os.path.join(checkpoint_dir_path, filename)

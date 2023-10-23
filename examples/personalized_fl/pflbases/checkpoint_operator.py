@@ -3,7 +3,7 @@ The implementation of checkpoints operations, such as saving and loading.
 """
 import os
 import re
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 
 import torch
 
@@ -205,50 +205,32 @@ def save_client_checkpoint(
     return filename
 
 
-def search_client_checkpoint(
-    client_id: int,
-    model_name: str,
+def search_checkpoint_file(
+    filename: str,
     checkpoints_dir: str,
-    current_round: Optional[int] = None,
-    run_id: Optional[int] = None,
-    epoch: Optional[int] = None,
-    prefix: Optional[str] = None,
+    key_words: List[str],
     anchor_metric: str = "round",
     mask_words: Optional[List[str]] = None,
     use_latest: bool = True,
-) -> CheckpointsOperator:
+) -> Tuple[str, bool]:
     # pylint:disable=too-many-arguments
 
-    """Search for the target checkpoint of the client.
+    """Search for the folder for the target checkpoint file.
+    Return the latest file when required."""
 
-    :param use_latest: A boolean to show whether utilize the latest checkpoint file
-        if the required file does not exist.
-    """
     if mask_words is None:
         mask_words = ["epoch"]
 
     cpk_oper = CheckpointsOperator(checkpoints_dir=checkpoints_dir)
-
-    # Before the training, we expect to save the initial
-    # model of this round
-    filename = NameFormatter.get_format_name(
-        model_name=model_name,
-        client_id=client_id,
-        round_n=current_round,
-        epoch_n=epoch,
-        run_id=run_id,
-        prefix=prefix,
-        ext="pth",
-    )
 
     if cpk_oper.vaild_checkpoint_file(filename):
         return filename, True
     else:
         if use_latest:
             # Loading the latest checkpoint file
-            search_key_words = [model_name, prefix]
+            # search_key_words = [model_name, prefix]
             filename = cpk_oper.search_latest_checkpoint_file(
-                search_key_words=search_key_words,
+                search_key_words=key_words,
                 anchor_metric=anchor_metric,
                 filter_words=mask_words,
             )

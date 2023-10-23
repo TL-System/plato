@@ -48,4 +48,4 @@ class Trainer(personalized_trainer.Trainer):
         # Do not save the personalized model as FedBABU utilizes the head as the
         # personalized model, which is not trained during the federated training.
         if self.do_final_personalization:
-            self.perform_personalized_model_checkpoint(config)
+            self.perform_personalized_model_checkpoint(config=config)

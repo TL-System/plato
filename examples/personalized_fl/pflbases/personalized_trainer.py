@@ -255,7 +255,7 @@ class Trainer(basic.Trainer):
         self.postprocess_models(config)
 
         if self.do_round_personalization or self.do_final_personalization:
-            self.perform_personalized_model_checkpoint(config)
+            self.perform_personalized_model_checkpoint(config=config)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
@@ -334,23 +334,36 @@ class Trainer(basic.Trainer):
             return self.test_personalized_model(config, testset, sampler=None, **kwargs)
         return super().test_model(config, testset, sampler, **kwargs)
 
-    def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
-        """Performing the saving for the personalized model with
-        necessary learning parameters."""
-        current_round = self.current_round
+    def get_model_checkpoint_path(
+        self, model_name: str, prefix=None, round_n=None, epoch_n=None
+    ):
+        """Getting the path of the personalized model."""
+        current_round = self.current_round if round_n is None else round_n
 
-        personalized_model_name = self.personalized_model_name
         save_location = self.get_checkpoint_dir_path()
         filename = NameFormatter.get_format_name(
             client_id=self.client_id,
-            model_name=personalized_model_name,
+            model_name=model_name,
             round_n=current_round,
-            epoch_n=epoch,
+            epoch_n=epoch_n,
             run_id=None,
-            prefix=self.personalized_model_prefix,
+            prefix=prefix,
             ext="pth",
         )
-        os.makedirs(save_location, exist_ok=True)
+
+        return save_location, filename
+
+    def perform_personalized_model_checkpoint(self, config, **kwargs):
+        """Performing the saving for the personalized model with
+        necessary learning parameters."""
+        round_n = kwargs.pop("round") if "round" in kwargs else self.current_round
+        epoch_n = kwargs.pop("epoch") if "epoch" in kwargs else None
+        save_location, filename = self.get_model_checkpoint_path(
+            model_name=self.personalized_model_name,
+            prefix=self.personalized_model_prefix,
+            round_n=round_n,
+            epoch_n=epoch_n,
+        )
 
         self.save_personalized_model(
             filename=filename, location=save_location, **kwargs
