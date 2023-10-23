@@ -19,6 +19,11 @@ class SendMaskProcessor(base.Processor):
     had been conducted
     """
 
+    def __init__(self, client_id, **kwargs) -> None:
+        super().__init__(**kwargs)
+
+        self.client_id = client_id
+
     def process(self, data: OrderedDict):
         model_name = (
             Config().trainer.model_name
@@ -61,7 +66,6 @@ class HermesCallback(ClientCallback):
         """
         send_payload_processor = SendMaskProcessor(
             client_id=client.client_id,
-            trainer=client.trainer,
             name="SendMaskProcessor",
         )
 
