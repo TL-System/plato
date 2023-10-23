@@ -7,7 +7,7 @@ clients:
     per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     random_seed: 1
 

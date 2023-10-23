@@ -94,8 +94,11 @@ class Trainer(basic.Trainer):
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
 
         loss_criterion_params = (
-            Config().parameters.personalization.loss_criterion._asdict()
+            {}
+            if not hasattr(Config().parameters.personalization, "loss_criterion")
+            else Config().parameters.personalization.loss_criterion._asdict()
         )
+
         return loss_criterion.get(
             loss_criterion=loss_criterion_type,
             loss_criterion_params=loss_criterion_params,
@@ -321,7 +324,9 @@ class Trainer(basic.Trainer):
         personalized model."""
 
         if self.do_round_personalization or self.do_final_personalization:
-            return self.test_personalized_model(config, testset, sampler=None, **kwargs)
+            return self.test_personalized_model(
+                config, testset, sampler=sampler, **kwargs
+            )
         return super().test_model(config, testset, sampler, **kwargs)
 
     def get_model_checkpoint_path(
