@@ -11,6 +11,7 @@ from pflbases import personalized_client
 
 from pflbases.client_callbacks import base_callbacks
 
+from hermes_callback import HermesCallback
 import hermes_trainer
 import hermes_server
 
@@ -22,7 +23,7 @@ def main():
     client = personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        callbacks=[base_callbacks.ClientPayloadCallback],
+        callbacks=[base_callbacks.ClientPayloadCallback, HermesCallback],
     )
     server = hermes_server.Server(
         trainer=trainer,
