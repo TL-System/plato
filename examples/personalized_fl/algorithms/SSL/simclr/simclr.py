@@ -65,7 +65,7 @@ class SimCLR(torch.nn.Module):
         return projected_z1, projected_z2
 
     @staticmethod
-    def get_model():
+    def get():
         return SimCLR()
 
 

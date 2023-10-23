@@ -22,8 +22,8 @@ server:
     
 
 data:
-    # mnist non-iid distribution
-    !include mnist_ssl_noniid.yml
+    # CIFAR10 non-iid distribution
+    !include cifar10_ssl_noniid.yml
 
 trainer:
     # LeNet5 model with the basic trainer
@@ -44,7 +44,7 @@ trainer:
     loss_criterion: NTXentLoss
 
     # The machine learning model
-    model_name: SimCLR
+    model_name: Calibre
     encoder_name: lenet5
     projection_hidden_dim: 2048
     projection_out_dim: 256
@@ -60,7 +60,7 @@ algorithm:
         train_transform:
             name: SimCLR
             parameters:
-                input_size: 28
+                input_size: 32
 
     global_modules_name:
         - encoder
@@ -68,32 +68,34 @@ algorithm:
     completion_modules_name:
         - projector
 
+    # auxiliary_loss_criterions:
+    #     - prototype_regularizers
+
+    # auxiliary_loss_criterions_param:
+    #     prototype_regularizers:
+    #         temperature: 0.2
+    
+    # losses_weight:
+    #     NTXentLoss: 0.6
+    #     prototype_regularizers: 0.2
+    #     meta_prototype_contrastive_representation_loss: 0.2
+
+    losses_weight:
+        NTXentLoss: 1.0
+        # this loss contains two parts, including
+        # l_p, l_n
+        prototype_regularizers: 
+            - 0.5
+            - 0.6
+
     personalization:
 
-        # Number of epochs for local training in each communication round
-        #   The batch size for the downstream task can be larger as it
-        # does not utilize the
-        epochs: 5
-        batch_size: 32
-        optimizer: SGD
-        lr_scheduler: StepLR
-        loss_criterion: CrossEntropyLoss
-
-        model_type: general_multilayer
-        model_name: linear_mlp
-
-        # the ratio of clients participanting in training
-        participating_clients_ratio: 1.0
-        
-        # whether the personalized model will be
-        # obtained in each round
-        do_personalization_per_round: false
-
+        !include ssl_personalization.yml
 
 
 parameters:
     # LeNet5 training params
-    !include lenet5_ssl_params.yml
+    !include resnet18_ssl_params.yml
 
 results:
     # Write the following parameter(s) into a CSV
