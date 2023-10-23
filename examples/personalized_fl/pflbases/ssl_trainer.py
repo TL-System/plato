@@ -3,7 +3,7 @@ The training and testing loops of PyTorch for personalized federated learning wi
 self-supervised learning.
 
 """
-
+import logging
 from typing import List, Tuple
 from warnings import warn
 from collections import UserList
@@ -105,6 +105,7 @@ class Trainer(personalized_trainer.Trainer):
 
     def get_personalized_model_params(self):
         """Getting parameters of the personalized model."""
+        # one must set the parameters for the personalized model
         pers_model_params = Config().parameters.personalization.model._asdict()
         pers_model_params["input_dim"] = self.model.encoding_dim
         pers_model_params["output_dim"] = pers_model_params["num_classes"]
@@ -112,7 +113,7 @@ class Trainer(personalized_trainer.Trainer):
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
-        if self.personalized_learning:
+        if self.do_final_personalization:
             personalized_config = Config().algorithm.personalization._asdict()
             batch_size = personalized_config["batch_size"]
             trainset = self.personalized_trainset
@@ -164,24 +165,20 @@ class Trainer(personalized_trainer.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if (
-            not self.personalized_learning
-            or not hasattr(Config().algorithm, "personalization")
-            or not hasattr(Config().parameters, "personalization")
-        ):
+        if not self.do_final_personalization:
             return self.plato_ssl_loss_wrapper()
 
-        loss_criterion_type = Config().algorithm.personalization.loss_criterion
-        loss_criterion_params = (
-            Config().parameters.personalization.loss_criterion._asdict()
-        )
-        return loss_criterion.get(
-            loss_criterion=loss_criterion_type,
-            loss_criterion_params=loss_criterion_params,
+        logging.info(
+            "[Client #%d] Using the personalized loss_criterion.", self.client_id
         )
 
-    def preprocess_personalized_model(self, config):
-        """Do nothing to the loaded personalized mdoel."""
+        return self.get_personalized_loss_criterion()
+
+    def preprocess_models(self, config):
+        """Do nothing to the personalized mdoel."""
+
+    def postprocess_models(self, config):
+        """Do nothing to the personalized mdoel."""
 
     def train_run_end(self, config):
         """Do nothing in the end of the training run."""
@@ -194,8 +191,6 @@ class Trainer(personalized_trainer.Trainer):
         # No optimization is reuqired by this encoder.
         with torch.no_grad():
             features = self.model.encoder(examples)
-            if "split" in kwargs and kwargs["split"] == "test":
-                self.test_metrics_collector.add_encodings(features)
 
         # Perfrom the training and compute the loss
         return self.personalized_model(features)

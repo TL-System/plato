@@ -19,7 +19,7 @@ To better compare the performance of different personalized federated learning a
 
 ### Baseline Algorithm
 
-We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as the baseline algorithm for personalized federated learning (FL). The code is available under `fedavg_finetune/`.
+We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as the baseline algorithm for personalized federated learning (FL). The code is available under `algorithms/fedavg_finetune/`.
 
 
 ### Classical personalized FL approaches
@@ -94,6 +94,10 @@ python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10
 
 ```bash
 python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/simclr/simclr.py -c algorithms/configs/simclr_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 

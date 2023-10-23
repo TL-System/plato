@@ -16,6 +16,7 @@ from plato.processors import base
 from plato.utils.filename_formatter import NameFormatter
 
 from pflbases.client_callbacks import base_callbacks
+from pflbases import checkpoint_operator
 
 
 class PayloadCompletionProcessor(base.Processor):

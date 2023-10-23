@@ -100,7 +100,12 @@ class Client(personalized_client.Client):
         super().inbound_received(inbound_processor)
 
         # set personalized terms for the trainer
-        self.trainer.set_personalized_trainset(self.personalized_trainset)
-        self.trainer.set_personalized_trainset_sampler(self.personalized_sampler)
-        self.trainer.set_personalized_testset(self.personalized_testset)
-        self.trainer.set_personalized_testset_sampler(self.personalized_testset_sampler)
+        # only need to set the personalized terms in the final
+        # personalization
+        if self.trainer.do_final_personalization:
+            self.trainer.set_personalized_trainset(self.personalized_trainset)
+            self.trainer.set_personalized_trainset_sampler(self.personalized_sampler)
+            self.trainer.set_personalized_testset(self.personalized_testset)
+            self.trainer.set_personalized_testset_sampler(
+                self.personalized_testset_sampler
+            )
