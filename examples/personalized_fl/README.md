@@ -157,6 +157,13 @@ python algorithms/SSL/moco/mocov2.py -c algorithms/configs/SSL/mocov2_CIFAR10_re
 python algorithms/SSL/byol/byol.py -c algorithms/configs/SSL/byol_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
+
+```bash
+python algorithms/SSL/calibre/calibre.py -c algorithms/configs/SSL/calibre_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+
+
 ## Hyper-parameters
 
 All hyper-parameters of `pflbases` should be placed under the `algorithm` block of the configuration file. 

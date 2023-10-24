@@ -1,15 +1,16 @@
 """
-The implementation of the losses for our calibre approach.
+The implementation of the losses for the Calibre approach.
 
-It includes:
+It includes NTXentLoss as the main loss, while:
     - prototype-oriented contrastive regularizer
     - prototype-based meta regularizer
     - prototype_contrastive_representation_loss
     - meta_prototype_contrastive_representation_loss
-The work most related to our idea of motivation A is the
-Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf. However,
-it belongs to one specific case, i.e., the fully-supervised, of our method.
+    as optional auxiliary losses.
 
+The one related loss is proposed in the paper:
+Supervised Contrastive Learning: https://arxiv.org/pdf/2004.11362.pdf. However,
+it belongs to one specific case, i.e., the fully-supervised, of Calibre.
 """
 
 from typing import List
@@ -18,19 +19,17 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from kmeans_pytorch import kmeans
 from lightly import loss as lightly_loss
 
 from plato.trainers import loss_criterion
 
+from clustering import kmeans_clustering
+from prototype_loss import get_prototype_loss
+
 
 class CalibreLoss(nn.Module):
     """
-    The contrastive adaptation losses for our proposed method.
-    It mainly includes:
-        - the client-oriented Representation Disentanglement loss
-        - the adversarial alignment loss
-
+    The contrastive adaptation losses for Calibre.
     """
 
     def __init__(
@@ -40,14 +39,11 @@ class CalibreLoss(nn.Module):
         auxiliary_losses: List[str] = None,
         auxiliary_losses_params: List[dict] = None,
         losses_weight: List[float] = None,
-        perform_label_distortion=False,
-        label_distrotion_type="random",
-        n_clusters: int = 10,
-        temperature=0.07,
-        base_temperature=0.07,
-        contrast_mode="all",
+        device: str = "cpu",
     ):
         super().__init__()
+
+        self.device = device
 
         self.main_loss = main_loss
         self.main_loss_params = main_loss_params
@@ -63,18 +59,6 @@ class CalibreLoss(nn.Module):
         self.set_losses()
 
         self.define_losses_func()
-
-        #
-        self.n_clusters = n_clusters
-
-        # a hyper-parameter for the supervision_contrastive loss
-        self.temperature = temperature
-        self.contrast_mode = contrast_mode
-        self.base_temperature = base_temperature
-
-        # whether to perform the label distortion
-        self.perform_label_distortion = perform_label_distortion
-        self.label_distrotion_type = label_distrotion_type
 
     def set_default(self):
         """Setting the default terms."""
@@ -123,19 +107,6 @@ class CalibreLoss(nn.Module):
 
             self.losses_func[loss_name] = loss_func
 
-    def kmeans_clustering(self, encodings):
-        """Cluster the samples based on the features."""
-        # kmeans
-        device = encodings.get_device() if encodings.is_cuda else torch.device("cpu")
-        cluster_ids_x, cluster_centers = kmeans(
-            X=encodings,
-            num_clusters=self.n_clusters,
-            distance="euclidean",
-            device=device,
-        )
-
-        return cluster_ids_x, cluster_centers
-
     def random_label_distortion(self, gt_labels):
         """To cover the label information for better generalization,
         each client should perform the label distortion to shift the label
@@ -151,24 +122,32 @@ class CalibreLoss(nn.Module):
 
         return pseudo_labels
 
-    def prototype_regularizers(
-        self,
-        encodings,
-        projections,
-    ):
+    def prototype_regularizers(self, encodings, projections, **kwargs):
         """Compute the L_p and L_n losses mentioned the paper."""
-        # get encodings, each with shape: batch_size, feature_dim
+        n_clusters = kwargs["n_clusters"]
+        distance_type = kwargs["distance_type"]
+        # get encodings, each with shape:
+        # [batch_size, feature_dim]
         encodings_a, encodings_b = encodings
+        # get projections, each with shape:
+        # [batch_size, projection_dim]
         projections_a, projections_b = projections
 
         batch_size = encodings_a.shape[0]
 
         # perform the K-means clustering to get the prototypes
+        # shape: [2*batch_size, feature_dim]
         full_encodings = torch.cat((encodings_a, encodings_b), axis=0)
-        # get cluster assignment for the input,
-        # shape, [2*batch_size]
-        clusters_assignment, _ = self.kmeans_clustering(full_encodings)
+        # get cluster assignment for the input encodings,
+        # clusters_assignment shape, [2*batch_size]
+        clusters_assignment, _ = kmeans_clustering(
+            full_encodings, n_clusters=n_clusters, device=self.device
+        )
+        # get the unique cluster ids
+        # with shape, [n_clusters]
         pseudo_classes = torch.unique(clusters_assignment)
+        # split into two parts corresponding to a, and b
+        # each with shape, [batch_size]
 
         pseudo_labels_a, pseudo_labels_b = torch.split(clusters_assignment, batch_size)
 
@@ -176,36 +155,47 @@ class CalibreLoss(nn.Module):
         ## prototype-oriented contrastive regularizer
         ##
         # compute the prototype features based on projection
-        prototypes_a_enc = torch.cat(
+        # with shape, [n_clusters, projection_dim]
+        prototypes_a = torch.stack(
             [
-                projections_a[torch.nonzero(pseudo_labels_a == class_id)].mean(0)
-                for class_id in range(pseudo_classes)
-            ]
+                projections_a[pseudo_labels_a == class_id].mean(0)
+                for class_id in pseudo_classes
+            ],
+            dim=0,
         )
-        prototypes_b_enc = torch.cat(
+        # with shape, [n_clusters, projection_dim]
+        prototypes_b = torch.stack(
             [
-                projections_b[torch.nonzero(pseudo_labels_b == class_id)].mean(0)
-                for class_id in range(pseudo_classes)
-            ]
+                projections_b[pseudo_labels_b == class_id].mean(0)
+                for class_id in pseudo_classes
+            ],
+            dim=0,
         )
 
         # compute the L_p loss
-        l_p = lightly_loss.NTXentLoss(prototypes_a_enc, prototypes_b_enc)
-
+        loss_fn = lightly_loss.NTXentLoss(memory_bank_size=0)
+        l_p = loss_fn(prototypes_a, prototypes_b)
         ##
         ## compute prototype-based meta regularizer
         ##
         # support set
-        support_prototypes_enc = torch.cat(
+        # with shape, [n_clusters, encoding_dim]
+        support_prototypes = torch.stack(
             [
-                encodings_a[torch.nonzero(pseudo_labels_a == class_id)].mean(0)
-                for class_id in range(pseudo_classes)
-            ]
+                encodings_a[pseudo_labels_a == class_id].mean(0)
+                for class_id in pseudo_classes
+            ],
+            dim=0,
         )
+
         # Calculate distances between query set embeddings and class prototypes
-        dists = torch.cdist(encodings_b, support_prototypes_enc)
-        meta_scores = -dists
-        l_n = nn.CrossEntropyLoss(meta_scores, pseudo_labels_b)
+        # with shape, [n_clusters, encoding_dim]
+        l_n = get_prototype_loss(
+            support_prototypes,
+            queries=encodings_b,
+            query_labels=pseudo_labels_b,
+            distance_type=distance_type,
+        )
 
         return l_p, l_n
 
@@ -339,15 +329,18 @@ class CalibreLoss(nn.Module):
 
         for loss_name in self.losses:
             loss_weight = self.losses[loss_name]["weight"]
+            loss_params = self.losses[loss_name]["params"]
 
             if loss_name == "prototype_regularizers":
-                regularizer_loss = self.prototype_regularizers(
-                    encodings=encodings, projections=projections
+                regularizers_loss = self.prototype_regularizers(
+                    encodings=encodings, projections=projections, **loss_params
                 )
+
                 computed_loss = sum(
-                    loss * weight for loss, weight in zip(regularizer_loss, loss_weight)
+                    loss * loss_weight[loss_idx]
+                    for loss_idx, loss in enumerate(regularizers_loss)
                 )
-                loss_weight += computed_loss
+                total_loss += computed_loss
             else:
                 computed_loss = self.losses_func[loss_name](*projections)
 

@@ -7,7 +7,7 @@ clients:
     per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     random_seed: 1
 
@@ -19,7 +19,6 @@ server:
 
     # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
     simulate_wall_time: true
-    
 
 data:
     # CIFAR10 non-iid distribution
@@ -45,7 +44,7 @@ trainer:
 
     # The machine learning model
     model_name: Calibre
-    encoder_name: lenet5
+    encoder_name: resnet_18
     projection_hidden_dim: 2048
     projection_out_dim: 256
 
@@ -68,18 +67,14 @@ algorithm:
     completion_modules_name:
         - projector
 
-    # auxiliary_loss_criterions:
-    #     - prototype_regularizers
+    auxiliary_loss_criterions:
+        - prototype_regularizers
 
-    # auxiliary_loss_criterions_param:
-    #     prototype_regularizers:
-    #         temperature: 0.2
+    auxiliary_loss_criterions_param:
+        prototype_regularizers:
+            n_clusters: 10
+            distance_type: euclidean
     
-    # losses_weight:
-    #     NTXentLoss: 0.6
-    #     prototype_regularizers: 0.2
-    #     meta_prototype_contrastive_representation_loss: 0.2
-
     losses_weight:
         NTXentLoss: 1.0
         # this loss contains two parts, including
@@ -94,8 +89,23 @@ algorithm:
 
 
 parameters:
-    # LeNet5 training params
-    !include resnet18_ssl_params.yml
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0001
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 150ep,350ep
+
+    loss_criterion:
+        temperature: 0.2
+
+    model:
+        num_classes: 10
+
+    personalization:
+        !include resnet18_pers_params.yml
 
 results:
     # Write the following parameter(s) into a CSV
