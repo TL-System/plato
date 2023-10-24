@@ -148,6 +148,7 @@ python algorithms/SSL/smog/smog.py -c algorithms/configs/SSL/smog_CIFAR10_resnet
 python algorithms/SSL/swav/swav.py -c algorithms/configs/SSL/swav_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
+This mocov2 may have some problems because the loss is not decreasing.
 ```bash
 python algorithms/SSL/moco/mocov2.py -c algorithms/configs/SSL/mocov2_CIFAR10_resnet18.yml -b pflExperiments
 ```

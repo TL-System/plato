@@ -183,7 +183,8 @@ class Trainer(separate_local_trainer.Trainer):
     def train_run_end(self, config):
         """Only save the local model but no personalized model will be saved."""
 
-        self.perform_local_model_checkpoint(config)
+        if not self.do_final_personalization:
+            self.perform_local_model_checkpoint(config)
 
         if self.do_final_personalization:
             self.perform_personalized_model_checkpoint(config=config)
