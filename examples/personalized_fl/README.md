@@ -140,6 +140,10 @@ python algorithms/SSL/simclr/simclr.py -c algorithms/configs/SSL/simclr_CIFAR10_
 python algorithms/SSL/simsiam/simsiam.py -c algorithms/configs/SSL/simsiam_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
+```bash
+python algorithms/SSL/smog/smog.py -c algorithms/configs/SSL/smog_CIFAR10_resnet18.yml -b pflExperiments
+```
+
 
 ## Hyper-parameters
 

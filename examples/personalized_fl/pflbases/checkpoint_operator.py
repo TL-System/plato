@@ -234,6 +234,6 @@ def search_checkpoint_file(
                 anchor_metric=anchor_metric,
                 filter_words=mask_words,
             )
-            return filename, True
+            return filename, filename is not None
 
     return filename, False

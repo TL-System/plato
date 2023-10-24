@@ -10,9 +10,10 @@ from lightly.utils.scheduler import cosine_schedule
 
 from plato.config import Config
 from plato.utils.filename_formatter import NameFormatter
-from plato.utils import checkpoint_operator
+
 
 from pflbases import ssl_trainer
+from pflbases import checkpoint_operator
 
 
 class Trainer(ssl_trainer.Trainer):
@@ -48,14 +49,14 @@ class Trainer(ssl_trainer.Trainer):
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             self.momentum_val = cosine_schedule(epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
         """Operations before starting one iteration."""
         super().train_step_start(config)
 
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             # update the global step
             self.global_step += batch
 
@@ -76,29 +77,35 @@ class Trainer(ssl_trainer.Trainer):
             # update the local iteration
             self.model.n_iteration = batch
 
-    def rollback_memory_bank(self, config):
+    def get_memory_bank(self, config):
         """Load the memory bank."""
         desired_round = self.current_round - 1
         checkpoint_dir_path = self.get_checkpoint_dir_path()
-        filename, ckpt_oper = checkpoint_operator.load_client_checkpoint(
+        filename = NameFormatter.get_format_name(
             client_id=self.client_id,
-            checkpoints_dir=checkpoint_dir_path,
             model_name="memory_bank",
-            current_round=desired_round,
+            round_n=desired_round,
             run_id=None,
-            epoch=None,
             prefix="personalized",
+            ext="pth",
+        )
+        filename, is_searched = checkpoint_operator.search_checkpoint_file(
+            filename=filename,
+            checkpoints_dir=checkpoint_dir_path,
+            key_words=["memory_bank", "personalized"],
             anchor_metric="round",
             mask_words=["epoch"],
             use_latest=True,
         )
-        if filename is not None:
+
+        if is_searched:
+            ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoint_dir_path)
             rollback_status = ckpt_oper.load_checkpoint(checkpoint_name=filename)
             memory_bank_status = rollback_status["model"]
             self.memory_bank.bank = memory_bank_status["bank"]
             self.memory_bank.bank_ptr = memory_bank_status["bank_ptr"]
             logging.info(
-                "[Client #%d] Rolled back the Memory Bank from %s under %s.",
+                "[Client #%d] Got the Memory Bank from %s under %s.",
                 self.client_id,
                 filename,
                 checkpoint_dir_path,
@@ -137,10 +144,10 @@ class Trainer(ssl_trainer.Trainer):
 
     def train_run_start(self, config):
         super().train_run_start(config)
-        if not self.personalized_learning:
-            self.rollback_memory_bank(config)
+        if not self.do_final_personalization:
+            self.get_memory_bank(config)
 
     def train_run_end(self, config):
         super().train_run_end(config)
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             self.save_memory_bank(config)
