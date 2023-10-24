@@ -21,8 +21,6 @@ from plato.config import Config
 from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 
-from pflbases.trainer_callbacks import separate_trainer_callbacks
-from pflbases.trainer_callbacks import ssl_trainer_callbacks
 from pflbases.client_callbacks import local_completion_callbacks
 
 from pflbases import ssl_client
@@ -59,13 +57,13 @@ class Trainer(ssl_trainer.Trainer):
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
         global_epoch = (self.current_round - 1) * config["epochs"] + epoch
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
         """Operations before starting one iteration."""
         super().train_step_start(config)
-        if not self.personalized_learning:
+        if not self.do_final_personalization:
             update_momentum(
                 self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
             )
@@ -132,6 +130,11 @@ class BYOL(nn.Module):
         projected_samples2 = self.forward_momentum(samples2)
         return (output1, projected_samples2), (output2, projected_samples1)
 
+    @staticmethod
+    def get():
+        """Get the defined BYOL model."""
+        return BYOL()
+
 
 def main():
     """
@@ -146,11 +149,6 @@ def main():
         algorithm=fedavg_partial.Algorithm,
         callbacks=[
             local_completion_callbacks.ClientModelLocalCompletionCallback,
-        ],
-        trainer_callbacks=[
-            separate_trainer_callbacks.PersonalizedModelMetricCallback,
-            separate_trainer_callbacks.PersonalizedModelStatusCallback,
-            ssl_trainer_callbacks.ModelStatusCallback,
         ],
     )
     server = fedavg_personalized_server.Server(
