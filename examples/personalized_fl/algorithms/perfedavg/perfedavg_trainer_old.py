@@ -10,7 +10,7 @@ import copy
 import torch
 
 from pflbases import personalized_trainer
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 from plato.config import Config
 
 

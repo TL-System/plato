@@ -12,7 +12,7 @@ from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion
 from plato.models import registry as models_registry
 from plato.utils import fonts
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 
 from pflbases import trainer_utils
 from pflbases import checkpoint_operator

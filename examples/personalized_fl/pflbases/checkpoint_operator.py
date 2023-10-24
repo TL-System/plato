@@ -7,7 +7,7 @@ from typing import Dict, Optional, List, Tuple
 
 import torch
 
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 
 
 class CheckpointsOperator:

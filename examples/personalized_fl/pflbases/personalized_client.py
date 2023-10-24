@@ -31,7 +31,7 @@ import os
 
 from plato.clients import simple
 from plato.config import Config
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 
 from pflbases import checkpoint_operator
 

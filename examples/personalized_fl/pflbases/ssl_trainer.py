@@ -111,17 +111,21 @@ class Trainer(separate_local_trainer.Trainer):
         pers_model_params["output_dim"] = pers_model_params["num_classes"]
         return pers_model_params
 
+    def get_personalized_train_loader(self, **kwargs):
+        """Obtain the trainset data loader for the personalization."""
+        personalized_config = Config().algorithm.personalization._asdict()
+        batch_size = personalized_config["batch_size"]
+        trainset = self.personalized_trainset
+        sampler = self.personalized_sampler.get()
+
+        return torch.utils.data.DataLoader(
+            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+        )
+
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
         if self.do_final_personalization:
-            personalized_config = Config().algorithm.personalization._asdict()
-            batch_size = personalized_config["batch_size"]
-            trainset = self.personalized_trainset
-            sampler = self.personalized_sampler.get()
-
-            return torch.utils.data.DataLoader(
-                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
-            )
+            return self.get_personalized_train_loader(**kwargs)
         else:
             collate_fn = MultiViewCollateWrapper()
 

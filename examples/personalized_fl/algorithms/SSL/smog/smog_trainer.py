@@ -9,7 +9,7 @@ from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
 from plato.config import Config
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 
 
 from pflbases import ssl_trainer
