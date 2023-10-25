@@ -46,9 +46,6 @@ algorithm:
         # the ratio of clients participanting in training
         participating_clients_ratio: 1.0
         
-        # the ratio of clients participanting in training
-        participating_clients_ratio: 1.0
-        
         # whether the personalized model will be
         # obtained in each round
         do_personalization_per_round: true
