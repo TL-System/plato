@@ -94,7 +94,6 @@ class Trainer(personalized_trainer.Trainer):
                 # i.e., v_k − η∇F_k(v_k)
                 # This can be achieved by the general optimization step.
                 # Perfrom the training and compute the loss
-                # Perfrom the training and compute the loss
                 preds = self.personalized_model(examples)
                 loss = self._loss_criterion(preds, labels)
 
