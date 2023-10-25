@@ -30,7 +30,7 @@ The file structure of this dataset is:
  - annotations_trainval2017: captions for train/val
 
 The data structure under the 'data/' is:
-├── COCO2017           # root dir of Flickr30K Entities dataset
+├── COCO2017           # root dir of COCO2017 Entities dataset
 │   ├── COCO2017Raw    # Raw images/annotations and the official splits
 │   │   └── annotations
 │   │   └── train2017
@@ -54,7 +54,7 @@ from plato.datasources import multimodal_base
 
 
 class DataSource(multimodal_base.MultiModalDataSource):
-    """ The COCO dataset."""
+    """The COCO dataset."""
 
     def __init__(self, **kwargs):
         super().__init__()
@@ -64,7 +64,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.modality_names = ["image", "text"]
 
-        _path = Config().params['data_path']
+        _path = Config().params["data_path"]
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
         base_data_path = self.mm_data_info["data_path"]
@@ -81,7 +81,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         splits_downalods = {
             "train": download_train_url,
             "test": download_test_url,
-            "val": download_val_url
+            "val": download_val_url,
         }
 
         # Download raw data and extract to different splits
@@ -91,7 +91,8 @@ class DataSource(multimodal_base.MultiModalDataSource):
             split_file_name = self._download_arrange_data(
                 download_url_address=split_download_url,
                 data_path=raw_data_path,
-                extract_to_dir=split_path)
+                extract_to_dir=split_path,
+            )
             # renaming the extracted file to "images"
             extracted_path = os.path.join(split_path, split_file_name)
             renamed_path = os.path.join(split_path, "images")
@@ -99,19 +100,20 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         # Download the annotation
         self._download_arrange_data(
-            download_url_address=download_annotation_url,
-            data_path=raw_data_path)
+            download_url_address=download_annotation_url, data_path=raw_data_path
+        )
         annotation_path = os.path.join(raw_data_path, "annotations")
 
         # Move the annotation to each split
         splits_caption_name = {
             "train": "captions_train2017.json",
-            "val": "captions_val2017.json"
+            "val": "captions_val2017.json",
         }
         for split_name in list(splits_caption_name.keys()):
             split_caption_name = splits_caption_name[split_name]
-            to_split_path = os.path.join(self.splits_info[split_name]["path"],
-                                         "captions.json")
-            shutil.copyfile(src=os.path.join(annotation_path,
-                                             split_caption_name),
-                            dst=to_split_path)
+            to_split_path = os.path.join(
+                self.splits_info[split_name]["path"], "captions.json"
+            )
+            shutil.copyfile(
+                src=os.path.join(annotation_path, split_caption_name), dst=to_split_path
+            )
