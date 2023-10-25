@@ -8,5 +8,5 @@
 	path = examples/pfedrlnas/VIT/nasvit_wrapper/NASViT
 	url = https://github.com/facebookresearch/NASViT
 [submodule "examples/controlnet_split_learning/ControlNet"]
-	path = examples/controlnet_split_learning/ControlNet
+	path = plato/models/ControlNet
 	url = https://github.com/lllyasviel/ControlNet
