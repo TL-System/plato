@@ -353,9 +353,11 @@ class Trainer(basic.Trainer):
         necessary learning parameters."""
         round_n = kwargs.pop("round") if "round" in kwargs else self.current_round
         epoch_n = kwargs.pop("epoch") if "epoch" in kwargs else None
+        model_name = self.personalized_model_name
+        prefix = self.personalized_model_prefix
         save_location, filename = self.get_model_checkpoint_path(
-            model_name=self.personalized_model_name,
-            prefix=self.personalized_model_prefix,
+            model_name=model_name,
+            prefix=prefix,
             round_n=round_n,
             epoch_n=epoch_n,
         )
@@ -363,6 +365,25 @@ class Trainer(basic.Trainer):
         self.save_personalized_model(
             filename=filename, location=save_location, **kwargs
         )
+
+        # always remove the expired checkpoints
+        self.remove_expired_checkpoints(model_name, prefix, round_n=round_n)
+
+    def remove_expired_checkpoints(self, model_name, prefix, **kwargs):
+        """Removing invalid checkpoints under the checkpoints_dir.
+        This function will only maintain the initial one and latest one.
+        """
+        current_round = (
+            self.current_round if "round_n" not in kwargs else kwargs["round_n"]
+        )
+        for round_id in range(1, current_round):
+            save_location, filename = self.get_model_checkpoint_path(
+                model_name=model_name,
+                prefix=prefix,
+                round_n=round_id,
+            )
+            if os.path.exists(os.path.join(save_location, filename)):
+                os.remove(os.path.join(save_location, filename))
 
     def save_personalized_model(self, filename=None, location=None, **kwargs):
         """Saving the model to a file."""

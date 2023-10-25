@@ -50,11 +50,18 @@ class Trainer(personalized_trainer.Trainer):
         necessary learning parameters."""
         round_n = kwargs.pop("round") if "round" in kwargs else self.current_round
         epoch_n = kwargs.pop("epoch") if "epoch" in kwargs else None
+        model_name = self.model_name
+        prefix = self.local_model_prefix
         save_location, filename = self.get_model_checkpoint_path(
-            model_name=self.model_name,
-            prefix=self.local_model_prefix,
+            model_name=model_name,
+            prefix=prefix,
             round_n=round_n,
             epoch_n=epoch_n,
         )
 
         self.save_model(filename=filename, location=save_location)
+
+        # always remove the expired checkpoints
+        self.remove_expired_checkpoints(
+            model_name=model_name, prefix=prefix, round_n=round_n
+        )

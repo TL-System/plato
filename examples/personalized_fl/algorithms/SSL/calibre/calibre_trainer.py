@@ -120,7 +120,6 @@ class Trainer(ssl_trainer.Trainer):
             "[Client #%d] Saving the divergence rate to %s.", self.client_id, save_path
         )
         torch.save(self.divergence_rate.detach().cpu(), save_path)
-        self.save_model
 
     def train_run_end(self, config):
         """Get the features of local samples after training."""
