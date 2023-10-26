@@ -3,7 +3,7 @@
     personalized_datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 2000
+    partition_size: 2048
 
     # IID or non-IID?
     sampler: noniid

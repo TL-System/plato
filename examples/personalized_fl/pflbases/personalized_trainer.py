@@ -285,6 +285,21 @@ class Trainer(basic.Trainer):
 
         return loss
 
+    def get_personalized_test_loader(self, batch_size, testset, sampler, **kwargs):
+        """Getting one test loader based on the learning mode.
+
+        As this function is only utilized by the personalization
+        process, it can be safely converted to rely on the personalized
+        testset and sampler.
+        """
+
+        return torch.utils.data.DataLoader(
+            dataset=testset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
+        )
+
     def test_personalized_model(self, config, testset, sampler=None, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
@@ -295,8 +310,8 @@ class Trainer(basic.Trainer):
         self.personalized_model.to(self.device)
 
         batch_size = config["batch_size"]
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        test_loader = self.get_personalized_test_loader(
+            batch_size, testset, sampler=sampler, **kwargs
         )
 
         correct = 0

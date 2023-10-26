@@ -3,6 +3,7 @@ The training and testing loops of PyTorch for personalized federated learning wi
 self-supervised learning.
 
 """
+
 import logging
 from typing import List, Tuple
 from warnings import warn
@@ -87,20 +88,14 @@ class Trainer(separate_local_trainer.Trainer):
         self.personalized_sampler = None
         self.personalized_testset_sampler = None
 
-    def set_personalized_trainset(self, dataset):
+    def set_personalized_trainset(self, dataset, sampler):
         """set the testset."""
         self.personalized_trainset = dataset
+        self.personalized_sampler = sampler
 
-    def set_personalized_trainset_sampler(self, dataset):
-        """set the sampler for personalized trainset."""
-        self.personalized_sampler = dataset
-
-    def set_personalized_testset(self, dataset):
+    def set_personalized_testset(self, dataset, sampler):
         """set the testset."""
         self.personalized_testset = dataset
-
-    def set_personalized_testset_sampler(self, sampler):
-        """set the sampler for the testset."""
         self.personalized_testset_sampler = sampler
 
     def get_personalized_model_params(self):
@@ -111,10 +106,8 @@ class Trainer(separate_local_trainer.Trainer):
         pers_model_params["output_dim"] = pers_model_params["num_classes"]
         return pers_model_params
 
-    def get_personalized_train_loader(self, **kwargs):
+    def get_personalized_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the trainset data loader for the personalization."""
-        personalized_config = Config().algorithm.personalization._asdict()
-        batch_size = personalized_config["batch_size"]
         trainset = self.personalized_trainset
         sampler = self.personalized_sampler.get()
 
@@ -125,7 +118,9 @@ class Trainer(separate_local_trainer.Trainer):
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
         if self.do_final_personalization:
-            return self.get_personalized_train_loader(**kwargs)
+            return self.get_personalized_train_loader(
+                batch_size, trainset, sampler, **kwargs
+            )
         else:
             collate_fn = MultiViewCollateWrapper()
 
@@ -138,21 +133,14 @@ class Trainer(separate_local_trainer.Trainer):
             )
 
     # pylint: disable=unused-argument
-    def get_test_loader(self, batch_size, **kwargs):
-        """Getting one test loader based on the learning mode.
-
-        As this function is only utilized by the personalization
-        process, it can be safely converted to rely on the personalized
-        testset and sampler.
-        """
-        testset = self.personalized_testset
-        sampler = self.personalized_testset_sampler.get()
+    def get_personalized_test_loader(self, batch_size, testset, sampler, **kwargs):
+        """Getting one test loader for the personalized."""
 
         return torch.utils.data.DataLoader(
-            dataset=testset,
+            dataset=self.personalized_testset,
             shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler,
+            batch_size=10,
+            sampler=self.personalized_testset_sampler.get(),
         )
 
     def plato_ssl_loss_wrapper(self):
@@ -189,8 +177,7 @@ class Trainer(separate_local_trainer.Trainer):
 
         if not self.do_final_personalization:
             self.perform_local_model_checkpoint(config)
-
-        if self.do_final_personalization:
+        else:
             self.perform_personalized_model_checkpoint(config=config)
 
     def personalized_model_forward(self, examples, **kwargs):
