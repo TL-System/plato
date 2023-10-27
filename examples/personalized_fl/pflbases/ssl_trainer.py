@@ -68,8 +68,8 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
         if fnames:  # Compatible with lightly
             return views, labels, fnames
-        else:  # Compatible with Plato
-            return views, labels
+        # Compatible with Plato
+        return views, labels
 
 
 class Trainer(separate_local_trainer.Trainer):
