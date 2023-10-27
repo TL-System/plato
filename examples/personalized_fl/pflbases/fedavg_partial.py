@@ -44,6 +44,30 @@ class Algorithm(fedavg.Algorithm):
             else f"Client #{self.client_id}"
         )
 
+    def get_target_weights(self, model_parameters: dict, modules_name: List[str]):
+        """Get the target weights from the parameters data based on the modules name."""
+        logging.info(
+            "[%s] Extracting modules with names %s.",
+            self.get_algorithm_holder(),
+            modules_name,
+        )
+        parameters_data = model_parameters.items()
+        extracted_weights = OrderedDict(
+            [
+                (name, param)
+                for name, param in parameters_data
+                if any(
+                    param_name in name.strip().split(".") for param_name in modules_name
+                )
+            ]
+        )
+        logging.info(
+            "[%s] Extracted modules with names %s.",
+            self.get_algorithm_holder(),
+            self.extract_modules_name(list(extracted_weights.keys())),
+        )
+        return extracted_weights
+
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
@@ -66,21 +90,8 @@ class Algorithm(fedavg.Algorithm):
         if modules_name is None:
             return model.cpu().state_dict()
         else:
-            logging.info(
-                "[%s] Extracting parameters with names %s.",
-                self.get_algorithm_holder(),
-                modules_name,
-            )
-
-            return OrderedDict(
-                [
-                    (name, param)
-                    for name, param in model.cpu().state_dict().items()
-                    if any(
-                        param_name in name.strip().split(".")
-                        for param_name in modules_name
-                    )
-                ]
+            return self.get_target_weights(
+                model.cpu().state_dict(), modules_name=modules_name
             )
 
     def is_consistent_weights(self, weights_param_name):

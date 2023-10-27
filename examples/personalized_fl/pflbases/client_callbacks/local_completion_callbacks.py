@@ -17,9 +17,8 @@ class PayloadCompletionProcessor(base.Processor):
     to complete parameters of payload with the loaded local model, which
     is the updated global model in the previous round."""
 
-    def __init__(self, current_round, algorithm, **kwargs) -> None:
+    def __init__(self, algorithm, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.current_round = current_round
         self.algorithm = algorithm
 
     def process(self, data: Any) -> Any:
@@ -62,8 +61,8 @@ class ClientModelLocalCompletionCallback(base_callbacks.ClientPayloadCallback):
 
         inbound_processor.processors.append(
             PayloadCompletionProcessor(
-                current_round=client.current_round,
                 trainer=client.trainer,
                 algorithm=client.algorithm,
+                name="LocalPayloadCompletionProcessor",
             )
         )

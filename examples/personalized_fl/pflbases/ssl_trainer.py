@@ -106,7 +106,9 @@ class Trainer(separate_local_trainer.Trainer):
         pers_model_params["output_dim"] = pers_model_params["num_classes"]
         return pers_model_params
 
-    def get_personalized_train_loader(self, batch_size, trainset, sampler, **kwargs):
+    def get_personalized_train_loader(
+        self, batch_size, trainset=None, sampler=None, **kwargs
+    ):
         """Obtain the trainset data loader for the personalization."""
         trainset = self.personalized_trainset
         sampler = self.personalized_sampler.get()
@@ -133,7 +135,9 @@ class Trainer(separate_local_trainer.Trainer):
             )
 
     # pylint: disable=unused-argument
-    def get_personalized_test_loader(self, batch_size, testset, sampler, **kwargs):
+    def get_personalized_test_loader(
+        self, batch_size, testset=None, sampler=None, **kwargs
+    ):
         """Getting one test loader for the personalized."""
 
         return torch.utils.data.DataLoader(
@@ -192,8 +196,64 @@ class Trainer(separate_local_trainer.Trainer):
         # Perfrom the training and compute the loss
         return self.personalized_model(features)
 
+    def collect_data_encodings(self, data_loader):
+        """Collecting the encodings of the data."""
+        samples_encoding = None
+        samples_label = None
+        self.model.eval()
+        self.model.to(self.device)
+        for _, (examples, labels) in enumerate(data_loader):
+            examples, labels = examples.to(self.device), labels.to(self.device)
+            with torch.no_grad():
+                features = self.model.encoder(examples)
+                samples_encoding = (
+                    features
+                    if samples_encoding is None
+                    else torch.cat([samples_encoding, features], dim=0)
+                )
+                samples_label = (
+                    labels
+                    if samples_label is None
+                    else torch.cat([samples_label, labels], dim=0)
+                )
+
+        return samples_encoding, samples_label
+
+    def test_round_personalization(self, config, testset=None, sampler=None, **kwargs):
+        """Test the personalization in each round.
+
+        For SSL, the way to test the trained model before personalization is
+        to use the KNN as a classifier to evaluate the extracted features.
+        """
+        logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
+        batch_size = config["batch_size"]
+
+        train_loader = self.get_personalized_train_loader(batch_size=batch_size)
+        test_loader = self.get_personalized_test_loader(batch_size=batch_size)
+        train_encodings, train_labels = self.collect_data_encodings(train_loader)
+        test_encodings, test_labels = self.collect_data_encodings(test_loader)
+
+        # KNN.
+        distances = torch.cdist(test_encodings, train_encodings, p=2)
+        knn = distances.topk(1, largest=False)
+        nearest_idx = knn.indices
+        predicted_labels = train_labels[nearest_idx].view(-1)
+        test_labels = test_labels.view(-1)
+
+        # compute the accuracy
+        num_correct = torch.sum(predicted_labels == test_labels).item()
+        accuracy = num_correct / len(test_labels)
+
+        return accuracy
+
     def test_model(self, config, testset, sampler=None, **kwargs):
         """Testing the model to report the accuracy of the
         personalized model."""
-
-        return self.test_personalized_model(config, testset, sampler=sampler, **kwargs)
+        if self.do_final_personalization:
+            return self.test_personalized_model(
+                config, testset, sampler=sampler, **kwargs
+            )
+        else:
+            return self.test_round_personalization(
+                config, testset, sampler=sampler, **kwargs
+            )
