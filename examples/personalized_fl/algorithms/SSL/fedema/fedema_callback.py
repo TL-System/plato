@@ -68,9 +68,6 @@ class GlobalLocalDivergenceProcessor(base.Processor):
             previous_parameters=local_modules,
             current_parameters=global_modules,
         )
-        # update the received payload with the local model as the
-        # local model contains all modules
-        data[0].update(local_modules)
         # update the ema parameters
         data[0].update(ema_parameters)
 

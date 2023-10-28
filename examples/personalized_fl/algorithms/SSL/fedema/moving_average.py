@@ -79,6 +79,7 @@ class ModelEMA:
         for paraml, paramg in zip(parameter_a.items(), parameter_b.items()):
             diff = paraml[1] - paramg[1]
             # Calculate L2 norm and add to the total
-            l2_distance += torch.norm(diff.to(torch.float32), p=2).item()
+            l2_distance += torch.sum(diff**2)
+            print("l2_distance: ", l2_distance)
 
-        return l2_distance
+        return l2_distance.sqrt()

@@ -19,7 +19,7 @@ import fedema_callback
 
 
 def main():
-    """."""
+    """Running the FedEMA approach."""
     trainer = fedema_trainer.Trainer
     client = ssl_client.Client(
         model=SSL.BYOL,
