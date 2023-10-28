@@ -29,20 +29,23 @@ class PayloadCompletionProcessor(base.Processor):
         assert hasattr(Config().algorithm, "completion_modules_name")
 
         completion_modules_name = Config().algorithm.completion_modules_name
-        local_model_modules = self.algorithm.extract_weights(
-            model=self.trainer.model, modules_name=completion_modules_name
-        )
+        local_model_modules = self.trainer.model.cpu().state_dict()
         logging.info(
-            "[Client #%d] Extracted modules: %s from its loaded local model.",
+            "[Client #%d] Loaded the local model containing modules: %s.",
             self.trainer.client_id,
             self.algorithm.extract_modules_name(list(local_model_modules.keys())),
         )
 
-        data.update(local_model_modules)
+        local_completion_modules = self.algorithm.get_target_weights(
+            model_parameters=local_model_modules, modules_name=completion_modules_name
+        )
+
+        data.update(local_completion_modules)
 
         logging.info(
-            "[Client #%d] Completed the payload with extracted modules.",
+            "[Client #%d] Completed the payload with extracted modules: %s.",
             self.trainer.client_id,
+            self.algorithm.extract_modules_name(list(local_completion_modules.keys())),
         )
 
         return data
