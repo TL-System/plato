@@ -235,7 +235,4 @@ AttributeError: 'NoneType' object has no attribute 'load_state_dict'
 ```
 This is caused by the fact that the program will not define the personalized model once there are saved models under `checkpoints/`.
 
-
-### Potential issue in the ping-timeout of the server
-
-One may perform experiments on self-supervised learning based personalized FL algorithms, such as SimCLR, SimSiam, and FedEMA. These algorithms potentially require a very long time for all clients to complete the local update due to the high computation complexity in the contrastive loss. In such a condition, the user should set the `ping_timeout` value to be larger. The current default value is `ping_timeout: 3600`, meaning 3600 seconds that the server waits for clients to respond before disconnecting. Set it to be `10800` if possible. Also see the `docs/misc.md` for more details.
+### An undetected running issue in the SSL experiments

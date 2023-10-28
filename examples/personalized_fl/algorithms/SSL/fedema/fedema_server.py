@@ -13,6 +13,8 @@ from pflbases import fedavg_personalized_server
 
 from moving_average import ModelEMA
 
+from model_statistic import get_model_statistic
+
 
 class Server(fedavg_personalized_server.Server):
     """A personalized federated learning server using the pFL-CMA's EMA method."""
@@ -94,6 +96,8 @@ class Server(fedavg_personalized_server.Server):
             client_encoder = self.algorithm.get_target_weights(
                 model_parameters=client_parameters, modules_name=encoder_modules_name
             )
+            print("aggregated_encoder: ", get_model_statistic(aggregated_encoder))
+            print("client_encoder: ", get_model_statistic(client_encoder))
 
             # the global L2 norm over a list of tensors.
             l2_distance = ModelEMA.get_parameters_diff(
