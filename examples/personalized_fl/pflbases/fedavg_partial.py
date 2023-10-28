@@ -46,11 +46,6 @@ class Algorithm(fedavg.Algorithm):
 
     def get_target_weights(self, model_parameters: dict, modules_name: List[str]):
         """Get the target weights from the parameters data based on the modules name."""
-        logging.info(
-            "[%s] Extracting modules with names %s.",
-            self.get_algorithm_holder(),
-            modules_name,
-        )
         parameters_data = model_parameters.items()
         extracted_weights = OrderedDict(
             [
@@ -62,7 +57,7 @@ class Algorithm(fedavg.Algorithm):
             ]
         )
         logging.info(
-            "[%s] Extracted modules with names %s.",
+            "[%s] Extracted modules: %s.",
             self.get_algorithm_holder(),
             self.extract_modules_name(list(extracted_weights.keys())),
         )
@@ -146,4 +141,9 @@ class Algorithm(fedavg.Algorithm):
 
     def load_weights(self, weights):
         """Loads the model weights passed in as a parameter."""
+        logging.info(
+            "[%s] Loading modules with names %s to the model.",
+            self.get_algorithm_holder(),
+            self.extract_modules_name(list(weights.keys())),
+        )
         self.model.load_state_dict(weights, strict=False)

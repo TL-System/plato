@@ -225,6 +225,7 @@ All hyper-parameters related to personalization should be placed under the `pers
 
 ## Precautions
 
+### Error of `None` personalized model
 As `pflbases` heavily relies on the mechanism that allows each client to load the personalized model from the disk, it is important to ensure that the model loading is correct. Thus, to avoid the program loading personalized models under `checkpoints\` saved by different runnings in experiments, `pflbases` forces the user to delete the `checkpoints/` before each running,; there will be an error presenting as 
 
 ```
@@ -233,3 +234,8 @@ File "pflbases/personalized_trainer.py", line 426, in load_personalized_model
 AttributeError: 'NoneType' object has no attribute 'load_state_dict'
 ```
 This is caused by the fact that the program will not define the personalized model once there are saved models under `checkpoints/`.
+
+
+### Potential issue in the ping-timeout of the server
+
+One may perform experiments on self-supervised learning based personalized FL algorithms, such as SimCLR, SimSiam, and FedEMA. These algorithms potentially require a very long time for all clients to complete the local update due to the high computation complexity in the contrastive loss. In such a condition, the user should set the `ping_timeout` value to be larger. The current default value is `ping_timeout: 3600`, meaning 3600 seconds that the server waits for clients to respond before disconnecting. Set it to be `10800` if possible. Also see the `docs/misc.md` for more details.
