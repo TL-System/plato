@@ -2,7 +2,7 @@
 The implementation of checkpoints operations, including
  - checkpoint saving
  - checkpoint loading
- - checkpoint searchig
+ - checkpoint searching
 """
 import os
 import re
@@ -86,7 +86,7 @@ class CheckpointsOperator:
         filter_words: Optional[List[str]] = None,
     ):
         """Search the latest checkpoint file under the checkpoint dir based on 'search_key_words'.
-        The 'anchor_metric' is utilized to measure what is 'latest'.
+        The 'anchor_metric' is utilized to measure what is the latest.
         The 'filter_words' term is utilized to filter out unrelated files.
         """
 
@@ -143,7 +143,7 @@ def save_client_checkpoint(
     local_epoch: Optional[int] = None,
     prefix: Optional[str] = None,
 ) -> str:
-    """Save the checkpoint for sepcific client."""
+    """Save the checkpoint for a specific client."""
     config = config if config is not None else {}
     current_round = config["current_round"] if "current_round" in config else None
     # run_id = config['run_id']
