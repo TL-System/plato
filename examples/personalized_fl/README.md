@@ -90,7 +90,7 @@ In the context of self-supervised learning (SSL), the model is trained to learn 
 pip install .
 ```
 
-3. Perfrom the algorithms by running:
+3. Perform the algorithms by running:
 
 ```bash
 python algorithms/fedavg_finetune/fedavg_finetune.py -c algorithms/configs/fedavg_finetune_CIFAR10_resnet18.yml -b pflExperiments

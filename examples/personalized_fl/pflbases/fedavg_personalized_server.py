@@ -76,7 +76,7 @@ class Server(fedavg.Server):
         Note: the participating clients pool will be set in the first round and no
             modification is performed afterwards.
         """
-        
+
         # Only need to set the clients pool when they are empty.
         if self.participating_clients_pool is None:
             self.participating_clients_pool = clients_pool[
@@ -85,7 +85,7 @@ class Server(fedavg.Server):
 
             logging.info(
                 fonts.colourize(
-                    "[%s] Prepared participanting clients pool: %s", colour="blue"
+                    "[%s] Prepared participating clients pool: %s", colour="blue"
                 ),
                 self,
                 self.participating_clients_pool,
@@ -101,7 +101,7 @@ class Server(fedavg.Server):
         clients_pool = self.participating_clients_pool
         clients_count = self.clients_per_round
 
-        # by default, we run the general federated training
+        # By default, when we run the general federated training,
         # the clients pool should be participating clients
         assert clients_count <= len(self.participating_clients_pool)
 
@@ -109,7 +109,7 @@ class Server(fedavg.Server):
 
     def perform_final_personalization(self):
         """Performing personalization after the final round."""
-        
+
         logging.info(
             fonts.colourize(
                 "Starting personalization after the final round.", colour="blue"
@@ -118,7 +118,7 @@ class Server(fedavg.Server):
 
         # To terminate the personalization afterwards
         self.personalization_started = True
-        
+
         # Do personalization on all clients
         return self.clients_pool, len(self.clients_pool)
 
@@ -127,11 +127,11 @@ class Server(fedavg.Server):
     ):
         """Determine clients pool and clients count before samling clients."""
 
-        # perform normal training
+        # Perform normal training
         clients_pool, clients_count = self.perform_normal_training(
             clients_pool, clients_count
         )
-        # perform personalization
+        # Perform personalization
         if self.current_round > Config().trainer.rounds:
             clients_pool, clients_count = self.perform_final_personalization()
 
@@ -143,7 +143,7 @@ class Server(fedavg.Server):
         In plato, this input `clients_pool` contains total clients
         id by default.
         """
-        # set required clients pool when possible
+        # Set required clients pool when possible
         self.set_various_clients_pool(clients_pool)
 
         clients_pool, clients_count = self.before_clients_sampling(
@@ -173,7 +173,8 @@ class Server(fedavg.Server):
             if self.personalization_started:
                 logging.info(
                     fonts.colourize(
-                        "Personalization completed after the final round.", colour="blue"
+                        "Personalization completed after the final round.",
+                        colour="blue",
                     ),
                 )
                 await self._close()
