@@ -46,7 +46,7 @@ class Algorithm(fedavg.Algorithm):
         )
         logging.info(
             "[%s] Extracted modules: %s.",
-            self.get_algorithm_holder(),
+            repr(self),
             self.extract_modules_name(list(extracted_weights.keys())),
         )
         return extracted_weights
@@ -134,7 +134,7 @@ class Algorithm(fedavg.Algorithm):
         """Loads the model weights passed in as a parameter."""
         logging.info(
             "[%s] Loading modules with names %s to the model.",
-            self.get_algorithm_holder(),
+            repr(self),
             self.extract_modules_name(list(weights.keys())),
         )
         self.model.load_state_dict(weights, strict=False)
