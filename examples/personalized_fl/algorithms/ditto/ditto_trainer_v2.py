@@ -128,5 +128,5 @@ class Trainer(personalized_trainer.Trainer):
 
         super().train_run_end(config)
 
-    def postprocess_models(self, config):
+    def postprocess_models(self):
         """Do nothing to the personalized model in Ditto."""

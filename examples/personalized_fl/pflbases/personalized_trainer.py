@@ -192,7 +192,7 @@ class Trainer(basic.Trainer):
 
         return super().get_train_loader(batch_size, trainset, sampler, **kwargs)
 
-    def copy_model_to_personalized_model(self, config):
+    def copy_model_to_personalized_model(self):
         """Copying the model to the personalized model."""
         self.personalized_model.load_state_dict(self.model.state_dict(), strict=True)
         logging.info(
@@ -216,7 +216,7 @@ class Trainer(basic.Trainer):
         # each client has to copy the global model to the personalized model by default.
 
         if self.do_final_personalization:
-            self.copy_model_to_personalized_model(config)
+            self.copy_model_to_personalized_model()
 
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
@@ -235,7 +235,7 @@ class Trainer(basic.Trainer):
             self.personalized_model.to(self.device)
             self.personalized_model.train()
 
-    def postprocess_models(self, config):
+    def postprocess_models(self):
         """After running, process the trained model and the personalized model.
 
         This function is required to be revised based on the specific condition of the
@@ -250,13 +250,13 @@ class Trainer(basic.Trainer):
         # By default:
         # the updated global model will be copied to the personalized model
         if self.do_round_personalization and not self.do_final_personalization:
-            self.copy_model_to_personalized_model(config)
+            self.copy_model_to_personalized_model()
 
     def train_run_end(self, config):
         """Copy the trained model to the untrained one."""
         super().train_run_end(config)
 
-        self.postprocess_models(config)
+        self.postprocess_models()
 
         if self.do_round_personalization or self.do_final_personalization:
             self.perform_personalized_model_checkpoint(config=config)

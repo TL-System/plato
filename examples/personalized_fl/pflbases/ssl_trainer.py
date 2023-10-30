@@ -173,7 +173,7 @@ class Trainer(separate_local_trainer.Trainer):
     def preprocess_models(self, config):
         """Do nothing to the personalized mdoel."""
 
-    def postprocess_models(self, config):
+    def postprocess_models(self):
         """Do nothing to the personalized mdoel."""
 
     def train_run_end(self, config):
