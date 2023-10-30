@@ -43,7 +43,7 @@ algorithm:
         - layer3
         - layer4
 
-    head_modules_name:
+    head_module_names:
         - linear
 
     completion_module_names:

@@ -21,7 +21,7 @@ class Trainer(personalized_trainer.Trainer):
         if self.do_final_personalization:
             trainer_utils.freeze_model(
                 self.personalized_model,
-                Config().algorithm.global_modules_name,
+                Config().algorithm.global_module_names,
                 log_info=f"[Client #{self.client_id}]",
             )
 
@@ -30,5 +30,5 @@ class Trainer(personalized_trainer.Trainer):
         super().train_run_end(config)
         if self.do_final_personalization:
             trainer_utils.activate_model(
-                self.personalized_model, Config().algorithm.global_modules_name
+                self.personalized_model, Config().algorithm.global_module_names
             )

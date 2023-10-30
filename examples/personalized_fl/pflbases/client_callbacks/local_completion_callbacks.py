@@ -37,7 +37,7 @@ class PayloadCompletionProcessor(base.Processor):
         )
 
         local_completion_modules = self.algorithm.get_target_weights(
-            model_parameters=local_model_modules, modules_name=completion_module_names
+            model_parameters=local_model_modules, module_names=completion_module_names
         )
 
         data.update(local_completion_modules)

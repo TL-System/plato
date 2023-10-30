@@ -31,7 +31,7 @@ class PayloadCompletionProcessor(base.Processor):
 
         completion_module_names = Config().algorithm.completion_module_names
         model_modules = self.algorithm.extract_weights(
-            model=self.trainer.personalized_model, modules_name=completion_module_names
+            model=self.trainer.personalized_model, module_names=completion_module_names
         )
         logging.info(
             "[Client #%d] Extracted modules: %s from its loaded personalized model.",

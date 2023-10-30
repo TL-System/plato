@@ -37,10 +37,10 @@ algorithm:
     global_module_names:
         - linear
 
-    head_modules_name:
+    head_module_names:
         - linear
 
-    body_modules_name:
+    body_module_names:
         - conv1
         - bn1
         - layer1

@@ -22,13 +22,13 @@ class Trainer(personalized_trainer.Trainer):
         if self.do_final_personalization:
             trainer_utils.freeze_model(
                 self.personalized_model,
-                Config().algorithm.global_modules_name,
+                Config().algorithm.global_module_names,
                 log_info=f"[Client #{self.client_id}]",
             )
         else:
             trainer_utils.freeze_model(
                 self.model,
-                Config().algorithm.personalized_modules_name,
+                Config().algorithm.personalized_module_names,
                 log_info=f"[Client #{self.client_id}]",
             )
 
@@ -36,11 +36,11 @@ class Trainer(personalized_trainer.Trainer):
         """Activating the model."""
         if self.do_final_personalization:
             trainer_utils.activate_model(
-                self.personalized_model, Config().algorithm.global_modules_name
+                self.personalized_model, Config().algorithm.global_module_names
             )
         else:
             trainer_utils.activate_model(
-                self.model, Config().algorithm.personalized_modules_name
+                self.model, Config().algorithm.personalized_module_names
             )
 
         self.postprocess_models(config)

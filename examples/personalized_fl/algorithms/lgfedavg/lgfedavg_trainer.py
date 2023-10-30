@@ -28,10 +28,10 @@ class Trainer(personalized_trainer.Trainer):
         # first freeze the head and optimize the body
         trainer_utils.freeze_model(
             self.model,
-            Config().algorithm.head_modules_name,
+            Config().algorithm.head_module_names,
             log_info=None,
         )
-        trainer_utils.activate_model(self.model, Config().algorithm.body_modules_name)
+        trainer_utils.activate_model(self.model, Config().algorithm.body_module_names)
         self.optimizer.step()
 
         # repeat the same optimization relying the optimized
@@ -51,10 +51,10 @@ class Trainer(personalized_trainer.Trainer):
         # first freeze the head and optimize the body
         trainer_utils.freeze_model(
             self.model,
-            Config().algorithm.body_modules_name,
+            Config().algorithm.body_module_names,
             log_info=None,
         )
-        trainer_utils.activate_model(self.model, Config().algorithm.head_modules_name)
+        trainer_utils.activate_model(self.model, Config().algorithm.head_module_names)
 
         self.optimizer.step()
 

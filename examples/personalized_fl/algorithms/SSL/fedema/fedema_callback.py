@@ -29,20 +29,20 @@ class GlobalLocalDivergenceProcessor(base.Processor):
 
         divergence_scale = data[1]
 
-        # extract the `encoder_modules_name` of the model head
-        assert hasattr(Config().algorithm, "encoder_modules_name")
+        # extract the `encoder_module_names` of the model head
+        assert hasattr(Config().algorithm, "encoder_module_names")
 
         local_model_modules = self.trainer.model.cpu().state_dict()
         global_modules = data[0]
 
-        global_modules_name = Config().algorithm.global_modules_name
-        encoder_modules_name = Config().algorithm.encoder_modules_name
+        global_module_names = Config().algorithm.global_module_names
+        encoder_module_names = Config().algorithm.encoder_module_names
 
         local_encoder_modules = self.algorithm.get_target_weights(
-            model_parameters=local_model_modules, modules_name=encoder_modules_name
+            model_parameters=local_model_modules, module_names=encoder_module_names
         )
         global_encoder_modules = self.algorithm.get_target_weights(
-            model_parameters=global_modules, modules_name=encoder_modules_name
+            model_parameters=global_modules, module_names=encoder_module_names
         )
         logging.info(
             "[Client #%d] Computing global and local divergence on modules: %s.",
@@ -61,7 +61,7 @@ class GlobalLocalDivergenceProcessor(base.Processor):
 
         # The local model
         local_modules = self.algorithm.get_target_weights(
-            model_parameters=local_model_modules, modules_name=global_modules_name
+            model_parameters=local_model_modules, module_names=global_module_names
         )
         ema_operator = ModelEMA(beta=divergence_scale)
         ema_parameters = ema_operator.update_parameters_moving_average(

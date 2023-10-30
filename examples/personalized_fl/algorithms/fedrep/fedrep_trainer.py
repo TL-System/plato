@@ -19,7 +19,7 @@ class Trainer(personalized_trainer.Trainer):
             # only optimize the head for the final personalization
             trainer_utils.freeze_model(
                 self.personalized_model,
-                Config().algorithm.global_modules_name,
+                Config().algorithm.global_module_names,
                 log_info=f"[Client #{self.client_id}]",
             )
 
@@ -48,22 +48,22 @@ class Trainer(personalized_trainer.Trainer):
             if self.current_epoch <= head_epochs:
                 trainer_utils.freeze_model(
                     self.model,
-                    Config().algorithm.global_modules_name,
+                    Config().algorithm.global_module_names,
                     log_info=f"[Client #{self.client_id}]",
                 )
                 trainer_utils.activate_model(
-                    self.model, Config().algorithm.head_modules_name
+                    self.model, Config().algorithm.head_module_names
                 )
 
             # The representation will then be optimized for only one epoch
             if self.current_epoch > head_epochs:
                 trainer_utils.freeze_model(
                     self.model,
-                    Config().algorithm.head_modules_name,
+                    Config().algorithm.head_module_names,
                     log_info=f"[Client #{self.client_id}]",
                 )
                 trainer_utils.activate_model(
-                    self.model, Config().algorithm.global_modules_name
+                    self.model, Config().algorithm.global_module_names
                 )
 
     def train_run_end(self, config):
@@ -71,5 +71,5 @@ class Trainer(personalized_trainer.Trainer):
         super().train_run_end(config)
         if self.do_round_personalization and not self.do_final_personalization:
             trainer_utils.activate_model(
-                self.model, Config().algorithm.global_modules_name
+                self.model, Config().algorithm.global_module_names
             )

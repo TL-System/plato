@@ -25,12 +25,12 @@ def set_random_seeds(seed: int = 0):
     torch.backends.cudnn.deterministic = True
 
 
-def freeze_model(model, modules_name=None, log_info: str = ""):
+def freeze_model(model, module_names=None, log_info: str = ""):
     """Freezing a part of the model."""
-    if modules_name is not None:
+    if module_names is not None:
         frozen_params = []
         for name, param in model.named_parameters():
-            if any(param_name in name for param_name in modules_name):
+            if any(param_name in name for param_name in module_names):
                 param.requires_grad = False
                 frozen_params.append(name)
 
@@ -42,11 +42,11 @@ def freeze_model(model, modules_name=None, log_info: str = ""):
             )
 
 
-def activate_model(model, modules_name=None):
+def activate_model(model, module_names=None):
     """Defreezing a part of the model."""
-    if modules_name is not None:
+    if module_names is not None:
         for name, param in model.named_parameters():
-            if any(param_name in name for param_name in modules_name):
+            if any(param_name in name for param_name in module_names):
                 param.requires_grad = True
 
 

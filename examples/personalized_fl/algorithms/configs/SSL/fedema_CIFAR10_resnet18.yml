@@ -69,7 +69,7 @@ algorithm:
         - projection_head
         - prediction_head
 
-    encoder_modules_name:
+    encoder_module_names:
         - encoder
 
     adaptive_divergence_scale: true
