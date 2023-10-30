@@ -413,7 +413,7 @@ class Trainer(basic.Trainer):
         location = self.get_checkpoint_dir_path() if location is None else location
         filename = self.personalized_model_name if filename is None else filename
         model_path = os.path.join(location, filename)
-        os.makedirs(model_path, exist_ok=True)
+        os.makedirs(location, exist_ok=True)
 
         torch.save(self.personalized_model.state_dict(), model_path)
         logging.info(
