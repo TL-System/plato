@@ -8,7 +8,7 @@ from typing import Optional
 
 
 class NameFormatter:
-    """The Formatter to force a consistent naming style."""
+    """The formatter to force a consistent naming style."""
 
     # pylint:disable=too-many-arguments
     @staticmethod
