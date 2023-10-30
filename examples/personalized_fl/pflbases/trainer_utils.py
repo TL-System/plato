@@ -38,7 +38,7 @@ def freeze_model(model, modules_name=None, log_info: str = ""):
             logging.info(
                 "%s has frozen %s",
                 log_info,
-                fedavg_partial.Algorithm.extract_modules_name(frozen_params),
+                fedavg_partial.Algorithm.extract_module_names(frozen_params),
             )
 
 

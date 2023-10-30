@@ -77,7 +77,7 @@ class Algorithm(fedavg.Algorithm):
             )
 
     @staticmethod
-    def extract_module_name(parameter_names):
+    def extract_module_names(parameter_names):
         """Extract module names from given parameter names."""
 
         extracted_names = []

@@ -28,7 +28,7 @@ class PayloadStatusProcessor(base.Processor):
         logging.info(
             "[Client #%d] Received the payload containing modules: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(payload.keys())),
+            self.algorithm.extract_module_names(list(payload.keys())),
         )
 
         return data

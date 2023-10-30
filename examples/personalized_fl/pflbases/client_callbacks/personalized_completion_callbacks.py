@@ -36,7 +36,7 @@ class PayloadCompletionProcessor(base.Processor):
         logging.info(
             "[Client #%d] Extracted modules: %s from its loaded personalized model.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(model_modules.keys())),
+            self.algorithm.extract_module_names(list(model_modules.keys())),
         )
 
         data.update(model_modules)

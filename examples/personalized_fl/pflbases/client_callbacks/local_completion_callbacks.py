@@ -33,7 +33,7 @@ class PayloadCompletionProcessor(base.Processor):
         logging.info(
             "[Client #%d] Loaded the local model containing modules: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(local_model_modules.keys())),
+            self.algorithm.extract_module_names(list(local_model_modules.keys())),
         )
 
         local_completion_modules = self.algorithm.get_target_weights(
@@ -45,7 +45,7 @@ class PayloadCompletionProcessor(base.Processor):
         logging.info(
             "[Client #%d] Completed the payload with extracted modules: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(local_completion_modules.keys())),
+            self.algorithm.extract_module_names(list(local_completion_modules.keys())),
         )
 
         return data

@@ -47,7 +47,7 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         logging.info(
             "[Client #%d] Computing global and local divergence on modules: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(local_encoder_modules.keys())),
+            self.algorithm.extract_module_names(list(local_encoder_modules.keys())),
         )
 
         # compute the divergence between encoders of local and global models
