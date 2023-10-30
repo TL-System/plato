@@ -22,18 +22,18 @@ We believe that these two modes can cover all personalized FL algorithms. For ex
 
 ## Core Functions
 
-Illustration of the core pipeline of the structure of`pflbases` is shown below.
+An illustration of the core pipeline of the structure of`pflbases` is shown below.
 
 ![](core_pipeline.png)
 
-In response to the abovementioned principle and learning modes, `pflbases` will always execute the code to 1). load the configuration within `trainer` block; 2). execute the Plato's code to operate on `self.model`, 3). train the `self.model` before reaching the total rounds (i.e., before the final personalization). Even though one set `do_personalization_per_round: true`, __no specific code towards training personalized models will be executed__. 
+In response to the abovementioned principle and learning modes, `pflbases` will always execute the code to 1). load the configuration within `trainer` block; 2). execute the Plato's code to operate on `self.model`, 3). train the `self.model` before reaching the total rounds (i.e., before the final personalization). Even though one sets `do_personalization_per_round: true`, __no specific code towards training personalized models will be executed__. 
 
 To make `pflbases` general enough as a personalized FL platform, two code parts in the structure should be emphasized. Thus, the user can simply adjust them to implement a customized algorithm. 
 
 - the _completion_ callbacks placed under `client_callbacks` merge other models into the `self.model` parameters. 
     > For example, when the whole model is A+B, you can set the global model to be A while the personalized model is B. To train the personalized model, you need to merge B to A as the `self.model` to be trained subsequently. 
 
-- `preprocess_models()` and `postprocess_models` typically need to be adjusted to achieve a customized way to train personalized models. 
+- `preprocess_models()` and `postprocess_models()` typically need to be adjusted to achieve a customized way to train personalized models. 
 
     - The default operation of `preprocess_models()` is to copy the `self.model` to the `self.personalized_model` only in the final personalization.
         >FedAvg-finetune uses this default logic as the personalized models are only trained in the final personalization, thus requiring assigning the received global model to the personalized model for the subsequent personalized training.  
@@ -204,7 +204,7 @@ All hyper-parameters related to personalization should be placed under the `pers
             model_name: resnet_18
     ```
 
-- participating_clients_ratio: A float to show the proporation of clients participating in the federated training process. The value ranges from 0.0 to 1.0 while 1.0 means that all clients will participant in training. Default: 1.0. For example, 
+- participating_clients_ratio: A float to show the proportion of clients participating in the federated training process. The value ranges from 0.0 to 1.0 while 1.0 means that all clients will participant in training. Default: 1.0. For example, 
     ```yaml
     algorithm:
         personalization:
