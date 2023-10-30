@@ -1,15 +1,12 @@
 """
-An algorithm is implemented to load, aggregate, and extract partial modules of one model.
+An algorithm for loading, aggregating, and extracting partial modules from a single model.
 
-Utilization condition:
-    In some scenarios, even given one defined model, the users want to utilize the partial
-    sub-modules as the global model in federated learning. Thus, solely these desired
-    sub-modules will be extracted and aggregated during the learning process.
-    Then, noticing that the names of parameters in one sub-module hold consistent names,
-    we propose this piece of code to support the aforementioned feature by setting the
-    hyper-parameter `global_modules_name` in the config file.
+In some scenarios, given one defined model, the users want to utilize the sub-modules as 
+the global model in federated learning. Thus, solely these desired sub-modules will be 
+extracted and aggregated during the learning process. Thus, the algorithm proposes to 
+support this feature by setting the hyper-parameter `global_modules_name` in the config file.
 
-The format of this hyper-parameter should be a list containing the name of desired layers.
+The format of this hyper-parameter should be a list containing the names of the desired layers.
 
 For example, when utilizing the "LeNet5" as the target model, the `global_modules_name` can
 be defined as:
@@ -18,14 +15,13 @@ be defined as:
         - conv1
         - conv2
 
-thus, the conv1 and conv2 layers will be used as the global model.
+By doing so, the conv1 and conv2 layers will be extracted.
 """
 
-import os
-import string
 import logging
-from typing import List, Optional
+import string
 from collections import OrderedDict
+from typing import List, Optional
 
 import torch
 
@@ -34,10 +30,7 @@ from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
-    """
-    Federated averaging algorithm for partial aggregation, used by both the client 
-    and the server.
-    """
+    """A base algorithm for extracting sub-modules from a model."""
 
     def extract_weights(
         self,
@@ -48,7 +41,7 @@ class Algorithm(fedavg.Algorithm):
         Extract weights from modules of the model. By default, weights of the entire model will be extracted.
         """
         model = self.model if model is None else model
-        
+
         modules_name = (
             modules_name
             if modules_name is not None
@@ -60,6 +53,9 @@ class Algorithm(fedavg.Algorithm):
         )
 
         # When no module names are provided, return the entire model
+        # when the `global_modules_name` is not set and
+        # the `modules_name` is not provided, this function
+        # returns the whole model.
         if modules_name is None:
             return model.cpu().state_dict()
 
@@ -70,8 +66,7 @@ class Algorithm(fedavg.Algorithm):
                 (name, param)
                 for name, param in model.cpu().state_dict().items()
                 if any(
-                    param_name in name.strip().split(".")
-                    for param_name in modules_name
+                    param_name in name.strip().split(".") for param_name in modules_name
                 )
             ]
         )
@@ -80,14 +75,14 @@ class Algorithm(fedavg.Algorithm):
         """Checks whether weights contain the same parameter names as the model."""
         model_params_name = self.model.state_dict().keys()
 
-        def search_func(x, y):
+        def compare(x, y):
             return [x_i for x_i in x if x_i not in y]
 
         inconsistent_params = []
         if len(model_params_name) > len(weights_param_name):
-            inconsistent_params = search_func(model_params_name, weights_param_name)
+            inconsistent_params = compare(model_params_name, weights_param_name)
         else:
-            inconsistent_params = search_func(weights_param_name, model_params_name)
+            inconsistent_params = compare(weights_param_name, model_params_name)
 
         return len(inconsistent_params) == 0, inconsistent_params
 
