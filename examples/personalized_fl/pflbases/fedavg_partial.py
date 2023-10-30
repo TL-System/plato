@@ -32,7 +32,7 @@ class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting sub-modules from a model."""
 
     def get_target_weights(self, model_parameters: dict, module_name: List[str]):
-        """Get the target weights from the parameters data based on the module name."""
+        """Get target weights from model parameters based on the module name."""
         parameters_data = model_parameters.items()
         extracted_weights = OrderedDict(
             [
@@ -66,7 +66,7 @@ class Algorithm(fedavg.Algorithm):
             )
         )
 
-        # when the `global_module_name` is not set and
+        # When the `global_module_name` is not set and
         # the `module_name` is not provided, this function
         # returns the whole model.
         if module_name is None:
@@ -97,9 +97,11 @@ class Algorithm(fedavg.Algorithm):
                 break
         # Increase the level by 1
         diff_level += 1
-        # the para name is presented as encoder.xxx.xxx
-        # that is combined by the key_word "."
-        # we aim to extract the encoder
+
+        # Split the parameter names based on the `split_str`,
+        # which should be a point as these names are presented
+        # as 'encoder.xxx.xxx'
+        # Extract the corresponding module names
         split_str = "."
         for para_name in parameter_names:
             splitted_names = para_name.split(split_str)
