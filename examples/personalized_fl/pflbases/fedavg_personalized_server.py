@@ -28,8 +28,7 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
 
-        # participanted clients as a percentage of all clients
-        # by default, all clients will participant
+        # participating clients as a percentage of all clients. By default, all clients will participate
         self.participating_clients_ratio = 1.0
         self.n_participating_clients = 0
 
@@ -37,18 +36,17 @@ class Server(fedavg.Server):
         self.participating_clients_pool = None
         self.nonparticipating_clients_pool = None
 
-        # whether stop the terminate personalization
-        # afterwards
-        self.to_terminate_personalization = False
+        # whether stop the terminate personalization afterwards
+        self.personalization_started = False
 
         self.initialize_personalization()
 
     def initialize_personalization(self):
         """Initialize two types of clients."""
-        # Set participant and nonparticipating clients
+        # Set participating and nonparticipating clients
         loaded_config = Config()
 
-        ## 1. Initialize participanting clients
+        ## 1. Initialize participating clients
         self.participating_clients_ratio = (
             loaded_config.algorithm.personalization.participating_clients_ratio
             if hasattr(
@@ -65,8 +63,8 @@ class Server(fedavg.Server):
 
         logging.info(
             fonts.colourize(
-                "[%s] Total clients (%d), participanting clients (%d), "
-                "nonparticipating_clients (%d), participanting ratio (%.3f).",
+                "[%s] Total clients (%d), participating clients (%d), "
+                "nonparticipating_clients (%d), participating ratio (%.3f).",
                 colour="blue",
             ),
             self,
@@ -91,7 +89,7 @@ class Server(fedavg.Server):
 
             logging.info(
                 fonts.colourize(
-                    "[%s] Prepared participanting clients pool: %s", colour="blue"
+                    "[%s] Prepared participating clients pool: %s", colour="blue"
                 ),
                 self,
                 self.participating_clients_pool,
@@ -123,11 +121,10 @@ class Server(fedavg.Server):
     def perform_final_personalization(
         self, clients_pool: List[int], clients_count: int
     ):
-        """Performing the personalization after the final round."""
-
+        """Performing personalization after the final round."""
         logging.info(
             fonts.colourize(
-                "Starting Personalization after the final round", colour="blue"
+                "Starting personalization after the final round.", colour="blue"
             )
         )
         # do personalization on all clients
@@ -138,7 +135,7 @@ class Server(fedavg.Server):
         clients_count = self.clients_per_round
 
         # to terminate the personalization afterwards
-        self.to_terminate_personalization = True
+        self.personalization_started = True
 
         return clients_pool, clients_count
 
@@ -187,17 +184,15 @@ class Server(fedavg.Server):
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
-
         self.save_to_checkpoint()
 
         if self.current_round >= Config().trainer.rounds:
             logging.info("Target number of training rounds reached.")
 
-            if self.to_terminate_personalization:
+            if self.personalization_started:
                 logging.info(
-                    "%s has completed.",
                     fonts.colourize(
-                        "Personalization after the final round", colour="blue"
+                        "Personalization completed after the final round.", colour="blue"
                     ),
                 )
                 await self._close()
