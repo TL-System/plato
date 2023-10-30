@@ -62,7 +62,7 @@ algorithm:
             parameters:
                 input_size: 28
 
-    global_modules_name:
+    global_module_names:
         - encoder
 
     completion_module_names:

@@ -34,7 +34,7 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    global_modules_name:
+    global_module_names:
         - linear
 
     head_modules_name:

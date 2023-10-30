@@ -34,7 +34,7 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    global_modules_name:
+    global_module_names:
         - conv1
         - bn1
         - layer1

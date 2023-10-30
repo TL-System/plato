@@ -4,14 +4,14 @@ An algorithm for loading, aggregating, and extracting partial modules from a sin
 In some scenarios, given one defined model, the users want to utilize the sub-modules as 
 the global model in federated learning. Thus, solely these desired sub-modules will be 
 extracted and aggregated during the learning process. Thus, the algorithm proposes to 
-support this feature by setting the hyper-parameter `global_module_name` in the config file.
+support this feature by setting the hyper-parameter `global_module_names` in the config file.
 
 The format of this hyper-parameter should be a list containing the names of the desired layers.
 
-For example, when utilizing the "LeNet5" as the target model, the `global_module_name` can
+For example, when utilizing the "LeNet5" as the target model, the `global_module_names` can
 be defined as:
 
-    global_module_name:
+    global_module_names:
         - conv1
         - conv2
 
@@ -60,13 +60,13 @@ class Algorithm(fedavg.Algorithm):
             module_name
             if module_name is not None
             else (
-                Config().algorithm.global_module_name
-                if hasattr(Config().algorithm, "global_module_name")
+                Config().algorithm.global_module_names
+                if hasattr(Config().algorithm, "global_module_names")
                 else None
             )
         )
 
-        # When the `global_module_name` is not set and
+        # When the `global_module_names` is not set and
         # the `module_name` is not provided, this function
         # returns the whole model.
         if module_name is None:
