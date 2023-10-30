@@ -74,10 +74,7 @@ class CheckpointsOperator:
         """Load the checkpoint."""
         checkpoint_path = os.path.join(self.checkpoints_dir, checkpoint_name)
 
-        if torch.cuda.is_available():
-            return torch.load(checkpoint_path)
-        else:
-            return torch.load(checkpoint_path, map_location=torch.device("cpu"))
+        return torch.load(checkpoint_path, map_location=torch.device("cpu"))
 
     def search_latest_checkpoint_file(
         self,
