@@ -68,6 +68,18 @@ class Trainer(basic.Trainer):
             self.personalized_model_name,
         )
 
+    def reinitialize_personalized_model(self):
+        """Reinitialize the personalized model based on the client id
+        as the random seed to ensure that each client id corresponds to
+        the specific model."""
+        trainer_utils.set_random_seeds(self.client_id)
+        self.personalized_model.apply(trainer_utils.weights_reinitialize)
+        logging.info(
+            "[Client #%d] Re-initialized the personalized model with the random seed %d.",
+            self.client_id,
+            self.client_id,
+        )
+
     def get_personalized_model_params(self):
         """Get the params of the personalized model."""
         if hasattr(Config().parameters, "personalization"):

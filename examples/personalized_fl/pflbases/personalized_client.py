@@ -61,11 +61,9 @@ class Client(simple.Client):
 
         # the personalized model here corresponds to the client's
         # personal needs.
+        # this object personalized model is a class but not an instance
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
-
-        # this the class of the personalized model
-        self.personalized_model_cls = None
 
         # the path of the initial personalized model of this client
         self.init_personalized_model_path = None
@@ -86,7 +84,7 @@ class Client(simple.Client):
             self.personalized_model is None
             and self.custom_personalized_model is not None
         ):
-            self.personalized_model_cls = self.custom_personalized_model
+            self.personalized_model = self.custom_personalized_model
 
         # set the indicators for personalization of the trainer
         self.trainer.do_round_personalization = self.is_round_personalization()
@@ -95,20 +93,24 @@ class Client(simple.Client):
         # get the initial personalized model path
         self.init_personalized_model_path = self.get_init_personalized_model_path()
 
-        # if this client does not a personalized model yet.
-        # define a an initial one and save to the disk
-        if not self.exist_init_personalized_model() and (
-            self.trainer.do_round_personalization
-            or self.trainer.do_final_personalization
+        # if this client does not its initialized personalized model yet.
+        # and the personalized model is required in the subsequent learning
+        if (
+            not self.exist_init_personalized_model()
+            and self.is_personalized_model_required()
         ):
-            # define its personalized model
-            self.trainer.define_personalized_model(self.personalized_model_cls)
+            # define its personalized model if it is not defined yet
+            if self.trainer.personalized_model is None:
+                self.trainer.define_personalized_model(self.personalized_model)
+            else:
+                # only reinitialize the model based on the client id
+                # as the random seed
+                self.trainer.reinitialize_personalized_model()
+
             self.trainer.save_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=self.trainer.get_checkpoint_dir_path(),
             )
-
-        self.personalized_model = self.trainer.personalized_model
 
     def inbound_received(self, inbound_processor):
         """Reloading the personalized model for this client before any operations."""
@@ -118,10 +120,7 @@ class Client(simple.Client):
         # 1. the personalization is performed per round
         # 2. the current round is larger than the total rounds,
         #   which means the final personalization.
-        if (
-            self.trainer.do_round_personalization
-            or self.trainer.do_final_personalization
-        ):
+        if self.is_personalized_model_required():
             self.get_personalized_model()
 
     def get_personalized_model(self):
@@ -172,6 +171,13 @@ class Client(simple.Client):
         """Whether this client is unselected on."""
 
         return os.path.exists(self.init_personalized_model_path)
+
+    def is_personalized_model_required(self):
+        """whether a well-defined personalized model is required."""
+        return (
+            self.trainer.do_round_personalization
+            or self.trainer.do_final_personalization
+        )
 
     def is_final_personalization(self):
         """Get whether the client is performing the final personalization.

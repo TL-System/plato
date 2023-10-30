@@ -3,10 +3,11 @@ The necessary tools used by trainers.
 """
 import random
 import logging
-from pflbases import fedavg_partial
 
 import torch
 import numpy as np
+
+from pflbases import fedavg_partial
 
 
 def set_random_seeds(seed: int = 0):
@@ -44,3 +45,28 @@ def activate_model(model, modules_name=None):
         for name, param in model.named_parameters():
             if any(param_name in name for param_name in modules_name):
                 param.requires_grad = True
+
+
+def weights_reinitialize(module: torch.nn.Module):
+    """Reinitialize a model with the desired seed."""
+    if hasattr(module, "reset_parameters"):
+        module.reset_parameters()
+
+
+def compute_model_statistics(model):
+    """Getting the statistics of the model."""
+    weight_statistics = {"mean": 0.0, "variance": 0.0, "std_dev": 0.0}
+
+    total_params = 0
+    for _, param in model.named_parameters():
+        if param.requires_grad:
+            values = param.data.cpu().numpy()
+            total_params += values.size
+            weight_statistics["mean"] += values.mean()
+            weight_statistics["variance"] += values.var()
+
+    weight_statistics["mean"] /= total_params
+    weight_statistics["variance"] /= total_params
+    weight_statistics["std_dev"] = weight_statistics["variance"] ** 0.5
+
+    return weight_statistics
