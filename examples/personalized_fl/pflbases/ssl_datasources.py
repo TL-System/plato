@@ -50,7 +50,7 @@ class TransformedDataSource(base.DataSource):
 
     def __init__(self, transforms_block: dict = None):
         super().__init__()
-        # use the default config of the transform when nothing
+        # Use the default config of the transform when nothing
         # is provided.
         if transforms_block is None:
             transforms_block = Config().algorithm.data_transforms._asdict()
