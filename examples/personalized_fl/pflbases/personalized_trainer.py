@@ -363,7 +363,7 @@ class Trainer(basic.Trainer):
 
         ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoints_dir=location)
         ckpt_oper.save_checkpoint(
-            model_state_dict=self.personalized_model.state_dict(),
+            model_state_dict=self.personalized_model.cpu().state_dict(),
             checkpoints_name=[filename],
             **kwargs,
         )
