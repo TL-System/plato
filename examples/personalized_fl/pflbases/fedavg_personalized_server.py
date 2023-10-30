@@ -94,10 +94,10 @@ class Server(fedavg.Server):
     def perform_normal_training(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee general federated learning without personalization."""
 
-        # reset `clients_per_round` to the predefined hyper-parameter
+        # Reset `clients_per_round` to the predefined hyper-parameter
         self.clients_per_round = Config().clients.per_round
 
-        # set the clients_pool to be participating_clients_pool
+        # Set the clients_pool to be participating_clients_pool
         clients_pool = self.participating_clients_pool
         clients_count = self.clients_per_round
 
@@ -107,26 +107,20 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def perform_final_personalization(
-        self, clients_pool: List[int], clients_count: int
-    ):
+    def perform_final_personalization(self):
         """Performing personalization after the final round."""
+        
         logging.info(
             fonts.colourize(
                 "Starting personalization after the final round.", colour="blue"
             )
         )
-        # do personalization on all clients
-        clients_pool = self.clients_pool
 
-        # set clients for personalization
-        self.clients_per_round = len(clients_pool)
-        clients_count = self.clients_per_round
-
-        # to terminate the personalization afterwards
+        # To terminate the personalization afterwards
         self.personalization_started = True
-
-        return clients_pool, clients_count
+        
+        # Do personalization on all clients
+        return self.clients_pool, len(self.clients_pool)
 
     def before_clients_sampling(
         self, clients_pool: List[int], clients_count: int, **kwargs
@@ -139,9 +133,7 @@ class Server(fedavg.Server):
         )
         # perform personalization
         if self.current_round > Config().trainer.rounds:
-            clients_pool, clients_count = self.perform_final_personalization(
-                clients_pool, clients_count
-            )
+            clients_pool, clients_count = self.perform_final_personalization()
 
         return clients_pool, clients_count
 
