@@ -18,7 +18,6 @@ be defined as:
 By doing so, the conv1 and conv2 layers will be extracted.
 """
 
-import logging
 import string
 from collections import OrderedDict
 from typing import List, Optional
@@ -43,11 +42,6 @@ class Algorithm(fedavg.Algorithm):
                     param_name in name.strip().split(".") for param_name in module_name
                 )
             ]
-        )
-        logging.info(
-            "[%s] Extracted modules: %s.",
-            repr(self),
-            self.extract_module_name(list(extracted_weights.keys())),
         )
         return extracted_weights
 
@@ -81,21 +75,6 @@ class Algorithm(fedavg.Algorithm):
             return self.get_target_weights(
                 model.cpu().state_dict(), module_name=module_name
             )
-
-    def is_consistent_weights(self, weights_param_name):
-        """Check whether weights contain the same parameter names as the model."""
-        model_params_name = self.model.state_dict().keys()
-
-        def compare(x, y):
-            return [x_i for x_i in x if x_i not in y]
-
-        inconsistent_params = []
-        if len(model_params_name) > len(weights_param_name):
-            inconsistent_params = compare(model_params_name, weights_param_name)
-        else:
-            inconsistent_params = compare(weights_param_name, model_params_name)
-
-        return len(inconsistent_params) == 0, inconsistent_params
 
     @staticmethod
     def extract_module_name(parameter_names):
@@ -133,9 +112,5 @@ class Algorithm(fedavg.Algorithm):
 
     def load_weights(self, weights):
         """Loads the model weights passed in as a parameter."""
-        logging.info(
-            "[%s] Loading modules with names %s to the model.",
-            repr(self),
-            self.extract_module_name(list(weights.keys())),
-        )
+
         self.model.load_state_dict(weights, strict=False)
