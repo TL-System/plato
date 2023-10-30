@@ -387,9 +387,7 @@ class Trainer(basic.Trainer):
             epoch_n=epoch_n,
         )
 
-        self.save_personalized_model(
-            filename=filename, location=save_location, **kwargs
-        )
+        self.save_personalized_model(filename=filename, location=save_location)
 
         # always remove the expired checkpoints
         self.remove_expired_checkpoints(model_name, prefix, round_n=round_n)
@@ -410,7 +408,7 @@ class Trainer(basic.Trainer):
             if os.path.exists(os.path.join(save_location, filename)):
                 os.remove(os.path.join(save_location, filename))
 
-    def save_personalized_model(self, filename=None, location=None, **kwargs):
+    def save_personalized_model(self, filename=None, location=None):
         """Saving the personalized model to a file."""
         location = self.get_checkpoint_dir_path() if location is None else location
         filename = self.personalized_model_name if filename is None else filename
