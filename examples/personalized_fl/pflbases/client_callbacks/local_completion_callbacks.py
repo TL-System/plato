@@ -25,7 +25,7 @@ class PayloadCompletionProcessor(base.Processor):
         """Processing the received payload by assigning modules of local model of
         each client."""
 
-        # extract the `completion_module_names` of the model head
+        # Extract the `completion_module_names` of the model head.
         assert hasattr(Config().algorithm, "completion_module_names")
 
         completion_module_names = Config().algorithm.completion_module_names

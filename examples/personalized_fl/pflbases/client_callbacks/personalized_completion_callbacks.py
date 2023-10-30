@@ -26,7 +26,7 @@ class PayloadCompletionProcessor(base.Processor):
         """Processing the received payload by assigning modules of personalized model
         if provided."""
 
-        # extract the `completion_module_names` of the personalized model head
+        # Extract the `completion_module_names` of the personalized model head.
         assert hasattr(Config().algorithm, "completion_module_names")
 
         completion_module_names = Config().algorithm.completion_module_names
