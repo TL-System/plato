@@ -59,13 +59,13 @@ class Client(simple.Client):
             trainer_callbacks=trainer_callbacks,
         )
 
-        # the personalized model here corresponds to the client's
+        # The personalized model here corresponds to the client's
         # personal needs.
-        # this object personalized model is a class but not an instance
+        # This object personalized model is a class but not an instance.
         self.custom_personalized_model = personalized_model
         self.personalized_model = None
 
-        # the path of the initial personalized model of this client
+        # The path of the initial personalized model of this client.
         self.init_personalized_model_path = None
 
     def configure(self) -> None:
@@ -73,41 +73,41 @@ class Client(simple.Client):
         personalized model for the client."""
         super().configure()
 
-        # jump out if no personalization info is provided
+        # Jump out if no personalization info is provided.
         if not hasattr(Config().algorithm, "personalization"):
             sys.exit(
                 "Error: personalization block must be provided under the algorithm."
             )
 
-        # set the personalized model class
+        # Set the personalized model class.
         if (
             self.personalized_model is None
             and self.custom_personalized_model is not None
         ):
             self.personalized_model = self.custom_personalized_model
 
-        # set the indicators for personalization of the trainer
+        # Set the indicators for personalization of the trainer.
         self.trainer.do_round_personalization = self.is_round_personalization()
         self.trainer.do_final_personalization = self.is_final_personalization()
 
-        # get the initial personalized model path
+        # Get the initial personalized model path.
         self.init_personalized_model_path = self.get_init_model_path(
             model_name=self.trainer.personalized_model_name,
             prefix=self.trainer.personalized_model_prefix,
         )
 
-        # if this client does not its initialized personalized model yet.
-        # and the personalized model is required in the subsequent learning
+        # If this client have not initialized its personalized model yet
+        # and the personalized model is required in the subsequent learning.
         if (
             not self.exist_init_personalized_model()
             and self.is_personalized_model_required()
         ):
-            # define its personalized model if it is not defined yet
+            # Define its personalized model if it is not defined yet.
             if self.trainer.personalized_model is None:
                 self.trainer.define_personalized_model(self.personalized_model)
             else:
-                # only reinitialize the model based on the client id
-                # as the random seed
+                # Only reinitialize the model based on the client id
+                # as the random seed.
                 self.trainer.reinitialize_personalized_model()
 
             self.trainer.save_personalized_model(
@@ -119,7 +119,7 @@ class Client(simple.Client):
         """Reloading the personalized model for this client before any operations."""
         super().inbound_received(inbound_processor)
 
-        # load the personalized model when
+        # Load the personalized model when
         # 1. the personalization is performed per round
         # 2. the current round is larger than the total rounds,
         #   which means the final personalization.
@@ -127,10 +127,11 @@ class Client(simple.Client):
             self.get_personalized_model()
 
     def get_personalized_model(self):
-        """Getting the personalized model of the client.
+        """
+        Getting the personalized model of the client.
         Default, the latest personalized model is obtained.
         """
-        # always get the latest personalized model.
+        # Always get the latest personalized model.
         desired_round = self.current_round - 1
         model_name = self.trainer.personalized_model_name
         prefix = self.trainer.personalized_model_prefix
