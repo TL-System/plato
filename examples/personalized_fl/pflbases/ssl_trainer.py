@@ -64,11 +64,11 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
         labels = torch.tensor(
             labels, dtype=torch.long
-        )  # Conversion to tensor to ensure backwards compatibility
+        )  # Conversion to tensor to ensure backwards compatibility.
 
         if fnames:  # Compatible with lightly
             return views, labels, fnames
-        # Compatible with Plato
+        # Compatible with Plato.
         return views, labels
 
 
@@ -79,7 +79,7 @@ class Trainer(separate_local_trainer.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
 
-        # dataset for personalization
+        # Dataset for personalization.
         self.personalized_trainset = None
         self.personalized_testset = None
 
@@ -206,16 +206,14 @@ class Trainer(separate_local_trainer.Trainer):
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
                 features = self.model.encoder(examples)
-                samples_encoding = (
-                    features
-                    if samples_encoding is None
-                    else torch.cat([samples_encoding, features], dim=0)
-                )
-                samples_label = (
-                    labels
-                    if samples_label is None
-                    else torch.cat([samples_label, labels], dim=0)
-                )
+                if samples_encoding is None:
+                    samples_encoding = features
+                else:
+                    samples_encoding = torch.cat([samples_encoding, features], dim=0)
+                if samples_label is None:
+                    samples_label = labels
+                else:
+                    samples_label = torch.cat([samples_label, labels], dim=0)
 
         return samples_encoding, samples_label
 
