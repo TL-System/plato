@@ -412,9 +412,13 @@ class Trainer(basic.Trainer):
         """Saving the personalized model to a file."""
         location = self.get_checkpoint_dir_path() if location is None else location
         filename = self.personalized_model_name if filename is None else filename
+        model_path = os.path.join(location, filename)
+        os.makedirs(model_path, exist_ok=True)
 
-        self.model_state_dict = self.personalized_model.state_dict()
-        self.save_model(filename, location)
+        torch.save(self.personalized_model.state_dict(), model_path)
+        logging.info(
+            "[Client #%d] Personalized Model saved to %s.", self.client_id, model_path
+        )
 
     def load_personalized_model(self, filename=None, location=None):
         """Loading the personalized model from a file."""
@@ -429,6 +433,9 @@ class Trainer(basic.Trainer):
         else:
             pretrained = torch.load(model_path, map_location=torch.device("cpu"))
         self.personalized_model.load_state_dict(pretrained, strict=True)
+        logging.info(
+            "[Client #%d] Loading a model from %s.", self.client_id, model_path
+        )
 
     @staticmethod
     def process_personalized_outputs(outputs):

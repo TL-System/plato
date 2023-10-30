@@ -2,7 +2,7 @@
 
 `pflbases`, built upon the Plato framework, is designed as a basic platform for personalized federated learning (FL) and, thus, can be used to implement various personalized FL algorithms while testing them with <ins>fairness</ins> and <ins>reproducibility</ins> guarantees. 
 
-As personalized federated learning is one specific domain of federated learning (FL),  its learning process should always focus on the process of how to exchange the global model between clients and the server and how to train this model during the federated training paradigm. Subsequently, the second priority can be to use the global model as the intermediary toward training high-quality personalized models. 
+As personalized federated learning is one specific domain of federated learning (FL), its learning process should always focus on the process of how to exchange the global model between clients and the server and how to train this model during the federated training paradigm. Subsequently, the second priority can be to use the global model as the intermediary toward training high-quality personalized models. 
 
 Hence, the core design principle underlying `pflbases` is to prioritize learning the global model (`self.model`), relegating all other models (`self.personalized_model`) or operations to subsidiary roles or auxiliary procedures. Besides, the global model and personalized models are treated as two separate models.
 
@@ -58,19 +58,19 @@ We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as th
 
 - {apfl} [Deng et al., "Adaptive Personalized Federated Learning", Arxiv 2020, citation 374](https://arxiv.org/pdf/2003.13461.pdf) - None
 
-- {fedper} [Arivazhagan et al., "Federated Learning with Personalization Layers", Arxiv 2019, citation 486](https://browse.arxiv.org/pdf/1912.00818.pdf) - [Third-part Code](https://github.com/ki-ljl/FedPer)
+- {fedper} [Arivazhagan et al., "Federated Learning with Personalization Layers", Arxiv 2019, citation 486](https://browse.arxiv.org/pdf/1912.00818.pdf) - [Third-party code](https://github.com/ki-ljl/FedPer)
 
-- {ditto} [Li et.al "Ditto: Fair and robust federated learning through personalization", ICML2020, citation 419](https://proceedings.mlr.press/v139/li21h.html) - [Office code](https://github.com/litian96/ditto)
+- {ditto} [Li et.al "Ditto: Fair and robust federated learning through personalization", ICML2020, citation 419](https://proceedings.mlr.press/v139/li21h.html) - [Official code](https://github.com/litian96/ditto)
 
-- {fedbabu} [Oh et.al "FedBABU: Toward Enhanced Representation for Federated Image Classification", ICLR 2022, citation 74](https://openreview.net/pdf?id=HuaYQfggn5u) - [Office code](https://github.com/jhoon-oh/FedBABU)
+- {fedbabu} [Oh et.al "FedBABU: Toward Enhanced Representation for Federated Image Classification", ICLR 2022, citation 74](https://openreview.net/pdf?id=HuaYQfggn5u) - [Official code](https://github.com/jhoon-oh/FedBABU)
 
 - {fedrep} [Collins et al., "Exploiting Shared Representations for Personalized Federated
-Learning", ICML21, citation 289](https://arxiv.org/abs/2102.07078) - [Office code](https://github.com/lgcollins/FedRep)
+Learning", ICML21, citation 289](https://arxiv.org/abs/2102.07078) - [Official code](https://github.com/lgcollins/FedRep)
 
-- {lgfedavg} [Liang et al., "Think Locally, Act Globally: Federated Learning with Local and Global Representations", NeurIPS 2019, citation 359](https://arxiv.org/abs/2001.01523) - [Office code](https://github.com/pliang279/LG-FedAvg)
+- {lgfedavg} [Liang et al., "Think Locally, Act Globally: Federated Learning with Local and Global Representations", NeurIPS 2019, citation 359](https://arxiv.org/abs/2001.01523) - [Official code](https://github.com/pliang279/LG-FedAvg)
 
 - {perfedavg} [Fallah et al., "Personalized federated learning with theoretical guarantees:
-A model-agnostic meta-learning approach", NeurIPS 2019, citation 502](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html) - [Third-part code](https://github.com/jhoon-oh/FedBABU)
+A model-agnostic meta-learning approach", NeurIPS 2019, citation 502](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html) - [Third-party code](https://github.com/jhoon-oh/FedBABU)
 
 - {hermes} [Li et al., "Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients", ACM MobiCom 21, citation 75](https://www.ang-li.com/assets/pdf/hermes.pdf) - None (The algorithm, first developed by Ying Chen, has been refined to integrate with the `pflbases` framework.)
 
