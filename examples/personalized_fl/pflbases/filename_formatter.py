@@ -17,7 +17,6 @@ class NameFormatter:
         model_name: Optional[str] = None,
         round_n: Optional[int] = None,
         epoch_n: Optional[int] = None,
-        run_id: Optional[str] = None,
         prefix: Optional[str] = None,
         suffix: Optional[str] = None,
         ext: str = "pth",
@@ -27,7 +26,7 @@ class NameFormatter:
         The desired name format will be:
 
         {prefix}_{model_name}__client{client_id}_round{round_n}\
-            _epoch{epoch_n}_runid{run_id}_{suffix}.{ext}
+            _epoch{epoch_n}_{suffix}.{ext}
 
         The 'client_id' and 'ext' are two mandatory parts.
         """
@@ -45,8 +44,6 @@ class NameFormatter:
             full_name = full_name + f"_round{round_n}"
         if epoch_n is not None:
             full_name = full_name + f"_epoch{epoch_n}"
-        if run_id is not None:
-            full_name = full_name + f"_runid{run_id}"
 
         if suffix is not None:
             full_name = full_name + f"_{suffix}"

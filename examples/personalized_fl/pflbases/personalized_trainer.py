@@ -368,7 +368,6 @@ class Trainer(basic.Trainer):
             model_name=model_name,
             round_n=current_round,
             epoch_n=epoch_n,
-            run_id=None,
             prefix=prefix,
             ext="pth",
         )
