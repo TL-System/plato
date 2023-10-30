@@ -29,8 +29,8 @@ class Trainer(basic.Trainer):
 
         self.personalized_model = None
 
-        # personalized model name and the file prefix
-        # used to save the model
+        # Personalized model name and the file prefix
+        # used to save the model.
         self.personalized_model_name = (
             Config().algorithm.personalization.model_name
             if hasattr(Config().algorithm.personalization, "model_name")
