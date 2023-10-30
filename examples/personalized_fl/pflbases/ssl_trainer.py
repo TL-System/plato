@@ -170,7 +170,7 @@ class Trainer(separate_local_trainer.Trainer):
 
         return self.get_personalized_loss_criterion()
 
-    def preprocess_models(self, config):
+    def preprocess_models(self):
         """Do nothing to the personalized mdoel."""
 
     def postprocess_models(self):

@@ -30,7 +30,7 @@ class Trainer(personalized_trainer.Trainer):
 
         self.personalized_optimizer = None
 
-    def preprocess_models(self, config):
+    def preprocess_models(self):
         """Do nothing to the loaded personalized model in Ditto."""
 
     def train_run_start(self, config):

@@ -77,7 +77,7 @@ class Trainer(personalized_trainer.Trainer):
         alpha_n = self.alpha - eta * grad_alpha
         self.alpha = np.clip(alpha_n.item(), 0.0, 1.0)
 
-    def preprocess_models(self, config):
+    def preprocess_models(self):
         """Do nothing to the loaded personalized model in APFL."""
 
     def perform_forward_and_backward_passes(self, config, examples, labels):

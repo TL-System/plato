@@ -205,7 +205,7 @@ class Trainer(basic.Trainer):
             self.personalized_model_name,
         )
 
-    def preprocess_models(self, config):
+    def preprocess_models(self):
         """Before running, we need to process the model and the personalized model.
 
         This function is required to be revised based on the specific condition of the
@@ -221,7 +221,7 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         """Before running, convert the config to be ones for personalization."""
 
-        self.preprocess_models(config)
+        self.preprocess_models()
 
         if self.do_final_personalization:
             personalized_config = Config().algorithm.personalization._asdict()
