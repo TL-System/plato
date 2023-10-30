@@ -31,7 +31,7 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting sub-modules from a model."""
 
-    def get_target_weights(self, model_parameters: dict, module_name: List[str]):
+    def get_target_weights(self, model_parameters: dict, module_names: List[str]):
         """Get target weights from model parameters based on the module name."""
         parameters_data = model_parameters.items()
         extracted_weights = OrderedDict(
@@ -39,7 +39,7 @@ class Algorithm(fedavg.Algorithm):
                 (name, param)
                 for name, param in parameters_data
                 if any(
-                    param_name in name.strip().split(".") for param_name in module_name
+                    param_name in name.strip().split(".") for param_name in module_names
                 )
             ]
         )
@@ -48,7 +48,7 @@ class Algorithm(fedavg.Algorithm):
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
-        module_name: Optional[List[str]] = None,
+        module_names: Optional[List[str]] = None,
     ):
         """
         Extract weights from modules of the model.
@@ -56,9 +56,9 @@ class Algorithm(fedavg.Algorithm):
         """
         model = self.model if model is None else model
 
-        module_name = (
-            module_name
-            if module_name is not None
+        module_names = (
+            module_names
+            if module_names is not None
             else (
                 Config().algorithm.global_module_names
                 if hasattr(Config().algorithm, "global_module_names")
@@ -69,11 +69,11 @@ class Algorithm(fedavg.Algorithm):
         # When the `global_module_names` is not set and
         # the `module_name` is not provided, this function
         # returns the whole model.
-        if module_name is None:
+        if module_names is None:
             return model.cpu().state_dict()
         else:
             return self.get_target_weights(
-                model.cpu().state_dict(), module_name=module_name
+                model.cpu().state_dict(), module_names=module_names
             )
 
     @staticmethod
