@@ -313,7 +313,7 @@ class Trainer(basic.Trainer):
 
     def test_personalized_model(self, config, testset, sampler=None, **kwargs):
         """Test the personalized model."""
-        # Define the test phase of the eval stage
+        # Define the test phase of the eval stage.
 
         logging.info("[Client #%d] Testing the personalized model.", self.client_id)
 
