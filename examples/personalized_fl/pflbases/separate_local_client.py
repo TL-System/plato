@@ -45,13 +45,13 @@ class Client(personalized_client.Client):
             personalized_model=personalized_model,
         )
 
-        # the path of the initial local model of this client
+        # The path of the initial local model of this client.
         self.init_local_mode_path = None
 
     def create_initial_local_model(self):
         """Create the initial local model once there is not one."""
 
-        # get the initial local model path
+        # Get the initial local model path.
         self.init_local_mode_path = self.get_init_model_path(
             model_name=self.trainer.model_name,
             prefix=self.trainer.local_model_prefix,
@@ -74,7 +74,7 @@ class Client(personalized_client.Client):
         """Reloading the local model for this client."""
         super().inbound_received(inbound_processor)
 
-        # load the local model
+        # Load the local model.
         self.get_local_model()
 
     def get_local_model(self):
@@ -85,7 +85,7 @@ class Client(personalized_client.Client):
         This function is to get the saved local model.
         """
 
-        # always get the latest local model.
+        # Always get the latest local model.
         desired_round = self.current_round - 1
         location = self.trainer.get_checkpoint_dir_path()
         model_name = self.trainer.model_name
