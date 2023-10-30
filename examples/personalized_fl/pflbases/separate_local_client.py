@@ -57,7 +57,7 @@ class Client(personalized_client.Client):
             prefix=self.trainer.local_model_prefix,
         )
 
-        if not self.exist_init_local_model():
+        if not os.path.exists(self.init_local_mode_path):
             self.trainer.define_local_model(custom_model=self.custom_model)
             self.trainer.save_model(
                 filename=os.path.basename(self.init_local_mode_path),
@@ -113,8 +113,3 @@ class Client(personalized_client.Client):
                 filename=os.path.basename(self.init_personalized_model_path),
                 location=location,
             )
-
-    def exist_init_local_model(self):
-        """Whether this client is unselected on."""
-
-        return os.path.exists(self.init_local_mode_path)
