@@ -29,7 +29,7 @@ class ExamplesList(UserList):
                     example = example.to(device)
                 else:
                     example.to(device)
-                self.__setitem__(example_idx, example)
+                self[example_idx] = example
 
         return self.data
 

@@ -1,5 +1,8 @@
 """
-The implementation of checkpoints operations, such as saving and loading.
+The implementation of checkpoints operations, including
+ - checkpoint saving
+ - checkpoint loading
+ - checkpoint searchig
 """
 import os
 import re
@@ -11,20 +14,14 @@ from plato.utils.filename_formatter import NameFormatter
 
 
 class CheckpointsOperator:
-    """The operations for checkpoints, including pretrained models and checkpoints models.
-
-    This class is called CheckpointsOperator, as the pre-trained models can also
-    be regarded as one type of checkpoint.
-    """
+    """A base operator for checkpoint operations."""
 
     def __init__(self, checkpoints_dir: str = "checkpoints/"):
-        """Initialize the directory where checkpoints should be stored or loaded.
-
-        :param checkpoints_dir: A string to show where checkpoint operations perform.
-        """
+        """Initialize the directory where checkpoints should be stored or loaded."""
         self.checkpoints_dir = checkpoints_dir
         os.makedirs(self.checkpoints_dir, exist_ok=True)
 
+    # pylint:disable=too-many-arguments
     def save_checkpoint(
         self,
         model_state_dict: Dict[str, torch.Tensor],
@@ -35,23 +32,23 @@ class CheckpointsOperator:
         epoch: Optional[int] = None,
         config_args: Optional[dict] = None,
     ) -> bool:
-        # pylint:disable=too-many-arguments
         """Save the checkpoint to specific dir.
 
-        :param model_state_dict: A Dict holding the state of a to-be-saved model
-        :param checkpoints_name: The List containg strings for names of checkpoint files.
-            This support saving the checkpoint to multiple pieces, each piece corresponding
-            to one string name within 'checkpoints_name'.
+        :param model_state_dict: A Dict holding the state of a to-be-saved model.
+        :param checkpoints_name: The List contains strings for the names of checkpoint
+         files. This supports saving the checkpoint to multiple pieces, each corresponding
+         to one string name.
         :param optimizer_state_dict: A Dict holding the state of a to-be-saved optimizer.
-            Default to be None for not saving.
+         Default to be None for not saving.
         :param lr_scheduler_state_dict: A Dict holding the state of a to-be-saved lr_scheduler.
-            Default to be None for not saving.
+         Default to be None for not saving.
         :param learning_dict: A Dict holding the state of the learning process. It can
-            include "loss" for example. Default to be None for not saving.
-        :param epoch: A Integer presenting the epoch number.
-            Default to be None for not saving.
-        :param config_args: A Dict containing the hyper-parameters
-            Default to be None for not saving.
+         include "loss" for example.
+         Default to be None for not saving.
+        :param epoch: An Integer presenting the epoch number.
+         Default to be None for not saving.
+        :param config_args: A Dict containing the hyper-parameters.
+         Default to be None for not saving.
         """
         checkpoint_paths = [
             os.path.join(self.checkpoints_dir, ckpt_name)
@@ -73,14 +70,14 @@ class CheckpointsOperator:
 
         return True
 
-    def load_checkpoint(self, checkpoint_name):
-        """Load the checkpoint to specific dir.
-
-        :param checkpoint_name: The string for the name of the checkpoint file.
-        """
+    def load_checkpoint(self, checkpoint_name: str):
+        """Load the checkpoint."""
         checkpoint_path = os.path.join(self.checkpoints_dir, checkpoint_name)
 
-        return torch.load(checkpoint_path)
+        if torch.cuda.is_available():
+            return torch.load(checkpoint_path)
+        else:
+            return torch.load(checkpoint_path, map_location=torch.device("cpu"))
 
     def search_latest_checkpoint_file(
         self,
@@ -89,13 +86,8 @@ class CheckpointsOperator:
         filter_words: Optional[List[str]] = None,
     ):
         """Search the latest checkpoint file under the checkpoint dir based on 'search_key_words'.
-            The 'anchor_metric' is utilized to measure what is 'latest'.
-            The 'filter_words' term is utilized to filter out unrelated files.
-
-        :param search_key_words: A list holding the words for searching target files.
-        :param anchor_metric: A string presenting the metric used to measure the latest.
-        :param filter_words: A list holding strings that should be ignored when searching
-            for the file name.
+        The 'anchor_metric' is utilized to measure what is 'latest'.
+        The 'filter_words' term is utilized to filter out unrelated files.
         """
 
         if filter_words is None:
@@ -137,6 +129,7 @@ class CheckpointsOperator:
         return False
 
 
+# pylint:disable=too-many-arguments
 def save_client_checkpoint(
     client_id: int,
     model_name: str,
@@ -150,28 +143,7 @@ def save_client_checkpoint(
     local_epoch: Optional[int] = None,
     prefix: Optional[str] = None,
 ) -> str:
-    # pylint:disable=too-many-arguments
-
-    """Save the checkpoint for sepcific client.
-
-    :param client_id: A integer to present the client id.
-    :param model_name: A integer to present the model's name used
-        for the checkpoint saving.
-    :param checkpoints_dir: A string to present whether to save the
-        checkpoints.
-    :param model_state_dict: A Dict holding the state of a to-be-saved model
-    :param optimizer_state_dict: A Dict holding the state of a to-be-saved optimizer.
-        Default to be None for not saving.
-    :param lr_scheduler_state_dict: A Dict holding the state of a to-be-saved lr_scheduler.
-        Default to be None for not saving.
-    :param learning_dict: A Dict holding the state of the learning process. It can
-        include "loss" for example. Default to be None for not saving.
-    :param global_epoch: A integer to present the client id.
-    :param global_epoch: A integer to present global epoch.
-    :param local_epoch: A integer to present local epoch within the client.
-    :param prefix: A integer to present the client id.
-
-    """
+    """Save the checkpoint for sepcific client."""
     config = config if config is not None else {}
     current_round = config["current_round"] if "current_round" in config else None
     # run_id = config['run_id']
@@ -205,6 +177,7 @@ def save_client_checkpoint(
     return filename
 
 
+# pylint:disable=too-many-arguments
 def search_client_checkpoint(
     client_id: int,
     model_name: str,
@@ -217,12 +190,10 @@ def search_client_checkpoint(
     mask_words: Optional[List[str]] = None,
     use_latest: bool = True,
 ) -> CheckpointsOperator:
-    # pylint:disable=too-many-arguments
-
     """Search for the target checkpoint of the client.
 
-    :param use_latest: A boolean to show whether utilize the latest checkpoint file
-        if the required file does not exist.
+    :param use_latest: A boolean to show whether to utilize the
+     latest checkpoint file if the required file does not exist. .
     """
     if mask_words is None:
         mask_words = ["epoch"]
