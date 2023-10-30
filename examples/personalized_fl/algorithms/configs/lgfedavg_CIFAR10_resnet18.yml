@@ -48,7 +48,7 @@ algorithm:
         - layer3
         - layer4
         
-    completion_modules_name:
+    completion_module_names:
         - conv1
         - bn1
         - layer1

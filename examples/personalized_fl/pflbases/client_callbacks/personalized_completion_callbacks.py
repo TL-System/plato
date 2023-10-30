@@ -15,7 +15,7 @@ from pflbases.client_callbacks import base_callbacks
 
 
 class PayloadCompletionProcessor(base.Processor):
-    """A processor relying on the hyper-parameter `completion_modules_name`
+    """A processor relying on the hyper-parameter `completion_module_names`
     to complete parameters of payload with the loaded personalized model."""
 
     def __init__(self, algorithm, **kwargs) -> None:
@@ -26,12 +26,12 @@ class PayloadCompletionProcessor(base.Processor):
         """Processing the received payload by assigning modules of personalized model
         if provided."""
 
-        # extract the `completion_modules_name` of the personalized model head
-        assert hasattr(Config().algorithm, "completion_modules_name")
+        # extract the `completion_module_names` of the personalized model head
+        assert hasattr(Config().algorithm, "completion_module_names")
 
-        completion_modules_name = Config().algorithm.completion_modules_name
+        completion_module_names = Config().algorithm.completion_module_names
         model_modules = self.algorithm.extract_weights(
-            model=self.trainer.personalized_model, modules_name=completion_modules_name
+            model=self.trainer.personalized_model, modules_name=completion_module_names
         )
         logging.info(
             "[Client #%d] Extracted modules: %s from its loaded personalized model.",

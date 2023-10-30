@@ -13,7 +13,7 @@ from pflbases.client_callbacks import base_callbacks
 
 
 class PayloadCompletionProcessor(base.Processor):
-    """A processor relying on the hyper-parameter `completion_modules_name`
+    """A processor relying on the hyper-parameter `completion_module_names`
     to complete parameters of payload with the loaded local model, which
     is the updated global model in the previous round."""
 
@@ -25,10 +25,10 @@ class PayloadCompletionProcessor(base.Processor):
         """Processing the received payload by assigning modules of local model of
         each client."""
 
-        # extract the `completion_modules_name` of the model head
-        assert hasattr(Config().algorithm, "completion_modules_name")
+        # extract the `completion_module_names` of the model head
+        assert hasattr(Config().algorithm, "completion_module_names")
 
-        completion_modules_name = Config().algorithm.completion_modules_name
+        completion_module_names = Config().algorithm.completion_module_names
         local_model_modules = self.trainer.model.cpu().state_dict()
         logging.info(
             "[Client #%d] Loaded the local model containing modules: %s.",
@@ -37,7 +37,7 @@ class PayloadCompletionProcessor(base.Processor):
         )
 
         local_completion_modules = self.algorithm.get_target_weights(
-            model_parameters=local_model_modules, modules_name=completion_modules_name
+            model_parameters=local_model_modules, modules_name=completion_module_names
         )
 
         data.update(local_completion_modules)

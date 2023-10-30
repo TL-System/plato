@@ -46,7 +46,7 @@ algorithm:
     head_modules_name:
         - linear
 
-    completion_modules_name:
+    completion_module_names:
         - linear
 
     personalization:

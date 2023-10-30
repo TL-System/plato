@@ -42,7 +42,7 @@ algorithm:
         - layer3
         - layer4
         
-    completion_modules_name:
+    completion_module_names:
         - linear
 
     personalization:

@@ -64,7 +64,7 @@ algorithm:
     global_modules_name:
         - encoder
 
-    completion_modules_name:
+    completion_module_names:
         - projector
 
     auxiliary_loss_criterions:
