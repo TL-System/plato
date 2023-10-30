@@ -4,11 +4,11 @@ A trainer to support a separate client's local model and the global model.
 import logging
 import warnings
 
-from plato.config import Config
-from plato.models import registry as models_registry
-
 from pflbases import trainer_utils
 from pflbases import personalized_trainer
+
+from plato.config import Config
+from plato.models import registry as models_registry
 
 warnings.simplefilter("ignore")
 
@@ -21,7 +21,7 @@ class Trainer(personalized_trainer.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
 
-        # get the model name
+        # Get the model name.
         self.model_name = Config().trainer.model_name
         self.local_model_prefix = "local"
 
@@ -61,7 +61,7 @@ class Trainer(personalized_trainer.Trainer):
 
         self.save_model(filename=filename, location=save_location)
 
-        # always remove the expired checkpoints
+        # Always remove the expired checkpoints.
         self.remove_expired_checkpoints(
             model_name=model_name, prefix=prefix, round_n=round_n
         )
