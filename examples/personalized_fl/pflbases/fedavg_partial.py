@@ -18,11 +18,10 @@ be defined as:
 By doing so, the conv1 and conv2 layers will be extracted.
 """
 
-import os
-import string
 import logging
-from typing import List, Optional
+import string
 from collections import OrderedDict
+from typing import List, Optional
 
 import torch
 
@@ -76,14 +75,14 @@ class Algorithm(fedavg.Algorithm):
         """Checks whether weights contain the same parameter names as the model."""
         model_params_name = self.model.state_dict().keys()
 
-        def search_func(x, y):
+        def compare(x, y):
             return [x_i for x_i in x if x_i not in y]
 
         inconsistent_params = []
         if len(model_params_name) > len(weights_param_name):
-            inconsistent_params = search_func(model_params_name, weights_param_name)
+            inconsistent_params = compare(model_params_name, weights_param_name)
         else:
-            inconsistent_params = search_func(weights_param_name, model_params_name)
+            inconsistent_params = compare(weights_param_name, model_params_name)
 
         return len(inconsistent_params) == 0, inconsistent_params
 
