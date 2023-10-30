@@ -4,7 +4,7 @@ global learning and local learning.
 
 Note:
     Plato simulates the client with multiple `processes`, which are started at the 
-    beginning of running. These The server will build fake connection with these `processes` 
+    beginning of running. The server will build fake connection with these `processes` 
     - when the `processes` receive information from the server, the `configuration()` 
     function is called the first time to perform necessary initialization 
     (model, trainer, algorithm, personalized model). Server will solely select clients by 
