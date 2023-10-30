@@ -72,7 +72,7 @@ class Algorithm(fedavg.Algorithm):
         )
 
     def is_consistent_weights(self, weights_param_name):
-        """Checks whether weights contain the same parameter names as the model."""
+        """Check whether weights contain the same parameter names as the model."""
         model_params_name = self.model.state_dict().keys()
 
         def compare(x, y):
@@ -87,31 +87,31 @@ class Algorithm(fedavg.Algorithm):
         return len(inconsistent_params) == 0, inconsistent_params
 
     @staticmethod
-    def extract_modules_name(parameters_name):
-        """Extracting modules name from given parameters' names."""
+    def extract_modules_name(parameter_names):
+        """Extract module names from given parameter names."""
 
         extracted_names = []
         # Remove punctuation and split the strings into words and sub-words
         translator = str.maketrans("", "", string.punctuation)
         combined_subnames = [
             [subname.translate(translator).lower() for subname in word.split(".")]
-            for word in parameters_name
+            for word in parameter_names
         ]
 
-        # from which subname, the modules name show difference
+        # An indicator of the level where the strings begin to differ
         diff_level = 0
         # Find the point where the strings begin to differ in content
         for level, subnames in enumerate(zip(*combined_subnames)):
             if len(set(subnames)) > 1:
                 diff_level = level
                 break
-        # add 1 to begin from 0
+        # Increase the level by 1
         diff_level += 1
         # the para name is presented as encoder.xxx.xxx
         # that is combined by the key_word "."
         # we aim to extract the encoder
         split_str = "."
-        for para_name in parameters_name:
+        for para_name in parameter_names:
             splitted_names = para_name.split(split_str)
             core_names = splitted_names[:diff_level]
             module_name = f"{split_str}".join(core_names)

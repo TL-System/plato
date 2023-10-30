@@ -143,9 +143,9 @@ def save_client_checkpoint(
     """Save the checkpoint for a specific client."""
     config = config if config is not None else {}
     current_round = config["current_round"] if "current_round" in config else None
-    # run_id = config['run_id']
-    # we have to set the run_id to be None here as the client can
-    # have different run id in the whole training process.
+
+    # The run_id is set to be None here as the client may have different run id in the
+    # whole training process.
     run_id = None
 
     cpk_oper = CheckpointsOperator(checkpoints_dir=checkpoints_dir)
