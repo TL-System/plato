@@ -139,10 +139,6 @@ def save_client_checkpoint(
     config = config if config is not None else {}
     current_round = config["current_round"] if "current_round" in config else None
 
-    # The run_id is set to be None here as the client may have different run id in the
-    # whole training process.
-    run_id = None
-
     cpk_oper = CheckpointsOperator(checkpoints_dir=checkpoints_dir)
 
     # Before the training, we expect to save the initial
@@ -152,7 +148,6 @@ def save_client_checkpoint(
         client_id=client_id,
         round_n=current_round,
         epoch_n=local_epoch,
-        run_id=run_id,
         prefix=prefix,
         ext="pth",
     )

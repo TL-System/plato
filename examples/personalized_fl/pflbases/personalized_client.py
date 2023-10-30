@@ -166,7 +166,6 @@ class Client(simple.Client):
             client_id=self.client_id,
             round_n=0,
             epoch_n=None,
-            run_id=None,
             prefix=prefix,
             ext="pth",
         )
