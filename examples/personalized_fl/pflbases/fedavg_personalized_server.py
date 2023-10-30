@@ -28,26 +28,24 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
 
-        # participating clients as a percentage of all clients. By default, all clients will participate
-        self.participating_clients_ratio = 1.0
-        self.n_participating_clients = 0
+        # The number of participanted clients
+        self.number_participating_clients = 0
 
-        # clients id of two types of clients
+        # The list of participanted clients
         self.participating_clients_pool = None
-        self.nonparticipating_clients_pool = None
 
-        # whether stop the terminate personalization afterwards
-        self.personalization_started = False
+        # Whether stop the terminate personalization afterwards
+        self.to_terminate_personalization = False
 
         self.initialize_personalization()
 
     def initialize_personalization(self):
         """Initialize two types of clients."""
-        # Set participating and nonparticipating clients
+        # Set participant and nonparticipating clients
         loaded_config = Config()
 
-        ## 1. Initialize participating clients
-        self.participating_clients_ratio = (
+        ## 1. Initialize participanting clients
+        participating_clients_ratio = (
             loaded_config.algorithm.personalization.participating_clients_ratio
             if hasattr(
                 loaded_config.algorithm.personalization, "participating_clients_ratio"
@@ -56,51 +54,42 @@ class Server(fedavg.Server):
         )
 
         #  clients will / will not participant in federated training
-        self.n_participating_clients = int(
-            self.total_clients * self.participating_clients_ratio
+        self.number_participating_clients = int(
+            self.total_clients * participating_clients_ratio
         )
-        n_nonparticipating_clients = self.total_clients - self.n_participating_clients
 
         logging.info(
             fonts.colourize(
-                "[%s] Total clients (%d), participating clients (%d), "
-                "nonparticipating_clients (%d), participating ratio (%.3f).",
+                "[%s] Total clients (%d), participanting clients (%d), "
+                "participanting ratio (%.3f).",
                 colour="blue",
             ),
             self,
             self.total_clients,
-            self.n_participating_clients,
-            n_nonparticipating_clients,
-            self.participating_clients_ratio,
+            self.number_participating_clients,
+            participating_clients_ratio,
         )
 
     def set_various_clients_pool(self, clients_pool: List[int]):
         """Set various clients pool utilized in federated learning.
 
-        Note, the participating clients pool will be set in the first round and no
+        Note: the participating clients pool will be set in the first round and no
             modification is performed afterwards.
         """
-
-        # only set the clients pool when they are empty.
+        
+        # Only need to set the clients pool when they are empty.
         if self.participating_clients_pool is None:
             self.participating_clients_pool = clients_pool[
-                : self.n_participating_clients
+                : self.number_participating_clients
             ]
 
             logging.info(
                 fonts.colourize(
-                    "[%s] Prepared participating clients pool: %s", colour="blue"
+                    "[%s] Prepared participanting clients pool: %s", colour="blue"
                 ),
                 self,
                 self.participating_clients_pool,
             )
-
-        if self.nonparticipating_clients_pool is None:
-            self.nonparticipating_clients_pool = [
-                client_id
-                for client_id in clients_pool
-                if client_id not in self.participating_clients_pool
-            ]
 
     def perform_normal_training(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee general federated learning without personalization."""
