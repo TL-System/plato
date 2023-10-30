@@ -9,7 +9,25 @@ from collections import defaultdict
 
 from pflbases import personalized_client
 from pflbases import personalized_trainer
-from pflbases import trainer_utils
+
+
+def compute_model_statistics(model):
+    """Getting the statistics of the model."""
+    weight_statistics = {"mean": 0.0, "variance": 0.0, "std_dev": 0.0}
+
+    total_params = 0
+    for _, param in model.named_parameters():
+        if param.requires_grad:
+            values = param.data.cpu().numpy()
+            total_params += values.size
+            weight_statistics["mean"] += values.mean()
+            weight_statistics["variance"] += values.var()
+
+    weight_statistics["mean"] /= total_params
+    weight_statistics["variance"] /= total_params
+    weight_statistics["std_dev"] = weight_statistics["variance"] ** 0.5
+
+    return weight_statistics
 
 
 class AppendDict(defaultdict):
@@ -49,9 +67,7 @@ class PersonalizedModelsTest:
             self.client.client_id = id_n
             self.client.configure()
 
-            statistic = trainer_utils.compute_model_statistics(
-                self.client.trainer.personalized_model
-            )
+            statistic = compute_model_statistics(self.client.trainer.personalized_model)
             address = hex(id(self.client.trainer.personalized_model))
             model_id = id(self.client.trainer.personalized_model)
 
