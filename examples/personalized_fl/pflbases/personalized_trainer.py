@@ -15,7 +15,6 @@ from plato.utils import fonts
 from pflbases.filename_formatter import NameFormatter
 
 from pflbases import trainer_utils
-from pflbases import checkpoint_operator
 
 warnings.simplefilter("ignore")
 
@@ -412,41 +411,26 @@ class Trainer(basic.Trainer):
                 os.remove(os.path.join(save_location, filename))
 
     def save_personalized_model(self, filename=None, location=None, **kwargs):
-        """Saving the model to a file."""
+        """Saving the personalized model to a file."""
+        location = self.get_checkpoint_dir_path() if location is None else location
+        filename = self.personalized_model_name if filename is None else filename
 
-        ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoints_dir=location)
-        ckpt_oper.save_checkpoint(
-            model_state_dict=self.personalized_model.cpu().state_dict(),
-            filename=filename,
-            **kwargs,
-        )
-
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] Saved personalized model to %s under %s.", colour="blue"
-            ),
-            self.client_id,
-            filename,
-            location,
-        )
+        self.model_state_dict = self.personalized_model.state_dict()
+        self.save_model(filename, location)
 
     def load_personalized_model(self, filename=None, location=None):
-        """Loading pre-trained model weights from a file."""
+        """Loading the personalized model from a file."""
 
-        ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoints_dir=location)
-        self.personalized_model.load_state_dict(
-            ckpt_oper.load_checkpoint(filename)["model"], strict=True
-        )
+        location = self.get_checkpoint_dir_path() if location is None else location
+        filename = self.personalized_model_name if filename is None else filename
 
-        logging.info(
-            fonts.colourize(
-                "[Client #%d] Loaded a Personalized model from %s under %s.",
-                colour="blue",
-            ),
-            self.client_id,
-            filename,
-            location,
-        )
+        model_path = os.path.join(location, filename)
+
+        if torch.cuda.is_available():
+            pretrained = torch.load(model_path)
+        else:
+            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
+        self.personalized_model.load_state_dict(pretrained, strict=True)
 
     @staticmethod
     def process_personalized_outputs(outputs):

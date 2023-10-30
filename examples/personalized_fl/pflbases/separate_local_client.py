@@ -18,7 +18,7 @@ import os
 
 
 from pflbases import personalized_client
-from pflbases import checkpoint_operator
+from pflbases import trainer_utils
 
 
 class Client(personalized_client.Client):
@@ -97,7 +97,8 @@ class Client(personalized_client.Client):
             epoch_n=None,
         )
 
-        filename, is_searched = checkpoint_operator.search_checkpoint_file(
+        filename, is_searched = trainer_utils.search_checkpoint_file(
+            checkpoint_dir=self.trainer.get_checkpoint_dir_path(),
             filename=filename,
             checkpoints_dir=save_location,
             key_words=[model_name, prefix],

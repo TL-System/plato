@@ -1,6 +1,5 @@
 """
 Different SSL methods.
-
 """
 import copy
 

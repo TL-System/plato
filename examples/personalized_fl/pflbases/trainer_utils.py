@@ -57,7 +57,7 @@ def weights_reinitialize(module: torch.nn.Module):
 
 
 def search_latest_checkpoint_file(
-    checkpoints_dir: str,
+    checkpoint_dir: str,
     search_key_words: List[str],
     anchor_metric: str = "round",
     filter_words: Optional[List[str]] = None,
@@ -78,7 +78,7 @@ def search_latest_checkpoint_file(
 
     checkpoint_files = [
         ckp_file
-        for ckp_file in os.listdir(checkpoints_dir)
+        for ckp_file in os.listdir(checkpoint_dir)
         if not is_filterd_file(ckp_file)
         and is_required_file(ckp_file)
         and re.search(r"\.pth$", ckp_file)
@@ -97,16 +97,16 @@ def search_latest_checkpoint_file(
     return latest_checkpoint_filename
 
 
-def is_vaild_checkpoint_file(checkpoints_dir, filename: str):
+def is_vaild_checkpoint_file(checkpoint_dir, filename: str):
     """Check whether the file exists."""
-    file_path = os.path.join(checkpoints_dir, filename)
+    file_path = os.path.join(checkpoint_dir, filename)
     if os.path.exists(file_path):
         return True
     return False
 
 
 def search_checkpoint_file(
-    checkpoints_dir: str,
+    checkpoint_dir: str,
     filename: str,
     key_words: List[str],
     anchor_metric: str = "round",
@@ -121,14 +121,14 @@ def search_checkpoint_file(
     if mask_words is None:
         mask_words = ["epoch"]
 
-    if os.path.exists(os.path.join(checkpoints_dir, filename)):
+    if os.path.exists(os.path.join(checkpoint_dir, filename)):
         return filename, True
     else:
         if use_latest:
             # Loading the latest checkpoint file
             # search_key_words = [model_name, prefix]
             filename = search_latest_checkpoint_file(
-                checkpoints_dir,
+                checkpoint_dir,
                 search_key_words=key_words,
                 anchor_metric=anchor_metric,
                 filter_words=mask_words,
