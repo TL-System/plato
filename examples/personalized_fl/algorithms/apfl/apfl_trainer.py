@@ -169,7 +169,7 @@ class Trainer(personalized_trainer.Trainer):
         self.adaptive_alpha = Config().algorithm.adaptive_alpha
         self.alpha = initial_alpha if self.alpha == 0.0 else self.alpha
 
-    def postprocess_models(self, config):
+    def postprocess_models(self):
         """Do nothing to the model."""
 
     def train_run_end(self, config):

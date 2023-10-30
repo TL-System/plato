@@ -43,7 +43,7 @@ class Trainer(personalized_trainer.Trainer):
                 self.model, Config().algorithm.personalized_module_names
             )
 
-        self.postprocess_models(config)
+        self.postprocess_models()
 
         # Do not save the personalized model as FedBABU utilizes the head as the
         # personalized model, which is not trained during the federated training.
