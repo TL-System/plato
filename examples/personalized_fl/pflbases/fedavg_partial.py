@@ -34,24 +34,21 @@ from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
-    """Federated averaging algorithm for the partial aggregation, used by both the client and the server."""
-
-    def get_algorithm_holder(self):
-        """Get who holds the defined algorithm."""
-        return (
-            f"server #{os.getpid()}"
-            if self.client_id == 0
-            else f"Client #{self.client_id}"
-        )
+    """
+    Federated averaging algorithm for partial aggregation, used by both the client 
+    and the server.
+    """
 
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
         modules_name: Optional[List[str]] = None,
     ):
-        """Extract weights from modules of the model.
-        By default, weights of the whole model will be extracted."""
+        """
+        Extract weights from modules of the model. By default, weights of the entire model will be extracted.
+        """
         model = self.model if model is None else model
+        
         modules_name = (
             modules_name
             if modules_name is not None
@@ -61,31 +58,26 @@ class Algorithm(fedavg.Algorithm):
                 else None
             )
         )
-        # when no modules are required,
-        # return the whole model
+
+        # When no module names are provided, return the entire model
         if modules_name is None:
             return model.cpu().state_dict()
-        else:
-            logging.info(
-                "[%s] Extracting parameters with names %s.",
-                self.get_algorithm_holder(),
-                modules_name,
-            )
 
-            return OrderedDict(
-                [
-                    (name, param)
-                    for name, param in model.cpu().state_dict().items()
-                    if any(
-                        param_name in name.strip().split(".")
-                        for param_name in modules_name
-                    )
-                ]
-            )
+        logging.info("[%s] Extracting parameters with names %s.", self, modules_name)
+
+        return OrderedDict(
+            [
+                (name, param)
+                for name, param in model.cpu().state_dict().items()
+                if any(
+                    param_name in name.strip().split(".")
+                    for param_name in modules_name
+                )
+            ]
+        )
 
     def is_consistent_weights(self, weights_param_name):
-        """Whether the 'weights' holds the parameters' name the same as the self.model."""
-
+        """Checks whether weights contain the same parameter names as the model."""
         model_params_name = self.model.state_dict().keys()
 
         def search_func(x, y):
