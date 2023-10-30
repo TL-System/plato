@@ -234,5 +234,3 @@ File "pflbases/personalized_trainer.py", line 426, in load_personalized_model
 AttributeError: 'NoneType' object has no attribute 'load_state_dict'
 ```
 This is caused by the fact that the program will not define the personalized model once there are saved models under `checkpoints/`.
-
-### An undetected running issue in the SSL experiments
