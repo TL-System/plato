@@ -1,28 +1,14 @@
 """
-The implementation for the BYOL [1] method.
+Implementation of the trainer for FedEMA.
 
-[1]. Jean-Bastien Grill, et al., Bootstrap Your Own Latent A New Approach to Self-Supervised Learning.
-https://arxiv.org/pdf/2006.07733.pdf.
-
-Source code: https://github.com/lucidrains/byol-pytorch
-The third-party code: https://github.com/sthalles/PyTorch-BYOL
+This trainer is the one used in BYOL method of FedSSL.
 """
 
-
 from lightly.utils.scheduler import cosine_schedule
-
-from plato.trainers import loss_criterion
 from lightly.models.utils import update_momentum
 
-from pflbases import fedavg_personalized_server
-from pflbases import fedavg_partial
-
-from pflbases.client_callbacks import local_completion_callbacks
-from pflbases.models import SSL
-
-from pflbases import ssl_client
+from plato.trainers import loss_criterion
 from pflbases import ssl_trainer
-from pflbases import ssl_datasources
 
 
 class Trainer(ssl_trainer.Trainer):
@@ -69,31 +55,3 @@ class Trainer(ssl_trainer.Trainer):
                 self.model.projection_head_momentum,
                 m=self.momentum_val,
             )
-
-
-def main():
-    """
-    A personalized federated learning sesstion for BYOL approach.
-    """
-    trainer = Trainer
-    client = ssl_client.Client(
-        model=SSL.BYOL,
-        datasource=ssl_datasources.TransformedDataSource,
-        personalized_datasource=ssl_datasources.TransformedDataSource,
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-        callbacks=[
-            local_completion_callbacks.ClientModelLocalCompletionCallback,
-        ],
-    )
-    server = fedavg_personalized_server.Server(
-        model=SSL.BYOL,
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-    )
-
-    server.run(client)
-
-
-if __name__ == "__main__":
-    main()

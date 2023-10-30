@@ -44,11 +44,17 @@ To make `pflbases` general enough as a personalized FL platform, two code parts 
 
 
 --- 
-## Baseline Algorithm
-
-We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as the baseline algorithm for personalized federated learning. The code is available under `fedavg_finetune/`.
 
 ## Implemented Algorithms
+
+To better compare the performance of different personalized federated learning approaches, we implemented the following algorithms using the `pflbases` framework. The code is available under `algorithms/`.
+
+### Baseline Algorithm
+
+We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as the baseline algorithm for personalized federated learning (FL). The code is available under `algorithms/fedavg_finetune/`.
+
+
+### Classical personalized FL approaches
 
 - {apfl} [Deng et al., "Adaptive Personalized Federated Learning", Arxiv 2020, citation 374](https://arxiv.org/pdf/2003.13461.pdf) - None
 
@@ -68,6 +74,12 @@ A model-agnostic meta-learning approach", NeurIPS 2019, citation 502](https://pr
 
 - {hermes} [Li et al., "Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients", ACM MobiCom 21, citation 75](https://www.ang-li.com/assets/pdf/hermes.pdf) - None (The algorithm, first developed by Ying Chen, has been refined to integrate with the `pflbases` framework.)
 
+### Personalized FL approaches with self-supervised learning
+
+In the context of self-supervised learning (SSL), the model is trained to learn representations from unlabeled data. Thus, the model is capable of extracting generic representations. A higher performance can be achieved in subsequent tasks with the trained model as the encoder. Such a benefit of SSL is introduced into personalized FL by relying on the learning objective of SSL to train the global model. After reaching convergence, each client can download the trained global model to extract features from local samples. A high-quality personalized model, typically a linear network, is prone to be achieved under those extracted features. The code is available under `SSL/`.
+
+- {SimCLR} [Chen et al., "A Simple Framework for Contrastive Learning of Visual Representations", Arxiv 2020, citation 374](https://arxiv.org/abs/2002.05709) - [Office code](https://github.com/google-research/simclr)
+
 
 ## Algorithms Running
 
@@ -83,6 +95,8 @@ pip install .
 ```bash
 python algorithms/fedavg_finetune/fedavg_finetune.py -c algorithms/configs/fedavg_finetune_CIFAR10_resnet18.yml -b pflExperiments
 ```
+
+---
 
 ```bash
 python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
@@ -115,6 +129,42 @@ python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10
 ```bash
 python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
 ```
+
+---
+
+```bash
+python algorithms/SSL/simclr/simclr.py -c algorithms/configs/SSL/simclr_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/simsiam/simsiam.py -c algorithms/configs/SSL/simsiam_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/smog/smog.py -c algorithms/configs/SSL/smog_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/swav/swav.py -c algorithms/configs/SSL/swav_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+This mocov2 may have some problems because the loss is not decreasing.
+```bash
+python algorithms/SSL/moco/mocov2.py -c algorithms/configs/SSL/mocov2_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/byol/byol.py -c algorithms/configs/SSL/byol_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/fedema/fedema.py -c algorithms/configs/SSL/fedema_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```bash
+python algorithms/SSL/calibre/calibre.py -c algorithms/configs/SSL/calibre_CIFAR10_resnet18.yml -b pflExperiments
+```
+
 
 
 ## Hyper-parameters
@@ -171,3 +221,18 @@ All hyper-parameters related to personalization should be placed under the `pers
             # obtained in each round
             do_personalization_per_round: true
     ```
+
+
+## Precautions
+
+### Error of `None` personalized model
+As `pflbases` heavily relies on the mechanism that allows each client to load the personalized model from the disk, it is important to ensure that the model loading is correct. Thus, to avoid the program loading personalized models under `checkpoints\` saved by different runnings in experiments, `pflbases` forces the user to delete the `checkpoints/` before each running,; there will be an error presenting as 
+
+```
+File "pflbases/personalized_trainer.py", line 426, in load_personalized_model
+    self.personalized_model.load_state_dict(
+AttributeError: 'NoneType' object has no attribute 'load_state_dict'
+```
+This is caused by the fact that the program will not define the personalized model once there are saved models under `checkpoints/`.
+
+### An undetected running issue in the SSL experiments

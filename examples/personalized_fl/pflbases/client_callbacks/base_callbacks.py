@@ -21,10 +21,14 @@ class PayloadStatusProcessor(base.Processor):
         self.algorithm = algorithm
 
     def process(self, data: Any) -> Any:
+        if isinstance(data, (list, tuple)):
+            payload = data[0]
+        else:
+            payload = data
         logging.info(
             "[Client #%d] Received the payload containing modules: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_modules_name(list(data.keys())),
+            self.algorithm.extract_modules_name(list(payload.keys())),
         )
 
         return data

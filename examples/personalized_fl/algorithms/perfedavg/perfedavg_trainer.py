@@ -87,67 +87,6 @@ class Trainer(personalized_trainer.Trainer):
         super().train_epoch_start(config)
         self.iter_trainloader = iter(self.train_loader)
 
-    def meta_forward_and_backward_passes_V2(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        This implementation derives from
-        https://github.com/KarhouTam/Per-FedAvg
-        """
-        alpha = Config().algorithm.alpha
-        beta = Config().algorithm.beta
-        if Config().algorithm.hessian_free:  # Per-FedAvg(HF)
-            temp_model = copy.deepcopy(self.model)
-
-            grads, _ = compute_gradients(
-                temp_model, self._loss_criterion, data_batch=(examples, labels)
-            )
-            for param, grad in zip(temp_model.parameters(), grads):
-                param.data.sub_(alpha * grad)
-
-            data_batch_2 = get_data_batch(
-                self.train_loader, self.iter_trainloader, self.device
-            )
-            grads_1st, _ = compute_gradients(
-                temp_model, self._loss_criterion, data_batch_2
-            )
-
-            data_batch_3 = get_data_batch(
-                self.train_loader, self.iter_trainloader, self.device
-            )
-            grads_2nd, loss = compute_gradients(
-                self.model,
-                self._loss_criterion,
-                data_batch_3,
-                base_grads=grads_1st,
-                second_order_grads=True,
-            )
-
-            for param, grad1, grad2 in zip(
-                self.model.parameters(), grads_1st, grads_2nd
-            ):
-                param.data.sub_(beta * grad1 - beta * alpha * grad2)
-
-        else:  # Per-FedAvg(FO)
-            temp_model = copy.deepcopy(self.model)
-            grads, _ = compute_gradients(
-                temp_model, self._loss_criterion, data_batch=(examples, labels)
-            )
-            for param, grad in zip(temp_model.parameters(), grads):
-                param.data.sub_(alpha * grad)
-
-            data_batch_2 = get_data_batch(
-                self.train_loader, self.iter_trainloader, self.device
-            )
-            grads, loss = compute_gradients(
-                temp_model, self._loss_criterion, data_batch_2
-            )
-            for param, grad in zip(self.model.parameters(), grads):
-                param.data.sub_(beta * grad)
-
-        self._loss_tracker.update(loss, labels.size(0))
-
-        return loss
-
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop.
 

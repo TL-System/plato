@@ -1,5 +1,5 @@
 """
-The training and testing loops for personalized federated learning.
+A trainer to support the personalized federated learning.
 
 """
 import logging
@@ -12,7 +12,7 @@ from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion
 from plato.models import registry as models_registry
 from plato.utils import fonts
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 
 from pflbases import trainer_utils
 from pflbases import checkpoint_operator
@@ -37,17 +37,17 @@ class Trainer(basic.Trainer):
             if hasattr(Config().algorithm.personalization, "model_name")
             else Config().trainer.model_name
         )
-        self.personalized_model_checkpoint_prefix = "personalized"
+        self.personalized_model_prefix = "personalized"
 
         # two indicators for personalization
         self.do_round_personalization = False
         self.do_final_personalization = False
 
-    def define_personalized_model(self, personalized_model_cls):
+    def define_personalized_model(self, custom_model):
         """Define the personalized model to this trainer."""
         trainer_utils.set_random_seeds(self.client_id)
 
-        if personalized_model_cls is None:
+        if custom_model is None:
             pers_model_type = (
                 Config().algorithm.personalization.model_type
                 if hasattr(Config().algorithm.personalization, "model_type")
@@ -60,7 +60,7 @@ class Trainer(basic.Trainer):
                 model_params=pers_model_params,
             )
         else:
-            self.personalized_model = personalized_model_cls.get()
+            self.personalized_model = custom_model.get()
 
         logging.info(
             "[Client #%d] Defined the personalized model: %s",
@@ -106,8 +106,11 @@ class Trainer(basic.Trainer):
         loss_criterion_type = Config().algorithm.personalization.loss_criterion
 
         loss_criterion_params = (
-            Config().parameters.personalization.loss_criterion._asdict()
+            {}
+            if not hasattr(Config().parameters.personalization, "loss_criterion")
+            else Config().parameters.personalization.loss_criterion._asdict()
         )
+
         return loss_criterion.get(
             loss_criterion=loss_criterion_type,
             loss_criterion_params=loss_criterion_params,
@@ -257,7 +260,7 @@ class Trainer(basic.Trainer):
         self.postprocess_models(config)
 
         if self.do_round_personalization or self.do_final_personalization:
-            self.perform_personalized_model_checkpoint(config)
+            self.perform_personalized_model_checkpoint(config=config)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
@@ -294,6 +297,21 @@ class Trainer(basic.Trainer):
 
         return loss
 
+    def get_personalized_test_loader(self, batch_size, testset, sampler, **kwargs):
+        """Getting one test loader based on the learning mode.
+
+        As this function is only utilized by the personalization
+        process, it can be safely converted to rely on the personalized
+        testset and sampler.
+        """
+
+        return torch.utils.data.DataLoader(
+            dataset=testset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
+        )
+
     def test_personalized_model(self, config, testset, sampler=None, **kwargs):
         """Test the personalized model."""
         # Define the test phase of the eval stage
@@ -304,8 +322,8 @@ class Trainer(basic.Trainer):
         self.personalized_model.to(self.device)
 
         batch_size = config["batch_size"]
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        test_loader = self.get_personalized_test_loader(
+            batch_size, testset, sampler=sampler, **kwargs
         )
 
         correct = 0
@@ -333,30 +351,66 @@ class Trainer(basic.Trainer):
         personalized model."""
 
         if self.do_round_personalization or self.do_final_personalization:
-            return self.test_personalized_model(config, testset, sampler=None, **kwargs)
+            return self.test_personalized_model(
+                config, testset, sampler=sampler, **kwargs
+            )
         return super().test_model(config, testset, sampler, **kwargs)
 
-    def perform_personalized_model_checkpoint(self, config, epoch=None, **kwargs):
-        """Performing the saving for the personalized model with
-        necessary learning parameters."""
-        current_round = self.current_round
+    def get_model_checkpoint_path(
+        self, model_name: str, prefix=None, round_n=None, epoch_n=None
+    ):
+        """Getting the path of the personalized model."""
+        current_round = self.current_round if round_n is None else round_n
 
-        personalized_model_name = self.personalized_model_name
         save_location = self.get_checkpoint_dir_path()
         filename = NameFormatter.get_format_name(
             client_id=self.client_id,
-            model_name=personalized_model_name,
+            model_name=model_name,
             round_n=current_round,
-            epoch_n=epoch,
+            epoch_n=epoch_n,
             run_id=None,
-            prefix=self.personalized_model_checkpoint_prefix,
+            prefix=prefix,
             ext="pth",
         )
-        os.makedirs(save_location, exist_ok=True)
+
+        return save_location, filename
+
+    def perform_personalized_model_checkpoint(self, config, **kwargs):
+        """Performing the saving for the personalized model with
+        necessary learning parameters."""
+        round_n = kwargs.pop("round") if "round" in kwargs else self.current_round
+        epoch_n = kwargs.pop("epoch") if "epoch" in kwargs else None
+        model_name = self.personalized_model_name
+        prefix = self.personalized_model_prefix
+        save_location, filename = self.get_model_checkpoint_path(
+            model_name=model_name,
+            prefix=prefix,
+            round_n=round_n,
+            epoch_n=epoch_n,
+        )
 
         self.save_personalized_model(
             filename=filename, location=save_location, **kwargs
         )
+
+        # always remove the expired checkpoints
+        self.remove_expired_checkpoints(model_name, prefix, round_n=round_n)
+
+    def remove_expired_checkpoints(self, model_name, prefix, **kwargs):
+        """Removing invalid checkpoints under the checkpoints_dir.
+        This function will only maintain the initial one and latest one.
+        """
+        current_round = (
+            self.current_round if "round_n" not in kwargs else kwargs["round_n"]
+        )
+        for round_id in range(1, current_round):
+            save_location, filename = self.get_model_checkpoint_path(
+                model_name=model_name,
+                prefix=prefix,
+                round_n=round_id,
+            )
+            if os.path.exists(os.path.join(save_location, filename)):
+                os.remove(os.path.join(save_location, filename))
 
     def save_personalized_model(self, filename=None, location=None, **kwargs):
         """Saving the model to a file."""

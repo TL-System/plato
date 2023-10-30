@@ -9,10 +9,10 @@ import logging
 from plato.samplers import registry as samplers_registry
 from plato.config import Config
 
-from pflbases import personalized_client
+from pflbases import separate_local_client
 
 
-class Client(personalized_client.Client):
+class Client(separate_local_client.Client):
     """A basic personalized federated learning client for self-supervised learning."""
 
     def __init__(
@@ -100,7 +100,9 @@ class Client(personalized_client.Client):
         super().inbound_received(inbound_processor)
 
         # set personalized terms for the trainer
-        self.trainer.set_personalized_trainset(self.personalized_trainset)
-        self.trainer.set_personalized_trainset_sampler(self.personalized_sampler)
-        self.trainer.set_personalized_testset(self.personalized_testset)
-        self.trainer.set_personalized_testset_sampler(self.personalized_testset_sampler)
+        self.trainer.set_personalized_trainset(
+            self.personalized_trainset, self.personalized_sampler
+        )
+        self.trainer.set_personalized_testset(
+            self.personalized_testset, self.personalized_testset_sampler
+        )

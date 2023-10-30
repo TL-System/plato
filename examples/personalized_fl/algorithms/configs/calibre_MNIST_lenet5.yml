@@ -9,38 +9,24 @@ clients:
     # Should the clients compute test accuracy locally?
     do_test: false
 
+    random_seed: 1
 
 server:
-
     address: 127.0.0.1
-    port: 8000
-
+    port: 8009
     do_test: false
+    random_seed: 1
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
     
 
 data:
-    # The training and testing dataset
-    datasource: CIFAR10
-    personalized_datasource: CIFAR10
-
-    # Number of samples in each partition
-    partition_size: 2000
-
-    # IID or non-IID?
-    sampler: noniid
-    testset_sampler: noniid
-
-    # personalized_sampler: noniid
-    # personalized_testset_sampler: noniid
-
-    # The concentration parameter for the Dirichlet distribution
-    concentration: 0.5
-
-    # The random seed for sampling data
-    random_seed: 1
+    # mnist non-iid distribution
+    !include mnist_ssl_noniid.yml
 
 trainer:
-
+    # LeNet5 model with the basic trainer
     # The maximum number of training rounds
     rounds: 2
 
@@ -58,38 +44,55 @@ trainer:
     loss_criterion: NTXentLoss
 
     # The machine learning model
-    model_name: MoCoV2
-    encoder_name: resnet_18
-
-    projection_hidden_dim: 512
-    projection_out_dim: 128
-
-    global_modules_name:
-        - encoder
-        - projection_head
-
+    model_name: Calibre
+    encoder_name: lenet5
+    projection_hidden_dim: 2048
+    projection_out_dim: 256
 
 algorithm:
     # Aggregation algorithm
     type: fedavg_partial
+
     #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
     data_transforms:
         train_transform:
-            name: MoCoV2
+            name: SimCLR
             parameters:
-                input_size: 32
+                input_size: 28
+
+    global_modules_name:
+        - encoder
 
     completion_modules_name:
-        -
+        - projector
+
+    # auxiliary_loss_criterions:
+    #     - meta_prototype_representation_loss
+    #     - meta_prototype_contrastive_representation_loss
+
+    # auxiliary_loss_criterions_param:
+    #     meta_prototype_representation_loss:
+    #         temperature: 0.2
+    #     meta_prototype_contrastive_representation_loss:
+    #         temperature: 0.2
+    
+    # losses_weight:
+    #     NTXentLoss: 0.6
+    #     meta_prototype_representation_loss: 0.2
+    #     meta_prototype_contrastive_representation_loss: 0.2
+
+    losses_weight:
+        NTXentLoss: 1.0
+
 
     personalization:
 
         # Number of epochs for local training in each communication round
         #   The batch size for the downstream task can be larger as it
         # does not utilize the
-        epochs: 10
+        epochs: 5
         batch_size: 32
         optimizer: SGD
         lr_scheduler: StepLR
@@ -103,7 +106,10 @@ algorithm:
         model_logging_epoch_interval: 2
 
         # the ratio of clients participanting in training
-        participating_clients_ratio: 0.5
+        participant_clients_ratio: 1.0
+        
+        # whether load the personalized each round
+        load_model_per_round: false
         
         # whether maintain and load the trained 
         # personalied model
@@ -120,37 +126,10 @@ algorithm:
 
 
 parameters:
+    # LeNet5 training params
+    !include lenet5_ssl_params.yml
 
-    optimizer:
-        lr: 0.01
-        momentum: 0.9
-        weight_decay: 0.0
-
-    learning_rate:
-        gamma: 0.1
-        milestone_steps: 150ep,350ep
-
-    loss_criterion:
-        temperature: 0.2
-        memory_bank_size: 4096
-
-    model:
-        num_classes: 10
-
-    personalization:
-
-        optimizer:
-            lr: 0.01  
-            momentum: 0.9
-            weight_decay: 0.0
-
-        learning_rate:
-            gamma: 0.3
-            step_size: 10
-
-        loss_criterion:
-            label_smoothing: 0.5
-
-        model:
-            num_classes: 10
-
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, round_time
+    result_path: results/pfl-simclr

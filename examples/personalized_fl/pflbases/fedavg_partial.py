@@ -32,6 +32,25 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting sub-modules from a model."""
 
+    def get_target_weights(self, model_parameters: dict, modules_name: List[str]):
+        """Get the target weights from the parameters data based on the modules name."""
+        parameters_data = model_parameters.items()
+        extracted_weights = OrderedDict(
+            [
+                (name, param)
+                for name, param in parameters_data
+                if any(
+                    param_name in name.strip().split(".") for param_name in modules_name
+                )
+            ]
+        )
+        logging.info(
+            "[%s] Extracted modules: %s.",
+            self.get_algorithm_holder(),
+            self.extract_modules_name(list(extracted_weights.keys())),
+        )
+        return extracted_weights
+
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
@@ -52,24 +71,15 @@ class Algorithm(fedavg.Algorithm):
             )
         )
 
-        # When no module names are provided, return the entire model
         # when the `global_modules_name` is not set and
         # the `modules_name` is not provided, this function
         # returns the whole model.
         if modules_name is None:
             return model.cpu().state_dict()
-
-        logging.info("[%s] Extracting parameters with names %s.", self, modules_name)
-
-        return OrderedDict(
-            [
-                (name, param)
-                for name, param in model.cpu().state_dict().items()
-                if any(
-                    param_name in name.strip().split(".") for param_name in modules_name
-                )
-            ]
-        )
+        else:
+            return self.get_target_weights(
+                model.cpu().state_dict(), modules_name=modules_name
+            )
 
     def is_consistent_weights(self, weights_param_name):
         """Check whether weights contain the same parameter names as the model."""
@@ -122,4 +132,9 @@ class Algorithm(fedavg.Algorithm):
 
     def load_weights(self, weights):
         """Loads the model weights passed in as a parameter."""
+        logging.info(
+            "[%s] Loading modules with names %s to the model.",
+            self.get_algorithm_holder(),
+            self.extract_modules_name(list(weights.keys())),
+        )
         self.model.load_state_dict(weights, strict=False)

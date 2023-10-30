@@ -73,6 +73,6 @@ parameters:
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead
+    types: round, accuracy, accuracy_std, elapsed_time, round_time, comm_overhead
     result_path: results/hermes
 

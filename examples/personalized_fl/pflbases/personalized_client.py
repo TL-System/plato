@@ -31,7 +31,7 @@ import os
 
 from plato.clients import simple
 from plato.config import Config
-from plato.utils.filename_formatter import NameFormatter
+from pflbases.filename_formatter import NameFormatter
 
 from pflbases import checkpoint_operator
 
@@ -91,7 +91,10 @@ class Client(simple.Client):
         self.trainer.do_final_personalization = self.is_final_personalization()
 
         # get the initial personalized model path
-        self.init_personalized_model_path = self.get_init_personalized_model_path()
+        self.init_personalized_model_path = self.get_init_model_path(
+            model_name=self.trainer.personalized_model_name,
+            prefix=self.trainer.personalized_model_prefix,
+        )
 
         # if this client does not its initialized personalized model yet.
         # and the personalized model is required in the subsequent learning
@@ -124,43 +127,47 @@ class Client(simple.Client):
             self.get_personalized_model()
 
     def get_personalized_model(self):
-        """Getting the personalized model of the client."""
-
+        """Getting the personalized model of the client.
+        Default, the latest personalized model is obtained.
+        """
         # always get the latest personalized model.
         desired_round = self.current_round - 1
-        location = self.trainer.get_checkpoint_dir_path()
+        model_name = self.trainer.personalized_model_name
+        prefix = self.trainer.personalized_model_prefix
+        save_location, filename = self.trainer.get_model_checkpoint_path(
+            model_name=model_name,
+            prefix=prefix,
+            round_n=desired_round,
+            epoch_n=None,
+        )
 
-        filename, is_searched = checkpoint_operator.search_client_checkpoint(
-            client_id=self.client_id,
-            checkpoints_dir=location,
-            model_name=self.trainer.personalized_model_name,
-            current_round=desired_round,
-            run_id=None,
-            epoch=None,
-            prefix=self.trainer.personalized_model_checkpoint_prefix,
+        filename, is_searched = checkpoint_operator.search_checkpoint_file(
+            filename=filename,
+            checkpoints_dir=save_location,
+            key_words=[model_name, prefix],
             anchor_metric="round",
             mask_words=["epoch"],
             use_latest=True,
         )
         if is_searched:
-            self.trainer.load_personalized_model(filename, location=location)
+            self.trainer.load_personalized_model(filename, location=save_location)
         else:
             self.trainer.load_personalized_model(
                 filename=os.path.basename(self.init_personalized_model_path),
-                location=location,
+                location=save_location,
             )
 
-    def get_init_personalized_model_path(self):
-        """Get the path of the personalized model."""
+    def get_init_model_path(self, model_name: str, prefix: str):
+        """Get the path of saved initial model (untrained)."""
         checkpoint_dir_path = self.trainer.get_checkpoint_dir_path()
 
         filename = NameFormatter.get_format_name(
-            model_name=self.trainer.personalized_model_name,
+            model_name=model_name,
             client_id=self.client_id,
             round_n=0,
             epoch_n=None,
             run_id=None,
-            prefix=self.trainer.personalized_model_checkpoint_prefix,
+            prefix=prefix,
             ext="pth",
         )
         model_path = os.path.join(checkpoint_dir_path, filename)

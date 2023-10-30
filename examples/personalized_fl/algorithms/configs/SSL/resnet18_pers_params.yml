@@ -1,0 +1,19 @@
+
+optimizer:
+    lr: 0.01 
+    momentum: 0.9
+    weight_decay: 0.0
+
+learning_rate:
+    gamma: 0.3
+    step_size: 10
+
+# loss_criterion:
+    # we cannot use lable smoothing as
+    # 'aten::masked_scatter_' has not been 
+    # supported in the MPS device
+    # label_smoothing: 0.5
+
+model:
+    num_classes: 10
+    

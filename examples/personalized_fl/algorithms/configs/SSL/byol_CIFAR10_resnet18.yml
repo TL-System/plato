@@ -7,7 +7,7 @@ clients:
     per_round: 2
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     random_seed: 1
 
@@ -40,13 +40,16 @@ trainer:
     batch_size: 128
     optimizer: SGD
     lr_scheduler: MultiStepLR
-    loss_criterion: NTXentLoss
+    loss_criterion: NegativeCosineSimilarity
 
     # The machine learning model
-    model_name: SimCLR
+    model_name: BYOL
     encoder_name: resnet_18
-    projection_hidden_dim: 2048
+
+    projection_hidden_dim: 1024
     projection_out_dim: 256
+    prediction_hidden_dim: 1024
+    prediction_out_dim: 256
 
 
 algorithm:
@@ -65,54 +68,38 @@ algorithm:
         - encoder
         
     completion_modules_name:
-        - projector
+        - projection_head
+        - prediction_head
         
     personalization:
 
-        # Number of epochs for local training in each communication round
-        #   The batch size for the downstream task can be larger as it
-        # does not utilize the
-        epochs: 5
-        batch_size: 32
-        optimizer: SGD
-        lr_scheduler: StepLR
-        loss_criterion: CrossEntropyLoss
-
-        model_type: general_multilayer
-        model_name: linear_mlp
-
-        logging_iteration_interval: 50
-        logging_epoch_interval: 1
-        model_logging_epoch_interval: 2
-
-        # the ratio of clients participanting in training
-        participating_clients_ratio: 1.0
-        
-        # whether load the personalized each round
-        load_model_per_round: false
-
-        # whether maintain and load the trained 
-        # personalied model
-        # set to be true, each client will load
-        # the latest trained personalized model
-        persist_personalized_model: False
-
-        # do personalization 
-        # for every `do_personalization_interval` rounds
-        # set -1 to do personalized only after the final round
-        do_personalization_interval: -1
-        # total, participant, nonparticipant
-        do_personalization_group: total
+        !include ssl_personalization.yml
 
 
 parameters:
     # ResNet-18 ssl training params
-    !include resnet18_ssl_params.yml
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0001
+
+    learning_rate:
+        gamma: 0.1
+        milestone_steps: 150ep,350ep
+
+    loss_criterion:
+        eps: 1.0E-8
+
+    model:
+        num_classes: 10
+
+    personalization:
+        !include resnet18_pers_params.yml
 
 results:
     # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, round_time
-    result_path: results/pfl-simclr
+    types: round, accuracy, accuracy_std, elapsed_time, round_time, comm_overhead
+    result_path: results/pfl-byol
 
     
 
