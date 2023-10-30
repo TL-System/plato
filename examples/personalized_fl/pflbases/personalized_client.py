@@ -144,7 +144,6 @@ class Client(simple.Client):
         filename, is_searched = trainer_utils.search_checkpoint_file(
             checkpoint_dir=self.trainer.get_checkpoint_dir_path(),
             filename=filename,
-            checkpoints_dir=save_location,
             key_words=[model_name, prefix],
             anchor_metric="round",
             mask_words=["epoch"],
