@@ -4,14 +4,14 @@ An algorithm for loading, aggregating, and extracting partial modules from a sin
 In some scenarios, given one defined model, the users want to utilize the sub-modules as 
 the global model in federated learning. Thus, solely these desired sub-modules will be 
 extracted and aggregated during the learning process. Thus, the algorithm proposes to 
-support this feature by setting the hyper-parameter `global_modules_name` in the config file.
+support this feature by setting the hyper-parameter `global_module_name` in the config file.
 
 The format of this hyper-parameter should be a list containing the names of the desired layers.
 
-For example, when utilizing the "LeNet5" as the target model, the `global_modules_name` can
+For example, when utilizing the "LeNet5" as the target model, the `global_module_name` can
 be defined as:
 
-    global_modules_name:
+    global_module_name:
         - conv1
         - conv2
 
@@ -32,53 +32,53 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting sub-modules from a model."""
 
-    def get_target_weights(self, model_parameters: dict, modules_name: List[str]):
-        """Get the target weights from the parameters data based on the modules name."""
+    def get_target_weights(self, model_parameters: dict, module_name: List[str]):
+        """Get the target weights from the parameters data based on the module name."""
         parameters_data = model_parameters.items()
         extracted_weights = OrderedDict(
             [
                 (name, param)
                 for name, param in parameters_data
                 if any(
-                    param_name in name.strip().split(".") for param_name in modules_name
+                    param_name in name.strip().split(".") for param_name in module_name
                 )
             ]
         )
         logging.info(
             "[%s] Extracted modules: %s.",
             repr(self),
-            self.extract_modules_name(list(extracted_weights.keys())),
+            self.extract_module_name(list(extracted_weights.keys())),
         )
         return extracted_weights
 
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
-        modules_name: Optional[List[str]] = None,
+        module_name: Optional[List[str]] = None,
     ):
         """
         Extract weights from modules of the model. By default, weights of the entire model will be extracted.
         """
         model = self.model if model is None else model
 
-        modules_name = (
-            modules_name
-            if modules_name is not None
+        module_name = (
+            module_name
+            if module_name is not None
             else (
-                Config().algorithm.global_modules_name
-                if hasattr(Config().algorithm, "global_modules_name")
+                Config().algorithm.global_module_name
+                if hasattr(Config().algorithm, "global_module_name")
                 else None
             )
         )
 
-        # when the `global_modules_name` is not set and
-        # the `modules_name` is not provided, this function
+        # when the `global_module_name` is not set and
+        # the `module_name` is not provided, this function
         # returns the whole model.
-        if modules_name is None:
+        if module_name is None:
             return model.cpu().state_dict()
         else:
             return self.get_target_weights(
-                model.cpu().state_dict(), modules_name=modules_name
+                model.cpu().state_dict(), module_name=module_name
             )
 
     def is_consistent_weights(self, weights_param_name):
@@ -97,7 +97,7 @@ class Algorithm(fedavg.Algorithm):
         return len(inconsistent_params) == 0, inconsistent_params
 
     @staticmethod
-    def extract_modules_name(parameter_names):
+    def extract_module_name(parameter_names):
         """Extract module names from given parameter names."""
 
         extracted_names = []
@@ -135,6 +135,6 @@ class Algorithm(fedavg.Algorithm):
         logging.info(
             "[%s] Loading modules with names %s to the model.",
             repr(self),
-            self.extract_modules_name(list(weights.keys())),
+            self.extract_module_name(list(weights.keys())),
         )
         self.model.load_state_dict(weights, strict=False)
