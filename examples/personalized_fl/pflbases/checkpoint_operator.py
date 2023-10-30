@@ -25,7 +25,7 @@ class CheckpointsOperator:
     def save_checkpoint(
         self,
         model_state_dict: Dict[str, torch.Tensor],
-        checkpoints_name: List[str],
+        filename: str,
         optimizer_state_dict: Optional[dict] = None,
         lr_scheduler_state_dict: Optional[dict] = None,
         learning_dict: Optional[dict] = None,
@@ -35,9 +35,7 @@ class CheckpointsOperator:
         """Save the checkpoint to specific dir.
 
         :param model_state_dict: A Dict holding the state of a to-be-saved model.
-        :param checkpoints_name: The List contains strings for the names of checkpoint
-         files. This supports saving the checkpoint to multiple pieces, each corresponding
-         to one string name.
+        :param filename: The filename used to save the model.
         :param optimizer_state_dict: A Dict holding the state of a to-be-saved optimizer.
          Default to be None for not saving.
         :param lr_scheduler_state_dict: A Dict holding the state of a to-be-saved lr_scheduler.
@@ -50,23 +48,20 @@ class CheckpointsOperator:
         :param config_args: A Dict containing the hyper-parameters.
          Default to be None for not saving.
         """
-        checkpoint_paths = [
-            os.path.join(self.checkpoints_dir, ckpt_name)
-            for ckpt_name in checkpoints_name
-        ]
 
-        for checkpoint_path in checkpoint_paths:
-            torch.save(
-                {
-                    "model": model_state_dict,
-                    "optimizer": optimizer_state_dict,
-                    "lr_scheduler": lr_scheduler_state_dict,
-                    "learning": learning_dict,
-                    "epoch": epoch,
-                    "args": config_args,
-                },
-                checkpoint_path,
-            )
+        filepath = os.path.join(self.checkpoints_dir, filename)
+
+        torch.save(
+            {
+                "model": model_state_dict,
+                "optimizer": optimizer_state_dict,
+                "lr_scheduler": lr_scheduler_state_dict,
+                "learning": learning_dict,
+                "epoch": epoch,
+                "args": config_args,
+            },
+            filepath,
+        )
 
         return True
 
@@ -163,7 +158,7 @@ def save_client_checkpoint(
     )
     cpk_oper.save_checkpoint(
         model_state_dict=model_state_dict,
-        checkpoints_name=[filename],
+        filename=filename,
         optimizer_state_dict=optimizer_state_dict,
         lr_scheduler_state_dict=lr_scheduler_state_dict,
         learning_dict=learning_dict,
