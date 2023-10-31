@@ -1,11 +1,10 @@
 """
 An algorithm for extracting partial modules from a model.
 
-These sub-moduels can be set by the `global_module_names` hyper-parameter in the 
+These modules can be set by the `global_module_names` hyper-parameter in the 
 configuration file.
 
-For example, when utilizing the "LeNet5" as the model, the `global_module_names` can
-be defined as:
+For example, with the LeNet-5 model, `global_module_names` can be defined as:
 
     global_module_names:
         - conv1
@@ -23,15 +22,13 @@ from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
-    """A base algorithm for extracting sub-modules from a model."""
-
+    """A base algorithm for extracting modules from a model."""
     def get_module_weights(self, model_parameters: dict, module_names: List[str]):
         """Get weights from model parameters based on module names."""
-        parameters_data = model_parameters.items()
         return OrderedDict(
             [
                 (name, param)
-                for name, param in parameters_data
+                for name, param in model_parameters.items()
                 if any(
                     param_name in name.strip().split(".") for param_name in module_names
                 )
@@ -50,9 +47,8 @@ class Algorithm(fedavg.Algorithm):
             module_names = Config().algorithm.global_module_names
 
         if module_names is None:
-            # When the `global_module_names` is not set and
-            # the `module_name` is not provided, return the
-            # whole model weights
+            # When `global_module_names` is not set and `module_name` is not provided,
+            # return all the model weights
             return model.cpu().state_dict()
         else:
             return self.get_module_weights(
@@ -62,7 +58,6 @@ class Algorithm(fedavg.Algorithm):
     @staticmethod
     def extract_module_names(parameter_names):
         """Extract module names from given parameter names."""
-
         # The split string to split the parameter name
         # Generally, the parameter name is a list of sub-names
         # connected by '.',
@@ -101,6 +96,5 @@ class Algorithm(fedavg.Algorithm):
         return extracted_names
 
     def load_weights(self, weights):
-        """Loads the model weights passed in as a parameter."""
-
+        """Loads a portion of the model weights passed in as a parameter."""
         self.model.load_state_dict(weights, strict=False)
