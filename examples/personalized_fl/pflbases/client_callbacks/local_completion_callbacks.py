@@ -29,7 +29,7 @@ class PayloadCompletionProcessor(base.Processor):
         assert hasattr(Config().algorithm, "local_module_names")
         local_module_names = Config().algorithm.local_module_names
 
-        # Local the previous saved model
+        # Load the previously saved local model
         filename = f"client_{self.trainer.client_id}_local_model.pth"
         location = Config().params["checkpoint_path"]
 
@@ -43,9 +43,11 @@ class PayloadCompletionProcessor(base.Processor):
             self.algorithm.extract_module_names(list(model_modules.keys())),
         )
 
+        # Extract desired local modules
         local_modules = self.algorithm.get_module_weights(
             model_parameters=model_modules, module_names=local_module_names
         )
+        # Update the payload with the local modules
         data.update(local_modules)
 
         logging.info(
