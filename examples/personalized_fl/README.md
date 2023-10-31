@@ -1,8 +1,7 @@
-# Simple Functions towards Implementing Personalized Federated Learning
 
 `pflbases` offers a set of fundamental functions designed to facilitate the implementation of the Personalized Federated Learning (FL) algorithm. Its objective is to provide both fairness and reproducibility guarantees. 
 
-## Core Functions
+## Core Components
 
 - the _completion_ callbacks placed under `client_callbacks` merge other models into the `self.model` parameters. 
     > For example, when the whole model is A+B, you can set the global model to be A while the local model is B. Then, the completion callback will merge B into A to obtain the whole model before local update.
