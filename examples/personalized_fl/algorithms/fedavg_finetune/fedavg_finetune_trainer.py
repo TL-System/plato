@@ -15,7 +15,7 @@ class Trainer(basic.Trainer):
         super().train_run_start(config)
         if self.current_round > Config().trainer.rounds:
             # Freeze the model body while only optimizing the head
-            # furing the final personalization
+            # during the final personalization
             trainer_utils.freeze_model(
                 self.model, Config().algorithm.global_module_names
             )
