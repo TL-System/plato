@@ -34,11 +34,12 @@ class BYOL(nn.Module):
         )
 
         # Define the encoder.
-        self.encoder = (
-            encoder
-            if encoder is not None
-            else encoder_registry.get(model_name=encoder_name, **encoder_params)
-        )
+        if encoder is not None:
+            self.encoder = encoder
+        else:
+            self.encoder = encoder_registry.get(
+                model_name=encoder_name, **encoder_params
+            )
 
         self.encoding_dim = self.encoder.encoding_dim
         projection_hidden_dim = Config().trainer.projection_hidden_dim
@@ -103,11 +104,12 @@ class SimCLR(nn.Module):
         projection_out_dim = Config().trainer.projection_out_dim
 
         # Define the encoder based on the model_name in config.
-        self.encoder = (
-            encoder
-            if encoder is not None
-            else encoder_registry.get(model_name=encoder_name, **encoder_params)
-        )
+        if encoder is not None:
+            self.encoder = encoder
+        else:
+            self.encoder = encoder_registry.get(
+                model_name=encoder_name, **encoder_params
+            )
 
         self.encoding_dim = self.encoder.encoding_dim
         self.projector = SimCLRProjectionHead(
@@ -138,11 +140,12 @@ class SimSiam(nn.Module):
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
         # Define the encoder based on the model_name in config.
-        self.encoder = (
-            encoder
-            if encoder is not None
-            else encoder_registry.get(model_name=encoder_name, **encoder_params)
-        )
+        if encoder is not None:
+            self.encoder = encoder
+        else:
+            self.encoder = encoder_registry.get(
+                model_name=encoder_name, **encoder_params
+            )
 
         self.encoding_dim = self.encoder.encoding_dim
 
@@ -195,11 +198,12 @@ class SMoG(nn.Module):
         )
 
         # Define the encoder based on the model_name in config.
-        self.encoder = (
-            encoder
-            if encoder is not None
-            else encoder_registry.get(model_name=encoder_name, **encoder_params)
-        )
+        if encoder is not None:
+            self.encoder = encoder
+        else:
+            self.encoder = encoder_registry.get(
+                model_name=encoder_name, **encoder_params
+            )
 
         self.encoding_dim = self.encoder.encoding_dim
         projection_hidden_dim = Config().trainer.projection_hidden_dim
@@ -301,11 +305,12 @@ class SwaV(nn.Module):
         )
 
         # Define the encoder.
-        self.encoder = (
-            encoder
-            if encoder is not None
-            else encoder_registry.get(model_name=encoder_name, **encoder_params)
-        )
+        if encoder is not None:
+            self.encoder = encoder
+        else:
+            self.encoder = encoder_registry.get(
+                model_name=encoder_name, **encoder_params
+            )
 
         self.encoding_dim = self.encoder.encoding_dim
 
@@ -351,11 +356,12 @@ class MoCoV2(nn.Module):
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
         # Define the encoder.
-        self.encoder = (
-            encoder
-            if encoder is not None
-            else encoder_registry.get(model_name=encoder_name, **encoder_params)
-        )
+        if encoder is not None:
+            self.encoder = encoder
+        else:
+            self.encoder = encoder_registry.get(
+                model_name=encoder_name, **encoder_params
+            )
 
         self.encoding_dim = self.encoder.encoding_dim
 
