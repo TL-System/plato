@@ -1,5 +1,5 @@
 """
-The trainer for the fedavg algorithm with fine-tuning.
+The trainer for the fedavg algorithm with fine-tuning in personalization round.
 """
 from pflbases import trainer_utils
 
