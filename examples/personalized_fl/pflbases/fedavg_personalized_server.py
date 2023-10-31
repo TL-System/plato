@@ -35,7 +35,7 @@ class Server(fedavg.Server):
         self.participating_clients_pool = None
 
         # Whether stop the terminate personalization afterwards
-        self.to_terminate_personalization = False
+        self.personalization_started = False
 
         self.initialize_personalization()
 
