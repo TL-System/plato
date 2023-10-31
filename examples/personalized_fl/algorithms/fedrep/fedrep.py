@@ -10,13 +10,13 @@ https://arxiv.org/abs/2102.07078
 
 Source code: https://github.com/lgcollins/FedRep
 """
-from pflbases import fedavg_personalized
-from pflbases import fedavg_partial
-from pflbases.client_callbacks import local_completion_callbacks
-
 import fedrep_trainer
 
 from plato.clients import simple
+
+from pflbases import fedavg_personalized
+from pflbases import fedavg_partial
+from pflbases.client_callbacks import local_completion_callbacks
 
 
 def main():

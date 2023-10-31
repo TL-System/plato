@@ -54,7 +54,7 @@ class Trainer(basic.Trainer):
                     self.model, Config().algorithm.local_module_names
                 )
 
-            # The representation will then be optimized for only one epoch
+            # The representation will then be optimized for only one epoch.
             if self.current_epoch > head_epochs:
                 trainer_utils.freeze_model(
                     self.model,
@@ -65,13 +65,13 @@ class Trainer(basic.Trainer):
                 )
         else:
             # The body of the model will be frozen during the
-            # final personalization
+            # final personalization.
             trainer_utils.freeze_model(
                 self.model,
                 Config().algorithm.global_module_names,
             )
 
     def train_run_end(self, config):
-        """Activating the model."""
+        """Activate the model."""
         super().train_run_end(config)
         trainer_utils.activate_model(self.model, Config().algorithm.global_module_names)
