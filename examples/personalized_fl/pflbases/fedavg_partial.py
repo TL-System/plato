@@ -25,7 +25,7 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting sub-modules from a model."""
 
-    def get_target_weights(self, model_parameters: dict, module_names: List[str]):
+    def get_module_weights(self, model_parameters: dict, module_names: List[str]):
         """Get target weights from model parameters based on the module name."""
         parameters_data = model_parameters.items()
         return OrderedDict(
@@ -65,7 +65,7 @@ class Algorithm(fedavg.Algorithm):
         if module_names is None:
             return model.cpu().state_dict()
         else:
-            return self.get_target_weights(
+            return self.get_module_weights(
                 model.cpu().state_dict(), module_names=module_names
             )
 
