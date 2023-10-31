@@ -11,7 +11,6 @@ import logging
 
 from plato.servers import fedavg
 from plato.config import Config
-from plato.utils import fonts
 
 
 class Server(fedavg.Server):
@@ -28,50 +27,44 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
 
-        # The number of participanted clients
+        # The number of clients that will be selected
+        # in federated learning
         self.number_participating_clients = 0
 
-        # The list of participanted clients
+        # The ids of these selected clients
         self.participating_clients_pool = None
 
-        # Whether stop the terminate personalization afterwards
+        # Whether personalization has been started
         self.personalization_started = False
 
         self.initialize_personalization()
 
     def initialize_personalization(self):
         """Initialize two types of clients."""
-        # Set participant and nonparticipating clients
-        loaded_config = Config()
 
-        ## 1. Initialize participanting clients
-        participating_clients_ratio = (
-            loaded_config.algorithm.personalization.participating_clients_ratio
-            if hasattr(
-                loaded_config.algorithm.personalization, "participating_clients_ratio"
-            )
+        ## 1. Initialize participanting client ratio
+        participating_client_ratio = (
+            Config().algorithm.personalization.participating_client_ratio
+            if hasattr(Config().algorithm.personalization, "participating_client_ratio")
             else 1.0
         )
 
         #  clients will / will not participant in federated training
         self.number_participating_clients = int(
-            self.total_clients * participating_clients_ratio
+            self.total_clients * participating_client_ratio
         )
 
         logging.info(
-            fonts.colourize(
-                "[%s] Total clients (%d), participanting clients (%d), "
-                "participanting ratio (%.3f).",
-                colour="blue",
-            ),
+            "[%s] Total clients (%d), participanting clients (%d), "
+            "participanting ratio (%.3f).",
             self,
             self.total_clients,
             self.number_participating_clients,
-            participating_clients_ratio,
+            participating_client_ratio,
         )
 
-    def set_various_clients_pool(self, clients_pool: List[int]):
-        """Set various clients pool utilized in federated learning.
+    def set_clients_pool(self, clients_pool: List[int]):
+        """Set clients pool utilized in federated learning.
 
         Note: the participating clients pool will be set in the first round and no
             modification is performed afterwards.
@@ -84,14 +77,12 @@ class Server(fedavg.Server):
             ]
 
             logging.info(
-                fonts.colourize(
-                    "[%s] Prepared participating clients pool: %s", colour="blue"
-                ),
+                "[%s] Prepared participating clients pool: %s",
                 self,
                 self.participating_clients_pool,
             )
 
-    def perform_normal_training(self, clients_pool: List[int], clients_count: int):
+    def get_normal_clients(self, clients_pool: List[int], clients_count: int):
         """Operations to guarantee general federated learning without personalization."""
 
         # Reset `clients_per_round` to the predefined hyper-parameter
@@ -107,14 +98,10 @@ class Server(fedavg.Server):
 
         return clients_pool, clients_count
 
-    def perform_final_personalization(self):
+    def get_personalization_clients(self):
         """Performing personalization after the final round."""
 
-        logging.info(
-            fonts.colourize(
-                "Starting personalization after the final round.", colour="blue"
-            )
-        )
+        logging.info("Starting personalization after the final round.")
 
         # To terminate the personalization afterwards
         self.personalization_started = True
@@ -122,18 +109,16 @@ class Server(fedavg.Server):
         # Do personalization on all clients
         return self.clients_pool, len(self.clients_pool)
 
-    def before_clients_sampling(
-        self, clients_pool: List[int], clients_count: int, **kwargs
-    ):
+    def get_clients(self, clients_pool: List[int], clients_count: int):
         """Determine clients pool and clients count before samling clients."""
 
         # Perform normal training
-        clients_pool, clients_count = self.perform_normal_training(
+        clients_pool, clients_count = self.get_normal_clients(
             clients_pool, clients_count
         )
         # Perform personalization
         if self.current_round > Config().trainer.rounds:
-            clients_pool, clients_count = self.perform_final_personalization()
+            clients_pool, clients_count = self.get_personalization_clients()
 
         return clients_pool, clients_count
 
@@ -144,11 +129,9 @@ class Server(fedavg.Server):
         id by default.
         """
         # Set required clients pool when possible
-        self.set_various_clients_pool(clients_pool)
+        self.set_clients_pool(clients_pool)
 
-        clients_pool, clients_count = self.before_clients_sampling(
-            clients_pool, clients_count
-        )
+        clients_pool, clients_count = self.get_clients(clients_pool, clients_count)
 
         random.setstate(self.prng_state)
 
@@ -172,9 +155,6 @@ class Server(fedavg.Server):
 
             if self.personalization_started:
                 logging.info(
-                    fonts.colourize(
-                        "Personalization completed after the final round.",
-                        colour="blue",
-                    ),
+                    "Personalization completed after the final round.",
                 )
                 await self._close()

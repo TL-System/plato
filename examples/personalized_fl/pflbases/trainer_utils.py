@@ -3,7 +3,6 @@ The necessary tools used by trainers.
 """
 import os
 import re
-from typing import Optional, List, Tuple
 
 
 def freeze_model(model, module_names=None):
