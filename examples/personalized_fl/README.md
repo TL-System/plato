@@ -1,12 +1,10 @@
 # A Basic Platform for Personalized Federated Learning
 
-`pflbases`, built upon the Plato framework, is designed as a basic platform for personalized federated learning (FL) and, thus, can be used to implement various personalized FL algorithms while testing them with <ins>fairness</ins> and <ins>reproducibility</ins> guarantees. 
+`pflbases`` is a platform based on the Plato framework, designed specifically for enabling streamlined implementation and testing processes for of various personalized federated learning (FL) algorithms, while providing both fairness and reproducibility guarantees.
 
-As personalized federated learning is one specific domain of federated learning (FL), its learning process should always focus on the process of how to exchange the global model between clients and the server and how to train this model during the federated training paradigm. Subsequently, the second priority can be to use the global model as the intermediary toward training high-quality personalized models. 
+The core design principle of `pflbases` reflects the nature of personalized FL extending traditional FL to obtain *personalized models* based on a high quality global model. Therefore, `pflbases` inherits the primary focus of training a global model, while keeping a number of auxiliary procedures for operations required to create personalized models.
 
-Hence, the core design principle underlying `pflbases` is to prioritize learning the global model (`self.model`), relegating all other models (`self.personalized_model`) or operations to subsidiary roles or auxiliary procedures. Besides, the global model and personalized models are treated as two separate models.
-
-With this principle, `pflbases` will always execute Plato's functions or programs of training the global model and only perform personalization with the corresponding configs after the final round of training. (See Core Structure for more code details.)
+Following this principle, `pflbases` will always execute Plato's functions or programs for training the global model first. Personalization with the corresponding configurations is performed only after the final round of training. (Refer to the Core Structure section for more code details.)
 
 
 ## Two Basic Learning Modes
