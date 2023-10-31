@@ -1,6 +1,5 @@
 """
 A base server to perform personalized federated learning.
-
 """
 
 from typing import List

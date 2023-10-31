@@ -1,10 +1,10 @@
 """
-An algorithm for loading, aggregating, and extracting partial modules from a single model.
+An algorithm for extracting partial modules from a model.
 
 These sub-moduels can be set by the `global_module_names` hyper-parameter in the 
 configuration file.
 
-For example, when utilizing the "LeNet5" as the target model, the `global_module_names` can
+For example, when utilizing the "LeNet5" as the model, the `global_module_names` can
 be defined as:
 
     global_module_names:
@@ -26,7 +26,7 @@ class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting sub-modules from a model."""
 
     def get_module_weights(self, model_parameters: dict, module_names: List[str]):
-        """Get target weights from model parameters based on the module name."""
+        """Get weights from model parameters based on module names."""
         parameters_data = model_parameters.items()
         return OrderedDict(
             [
@@ -43,10 +43,7 @@ class Algorithm(fedavg.Algorithm):
         model: Optional[torch.nn.Module] = None,
         module_names: Optional[List[str]] = None,
     ):
-        """
-        Extract weights from modules of the model.
-        By default, weights of the entire model will be extracted.
-        """
+        """Extract weights from the model based on the given module names."""
         model = self.model if model is None else model
 
         module_names = (
@@ -59,10 +56,10 @@ class Algorithm(fedavg.Algorithm):
             )
         )
 
-        # When the `global_module_names` is not set and
-        # the `module_name` is not provided, this function
-        # returns the whole model.
         if module_names is None:
+            # When the `global_module_names` is not set and
+            # the `module_name` is not provided, return the
+            # whole model weights
             return model.cpu().state_dict()
         else:
             return self.get_module_weights(
@@ -73,32 +70,37 @@ class Algorithm(fedavg.Algorithm):
     def extract_module_names(parameter_names):
         """Extract module names from given parameter names."""
 
-        extracted_names = []
-        # Remove punctuation and split the strings into words and sub-words
+        # The split string to split the parameter name
+        # Generally, the parameter name is a list of sub-names
+        # connected by '.',
+        # such as encoder.conv1.weight.
+        split_str = "."
+
+        # Remove punctuation and
+        # Split parameter name into sub-names
+        # such as from encoder.conv1.weight to [encoder, conv1, weight]
         translator = str.maketrans("", "", string.punctuation)
-        combined_subnames = [
-            [subname.translate(translator).lower() for subname in word.split(".")]
-            for word in parameter_names
+        splitted_names = [
+            [subname.translate(translator).lower() for subname in name.split(split_str)]
+            for name in parameter_names
         ]
 
-        # An indicator of the level where the strings begin to differ
-        diff_level = 0
-        # Find the point where the strings begin to differ in content
-        for level, subnames in enumerate(zip(*combined_subnames)):
+        # A position idx where the sub-names of different parameters
+        # begin to differ
+        # for example, with [encoder, conv1, weight], [encoder, conv1, bais]
+        # the diff_idx will be 1
+        diff_idx = 0
+        for idx, subnames in enumerate(zip(*splitted_names)):
             if len(set(subnames)) > 1:
-                diff_level = level
+                diff_idx = idx
                 break
-        # Increase the level by 1
-        diff_level += 1
 
-        # Split the parameter names based on the `split_str`,
-        # which should be a point as these names are presented
-        # as 'encoder.xxx.xxx'
-        # Extract the corresponding module names
-        split_str = "."
+        # Extract the first `diff_idx` parameter names
+        # as module names
+        extracted_names = []
         for para_name in parameter_names:
             splitted_names = para_name.split(split_str)
-            core_names = splitted_names[:diff_level]
+            core_names = splitted_names[: diff_idx + 1]
             module_name = f"{split_str}".join(core_names)
             if module_name not in extracted_names:
                 extracted_names.append(module_name)
