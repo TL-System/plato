@@ -26,14 +26,13 @@ Note:
     should load its own previously saved status to refresh variables.
 
 """
-import sys
 import os
+
+from pflbases import trainer_utils
+from pflbases.filename_formatter import NameFormatter
 
 from plato.clients import simple
 from plato.config import Config
-from pflbases.filename_formatter import NameFormatter
-
-from pflbases import trainer_utils
 
 
 class Client(simple.Client):
@@ -65,18 +64,13 @@ class Client(simple.Client):
         """Performing the general client's configure and then initialize the
         local model for the client."""
         super().configure()
-
-        # Jump out if no personalization info is provided.
-        if not hasattr(Config().algorithm, "personalization"):
-            sys.exit(
-                "Error: personalization block must be provided under the algorithm."
-            )
+        assert(hasattr(Config().algorithm, "personalization"))
 
         # Create the initial local model for this client.
         self.create_initial_local_model()
 
     def create_initial_local_model(self):
-        """Creating the initial local modle for this client."""
+        """Creating the initial local model for this client."""
 
         # Get the initial local model path
         self.init_local_model_path = self.get_init_model_path(
@@ -86,7 +80,7 @@ class Client(simple.Client):
 
         # If this client have not initialized its personalized model yet
         # and the personalized model is required in the subsequent learning.
-        if not self.exist_init_local_model():
+        if not os.path.exists(self.init_local_model_path):
             # Only reinitialize the model based on the client id
             # as the random seed.
             self.trainer.reinitialize_local_model()
@@ -151,8 +145,3 @@ class Client(simple.Client):
         model_path = os.path.join(checkpoint_dir_path, filename)
 
         return model_path
-
-    def exist_init_local_model(self):
-        """Whether this client is unselected on."""
-
-        return os.path.exists(self.init_local_model_path)
