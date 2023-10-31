@@ -1,45 +1,18 @@
 """
-A trainer to support the personalized federated learning.
-
+A trainer to support the personalized federated learning
+in the final round.
 """
 import logging
 import os
-import warnings
 
 from plato.config import Config
 from plato.trainers import basic
 from plato.trainers import optimizers, lr_schedulers, loss_criterion
-from pflbases.filename_formatter import NameFormatter
-
-from pflbases import trainer_utils
-
-warnings.simplefilter("ignore")
 
 
 class Trainer(basic.Trainer):
     # pylint:disable=too-many-public-methods
     """A basic personalized federated learning trainer."""
-
-    def __init__(self, model=None, callbacks=None):
-        """Initializing the trainer with the provided model."""
-        super().__init__(model=model, callbacks=callbacks)
-
-        # The model name and the file prefix
-        # used to save the model.
-        self.model_name = Config().trainer.model_name
-        self.local_model_prefix = "local"
-
-    def reinitialize_local_model(self):
-        """Reinitialize the local model based on the client id
-        as the random seed to ensure that each client id corresponds to
-        the specific model."""
-        trainer_utils.set_random_seeds(self.client_id)
-        self.model.apply(trainer_utils.weights_reinitialize)
-        logging.info(
-            "[Client #%d] Re-initialized the local model with the random seed %d.",
-            self.client_id,
-            self.client_id,
-        )
 
     def get_personalized_model_params(self):
         """Get the params of the personalized model."""
@@ -83,13 +56,13 @@ class Trainer(basic.Trainer):
         if not hasattr(Config().algorithm, "personalization") or not hasattr(
             Config().algorithm.personalization, "optimizer"
         ):
-            return super().get_optimizer(self.personalized_model)
+            return super().get_optimizer(self.model)
 
         optimizer_name = Config().algorithm.personalization.optimizer
         optimizer_params = Config().parameters.personalization.optimizer._asdict()
 
         return optimizers.get(
-            self.personalized_model,
+            self.model,
             optimizer_name=optimizer_name,
             optimizer_params=optimizer_params,
         )
@@ -165,64 +138,3 @@ class Trainer(basic.Trainer):
             # and then load the saved model relying on
             # Config().trainer.model_name
             config["model_name"] = Config().trainer.model_name
-
-    def train_run_end(self, config):
-        """Copy the trained model to the untrained one."""
-        super().train_run_end(config)
-
-        self.perform_local_model_checkpoint(config=config)
-
-    def get_model_checkpoint_path(
-        self, model_name: str, prefix=None, round_n=None, epoch_n=None
-    ):
-        """Getting the path of the personalized model."""
-        current_round = self.current_round if round_n is None else round_n
-
-        save_location = self.get_checkpoint_dir_path()
-        filename = NameFormatter.get_format_name(
-            client_id=self.client_id,
-            model_name=model_name,
-            round_n=current_round,
-            epoch_n=epoch_n,
-            prefix=prefix,
-            ext="pth",
-        )
-
-        return save_location, filename
-
-    def perform_local_model_checkpoint(self, **kwargs):
-        """Performing the saving for the personalized model with
-        necessary learning parameters."""
-        round_n = kwargs.pop("round") if "round" in kwargs else self.current_round
-        epoch_n = kwargs.pop("epoch") if "epoch" in kwargs else None
-        model_name = self.model_name
-        prefix = self.local_model_prefix
-        save_location, filename = self.get_model_checkpoint_path(
-            model_name=model_name,
-            prefix=prefix,
-            round_n=round_n,
-            epoch_n=epoch_n,
-        )
-
-        self.save_model(filename=filename, location=save_location)
-
-        # Always remove the expired checkpoints.
-        self.remove_expired_checkpoints(
-            model_name=model_name, prefix=prefix, round_n=round_n
-        )
-
-    def remove_expired_checkpoints(self, model_name, prefix, **kwargs):
-        """Removing invalid checkpoints under the checkpoints_dir.
-        This function will only maintain the initial one and latest one.
-        """
-        current_round = (
-            self.current_round if "round_n" not in kwargs else kwargs["round_n"]
-        )
-        for round_id in range(1, current_round):
-            save_location, filename = self.get_model_checkpoint_path(
-                model_name=model_name,
-                prefix=prefix,
-                round_n=round_id,
-            )
-            if os.path.exists(os.path.join(save_location, filename)):
-                os.remove(os.path.join(save_location, filename))
