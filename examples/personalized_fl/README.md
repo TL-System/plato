@@ -1,45 +1,11 @@
-# A Basic Platform for Personalized Federated Learning
+# Simple Functions towards Implementing Personalized Federated Learning
 
-`pflbases`` is a platform based on the Plato framework, designed specifically for enabling streamlined implementation and testing processes for various personalized federated learning (FL) algorithms, while providing both fairness and reproducibility guarantees.
-
-The core design principle of `pflbases` reflects the nature of personalized FL extending traditional FL to obtain *personalized models* based on a high quality global model. Therefore, `pflbases` inherits the primary focus of training a global model, while keeping a number of auxiliary procedures for operations required to create personalized models.
-
-Following this principle, `pflbases` will always execute Plato's functions or programs for training the global model first. Personalization with the corresponding configurations is performed only after the final round of training. (Refer to the Core Structure section for more code details.)
-
-
-## Two Basic Learning Modes
-
-`pflbases` contains two basic learning modes, i.e., performing personalization in each round or the next round of the final round. The indicator is `do_personalization_per_round` (see hyper-parameters below).
-
-When `do_personalization_per_round: true`, the personalized model will be 1. Loaded; 2. Obtained; 3. Tested; 4. Saved, in each round. Otherwise, the personalized model will only be processed in the next round of the final round. 
-
-We believe that these two modes can cover all personalized FL algorithms. For example, 
-- APFL, Ditto, LG-FedAvg, FedPer, FedRep, and FedBABU follows `do_personalization_per_round: true`. 
-- FedAvg with finetuning (fedavg_finetune) and PerFeAvg follows `do_personalization_per_round: false`.
-
+`pflbases` offers a set of fundamental functions designed to facilitate the implementation of the Personalized Federated Learning (FL) algorithm. Its objective is to provide both fairness and reproducibility guarantees. 
 
 ## Core Functions
 
-An illustration of the core pipeline of the structure of`pflbases` is shown below.
-
-![](core_pipeline.png)
-
-In response to the abovementioned principle and learning modes, `pflbases` will always execute the code to 1). load the configuration within `trainer` block; 2). execute the Plato's code to operate on `self.model`, 3). train the `self.model` before reaching the total rounds (i.e., before the final personalization). Even though one sets `do_personalization_per_round: true`, __no specific code towards training personalized models will be executed__. 
-
-To make `pflbases` general enough as a personalized FL platform, two code parts in the structure should be emphasized. Thus, the user can simply adjust them to implement a customized algorithm. 
-
 - the _completion_ callbacks placed under `client_callbacks` merge other models into the `self.model` parameters. 
-    > For example, when the whole model is A+B, you can set the global model to be A while the personalized model is B. To train the personalized model, you need to merge B to A as the `self.model` to be trained subsequently. 
-
-- `preprocess_models()` and `postprocess_models()` typically need to be adjusted to achieve a customized way to train personalized models. 
-
-    - The default operation of `preprocess_models()` is to copy the `self.model` to the `self.personalized_model` only in the final personalization.
-        >FedAvg-finetune uses this default logic as the personalized models are only trained in the final personalization, thus requiring assigning the received global model to the personalized model for the subsequent personalized training.  
-
-    - The default operation of `postprocess_models()` is to copy the `self.model` to the `self.personalized_model` only when `do_personalization_per_round: true` and not the final personalization.
-
-        >FedRep uses this default logic. It merges the `self.personalized_model` into `self.model` as submodules with _completion_. Thus, after training `self.model`, the trained submodules should be copied back to the `self.personalized_model`, __equivalent to training the personalized model__. 
-
+    > For example, when the whole model is A+B, you can set the global model to be A while the local model is B. Then, the completion callback will merge B into A to obtain the whole model before local update.
 
 --- 
 
@@ -182,10 +148,10 @@ All hyper-parameters of `pflbases` should be placed under the `algorithm` block 
             - layer4
     ```
 
-- completion_modules_name: This is a list in which each item is a string presenting the parameter name. Once you set the `global_modules_name`, the client receives a portion of the model from the server. To embrace all parameters (i.e., the whole model) during the local update, you should set `completion_modules_name` to indicate which parts parameters will be loaded from the local side to merge with the received ones. This is more like: the whole model is A+B. The client receives A from the server. Then, the client loads B from the local side to merge with A. For example, 
+- local_modules_name: This is a list in which each item is a string presenting the parameter name. Once you set the `local_modules_name`, the client receives a portion of the model from the server. To embrace all parameters (i.e., the whole model) during the local update, you should set `local_modules_name` to indicate which parts parameters will be loaded from the local side to merge with the received ones. This is more like: the whole model is A+B. The client receives A from the server. Then, the client loads B from the local side to merge with A. For example, 
     ```yaml
     algorithm:
-        completion_modules_name:
+        local_modules_name:
             - linear
     ```
 
