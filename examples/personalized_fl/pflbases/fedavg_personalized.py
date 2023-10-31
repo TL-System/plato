@@ -88,6 +88,7 @@ class Server(fedavg.Server):
 
     def get_personalization_clients(self):
         """Get clients used in the final personalization."""
+        # Use all clients in the final personalization
         self.clients_per_round = self.total_clients
 
         # Do personalization on all clients
