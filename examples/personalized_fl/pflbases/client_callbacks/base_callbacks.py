@@ -1,6 +1,5 @@
 """
-The processors for loading, assigning, and adjusting the models for local update
-of clients.
+The processors for processing the received payload.
 """
 
 import logging
@@ -13,7 +12,7 @@ from plato.callbacks import client as client_callbacks
 class PayloadStatusProcessor(base.Processor):
     """
     A default payload status processor to present what modules are
-    received contained in the payload.
+    contained in the received payload.
     """
 
     def __init__(self, algorithm, **kwargs) -> None:
