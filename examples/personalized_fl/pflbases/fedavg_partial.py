@@ -28,7 +28,7 @@ class Algorithm(fedavg.Algorithm):
     def get_target_weights(self, model_parameters: dict, module_names: List[str]):
         """Get target weights from model parameters based on the module name."""
         parameters_data = model_parameters.items()
-        extracted_weights = OrderedDict(
+        return OrderedDict(
             [
                 (name, param)
                 for name, param in parameters_data
@@ -37,7 +37,6 @@ class Algorithm(fedavg.Algorithm):
                 )
             ]
         )
-        return extracted_weights
 
     def extract_weights(
         self,
