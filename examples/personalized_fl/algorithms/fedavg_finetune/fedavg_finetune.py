@@ -11,15 +11,13 @@ this algorithm but only utilizes it as the baseline for personalized federated
 learning.
 """
 
+from plato.clients import simple
+import fedavg_finetune_trainer
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
 
 from pflbases.client_callbacks import base_callbacks
-
-from plato.clients import simple
-
-import fedavg_finetune_trainer
 
 
 def main():
