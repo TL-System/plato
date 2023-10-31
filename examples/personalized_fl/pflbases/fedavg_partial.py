@@ -1,12 +1,8 @@
 """
 An algorithm for loading, aggregating, and extracting partial modules from a single model.
 
-In some scenarios, given one defined model, the users want to utilize the sub-modules as 
-the global model in federated learning. Thus, solely these desired sub-modules will be 
-extracted and aggregated during the learning process. Thus, the algorithm proposes to 
-support this feature by setting the hyper-parameter `global_module_names` in the config file.
-
-The format of this hyper-parameter should be a list containing the names of the desired layers.
+These sub-moduels can be set by the `global_module_names` hyper-parameter in the 
+configuration file.
 
 For example, when utilizing the "LeNet5" as the target model, the `global_module_names` can
 be defined as:
@@ -14,8 +10,6 @@ be defined as:
     global_module_names:
         - conv1
         - conv2
-
-By doing so, the conv1 and conv2 layers will be extracted.
 """
 
 import string
