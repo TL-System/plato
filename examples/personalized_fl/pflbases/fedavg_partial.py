@@ -46,15 +46,8 @@ class Algorithm(fedavg.Algorithm):
         """Extract weights from the model based on the given module names."""
         model = self.model if model is None else model
 
-        module_names = (
-            module_names
-            if module_names is not None
-            else (
-                Config().algorithm.global_module_names
-                if hasattr(Config().algorithm, "global_module_names")
-                else None
-            )
-        )
+        if module_names is None and hasattr(Config().algorithm, "global_module_names"):
+            module_names = Config().algorithm.global_module_names
 
         if module_names is None:
             # When the `global_module_names` is not set and
@@ -77,8 +70,8 @@ class Algorithm(fedavg.Algorithm):
         split_str = "."
 
         # Remove punctuation and
-        # Split parameter name into sub-names
-        # such as from encoder.conv1.weight to [encoder, conv1, weight]
+        # split parameter name into sub-names
+        # such as from encoder.conv1.weight to [encoder, conv1, weight].
         translator = str.maketrans("", "", string.punctuation)
         splitted_names = [
             [subname.translate(translator).lower() for subname in name.split(split_str)]
@@ -88,7 +81,7 @@ class Algorithm(fedavg.Algorithm):
         # A position idx where the sub-names of different parameters
         # begin to differ
         # for example, with [encoder, conv1, weight], [encoder, conv1, bais]
-        # the diff_idx will be 1
+        # the diff_idx will be 1.
         diff_idx = 0
         for idx, subnames in enumerate(zip(*splitted_names)):
             if len(set(subnames)) > 1:
@@ -96,7 +89,7 @@ class Algorithm(fedavg.Algorithm):
                 break
 
         # Extract the first `diff_idx` parameter names
-        # as module names
+        # as module names.
         extracted_names = []
         for para_name in parameter_names:
             splitted_names = para_name.split(split_str)
