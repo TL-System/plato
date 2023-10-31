@@ -36,15 +36,7 @@ algorithm:
 
 
     personalization:
-
-        model_name: resnet_18
-
-        # the ratio of clients participanting in training
-        participating_clients_ratio: 1.0
-        
-        # whether the personalized model will be
-        # obtained in each round
-        do_personalization_per_round: false
+        epochs: 10
 
 
 

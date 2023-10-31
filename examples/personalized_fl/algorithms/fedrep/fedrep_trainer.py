@@ -1,32 +1,30 @@
 """
-A personalized federated learning trainer for FedPer approach.
+A trainer for FedRep approach.
 """
 
-from pflbases import personalized_trainer
 from pflbases import trainer_utils
 
+from plato.trainers import basic
 from plato.config import Config
 
 
-class Trainer(personalized_trainer.Trainer):
-    """A trainer to freeze and activate modules of one model
-    for normal and personalized learning processes."""
+class Trainer(basic.Trainer):
+    """A trainer for FedRep."""
 
     def train_run_start(self, config):
-        """Freezing the body"""
+        """Freeze the body during personalization."""
         super().train_run_start(config)
-        if self.do_final_personalization:
-            # only optimize the head for the final personalization
+        if self.current_round > Config().trainer.rounds:
+            # Freeze the model body while only optimizing the head
+            # furing the final personalization
             trainer_utils.freeze_model(
-                self.personalized_model,
-                Config().algorithm.global_module_names,
-                log_info=f"[Client #{self.client_id}]",
+                self.model, Config().algorithm.global_module_names
             )
+            # Set the number of epochs for personalization
+            config["epochs"] = Config().algorithm.personalization.epochs
 
     def train_epoch_start(self, config):
-        """
-        Method called at the beginning of a training epoch.
-
+        """A training epoch for FedRep.
         The local training stage in FedRep contains two parts:
 
         - Head optimization:
@@ -36,12 +34,14 @@ class Trainer(personalized_trainer.Trainer):
         - Representation optimization:
             Takes one local gradient-based update with respect to the current representation.
         """
-        if not self.do_final_personalization:
+        super().train_epoch_start(config)
+
+        if self.current_round <= Config().trainer.rounds:
             # As presented in Section 3 of the FedRep paper, the head is optimized
             # for (epochs - 1) while freezing the representation.
             head_epochs = (
-                config["head_epochs"]
-                if "head_epochs" in config
+                Config().algorithm.head_epochs
+                if hasattr(Config().algorithm, "head_epochs")
                 else config["epochs"] - 1
             )
 
@@ -49,27 +49,29 @@ class Trainer(personalized_trainer.Trainer):
                 trainer_utils.freeze_model(
                     self.model,
                     Config().algorithm.global_module_names,
-                    log_info=f"[Client #{self.client_id}]",
                 )
                 trainer_utils.activate_model(
-                    self.model, Config().algorithm.head_module_names
+                    self.model, Config().algorithm.local_module_names
                 )
 
             # The representation will then be optimized for only one epoch
             if self.current_epoch > head_epochs:
                 trainer_utils.freeze_model(
                     self.model,
-                    Config().algorithm.head_module_names,
-                    log_info=f"[Client #{self.client_id}]",
+                    Config().algorithm.local_module_names,
                 )
                 trainer_utils.activate_model(
                     self.model, Config().algorithm.global_module_names
                 )
+        else:
+            # The body of the model will be frozen during the
+            # final personalization
+            trainer_utils.freeze_model(
+                self.model,
+                Config().algorithm.global_module_names,
+            )
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
-        if self.do_round_personalization and not self.do_final_personalization:
-            trainer_utils.activate_model(
-                self.model, Config().algorithm.global_module_names
-            )
+        trainer_utils.activate_model(self.model, Config().algorithm.global_module_names)

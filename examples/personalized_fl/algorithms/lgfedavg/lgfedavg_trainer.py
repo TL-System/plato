@@ -26,11 +26,7 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        trainer_utils.freeze_model(
-            self.model,
-            Config().algorithm.head_module_names,
-            log_info=None,
-        )
+        trainer_utils.freeze_model(self.model, Config().algorithm.head_module_names)
         trainer_utils.activate_model(self.model, Config().algorithm.body_module_names)
         self.optimizer.step()
 

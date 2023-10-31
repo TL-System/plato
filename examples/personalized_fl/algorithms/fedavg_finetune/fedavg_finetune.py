@@ -11,20 +11,22 @@ Therefore, the performance of this algorithm works as the baseline for personali
 """
 
 
-from pflbases import personalized_trainer
-from pflbases import personalized_client
 from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 
 from pflbases.client_callbacks import base_callbacks
+
+from plato.clients import simple
+
+import fedavg_finetune_trainer
 
 
 def main():
     """
     A Plato personalized federated learning sesstion for FedAvg with fine-tuning.
     """
-    trainer = personalized_trainer.Trainer
-    client = personalized_client.Client(
+    trainer = fedavg_finetune_trainer.Trainer
+    client = simple.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[base_callbacks.ClientPayloadCallback],

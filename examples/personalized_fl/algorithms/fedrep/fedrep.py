@@ -10,12 +10,13 @@ https://arxiv.org/abs/2102.07078
 
 Source code: https://github.com/lgcollins/FedRep
 """
-from pflbases import fedavg_personalized_server
-from pflbases import personalized_client
+from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
-from pflbases.client_callbacks import personalized_completion_callbacks
+from pflbases.client_callbacks import local_completion_callbacks
 
 import fedrep_trainer
+
+from plato.clients import simple
 
 
 def main():
@@ -23,14 +24,14 @@ def main():
     A personalized federated learning sesstion for PerFedAvg approach.
     """
     trainer = fedrep_trainer.Trainer
-    client = personalized_client.Client(
+    client = simple.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
         callbacks=[
-            personalized_completion_callbacks.ClientModelPersonalizedCompletionCallback,
+            local_completion_callbacks.PayloadCompletionCallback,
         ],
     )
-    server = fedavg_personalized_server.Server(
+    server = fedavg_personalized.Server(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
