@@ -139,10 +139,8 @@ class Server(fedavg.Server):
         selected_clients = random.sample(clients_pool, clients_count)
 
         self.prng_state = random.getstate()
-        if selected_clients == len(clients_pool):
-            logging.info("[%s] Selected all %d clients", self, len(selected_clients))
-        else:
-            logging.info("[%s] Selected clients: %s", self, selected_clients)
+
+        logging.info("[%s] Selected clients: %s", self, selected_clients)
 
         return selected_clients
 
