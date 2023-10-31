@@ -3,12 +3,12 @@ An implementation of the personalized learning variant of FedAvg.
 
 The core idea is to achieve personalized FL in two stages:
 First, it trains a global model using conventional FedAvg until convergence. 
-Second, each client fine-tunes the trained global model using its local data by several epochs.
+Second, each client freezes the trained global model and optimizes the other 
+parts.
 
-Due to its simplicity, no work has been proposed that specifically discusses this algorithm.
-
-Therefore, the performance of this algorithm works 
-    as the baseline for personalized federated learning.
+Due to its simplicity, no work has been proposed that specifically discusses 
+this algorithm but only utilizes it as the baseline for personalized federated 
+learning.
 """
 
 

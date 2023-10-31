@@ -186,14 +186,3 @@ All hyper-parameters related to personalization should be placed under the `pers
     ```
 
 
-## Precautions
-
-### Error of `None` personalized model
-As `pflbases` heavily relies on the mechanism that allows each client to load the personalized model from the disk, it is important to ensure that the model loading is correct. Thus, to avoid the program loading personalized models under `checkpoints\` saved by different runnings in experiments, `pflbases` forces the user to delete the `checkpoints/` before each running,; there will be an error presenting as 
-
-```
-File "pflbases/personalized_trainer.py", line 426, in load_personalized_model
-    self.personalized_model.load_state_dict(
-AttributeError: 'NoneType' object has no attribute 'load_state_dict'
-```
-This is caused by the fact that the program will not define the personalized model once there are saved models under `checkpoints/`.
