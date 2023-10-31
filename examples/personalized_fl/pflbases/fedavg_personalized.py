@@ -1,8 +1,6 @@
 """
 A base server to perform personalized federated learning.
 
-This server is able to perform personalization in all clients after the 
-final round.
 """
 
 from typing import List
@@ -14,7 +12,8 @@ from plato.config import Config
 
 
 class Server(fedavg.Server):
-    """Federated learning server for personalization and partial client selection."""
+    """A base server to control how many clients will participate in the learning and
+    enable a final personalization round."""
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -27,29 +26,29 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
 
-        # The number of clients that will be selected
+        # The number of clients that will participate
         # in federated learning
         self.number_participating_clients = 0
 
-        # The ids of these selected clients
+        # The IDs of these participating clients
         self.participating_clients_pool = None
 
         # Whether personalization has been started
         self.personalization_started = False
 
-        self.initialize_personalization()
+        self.initialize_participant()
 
-    def initialize_personalization(self):
-        """Initialize two types of clients."""
+    def initialize_participant(self):
+        """Initialize participation information."""
 
-        ## 1. Initialize participanting client ratio
+        ## Initialize participanting client ratio
         participating_client_ratio = (
             Config().algorithm.personalization.participating_client_ratio
             if hasattr(Config().algorithm.personalization, "participating_client_ratio")
             else 1.0
         )
 
-        #  clients will / will not participant in federated training
+        #  Compute how many clients will participate in federated learning
         self.number_participating_clients = int(
             self.total_clients * participating_client_ratio
         )
@@ -64,13 +63,10 @@ class Server(fedavg.Server):
         )
 
     def set_clients_pool(self, clients_pool: List[int]):
-        """Set clients pool utilized in federated learning.
+        """Set clients pool utilized in federated learning."""
 
-        Note: the participating clients pool will be set in the first round and no
-            modification is performed afterwards.
-        """
-
-        # Only need to set the clients pool when they are empty.
+        # The participating client pool will be set in the first round,
+        # and no modification will be performed afterward.
         if self.participating_clients_pool is None:
             self.participating_clients_pool = clients_pool[
                 : self.number_participating_clients
@@ -83,28 +79,16 @@ class Server(fedavg.Server):
             )
 
     def get_normal_clients(self, clients_pool: List[int], clients_count: int):
-        """Operations to guarantee general federated learning without personalization."""
+        """Get the clients used in normal federated training rounds."""
 
-        # Reset `clients_per_round` to the predefined hyper-parameter
-        self.clients_per_round = Config().clients.per_round
-
-        # Set the clients_pool to be participating_clients_pool
+        # Use the participating clients pool
         clients_pool = self.participating_clients_pool
         clients_count = self.clients_per_round
-
-        # By default, when we run the general federated training,
-        # the clients pool should be participating clients
-        assert clients_count <= len(self.participating_clients_pool)
 
         return clients_pool, clients_count
 
     def get_personalization_clients(self):
-        """Performing personalization after the final round."""
-
-        logging.info("Starting personalization after the final round.")
-
-        # To terminate the personalization afterwards
-        self.personalization_started = True
+        """Get clients used in the final personalization."""
 
         # Do personalization on all clients
         return self.clients_pool, len(self.clients_pool)
@@ -118,17 +102,14 @@ class Server(fedavg.Server):
         )
         # Perform personalization
         if self.current_round > Config().trainer.rounds:
+            self.personalization_started = True
             clients_pool, clients_count = self.get_personalization_clients()
 
         return clients_pool, clients_count
 
     def choose_clients(self, clients_pool: List[int], clients_count: int):
-        """Chooses a subset of the clients to participate in each round.
-
-        In plato, this input `clients_pool` contains total clients
-        id by default.
-        """
-        # Set required clients pool when possible
+        """Choose a subset of the clients to participate in each round."""
+        # Set required client pools when possible
         self.set_clients_pool(clients_pool)
 
         clients_pool, clients_count = self.get_clients(clients_pool, clients_count)
@@ -148,6 +129,8 @@ class Server(fedavg.Server):
         """Wrapping up when each round of training is done."""
         self.save_to_checkpoint()
 
+        # Continue training until the final personalization round
+        # has been completed
         if self.current_round >= Config().trainer.rounds:
             logging.info("Target number of training rounds reached.")
 
