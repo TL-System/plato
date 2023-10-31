@@ -11,7 +11,7 @@ Therefore, the performance of this algorithm works as the baseline for personali
 """
 
 
-from pflbases import fedavg_personalized_server
+from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
 
 from pflbases.client_callbacks import base_callbacks
@@ -31,7 +31,7 @@ def main():
         algorithm=fedavg_partial.Algorithm,
         callbacks=[base_callbacks.ClientPayloadCallback],
     )
-    server = fedavg_personalized_server.Server(
+    server = fedavg_personalized.Server(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
