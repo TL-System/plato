@@ -27,13 +27,13 @@ class BYOL(nn.Module):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
-        # define the encoder
+        # Define the encoder.
         encoder_name = Config().trainer.encoder_name
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
 
-        # define the encoder
+        # Define the encoder.
         self.encoder = (
             encoder
             if encoder is not None
@@ -94,7 +94,7 @@ class SimCLR(nn.Module):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
-        # extract hyper-parameters
+        # Extract hyper-parameters.
         encoder_name = Config().trainer.encoder_name
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
@@ -102,7 +102,7 @@ class SimCLR(nn.Module):
         projection_hidden_dim = Config().trainer.projection_hidden_dim
         projection_out_dim = Config().trainer.projection_out_dim
 
-        # define the encoder based on the model_name in config
+        # Define the encoder based on the model_name in config.
         self.encoder = (
             encoder
             if encoder is not None
@@ -137,7 +137,7 @@ class SimSiam(nn.Module):
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
-        # define the encoder based on the model_name in config
+        # Define the encoder based on the model_name in config.
         self.encoder = (
             encoder
             if encoder is not None
@@ -188,13 +188,13 @@ class SMoG(nn.Module):
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
-        # define the encoder
+        # Define the encoder.
         encoder_name = Config().trainer.encoder_name
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
 
-        # define the encoder based on the model_name in config
+        # Define the encoder based on the model_name in config.
         self.encoder = (
             encoder
             if encoder is not None
@@ -227,12 +227,12 @@ class SMoG(nn.Module):
             group_features=torch.rand(self.n_groups, n_prototypes), beta=beta
         )
 
-        # current iteration
+        # Current iteration.
         self.n_iteration = 0
 
     def _cluster_features(self, features: torch.Tensor) -> torch.Tensor:
-        # clusters the features using sklearn
-        # (note: faiss is probably more efficient)
+        # Cluster the features using sklearn
+        # (note: faiss is probably more efficient).
         features = features.cpu().numpy()
         kmeans = KMeans(self.n_groups).fit(features)
         clustered = torch.from_numpy(kmeans.cluster_centers_).float()
@@ -240,13 +240,13 @@ class SMoG(nn.Module):
         return clustered
 
     def reset_group_features(self, memory_bank):
-        # see https://arxiv.org/pdf/2207.06167.pdf Table 7b)
+        # See https://arxiv.org/pdf/2207.06167.pdf Table 7b).
         features = memory_bank.bank
         group_features = self._cluster_features(features.t())
         self.smog.set_group_features(group_features)
 
     def reset_momentum_weights(self):
-        # see https://arxiv.org/pdf/2207.06167.pdf Table 7b)
+        # See https://arxiv.org/pdf/2207.06167.pdf Table 7b).
         self.encoder_momentum = copy.deepcopy(self.encoder)
         self.projection_head_momentum = copy.deepcopy(self.projection_head)
         deactivate_requires_grad(self.encoder_momentum)
@@ -267,14 +267,14 @@ class SMoG(nn.Module):
         samples1, samples2 = multiview_samples
 
         if self.n_iteration % 2:
-            # swap batches every two iterations
+            # Swap batches every two iterations.
             samples2, samples1 = samples1, samples2
 
         samples1_encoded, samples1_predicted = self.forward_direct(samples1)
 
         samples2_encoded = self.forward_momentum(samples2)
 
-        # update group features and get group assignments
+        # Update group features and get group assignments.
         assignments = self.smog.assign_groups(samples2_encoded)
         group_features = self.smog.get_updated_group_features(samples1_encoded)
         logits = self.smog(
@@ -294,13 +294,13 @@ class SwaV(nn.Module):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
-        # define the encoder
+        # Define the encoder.
         encoder_name = Config().trainer.encoder_name
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
 
-        # define the encoder
+        # Define the encoder.
         self.encoder = (
             encoder
             if encoder is not None
@@ -309,7 +309,7 @@ class SwaV(nn.Module):
 
         self.encoding_dim = self.encoder.encoding_dim
 
-        # define the projector
+        # Define the projector.
         projection_hidden_dim = Config().trainer.projection_hidden_dim
         projection_out_dim = Config().trainer.projection_out_dim
         n_prototypes = Config().trainer.n_prototypes
@@ -350,7 +350,7 @@ class MoCoV2(nn.Module):
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
-        # define the encoder
+        # Define the encoder.
         self.encoder = (
             encoder
             if encoder is not None
@@ -359,7 +359,7 @@ class MoCoV2(nn.Module):
 
         self.encoding_dim = self.encoder.encoding_dim
 
-        # define heads
+        # Define heads.
         projection_hidden_dim = Config().trainer.projection_hidden_dim
         projection_out_dim = Config().trainer.projection_out_dim
         self.projection_head = MoCoProjectionHead(
