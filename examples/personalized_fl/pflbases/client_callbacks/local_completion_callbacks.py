@@ -38,7 +38,7 @@ class PayloadCompletionProcessor(base.Processor):
 
         model_modules = self.trainer.model.cpu().state_dict()
         logging.info(
-            "[Client #%d] Local model contains: %s.",
+            "[Client #%d] The local model contains: %s.",
             self.trainer.client_id,
             self.algorithm.extract_module_names(list(model_modules.keys())),
         )

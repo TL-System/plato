@@ -23,6 +23,7 @@ from plato.config import Config
 
 class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting modules from a model."""
+
     def get_module_weights(self, model_parameters: dict, module_names: List[str]):
         """Get weights from model parameters based on module names."""
         return OrderedDict(
@@ -57,39 +58,35 @@ class Algorithm(fedavg.Algorithm):
 
     @staticmethod
     def extract_module_names(parameter_names):
-        """Extract module names from given parameter names."""
-        # The split string to split the parameter name
-        # Generally, the parameter name is a list of sub-names
-        # connected by '.',
-        # such as encoder.conv1.weight.
-        split_str = "."
+        """
+        Extract module names from the given parameter names. A parameter name is a list of names
+        connected by `.`, such as `encoder.conv1.weight`.
+        """
+        split_char = "."
 
-        # Remove punctuation and
-        # split parameter name into sub-names
-        # such as from encoder.conv1.weight to [encoder, conv1, weight].
+        # Converting `encoder.conv1.weight`` to [encoder, conv1, weight]
         translator = str.maketrans("", "", string.punctuation)
         splitted_names = [
-            [subname.translate(translator).lower() for subname in name.split(split_str)]
+            [
+                subname.translate(translator).lower()
+                for subname in name.split(split_char)
+            ]
             for name in parameter_names
         ]
 
-        # A position idx where the sub-names of different parameters
-        # begin to differ
-        # for example, with [encoder, conv1, weight], [encoder, conv1, bais]
-        # the diff_idx will be 1.
+        # With [encoder, conv1, weight], [encoder, conv1, bias], diff_idx = 1.
         diff_idx = 0
         for idx, subnames in enumerate(zip(*splitted_names)):
             if len(set(subnames)) > 1:
                 diff_idx = idx
                 break
 
-        # Extract the first `diff_idx` parameter names
-        # as module names.
+        # Extract the first `diff_idx` parameter names as module names
         extracted_names = []
         for para_name in parameter_names:
-            splitted_names = para_name.split(split_str)
+            splitted_names = para_name.split(split_char)
             core_names = splitted_names[: diff_idx + 1]
-            module_name = f"{split_str}".join(core_names)
+            module_name = f"{split_char}".join(core_names)
             if module_name not in extracted_names:
                 extracted_names.append(module_name)
 
