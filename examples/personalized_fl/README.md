@@ -1,6 +1,6 @@
 # A Basic Platform for Personalized Federated Learning
 
-`pflbases`` is a platform based on the Plato framework, designed specifically for enabling streamlined implementation and testing processes for of various personalized federated learning (FL) algorithms, while providing both fairness and reproducibility guarantees.
+`pflbases`` is a platform based on the Plato framework, designed specifically for enabling streamlined implementation and testing processes for various personalized federated learning (FL) algorithms, while providing both fairness and reproducibility guarantees.
 
 The core design principle of `pflbases` reflects the nature of personalized FL extending traditional FL to obtain *personalized models* based on a high quality global model. Therefore, `pflbases` inherits the primary focus of training a global model, while keeping a number of auxiliary procedures for operations required to create personalized models.
 
