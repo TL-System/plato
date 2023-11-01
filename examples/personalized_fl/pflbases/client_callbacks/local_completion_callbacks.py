@@ -24,11 +24,7 @@ class PayloadCompletionProcessor(base.Processor):
         self.trainer = trainer
 
     def process(self, data: Any) -> Any:
-        """Processing the received payload by assigning modules of local model of
-        each client."""
-
-        # Extract the `local_module_names` of the model head.
-        assert hasattr(Config().algorithm, "local_module_names")
+        """Processing the received payload by replacing the local layers with a client's own."""
         local_module_names = Config().algorithm.local_module_names
 
         # Load the previously saved local model
@@ -46,16 +42,17 @@ class PayloadCompletionProcessor(base.Processor):
         )
 
         # Extract desired local modules
-        local_modules = Algorithm.get_module_weights(
+        local_layers = self.algorithm.get_module_weights(
             model_parameters=model_modules, module_names=local_module_names
         )
-        # Update the payload with the local modules
-        data.update(local_modules)
+
+        # Replace the corresponding layers in the received global model with the local counterparts
+        data.update(local_layers)
 
         logging.info(
-            "[Client #%d] Completed the payload by extracting local modules: %s.",
+            "[Client #%d] Replaced the corresponding layers in the received global model with local layers: %s.",
             self.trainer.client_id,
-            Algorithm.extract_module_names(list(local_modules.keys())),
+            self.algorithm.extract_module_names(list(local_layers.keys())),
         )
 
         return data
