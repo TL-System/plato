@@ -18,7 +18,7 @@ import calibre_server
 
 def main():
     """
-    A personalized federated learning sesstion for SimCLR approach.
+    A personalized federated learning session for SimCLR approach.
     """
     trainer = calibre_trainer.Trainer
     client = calibre_client.Client(

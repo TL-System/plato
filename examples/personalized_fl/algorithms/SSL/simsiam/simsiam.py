@@ -41,7 +41,7 @@ class Trainer(ssl_trainer.Trainer):
 
 def main():
     """
-    A personalized federated learning sesstion for SimSiam approach.
+    A personalized federated learning session for SimSiam approach.
     """
     trainer = Trainer
     client = ssl_client.Client(

@@ -19,7 +19,7 @@ from pflbases import ssl_datasources
 
 def main():
     """
-    A pFL sesstion for SwaV approach.
+    A pFL session for SwaV approach.
     """
     trainer = ssl_trainer.Trainer
     client = ssl_client.Client(
