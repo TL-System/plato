@@ -39,7 +39,7 @@ class Algorithm(fedavg.Algorithm):
 
     def extract_weights(self, model=None):
         weights = super().extract_weights(model)
-        # Save the local layers before giving it to outbound processor.
+        # Save local layers before giving them to the outbound processor
         if hasattr(Config().algorithm, "local_layer_names"):
             # Extract weights of desired local layers
             local_layers = OrderedDict(
