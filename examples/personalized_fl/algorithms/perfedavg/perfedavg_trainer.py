@@ -2,14 +2,13 @@
 A personalized federated learning trainer using Per-FedAvg
 """
 
-from typing import Iterator, Tuple, Union
-from collections import OrderedDict
+from typing import Iterator
 import copy
 
 import torch
 
-from pflbases import personalized_trainer
 from plato.config import Config
+from plato.trainers import basic
 
 
 def get_data_batch(
@@ -27,7 +26,7 @@ def get_data_batch(
     return samples.to(device), labels.to(device)
 
 
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A personalized federated learning trainer using the Per-FedAvg algorithm."""
 
     def __init__(self, model=None, callbacks=None):
@@ -42,11 +41,7 @@ class Trainer(personalized_trainer.Trainer):
         self.iter_trainloader = iter(self.train_loader)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        This implementation derives from
-        https://github.com/jhoon-oh/FedBABU
-        """
+        """Perform forward and backward passes in the training loop."""
 
         if self.do_final_personalization:
             return self.personalized_forward_and_backward_passes(
