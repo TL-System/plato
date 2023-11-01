@@ -34,39 +34,21 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    global_layer_names:
+    local_layer_names:
         - linear
-
-    head_layer_names:
-        - linear
-
-    body_layer_names:
         - conv1
         - bn1
         - layer1
         - layer2
         - layer3
         - layer4
-        
-    completion_layer_names:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
+       
 
     personalization:
 
-        model_name: resnet_18
-
         # the ratio of clients participanting in training
-        participating_clients_ratio: 1.0
-        
-        # whether the personalized model will be
-        # obtained in each round
-        do_personalization_per_round: true
-
+        participating_client_ratio: 1.0
+       
 
 
 parameters:

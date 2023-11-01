@@ -13,9 +13,5 @@ model_name: linear_mlp
 
 
 # the ratio of clients participanting in training
-participating_clients_ratio: 1.0
-
-# whether the personalized model will be
-# obtained in each round
-do_personalization_per_round: true
+participating_client_ratio: 1.0
 
