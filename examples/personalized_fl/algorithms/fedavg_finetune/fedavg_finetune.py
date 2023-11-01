@@ -15,7 +15,6 @@ from plato.clients import simple
 from plato.trainers import basic
 
 from pflbases import fedavg_personalized
-from pflbases import fedavg_partial
 
 
 def main():
@@ -23,10 +22,7 @@ def main():
     A Plato personalized federated learning session for FedAvg with fine-tuning.
     """
     trainer = basic.Trainer
-    client = simple.Client(
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-    )
+    client = simple.Client(trainer=trainer)
     server = fedavg_personalized.Server(trainer=trainer)
 
     server.run(client)
