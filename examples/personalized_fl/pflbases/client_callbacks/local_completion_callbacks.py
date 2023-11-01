@@ -1,4 +1,5 @@
 """
+*** Will soon be removed after algorithm.load_weight() is correctly implemented ***.
 Customize client callbacks for assigning the layers of client's local model
 to the received payload.
 """
