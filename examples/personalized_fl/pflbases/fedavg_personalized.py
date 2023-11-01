@@ -47,11 +47,11 @@ class Server(fedavg.Server):
     async def wrap_up(self) -> None:
         """Wraps up when each round of training is done."""
         if self.personalization_started:
-            super().wrap_up()
+            await super().wrap_up()
         else:
             # If the target number of training rounds has been reached, start
             # the final round of training for personalization on the clients
             self.save_to_checkpoint()
 
-            if self.current_round > Config().trainer.rounds:
+            if self.current_round >= Config().trainer.rounds:
                 self.personalization_started = True
