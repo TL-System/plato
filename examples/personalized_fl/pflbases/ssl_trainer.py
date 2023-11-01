@@ -143,8 +143,8 @@ class Trainer(separate_local_trainer.Trainer):
         return torch.utils.data.DataLoader(
             dataset=self.personalized_testset,
             shuffle=False,
-            batch_size=10,
-            sampler=self.personalized_testset_sampler.get(),
+            batch_size=batch_size,
+            sampler=sampler,
         )
 
     def plato_ssl_loss_wrapper(self):
@@ -169,20 +169,6 @@ class Trainer(separate_local_trainer.Trainer):
         )
 
         return self.get_personalized_loss_criterion()
-
-    def preprocess_models(self):
-        """Do nothing to the personalized mdoel."""
-
-    def postprocess_models(self):
-        """Do nothing to the personalized mdoel."""
-
-    def train_run_end(self, config):
-        """Only save the local model but no personalized model will be saved."""
-
-        if self.current_round > Config().trainer.rounds:
-            self.perform_local_model_checkpoint(config)
-        else:
-            self.perform_personalized_model_checkpoint(config=config)
 
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
@@ -227,7 +213,9 @@ class Trainer(separate_local_trainer.Trainer):
         batch_size = config["batch_size"]
 
         train_loader = self.get_personalized_train_loader(batch_size=batch_size)
-        test_loader = self.get_personalized_test_loader(batch_size=batch_size)
+        test_loader = self.get_personalized_test_loader(
+            batch_size=batch_size, sampler=sampler
+        )
         train_encodings, train_labels = self.collect_data_encodings(train_loader)
         test_encodings, test_labels = self.collect_data_encodings(test_loader)
 
