@@ -77,34 +77,19 @@ class Server(fedavg.Server):
                 self.participating_clients_pool,
             )
 
-    def get_normal_clients(self, clients_pool: List[int], clients_count: int):
-        """Get the clients used in normal federated training rounds."""
-
-        # Use the participating clients pool
-        clients_pool = self.participating_clients_pool
-        clients_count = self.clients_per_round
-
-        return clients_pool, clients_count
-
-    def get_personalization_clients(self):
-        """Get clients used in the final personalization."""
-        # Use all clients in the final personalization
-        self.clients_per_round = self.total_clients
-
-        # Do personalization on all clients
-        return self.clients_pool, len(self.clients_pool)
-
     def get_clients(self, clients_pool: List[int], clients_count: int):
         """Determine clients pool and clients count before samling clients."""
 
         # Perform normal training
-        clients_pool, clients_count = self.get_normal_clients(
-            clients_pool, clients_count
-        )
+        clients_pool = self.participating_clients_pool
+        clients_count = self.clients_per_round
+
         # Perform personalization
         if self.current_round > Config().trainer.rounds:
             self.personalization_started = True
-            clients_pool, clients_count = self.get_personalization_clients()
+            self.clients_per_round = self.total_clients
+            clients_pool = self.clients_pool
+            clients_count = len(self.clients_pool)
 
         return clients_pool, clients_count
 
