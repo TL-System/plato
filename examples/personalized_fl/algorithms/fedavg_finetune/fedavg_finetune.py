@@ -17,8 +17,6 @@ import fedavg_finetune_trainer
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
 
-from pflbases.client_callbacks import base_callbacks
-
 
 def main():
     """
@@ -28,7 +26,6 @@ def main():
     client = simple.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        callbacks=[base_callbacks.ClientPayloadCallback],
     )
     server = fedavg_personalized.Server(
         trainer=trainer,
