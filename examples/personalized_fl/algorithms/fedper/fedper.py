@@ -14,7 +14,6 @@ from plato.clients import simple
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
-from pflbases.client_callbacks import local_completion_callbacks
 
 
 def main():
@@ -25,9 +24,6 @@ def main():
     client = simple.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        callbacks=[
-            local_completion_callbacks.PayloadCompletionCallback,
-        ],
     )
     server = fedavg_personalized.Server(
         trainer=trainer,

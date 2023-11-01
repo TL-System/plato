@@ -27,10 +27,7 @@ def main():
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
-    server = fedavg_personalized.Server(
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-    )
+    server = fedavg_personalized.Server(trainer=trainer)
 
     server.run(client)
 
