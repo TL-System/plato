@@ -92,7 +92,7 @@ class PayloadCompletionCallback(base_callbacks.ClientPayloadCallback):
         inbound_processor.processors.append(
             PayloadCompletionProcessor(
                 trainer=client.trainer,
-                name="LocalPayloadCompletionProcessor",
+                name="PayloadCompletionProcessor",
             )
         )
 
