@@ -15,8 +15,8 @@ class Trainer(personalized_trainer.Trainer):
 
     def train_run_start(self, config):
         """According to FedBABU,
-        1. freeze head of the model during federated training phase.
-        2. freeze body of the personalized model during personalized learning phase.
+        1. freeze first part of the model during federated training phase.
+        2. freeze second part of the personalized model during personalized learning phase.
         """
         super().train_run_start(config)
         if self.current_round > Config().trainer.rounds:
