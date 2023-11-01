@@ -9,10 +9,10 @@ import logging
 from plato.samplers import registry as samplers_registry
 from plato.config import Config
 
-from pflbases import separate_local_client
+from plato.clients import simple
 
 
-class Client(separate_local_client.Client):
+class Client(simple.Client):
     """A basic personalized federated learning client for self-supervised learning."""
 
     def __init__(
@@ -23,8 +23,6 @@ class Client(separate_local_client.Client):
         trainer=None,
         callbacks=None,
         trainer_callbacks=None,
-        personalized_model=None,
-        personalized_datasource=None,
     ):
         super().__init__(
             model=model,
@@ -33,13 +31,8 @@ class Client(separate_local_client.Client):
             trainer=trainer,
             callbacks=callbacks,
             trainer_callbacks=trainer_callbacks,
-            personalized_model=personalized_model,
         )
 
-        # the personalized datasource
-        # By default, if `personalized_datasource` is not set up, it will
-        # be equal to the `datasource`
-        self.custom_personalized_datasource = personalized_datasource
         self.personalized_datasource = None
 
         # dataset for personalization
@@ -94,10 +87,6 @@ class Client(separate_local_client.Client):
         # obtain the train/test set for personalization
         self.personalized_trainset = self.personalized_datasource.get_train_set()
         self.personalized_testset = self.personalized_datasource.get_test_set()
-
-    def inbound_received(self, inbound_processor):
-        """Setting personalized datasets and the samplers to the trainer."""
-        super().inbound_received(inbound_processor)
 
         # set personalized terms for the trainer
         self.trainer.set_personalized_trainset(
