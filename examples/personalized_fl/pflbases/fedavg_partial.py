@@ -1,14 +1,5 @@
 """
-An algorithm for extracting partial layers from a model.
-
-These layers can be set by the `global_layer_names` hyper-parameter in the 
-configuration file.
-
-For example, with the LeNet-5 model, `global_layer_names` can be defined as:
-
-    global_layer_names:
-        - conv1
-        - conv2
+Loading the model weights for personalized FL clients.
 """
 import os
 import logging
@@ -26,40 +17,30 @@ class Algorithm(fedavg.Algorithm):
         Loads the first part of the model with the global received from the server
             and the second part of the model with the saved local model.
         """
-
-        # Not load local weights if there is no saved local model to combine.
         if hasattr(Config().algorithm, "local_layer_names"):
-            # Load the local model weights previously saved on filesystem.
+            # Load the local model that has previously been saved
             filename = f"client_{self.trainer.client_id}_local_model.pth"
             location = Config().params["checkpoint_path"]
             if os.path.exists(os.path.join(location, filename)):
                 local_layer_names = Config().algorithm.local_layer_names
-                self.trainer.load_model(filename, location=location)
 
                 # Extract weights of desired local layers
-                local_model_weights = OrderedDict(
+                local_layers = OrderedDict(
                     [
                         (name, param)
-                        for name, param in self.model.state_dict().items()
+                        for name, param in enumerate(self.model.cpu().state_dict())
                         if any(
                             param_name in name.strip().split(".")
                             for param_name in local_layer_names
                         )
                     ]
                 )
-                weights.update(local_model_weights)
+
+                weights.update(local_layers)
 
                 logging.info(
                     "[Client #%d] Replaced portions of the global model with local layers.",
                     self.trainer.client_id,
                 )
-        # Load the weights containing two parts of the model weights.
-        super().load_weights(weights)
 
-    def combine_weights(self, weights):
-        """
-        Combine the existing model weights (the global model weights)
-        and the saved local model weights .
-        """
-
-        return weights
+        self.model.load_state_dict(weights, strict=True)
