@@ -5,17 +5,17 @@ import copy
 
 import torch
 from torch import nn
-from lightly.models.layers import BYOLPredictionHead, BYOLProjectionHead
-from lightly.models.layers.heads import SimCLRProjectionHead
-from lightly.models.layers import SimSiamPredictionHead, SimSiamProjectionHead
+from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
+from lightly.models.modules.heads import SimCLRProjectionHead
+from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 from sklearn.cluster import KMeans
-from lightly.models.layers.heads import (
+from lightly.models.modules.heads import (
     SMoGPredictionHead,
     SMoGProjectionHead,
     SMoGPrototypes,
 )
-from lightly.models.layers import SwaVProjectionHead, SwaVPrototypes
-from lightly.models.layers import MoCoProjectionHead
+from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
+from lightly.models.modules import MoCoProjectionHead
 
 from lightly.models.utils import deactivate_requires_grad
 
