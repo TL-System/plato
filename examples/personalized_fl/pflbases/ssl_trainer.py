@@ -119,7 +119,7 @@ class Trainer(separate_local_trainer.Trainer):
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
-        if self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             return self.get_personalized_train_loader(
                 batch_size, trainset, sampler, **kwargs
             )
@@ -161,7 +161,7 @@ class Trainer(separate_local_trainer.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion."""
-        if not self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             return self.plato_ssl_loss_wrapper()
 
         logging.info(
@@ -179,7 +179,7 @@ class Trainer(separate_local_trainer.Trainer):
     def train_run_end(self, config):
         """Only save the local model but no personalized model will be saved."""
 
-        if not self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             self.perform_local_model_checkpoint(config)
         else:
             self.perform_personalized_model_checkpoint(config=config)
@@ -247,7 +247,7 @@ class Trainer(separate_local_trainer.Trainer):
     def test_model(self, config, testset, sampler=None, **kwargs):
         """Testing the model to report the accuracy of the
         personalized model."""
-        if self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             return self.test_personalized_model(
                 config, testset, sampler=sampler, **kwargs
             )
