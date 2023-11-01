@@ -53,9 +53,8 @@ class Trainer(basic.Trainer):
                 trainer_utils.activate_model(
                     self.model, Config().algorithm.local_layer_names
                 )
-
             # The representation will then be optimized for only one epoch.
-            if self.current_epoch > head_epochs:
+            else:
                 trainer_utils.freeze_model(
                     self.model,
                     Config().algorithm.local_layer_names,
