@@ -42,7 +42,7 @@ class PayloadCompletionProcessor(base.Processor):
         )
 
         # Extract desired local modules
-        local_layers = self.algorithm.get_module_weights(
+        local_layers = Algorithm.get_module_weights(
             model_parameters=model_modules, module_names=local_module_names
         )
 
@@ -52,7 +52,7 @@ class PayloadCompletionProcessor(base.Processor):
         logging.info(
             "[Client #%d] Replaced the corresponding layers in the received global model with local layers: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_module_names(list(local_layers.keys())),
+            Algorithm.extract_module_names(list(local_layers.keys())),
         )
 
         return data
