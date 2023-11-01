@@ -17,7 +17,7 @@ class Trainer(basic.Trainer):
             # Freeze the model body while only optimizing the head
             # during the final personalization
             trainer_utils.freeze_model(
-                self.model, Config().algorithm.global_module_names
+                self.model, Config().algorithm.global_layer_names
             )
             # Set the number of epochs for personalization
             config["epochs"] = Config().algorithm.personalization.epochs

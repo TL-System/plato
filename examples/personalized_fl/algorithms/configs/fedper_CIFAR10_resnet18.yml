@@ -34,7 +34,7 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    global_module_names:
+    global_layer_names:
         - conv1
         - bn1
         - layer1
@@ -42,7 +42,7 @@ algorithm:
         - layer3
         - layer4
         
-    completion_module_names:
+    completion_layer_names:
         - linear
 
     personalization:

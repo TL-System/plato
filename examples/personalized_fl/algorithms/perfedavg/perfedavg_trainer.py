@@ -28,7 +28,7 @@ def get_data_batch(
 
 
 def compute_gradients(
-    model: torch.nn.Module,
+    model: torch.nn.layer,
     loss_criterion,
     data_batch: Tuple[torch.Tensor, torch.Tensor],
     base_grads: Union[Tuple[torch.Tensor, ...], None] = None,

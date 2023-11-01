@@ -74,10 +74,10 @@ algorithm:
                     - 1
                     - 1
 
-    global_module_names:
+    global_layer_names:
         - encoder
         
-    completion_module_names:
+    completion_layer_names:
         - projection_head
         - prediction_head
         

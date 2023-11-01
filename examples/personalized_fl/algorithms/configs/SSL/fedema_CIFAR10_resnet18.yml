@@ -64,12 +64,12 @@ algorithm:
             parameters:
                 input_size: 32
 
-    global_module_names:
+    global_layer_names:
         - encoder
         - projection_head
         - prediction_head
 
-    encoder_module_names:
+    encoder_layer_names:
         - encoder
 
     adaptive_divergence_scale: true

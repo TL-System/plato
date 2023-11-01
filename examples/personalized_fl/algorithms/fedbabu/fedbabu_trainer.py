@@ -10,7 +10,7 @@ from plato.config import Config
 
 
 class Trainer(personalized_trainer.Trainer):
-    """A trainer to freeze and activate modules of one model
+    """A trainer to freeze and activate layers of one model
     for normal and personalized learning processes."""
 
     def train_run_start(self, config):
@@ -22,13 +22,13 @@ class Trainer(personalized_trainer.Trainer):
         if self.do_final_personalization:
             trainer_utils.freeze_model(
                 self.personalized_model,
-                Config().algorithm.global_module_names,
+                Config().algorithm.global_layer_names,
                 log_info=f"[Client #{self.client_id}]",
             )
         else:
             trainer_utils.freeze_model(
                 self.model,
-                Config().algorithm.personalized_module_names,
+                Config().algorithm.personalized_layer_names,
                 log_info=f"[Client #{self.client_id}]",
             )
 
@@ -36,11 +36,11 @@ class Trainer(personalized_trainer.Trainer):
         """Activating the model."""
         if self.do_final_personalization:
             trainer_utils.activate_model(
-                self.personalized_model, Config().algorithm.global_module_names
+                self.personalized_model, Config().algorithm.global_layer_names
             )
         else:
             trainer_utils.activate_model(
-                self.model, Config().algorithm.personalized_module_names
+                self.model, Config().algorithm.personalized_layer_names
             )
 
         self.postprocess_models()

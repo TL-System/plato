@@ -12,7 +12,7 @@ from pflbases.fedavg_partial import Algorithm
 
 class PayloadStatusProcessor(base.Processor):
     """
-    A default payload status processor to present what modules are
+    A default payload status processor to present what layers are
     contained in the received payload.
     """
 
@@ -22,9 +22,9 @@ class PayloadStatusProcessor(base.Processor):
         else:
             payload = data
         logging.info(
-            "[Client #%d] Received the payload containing modules: %s.",
+            "[Client #%d] Received the payload containing layers: %s.",
             self.trainer.client_id,
-            Algorithm.extract_module_names(list(payload.keys())),
+            Algorithm.extract_layer_names(list(payload.keys())),
         )
 
         return data

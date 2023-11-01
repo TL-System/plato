@@ -43,7 +43,7 @@ class ModelEMA:
     def update_model_moving_average(self, previous_model, current_model):
         """Perform the moving average to update the model.
 
-        The input should be the model with type torch.module, thus
+        The input should be the model with type torch.layer, thus
         its parameter can be obtained by model.parameters() ->
         OrderDict
         """

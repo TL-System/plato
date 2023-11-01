@@ -24,49 +24,49 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         self.algorithm = algorithm
 
     def process(self, data: Any) -> Any:
-        """Processing the received payload by assigning modules of local model of
+        """Processing the received payload by assigning layers of local model of
         each client."""
 
         divergence_scale = data[1]
 
-        # extract the `encoder_module_names` of the model head
-        assert hasattr(Config().algorithm, "encoder_module_names")
+        # extract the `encoder_layer_names` of the model head
+        assert hasattr(Config().algorithm, "encoder_layer_names")
 
-        local_model_modules = self.trainer.model.cpu().state_dict()
-        global_modules = data[0]
+        local_model_layers = self.trainer.model.cpu().state_dict()
+        global_layers = data[0]
 
-        global_module_names = Config().algorithm.global_module_names
-        encoder_module_names = Config().algorithm.encoder_module_names
+        global_layer_names = Config().algorithm.global_layer_names
+        encoder_layer_names = Config().algorithm.encoder_layer_names
 
-        local_encoder_modules = self.algorithm.get_target_weights(
-            model_parameters=local_model_modules, module_names=encoder_module_names
+        local_encoder_layers = self.algorithm.get_target_weights(
+            model_parameters=local_model_layers, layer_names=encoder_layer_names
         )
-        global_encoder_modules = self.algorithm.get_target_weights(
-            model_parameters=global_modules, module_names=encoder_module_names
+        global_encoder_layers = self.algorithm.get_target_weights(
+            model_parameters=global_layers, layer_names=encoder_layer_names
         )
         logging.info(
-            "[Client #%d] Computing global and local divergence on modules: %s.",
+            "[Client #%d] Computing global and local divergence on layers: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_module_names(list(local_encoder_modules.keys())),
+            self.algorithm.extract_layer_names(list(local_encoder_layers.keys())),
         )
 
         # compute the divergence between encoders of local and global models
         l2_distance = ModelEMA.get_parameters_diff(
-            parameter_a=local_encoder_modules,
-            parameter_b=global_encoder_modules,
+            parameter_a=local_encoder_layers,
+            parameter_b=global_encoder_layers,
         )
 
         # EMA update
         divergence_scale = min(l2_distance * divergence_scale, 1)
 
         # The local model
-        local_modules = self.algorithm.get_target_weights(
-            model_parameters=local_model_modules, module_names=global_module_names
+        local_layers = self.algorithm.get_target_weights(
+            model_parameters=local_model_layers, layer_names=global_layer_names
         )
         ema_operator = ModelEMA(beta=divergence_scale)
         ema_parameters = ema_operator.update_parameters_moving_average(
-            previous_parameters=local_modules,
-            current_parameters=global_modules,
+            previous_parameters=local_layers,
+            current_parameters=global_layers,
         )
         # update the ema parameters
         data[0].update(ema_parameters)

@@ -18,7 +18,7 @@ class Trainer(basic.Trainer):
             # Freeze the model body while only optimizing the head
             # furing the final personalization
             trainer_utils.freeze_model(
-                self.model, Config().algorithm.global_module_names
+                self.model, Config().algorithm.global_layer_names
             )
             # Set the number of epochs for personalization
             config["epochs"] = Config().algorithm.personalization.epochs
@@ -48,30 +48,30 @@ class Trainer(basic.Trainer):
             if self.current_epoch <= head_epochs:
                 trainer_utils.freeze_model(
                     self.model,
-                    Config().algorithm.global_module_names,
+                    Config().algorithm.global_layer_names,
                 )
                 trainer_utils.activate_model(
-                    self.model, Config().algorithm.local_module_names
+                    self.model, Config().algorithm.local_layer_names
                 )
 
             # The representation will then be optimized for only one epoch.
             if self.current_epoch > head_epochs:
                 trainer_utils.freeze_model(
                     self.model,
-                    Config().algorithm.local_module_names,
+                    Config().algorithm.local_layer_names,
                 )
                 trainer_utils.activate_model(
-                    self.model, Config().algorithm.global_module_names
+                    self.model, Config().algorithm.global_layer_names
                 )
         else:
             # The body of the model will be frozen during the
             # final personalization.
             trainer_utils.freeze_model(
                 self.model,
-                Config().algorithm.global_module_names,
+                Config().algorithm.global_layer_names,
             )
 
     def train_run_end(self, config):
         """Activate the model."""
         super().train_run_end(config)
-        trainer_utils.activate_model(self.model, Config().algorithm.global_module_names)
+        trainer_utils.activate_model(self.model, Config().algorithm.global_layer_names)

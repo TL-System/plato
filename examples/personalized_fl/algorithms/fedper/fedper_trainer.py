@@ -9,7 +9,7 @@ from plato.config import Config
 
 
 class Trainer(personalized_trainer.Trainer):
-    """A trainer to freeze and activate modules of one model
+    """A trainer to freeze and activate layers of one model
     for normal and personalized learning processes."""
 
     def train_run_start(self, config):
@@ -20,7 +20,7 @@ class Trainer(personalized_trainer.Trainer):
         if self.current_round > Config().trainer.rounds:
             trainer_utils.freeze_model(
                 self.model,
-                Config().algorithm.global_module_names,
+                Config().algorithm.global_layer_names,
             )
 
     def train_run_end(self, config):
@@ -28,5 +28,5 @@ class Trainer(personalized_trainer.Trainer):
         super().train_run_end(config)
         if self.current_round > Config().trainer.rounds:
             trainer_utils.activate_model(
-                self.model, Config().algorithm.global_module_names
+                self.model, Config().algorithm.global_layer_names
             )

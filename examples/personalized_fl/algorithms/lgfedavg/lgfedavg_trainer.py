@@ -26,8 +26,8 @@ class Trainer(personalized_trainer.Trainer):
             loss.backward()
 
         # first freeze the head and optimize the body
-        trainer_utils.freeze_model(self.model, Config().algorithm.head_module_names)
-        trainer_utils.activate_model(self.model, Config().algorithm.body_module_names)
+        trainer_utils.freeze_model(self.model, Config().algorithm.head_layer_names)
+        trainer_utils.activate_model(self.model, Config().algorithm.body_layer_names)
         self.optimizer.step()
 
         # repeat the same optimization relying the optimized
@@ -47,10 +47,10 @@ class Trainer(personalized_trainer.Trainer):
         # first freeze the head and optimize the body
         trainer_utils.freeze_model(
             self.model,
-            Config().algorithm.body_module_names,
+            Config().algorithm.body_layer_names,
             log_info=None,
         )
-        trainer_utils.activate_model(self.model, Config().algorithm.head_module_names)
+        trainer_utils.activate_model(self.model, Config().algorithm.head_layer_names)
 
         self.optimizer.step()
 

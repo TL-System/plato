@@ -39,8 +39,8 @@ class Server(fedavg_personalized_server.Server):
         step = 0
 
         masked_layers = []
-        for name, module in self.trainer.model.named_modules():
-            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
+        for name, layer in self.trainer.model.named_layers():
+            if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
                 layer_name = f"{name}.weight"
                 masked_layers.append(layer_name)
 

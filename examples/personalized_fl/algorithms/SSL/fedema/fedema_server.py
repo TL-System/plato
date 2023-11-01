@@ -79,7 +79,7 @@ class Server(fedavg_personalized_server.Server):
         """Compute the divergence scale based on the distance between
         the updated local model and the aggregated global model.
         """
-        encoder_module_names = Config().algorithm.encoder_module_names
+        encoder_layer_names = Config().algorithm.encoder_layer_names
 
         logging.info("[Server #%d] Computing divergence scales.", os.getpid())
 
@@ -91,10 +91,10 @@ class Server(fedavg_personalized_server.Server):
                 continue
 
             aggregated_encoder = self.algorithm.extract_weights(
-                module_names=encoder_module_names
+                layer_names=encoder_layer_names
             )
             client_encoder = self.algorithm.get_target_weights(
-                model_parameters=client_parameters, module_names=encoder_module_names
+                model_parameters=client_parameters, layer_names=encoder_layer_names
             )
             print("aggregated_encoder: ", get_model_statistic(aggregated_encoder))
             print("client_encoder: ", get_model_statistic(client_encoder))

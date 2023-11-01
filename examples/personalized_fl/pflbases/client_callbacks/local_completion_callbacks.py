@@ -1,5 +1,5 @@
 """
-Customize client callbacks for assigning the modules of client's local model
+Customize client callbacks for assigning the layers of client's local model
 to the received payload.
 """
 import logging
@@ -14,7 +14,7 @@ from plato.processors import base
 
 class PayloadCompletionProcessor(base.Processor):
     """
-    A processor relying on the hyper-parameter `local_module_names` to complete parameters of payload
+    A processor relying on the hyper-parameter `local_layer_names` to complete parameters of payload
     with the loaded local model, which is the updated global model in the previous round.
     """
 
@@ -24,7 +24,7 @@ class PayloadCompletionProcessor(base.Processor):
 
     def process(self, data: Any) -> Any:
         """Processing the received payload by replacing the local layers with a client's own."""
-        local_module_names = Config().algorithm.local_module_names
+        local_layer_names = Config().algorithm.local_layer_names
 
         # Load the previously saved local model
         filename = f"client_{self.trainer.client_id}_local_model.pth"
@@ -33,8 +33,8 @@ class PayloadCompletionProcessor(base.Processor):
         if os.path.exists(os.path.join(location, filename)):
             self.trainer.load_model(filename, location=location)
 
-        # Extract desired local modules
-        local_layers = self.algorithm.extract_local_weights(local_module_names)
+        # Extract desired local layers
+        local_layers = self.algorithm.extract_local_weights(local_layer_names)
 
         # Replace the corresponding layers in the received global model with the local counterparts
         data.update(local_layers)

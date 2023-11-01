@@ -27,7 +27,7 @@ from clustering import kmeans_clustering
 from prototype_loss import get_prototype_loss
 
 
-class CalibreLoss(nn.Module):
+class CalibreLoss(nn.layer):
     """
     The contrastive adaptation losses for Calibre.
     """
@@ -321,7 +321,7 @@ class CalibreLoss(nn.Module):
         )
 
     def forward(self, *args, **kwargs):
-        """Forward the loss computaton module."""
+        """Forward the loss computaton layer."""
         total_loss = 0.0
         labels = kwargs.get("labels", None)
         encodings = args[0]

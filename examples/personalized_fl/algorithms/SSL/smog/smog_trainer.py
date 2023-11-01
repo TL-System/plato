@@ -4,7 +4,7 @@ The implemetation of the trainer for SMoG approach.
 
 import logging
 
-from lightly.loss.memory_bank import MemoryBankModule
+from lightly.loss.memory_bank import MemoryBanklayer
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
@@ -35,7 +35,7 @@ class Trainer(ssl_trainer.Trainer):
             else 300
         )
         memory_bank_size = self.reset_interval * Config().trainer.batch_size
-        self.memory_bank = MemoryBankModule(size=memory_bank_size)
+        self.memory_bank = MemoryBanklayer(size=memory_bank_size)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""

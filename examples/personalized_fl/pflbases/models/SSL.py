@@ -5,17 +5,17 @@ import copy
 
 import torch
 from torch import nn
-from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
-from lightly.models.modules.heads import SimCLRProjectionHead
-from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
+from lightly.models.layers import BYOLPredictionHead, BYOLProjectionHead
+from lightly.models.layers.heads import SimCLRProjectionHead
+from lightly.models.layers import SimSiamPredictionHead, SimSiamProjectionHead
 from sklearn.cluster import KMeans
-from lightly.models.modules.heads import (
+from lightly.models.layers.heads import (
     SMoGPredictionHead,
     SMoGProjectionHead,
     SMoGPrototypes,
 )
-from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
-from lightly.models.modules import MoCoProjectionHead
+from lightly.models.layers import SwaVProjectionHead, SwaVPrototypes
+from lightly.models.layers import MoCoProjectionHead
 
 from lightly.models.utils import deactivate_requires_grad
 
@@ -23,7 +23,7 @@ from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
-class BYOL(nn.Module):
+class BYOL(nn.layer):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
@@ -89,7 +89,7 @@ class BYOL(nn.Module):
         return BYOL()
 
 
-class SimCLR(nn.Module):
+class SimCLR(nn.layer):
     """The model structure of SimCLR."""
 
     def __init__(self, encoder=None, encoder_dim=None):
@@ -131,7 +131,7 @@ class SimCLR(nn.Module):
         return SimCLR()
 
 
-class SimSiam(nn.Module):
+class SimSiam(nn.layer):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
@@ -179,7 +179,7 @@ class SimSiam(nn.Module):
         return SimSiam()
 
 
-class SMoG(nn.Module):
+class SMoG(nn.layer):
     def __init__(self, encoder=None):
         super().__init__()
         self.temperature = (
@@ -294,7 +294,7 @@ class SMoG(nn.Module):
         return SMoG()
 
 
-class SwaV(nn.Module):
+class SwaV(nn.layer):
     def __init__(self, encoder=None, encoder_dim=None):
         super().__init__()
 
@@ -347,7 +347,7 @@ class SwaV(nn.Module):
         return SwaV()
 
 
-class MoCoV2(nn.Module):
+class MoCoV2(nn.layer):
     def __init__(self, encoder=None):
         super().__init__()
 
