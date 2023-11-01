@@ -21,7 +21,8 @@ class Trainer(basic.Trainer):
                 self.model, Config().algorithm.global_layer_names
             )
             # Set the number of epochs for personalization
-            config["epochs"] = Config().algorithm.personalization.epochs
+            if hasattr(Config().algorithm.personalization, "epochs"):
+                config["epochs"] = Config().algorithm.personalization.epochs
 
     def train_epoch_start(self, config):
         """A training epoch for FedRep.
