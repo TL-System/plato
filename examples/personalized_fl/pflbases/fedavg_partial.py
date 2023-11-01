@@ -36,7 +36,6 @@ class Algorithm(fedavg.Algorithm):
             filename = f"client_{self.trainer.client_id}_local_model.pth"
             location = Config().params["checkpoint_path"]
             if os.path.exists(os.path.join(location, filename)):
-                weights = self.extract_weights()
                 local_layer_names = Config().algorithm.local_layer_names
                 self.trainer.load_model(filename, location=location)
 
