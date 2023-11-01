@@ -1,17 +1,14 @@
 """
-The implementation of LG-FedAvg method based on the plato's
-pFL code.
+The implementation of LG-FedAvg method based on the plato's pFL code.
 
-Paul Pu Liang, et al., Think Locally, Act Globally: Federated Learning with Local and Global Representations
-https://arxiv.org/abs/2001.01523
+Paul Pu Liang, et al., Think Locally, Act Globally: Federated Learning
+with Local and Global Representations. https://arxiv.org/abs/2001.01523
 
 """
 
-
-from plato.clients.simple import Client
-
 from pflbases import fedavg_partial
 from pflbases import fedavg_personalized
+from plato.clients.simple import Client
 import lgfedavg_trainer
 
 
