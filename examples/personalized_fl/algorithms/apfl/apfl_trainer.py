@@ -3,58 +3,31 @@ A personalized federated learning trainer For APFL.
 """
 import os
 import logging
-
 import numpy as np
-
 import torch
-from pflbases import personalized_trainer
 
+from plato.trainers import basic
+from plato.models import registry as models_registry
 from plato.config import Config
 
 
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A trainer using the algorithm of APFL to jointly train the global
     and personalized models."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
-        # the alpha used in the APFL paper
+        # The alpha used in the APFL paper
         self.alpha = Config().algorithm.alpha
-        self.adaptive_alpha = Config().algorithm.adaptive_alpha
 
-    def load_alpha(self):
-        """Extracting the alpha."""
-        save_dir_path = Config().params["model_path"]
-        filename = f"client_{self.client_id}_alpha.pth"
-        save_path = os.path.join(save_dir_path, filename)
-
-        if os.path.exists(save_path):
-            self.alpha = torch.load(save_path)
-            logging.info(
-                "[Client #%d] Loaded the alpha %s",
-                self.client_id,
-                self.alpha,
-            )
-        else:
-            logging.info(
-                "[Client #%d] uses the initial alpha.",
-                self.client_id,
-            )
+        # A personalized model and its optimizer
+        self.personalized_model = models_registry.get()
+        self.personalized_optimizer = None
 
     def update_alpha(self, eta):
-        """Updating the alpha based on the Eq. 10 of the paper.
-
-        The implementation of this alpha update comes from the
-        APFL code of:
-         https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
-
-        The only concern is that
-            why 'grad_alpha' needs to be computed as:
-                grad_alpha = grad_alpha + 0.02 * alpha
-        """
+        """Updates the alpha based on the Eq. 10 of the paper."""
         grad_alpha = 0
-        # perform the second term of Eq. 10
         for l_params, p_params in zip(
             self.model.parameters(), self.personalized_model.parameters()
         ):
@@ -71,30 +44,14 @@ class Trainer(personalized_trainer.Trainer):
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing forward and backward passes in the training loop.
-
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
-
         This implementation refers to:
         https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
-
-        It seems that in this implementation, the v^{t} will be optimized based on the
-        optimized w^{t}, instead of the w^{t-1} shown in Table Algorithm 1 of the paper.
-
-        To fix the issue, we have the `perform_forward_and_backward_passes_V2`.
-
-        However, to be consistent with FedTorch's implementation, this version is
-        used by default.
         """
 
-        # perform normal local update
+        # Perform the local update on self.model
         super().perform_forward_and_backward_passes(config, examples, labels)
 
-        # perform personalization
+        # Perform the local update on self.personalized_model
         # clean the grads in normal optimizer
         self.optimizer.zero_grad()
         self.personalized_optimizer.zero_grad()
@@ -106,78 +63,58 @@ class Trainer(personalized_trainer.Trainer):
 
         personalized_loss.backward()
         self.personalized_optimizer.step()
-
-        return personalized_loss
-
-    def perform_forward_and_backward_passes_v2(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
-
-        This implementation refers to:
-        https://github.com/lgcollins/FedRep
-
-        """
-
-        # perform personalization
-        # clean the grads in normal optimizer
-        self.optimizer.zero_grad()
-        self.personalized_optimizer.zero_grad()
-
-        output1 = self.personalized_model(examples)
-        output2 = self.model(examples)
-        output = self.alpha * output1 + (1 - self.alpha) * output2
-        personalized_loss = self._loss_criterion(output, labels)
-
-        personalized_loss.backward()
-        self.personalized_optimizer.step()
-
-        # perform normal local update
-        super().perform_forward_and_backward_passes(config, examples, labels)
 
         return personalized_loss
 
     def train_run_start(self, config):
-        """Defining items for personalization."""
+        """Load the alpha before starting the training."""
         super().train_run_start(config)
 
-        # Define the personalized optimizer
-        self.personalized_optimizer = self.get_personalized_optimizer()
+        # Load the alpha from the saved file
+        model_path = Config().params["model_path"]
+        filename = f"client_{self.client_id}_alpha.pth"
+        save_path = os.path.join(model_path, filename)
+        if os.path.exists(save_path):
+            self.alpha = torch.load(save_path)
 
-        # set the personalized model to be trainable
+        # Load the personalized model
+        model_name = Config().trainer.model_name
+        model_path = (
+            f"{model_path}/{model_name}_{self.client_id}_personalized_model.pth"
+        )
+        if os.path.exists(model_path):
+            self.personalized_model.load_state_dict(
+                torch.load(model_path, map_location=torch.device("cpu")), strict=True
+            )
+            logging.info("[Client #%d] Loaded the personalized model.", self.client_id)
+
+        self.personalized_optimizer = self.get_optimizer(self.personalized_model)
+
         self.personalized_model.to(self.device)
         self.personalized_model.train()
-
-        # Load the alpha from the saved file
-        self.load_alpha()
 
     def train_run_end(self, config):
         """Saving the alpha."""
         super().train_run_end(config)
 
-        location = Config().params["model_path"]
-        save_dir_path = self.get_checkpoint_dir_path()
-        save_path = os.path.join(save_dir_path, self.alpha_filename)
+        # Save the alpha to the file
+        model_path = Config().params["model_path"]
+        filename = f"client_{self.client_id}_alpha.pth"
+        save_path = os.path.join(model_path, filename)
         torch.save(self.alpha, save_path)
+
+        # Save the personalized model
+        model_name = Config().trainer.model_name
+        model_path = (
+            f"{model_path}/{model_name}_{self.client_id}_personalized_model.pth"
+        )
+        torch.save(self.personalized_model.state_dict(), model_path)
 
     def train_step_end(self, config, batch=None, loss=None):
         """Updating the alpha of APFL before each iteration."""
         super().train_step_end(config, batch, loss)
-        # update alpha based on the Eq. 10 of the paper.
-        if self.adaptive_alpha and self.current_epoch == 1 and batch == 0:
+        # Update alpha based on the Eq. 10 of the paper.
+        if Config().algorithm.adaptive_alpha and self.current_epoch == 1 and batch == 0:
             # 0.1/np.sqrt(1+args.local_index))
             lr = self.lr_scheduler.get_lr()[0]
-            previous_alpha = self.alpha
             self.update_alpha(lr)
-            logging.info(
-                "[Client #%d] in round#%d Update alpha from %.6f to %.6f.",
-                self.client_id,
-                self.current_round,
-                previous_alpha,
-                self.alpha,
-            )
