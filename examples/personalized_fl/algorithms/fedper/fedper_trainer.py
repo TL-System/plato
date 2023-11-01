@@ -1,6 +1,5 @@
 """
 A personalized federated learning trainer for FedPer.
-
 """
 
 from pflbases import personalized_trainer
@@ -18,17 +17,16 @@ class Trainer(personalized_trainer.Trainer):
         1. freeze body of the model during personalization.
         """
         super().train_run_start(config)
-        if self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             trainer_utils.freeze_model(
-                self.personalized_model,
+                self.model,
                 Config().algorithm.global_module_names,
-                log_info=f"[Client #{self.client_id}]",
             )
 
     def train_run_end(self, config):
         """Activating the model."""
         super().train_run_end(config)
-        if self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             trainer_utils.activate_model(
-                self.personalized_model, Config().algorithm.global_module_names
+                self.model, Config().algorithm.global_module_names
             )

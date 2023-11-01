@@ -21,7 +21,7 @@ from pflbases.client_callbacks import local_completion_callbacks
 
 def main():
     """
-    A personalized federated learning sesstion for PerFedAvg approach.
+    A personalized federated learning session for FedRep approach.
     """
     trainer = fedrep_trainer.Trainer
     client = simple.Client(
