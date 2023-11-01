@@ -10,6 +10,7 @@ from plato.config import Config
 from plato.processors import base
 
 from pflbases.client_callbacks import base_callbacks
+from pflbases.fedavg_partial import Algorithm
 
 
 class PayloadCompletionProcessor(base.Processor):
@@ -17,9 +18,10 @@ class PayloadCompletionProcessor(base.Processor):
     to complete parameters of payload with the loaded local model, which
     is the updated global model in the previous round."""
 
-    def __init__(self, algorithm, **kwargs) -> None:
+    def __init__(self, trainer, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.algorithm = algorithm
+
+        self.trainer = trainer
 
     def process(self, data: Any) -> Any:
         """Processing the received payload by assigning modules of local model of
@@ -40,11 +42,11 @@ class PayloadCompletionProcessor(base.Processor):
         logging.info(
             "[Client #%d] The local model contains: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_module_names(list(model_modules.keys())),
+            Algorithm.extract_module_names(list(model_modules.keys())),
         )
 
         # Extract desired local modules
-        local_modules = self.algorithm.get_module_weights(
+        local_modules = Algorithm.get_module_weights(
             model_parameters=model_modules, module_names=local_module_names
         )
         # Update the payload with the local modules
@@ -53,7 +55,7 @@ class PayloadCompletionProcessor(base.Processor):
         logging.info(
             "[Client #%d] Completed the payload by extracting local modules: %s.",
             self.trainer.client_id,
-            self.algorithm.extract_module_names(list(local_modules.keys())),
+            Algorithm.extract_module_names(list(local_modules.keys())),
         )
 
         return data
@@ -93,7 +95,6 @@ class PayloadCompletionCallback(base_callbacks.ClientPayloadCallback):
         inbound_processor.processors.append(
             PayloadCompletionProcessor(
                 trainer=client.trainer,
-                algorithm=client.algorithm,
                 name="LocalPayloadCompletionProcessor",
             )
         )

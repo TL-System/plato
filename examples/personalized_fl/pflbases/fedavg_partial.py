@@ -23,18 +23,6 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """A base algorithm for extracting modules from a model."""
 
-    def get_module_weights(self, model_parameters: dict, module_names: List[str]):
-        """Get weights from model parameters based on module names."""
-        return OrderedDict(
-            [
-                (name, param)
-                for name, param in model_parameters.items()
-                if any(
-                    param_name in name.strip().split(".") for param_name in module_names
-                )
-            ]
-        )
-
     def extract_weights(
         self,
         model: Optional[torch.nn.Module] = None,
@@ -51,10 +39,23 @@ class Algorithm(fedavg.Algorithm):
             # return all the model weights
             return model.cpu().state_dict()
         else:
-            return self.get_module_weights(
+            return Algorithm.get_module_weights(
                 model.cpu().state_dict(), module_names=module_names
             )
 
     def load_weights(self, weights):
         """Loads a portion of the model weights passed in as a parameter."""
         self.model.load_state_dict(weights, strict=False)
+
+    @staticmethod
+    def get_module_weights(model_parameters: dict, module_names: List[str]):
+        """Get weights from model parameters based on module names."""
+        return OrderedDict(
+            [
+                (name, param)
+                for name, param in model_parameters.items()
+                if any(
+                    param_name in name.strip().split(".") for param_name in module_names
+                )
+            ]
+        )
