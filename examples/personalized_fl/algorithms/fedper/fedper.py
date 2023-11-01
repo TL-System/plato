@@ -11,7 +11,7 @@ Third-part code: https://github.com/jhoon-oh/FedBABU
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
-from plato.clients import simple
+from pflbases import fedavg_personalized_client
 import fedper_trainer
 
 
@@ -20,7 +20,7 @@ def main():
     A personalized federated learning session for FedPer approach.
     """
     trainer = fedper_trainer.Trainer
-    client = simple.Client(
+    client = fedavg_personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )

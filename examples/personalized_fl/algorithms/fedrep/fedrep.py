@@ -13,7 +13,7 @@ Source code: https://github.com/lgcollins/FedRep
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
-from plato.clients import simple
+from pflbases import fedavg_personalized_client
 import fedrep_trainer
 
 
@@ -22,7 +22,7 @@ def main():
     A personalized federated learning session for FedRep approach.
     """
     trainer = fedrep_trainer.Trainer
-    client = simple.Client(
+    client = fedavg_personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
