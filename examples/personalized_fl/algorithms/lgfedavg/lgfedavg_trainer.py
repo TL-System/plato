@@ -3,13 +3,13 @@ A personalized federated learning trainer using LG-FedAvg.
 
 """
 
+
+from pflbases import trainer_utils
+from plato.trainers import basic
 from plato.config import Config
 
-from pflbases import personalized_trainer
-from pflbases import trainer_utils
 
-
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A personalized federated learning trainer using the LG-FedAvg algorithm."""
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
