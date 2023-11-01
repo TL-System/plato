@@ -18,15 +18,15 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
-        # the lambda used in the Ditto paper
+        # The lambda used in the Ditto paper.
         self.ditto_lambda = Config().algorithm.ditto_lambda
-        # The personalized model is the vnet defined in the paper
+        # The personalized model is the vnet defined in the paper.
         if model is None:
             self.personalized_model = models_registry.get()
         else:
             self.personalized_model = model()
-        # The global model weights received from the server.
-        #   which is the w^t in the paper.
+        # The global model weights received from the server,
+        # which is the w^t in the paper.
         self.initial_wnet_params = None
 
     def train_run_start(self, config):
@@ -39,13 +39,13 @@ class Trainer(basic.Trainer):
 
         logging.info(
             fonts.colourize(
-                "[Client #%d] performing Ditto Solver for personalizaiton: ",
+                "[Client #%d] performing Ditto Solver for personalization: ",
                 colour="blue",
             ),
             self.client_id,
         )
 
-        # load v net parameters from filesystem
+        # Load v net parameters from filesystem.
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_path}/{model_name}_{self.client_id}_v_net.pth"
@@ -72,11 +72,11 @@ class Trainer(basic.Trainer):
                 #   of the equation in the Algorithm. 1.
                 # i.e., v_k − η∇F_k(v_k)
                 # This can be achieved by the general optimization step.
-                # Perfrom the training and compute the loss
+                # Perform the training and compute the loss.
                 preds = self.personalized_model(examples)
                 loss = self._loss_criterion(preds, labels)
 
-                # Perfrom the optimization
+                # Perform the optimization.
                 loss.backward()
                 personalized_optimizer.step()
                 ## 2.- Compute the ηλ(v_k − w^t), which is the second term of
@@ -92,7 +92,7 @@ class Trainer(basic.Trainer):
                         - self.initial_wnet_params[v_net_name].to(self.device)
                     )
 
-                # Update the epoch loss container
+                # Update the epoch loss container.
                 epoch_loss_meter.update(loss, labels.size(0))
 
             lr_scheduler.step()
@@ -104,7 +104,7 @@ class Trainer(basic.Trainer):
                 epoch_loss_meter.average,
             )
         self.personalized_model.to(torch.device("cpu"))
-        # save v net parameters from filesystem
+        # Save v net parameters from filesystem.
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_path}/{model_name}_{self.client_id}_v_net.pth"
