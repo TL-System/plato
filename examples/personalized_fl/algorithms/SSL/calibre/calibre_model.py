@@ -10,7 +10,7 @@ from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
-class CalibreNet(torch.nn.layer):
+class CalibreNet(torch.nn.Module):
     """The model structure of Calibre."""
 
     def __init__(self, encoder=None, encoder_dim=None):

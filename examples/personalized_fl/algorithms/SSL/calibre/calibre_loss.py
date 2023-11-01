@@ -27,7 +27,7 @@ from clustering import kmeans_clustering
 from prototype_loss import get_prototype_loss
 
 
-class CalibreLoss(nn.layer):
+class CalibreLoss(nn.Module):
     """
     The contrastive adaptation losses for Calibre.
     """

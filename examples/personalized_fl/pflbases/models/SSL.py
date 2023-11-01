@@ -23,7 +23,7 @@ from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
-class BYOL(nn.layer):
+class BYOL(nn.Module):
     def __init__(self, encoder=None):
         super().__init__()
 
@@ -89,7 +89,7 @@ class BYOL(nn.layer):
         return BYOL()
 
 
-class SimCLR(nn.layer):
+class SimCLR(nn.Module):
     """The model structure of SimCLR."""
 
     def __init__(self, encoder=None):
@@ -131,7 +131,7 @@ class SimCLR(nn.layer):
         return SimCLR()
 
 
-class SimSiam(nn.layer):
+class SimSiam(nn.Module):
     def __init__(self, encoder=None):
         super().__init__()
 
@@ -179,7 +179,7 @@ class SimSiam(nn.layer):
         return SimSiam()
 
 
-class SMoG(nn.layer):
+class SMoG(nn.Module):
     def __init__(self, encoder=None):
         super().__init__()
         self.temperature = (
@@ -294,7 +294,7 @@ class SMoG(nn.layer):
         return SMoG()
 
 
-class SwaV(nn.layer):
+class SwaV(nn.Module):
     def __init__(self, encoder=None):
         super().__init__()
 
@@ -347,7 +347,7 @@ class SwaV(nn.layer):
         return SwaV()
 
 
-class MoCoV2(nn.layer):
+class MoCoV2(nn.Module):
     def __init__(self, encoder=None):
         super().__init__()
 
