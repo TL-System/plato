@@ -135,10 +135,10 @@ python algorithms/SSL/calibre/calibre.py -c algorithms/configs/SSL/calibre_CIFAR
 All hyper-parameters of `pflbases` should be placed under the `algorithm` block of the configuration file. 
 
 ### For `fedavg_partial`
-- global_layers_name: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_partial.py` as the algorithm, the `global_layers_name` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `global_layers_name` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
+- global_layer_names: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_partial.py` as the algorithm, the `global_layer_names` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `global_layer_names` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
     ```yaml
     algorithm:
-        global_layers_name:
+        global_layer_names:
             - conv1
             - bn1
             - layer1
@@ -147,10 +147,10 @@ All hyper-parameters of `pflbases` should be placed under the `algorithm` block 
             - layer4
     ```
 
-- local_layers_name: This is a list in which each item is a string presenting the parameter name. Once you set the `local_layers_name`, the client receives a portion of the model from the server. To embrace all parameters (i.e., the whole model) during the local update, you should set `local_layers_name` to indicate which parts parameters will be loaded from the local side to merge with the received ones. This is more like: the whole model is A+B. The client receives A from the server. Then, the client loads B from the local side to merge with A. For example, 
+- local_layer_names: This is a list in which each item is a string presenting the parameter name. Once you set the `local_layer_names`, the client receives a portion of the model from the server. To embrace all parameters (i.e., the whole model) during the local update, you should set `local_layer_names` to indicate which parts parameters will be loaded from the local side to merge with the received ones. This is more like: the whole model is A+B. The client receives A from the server. Then, the client loads B from the local side to merge with A. For example, 
     ```yaml
     algorithm:
-        local_layers_name:
+        local_layer_names:
             - linear
     ```
 
