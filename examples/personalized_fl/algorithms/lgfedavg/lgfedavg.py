@@ -7,12 +7,12 @@ https://arxiv.org/abs/2001.01523
 
 """
 
-from pflbases import fedavg_partial
-
-import lgfedavg_trainer
 
 from plato.clients.simple import Client
-from plato.servers.fedavg import Server
+
+from pflbases import fedavg_partial
+from pflbases import fedavg_personalized
+import lgfedavg_trainer
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
-    server = Server(trainer=trainer)
+    server = fedavg_personalized.Server(trainer=trainer)
 
     server.run(client)
 

@@ -35,7 +35,6 @@ algorithm:
     type: fedavg
 
     local_layer_names:
-        - linear
         - conv1
         - bn1
         - layer1
@@ -43,6 +42,9 @@ algorithm:
         - layer3
         - layer4
        
+    global_layer_names:
+        - linear
+
 
     personalization:
 

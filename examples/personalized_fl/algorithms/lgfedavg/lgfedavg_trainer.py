@@ -1,6 +1,5 @@
 """
 A personalized federated learning trainer using LG-FedAvg.
-
 """
 
 
@@ -14,44 +13,20 @@ class Trainer(basic.Trainer):
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing one iteration of LG-FedAvg."""
-        self.optimizer.zero_grad()
 
-        outputs = self.forward_examples(examples)
+        # LG-FedAvg will first only train local layers
+        trainer_utils.freeze_model(self.model, Config().algorithm.global_layer_names)
+        trainer_utils.activate_model(self.model, Config().algorithm.local_layer_names)
 
-        loss = self._loss_criterion(outputs, labels)
+        super().perform_forward_and_backward_passes(config, examples, labels)
 
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
-
-        # first freeze the head and optimize the body
-        trainer_utils.freeze_model(self.model, Config().algorithm.head_layer_names)
-        trainer_utils.activate_model(self.model, Config().algorithm.body_layer_names)
-        self.optimizer.step()
-
-        # repeat the same optimization relying the optimized
-        # body of the model
-        self.optimizer.zero_grad()
-
-        outputs = self.forward_examples(examples)
-
-        loss = self._loss_criterion(outputs, labels)
-        self._loss_tracker.update(loss, labels.size(0))
-
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
-
-        # first freeze the head and optimize the body
+        # Then, LG-FedAvg will only train non-local layers
+        trainer_utils.activate_model(self.model, Config().algorithm.global_layer_names)
         trainer_utils.freeze_model(
             self.model,
-            Config().algorithm.body_layer_names,
-            log_info=None,
+            Config().algorithm.local_layer_names,
         )
-        trainer_utils.activate_model(self.model, Config().algorithm.head_layer_names)
 
-        self.optimizer.step()
+        loss = super().perform_forward_and_backward_passes(config, examples, labels)
 
         return loss
