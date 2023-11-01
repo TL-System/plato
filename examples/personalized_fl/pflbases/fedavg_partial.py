@@ -38,6 +38,7 @@ class Algorithm(fedavg.Algorithm):
         self.model.load_state_dict(weights, strict=True)
 
     def extract_weights(self, model=None):
+        """Extracts the weights from the model and saves local layers."""
         weights = super().extract_weights(model)
         # Save local layers before giving them to the outbound processor
         if hasattr(Config().algorithm, "local_layer_names"):
