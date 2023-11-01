@@ -1,24 +1,17 @@
 """
 A personalized federated learning trainer using Ditto.
-
-This implementation striclty follows the official code presented in
-https://github.com/lgcollins/FedRep.
-
 """
 
 import copy
 import logging
 
 
-from plato.trainers import tracking
+from plato.trainers import tracking, basic
 from plato.utils import fonts
 from plato.config import Config
 
 
-from pflbases import personalized_trainer
-
-
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A personalized federated learning trainer using the Ditto algorithm."""
 
     def __init__(self, model=None, callbacks=None):
