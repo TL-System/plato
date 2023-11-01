@@ -3,8 +3,6 @@ A base client for personalized federated learning
 """
 from collections import OrderedDict
 
-import torch
-
 from plato.clients import simple
 from plato.config import Config
 
@@ -36,4 +34,4 @@ class Client(simple.Client):
             model_path = Config().params["model_path"]
             model_name = Config().trainer.model_name
             filename = f"{model_path}/{model_name}_{self.client_id}_local_layers.pth"
-            torch.save(local_layers, filename)
+            self.algorithm.save_local_layers(local_layers, filename)
