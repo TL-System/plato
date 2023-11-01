@@ -49,8 +49,6 @@ algorithm:
 
 
     personalization:
-
-        epochs: 10
         
         # the ratio of clients participanting in training
         participating_client_ratio: 1.0

@@ -42,8 +42,6 @@ algorithm:
         # the ratio of clients participanting in training
         participating_client_ratio: 1.0
         
-
-
 parameters:
     # ResNet-18 training params
     !include resnet18_params.yml
