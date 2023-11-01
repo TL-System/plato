@@ -58,26 +58,6 @@ class PayloadCompletionProcessor(base.Processor):
         return data
 
 
-class SaveLocalModelProcessor(base.Processor):
-    """
-    A processor for clients to always save the trained local model.
-    """
-
-    def __init__(self, client_id, trainer, **kwargs) -> None:
-        super().__init__(**kwargs)
-
-        self.client_id = client_id
-        self.trainer = trainer
-
-    def process(self, data: Any):
-        """Save the local model before sending the data."""
-        filename = f"client_{self.client_id}_local_model.pth"
-        location = Config().params["checkpoint_path"]
-        self.trainer.save_model(filename, location=location)
-
-        return data
-
-
 class PayloadCompletionCallback(base_callbacks.ClientPayloadCallback):
     """
     A client callback for processing payload by assigning parameters of the local
@@ -95,12 +75,3 @@ class PayloadCompletionCallback(base_callbacks.ClientPayloadCallback):
                 name="PayloadCompletionProcessor",
             )
         )
-
-    def on_outbound_ready(self, client, report, outbound_processor):
-        """Save local model of the client."""
-        send_payload_processor = SaveLocalModelProcessor(
-            client_id=client.client_id,
-            trainer=client.trainer,
-            name="SaveLocalModelProcessor",
-        )
-        outbound_processor.processors.insert(0, send_payload_processor)
