@@ -115,16 +115,7 @@ class Server(fedavg.Server):
 
         clients_pool, clients_count = self.get_clients(clients_pool, clients_count)
 
-        random.setstate(self.prng_state)
-
-        # Select clients randomly
-        selected_clients = random.sample(clients_pool, clients_count)
-
-        self.prng_state = random.getstate()
-
-        logging.info("[%s] Selected clients: %s", self, selected_clients)
-
-        return selected_clients
+        return super().choose_clients(clients_pool, clients_count)
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
