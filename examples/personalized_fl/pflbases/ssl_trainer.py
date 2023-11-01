@@ -89,7 +89,7 @@ class Trainer(separate_local_trainer.Trainer):
         self.personalized_testset_sampler = None
 
     def set_personalized_trainset(self, dataset, sampler):
-        """set the testset."""
+        """set the trainset."""
         self.personalized_trainset = dataset
         self.personalized_sampler = sampler
 

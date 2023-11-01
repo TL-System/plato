@@ -9,31 +9,22 @@ https://openreview.net/pdf?id=HuaYQfggn5u
 Source code: https://github.com/jhoon-oh/FedBABU
 """
 
-from pflbases import fedavg_personalized_server
-from pflbases import personalized_client
-from pflbases import fedavg_partial
-from pflbases.client_callbacks import personalized_completion_callbacks
 
+from plato.clients import simple
+
+from pflbases import fedavg_personalized
+from pflbases import fedavg_partial
 
 import fedbabu_trainer
 
 
 def main():
     """
-    A personalized federated learning sesstion for FedBABU algorithm under the supervised setting.
+    A personalized federated learning session for FedBABU algorithm under the supervised setting.
     """
     trainer = fedbabu_trainer.Trainer
-    client = personalized_client.Client(
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-        callbacks=[
-            personalized_completion_callbacks.ClientModelPersonalizedCompletionCallback,
-        ],
-    )
-    server = fedavg_personalized_server.Server(
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-    )
+    client = simple.Client(trainer=trainer, algorithm=fedavg_partial.Algorithm)
+    server = fedavg_personalized.Server(trainer=trainer)
 
     server.run(client)
 

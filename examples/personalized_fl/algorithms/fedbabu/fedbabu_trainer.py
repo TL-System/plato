@@ -19,33 +19,26 @@ class Trainer(personalized_trainer.Trainer):
         2. freeze body of the personalized model during personalized learning phase.
         """
         super().train_run_start(config)
-        if self.do_final_personalization:
+        if self.current_round > Config().trainer.rounds:
             trainer_utils.freeze_model(
                 self.personalized_model,
                 Config().algorithm.global_layer_names,
-                log_info=f"[Client #{self.client_id}]",
             )
         else:
             trainer_utils.freeze_model(
                 self.model,
-                Config().algorithm.personalized_layer_names,
-                log_info=f"[Client #{self.client_id}]",
+                Config().algorithm.local_layer_names,
             )
 
     def train_run_end(self, config):
         """Activating the model."""
-        if self.do_final_personalization:
+        super().train_run_end(config)
+
+        if self.current_round > Config().trainer.rounds:
             trainer_utils.activate_model(
                 self.personalized_model, Config().algorithm.global_layer_names
             )
         else:
             trainer_utils.activate_model(
-                self.model, Config().algorithm.personalized_layer_names
+                self.model, Config().algorithm.local_layer_names
             )
-
-        self.postprocess_models()
-
-        # Do not save the personalized model as FedBABU utilizes the head as the
-        # personalized model, which is not trained during the federated training.
-        if self.do_final_personalization:
-            self.perform_personalized_model_checkpoint(config=config)

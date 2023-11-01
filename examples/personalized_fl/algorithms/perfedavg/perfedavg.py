@@ -21,7 +21,7 @@ import perfedavg_trainer
 
 def main():
     """
-    A personalized federated learning sesstion for PerFedAvg approach.
+    A personalized federated learning session for PerFedAvg approach.
     """
     trainer = perfedavg_trainer.Trainer
     client = personalized_client.Client(
