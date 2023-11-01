@@ -37,3 +37,9 @@ class Algorithm(fedavg.Algorithm):
                 )
 
         self.model.load_state_dict(weights, strict=True)
+
+    def save_local_layers(self, local_layers, filename):
+        """
+        Save local layers to the place of given filename
+        """
+        torch.save(local_layers, filename)
