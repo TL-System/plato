@@ -24,7 +24,7 @@ from plato.config import Config
 
 
 class BYOL(nn.layer):
-    def __init__(self, encoder=None, encoder_dim=None):
+    def __init__(self, encoder=None):
         super().__init__()
 
         # Define the encoder.
@@ -92,7 +92,7 @@ class BYOL(nn.layer):
 class SimCLR(nn.layer):
     """The model structure of SimCLR."""
 
-    def __init__(self, encoder=None, encoder_dim=None):
+    def __init__(self, encoder=None):
         super().__init__()
 
         # Extract hyper-parameters.
@@ -132,7 +132,7 @@ class SimCLR(nn.layer):
 
 
 class SimSiam(nn.layer):
-    def __init__(self, encoder=None, encoder_dim=None):
+    def __init__(self, encoder=None):
         super().__init__()
 
         encoder_name = Config().trainer.encoder_name
@@ -295,7 +295,7 @@ class SMoG(nn.layer):
 
 
 class SwaV(nn.layer):
-    def __init__(self, encoder=None, encoder_dim=None):
+    def __init__(self, encoder=None):
         super().__init__()
 
         # Define the encoder.
