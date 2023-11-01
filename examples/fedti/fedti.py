@@ -28,7 +28,7 @@ datasets = {"Flowers102OneClass": flowers102}
 
 def main():
     """
-    A personalized federated learning sesstion for generation approach.
+    A personalized federated learning session for generation approach.
     """
     data_name = Config().data.datasource
     target_dataset = datasets[data_name]

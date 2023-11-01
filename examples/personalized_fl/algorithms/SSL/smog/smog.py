@@ -22,7 +22,7 @@ from smog_trainer import Trainer
 
 def main():
     """
-    A personalized federated learning sesstion for SMoG approach.
+    A personalized federated learning session for SMoG approach.
     """
     trainer = Trainer
     client = ssl_client.Client(

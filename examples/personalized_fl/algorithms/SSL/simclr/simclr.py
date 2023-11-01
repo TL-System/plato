@@ -23,7 +23,7 @@ from pflbases import ssl_trainer
 
 def main():
     """
-    A personalized federated learning sesstion for SimCLR approach.
+    A personalized federated learning session for SimCLR approach.
     """
     trainer = ssl_trainer.Trainer
     client = ssl_client.Client(
