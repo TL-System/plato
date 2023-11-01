@@ -11,8 +11,8 @@ Third-part code: https://github.com/jhoon-oh/FedBABU
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
-import fedper_trainer
 from plato.clients import simple
+import fedper_trainer
 
 
 def main():
