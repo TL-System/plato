@@ -26,9 +26,6 @@ class Algorithm(fedavg.Algorithm):
             filename = f"{model_path}/{model_name}_{self.client_id}_local_layers.pth"
             if os.path.exists(filename):
                 local_layers = torch.load(filename, map_location=torch.device("cpu"))
-                # Remove after local layers are loaded.
-                # Will save local layers after new weights are trained.
-                os.remove(filename)
 
                 weights.update(local_layers)
 
