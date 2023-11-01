@@ -6,7 +6,7 @@ import logging
 import os
 from typing import Any
 
-from pflbases.client_callbacks import base_callbacks
+from plato.callbacks import client as client_callbacks
 
 from plato.config import Config
 from plato.processors import base
@@ -47,7 +47,7 @@ class PayloadCompletionProcessor(base.Processor):
         return data
 
 
-class PayloadCompletionCallback(base_callbacks.ClientPayloadCallback):
+class PayloadCompletionCallback(client_callbacks.ClientPayloadCallback):
     """
     A client callback for processing payload by assigning parameters of the local
     model to it.
@@ -56,7 +56,6 @@ class PayloadCompletionCallback(base_callbacks.ClientPayloadCallback):
     def on_inbound_received(self, client, inbound_processor):
         """Complete the recevied payload with the local updated model,
         which is the locally updated global model in the previous round."""
-        super().on_inbound_received(client, inbound_processor)
 
         inbound_processor.processors.append(
             PayloadCompletionProcessor(
