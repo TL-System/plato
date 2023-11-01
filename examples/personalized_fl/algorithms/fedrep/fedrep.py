@@ -10,12 +10,11 @@ https://arxiv.org/abs/2102.07078
 
 Source code: https://github.com/lgcollins/FedRep
 """
-import fedrep_trainer
-
-from plato.clients import simple
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
+from plato.clients import simple
+import fedrep_trainer
 
 
 def main():
