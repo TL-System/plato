@@ -4,7 +4,7 @@ Implementation of Net used in calibre.
 
 import torch
 
-from lightly.models.layers.heads import SimCLRProjectionHead
+from lightly.models.modules.heads import SimCLRProjectionHead
 
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
