@@ -22,7 +22,11 @@ class Trainer(basic.Trainer):
         self.alpha = Config().algorithm.alpha
 
         # A personalized model and its optimizer
-        self.personalized_model = models_registry.get()
+        if model is None:
+            self.personalized_model = models_registry.get()
+        else:
+            self.personalized_model = model()
+
         self.personalized_optimizer = None
 
     def update_alpha(self, eta):
@@ -52,7 +56,6 @@ class Trainer(basic.Trainer):
         super().perform_forward_and_backward_passes(config, examples, labels)
 
         # Perform the local update on self.personalized_model
-        # clean the grads in normal optimizer
         self.optimizer.zero_grad()
         self.personalized_optimizer.zero_grad()
 
