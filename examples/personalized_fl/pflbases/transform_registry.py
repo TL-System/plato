@@ -24,13 +24,7 @@ registered_transforms = {
 }
 
 
-def extract_normalization(datasource):
-    """Get the normalization for datasource."""
-    data_norm = visual_augmentations.datasets_normalization[datasource]
-    return data_norm
-
-
-def get(client_id: int = 0, **kwargs):
+def get(**kwargs):
     """Get the data source with the provided name."""
 
     datasource_name = (
@@ -52,7 +46,9 @@ def get(client_id: int = 0, **kwargs):
         else {}
     )
 
-    data_transform_params["normalize"] = extract_normalization(datasource_name)
+    data_transform_params["normalize"] = visual_augmentations.datasets_normalization[
+        datasource_name
+    ]
 
     if data_transform_name in registered_transforms:
         dataset_transform = registered_transforms[data_transform_name](

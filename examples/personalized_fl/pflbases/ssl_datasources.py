@@ -1,7 +1,9 @@
 """
-Customize a flexible interface of datasource for personalized federated learning.
+Customize a flexible interface of datasource for self-supervised learning.
 """
 import logging
+
+from lightly.transforms import *
 
 from plato.datasources import base
 from plato.datasources import registry as datasources_registry

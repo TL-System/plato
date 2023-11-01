@@ -83,11 +83,6 @@ class BYOL(nn.Module):
         projected_samples2 = self.forward_momentum(samples2)
         return (output1, projected_samples2), (output2, projected_samples1)
 
-    @staticmethod
-    def get():
-        """Get the defined BYOL model."""
-        return BYOL()
-
 
 class SimCLR(nn.Module):
     """The model structure of SimCLR."""
@@ -125,10 +120,6 @@ class SimCLR(nn.Module):
         projected_z1 = self.projector(encoded_h1)
         projected_z2 = self.projector(encoded_h2)
         return projected_z1, projected_z2
-
-    @staticmethod
-    def get():
-        return SimCLR()
 
 
 class SimSiam(nn.Module):
@@ -173,10 +164,6 @@ class SimSiam(nn.Module):
         projected_samples1, output1 = self.forward_direct(samples1)
         projected_samples2, output2 = self.forward_direct(samples2)
         return (projected_samples1, output2), (projected_samples2, output1)
-
-    @staticmethod
-    def get():
-        return SimSiam()
 
 
 class SMoG(nn.Module):
@@ -288,11 +275,6 @@ class SMoG(nn.Module):
 
         return logits, assignments, samples1_encoded
 
-    @staticmethod
-    def get():
-        """Get the defined SMoG model."""
-        return SMoG()
-
 
 class SwaV(nn.Module):
     def __init__(self, encoder=None):
@@ -340,11 +322,6 @@ class SwaV(nn.Module):
         low_resolution = multi_crop_features[2:]
 
         return high_resolution, low_resolution
-
-    @staticmethod
-    def get():
-        """Get the defined SwaV model."""
-        return SwaV()
 
 
 class MoCoV2(nn.Module):
@@ -394,8 +371,3 @@ class MoCoV2(nn.Module):
         key = self.forward_momentum(key_samples)
 
         return query, key
-
-    @staticmethod
-    def get():
-        """Get the defined MoCoV2 model."""
-        return MoCoV2()

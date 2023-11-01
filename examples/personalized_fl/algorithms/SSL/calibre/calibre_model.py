@@ -13,7 +13,7 @@ from plato.config import Config
 class CalibreNet(torch.nn.Module):
     """The model structure of Calibre."""
 
-    def __init__(self, encoder=None, encoder_dim=None):
+    def __init__(self, encoder=None):
         super().__init__()
 
         # extract hyper-parameters
