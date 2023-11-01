@@ -39,11 +39,6 @@ class Client(simple.Client):
         self.personalized_trainset = None
         self.personalized_testset = None
 
-        # By default, if `personalized_sampler` is not set up, it will
-        # be equal to the `sampler`.
-        self.personalized_sampler = None
-        self.personalized_testset_sampler = None
-
     def configure(self) -> None:
         """Prepares this client for training."""
         super().configure()
@@ -59,39 +54,10 @@ class Client(simple.Client):
                 transforms_block=transforms_block
             )
 
-        # Setting up the data sampler for personalization
-        sampler_type = (
-            Config().algorithm.personalization.sampler
-            if hasattr(Config().algorithm.personalization, "sampler")
-            else Config().data.sampler
-        )
-        self.personalized_sampler = samplers_registry.get(
-            self.personalized_datasource,
-            self.client_id,
-            sampler_type=sampler_type,
-        )
-
-        sampler_type = (
-            Config().algorithm.personalization.testset_sampler
-            if hasattr(Config().algorithm.personalization, "testset_sampler")
-            else Config().data.testset_sampler
-        )
-        # Set the sampler for test set
-        self.personalized_testset_sampler = samplers_registry.get(
-            self.personalized_datasource,
-            self.client_id,
-            testing=True,
-            sampler_type=sampler_type,
-        )
-
         # obtain the train/test set for personalization
         self.personalized_trainset = self.personalized_datasource.get_train_set()
         self.personalized_testset = self.personalized_datasource.get_test_set()
 
         # set personalized terms for the trainer
-        self.trainer.set_personalized_trainset(
-            self.personalized_trainset, self.personalized_sampler
-        )
-        self.trainer.set_personalized_testset(
-            self.personalized_testset, self.personalized_testset_sampler
-        )
+        self.trainer.set_personalized_trainset(self.personalized_trainset)
+        self.trainer.set_personalized_testset(self.personalized_testset)
