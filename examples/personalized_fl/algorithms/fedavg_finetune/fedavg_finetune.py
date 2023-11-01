@@ -12,7 +12,7 @@ learning.
 """
 
 from plato.clients import simple
-import fedavg_finetune_trainer
+from plato.trainers import basic
 
 from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
@@ -22,7 +22,7 @@ def main():
     """
     A Plato personalized federated learning sesstion for FedAvg with fine-tuning.
     """
-    trainer = fedavg_finetune_trainer.Trainer
+    trainer = basic.Trainer
     client = simple.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,

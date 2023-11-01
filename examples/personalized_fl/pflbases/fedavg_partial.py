@@ -27,15 +27,6 @@ class Algorithm(fedavg.Algorithm):
             and the second part of the model with the saved local model.
         """
 
-        weights = self.combine_weights(weights)
-        # Load the weights containing two parts of the model weights.
-        super().load_weights(weights)
-
-    def combine_weights(self, weights):
-        """
-        Combine the existing model weights (the global model weights)
-        and the saved local model weights .
-        """
         # Not load local weights if there is no saved local model to combine.
         if hasattr(Config().algorithm, "local_layer_names"):
             # Load the local model weights previously saved on filesystem.
@@ -62,4 +53,13 @@ class Algorithm(fedavg.Algorithm):
                     "[Client #%d] Replaced portions of the global model with local layers.",
                     self.trainer.client_id,
                 )
+        # Load the weights containing two parts of the model weights.
+        super().load_weights(weights)
+
+    def combine_weights(self, weights):
+        """
+        Combine the existing model weights (the global model weights)
+        and the saved local model weights .
+        """
+
         return weights
