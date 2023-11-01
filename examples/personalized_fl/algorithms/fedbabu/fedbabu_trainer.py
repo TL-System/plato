@@ -21,7 +21,7 @@ class Trainer(personalized_trainer.Trainer):
         super().train_run_start(config)
         if self.current_round > Config().trainer.rounds:
             trainer_utils.freeze_model(
-                self.personalized_model,
+                self.model,
                 Config().algorithm.global_layer_names,
             )
         else:
@@ -36,7 +36,7 @@ class Trainer(personalized_trainer.Trainer):
 
         if self.current_round > Config().trainer.rounds:
             trainer_utils.activate_model(
-                self.personalized_model, Config().algorithm.global_layer_names
+                self.model, Config().algorithm.global_layer_names
             )
         else:
             trainer_utils.activate_model(
