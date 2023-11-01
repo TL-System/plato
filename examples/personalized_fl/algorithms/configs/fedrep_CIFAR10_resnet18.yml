@@ -35,14 +35,7 @@ algorithm:
     type: fedavg
 
     # ['conv1', 'bn1', 'layer1', 'layer2', 'layer3', 'layer4', 'linear']
-    global_layer_names:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
-
+    
     local_layer_names:
         - linear
 

@@ -34,17 +34,9 @@ algorithm:
     # Aggregation algorithm
     type: fedavg
 
-    global_layer_names:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
-        
-    completion_layer_names:
+    local_layer_names:
         - linear
-
+        
     personalization:
 
         # the ratio of clients participanting in training
