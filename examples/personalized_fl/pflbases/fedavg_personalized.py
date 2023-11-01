@@ -3,7 +3,6 @@ A base server to perform personalized federated learning.
 """
 
 from typing import List
-import random
 import logging
 
 from plato.servers import fedavg
@@ -25,82 +24,26 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
 
-        # The number of clients that will participate
-        # in federated learning
-        self.number_participating_clients = 0
-
-        # The IDs of these participating clients
-        self.participating_clients_pool = None
-
-        # Whether personalization has been started
         self.personalization_started = False
-
-        self.initialize_participant()
-
-    def initialize_participant(self):
-        """Initialize participation information."""
-
-        ## Initialize participanting client ratio
-        participating_client_ratio = (
-            Config().algorithm.personalization.participating_client_ratio
-            if hasattr(Config().algorithm.personalization, "participating_client_ratio")
-            else 1.0
-        )
-
-        #  Compute how many clients will participate in federated learning
-        self.number_participating_clients = int(
-            self.total_clients * participating_client_ratio
-        )
-
-        logging.info(
-            "[%s] Total clients (%d), participanting clients (%d), "
-            "participanting ratio (%.3f).",
-            self,
-            self.total_clients,
-            self.number_participating_clients,
-            participating_client_ratio,
-        )
-
-    def set_clients_pool(self, clients_pool: List[int]):
-        """Set clients pool utilized in federated learning."""
-
-        # The participating client pool will be set in the first round,
-        # and no modification will be performed afterward.
-        if self.participating_clients_pool is None:
-            self.participating_clients_pool = clients_pool[
-                : self.number_participating_clients
-            ]
-
-            logging.info(
-                "[%s] Prepared participating clients pool: %s",
-                self,
-                self.participating_clients_pool,
-            )
-
-    def get_clients(self, clients_pool: List[int], clients_count: int):
-        """Determine clients pool and clients count before samling clients."""
-
-        # Perform normal training
-        clients_pool = self.participating_clients_pool
-        clients_count = self.clients_per_round
-
-        # Perform personalization
-        if self.current_round > Config().trainer.rounds:
-            self.personalization_started = True
-            self.clients_per_round = self.total_clients
-            clients_pool = self.clients_pool
-            clients_count = len(self.clients_pool)
-
-        return clients_pool, clients_count
 
     def choose_clients(self, clients_pool: List[int], clients_count: int):
         """Choose a subset of the clients to participate in each round."""
         # Set required client pools when possible
-        self.set_clients_pool(clients_pool)
-
-        clients_pool, clients_count = self.get_clients(clients_pool, clients_count)
-
-        return super().choose_clients(clients_pool, clients_count)
+        if self.current_round > Config().trainer.rounds:
+            self.personalization_started = True
+            return super().choose_clients(clients_pool, clients_count)
+        else:
+            participating_client_ratio = (
+                Config().algorithm.personalization.participating_client_ratio
+                if hasattr(
+                    Config().algorithm.personalization, "participating_client_ratio"
+                )
+                else 1.0
+            )
+            return super().choose_clients(
+                clients_pool[: int(self.total_clients * participating_client_ratio)],
+                clients_count,
+            )
 
     async def wrap_up(self):
         """Wrapping up when each round of training is done."""
