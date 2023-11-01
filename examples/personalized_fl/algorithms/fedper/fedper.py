@@ -19,7 +19,7 @@ from pflbases.client_callbacks import local_completion_callbacks
 
 def main():
     """
-    A personalized federated learning sesstion for FedPer approach.
+    A personalized federated learning session for FedPer approach.
     """
     trainer = fedper_trainer.Trainer
     client = simple.Client(
