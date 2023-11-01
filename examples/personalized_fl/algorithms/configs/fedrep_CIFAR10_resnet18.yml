@@ -50,9 +50,9 @@ algorithm:
     personalization:
 
         epochs: 10
-
-
-
+        
+        # the ratio of clients participanting in training
+        participating_clients_ratio: 1.0
 
 parameters:
     # ResNet-18 training params

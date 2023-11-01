@@ -49,8 +49,6 @@ algorithm:
         # obtained in each round
         do_personalization_per_round: false
 
-
-
 parameters:
     # ResNet-18 training params
     !include resnet18_params.yml
