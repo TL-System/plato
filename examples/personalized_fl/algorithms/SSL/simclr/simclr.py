@@ -15,12 +15,10 @@ the work https://github.com/spijkervet/SimCLR.git.
 from pflbases import fedavg_personalized_server
 from pflbases import fedavg_partial
 
-from pflbases.client_callbacks import local_completion_callbacks
 from pflbases.models import SSL
-
+from pflbases import ssl_datasources
 from pflbases import ssl_client
 from pflbases import ssl_trainer
-from pflbases import ssl_datasources
 
 
 def main():
@@ -31,18 +29,10 @@ def main():
     client = ssl_client.Client(
         model=SSL.SimCLR,
         datasource=ssl_datasources.TransformedDataSource,
-        personalized_datasource=ssl_datasources.TransformedDataSource,
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-        callbacks=[
-            local_completion_callbacks.ClientModelLocalCompletionCallback,
-        ],
-    )
-    server = fedavg_personalized_server.Server(
-        model=SSL.SimCLR,
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
+    server = fedavg_personalized_server.Server(model=SSL.SimCLR, trainer=trainer)
 
     server.run(client)
 

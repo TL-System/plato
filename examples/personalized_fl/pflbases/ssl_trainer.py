@@ -5,18 +5,15 @@ self-supervised learning.
 """
 
 import logging
-from typing import List, Tuple
 from warnings import warn
 from collections import UserList
 
 import torch
-from torch import Tensor
 from lightly.data.multi_view_collate import MultiViewCollate
 
 from plato.trainers import loss_criterion
 from plato.config import Config
-
-from pflbases import separate_local_trainer
+from plato.trainers import basic
 
 
 class ExamplesList(UserList):
@@ -39,9 +36,7 @@ class MultiViewCollateWrapper(MultiViewCollate):
     """An interface to connect the collate from lightly with the data loading schema of
     Plato."""
 
-    def __call__(
-        self, batch: List[Tuple[List[Tensor], int, str]]
-    ) -> Tuple[List[Tensor], Tensor, List[str]]:
+    def __call__(self, batch):
         """Turns a batch of tuples into single tuple."""
         if len(batch) == 0:
             warn("MultiViewCollate received empty batch.")
@@ -66,13 +61,14 @@ class MultiViewCollateWrapper(MultiViewCollate):
             labels, dtype=torch.long
         )  # Conversion to tensor to ensure backwards compatibility.
 
-        if fnames:  # Compatible with lightly
+        # Compatible with lightly
+        if fnames:
             return views, labels, fnames
         # Compatible with Plato.
         return views, labels
 
 
-class Trainer(separate_local_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
 
     def __init__(self, model=None, callbacks=None):

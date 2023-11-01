@@ -6,7 +6,8 @@ self-supervised learning (SSL).
 
 import logging
 
-from plato.samplers import registry as samplers_registry
+from pflbases import ssl_datasources
+
 from plato.config import Config
 
 from plato.clients import simple
@@ -33,9 +34,10 @@ class Client(simple.Client):
             trainer_callbacks=trainer_callbacks,
         )
 
+        # Datasource used in the final personalization
         self.personalized_datasource = None
 
-        # dataset for personalization
+        # Train and Test Datasets for personalization
         self.personalized_trainset = None
         self.personalized_testset = None
 
@@ -50,7 +52,7 @@ class Client(simple.Client):
                 else Config().algorithm.personalization.data_transforms._asdict()
             )
             logging.info("Defining the personalized datasource:")
-            self.personalized_datasource = self.custom_personalized_datasource(
+            self.personalized_datasource = ssl_datasources.TransformedDataSource(
                 transforms_block=transforms_block
             )
 
