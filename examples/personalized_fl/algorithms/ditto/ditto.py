@@ -18,7 +18,7 @@ import ditto_trainer_v2 as ditto_trainer
 
 def main():
     """
-    A personalized federated learning sesstion for Ditto approach.
+    A personalized federated learning session for Ditto approach.
     """
     trainer = ditto_trainer.Trainer
     client = personalized_client.Client(

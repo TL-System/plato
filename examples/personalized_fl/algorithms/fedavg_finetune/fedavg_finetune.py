@@ -20,7 +20,7 @@ from pflbases import fedavg_partial
 
 def main():
     """
-    A Plato personalized federated learning sesstion for FedAvg with fine-tuning.
+    A Plato personalized federated learning session for FedAvg with fine-tuning.
     """
     trainer = basic.Trainer
     client = simple.Client(

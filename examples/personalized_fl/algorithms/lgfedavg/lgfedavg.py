@@ -19,7 +19,7 @@ import lgfedavg_trainer
 
 def main():
     """
-    A Plato personalized federated learning sesstion for LG-FedAvg approach.
+    A Plato personalized federated learning session for LG-FedAvg approach.
     """
     trainer = lgfedavg_trainer.Trainer
     client = personalized_client.Client(

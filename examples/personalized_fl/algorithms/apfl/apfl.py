@@ -22,7 +22,7 @@ import apfl_trainer
 
 def main():
     """
-    A personalized federated learning sesstion for APFL approach.
+    A personalized federated learning session for APFL approach.
     """
     trainer = apfl_trainer.Trainer
     client = apfl_client.Client(
