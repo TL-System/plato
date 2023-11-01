@@ -20,22 +20,14 @@ class Trainer(personalized_trainer.Trainer):
         super().__init__(model, callbacks)
 
         # the alpha used in the APFL paper
-        self.alpha = 0.0
-        self.adaptive_alpha = False
+        self.alpha = Config().algorithm.alpha
+        self.adaptive_alpha = Config().algorithm.adaptive_alpha
 
-        # the filename of the alpha
-        # for saving and loading
-        self.alpha_filename = "alpha.npy"
-
-        # define the personalized optimizer
-        # to update the personalized model
-        self.personalized_optimizer = None
-
-    def extract_alpha(self):
+    def load_alpha(self):
         """Extracting the alpha."""
-
-        save_dir_path = self.get_checkpoint_dir_path()
-        save_path = os.path.join(save_dir_path, self.alpha_filename)
+        save_dir_path = Config().params["model_path"]
+        filename = f"client_{self.client_id}_alpha.pth"
+        save_path = os.path.join(save_dir_path, filename)
 
         if os.path.exists(save_path):
             self.alpha = torch.load(save_path)
@@ -76,9 +68,6 @@ class Trainer(personalized_trainer.Trainer):
 
         alpha_n = self.alpha - eta * grad_alpha
         self.alpha = np.clip(alpha_n.item(), 0.0, 1.0)
-
-    def preprocess_models(self):
-        """Do nothing to the loaded personalized model in APFL."""
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing forward and backward passes in the training loop.
@@ -157,35 +146,24 @@ class Trainer(personalized_trainer.Trainer):
         """Defining items for personalization."""
         super().train_run_start(config)
 
-        # define the personalized optimizer
+        # Define the personalized optimizer
         self.personalized_optimizer = self.get_personalized_optimizer()
 
         # set the personalized model to be trainable
         self.personalized_model.to(self.device)
         self.personalized_model.train()
 
-        # initialize the alpha
-        initial_alpha = Config().algorithm.alpha
-        self.adaptive_alpha = Config().algorithm.adaptive_alpha
-        self.alpha = initial_alpha if self.alpha == 0.0 else self.alpha
-
-    def postprocess_models(self):
-        """Do nothing to the model."""
+        # Load the alpha from the saved file
+        self.load_alpha()
 
     def train_run_end(self, config):
         """Saving the alpha."""
         super().train_run_end(config)
 
+        location = Config().params["model_path"]
         save_dir_path = self.get_checkpoint_dir_path()
         save_path = os.path.join(save_dir_path, self.alpha_filename)
         torch.save(self.alpha, save_path)
-
-    def train_epoch_start(self, config):
-        """Assigning the lr of optimizer to the personalized optimizer."""
-        super().train_epoch_start(config)
-        self.personalized_optimizer.param_groups[0]["lr"] = self.optimizer.param_groups[
-            0
-        ]["lr"]
 
     def train_step_end(self, config, batch=None, loss=None):
         """Updating the alpha of APFL before each iteration."""
