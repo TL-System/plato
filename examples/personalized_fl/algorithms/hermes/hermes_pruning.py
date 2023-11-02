@@ -110,7 +110,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
 
 
 def apply_mask(model, mask, device):
-    """Applies the mask onto the model."""
+    """Apply the mask onto the model."""
 
     if not torch.is_tensor(mask[0]):
         for step, __ in enumerate(mask):

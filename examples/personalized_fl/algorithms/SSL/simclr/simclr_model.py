@@ -35,10 +35,10 @@ class SimCLRModel(nn.Module):
 
     def forward(self, multiview_samples):
         """Forward two batch of contrastive samples."""
-        samples1, samples2 = multiview_samples
-        encoded_h1 = self.encoder(samples1)
-        encoded_h2 = self.encoder(samples2)
+        view_sample1, view_sample2 = multiview_samples
+        encoded_sample1 = self.encoder(view_sample1)
+        encoded_sample2 = self.encoder(view_sample2)
 
-        projected_z1 = self.projector(encoded_h1)
-        projected_z2 = self.projector(encoded_h2)
-        return projected_z1, projected_z2
+        projected_sample1 = self.projector(encoded_sample1)
+        projected_sample2 = self.projector(encoded_sample2)
+        return projected_sample1, projected_sample2

@@ -50,7 +50,7 @@ class BYOLModel(nn.Module):
         deactivate_requires_grad(self.momentum_encoder)
         deactivate_requires_grad(self.momentum_projector)
 
-    def forward_direct(self, sample):
+    def forward_view(self, sample):
         """Foward one sample to get the output."""
         encoded_sample = self.encoder(sample).flatten(start_dim=1)
         projected_sample = self.projector(encoded_sample)
@@ -66,9 +66,9 @@ class BYOLModel(nn.Module):
 
     def forward(self, multiview_samples):
         """Main forward function of the model."""
-        sample1, sample2 = multiview_samples
-        output1 = self.forward_direct(sample1)
-        projected_sample1 = self.forward_momentum(sample1)
-        output2 = self.forward_direct(sample2)
-        projected_sample2 = self.forward_momentum(sample2)
-        return (output1, projected_sample2), (output2, projected_sample1)
+        view_sample1, view_sample2 = multiview_samples
+        output1 = self.forward_view(view_sample1)
+        momentum1 = self.forward_momentum(view_sample1)
+        output2 = self.forward_view(view_sample2)
+        momentum2 = self.forward_momentum(view_sample2)
+        return (output1, momentum2), (output2, momentum1)
