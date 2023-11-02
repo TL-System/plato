@@ -34,21 +34,9 @@ algorithm:
     # Aggregation algorithm
     type: fedavg_personalized
 
-    # ['conv1', 'bn1', 'layer1', 'layer2', 'layer3', 'layer4', 'linear']
-    global_layer_names:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
-
     personalization:
-    
         # the ratio of clients participanting in training
         participating_client_ratio: 1.0
-
-
 
 parameters:
     # ResNet-18 training params
