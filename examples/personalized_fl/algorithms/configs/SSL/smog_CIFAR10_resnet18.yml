@@ -27,7 +27,7 @@ data:
 trainer:
 
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 2
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -73,12 +73,10 @@ algorithm:
                 crop_counts:
                     - 1
                     - 1
-
-        
+     
     personalization:
         !include ssl_personalization.yml
-
-
+        
 parameters:
     # ResNet-18 ssl training params
     optimizer:
