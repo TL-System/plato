@@ -52,9 +52,8 @@ class MultiViewCollateWrapper(MultiViewCollate):
         for i, view in enumerate(views):
             views[i] = torch.cat(view)
 
-        labels = torch.tensor(
-            labels, dtype=torch.long
-        )  # Conversion to tensor to ensure backwards compatibility.
+        # Conversion to tensor to ensure backwards compatibility.
+        labels = torch.tensor(labels, dtype=torch.long)
 
         # Compatible with lightly
         if fnames:
@@ -123,6 +122,20 @@ class Trainer(basic.Trainer):
             optimizer_params=optimizer_params,
         )
 
+    def get_ssl_criterion(self):
+        """Get the loss criterion for SSL."""
+
+        # Get loss criterion for the SSL
+        ssl_loss_function = loss_criterion.get()
+
+        def compute_plato_loss(outputs, labels):
+            if isinstance(outputs, (list, tuple)):
+                return ssl_loss_function(*outputs)
+            else:
+                return ssl_loss_function(outputs)
+
+        return compute_plato_loss
+
     def get_loss_criterion(self):
         """Returns the loss criterion for the SSL."""
         # Get loss criterion for the personalization
@@ -138,16 +151,7 @@ class Trainer(basic.Trainer):
                 loss_criterion_params=loss_criterion_params,
             )
 
-        # Get loss criterion for the SSL
-        ssl_loss_function = loss_criterion.get()
-
-        def compute_plato_loss(outputs, labels):
-            if isinstance(outputs, (list, tuple)):
-                return ssl_loss_function(*outputs)
-            else:
-                return ssl_loss_function(outputs)
-
-        return compute_plato_loss
+        return self.get_ssl_criterion()
 
     def get_lr_scheduler(self, config, optimizer):
         # Get the lr scheduler for the personalization
