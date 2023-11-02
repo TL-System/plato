@@ -1,5 +1,5 @@
 """
-A base algorithm to load and save local layers of a model.
+A personalized federate learning algorithm that loads and saves local layers of a model.
 """
 import os
 import logging
@@ -10,13 +10,15 @@ from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):
-    """A base algorithm to load local layers to the received weights and save
-    local layers after the local training."""
+    """
+    A personalized federate learning algorithm that loads and saves local layers
+    of a model.
+    """
 
     def load_weights(self, weights):
         """
-        Loads local layers included in `local_layer_names` to the received weights which,
-        will be loaded to the model.
+        Loads local layers included in `local_layer_names` to the received weights which
+        will be loaded to the model
         """
         if hasattr(Config().algorithm, "local_layer_names"):
             # Get the filename of the previous saved local layer
@@ -40,6 +42,6 @@ class Algorithm(fedavg.Algorithm):
 
     def save_local_layers(self, local_layers, filename):
         """
-        Save local layers to the place of given filename
+        Save local layers to a file with the filename provided.
         """
         torch.save(local_layers, filename)
