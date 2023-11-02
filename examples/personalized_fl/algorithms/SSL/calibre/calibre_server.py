@@ -25,7 +25,7 @@ class Server(fedavg_personalized.Server):
 
     async def aggregate_deltas(self, updates, deltas_received):
         """Add the divergence rates to deltas."""
-
+        self.divergence_rates_received = 1 / self.divergence_rates_received
         total_divergence = torch.sum(self.divergence_rates_received)
         # Normalize the delta with the divergence rates
         for i, update in enumerate(deltas_received):

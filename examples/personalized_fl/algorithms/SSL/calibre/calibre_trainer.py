@@ -96,6 +96,16 @@ class Trainer(ssl_trainer.Trainer):
 
         self.divergence_rate = torch.mean(self.clusters_divergence)
 
+    def get_optimizer(self, model):
+        """Getting the optimizer"""
+        optimizer = super().get_optimizer(model)
+        if self.current_round > Config().trainer.rounds:
+            # Add another self.model's parameters to the existing optimizer
+            # This will not be trained but only used to build an entire model
+            # encoder - linear classifier
+            optimizer.add_param_group({"params": self.model.encoder.parameters()})
+        return optimizer
+
     def train_run_end(self, config):
         """Get the features of local samples after training."""
         super().train_run_end(config)
