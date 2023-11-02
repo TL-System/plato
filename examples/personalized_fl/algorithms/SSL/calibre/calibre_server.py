@@ -5,10 +5,10 @@ thus is divergence-aware.
 
 import torch
 
-from pflbases import fedavg_personalized_server
+from pflbases import fedavg_personalized
 
 
-class Server(fedavg_personalized_server.Server):
+class Server(fedavg_personalized.Server):
     """A federated learning server using the Hermes algorithm."""
 
     def __init__(
@@ -27,7 +27,7 @@ class Server(fedavg_personalized_server.Server):
         """Add the divergence rates to deltas."""
 
         total_divergence = torch.sum(self.divergence_rates_received)
-        # normalize the delta with the divergence rates
+        # Normalize the delta with the divergence rates
         for i, update in enumerate(deltas_received):
             divergence_rate = self.divergence_rates_received[i]
             for name, delta in update.items():
@@ -42,5 +42,4 @@ class Server(fedavg_personalized_server.Server):
         self.divergence_rates_received = torch.stack(
             [weight[1] for weight in weights_received], dim=0
         )
-        print("self.divergence_rates_received: ", self.divergence_rates_received)
         return [weight[0] for weight in weights_received]

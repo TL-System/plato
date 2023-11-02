@@ -8,13 +8,12 @@ import logging
 
 import torch
 
-from plato.config import Config
 from pflbases import ssl_trainer
-from pflbases.filename_formatter import NameFormatter
-
 
 from calibre_loss import CalibreLoss
 from clustering import kmeans_clustering
+
+from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
@@ -31,7 +30,7 @@ class Trainer(ssl_trainer.Trainer):
         self.clusters_center = None
         self.divergence_rate = None
 
-    def plato_ssl_loss_wrapper(self):
+    def get_ssl_criterion(self):
         """A wrapper to connect ssl loss with plato."""
 
         loss_criterion_name = (
@@ -79,7 +78,7 @@ class Trainer(ssl_trainer.Trainer):
 
         return compute_plato_loss
 
-    def compute_divergence_rate(self, config):
+    def compute_divergence_rate(self):
         """Computing the divergence rate of the local model"""
         cluster_ids_x, self.clusters_center = kmeans_clustering(
             self.samples_encoding, n_clusters=10
@@ -97,35 +96,33 @@ class Trainer(ssl_trainer.Trainer):
 
         self.divergence_rate = torch.mean(self.clusters_divergence)
 
-    def get_divergence_filepath(self):
-        """Get the file path of the divergence rate."""
-        save_dir = self.get_checkpoint_dir_path()
-        filename = NameFormatter.get_format_name(
-            client_id=self.client_id,
-            model_name=self.model_name,
-            round_n=self.current_round,
-            epoch_n=None,
-            run_id=None,
-            prefix="divergence",
-            ext="pth",
-        )
-
-        return os.path.join(save_dir, filename)
+    def get_optimizer(self, model):
+        """Getting the optimizer"""
+        optimizer = super().get_optimizer(model)
+        if self.current_round > Config().trainer.rounds:
+            # Add another self.model's parameters to the existing optimizer
+            optimizer.add_param_group({"params": self.model.encoder.parameters()})
+        return optimizer
 
     def save_divergences(self):
         """Saving the local divergence of the client."""
 
-        save_path = self.get_divergence_filepath()
-        logging.info(
-            "[Client #%d] Saving the divergence rate to %s.", self.client_id, save_path
-        )
+        model_path = Config().params["model_path"]
+        filename = f"client_{self.client_id}_divergence_rate.pth"
+        save_path = os.path.join(model_path, filename)
+
         torch.save(self.divergence_rate.detach().cpu(), save_path)
 
     def train_run_end(self, config):
         """Get the features of local samples after training."""
         super().train_run_end(config)
 
-        personalized_train_loader = self.get_personalized_train_loader()
+        personalized_train_loader = torch.utils.data.DataLoader(
+            dataset=self.personalized_trainset,
+            shuffle=False,
+            batch_size=10,
+            sampler=self.sampler,
+        )
 
         logging.info("[Client #%d] Computing the divergence rate.", self.client_id)
 
@@ -145,5 +142,5 @@ class Trainer(ssl_trainer.Trainer):
                     else torch.cat((self.samples_label, labels), dim=0)
                 )
 
-        self.compute_divergence_rate(config)
+        self.compute_divergence_rate()
         self.save_divergences()

@@ -107,21 +107,6 @@ class CalibreLoss(nn.Module):
 
             self.losses_func[loss_name] = loss_func
 
-    def random_label_distortion(self, gt_labels):
-        """To cover the label information for better generalization,
-        each client should perform the label distortion to shift the label
-        index."""
-        pseudo_labels = torch.zeros(gt_labels.shape)
-        gt_classes = torch.unique(gt_labels).cpu().numpy()
-        num_classes = len(gt_classes)
-        new_classes_label_mapper = {
-            cls: cls_idx for cls_idx, cls in enumerate(num_classes)
-        }
-        for cls in gt_classes:
-            pseudo_labels[gt_classes == cls] = new_classes_label_mapper[cls]
-
-        return pseudo_labels
-
     def prototype_regularizers(self, encodings, projections, **kwargs):
         """Compute the L_p and L_n losses mentioned the paper."""
         n_clusters = kwargs["n_clusters"]
@@ -172,11 +157,11 @@ class CalibreLoss(nn.Module):
             dim=0,
         )
 
-        # compute the L_p loss
+        # Compute the L_p loss
         loss_fn = lightly_loss.NTXentLoss(memory_bank_size=0)
         l_p = loss_fn(prototypes_a, prototypes_b)
         ##
-        ## compute prototype-based meta regularizer
+        ## Compute prototype-based meta regularizer
         ##
         # support set
         # with shape, [n_clusters, encoding_dim]
@@ -286,39 +271,6 @@ class CalibreLoss(nn.Module):
         loss = loss.view(anchor_count, batch_size).mean()
 
         return loss
-
-    def meta_prototype_contrastive_representation_loss(self, outputs, labels):
-        """Compute the contrastive loss based on the prototypes instead of
-        each sample.
-
-        The support set (encoded_z1) is utilized to create the prototypes
-        in which each prototype is the averaged embedding of samples
-        Then, the contrastive loss is computed based in the built prototypes.
-
-        """
-        encoded_z1, encoded_z2 = outputs
-
-        # Infer the number of different classes from the labels of the support set
-        prototypes_label = torch.unique(labels)
-        num_prototypes = len(prototypes_label)
-
-        # Prototype i is the mean of all instances of features corresponding to labels == i
-        view1_prototypes = torch.cat(
-            [
-                encoded_z1[torch.nonzero(labels == prototypes_label[label_idx])].mean(0)
-                for label_idx in range(num_prototypes)
-            ]
-        )
-        view2_prototypes = torch.cat(
-            [
-                encoded_z2[torch.nonzero(labels == prototypes_label[label_idx])].mean(0)
-                for label_idx in range(num_prototypes)
-            ]
-        )
-
-        return self.prototype_contrastive_representation_loss(
-            [view1_prototypes, view2_prototypes], prototypes_label
-        )
 
     def forward(self, *args, **kwargs):
         """Forward the loss computaton layer."""
