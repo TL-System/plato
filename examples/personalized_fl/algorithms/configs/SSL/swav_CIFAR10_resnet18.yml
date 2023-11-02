@@ -25,7 +25,6 @@ data:
     !include cifar10_ssl_noniid.yml
 
 trainer:
-
     # The maximum number of training rounds
     rounds: 2
 
@@ -52,7 +51,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
     #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)

@@ -5,8 +5,8 @@ Zhuang, et.al, "Divergence-aware Federated Self-Supervised Learning", ICLR22.
 https://arxiv.org/pdf/2204.04385.pdf.
 
 """
-from pflbases import ssl_datasources
-from pflbases import ssl_client
+from ssl import ssl_datasources
+from ssl import ssl_client
 
 import fedema_server
 import fedema_trainer

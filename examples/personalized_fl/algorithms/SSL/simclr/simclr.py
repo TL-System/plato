@@ -10,10 +10,10 @@ The structure of our SimCLR and the classifier is the same as the ones used in
 the work https://github.com/spijkervet/SimCLR.git.
 
 """
-from pflbases import fedavg_personalized
-from pflbases import ssl_datasources
-from pflbases import ssl_client
-from pflbases import ssl_trainer
+from plato.servers import fedavg_personalized as personalized_server
+from ssl import ssl_datasources
+from ssl import ssl_client
+from ssl import ssl_trainer
 
 from simclr_model import SimCLRModel
 
@@ -28,7 +28,7 @@ def main():
         datasource=ssl_datasources.SSLDataSource,
         trainer=trainer,
     )
-    server = fedavg_personalized.Server(model=SimCLRModel, trainer=trainer)
+    server = personalized_server.Server(model=SimCLRModel, trainer=trainer)
 
     server.run(client)
 

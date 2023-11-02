@@ -9,10 +9,10 @@ Source code: https://github.com/lucidrains/byol-pytorch
 The third-party code: https://github.com/sthalles/PyTorch-BYOL
 """
 
-from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized
-from pflbases import ssl_client
-from pflbases import ssl_datasources
+from plato.servers import fedavg_personalized as personalized_server
+
+from ssl import ssl_client
+from ssl import ssl_datasources
 
 from byol_model import BYOLModel
 import byol_trainer
@@ -27,9 +27,8 @@ def main():
         model=BYOLModel,
         datasource=ssl_datasources.SSLDataSource,
         trainer=trainer,
-        algorithm=fedavg_personalized.Algorithm,
     )
-    server = fedavg_personalized.Server(model=BYOLModel, trainer=trainer)
+    server = personalized_server.Server(model=BYOLModel, trainer=trainer)
 
     server.run(client)
 

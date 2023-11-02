@@ -8,11 +8,11 @@ https://arxiv.org/abs/2006.09882, NeurIPS 2020.
 Source code: https://github.com/facebookresearch/swav
 """
 
-from pflbases import fedavg_personalized
+from plato.servers import fedavg_personalized as personalized_server
 
-from pflbases import ssl_client
-from pflbases import ssl_trainer
-from pflbases import ssl_datasources
+from ssl import ssl_client
+from ssl import ssl_trainer
+from ssl import ssl_datasources
 
 
 import swav_model
@@ -27,7 +27,7 @@ def main():
         datasource=ssl_datasources.SSLDataSource,
         trainer=ssl_trainer.Trainer,
     )
-    server = fedavg_personalized.Server(
+    server = personalized_server.Server(
         model=swav_model.SwaV, trainer=ssl_trainer.Trainer
     )
 

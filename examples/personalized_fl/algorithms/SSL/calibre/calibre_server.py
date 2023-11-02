@@ -18,10 +18,10 @@ classes. This observation was also mentioned in the paper:
 
 import torch
 
-from pflbases import fedavg_personalized
+from plato.servers import fedavg_personalized as personalized_server
 
 
-class Server(fedavg_personalized.Server):
+class Server(personalized_server.Server):
     """A federated learning server using the Calibre algorithm."""
 
     def __init__(

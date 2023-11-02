@@ -50,7 +50,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
 
     #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)

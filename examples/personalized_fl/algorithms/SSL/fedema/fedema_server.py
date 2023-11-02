@@ -10,11 +10,10 @@ import logging
 import utils
 
 from plato.config import Config
+from plato.servers import fedavg_personalized as personalized_server
 
-from pflbases import fedavg_personalized
 
-
-class Server(fedavg_personalized.Server):
+class Server(personalized_server.Server):
     """A personalized federated learning server using the pFL-CMA's EMA method."""
 
     def __init__(

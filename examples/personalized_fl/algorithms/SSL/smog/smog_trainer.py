@@ -3,7 +3,7 @@ The implemetation of the trainer for SMoG approach.
 """
 import os
 
-from pflbases import ssl_trainer
+from ssl import ssl_trainer
 
 import torch
 from lightly.loss.memory_bank import MemoryBankModule

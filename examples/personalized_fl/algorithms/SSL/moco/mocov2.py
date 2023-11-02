@@ -13,10 +13,10 @@ The official code: https://github.com/facebookresearch/moco.
 
 """
 
-from pflbases import fedavg_personalized
+from plato.servers import fedavg_personalized as personalized_server
 
-from pflbases import ssl_client
-from pflbases import ssl_datasources
+from ssl import ssl_client
+from ssl import ssl_datasources
 
 import mocov2_model
 import mocov2_trainer
@@ -31,7 +31,7 @@ def main():
         datasource=ssl_datasources.SSLDataSource,
         trainer=mocov2_trainer.Trainer,
     )
-    server = fedavg_personalized.Server(
+    server = personalized_server.Server(
         model=mocov2_model.MoCoV2,
         trainer=mocov2_trainer.Trainer,
     )

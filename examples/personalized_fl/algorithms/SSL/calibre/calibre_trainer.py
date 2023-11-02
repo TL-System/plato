@@ -7,7 +7,7 @@ import logging
 
 import torch
 
-from pflbases import ssl_trainer
+from ssl import ssl_trainer
 
 from calibre_loss import CalibreLoss
 from clustering import kmeans_clustering

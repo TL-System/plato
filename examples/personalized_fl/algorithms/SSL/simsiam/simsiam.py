@@ -9,10 +9,10 @@ Source code: https://github.com/facebookresearch/simsiam
 Third-party code: https://github.com/PatrickHua/SimSiam
 """
 
-from pflbases import fedavg_personalized
+from plato.servers import fedavg_personalized as personalized_server
 
-from pflbases import ssl_client
-from pflbases import ssl_datasources
+from ssl import ssl_client
+from ssl import ssl_datasources
 
 import simsiam_trainer
 import simsiam_model
@@ -27,7 +27,7 @@ def main():
         datasource=ssl_datasources.SSLDataSource,
         trainer=simsiam_trainer.Trainer,
     )
-    server = fedavg_personalized.Server(
+    server = personalized_server.Server(
         model=simsiam_model.SimSiam, trainer=simsiam_trainer.Trainer
     )
 
