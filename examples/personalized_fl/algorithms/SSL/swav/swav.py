@@ -1,6 +1,7 @@
 """
 The implementation for the SwAV [1] method.
 
+Reference:
 [1]. Mathilde Caron, et al., Unsupervised Learning of Visual Features by Contrasting Cluster Assignments.
 https://arxiv.org/abs/2006.09882, NeurIPS 2020.
 
@@ -22,13 +23,12 @@ def main():
     """
     A pFL session for SwaV approach.
     """
-    trainer = ssl_trainer.Trainer
     client = ssl_client.Client(
         model=swav_model.SwaV,
         datasource=ssl_datasources.SSLDataSource,
-        trainer=trainer,
+        trainer=ssl_trainer.Trainer,
     )
-    server = fedavg_personalized.Server(model=SSL.SwaV, trainer=trainer)
+    server = fedavg_personalized.Server(model=SSL.SwaV, trainer=ssl_trainer.Trainer)
 
     server.run(client)
 
