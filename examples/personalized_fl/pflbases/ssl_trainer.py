@@ -60,7 +60,7 @@ class Trainer(basic.Trainer):
         model_params = Config().parameters.personalization.model._asdict()
         model_params["input_dim"] = self.model.encoder.encoding_dim
         model_params["output_dim"] = model_params["num_classes"]
-        self.personalized_model = models_registry.get(
+        self.local_layers = models_registry.get(
             model_name=Config().algorithm.personalization.model_name,
             model_type=Config().algorithm.personalization.model_type,
             model_params=model_params,
@@ -99,7 +99,7 @@ class Trainer(basic.Trainer):
         optimizer_name = Config().algorithm.personalization.optimizer
         optimizer_params = Config().parameters.personalization.optimizer._asdict()
         return optimizers.get(
-            self.personalized_model,
+            self.local_layers,
             optimizer_name=optimizer_name,
             optimizer_params=optimizer_params,
         )
@@ -107,7 +107,7 @@ class Trainer(basic.Trainer):
     def get_ssl_criterion(self):
         """
         Get the loss criterion for the SSL.
-        Some SSL algorithms will overwrite this function for specific purpose.
+        Some SSL algorithms will overwrite this function for specific loss functions.
         """
 
         # Get loss criterion for the SSL
@@ -159,8 +159,8 @@ class Trainer(basic.Trainer):
             config["batch_size"] = Config().algorithm.personalization.batch_size
             config["epochs"] = Config().algorithm.personalization.epochs
 
-            self.personalized_model.to(self.device)
-            self.personalized_model.train()
+            self.local_layers.to(self.device)
+            self.local_layers.train()
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop."""
@@ -168,13 +168,13 @@ class Trainer(basic.Trainer):
         if not self.current_round > Config().trainer.rounds:
             return super().perform_forward_and_backward_passes(config, examples, labels)
 
-        # Perform the local update on self.personalized_model
+        # Perform the local update on self.local_layers
         self.optimizer.zero_grad()
 
         # Use the trained encoder to output features.
         # No optimizer for this basic encoder
         features = self.model.encoder(examples)
-        outputs = self.personalized_model(features)
+        outputs = self.local_layers(features)
 
         loss = self._loss_criterion(outputs, labels)
         self._loss_tracker.update(loss, labels.size(0))
@@ -213,8 +213,8 @@ class Trainer(basic.Trainer):
         """Testing the model to report the accuracy in each round."""
         if self.current_round > Config().trainer.rounds:
             # Test the personalized model after the final round.
-            self.personalized_model.eval()
-            self.personalized_model.to(self.device)
+            self.local_layers.eval()
+            self.local_layers.to(self.device)
 
             self.model.eval()
             self.model.to(self.device)
@@ -231,7 +231,7 @@ class Trainer(basic.Trainer):
                     examples, labels = examples.to(self.device), labels.to(self.device)
 
                     features = self.model.encoder(examples)
-                    outputs = self.personalized_model(features)
+                    outputs = self.local_layers(features)
 
                     _, predicted = torch.max(outputs.data, 1)
                     total += labels.size(0)
