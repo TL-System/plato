@@ -1,52 +1,54 @@
 """
 A trainer for FedRep approach.
 """
-
-from pflbases import trainer_utils
-
 from plato.trainers import basic
 from plato.config import Config
+
+from pflbases import trainer_utils
 
 
 class Trainer(basic.Trainer):
     """A trainer for FedRep."""
 
     def train_run_start(self, config):
-        """Freeze the body during personalization."""
+        """Freeze the global layers during the personalization round."""
         super().train_run_start(config)
+
         if self.current_round > Config().trainer.rounds:
-            # Freeze the model body while only optimizing the head
+            # Freeze the model body while only optimizing the local layers
             # furing the final personalization
             trainer_utils.freeze_model(
                 self.model, Config().algorithm.global_layer_names
             )
+
             # Set the number of epochs for personalization
             if hasattr(Config().algorithm.personalization, "epochs"):
                 config["epochs"] = Config().algorithm.personalization.epochs
 
     def train_epoch_start(self, config):
-        """A training epoch for FedRep.
-        The local training stage in FedRep contains two parts:
+        """
+        Local training in FedRep contains two phases:
 
-        - Head optimization:
-            Makes τ local gradient-based updates to solve for its optimal head given
-            the current global representation communicated by the server.
+        - Optimizing the local layers:
+            Go through a number of epoches involving local gradient-based updates,
+            with the current shared global layers frozen.
 
-        - Representation optimization:
-            Takes one local gradient-based update with respect to the current representation.
+        - Optimizing the global layers:
+            Using the remaining number of epoches to optimize the global layers.
         """
         super().train_epoch_start(config)
 
         if self.current_round <= Config().trainer.rounds:
-            # As presented in Section 3 of the FedRep paper, the head is optimized
-            # for (epochs - 1) while freezing the representation.
-            head_epochs = (
-                Config().algorithm.head_epochs
-                if hasattr(Config().algorithm, "head_epochs")
+            # As presented in Section 3 of the paper, the local layers is
+            # optimized for a certain number of epochs while freezing the global
+            # layers
+            local_epochs = (
+                Config().algorithm.local_epochs
+                if hasattr(Config().algorithm, "local_epochs")
                 else config["epochs"] - 1
             )
 
-            if self.current_epoch <= head_epochs:
+            if self.current_epoch <= local_epochs:
                 trainer_utils.freeze_model(
                     self.model,
                     Config().algorithm.global_layer_names,
@@ -54,7 +56,7 @@ class Trainer(basic.Trainer):
                 trainer_utils.activate_model(
                     self.model, Config().algorithm.local_layer_names
                 )
-            # The representation will then be optimized for only one epoch.
+            # The global layers will then be optimized for the remaining epochs
             else:
                 trainer_utils.freeze_model(
                     self.model,
@@ -64,8 +66,8 @@ class Trainer(basic.Trainer):
                     self.model, Config().algorithm.global_layer_names
                 )
         else:
-            # The body of the model will be frozen during the
-            # final personalization.
+            # The global layers in the model will be frozen during the final
+            # personalization round
             trainer_utils.freeze_model(
                 self.model,
                 Config().algorithm.global_layer_names,
@@ -74,4 +76,8 @@ class Trainer(basic.Trainer):
     def train_run_end(self, config):
         """Activate the model."""
         super().train_run_end(config)
-        trainer_utils.activate_model(self.model, Config().algorithm.global_layer_names)
+
+        if self.current_round > Config().trainer.rounds:
+            trainer_utils.activate_model(
+                self.model, Config().algorithm.global_layer_names
+            )

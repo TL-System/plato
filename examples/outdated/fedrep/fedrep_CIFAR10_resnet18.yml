@@ -59,7 +59,7 @@ trainer:
     optimizer: SGD
 
     # Number of epoches for head optimization
-    head_epochs: 9
+    local_epochs: 9
 
     # The machine learning model
     model_name: resnet_18
