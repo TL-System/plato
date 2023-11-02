@@ -38,7 +38,7 @@ class BYOLModel(nn.Module):
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )
-        self.predicter = BYOLPredictionHead(
+        self.predictor = BYOLPredictionHead(
             Config().trainer.projection_out_dim,
             Config().trainer.prediction_hidden_dim,
             Config().trainer.prediction_out_dim,
@@ -54,7 +54,7 @@ class BYOLModel(nn.Module):
         """Foward one view sample to get the output."""
         encoded_sample = self.encoder(sample).flatten(start_dim=1)
         projected_sample = self.projector(encoded_sample)
-        output = self.predicter(projected_sample)
+        output = self.predictor(projected_sample)
         return output
 
     def forward_momentum(self, sample):
