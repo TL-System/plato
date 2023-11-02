@@ -4,8 +4,9 @@ A trainer for BYOL to rewrite the loss wrappe.
 from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
 
-from plato.trainers import loss_criterion
+
 from pflbases import ssl_trainer
+from plato.trainers import loss_criterion
 from plato.config import Config
 
 
