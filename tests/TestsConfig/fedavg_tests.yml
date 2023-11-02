@@ -52,7 +52,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg_partial
+    type: fedavg_personalized
 
 parameters:
     optimizer:

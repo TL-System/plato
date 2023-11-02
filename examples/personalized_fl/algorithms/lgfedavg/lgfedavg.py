@@ -6,9 +6,9 @@ with Local and Global Representations. https://arxiv.org/abs/2001.01523
 
 """
 
-from pflbases import fedavg_partial
 from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized_client
+from pflbases import fedavg_personalized
+from pflbases import fedavg_personalized
 import lgfedavg_trainer
 
 
@@ -17,9 +17,9 @@ def main():
     A Plato personalized federated learning session for LG-FedAvg approach.
     """
     trainer = lgfedavg_trainer.Trainer
-    client = fedavg_personalized_client.Client(
+    client = fedavg_personalized.Client(
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
+        algorithm=fedavg_personalized.Algorithm,
     )
     server = fedavg_personalized.Server(trainer=trainer)
 

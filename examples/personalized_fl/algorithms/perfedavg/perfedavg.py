@@ -7,13 +7,13 @@ Alireza Fallah, et al., Personalized federated learning with theoretical guarant
 A model-agnostic meta-learning approach, NeurIPS 2020.
 https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html
 
-Third-part code: https://github.com/jhoon-oh/FedBABU
+Third-party code: https://github.com/jhoon-oh/FedBABU
 
 """
 
 from pflbases import fedavg_personalized
-from pflbases import fedavg_partial
-from pflbases import fedavg_personalized_client
+from pflbases import fedavg_personalized
+from pflbases import fedavg_personalized
 
 import perfedavg_trainer
 
@@ -23,13 +23,13 @@ def main():
     A personalized federated learning session for PerFedAvg approach.
     """
     trainer = perfedavg_trainer.Trainer
-    client = fedavg_personalized_client.Client(
+    client = fedavg_personalized.Client(
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
+        algorithm=fedavg_personalized.Algorithm,
     )
     server = fedavg_personalized.Server(
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
+        algorithm=fedavg_personalized.Algorithm,
     )
 
     server.run(client)
