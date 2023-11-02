@@ -47,7 +47,8 @@ class Trainer(ssl_trainer.Trainer):
     def train_step_start(self, config, batch=None):
         """
         At the start of every iteration,
-            xxxxx.
+            update the models for generating momentum
+            with new momemtum parameter: momentum value.
         """
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
