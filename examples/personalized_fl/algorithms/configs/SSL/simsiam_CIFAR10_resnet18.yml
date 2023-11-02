@@ -62,13 +62,6 @@ algorithm:
             name: SimSiam
             parameters:
                 input_size: 32
-
-    global_layer_names:
-        - encoder
-
-    local_layer_names:
-        - projector
-        - predictor
         
     personalization:
         !include ssl_personalization.yml
