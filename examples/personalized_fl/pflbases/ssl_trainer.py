@@ -105,7 +105,10 @@ class Trainer(basic.Trainer):
         )
 
     def get_ssl_criterion(self):
-        """Get the loss criterion for the SSL."""
+        """
+        Get the loss criterion for the SSL.
+        Some SSL algorithms will overwrite this function for specific purpose.
+        """
 
         # Get loss criterion for the SSL
         ssl_loss_function = loss_criterion.get()
