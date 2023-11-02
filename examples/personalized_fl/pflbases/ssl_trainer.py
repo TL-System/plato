@@ -122,6 +122,9 @@ class Trainer(basic.Trainer):
         # Get loss criterion for the SSL
         ssl_loss_function = loss_criterion.get()
 
+        # We need to wrap the loss function to make it compatible
+        # with different types of outputs
+        # The types of the outputs can vary from Tensor to a list of Tensors
         def compute_plato_loss(outputs, labels):
             if isinstance(outputs, (list, tuple)):
                 return ssl_loss_function(*outputs)
@@ -169,11 +172,16 @@ class Trainer(basic.Trainer):
             config["batch_size"] = Config().algorithm.personalization.batch_size
             config["epochs"] = Config().algorithm.personalization.epochs
 
+            # Move the local layers to the device and set it to train mode
             self.local_layers.to(self.device)
             self.local_layers.train()
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop."""
+        """Perform forward and backward passes in the training loop.
+        This function needs to reuse the optimization code of Plato as
+        during personalization, the encoder of the self.model will be used to
+        extract features to the local layers to use.
+        """
 
         # Perform the SSL training in the first Config().trainer.rounds rounds
         if not self.current_round > Config().trainer.rounds:
