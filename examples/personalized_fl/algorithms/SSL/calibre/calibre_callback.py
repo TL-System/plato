@@ -14,7 +14,7 @@ from plato.config import Config
 
 class AddDivergenceRateProcessor(base.Processor):
     """
-    Implements a processor for adding the divergence rate to the payload.
+    Implement a processor for adding the divergence rate to the payload.
     """
 
     def __init__(self, client_id, trainer, **kwargs) -> None:
