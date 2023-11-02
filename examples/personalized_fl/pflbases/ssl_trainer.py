@@ -1,7 +1,5 @@
 """
-The training and testing loops of PyTorch for personalized federated learning with
-self-supervised learning.
-
+A base trainer to perform training and testing loops for self-supervised learning.
 """
 
 import logging

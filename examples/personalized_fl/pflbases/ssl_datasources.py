@@ -1,5 +1,5 @@
 """
-Customize a flexible interface of datasource for self-supervised learning.
+A base datasource for self-supervised learning.
 """
 import logging
 
@@ -8,56 +8,66 @@ from lightly.transforms import *
 from plato.datasources import base
 from plato.datasources import registry as datasources_registry
 from plato.config import Config
-
-from pflbases import transform_registry
-
-
-def get_transform(transform_config: dict):
-    """Getting transform for the desired transform_type."""
-
-    transform_name = transform_config["name"]
-    transform_params = transform_config["parameters"]._asdict()
-    defined_transform = transform_registry.get(
-        data_transform_name=transform_name,
-        data_transform_params=transform_params,
-    )
-
-    return defined_transform
+from plato.utils import visual_augmentations
 
 
-def get_data_transforms(transforms_block: dict):
+registered_transforms = {
+    "SimCLR": SimCLRTransform,
+    "DINO": DINOTransform,
+    "MAE": MAETransform,
+    "MoCoV1": MoCoV1Transform,
+    "MoCoV2": MoCoV2Transform,
+    "MSN": MSNTransform,
+    "PIRL": PIRLTransform,
+    "SimSiam": SimSiamTransform,
+    "SMoG": SMoGTransform,
+    "SwaV": SwaVTransform,
+    "VICReg": VICRegTransform,
+    "VICRegL": VICRegLTransform,
+    "FastSiam": FastSiamTransform,
+}
+
+
+def get_transforms(transforms_block: dict):
     """Obtaining train/test transforms for the corresponding data."""
 
     data_transforms = {}
 
     if "train_transform" in transforms_block:
         transform_config = transforms_block["train_transform"]._asdict()
-        train_transform = get_transform(transform_config)
-        logging.info("Data train transform: %s", transform_config["name"])
-        data_transforms.update({"train_transform": train_transform})
+        transform_name = transform_config["name"]
+        transform_params = transform_config["parameters"]._asdict()
 
-    if "test_transform" in transforms_block:
-        transform_config = transforms_block["test_transform"]._asdict()
-        test_transform = get_transform(transform_config)
-        logging.info("Data test transform: %s", transform_config["name"])
-        data_transforms.update({"test_transform": test_transform})
+        datasource_name = Config().data.datasource
+
+        transform_params["normalize"] = visual_augmentations.datasets_normalization[
+            datasource_name
+        ]
+        if transform_name in registered_transforms:
+            dataset_transform = registered_transforms[transform_name](
+                **transform_params
+            )
+        else:
+            raise ValueError(f"No such data source: {transform_name}")
+
+        logging.info("Data train transform: %s", transform_config["name"])
+        data_transforms.update({"train_transform": dataset_transform})
 
     return data_transforms
 
 
-class TransformedDataSource(base.DataSource):
+class SSLDataSource(base.DataSource):
     """A custom datasource receiving configuration of transform as the
     input to define the datasource.
     """
 
     def __init__(self, transforms_block: dict = None):
         super().__init__()
-        # Use the default config of the transform when nothing
-        # is provided.
+        # Use the transform set in the config file.
         if transforms_block is None:
             transforms_block = Config().algorithm.data_transforms._asdict()
 
-        data_transforms = get_data_transforms(transforms_block)
+        data_transforms = get_transforms(transforms_block)
 
         self.datasource = datasources_registry.get(**data_transforms)
         self.trainset = self.datasource.trainset
