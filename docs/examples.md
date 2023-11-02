@@ -181,6 +181,21 @@ Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning 
 ```
 ````
 
+#### Text-to-image Generation Algorithms in Federated Learning
+````{admonition} **FedTI**
+FedTI is to perform textual inversion under federated learning, which we can simply refer
+to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
+
+```shell
+python examples/fedti/fedti.py -c examples/fedti/StableDiffusionFed_iid_50.yml -b FedTI
+```
+```{note}
+Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
+    Textual Inversion],
+&rdquo; 
+````
+
+
 #### Personalized Federated Learning Algorithms
 
 ````{admonition} **FedRep**
@@ -546,19 +561,6 @@ FedSaw is proposed to improve training performance in three-layer federated lear
 ```shell
 python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
 ```
-````
-
-````{admonition} **FedTI**
-FedTI is to perform textual inversion under federated learning, which we can simply refer
-to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
-
-```shell
-python examples/fedti/fedti.py -c examples/fedti/StableDiffusionFed_iid_50.yml -b FedTI
-```
-```{note}
-Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
-    Textual Inversion],
-&rdquo; 
 ````
 
 
