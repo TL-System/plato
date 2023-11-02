@@ -6,23 +6,19 @@ A. Li, J. Sun, P. Li, Y. Pu, H. Li, and Y. Chen,
 in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
 """
 
-from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized
-
 from hermes_callback import HermesCallback
 import hermes_trainer
 import hermes_server
+
+
+from plato.clients import fedavg_personalized as personalized_client
 
 
 def main():
     """A Plato federated learning training session using the Hermes algorithm."""
     trainer = hermes_trainer.Trainer
 
-    client = fedavg_personalized.Client(
-        trainer=trainer,
-        algorithm=fedavg_personalized.Algorithm,
-        callbacks=[HermesCallback],
-    )
+    client = personalized_client.Client(trainer=trainer, callbacks=[HermesCallback])
     server = hermes_server.Server(trainer=trainer)
 
     server.run(client)
