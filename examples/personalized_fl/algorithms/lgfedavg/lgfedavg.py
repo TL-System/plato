@@ -6,10 +6,10 @@ with Local and Global Representations. https://arxiv.org/abs/2001.01523
 
 """
 
-from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized
 import lgfedavg_trainer
+
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import fedavg_personalized as personalized_client
 
 
 def main():
@@ -17,11 +17,8 @@ def main():
     A Plato personalized federated learning session for LG-FedAvg approach.
     """
     trainer = lgfedavg_trainer.Trainer
-    client = fedavg_personalized.Client(
-        trainer=trainer,
-        algorithm=fedavg_personalized.Algorithm,
-    )
-    server = fedavg_personalized.Server(trainer=trainer)
+    client = personalized_client.Client(trainer=trainer)
+    server = personalized_server.Server(trainer=trainer)
 
     server.run(client)
 
