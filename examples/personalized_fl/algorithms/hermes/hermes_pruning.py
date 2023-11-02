@@ -109,15 +109,6 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     return mask
 
 
-def remove(model):
-    """
-    Removes the original unpruned weight tensors in the model
-    """
-    for __, layer in model.named_parameters():
-        if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
-            prune.remove(layer, "weight")
-
-
 def apply_mask(model, mask, device):
     """Applies the mask onto the model."""
 

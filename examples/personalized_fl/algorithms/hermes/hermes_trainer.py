@@ -12,6 +12,9 @@ import os
 
 import pickle
 
+import torch
+from torch.nn.utils import prune
+
 import hermes_pruning as pruning
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -88,7 +91,9 @@ class Trainer(basic.Trainer):
         """Method called at the end of training run."""
         # Make pruning permanent if it was conducted
         if self.need_prune or self.pruned_amount > 0:
-            pruning.remove(self.model)
+            for __, layer in self.model.named_parameters():
+                if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
+                    prune.remove(layer, "weight")
 
             self.pruned_amount = pruning.compute_pruned_amount(
                 self.model, self.client_id
