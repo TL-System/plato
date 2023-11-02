@@ -170,11 +170,10 @@ class Trainer(basic.Trainer):
 
         # Perform the local update on self.personalized_model
         self.optimizer.zero_grad()
+
         # Use the trained encoder to output features.
-        # Freeze the encoder of ssl.
-        # No optimization is reuqired by this encoder.
-        with torch.no_grad():
-            features = self.model.encoder(examples)
+        # No optimizer for this basic encoder
+        features = self.model.encoder(examples)
         outputs = self.personalized_model(features)
 
         loss = self._loss_criterion(outputs, labels)

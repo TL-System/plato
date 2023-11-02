@@ -1,7 +1,7 @@
 """
 Callback for adding the divergence rate to the payload.
 """
-
+import os
 import logging
 from typing import OrderedDict
 
@@ -9,6 +9,7 @@ import torch
 
 from plato.callbacks.client import ClientCallback
 from plato.processors import base
+from plato.config import Config
 
 
 class AddDivergenceRateProcessor(base.Processor):
@@ -23,7 +24,9 @@ class AddDivergenceRateProcessor(base.Processor):
         self.trainer = trainer
 
     def process(self, data: OrderedDict):
-        save_path = self.trainer.get_divergence_filepath()
+        model_path = Config().params["model_path"]
+        filename = f"client_{self.client_id}_divergence_rate.pth"
+        save_path = os.path.join(model_path, filename)
 
         divergence_rate = torch.load(save_path)
 
