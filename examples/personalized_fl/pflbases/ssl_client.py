@@ -1,5 +1,8 @@
 """
 A base client for self-supervised learning (SSL).
+The main purpose is to set the personalized datasource for the client as
+the datasets used in personalization are different from the ones used in
+the regular federated learning with SSL.
 """
 
 from plato.datasources import registry as datasources_registry
@@ -7,8 +10,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """A base client to prepare the datasource for self-supervised learning
-    in the personalization."""
+    """A base client to prepare the datasource for the personalization."""
 
     def __init__(
         self,
@@ -30,7 +32,7 @@ class Client(simple.Client):
         self.personalized_datasource = None
 
     def configure(self) -> None:
-        """Prepares this client for training."""
+        """Prepare this client for training."""
         super().configure()
 
         # Get the personalized datasource
