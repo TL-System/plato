@@ -323,6 +323,7 @@ pFLSSL achieves Personalized federated learning by introducing self-supervised l
 - MoCoV2 [4]
 - SwAV [5]
 - SMoG [6]
+- FedEMA [7] 
 
 Please read `examples/ssl/README.md` for more details about how to run the code.
 
@@ -354,6 +355,10 @@ python algorithms/swav/swav.py -c configs/swav/swav_CIFAR10_resnet18_noniid.yml 
 python algorithms/smog/smog.py -c configs/smog/smog_CIFAR10_resnet18_noniid.yml -b pflExperiments
 ```
 
+```shell
+python algorithms/fedema/fedema.py -c configs/fedema/fedema_CIFAR10_resnet18_noniid.yml -b pflExperiments
+```
+
 ```{note}
 [1]. Ting Chen, et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
 
@@ -366,6 +371,8 @@ python algorithms/smog/smog.py -c configs/smog/smog_CIFAR10_resnet18_noniid.yml 
 [5]. Mathilde Caron, et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
 
 [6]. Bo Pang, et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
+
+[7]. W Zhuang, et al., &ldquo;[Divergence-aware federated self-supervised learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc ICLR, 2022.
 
 ```
 ````
