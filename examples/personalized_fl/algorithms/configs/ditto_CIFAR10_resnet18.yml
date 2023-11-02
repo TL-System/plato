@@ -32,7 +32,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
 
     # the chosen of lambda derives from 
     # the appendix D.2 of the paper and 
