@@ -62,7 +62,6 @@ algorithm:
             name: SimSiam
             parameters:
                 input_size: 32
-
         
     personalization:
         !include ssl_personalization.yml
