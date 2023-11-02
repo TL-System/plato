@@ -5,8 +5,7 @@ import copy
 
 import torch
 from torch import nn
-from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
-from lightly.models.modules.heads import SimCLRProjectionHead
+
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 from sklearn.cluster import KMeans
 from lightly.models.modules.heads import (

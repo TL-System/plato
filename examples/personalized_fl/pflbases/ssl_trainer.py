@@ -15,7 +15,7 @@ from plato.trainers import optimizers, lr_schedulers, loss_criterion
 
 
 class SSLSamples(UserList):
-    """A SSL sample."""
+    """An SSL sample, which is the inputs to the model in SSL methods."""
 
     def to(self, device):
         """Assign the tensor item into the specific device."""
@@ -51,15 +51,14 @@ class MultiViewCollateWrapper(MultiViewCollate):
         for i, sample in enumerate(samples):
             samples[i] = torch.cat(sample)
 
-        labels = torch.tensor(
-            labels, dtype=torch.long
-        )
-        
+        labels = torch.tensor(labels, dtype=torch.long)
+
         # Compatible with lightly
         if fnames:
             return samples, labels, fnames
         # Compatible with Plato.
         return samples, labels
+
 
 class Trainer(basic.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
@@ -73,18 +72,17 @@ class Trainer(basic.Trainer):
         self.personalized_testset = None
 
         # Define the personalized model
-        model_type = Config().algorithm.personalization.model_type
         model_params = Config().parameters.personalization.model._asdict()
         model_params["input_dim"] = self.model.encoder.encoding_dim
         model_params["output_dim"] = model_params["num_classes"]
         self.personalized_model = models_registry.get(
             model_name=Config().algorithm.personalization.model_name,
-            model_type=model_type,
+            model_type=Config().algorithm.personalization.model_type,
             model_params=model_params,
         )
 
     def set_personalized_datasets(self, trainset, testset):
-        """Set the trainset."""
+        """Set the personalized trainset."""
         self.personalized_trainset = trainset
         self.personalized_testset = testset
 
@@ -121,6 +119,20 @@ class Trainer(basic.Trainer):
             optimizer_params=optimizer_params,
         )
 
+    def get_ssl_criterion(self):
+        """Get the loss criterion for SSL."""
+
+        # Get loss criterion for the SSL
+        ssl_loss_function = loss_criterion.get()
+
+        def compute_plato_loss(outputs, labels):
+            if isinstance(outputs, (list, tuple)):
+                return ssl_loss_function(*outputs)
+            else:
+                return ssl_loss_function(outputs)
+
+        return compute_plato_loss
+
     def get_loss_criterion(self):
         """Returns the loss criterion for the SSL."""
         # Get loss criterion for the personalization
@@ -136,16 +148,7 @@ class Trainer(basic.Trainer):
                 loss_criterion_params=loss_criterion_params,
             )
 
-        # Get loss criterion for the SSL
-        ssl_loss_function = loss_criterion.get()
-
-        def compute_plato_loss(outputs, labels):
-            if isinstance(outputs, (list, tuple)):
-                return ssl_loss_function(*outputs)
-            else:
-                return ssl_loss_function(outputs)
-
-        return compute_plato_loss
+        return self.get_ssl_criterion()
 
     def get_lr_scheduler(self, config, optimizer):
         # Get the lr scheduler for the personalization
@@ -179,8 +182,8 @@ class Trainer(basic.Trainer):
 
         # Perform the local update on self.personalized_model
         self.optimizer.zero_grad()
-        # Extract representation from the trained
-        # frozen encoder of ssl.
+        # Use the trained encoder to output features.
+        # Freeze the encoder of ssl.
         # No optimization is reuqired by this encoder.
         with torch.no_grad():
             features = self.model.encoder(examples)
@@ -204,7 +207,7 @@ class Trainer(basic.Trainer):
         samples_label = None
         self.model.eval()
         self.model.to(self.device)
-        for _, (examples, labels) in enumerate(data_loader):
+        for examples, labels in data_loader:
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
                 features = self.model.encoder(examples)
@@ -219,77 +222,68 @@ class Trainer(basic.Trainer):
 
         return samples_encoding, samples_label
 
-    def test_knn(self, config, testset=None, sampler=None, **kwargs):
-        """Test the personalization in each round.
-
-        For SSL, the way to test the trained model before personalization is
-        to use the KNN as a classifier to evaluate the extracted features.
-        """
-        logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
-        batch_size = config["batch_size"]
-
-        # Get the training loader and test loader
-        train_loader = torch.utils.data.DataLoader(
-            dataset=self.personalized_trainset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler,
-        )
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
-        train_encodings, train_labels = self.collect_encodings(train_loader)
-        test_encodings, test_labels = self.collect_encodings(test_loader)
-
-        # KNN.
-        distances = torch.cdist(test_encodings, train_encodings, p=2)
-        knn = distances.topk(1, largest=False)
-        nearest_idx = knn.indices
-        predicted_labels = train_labels[nearest_idx].view(-1)
-        test_labels = test_labels.view(-1)
-
-        # compute the accuracy
-        num_correct = torch.sum(predicted_labels == test_labels).item()
-        accuracy = num_correct / len(test_labels)
-
-        return accuracy
-
-    def test_personalized_model(self, config, testset=None, sampler=None, **kwargs):
-        """Test the personalized model after the final round."""
-
-        self.personalized_model.eval()
-        self.personalized_model.to(self.device)
-
-        self.model.eval()
-        self.model.to(self.device)
-
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=20, shuffle=False, sampler=sampler
-        )
-
-        correct = 0
-        total = 0
-        accuracy = 0
-        with torch.no_grad():
-            for _, (examples, labels) in enumerate(test_loader):
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                features = self.model.encoder(examples)
-                outputs = self.personalized_model(features)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        accuracy = correct / total
-
-        return accuracy
-
     def test_model(self, config, testset, sampler=None, **kwargs):
         """Testing the model to report the accuracy in each round."""
         if self.current_round > Config().trainer.rounds:
-            return self.test_personalized_model(
-                config, testset, sampler=sampler, **kwargs
+            # Test the personalized model after the final round.
+            self.personalized_model.eval()
+            self.personalized_model.to(self.device)
+
+            self.model.eval()
+            self.model.to(self.device)
+
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=20, shuffle=False, sampler=sampler
             )
+
+            correct = 0
+            total = 0
+            accuracy = 0
+            with torch.no_grad():
+                for _, (examples, labels) in enumerate(test_loader):
+                    examples, labels = examples.to(self.device), labels.to(self.device)
+
+                    features = self.model.encoder(examples)
+                    outputs = self.personalized_model(features)
+
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+
+            accuracy = correct / total
+
+            return accuracy
         else:
-            return self.test_knn(config, testset, sampler=sampler, **kwargs)
+            # Test the personalization in each round.
+
+            # For SSL, the way to test the trained model before personalization is
+            #   to use the KNN as a classifier to evaluate the extracted features.
+
+            logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
+            batch_size = config["batch_size"]
+
+            # Get the training loader and test loader
+            train_loader = torch.utils.data.DataLoader(
+                dataset=self.personalized_trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=sampler,
+            )
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            )
+            train_encodings, train_labels = self.collect_encodings(train_loader)
+            test_encodings, test_labels = self.collect_encodings(test_loader)
+
+            # KNN.
+            distances = torch.cdist(test_encodings, train_encodings, p=2)
+            knn = distances.topk(1, largest=False)
+            nearest_idx = knn.indices
+            predicted_labels = train_labels[nearest_idx].view(-1)
+            test_labels = test_labels.view(-1)
+
+            # compute the accuracy
+            num_correct = torch.sum(predicted_labels == test_labels).item()
+            accuracy = num_correct / len(test_labels)
+
+            return accuracy
