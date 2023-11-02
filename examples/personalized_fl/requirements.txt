@@ -3,4 +3,3 @@ matplotlib
 scipy
 scikit-learn
 lightly
-kmeans_pytorch

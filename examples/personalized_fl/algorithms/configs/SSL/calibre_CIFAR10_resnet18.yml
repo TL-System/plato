@@ -27,7 +27,7 @@ data:
 trainer:
     # LeNet5 model with the basic trainer
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 2

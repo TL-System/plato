@@ -115,7 +115,7 @@ class CalibreLoss(nn.Module):
         # Get cluster assignment for the input encodings,
         # clusters_assignment shape, [2*batch_size]
         clusters_assignment, _ = kmeans_clustering(
-            full_encodings, n_clusters=n_clusters, device=self.device
+            full_encodings, n_clusters=n_clusters
         )
         # Get the unique cluster ids
         # with shape, [n_clusters]
