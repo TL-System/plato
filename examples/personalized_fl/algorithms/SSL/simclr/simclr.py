@@ -15,7 +15,7 @@ from pflbases import ssl_datasources
 from pflbases import ssl_client
 from pflbases import ssl_trainer
 
-from model import SimCLRModel
+from simclr_model import SimCLRModel
 
 
 def main():
