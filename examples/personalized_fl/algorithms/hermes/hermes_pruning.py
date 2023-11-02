@@ -2,7 +2,6 @@
 Utility functions for pruning.
 """
 
-import copy
 from math import floor
 import os
 import numpy as np
