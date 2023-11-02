@@ -106,9 +106,8 @@ class SimCLR(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
-        self.encoding_dim = self.encoder.encoding_dim
         self.projector = SimCLRProjectionHead(
-            self.encoding_dim, projection_hidden_dim, projection_out_dim
+            self.encoder.encoding_dim, projection_hidden_dim, projection_out_dim
         )
 
     def forward(self, multiview_samples):
