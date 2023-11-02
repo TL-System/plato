@@ -63,7 +63,6 @@ algorithm:
                 crop_sizes: 
                     - 32
                     - 32
-
         
     personalization:
         !include ssl_personalization.yml
