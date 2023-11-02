@@ -1,5 +1,5 @@
 """
-A self-supervised learning dataset working as a wrapper to add the SSL data 
+An self-supervised learning dataset working as a wrapper to add the SSL data 
 transform to the datasource of Plato.
 
 To allow SSL transform to use the desired parameters, one should place the 
