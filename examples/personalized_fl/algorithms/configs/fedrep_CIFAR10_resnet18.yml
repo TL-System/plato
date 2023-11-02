@@ -32,9 +32,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
-
-    # ['conv1', 'bn1', 'layer1', 'layer2', 'layer3', 'layer4', 'linear']
+    type: fedavg_personalized
     
     global_layer_names:
         - conv1
@@ -47,9 +45,7 @@ algorithm:
     local_layer_names:
         - linear
 
-
     personalization:
-        
         # the ratio of clients participanting in training
         participating_client_ratio: 1.0
 

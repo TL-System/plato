@@ -6,13 +6,13 @@ Tian Li, et al., Ditto: Fair and robust federated learning through personalizati
  https://proceedings.mlr.press/v139/li21h.html
 
 Official code: https://github.com/litian96/ditto
-Third-part code: https://github.com/lgcollins/FedRep
+Third-party code: https://github.com/lgcollins/FedRep
 
 """
 
 from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized_client
-from pflbases import fedavg_partial
+from pflbases import fedavg_personalized
+from pflbases import fedavg_personalized
 
 import ditto_trainer
 
@@ -22,13 +22,13 @@ def main():
     A personalized federated learning session for Ditto approach.
     """
     trainer = ditto_trainer.Trainer
-    client = fedavg_personalized_client.Client(
+    client = fedavg_personalized.Client(
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
+        algorithm=fedavg_personalized.Algorithm,
     )
     server = fedavg_personalized.Server(
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
+        algorithm=fedavg_personalized.Algorithm,
     )
 
     server.run(client)

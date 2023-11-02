@@ -10,8 +10,8 @@ Source code: https://github.com/jhoon-oh/FedBABU
 """
 
 from pflbases import fedavg_personalized
-from pflbases import fedavg_partial
-from pflbases import fedavg_personalized_client
+from pflbases import fedavg_personalized
+from pflbases import fedavg_personalized
 
 import fedbabu_trainer
 
@@ -21,8 +21,8 @@ def main():
     A personalized federated learning session for FedBABU algorithm under the supervised setting.
     """
     trainer = fedbabu_trainer.Trainer
-    client = fedavg_personalized_client.Client(
-        trainer=trainer, algorithm=fedavg_partial.Algorithm
+    client = fedavg_personalized.Client(
+        trainer=trainer, algorithm=fedavg_personalized.Algorithm
     )
     server = fedavg_personalized.Server(trainer=trainer)
 

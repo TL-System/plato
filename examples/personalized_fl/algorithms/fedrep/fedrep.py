@@ -11,9 +11,9 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 
-from pflbases import fedavg_personalized
-from pflbases import fedavg_partial
-from pflbases import fedavg_personalized_client
+from plato import servers
+from plato import clients
+
 import fedrep_trainer
 
 
@@ -22,11 +22,8 @@ def main():
     A personalized federated learning session for FedRep approach.
     """
     trainer = fedrep_trainer.Trainer
-    client = fedavg_personalized_client.Client(
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-    )
-    server = fedavg_personalized.Server(trainer=trainer)
+    client = clients.fedavg_personalized.Client(trainer=trainer)
+    server = servers.fedavg_personalized.Server(trainer=trainer)
 
     server.run(client)
 

@@ -32,7 +32,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
 
     alpha: 0.75
     adaptive_alpha: True
