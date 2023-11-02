@@ -187,7 +187,7 @@ Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with 
 ````{admonition} **Split Learning**
 Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In split learning, each training iteration is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. Unlike federated learning, split learning clients sequentially interact with the server, and the global model is synchronized implicitly through the model on the server side, which is shared and updated by all clients.
 ```shell
-python examples/split_learning/split_learning.py -c examples/split_learning/split_learning_MNIST_lenet5.yml -l warn
+python ./run -c configs/CIFAR10/split_learning_resnet18.yml
 ```
 
 ```{note}
