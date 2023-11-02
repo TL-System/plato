@@ -1,8 +1,6 @@
 """
 A trainer for BYOL to rewrite the loss wrappe.
 """
-
-
 from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
 
@@ -35,7 +33,10 @@ class Trainer(ssl_trainer.Trainer):
         return compute_plato_loss
 
     def train_epoch_start(self, config):
-        """Operations before starting one epoch."""
+        """
+        Before the start of one epoch,
+            prepare the momentum value for updating momentum outputs.
+        """
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
@@ -44,14 +45,17 @@ class Trainer(ssl_trainer.Trainer):
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
-        """Operations before starting one iteration."""
+        """
+        At the start of every iteration,
+            xxxxx.
+        """
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
             update_momentum(
-                self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
+                self.model.encoder, self.model.momentum_encoder, m=self.momentum_val
             )
             update_momentum(
-                self.model.projection_head,
-                self.model.projection_head_momentum,
+                self.model.projector,
+                self.model.momentum_projector,
                 m=self.momentum_val,
             )
