@@ -10,6 +10,8 @@ from lightly.models.utils import update_momentum
 from plato.trainers import loss_criterion
 from pflbases import ssl_trainer
 
+from plato.config import Config
+
 
 class Trainer(ssl_trainer.Trainer):
     """A trainer for BYOL to rewrite the loss wrappe."""
@@ -19,7 +21,7 @@ class Trainer(ssl_trainer.Trainer):
 
         self.momentum_val = 0
 
-    def plato_ssl_loss_wrapper(self):
+    def get_ssl_criterion(self):
         """A wrapper to connect ssl loss with plato."""
         defined_ssl_loss = loss_criterion.get()
 
@@ -40,13 +42,13 @@ class Trainer(ssl_trainer.Trainer):
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
         global_epoch = (self.current_round - 1) * config["epochs"] + epoch
-        if not self.do_final_personalization:
+        if not self.current_round > Config().trainer.rounds:
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
         """Operations before starting one iteration."""
         super().train_step_start(config)
-        if not self.do_final_personalization:
+        if not self.current_round > Config().trainer.rounds:
             update_momentum(
                 self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
             )
