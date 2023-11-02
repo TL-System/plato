@@ -53,22 +53,20 @@ class Server(fedavg_personalized.Server):
         """Get client divergence based on the aggregated weights and
         the client's update.
         """
-        # Get the clients id required to compute the divergence rate
-        # which clients' scales are required to be computed.
-        clients_id = []
-
         # if divergence is not required to be computed
         # adaptively
         if not self.adaptive_divg_scale:
-            return clients_id
+            return
         # if the computation round has been passed
         if not hasattr(Config().algorithm, "compute_scale_before_round"):
             divg_before_round = 1
         else:
             divg_before_round = Config().algorithm.compute_scale_before_round
         if self.current_round > divg_before_round:
-            return clients_id
+            return
 
+        # Get the clients id required to compute the divergence rate
+        # which clients' scales are required to be computed.
         clients_id = [update.report.client_id for update in updates]
 
         # Compute the divergence scale based on the distance between
