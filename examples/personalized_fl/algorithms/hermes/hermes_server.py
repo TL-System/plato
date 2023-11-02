@@ -25,6 +25,7 @@ class Server(fedavg_personalized.Server):
         )
         self.masks_received = []
         self.aggregated_clients_model = {}
+        self.total_samples = 0
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregates weight updates from the clients using personalized aggregating."""
@@ -81,7 +82,7 @@ class Server(fedavg_personalized.Server):
                 for model in weights_received:
                     model[layer_name] = new_tensor
 
-        self.update_clients_model(weights_received, updates)
+        self.update_client_model(weights_received, updates)
 
         deltas_received = self.algorithm.compute_weight_deltas(
             baseline_weights, weights_received
@@ -93,7 +94,7 @@ class Server(fedavg_personalized.Server):
 
         return updated_weights
 
-    def update_clients_model(self, aggregated_clients_models, updates):
+    def update_client_model(self, aggregated_clients_models, updates):
         """Update clients' models."""
 
         for client_model, update in zip(aggregated_clients_models, updates):
