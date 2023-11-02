@@ -19,13 +19,13 @@ class SSLSamples(UserList):
 
     def to(self, device):
         """Assign the tensor item into the specific device."""
-        for example_idx, example in enumerate(self.data):
-            if hasattr(example, "to"):
-                if isinstance(example, torch.Tensor):
-                    example = example.to(device)
+        for i, sample in enumerate(self.data):
+            if hasattr(sample, "to"):
+                if isinstance(sample, torch.Tensor):
+                    sample = sample.to(device)
                 else:
-                    example.to(device)
-                self[example_idx] = example
+                    sample.to(device)
+                self[i] = sample
 
         return self.data
 
