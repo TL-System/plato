@@ -1,5 +1,5 @@
 """
-Different SSL methods.
+A model for the SwAV method.
 """
 
 from torch import nn
