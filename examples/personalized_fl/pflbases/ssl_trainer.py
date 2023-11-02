@@ -42,8 +42,6 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
         # Assign views, which is a list of tensors, into SSLSamples
         samples = SSLSamples(samples)
-
-        # To be compatible with Plato.
         return samples, labels
 
 
