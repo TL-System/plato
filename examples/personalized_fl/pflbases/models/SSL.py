@@ -100,18 +100,15 @@ class SimSiam(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
-        self.encoding_dim = self.encoder.encoding_dim
-
-        projection_hidden_dim = Config().trainer.projection_hidden_dim
-        projection_out_dim = Config().trainer.projection_out_dim
-        prediction_hidden_dim = Config().trainer.prediction_hidden_dim
-        prediction_out_dim = Config().trainer.prediction_out_dim
-
         self.projection_head = SimSiamProjectionHead(
-            self.encoding_dim, projection_hidden_dim, projection_out_dim
+            self.encoder.encoding_dim,
+            Config().trainer.projection_hidden_dimm,
+            Config().trainer.projection_out_dim,
         )
         self.prediction_head = SimSiamPredictionHead(
-            projection_out_dim, prediction_hidden_dim, prediction_out_dim
+            Config().trainer.projection_out_dim,
+            Config().trainer.prediction_hidden_dim,
+            Config().trainer.prediction_out_dim,
         )
 
     def forward_direct(self, samples):
