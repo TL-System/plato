@@ -4,7 +4,6 @@ The implementation for the FedEMA proposed by the work [1].
 Zhuang, et.al, "Divergence-aware Federated Self-Supervised Learning", ICLR22.
 https://arxiv.org/pdf/2204.04385.pdf.
 
-No official code.
 """
 
 from pflbases import ssl_datasources
@@ -19,18 +18,17 @@ import fedema_algorithm
 
 def main():
     """Running the FedEMA approach."""
-    trainer = fedema_trainer.Trainer
     client = ssl_client.Client(
         model=fedema_model.BYOLModel,
         datasource=ssl_datasources.SSLDataSource,
-        trainer=trainer,
+        trainer=fedema_trainer.Trainer,
         callbacks=[
             fedema_callback.FedEMACallback,
         ],
     )
     server = fedema_server.Server(
         model=fedema_model.BYOLModel,
-        trainer=trainer,
+        trainer=fedema_trainer.Trainer,
         algorithm=fedema_algorithm.Algorithm,
     )
 

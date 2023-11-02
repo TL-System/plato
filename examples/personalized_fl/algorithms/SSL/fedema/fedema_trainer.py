@@ -5,9 +5,8 @@ Implementation of the trainer for FedEMA.
 from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
 
-from plato.trainers import loss_criterion
 from pflbases import ssl_trainer
-
+from plato.trainers import loss_criterion
 from plato.config import Config
 
 
@@ -44,7 +43,11 @@ class Trainer(ssl_trainer.Trainer):
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
-        """Operations before starting one iteration."""
+        """
+        At the start of every iteration,
+            update the models for generating momentum
+            with new momemtum parameter: momentum value.
+        """
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
             update_momentum(

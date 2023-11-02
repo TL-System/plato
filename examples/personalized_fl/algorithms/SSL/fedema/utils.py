@@ -1,7 +1,8 @@
 """
-Tools to compute the model statistic.
+Tools used in algorithm FedEMA
 """
 from collections import OrderedDict
+import torch
 
 
 def extract_encoder(model_layers, encoder_layer_names):
@@ -18,22 +19,13 @@ def extract_encoder(model_layers, encoder_layer_names):
     )
 
 
-def get_model_statistic(model_parameters):
-    """Getting the model statistic."""
+def get_parameters_diff(parameter_a: OrderedDict, parameter_b: OrderedDict):
+    """Get the difference between two sets of parameters"""
+    # Compute the divergence between encoders of local and global models
+    l2_distance = 0.0
+    for paraml, paramg in zip(parameter_a.items(), parameter_b.items()):
+        diff = paraml[1] - paramg[1]
+        # Calculate L2 norm and add to the total
+        l2_distance += torch.sum(diff**2)
 
-    parameters_statistic = {}
-    for name, parameters in model_parameters.items():
-        parameters_statistic[name] = {
-            "mean": parameters.mean(),
-            "std": parameters.std(),
-            "max": parameters.max(),
-            "min": parameters.min(),
-        }
-    model_statistic = {"mean": 0.0, "std": 0.0, "max": 0.0, "min": 0.0}
-    for name, value in parameters_statistic.items():
-        model_statistic["mean"] += value["mean"]
-        model_statistic["std"] += value["std"]
-        model_statistic["max"] += value["max"]
-        model_statistic["min"] += value["min"]
-
-    return model_statistic
+    return l2_distance.sqrt()
