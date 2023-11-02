@@ -18,17 +18,6 @@ from plato.config import Config
 class Trainer(ssl_trainer.Trainer):
     """A trainer for the Calibre method."""
 
-    def __init__(self, model=None, callbacks=None):
-        """Initializing the trainer with the provided model."""
-        super().__init__(model=model, callbacks=callbacks)
-
-        self.samples_encoding = None
-        self.samples_label = None
-
-        self.clusters_divergence = None
-        self.clusters_center = None
-        self.divergence_rate = None
-
     def get_ssl_criterion(self):
         """A wrapper to connect ssl loss with plato."""
 
@@ -77,23 +66,19 @@ class Trainer(ssl_trainer.Trainer):
 
         return compute_plato_loss
 
-    def compute_divergence_rate(self):
+    def compute_divergence_rate(self, encodings):
         """Compute the divergence rate of the local model"""
-        cluster_ids_x, self.clusters_center = kmeans_clustering(
-            self.samples_encoding, n_clusters=10
-        )
+        cluster_ids_x, cluster_centers = kmeans_clustering(encodings, n_clusters=10)
         clusters_id = torch.unique(cluster_ids_x, return_counts=False)
-        self.clusters_divergence = torch.zeros(
-            size=(len(clusters_id),), device=self.device
-        )
+        clusters_divergence = torch.zeros(size=(len(clusters_id),), device=self.device)
         for cluster_id in clusters_id:
-            cluster_center = self.clusters_center[cluster_id]
-            cluster_elems = self.samples_encoding[cluster_ids_x == cluster_id]
+            cluster_center = cluster_centers[cluster_id]
+            cluster_elems = encodings[cluster_ids_x == cluster_id]
             distance = torch.norm(cluster_elems - cluster_center, dim=1)
             divergence = torch.mean(distance)
-            self.clusters_divergence[cluster_id] = divergence
+            clusters_divergence[cluster_id] = divergence
 
-        self.divergence_rate = torch.mean(self.clusters_divergence)
+        return torch.mean(clusters_divergence)
 
     def get_optimizer(self, model):
         """Getting the optimizer"""
@@ -118,27 +103,24 @@ class Trainer(ssl_trainer.Trainer):
 
         logging.info("[Client #%d] Computing the divergence rate.", self.client_id)
 
+        sample_encodings = None
+
         with torch.no_grad():
-            for _, (examples, labels) in enumerate(personalized_train_loader):
+            for _, (examples, _) in enumerate(personalized_train_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
                 features = self.model.encoder(examples)
 
-                self.samples_encoding = (
+                sample_encodings = (
                     features
-                    if self.samples_encoding is None
-                    else torch.cat((self.samples_encoding, features), dim=0)
-                )
-                self.samples_label = (
-                    labels
-                    if self.samples_label is None
-                    else torch.cat((self.samples_label, labels), dim=0)
+                    if sample_encodings is None
+                    else torch.cat((sample_encodings, features), dim=0)
                 )
 
-        self.compute_divergence_rate()
+        divergence_rate = self.compute_divergence_rate(sample_encodings)
 
         # Save the divergence
         model_path = Config().params["model_path"]
         filename = f"client_{self.client_id}_divergence_rate.pth"
         save_path = os.path.join(model_path, filename)
 
-        torch.save(self.divergence_rate.detach().cpu(), save_path)
+        torch.save(divergence_rate.detach().cpu(), save_path)
