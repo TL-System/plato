@@ -415,6 +415,65 @@ python ./examples/fedtp/fedtp.py -c ./examples/fedtp/FedTP_CIFAR10_ViT_NonIID03_
 Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo;
 ````
 
+````{admonition} **HeteroFL**
+HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
+
+```shell
+python examples/heterofl/heterofl.py -c examples/heterofl/heterofl_resnet18_dynamic.yml
+```
+
+```{note}
+Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
+&rdquo; in International Conference on Learning Representations (ICLR), 2021.
+````
+
+````{admonition} **FedRolex**
+FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
+```
+
+```{note}
+Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
+&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
+```
+````
+
+````{admonition} **FjORD**
+FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
+
+```shell
+python3 examples/fjord/fjord.py -c examples/fjord/fjord_resnet18_dynamic.yml
+```
+
+```{note}
+Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
+&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2021.
+```
+````
+
+````{admonition} **AnyCostFL**
+AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
+```
+
+```{note}
+Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
+&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
+````{admonition} **SysHeteroFL**
+In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
+
+```shell
+python3 ./examples/sysheterofl/sysheterofl.py -c examples/sysheterofl/config_ResNet152.yml
+```
+````
+
 #### Algorithms Not Yet Categorized
 
 
@@ -481,66 +540,6 @@ FedSaw is proposed to improve training performance in three-layer federated lear
 python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
 ```
 ````
-
-````{admonition} **SysHeteroFL**
-In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
-
-```shell
-python3 ./examples/sysheterofl/sysheterofl.py -c examples/sysheterofl/config_ResNet152.yml
-```
-````
-
-````{admonition} **HeteroFL**
-HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
-
-```shell
-python examples/heterofl/heterofl.py -c examples/heterofl/heterofl_resnet18_dynamic.yml
-```
-
-```{note}
-Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
-&rdquo; in International Conference on Learning Representations (ICLR), 2021.
-````
-
-````{admonition} **FedRolex**
-FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
-
-```shell
-python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
-```
-
-```{note}
-Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
-&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
-```
-````
-
-````{admonition} **FjORD**
-FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
-
-```shell
-python3 examples/fjord/fjord.py -c examples/fjord/fjord_resnet18_dynamic.yml
-```
-
-```{note}
-Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
-&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2021.
-```
-````
-
-````{admonition} **AnyCostFL**
-AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
-
-```shell
-python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
-```
-
-```{note}
-Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
-&rdquo; in Proc. INFOCOM, 2022.
-```
-````
-
 
 ````{admonition} **FedTI**
 FedTI is to perform textual inversion under federated learning, which we can simply refer
