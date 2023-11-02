@@ -82,7 +82,6 @@ algorithm:
 
         !include ssl_personalization.yml
 
-
 parameters:
     optimizer:
         lr: 0.01
