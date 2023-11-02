@@ -36,13 +36,6 @@ class Trainer(ssl_trainer.Trainer):
             size=self.reset_interval * Config().trainer.batch_size
         )
 
-    def model_forward(self, examples):
-        """Forward the input examples to the model."""
-        outputs = self.model(examples)
-        encoded_samples = outputs[-1]
-        self.memory_bank(encoded_samples, update=True)
-        return outputs[:2]
-
     def train_epoch_start(self, config):
         """Operation before starting one epoch."""
         super().train_epoch_start(config)
