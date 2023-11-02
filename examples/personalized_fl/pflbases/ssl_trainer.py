@@ -222,77 +222,68 @@ class Trainer(basic.Trainer):
 
         return samples_encoding, samples_label
 
-    def test_knn(self, config, testset=None, sampler=None, **kwargs):
-        """Test the personalization in each round.
-
-        For SSL, the way to test the trained model before personalization is
-        to use the KNN as a classifier to evaluate the extracted features.
-        """
-        logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
-        batch_size = config["batch_size"]
-
-        # Get the training loader and test loader
-        train_loader = torch.utils.data.DataLoader(
-            dataset=self.personalized_trainset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler,
-        )
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
-        train_encodings, train_labels = self.collect_encodings(train_loader)
-        test_encodings, test_labels = self.collect_encodings(test_loader)
-
-        # KNN.
-        distances = torch.cdist(test_encodings, train_encodings, p=2)
-        knn = distances.topk(1, largest=False)
-        nearest_idx = knn.indices
-        predicted_labels = train_labels[nearest_idx].view(-1)
-        test_labels = test_labels.view(-1)
-
-        # compute the accuracy
-        num_correct = torch.sum(predicted_labels == test_labels).item()
-        accuracy = num_correct / len(test_labels)
-
-        return accuracy
-
-    def test_personalized_model(self, config, testset=None, sampler=None, **kwargs):
-        """Test the personalized model after the final round."""
-
-        self.personalized_model.eval()
-        self.personalized_model.to(self.device)
-
-        self.model.eval()
-        self.model.to(self.device)
-
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=20, shuffle=False, sampler=sampler
-        )
-
-        correct = 0
-        total = 0
-        accuracy = 0
-        with torch.no_grad():
-            for _, (examples, labels) in enumerate(test_loader):
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                features = self.model.encoder(examples)
-                outputs = self.personalized_model(features)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        accuracy = correct / total
-
-        return accuracy
-
     def test_model(self, config, testset, sampler=None, **kwargs):
         """Testing the model to report the accuracy in each round."""
         if self.current_round > Config().trainer.rounds:
-            return self.test_personalized_model(
-                config, testset, sampler=sampler, **kwargs
+            # Test the personalized model after the final round.
+            self.personalized_model.eval()
+            self.personalized_model.to(self.device)
+
+            self.model.eval()
+            self.model.to(self.device)
+
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=20, shuffle=False, sampler=sampler
             )
+
+            correct = 0
+            total = 0
+            accuracy = 0
+            with torch.no_grad():
+                for _, (examples, labels) in enumerate(test_loader):
+                    examples, labels = examples.to(self.device), labels.to(self.device)
+
+                    features = self.model.encoder(examples)
+                    outputs = self.personalized_model(features)
+
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+
+            accuracy = correct / total
+
+            return accuracy
         else:
-            return self.test_knn(config, testset, sampler=sampler, **kwargs)
+            # Test the personalization in each round.
+
+            # For SSL, the way to test the trained model before personalization is
+            #   to use the KNN as a classifier to evaluate the extracted features.
+
+            logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
+            batch_size = config["batch_size"]
+
+            # Get the training loader and test loader
+            train_loader = torch.utils.data.DataLoader(
+                dataset=self.personalized_trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=sampler,
+            )
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            )
+            train_encodings, train_labels = self.collect_encodings(train_loader)
+            test_encodings, test_labels = self.collect_encodings(test_loader)
+
+            # KNN.
+            distances = torch.cdist(test_encodings, train_encodings, p=2)
+            knn = distances.topk(1, largest=False)
+            nearest_idx = knn.indices
+            predicted_labels = train_labels[nearest_idx].view(-1)
+            test_labels = test_labels.view(-1)
+
+            # compute the accuracy
+            num_correct = torch.sum(predicted_labels == test_labels).item()
+            accuracy = num_correct / len(test_labels)
+
+            return accuracy
