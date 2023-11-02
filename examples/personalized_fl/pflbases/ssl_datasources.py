@@ -69,7 +69,7 @@ class SSLDataSource(base.DataSource):
         self.testset = self.datasource.testset
 
     def num_train_examples(self):
-        return self.datasource.num_train_examples()
+        return len(self.trainset)
 
     def num_test_examples(self):
-        return self.datasource.num_test_examples()
+        return len(self.testset)
