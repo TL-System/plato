@@ -10,29 +10,6 @@ python examples/catalyst/catalyst_example.py -c examples/catalyst/catalyst_fedav
 ```
 ````
 
-````{admonition} **FedProx**
-To better handle system heterogeneity, the FedProx algorithm introduced a proximal term in the optimizer used by local training on the clients. It has been quite widely cited and compared with in the federated learning literature.
-
-```shell
-python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
-```
-
-```{note}
-T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; Proceedings of Machine Learning and Systems (MLSys), 2020.
-```
-````
-
-````{admonition} **FedDyn**
-FedDyn is proposed to provide communication savings by dynamically updating each participating device's regularizer in each round of training. It is a method proposed to solve data heterogeneity in federated learning.
-```shell
-python examples/feddyn/feddyn.py -c examples/feddyn/feddyn_MNIST_lenet5.yml
-```
-
-```{note}
-Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations, 2021.
-```
-````
-
 ````{admonition} **FedAsync**
 FedAsync is one of the first algorithms proposed in the literature towards operating federated learning training sessions in *asynchronous* mode, which Plato supports natively. It advocated aggregating aggressively whenever only *one* client reported its local updates to the server.
 
@@ -60,6 +37,7 @@ J. Goetz, K. Malik, D. Bui, S. Moon, H. Liu, A. Kumar. &ldquo;[Active Federated 
 ```
 ````
 
+## Server Aggregation Algorithms
 
 ````{admonition} **FedAtt**
 FedAtt is a server aggregation algorithm, where client updates were aggregated using a layer-wise attention-based mechanism that considered the similarity between the server and client models.  The objective was to improve the accuracy or perplexity of the trained model with the same number of communication rounds. In its implementation in `examples/fedatt/fedatt_algorithm.py`, the PyTorch implementation of FedAtt overrides `aggregate_weights()` to implement FedAtt as a custom server aggregation algorithm.
@@ -73,7 +51,6 @@ S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. &ldquo;[Learning Private Neur
 ```
 ````
 
-
 ````{admonition} **FedAdp**
 FedAdp is another server aggregation algorithm, which exploited the implicit connection between data distribution on a client and the contribution from that client to the global model, measured at the server by inferring gradient information of participating clients. In its implementation in `examples/fedadp/fedadp_server.py`, a framework-agnostic implementation of FedAdp overrides `aggregate_deltas()` to implement FedAdp as a custom server aggregation algorithm.
 
@@ -85,6 +62,8 @@ python examples/fedadp/fedadp.py -c examples/fedadp/fedadp_FashionMNIST_lenet5.y
 H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Transactions on Cognitive Communications and Networking (TCCN 2021).
 ```
 ````
+
+## Federated Unlearning
 
 ````{admonition} **Federated Unlearning**
 Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/fedunlearning/fedunlearning_server.py` and `examples/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
@@ -100,6 +79,8 @@ Liu et al., &ldquo;[The Right to be Forgotten in Federated Learning: An Efficien
 ```
 ````
 
+## Gradient Leakage Attacks and Defences
+
 ````{admonition} **Gradient leakage attacks and defenses**
 Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/dlg/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations.
 
@@ -107,6 +88,8 @@ Gradient leakage attacks and their defenses have been extensively studied in the
 python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
 ```
 ````
+
+## Algorithms with Customized Client Training Loops
 
 ````{admonition} **SCAFFOLD**
 SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
@@ -120,6 +103,32 @@ Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federa
 ```
 ````
 
+
+````{admonition} **FedProx**
+To better handle system heterogeneity, the FedProx algorithm introduced a proximal term in the optimizer used by local training on the clients. It has been quite widely cited and compared with in the federated learning literature.
+
+```shell
+python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
+```
+
+```{note}
+T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; Proceedings of Machine Learning and Systems (MLSys), 2020.
+```
+````
+
+````{admonition} **FedDyn**
+FedDyn is proposed to provide communication savings by dynamically updating each participating device's regularizer in each round of training. It is a method proposed to solve data heterogeneity in federated learning.
+```shell
+python examples/feddyn/feddyn.py -c examples/feddyn/feddyn_MNIST_lenet5.yml
+```
+
+```{note}
+Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations, 2021.
+```
+````
+
+## Client Selection Algorithms
+
 ````{admonition} **Pisces**
 Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, a client running the Pisces algorithm calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for the next communication round. The algorithm also attempts to detect outliers via DBSCAN for better robustness.
 
@@ -132,6 +141,20 @@ Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchrono
 &rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
 ```
 ````
+
+````{admonition} **Oort**
+Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
+
+```shell
+python examples/oort/oort.py -c examples/oort/oort_MNIST_lenet5.yml
+```
+
+```{note}
+Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
+```
+````
+
+## Split Learning Algorithms
 
 ````{admonition} **Split Learning**
 Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In split learning, each training iteration is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. Unlike federated learning, split learning clients sequentially interact with the server, and the global model is synchronized implicitly through the model on the server side, which is shared and updated by all clients.
@@ -156,40 +179,12 @@ Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://
 ```
 ````
 
-````{admonition} **Oort**
-Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
-
-```shell
-python examples/oort/oort.py -c examples/oort/oort_MNIST_lenet5.yml
-```
-
-```{note}
-Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
-```
-````
 
 ````{admonition} **MaskCrypt**
 MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
 
 ```shell
 python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_lenet5.yml
-```
-````
-
-````{admonition} **Hermes**
-Hermes utilizes structured pruning to improve both communication efficiency and inference efficiency of federated learning. It prunes channels with the lowest magnitudes in each local model and adjusts the pruning amount based on each local model’s test accuracy and its previous pruning amount. When the server aggregates pruned updates, it only averages parameters that were not pruned on all clients.
-
-
-Hermes belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
-
-```shell
-python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```{note}
-Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients](https://sites.duke.edu/angli/files/2021/10/2021_Mobicom_Hermes_v1.pdf),
-&rdquo; in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
 ```
 ````
 
@@ -278,8 +273,9 @@ DARTS search space
 ```
 python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
 ```
-
 ````
+
+## Personalized Federated Learning Algorithms
 
 ````{admonition} **FedRep**
 FedRep is an algorithm for learning a shared data representation across clients and unique, personalized local ``heads'' for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
@@ -312,7 +308,6 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 &rdquo; in International Conference on Learning Representations (ICLR), 2022.
 ```
 ````
-
 
 ````{admonition} **APFL**
 APFL is a synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by interpolating between local and personalized models. It has been quite widely cited and compared with in the personalized federated learning literature. In this example, once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
@@ -359,7 +354,6 @@ Paul Pu Liang, et al., &ldquo;[Think Locally, Act Globally: Federated Learning w
 ```
 ````
 
-
 ````{admonition} **Ditto**
 Ditto is another synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by learning local models that are encouraged to be close together by global regularization. In this example, once the global model is received, each client will carry out a regular local update followed by a Ditto solver to optimize the personalized model. 
 
@@ -393,6 +387,25 @@ A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/20
 ```
 ````
 
+````{admonition} **Hermes**
+Hermes utilizes structured pruning to improve both communication efficiency and inference efficiency of federated learning. It prunes channels with the lowest magnitudes in each local model and adjusts the pruning amount based on each local model’s test accuracy and its previous pruning amount. When the server aggregates pruned updates, it only averages parameters that were not pruned on all clients.
+
+
+Hermes belongs to personalized federated learning.
+Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+
+```shell
+python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```{note}
+Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients](https://sites.duke.edu/angli/files/2021/10/2021_Mobicom_Hermes_v1.pdf),
+&rdquo; in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
+```
+````
+
+## Personalized Federated Learning Algorithms based on Self-Supervised Learning
+
 ````{admonition} **pFLSSL**
 pFLSSL achieves Personalized federated learning by introducing self-supervised learning (SSL) to the training schema. Specifically, there are two stages. In this first stage, one global model is trained based on SSL under the federated training paradigm. Each client, in the second stage, trains its personalized model based on the extracted features of the received global model. Therefore, due to the diversity of SSL approaches, pFLSSL includes:
 - SimCLR [1]
@@ -402,34 +415,34 @@ pFLSSL achieves Personalized federated learning by introducing self-supervised l
 - SwAV [5]
 - SMoG [6]
 
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+Please read `examples/ssl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/SSL/simclr/simclr.py -c algorithms/SSL/simclr/simclr_MNIST_lenet5_noniid.yml -b pflExperiments
+python algorithms/simclr/simclr.py -c configs/simclr/simclr_MNIST_lenet5_noniid.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/SSL/simclr/simclr.py -c algorithms/SSL/simclr/simclr_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python algorithms/simclr/simclr.py -c configs/simclr/simclr_CIFAR10_resnet18_noniid.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/SSL/byol/byol.py -c algorithms/SSL/byol/byol_MNIST_lenet5_noniid.yml -b pflExperiments
+python algorithms/byol/byol.py -c configs/byol/byol_MNIST_lenet5_noniid.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/SSL/simsiam/simsiam.py -c algorithms/SSL/simsiam/simsiam_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python algorithms/simsiam/simsiam.py -c configs/simsiam/simsiam_CIFAR10_resnet18_noniid.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/SSL/moco/mocov2.py -c algorithms/SSL/moco/mocov2_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python algorithms/moco/mocov2.py -c configs/moco/mocov2_CIFAR10_resnet18_noniid.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/SSL/swav/swav.py -c algorithms/SSL/swav/swav_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python algorithms/swav/swav.py -c configs/swav/swav_CIFAR10_resnet18_noniid.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/SSL/smog/smog.py -c algorithms/SSL/smog/smog_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python algorithms/smog/smog.py -c configs/smog/smog_CIFAR10_resnet18_noniid.yml -b pflExperiments
 ```
 
 ```{note}
