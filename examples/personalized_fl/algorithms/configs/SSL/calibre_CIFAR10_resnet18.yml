@@ -61,11 +61,6 @@ algorithm:
             parameters:
                 input_size: 32
 
-    global_layer_names:
-        - encoder
-
-    completion_layer_names:
-        - projector
 
     auxiliary_loss_criterions:
         - prototype_regularizers
