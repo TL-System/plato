@@ -54,7 +54,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg_partial
+    type: fedavg_personalized
         
     target_class: clematis
     what_to_teach: object

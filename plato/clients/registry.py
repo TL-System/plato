@@ -7,11 +7,12 @@ on a configuration at run-time.
 import logging
 
 from plato.config import Config
-from plato.clients import simple, mistnet, split_learning
+from plato.clients import simple, mistnet, fedavg_personalized, split_learning
 
 registered_clients = {
     "simple": simple.Client,
     "mistnet": mistnet.Client,
+    "fedavg_personalized": fedavg_personalized.Client,
     "split_learning": split_learning.Client,
 }
 

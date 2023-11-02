@@ -32,6 +32,8 @@ The type of the server.
 - `mistnet` a client following the MistNet algorithm.
 
 - `split_learning` a client following the Split Learning algorithm. When this client is used, `clients.do_test` in configuration should be set as `False` because in split learning, we conduct the test on the server.
+
+- `fedavg_personalized` a client saves its local layers before sending the shared global model to the server after local training.
 ```
 
 ```{admonition} **total_clients**
@@ -130,7 +132,7 @@ A list of processors for the client to apply on the payload before sending it ou
 
 - `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
-- `model_encrypt` Encrypts the model parameters using homomorphic encyrption.
+- `model_encrypt` Encrypts the model parameters using homomorphic encryption.
 ```
 
 ```{admonition} inbound_processors
@@ -138,7 +140,7 @@ A list of processors for the client to apply on the payload before receiving it 
 
 - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the server side.
 
-- `model_decrypt` Decrypts the model parameters using homomorphic encyrption.
+- `model_decrypt` Decrypts the model parameters using homomorphic encryption.
 
 ```
 
@@ -165,6 +167,9 @@ The type of the server.
 - `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
 
 - `split_learning` a Split Learning server that supports training different kinds of models in split learning framework. When this server is used, the `clients.per_round` in the configuration should be set to 1. Users should define the rules for updating models weights before cut from the clients to the server in the callback function `on_update_weights_before_cut`, depending on the specific model they use.
+
+- `fedavg_personalized` a personalized federated learning server that starts from a number of regular
+rounds of federated learning. In these regular rounds, only a subset of the total clients can be selected to perform the local update (the ratio of which is a configuration setting). After all regular rounds are completed, it starts a final round of personalization, where a selected subset of clients perform local training using their local dataset.
 ```
 
 ```{admonition} **address**
@@ -228,7 +233,7 @@ Whether the server tests the global model and computes the global accuracy or pe
 ```
 
 ```{admonition} model_path
-The path to the pretrained and trained models. The deafult path is `<base_path>/models/pretrained`, where `<base_path>` is specified in the `general` section.
+The path to the pretrained and trained models. The default path is `<base_path>/models/pretrained`, where `<base_path>` is specified in the `general` section.
 ```
 
 ```{admonition} checkpoint_path
@@ -343,7 +348,7 @@ How to divide the entire dataset to the clients. The following options are avail
 If the sampler is `noniid`, the concentration parameter for the Dirichlet distribution can be specified. The default value is `1`.
 ```
 
-- `orthogonal`: Each insitution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes
+- `orthogonal`: Each institution's clients have data of different classes. Could have *institution_class_ids* and *label_distribution* attributes
 
 ```{admonition} institution_class_ids
 If the sampler is `orthogonal`, the indices of classes of local data of each institution's clients can be specified. e.g., `0, 1; 2, 3` (the first institution's clients only have data of class #0 and #1; the second institution's clients only have data of class #2 and #3).
@@ -431,7 +436,7 @@ The target perplexity of the global Natural Language Processing (NLP) model.
 ```
 
 ```{admonition} **epochs**
-The total number of epoches in local training in each communication round.
+The total number of epochs in local training in each communication round.
 ```
 
 ```{admonition} **batch_size**
@@ -502,6 +507,9 @@ The loss criterion. The following options are supported:
 - `MarginRankingLoss`
 - `TripletMarginLoss`
 - `KLDivLoss`
+- `NegativeCosineSimilarity`
+- `NTXentLoss`
+- `SwaVLoss`
 
 ```
 
@@ -514,7 +522,7 @@ If `true`, the learning rate of the first epoch in the next communication round 
 The repository where the machine learning model should be retrieved from. The following options are available:
 
 - `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
-- `general_multilayer` (for generateing a multi-layer perceptron using a provided configuration)
+- `general_multilayer` (for generating a multi-layer perceptron using a provided configuration)
 - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
 - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
 - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
@@ -558,6 +566,7 @@ The input should be:
 - `fedavg`:  the federated averaging algorithm
 - `mistnet`: the MistNet algorithm
 - `split_learning`: the Split Learning algorithm
+- `fedavg_personalized`: the personalized federated learning algorithm
 ```
 
 ````{admonition} cross_silo
@@ -572,6 +581,22 @@ The number of local aggregation rounds on edge servers before sending aggregated
 ```
 ````
 
+```{admonition} **local_rounds**
+The number of local aggregation rounds on edge servers before sending aggregated weights to the central server. The input could be any positive integer.
+```
+````
+
+````{admonition} fedavg_personalized
+Whether or not the personalized training should be used. 
+
+```{admonition} **local_layer_names**
+Local layers in a model should remain local at the clients during personalized FL training, and should not be aggregated at the server.
+
+```
+```{admonition} **participating_clients_ratio**
+A float to show the proportion of clients participating in the federated training process.  It is under `personalization`, which is a sub-config path that contains other personalized training parameters. Default: 1.0
+```
+````
 
 ## results
 

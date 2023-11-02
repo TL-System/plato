@@ -1,0 +1,19 @@
+    # The training and testing dataset
+    datasource: CIFAR10
+    personalized_datasource: CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 1024
+
+    # IID or non-IID?
+    sampler: noniid
+    testset_sampler: noniid
+
+    # personalized_sampler: noniid
+    # personalized_testset_sampler: noniid
+
+    # The concentration parameter for the Dirichlet distribution
+    concentration: 1
+
+    # The random seed for sampling data
+    random_seed: 1

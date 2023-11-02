@@ -1,0 +1,62 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 10
+
+    # The number of clients selected in each round
+    per_round: 2
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+
+    random_seed: 1
+
+server:
+    address: 127.0.0.1
+    port: 8009
+    do_test: false
+    random_seed: 1
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
+
+data:
+    # CIFAR-10 non-iid distribution
+    !include cifar10_noniid.yml
+
+trainer:
+     # ResNet-18 model with the basic trainer
+    !include basic_resnet18.yml
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg_personalized
+
+    global_layer_names:
+        - conv1
+        - bn1
+        - layer1
+        - layer2
+        - layer3
+        - layer4
+        
+    local_layer_names:
+        - linear
+        
+    personalization:
+
+        # the ratio of clients participanting in training
+        participating_client_ratio: 1.0
+        
+
+parameters:
+    # ResNet-18 training params
+    !include resnet18_params.yml
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, accuracy_std, elapsed_time, round_time, comm_overhead
+    result_path: results/fedper
+
