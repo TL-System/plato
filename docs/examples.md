@@ -123,7 +123,7 @@ FedTI is to perform textual inversion under federated learning, which we can sim
 to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
 
 ```shell
-python examples/fedti/fedti.py -c examples/fedti/StableDiffusionFed_iid_50.yml -b FedTI
+python examples/customized_client_training/fedti/fedti.py -c examples/customized_client_training/fedti/StableDiffusionFed_iid_50.yml -b FedTI
 ```
 ```{note}
 Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
