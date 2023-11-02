@@ -21,7 +21,7 @@ def make_init_mask(model):
     :return mask: a list of pruning masks
     """
     mask = []
-    for __, layer in model.named_layers():
+    for __, layer in model.named_parameters():
         if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
             tensor = layer.weight.detach().cpu().numpy()
             mask.append(np.ones_like(tensor))
@@ -70,7 +70,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     mask = []
 
     if adjust_rate == 0:
-        for __, layer in model.named_layers():
+        for __, layer in model.named_parameters():
             if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
                 pruning_rates.append(pruning_rate)
     else:
@@ -82,7 +82,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
             total_params += param.numel()
         total_prune = floor(pruning_rate * total_params)
 
-        for layer in model.layers():
+        for layer in model.modules():
             if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
                 weight_nums.append(layer.weight.numel())
                 pruning_rates.append(0)
@@ -97,7 +97,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
         step = 0
 
     step = 0
-    for __, layer in model.named_layers():
+    for __, layer in model.named_parameters():
         if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
             amount = pruning_rates[step]
             prune.ln_structured(layer, "weight", amount, norm, dim)
@@ -114,7 +114,7 @@ def remove(model):
     """
     Removes the original unpruned weight tensors in the model
     """
-    for __, layer in model.named_layers():
+    for __, layer in model.named_parameters():
         if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
             prune.remove(layer, "weight")
 
@@ -122,16 +122,15 @@ def remove(model):
 def apply_mask(model, mask, device):
     """Applies the mask onto the model."""
 
-    masked_model = copy.deepcopy(model).to(device)
     if not torch.is_tensor(mask[0]):
         for step, __ in enumerate(mask):
             mask[step] = torch.from_numpy(mask[step])
 
     step = 0
-    for layer in masked_model.layers():
+    for layer in model.modules():
         if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
             device = layer.weight.device
             prune.custom_from_mask(layer, "weight", mask[step].to(device))
             step += 1
 
-    return masked_model
+    return model

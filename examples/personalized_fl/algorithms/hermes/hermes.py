@@ -23,10 +23,7 @@ def main():
         algorithm=fedavg_partial.Algorithm,
         callbacks=[HermesCallback],
     )
-    server = hermes_server.Server(
-        trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-    )
+    server = hermes_server.Server(trainer=trainer)
 
     server.run(client)
 
