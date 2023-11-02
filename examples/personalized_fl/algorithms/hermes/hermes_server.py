@@ -7,10 +7,10 @@ import torch
 
 import hermes_pruning as pruning
 
-from pflbases import fedavg_personalized
+from plato.servers import fedavg_personalized as personalized_server
 
 
-class Server(fedavg_personalized.Server):
+class Server(personalized_server.Server):
     """A federated learning server using the Hermes algorithm."""
 
     def __init__(
