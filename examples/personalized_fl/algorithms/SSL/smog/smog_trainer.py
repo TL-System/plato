@@ -3,14 +3,14 @@ The implemetation of the trainer for SMoG approach.
 """
 import os
 
+from pflbases import ssl_trainer
+
 import torch
 from lightly.loss.memory_bank import MemoryBankModule
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
 from plato.config import Config
-
-from pflbases import ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):
@@ -23,7 +23,6 @@ class Trainer(ssl_trainer.Trainer):
 
         # Set training steps
         self.global_step = 0
-        self.local_step = 0
 
         # Set the memory bank because we
         # reset the group features every 300 iterations
