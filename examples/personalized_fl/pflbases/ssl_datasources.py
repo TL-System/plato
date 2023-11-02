@@ -2,9 +2,8 @@
 A self-supervised learning dataset working as a wrapper to add the SSL data 
 transform to the datasource of Plato.
 
-To set SSL transform to use and parameters, 
-one should place the 'data_transforms' sub-block under the 'algorithm'
-block in the config file. 
+To allow SSL transform to use the desired parameters, one should place the 
+'data_transforms' sub-block under the 'algorithm' block in the config file. 
 """
 from lightly import transforms
 
