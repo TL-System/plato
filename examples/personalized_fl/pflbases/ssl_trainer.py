@@ -3,19 +3,19 @@ A base trainer to perform training and testing loops for self-supervised learnin
 """
 
 import logging
-from warnings import warn
 from collections import UserList
 
 import torch
 from lightly.data.multi_view_collate import MultiViewCollate
 
-from plato.trainers import loss_criterion
 from plato.config import Config
 from plato.trainers import basic
+from plato.models import registry as models_registry
+from plato.trainers import optimizers, lr_schedulers, loss_criterion
 
 
-class ExamplesList(UserList):
-    """The list containing multiple examples."""
+class SSLSamples(UserList):
+    """A SSL sample."""
 
     def to(self, device):
         """Assign the tensor item into the specific device."""
@@ -36,11 +36,8 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
     def __call__(self, batch):
         """Turns a batch of tuples into single tuple."""
-        if len(batch) == 0:
-            warn("MultiViewCollate received empty batch.")
-            return [], [], []
 
-        views = ExamplesList([[] for _ in range(len(batch[0][0]))])
+        views = SSLSamples([[] for _ in range(len(batch[0][0]))])
         labels = []
         fnames = []
         for sample in batch:
@@ -73,53 +70,38 @@ class Trainer(basic.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
 
-        # Dataset for personalization.
+        # Datasets for personalization.
         self.personalized_trainset = None
         self.personalized_testset = None
 
-        # By default, if `personalized_sampler` is not set up, it will
-        # be equal to the `sampler`.
-        self.personalized_sampler = None
-        self.personalized_testset_sampler = None
-
-    def set_personalized_trainset(self, dataset, sampler):
-        """set the trainset."""
-        self.personalized_trainset = dataset
-        self.personalized_sampler = sampler
-
-    def set_personalized_testset(self, dataset, sampler):
-        """set the testset."""
-        self.personalized_testset = dataset
-        self.personalized_testset_sampler = sampler
-
-    def get_personalized_model_params(self):
-        """Getting parameters of the personalized model."""
-        # one must set the parameters for the personalized model
-        pers_model_params = Config().parameters.personalization.model._asdict()
-        pers_model_params["input_dim"] = self.model.encoding_dim
-        pers_model_params["output_dim"] = pers_model_params["num_classes"]
-        return pers_model_params
-
-    def get_personalized_train_loader(
-        self, batch_size, trainset=None, sampler=None, **kwargs
-    ):
-        """Obtain the trainset data loader for the personalization."""
-        trainset = self.personalized_trainset
-        sampler = self.personalized_sampler.get()
-
-        return torch.utils.data.DataLoader(
-            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+        # Define the personalized model
+        model_type = Config().algorithm.personalization.model_type
+        model_params = Config().parameters.personalization.model._asdict()
+        model_params["input_dim"] = self.model.encoding_dim
+        model_params["output_dim"] = model_params["num_classes"]
+        self.personalized_model = models_registry.get(
+            model_name=Config().algorithm.personalization.model_name,
+            model_type=model_type,
+            model_params=model_params,
         )
+
+    def set_personalized_datasets(self, trainset, testset):
+        """Set the trainset."""
+        self.personalized_trainset = trainset
+        self.personalized_testset = testset
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
+        # Get the training loader for the personalization
         if self.current_round > Config().trainer.rounds:
-            return self.get_personalized_train_loader(
-                batch_size, trainset, sampler, **kwargs
+            return torch.utils.data.DataLoader(
+                dataset=self.personalized_trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=sampler,
             )
         else:
             collate_fn = MultiViewCollateWrapper()
-
             return torch.utils.data.DataLoader(
                 dataset=trainset,
                 shuffle=False,
@@ -128,41 +110,57 @@ class Trainer(basic.Trainer):
                 collate_fn=collate_fn,
             )
 
-    # pylint: disable=unused-argument
-    def get_personalized_test_loader(
-        self, batch_size, testset=None, sampler=None, **kwargs
-    ):
-        """Getting one test loader for the personalized."""
-
-        return torch.utils.data.DataLoader(
-            dataset=self.personalized_testset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler,
+    def get_optimizer(self, model):
+        """Returns the optimizer for SSL and personalization."""
+        if self.current_round <= Config().trainer.rounds:
+            return super().get_optimizer(model)
+        # Define the optimizer for the personalized model
+        optimizer_name = Config().algorithm.personalization.optimizer
+        optimizer_params = Config().parameters.personalization.optimizer._asdict()
+        return optimizers.get(
+            self.personalized_model,
+            optimizer_name=optimizer_name,
+            optimizer_params=optimizer_params,
         )
 
-    def plato_ssl_loss_wrapper(self):
-        """A wrapper to connect ssl loss with plato."""
-        defined_ssl_loss = loss_criterion.get()
+    def get_loss_criterion(self):
+        """Returns the loss criterion for the SSL."""
+        # Get loss criterion for the personalization
+        if self.current_round > Config().trainer.rounds:
+            loss_criterion_type = Config().algorithm.personalization.loss_criterion
+            loss_criterion_params = (
+                Config().parameters.personalization.loss_criterion._asdict()
+            )
+            return loss_criterion.get(
+                loss_criterion=loss_criterion_type,
+                loss_criterion_params=loss_criterion_params,
+            )
+
+        # Get loss criterion for the SSL
+        ssl_loss_function = loss_criterion.get()
 
         def compute_plato_loss(outputs, labels):
             if isinstance(outputs, (list, tuple)):
-                return defined_ssl_loss(*outputs)
+                return ssl_loss_function(*outputs)
             else:
-                return defined_ssl_loss(outputs)
+                return ssl_loss_function(outputs)
 
         return compute_plato_loss
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
+    def get_lr_scheduler(self, config, optimizer):
+        # Get the lr scheduler for the personalization
         if self.current_round > Config().trainer.rounds:
-            return self.plato_ssl_loss_wrapper()
+            lr_scheduler = Config().algorithm.personalization.lr_scheduler
+            lr_params = Config().parameters.personalization.learning_rate._asdict()
 
-        logging.info(
-            "[Client #%d] Using the personalized loss_criterion.", self.client_id
-        )
-
-        return self.get_personalized_loss_criterion()
+            return lr_schedulers.get(
+                optimizer,
+                len(self.train_loader),
+                lr_scheduler=lr_scheduler,
+                lr_params=lr_params,
+            )
+        # Get the lr scheduler for the SSL
+        return super().get_lr_scheduler(config, optimizer)
 
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
@@ -176,7 +174,40 @@ class Trainer(basic.Trainer):
         # Perfrom the training and compute the loss
         return self.personalized_model(features)
 
-    def collect_data_encodings(self, data_loader):
+    def train_run_start(self, config):
+        """Set the config before training."""
+        if self.current_round > Config().trainer.rounds:
+            config["batch_size"] = Config().algorithm.personalization.batch_size
+            config["epochs"] = Config().algorithm.personalization.epochs
+
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform forward and backward passes in the training loop."""
+
+        if not self.current_round > Config().trainer.rounds:
+            return super().perform_forward_and_backward_passes(config, examples, labels)
+
+        # Perform the local update on self.personalized_model
+        self.optimizer.zero_grad()
+        # Extract representation from the trained
+        # frozen encoder of ssl.
+        # No optimization is reuqired by this encoder.
+        with torch.no_grad():
+            features = self.model.encoder(examples)
+        outputs = self.personalized_model(features)
+
+        loss = self._loss_criterion(outputs, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
+
+    def collect_encodings(self, data_loader):
         """Collecting the encodings of the data."""
         samples_encoding = None
         samples_label = None
@@ -197,7 +228,7 @@ class Trainer(basic.Trainer):
 
         return samples_encoding, samples_label
 
-    def test_round_personalization(self, config, testset=None, sampler=None, **kwargs):
+    def test_knn(self, config, testset=None, sampler=None, **kwargs):
         """Test the personalization in each round.
 
         For SSL, the way to test the trained model before personalization is
@@ -206,12 +237,18 @@ class Trainer(basic.Trainer):
         logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
         batch_size = config["batch_size"]
 
-        train_loader = self.get_personalized_train_loader(batch_size=batch_size)
-        test_loader = self.get_personalized_test_loader(
-            batch_size=batch_size, sampler=sampler
+        # Get the training loader and test loader
+        train_loader = torch.utils.data.DataLoader(
+            dataset=self.personalized_trainset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
         )
-        train_encodings, train_labels = self.collect_data_encodings(train_loader)
-        test_encodings, test_labels = self.collect_data_encodings(test_loader)
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+        train_encodings, train_labels = self.collect_encodings(train_loader)
+        test_encodings, test_labels = self.collect_encodings(test_loader)
 
         # KNN.
         distances = torch.cdist(test_encodings, train_encodings, p=2)
@@ -226,14 +263,42 @@ class Trainer(basic.Trainer):
 
         return accuracy
 
+    def test_personalized_model(self, config, testset=None, sampler=None, **kwargs):
+        """Test the personalized model after the final round."""
+
+        self.personalized_model.eval()
+        self.personalized_model.to(self.device)
+
+        self.model.eval()
+        self.model.to(self.device)
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=20, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+        accuracy = 0
+        with torch.no_grad():
+            for _, (examples, labels) in enumerate(test_loader):
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                features = self.model.encoder(examples)
+                outputs = self.personalized_model(features)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+
+        return accuracy
+
     def test_model(self, config, testset, sampler=None, **kwargs):
-        """Testing the model to report the accuracy of the
-        personalized model."""
+        """Testing the model to report the accuracy in each round."""
         if self.current_round > Config().trainer.rounds:
             return self.test_personalized_model(
                 config, testset, sampler=sampler, **kwargs
             )
         else:
-            return self.test_round_personalization(
-                config, testset, sampler=sampler, **kwargs
-            )
+            return self.test_knn(config, testset, sampler=sampler, **kwargs)

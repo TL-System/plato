@@ -1,8 +1,6 @@
 """
 A base datasource for self-supervised learning.
 """
-import logging
-
 from lightly.transforms import *
 
 from plato.datasources import base
@@ -28,13 +26,13 @@ registered_transforms = {
 }
 
 
-def get_transforms(transforms_block: dict):
-    """Obtaining train/test transforms for the corresponding data."""
+def get_transforms():
+    """Obtains train/test transforms for the corresponding data."""
+    transforms_config = Config().algorithm.data_transforms._asdict()
 
     data_transforms = {}
-
-    if "train_transform" in transforms_block:
-        transform_config = transforms_block["train_transform"]._asdict()
+    if "train_transform" in transforms_config:
+        transform_config = transforms_config["train_transform"]._asdict()
         transform_name = transform_config["name"]
         transform_params = transform_config["parameters"]._asdict()
 
@@ -50,24 +48,20 @@ def get_transforms(transforms_block: dict):
         else:
             raise ValueError(f"No such data source: {transform_name}")
 
-        logging.info("Data train transform: %s", transform_config["name"])
         data_transforms.update({"train_transform": dataset_transform})
 
     return data_transforms
 
 
 class SSLDataSource(base.DataSource):
-    """A custom datasource receiving configuration of transform as the
-    input to define the datasource.
-    """
+    """A base datasource to define the DataSource for self-supervised
+    learning."""
 
-    def __init__(self, transforms_block: dict = None):
+    def __init__(self):
         super().__init__()
-        # Use the transform set in the config file.
-        if transforms_block is None:
-            transforms_block = Config().algorithm.data_transforms._asdict()
 
-        data_transforms = get_transforms(transforms_block)
+        # Get the transforms for the data
+        data_transforms = get_transforms()
 
         self.datasource = datasources_registry.get(**data_transforms)
         self.trainset = self.datasource.trainset
