@@ -2,6 +2,7 @@
 Base class for algorithms.
 """
 
+import os
 from abc import ABC, abstractmethod
 
 from plato.trainers.base import Trainer
@@ -21,6 +22,12 @@ class Algorithm(ABC):
         self.trainer = trainer
         self.model = trainer.model
         self.client_id = 0
+
+    def __repr__(self):
+        if self.client_id == 0:
+            return f"Server #{os.getpid()}"
+        else:
+            return f"Client #{self.client_id}"
 
     def set_client_id(self, client_id):
         """Sets the client ID."""

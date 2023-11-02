@@ -1,0 +1,17 @@
+
+# Number of epochs for local training in each communication round
+#   The batch size for the downstream task can be larger as it
+# does not utilize the
+epochs: 5
+batch_size: 32
+optimizer: SGD
+lr_scheduler: StepLR
+loss_criterion: CrossEntropyLoss
+
+model_type: general_multilayer
+model_name: linear_mlp
+
+
+# the ratio of clients participanting in training
+participating_client_ratio: 1.0
+

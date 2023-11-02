@@ -69,11 +69,11 @@ class Trainer(basic.Trainer):
         """
         # As presented in Section 3 of the FedRep paper, the head is optimized
         # for (epochs - 1) while freezing the representation.
-        head_epochs = (
-            config["head_epochs"] if "head_epochs" in config else config["epochs"] - 1
+        local_epochs = (
+            config["local_epochs"] if "local_epochs" in config else config["epochs"] - 1
         )
 
-        if self.current_epoch <= head_epochs:
+        if self.current_epoch <= local_epochs:
             for name, param in self.model.named_parameters():
                 if name in self.representation_param_names:
                     param.requires_grad = False
@@ -81,7 +81,7 @@ class Trainer(basic.Trainer):
                     param.requires_grad = True
 
         # The representation will then be optimized for only one epoch
-        if self.current_epoch > head_epochs:
+        if self.current_epoch > local_epochs:
             for name, param in self.model.named_parameters():
                 if name in self.representation_param_names:
                     param.requires_grad = True
