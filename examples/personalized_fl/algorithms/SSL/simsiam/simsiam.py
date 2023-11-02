@@ -9,7 +9,7 @@ Third-party code: https://github.com/PatrickHua/SimSiam
 """
 
 
-from pflbases import fedavg_personalized_server
+from pflbases import fedavg_personalized
 
 from pflbases import ssl_client
 from pflbases import ssl_datasources
@@ -28,9 +28,7 @@ def main():
         datasource=ssl_datasources.SSLDataSource,
         trainer=trainer,
     )
-    server = fedavg_personalized_server.Server(
-        model=simsiam_model.SimSiam, trainer=trainer
-    )
+    server = fedavg_personalized.Server(model=simsiam_model.SimSiam, trainer=trainer)
 
     server.run(client)
 
