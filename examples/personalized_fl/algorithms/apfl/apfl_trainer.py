@@ -47,10 +47,7 @@ class Trainer(basic.Trainer):
         self.alpha = np.clip(alpha_n.item(), 0.0, 1.0)
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Performing forward and backward passes in the training loop.
-        This implementation refers to:
-        https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
-        """
+        """Performing forward and backward passes in the training loop."""
 
         # Perform the local update on self.model
         super().perform_forward_and_backward_passes(config, examples, labels)
