@@ -55,13 +55,6 @@ def get_prototype_loss(
     # convert to [n_samples, n_proto]
     distances = distances.T
 
-    ## First way of computing the loss
-    # # Calculate logits with softmax
-    # log_p_y = (-distances).log_softmax(dim=1)
-    # return F.nll_loss(log_p_y, query_labels)
-
-    ## First way of computing the loss
-    # convert to [n_samples, n_proto]
     logits = -distances
 
     # Calculate logits with softmax

@@ -15,7 +15,7 @@ from typing import List
 from collections import OrderedDict
 
 import torch
-import torch.nn as nn
+from torch import nn
 from lightly import loss as lightly_loss
 
 from plato.trainers import loss_criterion
@@ -42,67 +42,41 @@ class CalibreLoss(nn.Module):
 
         self.device = device
 
-        self.main_loss = main_loss
-        self.main_loss_params = main_loss_params
+        losses_weight = losses_weight._asdict()
+        self.loss_weights_params = OrderedDict()
+        self.loss_funcs = OrderedDict()
 
-        self.auxiliary_losses = auxiliary_losses
-        self.auxiliary_losses_params = auxiliary_losses_params
+        if auxiliary_losses is None:
+            auxiliary_losses = []
+        if auxiliary_losses_params is None:
+            auxiliary_losses_params = []
+        assert len(auxiliary_losses) == len(auxiliary_losses_params)
 
-        self.losses_weight = losses_weight._asdict()
+        if main_loss not in losses_weight:
+            weight = 1.0
+        else:
+            weight = losses_weight[main_loss]
+        self.loss_weights_params[main_loss] = {
+            "params": main_loss_params,
+            "weight": weight,
+        }
+        for loss in auxiliary_losses:
+            if loss not in losses_weight:
+                self.loss_weights_params[loss] = {
+                    "params": auxiliary_losses_params[loss]._asdict(),
+                    "weight": losses_weight[loss],
+                }
 
-        self.losses = OrderedDict()
-        self.losses_func = OrderedDict()
-        self.set_default()
-        self.set_losses()
-
-        self.define_losses_func()
-
-    def set_default(self):
-        """Setting the default terms."""
-
-        self.auxiliary_losses = (
-            self.auxiliary_losses if self.auxiliary_losses is not None else []
-        )
-        self.auxiliary_losses_params = (
-            self.auxiliary_losses_params
-            if self.auxiliary_losses_params is not None
-            else []
-        )
-        assert len(self.auxiliary_losses) == len(self.auxiliary_losses_params)
-
-        self.losses[self.main_loss] = {"params": {}, "weight": 0.0}
-        if self.main_loss not in self.losses_weight:
-            self.losses_weight[self.main_loss] = 1.0
-
-        for name in self.auxiliary_losses:
-            if name not in self.losses_weight:
-                self.losses_weight[name] = 0.0
-
-            self.losses[name] = {"params": {}, "weight": 0.0}
-
-    def set_losses(self):
-        """Setting the losses and the corresponding parameters."""
-        self.losses[self.main_loss]["params"] = self.main_loss_params
-        self.losses[self.main_loss]["weight"] = self.losses_weight[self.main_loss]
-
-        for loss in self.auxiliary_losses:
-            param = self.auxiliary_losses_params[loss]
-            self.losses[loss]["params"] = param._asdict()
-            self.losses[loss]["weight"] = self.losses_weight[loss]
-
-    def define_losses_func(self):
-        """Define the loss functions."""
-
-        for loss_name in self.losses:
+        for loss_name in self.loss_weights_params:
             if hasattr(self, loss_name):
                 loss_func = getattr(self, loss_name)
             else:
                 loss_func = loss_criterion.get(
                     loss_criterion=loss_name,
-                    loss_criterion_params=self.losses[loss_name]["params"],
+                    loss_criterion_params=self.loss_weights_params[loss_name]["params"],
                 )
 
-            self.losses_func[loss_name] = loss_func
+            self.loss_funcs[loss_name] = loss_func
 
     def prototype_regularizers(self, encodings, projections, **kwargs):
         """Compute the L_p and L_n losses mentioned the paper."""
@@ -184,13 +158,12 @@ class CalibreLoss(nn.Module):
     def forward(self, *args, **kwargs):
         """Forward the loss computaton layer."""
         total_loss = 0.0
-        labels = kwargs.get("labels", None)
         encodings = args[0]
         projections = args[1]
 
-        for loss_name in self.losses:
-            loss_weight = self.losses[loss_name]["weight"]
-            loss_params = self.losses[loss_name]["params"]
+        for loss_name in self.loss_weights_params:
+            loss_weight = self.loss_weights_params[loss_name]["weight"]
+            loss_params = self.loss_weights_params[loss_name]["params"]
 
             if loss_name == "prototype_regularizers":
                 regularizers_loss = self.prototype_regularizers(
@@ -203,7 +176,7 @@ class CalibreLoss(nn.Module):
                 )
                 total_loss += computed_loss
             else:
-                computed_loss = self.losses_func[loss_name](*projections)
+                computed_loss = self.loss_funcs[loss_name](*projections)
 
                 total_loss += loss_weight * computed_loss
 
