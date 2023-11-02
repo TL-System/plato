@@ -1,6 +1,14 @@
 """
-A federated learning server using Calibre,
-thus is divergence-aware.
+A base server for Calibre to perform divergence-aware global aggregation.
+
+After each client clusters local samples based on their encodings, there will be 
+local clusters where each cluster's divergence is computed as the normalized distance 
+between the membership encodings and the centroid. These divergence values updated from 
+clients guide global aggregation on the server side. Intuitively, it rejects the client
+who does not have better (lower divergence) clusters. The main reason is that in the 
+final, each client will perform a classification, making clusters with clear boundaries 
+gain higher accuracy. 
+
 """
 
 import torch
