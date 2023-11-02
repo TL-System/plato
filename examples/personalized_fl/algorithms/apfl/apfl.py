@@ -15,8 +15,8 @@ Third-party code:
 
 import apfl_trainer
 
-from plato import servers
-from plato import clients
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import fedavg_personalized as personalized_client
 
 
 def main():
@@ -24,8 +24,8 @@ def main():
     A personalized federated learning session for APFL approach.
     """
     trainer = apfl_trainer.Trainer
-    client = clients.fedavg_personalized.Client(trainer=trainer)
-    server = servers.fedavg_personalized.Server(trainer=trainer)
+    client = personalized_client.Client(trainer=trainer)
+    server = personalized_server.Server(trainer=trainer)
 
     server.run(client)
 

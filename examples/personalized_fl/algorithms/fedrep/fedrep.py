@@ -11,19 +11,19 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 
-from plato import servers
-from plato import clients
-
 import fedrep_trainer
+
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import fedavg_personalized as personalized_client
 
 
 def main():
     """
-    A personalized federated learning session for FedRep approach.
+    A personalized federated learning session using FedRep.
     """
     trainer = fedrep_trainer.Trainer
-    client = clients.fedavg_personalized.Client(trainer=trainer)
-    server = servers.fedavg_personalized.Server(trainer=trainer)
+    client = personalized_client.Client(trainer=trainer)
+    server = personalized_server.Server(trainer=trainer)
 
     server.run(client)
 
