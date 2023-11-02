@@ -96,23 +96,6 @@ class Trainer(ssl_trainer.Trainer):
 
         self.divergence_rate = torch.mean(self.clusters_divergence)
 
-    def get_optimizer(self, model):
-        """Getting the optimizer"""
-        optimizer = super().get_optimizer(model)
-        if self.current_round > Config().trainer.rounds:
-            # Add another self.model's parameters to the existing optimizer
-            optimizer.add_param_group({"params": self.model.encoder.parameters()})
-        return optimizer
-
-    def save_divergences(self):
-        """Saving the local divergence of the client."""
-
-        model_path = Config().params["model_path"]
-        filename = f"client_{self.client_id}_divergence_rate.pth"
-        save_path = os.path.join(model_path, filename)
-
-        torch.save(self.divergence_rate.detach().cpu(), save_path)
-
     def train_run_end(self, config):
         """Get the features of local samples after training."""
         super().train_run_end(config)
@@ -143,4 +126,10 @@ class Trainer(ssl_trainer.Trainer):
                 )
 
         self.compute_divergence_rate()
-        self.save_divergences()
+
+        # Save the divergence
+        model_path = Config().params["model_path"]
+        filename = f"client_{self.client_id}_divergence_rate.pth"
+        save_path = os.path.join(model_path, filename)
+
+        torch.save(self.divergence_rate.detach().cpu(), save_path)

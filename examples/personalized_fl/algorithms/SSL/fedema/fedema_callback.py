@@ -3,27 +3,13 @@ Customize the processor for FedEMA.
 """
 import logging
 from typing import Any
-from collections import OrderedDict
 
+import utils
 from moving_average import ModelEMA
 
 from plato.config import Config
 from plato.callbacks.client import ClientCallback
 from plato.processors import base
-
-
-def extract_encoder(model_layers, encoder_layer_names):
-    """Extract the encoder layers from the model layers."""
-    return OrderedDict(
-        [
-            (name, param)
-            for name, param in model_layers.items()
-            if any(
-                param_name in name.strip().split(".")
-                for param_name in encoder_layer_names
-            )
-        ]
-    )
 
 
 class GlobalLocalDivergenceProcessor(base.Processor):
@@ -47,8 +33,12 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         encoder_layer_names = Config().algorithm.encoder_layer_names
 
         # Get encoder layers of the local and global models
-        local_encoder_layers = extract_encoder(local_model_layers, encoder_layer_names)
-        global_encoder_layers = extract_encoder(global_layers, encoder_layer_names)
+        local_encoder_layers = utils.extract_encoder(
+            local_model_layers, encoder_layer_names
+        )
+        global_encoder_layers = utils.extract_encoder(
+            global_layers, encoder_layer_names
+        )
 
         logging.info(
             "[Client #%d] Computing global and local divergence.",
