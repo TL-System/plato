@@ -2,14 +2,13 @@
 A personalized federated learning trainer for FedBABU.
 """
 
-
-from pflbases import personalized_trainer
 from pflbases import trainer_utils
 
 from plato.config import Config
+from plato.trainers import basic
 
 
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A trainer to freeze and activate layers of one model
     for normal and personalized learning processes."""
 
@@ -31,7 +30,7 @@ class Trainer(personalized_trainer.Trainer):
             )
 
     def train_run_end(self, config):
-        """Activating the model."""
+        """Activate the model."""
         super().train_run_end(config)
 
         if self.current_round > Config().trainer.rounds:
