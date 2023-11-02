@@ -21,8 +21,6 @@ class CalibreNet(torch.nn.Module):
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
-        projection_hidden_dim = Config().trainer.projection_hidden_dim
-        projection_out_dim = Config().trainer.projection_out_dim
 
         # define the encoder based on the model_name in config
         self.encoder = (
@@ -31,20 +29,24 @@ class CalibreNet(torch.nn.Module):
             else encoder_registry.get(model_name=encoder_name, **encoder_params)
         )
 
-        self.encoding_dim = self.encoder.encoding_dim
         self.projector = SimCLRProjectionHead(
-            self.encoding_dim, projection_hidden_dim, projection_out_dim
+            self.encoder.encoding_dim,
+            Config().trainer.projection_hidden_dim,
+            Config().trainer.projection_out_dim,
         )
 
     def forward(self, multiview_samples):
         """Forward two batch of contrastive samples."""
-        samples1, samples2 = multiview_samples
-        encoded_h1 = self.encoder(samples1)
-        encoded_h2 = self.encoder(samples2)
+        sample1, sample2 = multiview_samples
+        encoded_sample1 = self.encoder(sample1)
+        encoded_sample2 = self.encoder(sample2)
 
-        projected_z1 = self.projector(encoded_h1)
-        projected_z2 = self.projector(encoded_h2)
-        return (encoded_h1, encoded_h2), (projected_z1, projected_z2)
+        projected_sample1 = self.projector(encoded_sample1)
+        projected_sample2 = self.projector(encoded_sample2)
+        return (encoded_sample1, encoded_sample2), (
+            projected_sample1,
+            projected_sample2,
+        )
 
     @staticmethod
     def get():
