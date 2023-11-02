@@ -15,7 +15,7 @@ from pflbases import ssl_datasources
 from pflbases import ssl_client
 from pflbases import ssl_trainer
 
-from model import SimCLR
+from model import SimCLRModel
 
 
 def main():
@@ -24,11 +24,11 @@ def main():
     """
     trainer = ssl_trainer.Trainer
     client = ssl_client.Client(
-        model=SimCLR,
+        model=SimCLRModel,
         datasource=ssl_datasources.SSLDataSource,
         trainer=trainer,
     )
-    server = fedavg_personalized.Server(model=SimCLR, trainer=trainer)
+    server = fedavg_personalized.Server(model=SimCLRModel, trainer=trainer)
 
     server.run(client)
 

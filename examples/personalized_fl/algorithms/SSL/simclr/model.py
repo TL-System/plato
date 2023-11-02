@@ -7,7 +7,7 @@ from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
-class SimCLR(nn.Module):
+class SimCLRModel(nn.Module):
     """The model structure of SimCLR."""
 
     def __init__(self, encoder=None):
@@ -18,8 +18,6 @@ class SimCLR(nn.Module):
         encoder_params = (
             Config().params.encoder if hasattr(Config().params, "encoder") else {}
         )
-        projection_hidden_dim = Config().trainer.projection_hidden_dim
-        projection_out_dim = Config().trainer.projection_out_dim
 
         # Define the encoder based on the model_name in config.
         if encoder is not None:
@@ -30,7 +28,9 @@ class SimCLR(nn.Module):
             )
 
         self.projector = SimCLRProjectionHead(
-            self.encoder.encoding_dim, projection_hidden_dim, projection_out_dim
+            self.encoder.encoding_dim,
+            Config().trainer.projection_hidden_dim,
+            Config().trainer.projection_out_dim,
         )
 
     def forward(self, multiview_samples):
