@@ -9,6 +9,11 @@ who does not have better (lower divergence) clusters. The main reason is that in
 final, each client will perform a classification, making clusters with clear boundaries 
 gain higher accuracy. 
 
+One interesting observation is that the representation learned by SSL presents better 
+performance when it is applied to imbalanced classification. Compared to other features 
+learned in a supervised manner, SSL features generally lead to high accuracy in all different 
+classes. This observation was also mentioned in the paper: 
+"Self-supervised Learning is More Robust to Dataset Imbalance." (accepted by NeurIPS21) 
 """
 
 import torch
