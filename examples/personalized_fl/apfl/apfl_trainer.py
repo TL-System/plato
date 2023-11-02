@@ -12,8 +12,10 @@ from plato.config import Config
 
 
 class Trainer(basic.Trainer):
-    """A trainer using the algorithm of APFL to jointly train the global
-    and personalized models."""
+    """
+    A trainer using the APFL algorithm to jointly train the global and
+    personalized models.
+    """
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
@@ -29,27 +31,8 @@ class Trainer(basic.Trainer):
 
         self.personalized_optimizer = None
 
-    def update_alpha(self, eta):
-        """Updates the alpha based on the Eq. 10 of the paper."""
-        grad_alpha = 0
-        for l_params, p_params in zip(
-            self.model.parameters(), self.personalized_model.parameters()
-        ):
-            dif = p_params.data - l_params.data
-            grad = (
-                self.alpha * p_params.grad.data + (1 - self.alpha) * l_params.grad.data
-            )
-            grad_alpha += dif.view(-1).T.dot(grad.view(-1))
-
-        grad_alpha += 0.02 * self.alpha
-
-        alpha_n = self.alpha - eta * grad_alpha
-        self.alpha = np.clip(alpha_n.item(), 0.0, 1.0)
-
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing forward and backward passes in the training loop."""
-
-        # Perform the local update on self.model
         super().perform_forward_and_backward_passes(config, examples, labels)
 
         # Perform the local update on self.personalized_model
@@ -113,8 +96,27 @@ class Trainer(basic.Trainer):
     def train_step_end(self, config, batch=None, loss=None):
         """Updating the alpha of APFL before each iteration."""
         super().train_step_end(config, batch, loss)
-        # Update alpha based on the Eq. 10 of the paper.
+
+        # Update alpha based on Eq. 10 in the paper
         if Config().algorithm.adaptive_alpha and self.current_epoch == 1 and batch == 0:
-            # 0.1/np.sqrt(1+args.local_index))
+            # 0.1 / np.sqrt(1 + args.local_index))
             lr = self.lr_scheduler.get_lr()[0]
-            self.update_alpha(lr)
+            self._update_alpha(lr)
+
+    def _update_alpha(self, eta):
+        """Updates alpha based on Eq. 10 in the paper."""
+        grad_alpha = 0
+
+        for l_params, p_params in zip(
+            self.model.parameters(), self.personalized_model.parameters()
+        ):
+            dif = p_params.data - l_params.data
+            grad = (
+                self.alpha * p_params.grad.data + (1 - self.alpha) * l_params.grad.data
+            )
+            grad_alpha += dif.view(-1).T.dot(grad.view(-1))
+
+        grad_alpha += 0.02 * self.alpha
+
+        alpha_n = self.alpha - eta * grad_alpha
+        self.alpha = np.clip(alpha_n.item(), 0.0, 1.0)

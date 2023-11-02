@@ -11,9 +11,7 @@ this algorithm but only utilizes it as the baseline for personalized federated
 learning.
 """
 
-from plato.clients import simple
-from plato.trainers import basic
-
+from plato.clients import fedavg_personalized as personalized_client
 from plato.servers import fedavg_personalized as personalized_server
 
 
@@ -21,10 +19,8 @@ def main():
     """
     A Plato personalized federated learning session for FedAvg with fine-tuning.
     """
-    trainer = basic.Trainer
-    client = simple.Client(trainer=trainer)
-    server = personalized_server.Server(trainer=trainer)
-
+    client = personalized_client.Client()
+    server = personalized_server.Server()
     server.run(client)
 
 

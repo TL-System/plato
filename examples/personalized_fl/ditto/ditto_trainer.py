@@ -19,37 +19,40 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
-        # The lambda used in the Ditto paper.
+        # The lambda (used in the paper)
         self.ditto_lambda = Config().algorithm.ditto_lambda
-        # The personalized model is the vnet defined in the paper.
+
+        # The personalized model
         if model is None:
             self.personalized_model = models_registry.get()
         else:
             self.personalized_model = model()
-        # The global model weights received from the server,
-        # which is the w^t in the paper.
+
+        # The global model weights received from the server, which is the w^t in
+        # the paper
         self.initial_wnet_params = None
 
     def train_run_start(self, config):
         super().train_run_start(config)
+
         self.initial_wnet_params = copy.deepcopy(self.model.cpu().state_dict())
 
     def train_run_end(self, config):
-        """Performing the personalized learning of Ditto."""
+        """Perform personalized training, proposed in Ditto."""
         super().train_run_end(config)
 
         logging.info(
             fonts.colourize(
-                "[Client #%d] performing Ditto Solver for personalization: ",
+                "[Client #%d] Started Ditto's personalized training.",
                 colour="blue",
             ),
             self.client_id,
         )
 
-        # Load v net parameters from filesystem.
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_path}/{model_name}_{self.client_id}_v_net.pth"
+
         if os.path.exists(filename):
             self.personalized_model.load_state_dict(
                 torch.load(filename, map_location=torch.device("cpu"))
@@ -63,25 +66,18 @@ class Trainer(basic.Trainer):
         self.personalized_model.train()
         for epoch in range(1, config["epochs"] + 1):
             epoch_loss_meter.reset()
-            for _, (examples, labels) in enumerate(self.train_loader):
+            for __, (examples, labels) in enumerate(self.train_loader):
                 examples, labels = examples.to(self.device), labels.to(self.device)
-
-                # Clear the previous gradient
                 personalized_optimizer.zero_grad()
 
-                ## 1.- Compute the ∇F_k(v_k), thus to compute the first term
-                #   of the equation in the Algorithm. 1.
-                # i.e., v_k − η∇F_k(v_k)
-                # This can be achieved by the general optimization step.
-                # Perform the training and compute the loss.
+                # Compute the first term of the equation in Algorithm 1: v_k − η∇F_k(v_k)
                 preds = self.personalized_model(examples)
                 loss = self._loss_criterion(preds, labels)
 
-                # Perform the optimization.
                 loss.backward()
                 personalized_optimizer.step()
-                ## 2.- Compute the ηλ(v_k − w^t), which is the second term of
-                #   the corresponding equation in Algorithm. 1.
+
+                # Compute ηλ(v_k − w^t), which is the second term in Algorithm 1
                 lr = personalized_optimizer.param_groups[0]["lr"]
 
                 for (
@@ -93,10 +89,11 @@ class Trainer(basic.Trainer):
                         - self.initial_wnet_params[v_net_name].to(self.device)
                     )
 
-                # Update the epoch loss container.
+                # Update the epoch loss container
                 epoch_loss_meter.update(loss, labels.size(0))
 
             lr_scheduler.step()
+
             logging.info(
                 "[Client #%d] Personalization Training Epoch: [%d/%d]\tLoss: %.6f",
                 self.client_id,
@@ -104,14 +101,14 @@ class Trainer(basic.Trainer):
                 config["epochs"],
                 epoch_loss_meter.average,
             )
+
         self.personalized_model.to(torch.device("cpu"))
-        # Save v net parameters from filesystem.
+
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_path}/{model_name}_{self.client_id}_v_net.pth"
         torch.save(self.personalized_model.state_dict(), filename)
 
-        # In the final personalization round, do the fine-tune and testing
-        #   on the local personalized model
+        # In the final personalization round, test the personalized model only
         if self.current_round > Config().trainer.rounds:
             self.model = self.personalized_model

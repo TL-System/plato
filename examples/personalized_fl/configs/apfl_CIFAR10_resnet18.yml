@@ -34,22 +34,13 @@ algorithm:
     # Aggregation algorithm
     type: fedavg_personalized
 
-    # ['conv1', 'bn1', 'layer1', 'layer2', 'layer3', 'layer4', 'linear']
-    global_layer_names:
-        - conv1
-        - bn1
-        - layer1
-        - layer2
-        - layer3
-        - layer4
+    alpha: 0.75
+    adaptive_alpha: True
 
     personalization:
-    
         # the ratio of clients participanting in training
         participating_client_ratio: 1.0
-
-
-
+        
 parameters:
     # ResNet-18 training params
     !include resnet18_params.yml
@@ -57,5 +48,5 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, accuracy_std, elapsed_time, round_time, comm_overhead
-    result_path: results/fedavg_finetune
+    result_path: results/apfl
 

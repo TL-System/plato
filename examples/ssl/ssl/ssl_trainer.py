@@ -1,5 +1,5 @@
 """
-A elf-supervised learning (SSL) trainer for SSL training and testing.
+A self-supervised learning (SSL) trainer for SSL training and testing.
 
 Federated SSL trains the global model based on the data loader and objective function 
 of SSL algorithms. For this unsupervised learning process, we cannot test the model directly 
