@@ -31,24 +31,23 @@ class SwaV(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
-        self.encoding_dim = self.encoder.encoding_dim
-
         # Define the projector.
-        projection_hidden_dim = Config().trainer.projection_hidden_dim
-        projection_out_dim = Config().trainer.projection_out_dim
-        n_prototypes = Config().trainer.n_prototypes
-
-        self.projection_head = SwaVProjectionHead(
-            self.encoding_dim, projection_hidden_dim, projection_out_dim
+        self.projector = SwaVProjectionHead(
+            self.encoder.encoding_dim,
+            Config().trainer.projection_hidden_dim,
+            Config().trainer.projection_out_dim,
         )
-        self.prototypes = SwaVPrototypes(projection_out_dim, n_prototypes=n_prototypes)
+        self.prototypes = SwaVPrototypes(
+            Config().trainer.projection_out_dim,
+            n_prototypes=Config().trainer.n_prototypes,
+        )
 
-    def forward_view(self, views):
+    def forward_view(self, view_sample):
         """Foward views of the samples"""
-        encoded_samples = self.encoder(views).flatten(start_dim=1)
-        encoded_samples = self.projection_head(encoded_samples)
-        encoded_samples = nn.functional.normalize(encoded_samples, dim=1, p=2)
-        outputs = self.prototypes(encoded_samples)
+        encoded_sample = self.encoder(view_sample).flatten(start_dim=1)
+        projection_sample = self.projector(encoded_sample)
+        normalized_sample = nn.functional.normalize(projection_sample, dim=1, p=2)
+        outputs = self.prototypes(normalized_sample)
         return outputs
 
     def forward(self, multiview_samples):
