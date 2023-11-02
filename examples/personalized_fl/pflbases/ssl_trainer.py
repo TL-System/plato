@@ -1,6 +1,5 @@
 """
-A base trainer to perform training and testing loops for federated self-supervised 
-learning (SSL).
+A elf-supervised learning (SSL) trainer for SSL training and testing.
 
 Federated SSL trains the global model based on the data loader and objective function 
 of SSL algorithms. For this unsupervised learning process, we cannot test the model directly 
@@ -42,7 +41,7 @@ class MultiViewCollateWrapper(MultiViewCollate):
     Plato."""
 
     def __call__(self, batch):
-        """Turns a batch of tuples into a single tuple."""
+        """Turn a batch of tuples into a single tuple."""
         # Add a fname to each sample to make the batch compatible with lightly
         batch = [batch[i] + (" ",) for i in range(len(batch))]
 
@@ -55,7 +54,7 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
 
 class Trainer(basic.Trainer):
-    """A basic trainer for personalized FL with SSL."""
+    """A federated SSL trainer."""
 
     def __init__(self, model=None, callbacks=None):
         """Initialize the trainer."""
@@ -135,7 +134,7 @@ class Trainer(basic.Trainer):
         return compute_plato_loss
 
     def get_loss_criterion(self):
-        """Returns the loss criterion for the SSL."""
+        """Return the loss criterion for the SSL."""
         # Get loss criterion for the subsequent training process
         if self.current_round > Config().trainer.rounds:
             loss_criterion_type = Config().algorithm.personalization.loss_criterion

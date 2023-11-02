@@ -1,9 +1,8 @@
 """
-A base datasource for self-supervised learning.
-This datasource works as a wrapper to add the SSL data 
+A self-supervised learning dataset working as a wrapper to add the SSL data 
 transform to the datasource of Plato.
 
-To set which SSL transform to use and the corresponding parameters, 
+To set SSL transform to use and parameters, 
 one should place the 'data_transforms' sub-block under the 'algorithm'
 block in the config file. 
 """
@@ -50,7 +49,7 @@ registered_transforms = {
 
 
 def get_transforms():
-    """Obtains train/test transforms for the corresponding data."""
+    """Obtain train/test transforms for the corresponding data."""
 
     # Get the transforms details set in the config file
     transforms_config = Config().algorithm.data_transforms._asdict()
@@ -83,8 +82,9 @@ def get_transforms():
 
 # pylint: disable=abstract-method
 class SSLDataSource(base.DataSource):
-    """A base datasource to define the DataSource for self-supervised
-    learning."""
+    """
+    An SSL datasource to define the dataSource for self-supervised learning.
+    """
 
     def __init__(self):
         super().__init__()
