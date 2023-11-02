@@ -9,14 +9,14 @@ import logging
 
 from plato.config import Config
 
-from pflbases import fedavg_personalized_server
+from pflbases import fedavg_personalized
 
 from moving_average import ModelEMA
 
 from model_statistic import get_model_statistic
 
 
-class Server(fedavg_personalized_server.Server):
+class Server(fedavg_personalized.Server):
     """A personalized federated learning server using the pFL-CMA's EMA method."""
 
     def __init__(
@@ -31,86 +31,50 @@ class Server(fedavg_personalized_server.Server):
         )
 
         # the lambda used in the paper
-        self.clients_divg_scale = {}
+        self.clients_divg_scale = {
+            client_id: 0.0 for client_id in range(1, self.total_clients + 1)
+        }
 
         # whether to compute the divergence scale adaptively
         # False: use `default_genrlz_divg_scale`
-        self.adaptive_divg_scale = False
+        self.adaptive_divg_scale = (
+            False
+            if not hasattr(Config().algorithm, "adaptive_divergence_scale")
+            else Config().algorithm.adaptive_divergence_scale
+        )
 
         self.default_divg_scale = 0.0
-        self.tau = 0.0
-        self.divg_divg_before_round = 1
+        self.tau = (
+            0.7
+            if not hasattr(Config().algorithm, "divergence_scale_tau")
+            else Config().algorithm.divergence_scale_tau
+        )
+        # Compute the scale before which round
+        self.divg_divg_before_round = (
+            1
+            if not hasattr(Config().algorithm, "compute_scale_before_round")
+            else Config().algorithm.compute_scale_before_round
+        )
         self.initial_clients_divergence()
 
     def initial_clients_divergence(self):
         """Initial the clients' lambda by assiging the
         0.0 float values."""
 
-        total_clients = Config().clients.total_clients
-        self.clients_divg_scale = {
-            client_id: 0.0 for client_id in range(1, total_clients + 1)
-        }
-        self.tau = (
-            0.7
-            if not hasattr(Config().algorithm, "divergence_scale_tau")
-            else Config().algorithm.divergence_scale_tau
-        )
-        self.adaptive_divg_scale = (
-            False
-            if not hasattr(Config().algorithm, "adaptive_divergence_scale")
-            else Config().algorithm.adaptive_divergence_scale
-        )
-        # compute the scale before which round
-        self.divg_divg_before_round = (
-            1
-            if not hasattr(Config().algorithm, "compute_scale_before_round")
-            else Config().algorithm.compute_scale_before_round
-        )
         # if the personalized divergence scale is set to be constant
         # then all clients share the same scale
         if not self.adaptive_divg_scale:
             # must provide the default value in the config file
             default_scale = Config().algorithm.default_divergence_scale
             self.clients_divg_scale = {
-                client_id: default_scale for client_id in range(1, total_clients + 1)
+                client_id: default_scale for client_id in self.clients_divg_scale
             }
 
-    def compute_divergence_scales(self, updates, clients_id):
-        """Compute the divergence scale based on the distance between
-        the updated local model and the aggregated global model.
+    def weights_aggregated(self, updates):
+        """Get client divergence based on the aggregated weights and
+        the client's update.
         """
-        encoder_layer_names = Config().algorithm.encoder_layer_names
-
-        logging.info("[Server #%d] Computing divergence scales.", os.getpid())
-
-        for client_update in updates:
-            client_parameters = client_update.payload
-            client_id = client_update.report.client_id
-
-            if client_id not in clients_id:
-                continue
-
-            aggregated_encoder = self.algorithm.extract_weights(
-                layer_names=encoder_layer_names
-            )
-            client_encoder = self.algorithm.get_target_weights(
-                model_parameters=client_parameters, layer_names=encoder_layer_names
-            )
-            print("aggregated_encoder: ", get_model_statistic(aggregated_encoder))
-            print("client_encoder: ", get_model_statistic(client_encoder))
-
-            # the global L2 norm over a list of tensors.
-            l2_distance = ModelEMA.get_parameters_diff(
-                parameter_a=aggregated_encoder,
-                parameter_b=client_encoder,
-            )
-
-            client_divg_scale = self.tau / l2_distance
-
-            self.clients_divg_scale[client_id] = client_divg_scale
-
-    def get_computation_clients(self, updates):
-        """Get the clients id required to compute the divergence rate."""
+        # Get the clients id required to compute the divergence rate
         # which clients' scales are required to be computed.
         do_clients_id = []
 
@@ -124,15 +88,35 @@ class Server(fedavg_personalized_server.Server):
 
         do_clients_id = [update.report.client_id for update in updates]
 
-        return do_clients_id
+        # Compute the divergence scale based on the distance between
+        # the updated local model and the aggregated global model
+        encoder_layer_names = Config().algorithm.encoder_layer_names
 
-    def weights_aggregated(self, updates):
-        """Get client divergence based on the aggregated weights and
-        the client's update.
-        """
-        # get the clients id required to compute the divergence rate
-        clients_id = self.get_computation_clients(updates)
-        self.compute_divergence_scales(updates, clients_id)
+        logging.info("[Server #%d] Computing divergence scales.", os.getpid())
+
+        for client_update in updates:
+            client_parameters = client_update.payload
+            client_id = client_update.report.client_id
+
+            if client_id not in do_clients_id:
+                continue
+
+            aggregated_encoder = self.algorithm.extract_weights(
+                layer_names=encoder_layer_names
+            )
+            client_encoder = self.algorithm.get_target_weights(
+                model_parameters=client_parameters, layer_names=encoder_layer_names
+            )
+
+            # the global L2 norm over a list of tensors.
+            l2_distance = ModelEMA.get_parameters_diff(
+                parameter_a=aggregated_encoder,
+                parameter_b=client_encoder,
+            )
+
+            client_divg_scale = self.tau / l2_distance
+
+            self.clients_divg_scale[client_id] = client_divg_scale
 
     def customize_server_payload(self, payload):
         """Insert the divergence scale into the server payload."""
