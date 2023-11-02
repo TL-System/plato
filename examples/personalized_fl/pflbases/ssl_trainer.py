@@ -20,12 +20,10 @@ class SSLSamples(UserList):
     def to(self, device):
         """Assign the tensor item into the specific device."""
         for example_idx, example in enumerate(self.data):
-            if hasattr(example, "to"):
-                if isinstance(example, torch.Tensor):
-                    example = example.to(device)
-                else:
-                    example.to(device)
-                self[example_idx] = example
+            if isinstance(example, torch.Tensor):
+                example = example.to(device)
+
+            self[example_idx] = example
 
         return self.data
 
@@ -36,27 +34,16 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
     def __call__(self, batch):
         """Turns a batch of tuples into single tuple."""
+        # Add a fname to each sample to make the batch compatible with lightly
+        batch = [batch[i] + (" ",) for i in range(len(batch))]
 
-        samples = SSLSamples([[] for _ in range(len(batch[0][0]))])
-        labels = []
-        fnames = []
-        for raw in batch:
-            views, label = raw[0], raw[1]
-            for i, view in enumerate(views):
-                samples[i].append(view.unsqueeze(0))
-            labels.append(label)
-            if len(raw) == 3:
-                fnames.append(raw[2])
+        # Process first two parts with the lightly collate
+        samples, labels, _ = super().__call__(batch)
 
-        for i, sample in enumerate(samples):
-            samples[i] = torch.cat(sample)
+        # Assign views, which is a list of tensors, into SSLSamples
+        samples = SSLSamples(samples)
 
-        labels = torch.tensor(labels, dtype=torch.long)
-
-        # Compatible with lightly
-        if fnames:
-            return samples, labels, fnames
-        # Compatible with Plato.
+        # To be compatible with Plato.
         return samples, labels
 
 
