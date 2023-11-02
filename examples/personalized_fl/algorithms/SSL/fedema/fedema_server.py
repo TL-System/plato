@@ -53,57 +53,52 @@ class Server(fedavg_personalized.Server):
         """Get client divergence based on the aggregated weights and
         the client's update.
         """
-        # if divergence is not required to be computed
-        # adaptively
-        if not self.adaptive_divg_scale:
-            return
-        # if the computation round has been passed
+        # Get the divergence will be computed within how many rounds
         if not hasattr(Config().algorithm, "compute_scale_before_round"):
             divg_before_round = 1
         else:
             divg_before_round = Config().algorithm.compute_scale_before_round
-        if self.current_round > divg_before_round:
-            return
 
-        # Get the clients id required to compute the divergence rate
-        # which clients' scales are required to be computed.
-        clients_id = [update.report.client_id for update in updates]
+        # To compute the divergence scale adaptively
+        # and within the computing rounds
+        if self.adaptive_divg_scale and not (self.current_round > divg_before_round):
+            clients_id = [update.report.client_id for update in updates]
 
-        # Compute the divergence scale based on the distance between
-        # the updated local model and the aggregated global model
-        encoder_layer_names = Config().algorithm.encoder_layer_names
+            # Compute the divergence scale based on the distance between
+            # the updated local model and the aggregated global model
+            encoder_layer_names = Config().algorithm.encoder_layer_names
 
-        logging.info("[Server #%d] Computing divergence scales.", os.getpid())
+            logging.info("[Server #%d] Computing divergence scales.", os.getpid())
 
-        for client_update in updates:
-            client_parameters = client_update.payload
-            client_id = client_update.report.client_id
+            for client_update in updates:
+                client_parameters = client_update.payload
+                client_id = client_update.report.client_id
 
-            if client_id not in clients_id:
-                continue
+                if client_id not in clients_id:
+                    continue
 
-            aggregated_encoder = utils.extract_encoder(
-                self.algorithm.model.state_dict(), encoder_layer_names
-            )
+                aggregated_encoder = utils.extract_encoder(
+                    self.algorithm.model.state_dict(), encoder_layer_names
+                )
 
-            client_encoder = utils.extract_encoder(
-                model_layers=client_parameters,
-                encoder_layer_names=encoder_layer_names,
-            )
+                client_encoder = utils.extract_encoder(
+                    model_layers=client_parameters,
+                    encoder_layer_names=encoder_layer_names,
+                )
 
-            # the global L2 norm over a list of tensors.
-            l2_distance = utils.get_parameters_diff(
-                parameter_a=aggregated_encoder,
-                parameter_b=client_encoder,
-            )
+                # the global L2 norm over a list of tensors.
+                l2_distance = utils.get_parameters_diff(
+                    parameter_a=aggregated_encoder,
+                    parameter_b=client_encoder,
+                )
 
-            if not hasattr(Config().algorithm, "divergence_scale_tau"):
-                tau = 0.7
-            else:
-                tau = Config().algorithm.divergence_scale_tau
-            client_divg_scale = tau / l2_distance
+                if not hasattr(Config().algorithm, "divergence_scale_tau"):
+                    tau = 0.7
+                else:
+                    tau = Config().algorithm.divergence_scale_tau
+                client_divg_scale = tau / l2_distance
 
-            self.clients_divg_scale[client_id] = client_divg_scale
+                self.clients_divg_scale[client_id] = client_divg_scale
 
     def customize_server_payload(self, payload):
         """Insert the divergence scale into the server payload."""
