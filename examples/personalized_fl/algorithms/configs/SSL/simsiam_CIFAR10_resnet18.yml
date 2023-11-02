@@ -66,9 +66,9 @@ algorithm:
     global_layer_names:
         - encoder
 
-    completion_layer_names:
-        - projection_head
-        - prediction_head
+    local_layer_names:
+        - projector
+        - predictor
         
     personalization:
         !include ssl_personalization.yml
