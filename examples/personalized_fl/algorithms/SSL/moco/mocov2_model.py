@@ -27,34 +27,39 @@ class MoCoV2(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
-        self.encoding_dim = self.encoder.encoding_dim
-
         # Define heads.
-        projection_hidden_dim = Config().trainer.projection_hidden_dim
-        projection_out_dim = Config().trainer.projection_out_dim
-        self.projection_head = MoCoProjectionHead(
-            self.encoding_dim, projection_hidden_dim, projection_out_dim
+        self.projector = MoCoProjectionHead(
+            self.encoder.encoding_dim,
+            Config().trainer.projection_hidden_dim,
+            Config().trainer.projection_out_dim,
         )
 
         self.encoder_momentum = copy.deepcopy(self.encoder)
-        self.projection_head_momentum = copy.deepcopy(self.projection_head)
+        self.projector_momentum = copy.deepcopy(self.projector)
 
         deactivate_requires_grad(self.encoder_momentum)
-        deactivate_requires_grad(self.projection_head_momentum)
+        deactivate_requires_grad(self.projector_momentum)
 
-    def forward_direct(self, samples):
-        query = self.encoder(samples).flatten(start_dim=1)
-        query = self.projection_head(query)
+    def forward_view(self, view_sample):
+        """
+        Foward one view sample to get the output.
+        """
+        query = self.encoder(view_sample).flatten(start_dim=1)
+        query = self.projector(query)
         return query
 
-    def forward_momentum(self, samples):
-        key = self.encoder_momentum(samples).flatten(start_dim=1)
-        key = self.projection_head_momentum(key).detach()
+    def forward_momentum(self, view_sample):
+        """
+        Foward one view sample to get the output in a momentum manner.
+        """
+        key = self.encoder_momentum(view_sample).flatten(start_dim=1)
+        key = self.projector_momentum(key).detach()
         return key
 
     def forward(self, multiview_samples):
-        query_samples, key_samples = multiview_samples
-        query = self.forward_direct(query_samples)
-        key = self.forward_momentum(key_samples)
+        """Main forward function of the model."""
+        view_sample1, view_sample2 = multiview_samples
+        query = self.forward_view(view_sample1)
+        key = self.forward_momentum(view_sample2)
 
         return query, key
