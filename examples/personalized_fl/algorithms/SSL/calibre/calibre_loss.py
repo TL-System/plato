@@ -61,7 +61,7 @@ class CalibreLoss(nn.Module):
         assert len(auxiliary_losses) == len(auxiliary_losses_params)
 
         # The weights of these losses set in the config file
-        self.loss_weights_params_weight = losses_weight._asdict()
+        losses_weight = losses_weight._asdict()
 
         self.loss_weights_params = OrderedDict()
         self.loss_functions = OrderedDict()
