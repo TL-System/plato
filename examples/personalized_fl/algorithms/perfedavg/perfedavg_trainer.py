@@ -6,7 +6,6 @@ import copy
 
 from plato.config import Config
 from plato.trainers import basic
-from plato.models import registry as models_registry
 
 
 class Trainer(basic.Trainer):
