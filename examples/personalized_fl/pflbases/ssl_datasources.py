@@ -1,5 +1,11 @@
 """
 A base datasource for self-supervised learning.
+This datasource works as a wrapper to add the ssl data 
+transform to the datasource of Plato.
+
+To set which ssl transform to use and the corresponding parameters, 
+one should place the 'data_transforms' sub-block under the 'algorithm'
+block in the config file. 
 """
 from lightly import transforms
 
