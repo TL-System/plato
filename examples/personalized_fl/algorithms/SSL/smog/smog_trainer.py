@@ -1,19 +1,16 @@
 """
 The implemetation of the trainer for SMoG approach.
 """
+import os
 
-import logging
-
-from lightly.loss.memory_bank import MemoryBanklayer
+import torch
+from lightly.loss.memory_bank import MemoryBankModule
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
 from plato.config import Config
-from pflbases.filename_formatter import NameFormatter
-
 
 from pflbases import ssl_trainer
-from pflbases import checkpoint_operator
 
 
 class Trainer(ssl_trainer.Trainer):
@@ -35,7 +32,7 @@ class Trainer(ssl_trainer.Trainer):
             else 300
         )
         memory_bank_size = self.reset_interval * Config().trainer.batch_size
-        self.memory_bank = MemoryBanklayer(size=memory_bank_size)
+        self.memory_bank = MemoryBankModule(size=memory_bank_size)
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
@@ -49,14 +46,14 @@ class Trainer(ssl_trainer.Trainer):
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
-        if not self.do_final_personalization:
+        if not self.current_round > Config().trainer.rounds:
             self.momentum_val = cosine_schedule(epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
         """Operations before starting one iteration."""
         super().train_step_start(config)
 
-        if not self.do_final_personalization:
+        if not self.current_round > Config().trainer.rounds:
             # update the global step
             self.global_step += batch
 
@@ -77,77 +74,36 @@ class Trainer(ssl_trainer.Trainer):
             # update the local iteration
             self.model.n_iteration = batch
 
-    def get_memory_bank(self, config):
+    def load_memory_bank(self):
         """Load the memory bank."""
-        desired_round = self.current_round - 1
-        checkpoint_dir_path = self.get_checkpoint_dir_path()
-        filename = NameFormatter.get_format_name(
-            client_id=self.client_id,
-            model_name="memory_bank",
-            round_n=desired_round,
-            run_id=None,
-            prefix="personalized",
-            ext="pth",
-        )
-        filename, is_searched = checkpoint_operator.search_checkpoint_file(
-            filename=filename,
-            checkpoints_dir=checkpoint_dir_path,
-            key_words=["memory_bank", "personalized"],
-            anchor_metric="round",
-            mask_words=["epoch"],
-            use_latest=True,
-        )
+        model_path = Config().params["model_path"]
+        filename_bank = f"client_{self.client_id}_bank.pth"
+        filename_ptr = f"client_{self.client_id}_ptr.pth"
+        bank_path = os.path.join(model_path, filename_bank)
+        ptr_path = os.path.join(model_path, filename_ptr)
 
-        if is_searched:
-            ckpt_oper = checkpoint_operator.CheckpointsOperator(checkpoint_dir_path)
-            rollback_status = ckpt_oper.load_checkpoint(checkpoint_name=filename)
-            memory_bank_status = rollback_status["model"]
-            self.memory_bank.bank = memory_bank_status["bank"]
-            self.memory_bank.bank_ptr = memory_bank_status["bank_ptr"]
-            logging.info(
-                "[Client #%d] Got the Memory Bank from %s under %s.",
-                self.client_id,
-                filename,
-                checkpoint_dir_path,
-            )
+        if os.path.exists(bank_path):
+            self.memory_bank.bank = torch.load(bank_path)
+            self.memory_bank.bank_ptr = torch.load(ptr_path)
 
-    def save_memory_bank(self, config):
-        """Save the memory bank locally."""
-        current_round = self.current_round
+    def save_memory_bank(self):
+        """Save the memory bank."""
 
-        save_location = self.get_checkpoint_dir_path()
-        filename = NameFormatter.get_format_name(
-            client_id=self.client_id,
-            model_name="memory_bank",
-            round_n=current_round,
-            run_id=None,
-            prefix="personalized",
-            ext="pth",
-        )
-        ckpt_oper = checkpoint_operator.CheckpointsOperator(
-            checkpoints_dir=save_location
-        )
-        ckpt_oper.save_checkpoint(
-            model_state_dict={
-                "bank": self.memory_bank.bank,
-                "bank_ptr": self.memory_bank.bank_ptr,
-            },
-            checkpoints_name=[filename],
-        )
+        model_path = Config().params["model_path"]
+        filename_bank = f"client_{self.client_id}_bank.pth"
+        filename_ptr = f"client_{self.client_id}_ptr.pth"
 
-        logging.info(
-            "[Client #%d] Saved Memory Bank model to %s under %s.",
-            self.client_id,
-            filename,
-            save_location,
-        )
+        bank_path = os.path.join(model_path, filename_bank)
+        ptr_path = os.path.join(model_path, filename_ptr)
+        torch.save(self.memory_bank.bank, bank_path)
+        torch.save(self.memory_bank.bank_ptr, ptr_path)
 
     def train_run_start(self, config):
         super().train_run_start(config)
-        if not self.do_final_personalization:
-            self.get_memory_bank(config)
+        if not self.current_round > Config().trainer.rounds:
+            self.load_memory_bank()
 
     def train_run_end(self, config):
         super().train_run_end(config)
-        if not self.do_final_personalization:
-            self.save_memory_bank(config)
+        if not self.current_round > Config().trainer.rounds:
+            self.save_memory_bank()
