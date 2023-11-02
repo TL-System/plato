@@ -1,6 +1,5 @@
 """
 Implementation of the trainer for Calibre algorithm.
-
 """
 
 import os
@@ -79,7 +78,7 @@ class Trainer(ssl_trainer.Trainer):
         return compute_plato_loss
 
     def compute_divergence_rate(self):
-        """Computing the divergence rate of the local model"""
+        """Compute the divergence rate of the local model"""
         cluster_ids_x, self.clusters_center = kmeans_clustering(
             self.samples_encoding, n_clusters=10
         )
