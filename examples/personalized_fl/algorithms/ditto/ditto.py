@@ -10,26 +10,18 @@ Third-party code: https://github.com/lgcollins/FedRep
 
 """
 
-from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized
-from pflbases import fedavg_personalized
-
 import ditto_trainer
 
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import fedavg_personalized as personalized_client
 
 def main():
     """
     A personalized federated learning session for Ditto approach.
     """
     trainer = ditto_trainer.Trainer
-    client = fedavg_personalized.Client(
-        trainer=trainer,
-        algorithm=fedavg_personalized.Algorithm,
-    )
-    server = fedavg_personalized.Server(
-        trainer=trainer,
-        algorithm=fedavg_personalized.Algorithm,
-    )
+    client = personalized_client.Client(trainer=trainer)
+    server = personalized_server.Server(trainer=trainer)
 
     server.run(client)
 
