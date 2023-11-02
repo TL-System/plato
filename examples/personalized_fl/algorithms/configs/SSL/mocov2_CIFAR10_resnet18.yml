@@ -52,7 +52,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg_partial
+    type: fedavg
     #  - STL10 (Image size=96)
     #  - CIFAR10 (Image size=32)
     #  - MNIST (Image size=28)
@@ -62,12 +62,6 @@ algorithm:
             parameters:
                 input_size: 32
 
-    global_layer_names:
-        - encoder
-        
-    completion_layer_names:
-        - projection_head
-        
     personalization:
 
         !include ssl_personalization.yml

@@ -8,35 +8,29 @@ Source code: None
 """
 
 
-from pflbases import fedavg_personalized_server
+from pflbases import fedavg_personalized
 from pflbases import fedavg_partial
 
-from pflbases.client_callbacks import local_completion_callbacks
-from pflbases.models import SSL
 from pflbases import ssl_client
 from pflbases import ssl_datasources
 
 
-from smog_trainer import Trainer
+import smog_trainer
+import smog_model
 
 
 def main():
     """
     A personalized federated learning session for SMoG approach.
     """
-    trainer = Trainer
+    trainer = smog_trainer.Trainer
     client = ssl_client.Client(
-        model=SSL.SMoG,
-        datasource=ssl_datasources.TransformedDataSource,
-        personalized_datasource=ssl_datasources.TransformedDataSource,
+        model=smog_model.SMoG,
+        datasource=ssl_datasources.SSLDataSource,
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
-        callbacks=[
-            local_completion_callbacks.ClientModelLocalCompletionCallback,
-        ],
     )
-    server = fedavg_personalized_server.Server(
-        model=SSL.SMoG,
+    server = fedavg_personalized.Server(
+        model=smog_model.SMoG,
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
     )
