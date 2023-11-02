@@ -38,31 +38,29 @@ class MultiViewCollateWrapper(MultiViewCollate):
     def __call__(self, batch):
         """Turns a batch of tuples into single tuple."""
 
-        views = SSLSamples([[] for _ in range(len(batch[0][0]))])
+        samples = SSLSamples([[] for _ in range(len(batch[0][0]))])
         labels = []
         fnames = []
-        for sample in batch:
-            img, label = sample[0], sample[1]
-            fname = sample[3] if len(sample) == 3 else None
+        for raw in batch:
+            img, label = raw[0], raw[1]
             for i, view in enumerate(img):
-                views[i].append(view.unsqueeze(0))
+                samples[i].append(view.unsqueeze(0))
             labels.append(label)
-            if fname is not None:
-                fnames.append(fname)
+            if len(raw) == 3:
+                fnames.append(raw[3])
 
-        for i, view in enumerate(views):
-            views[i] = torch.cat(view)
+        for i, sample in enumerate(samples):
+            samples[i] = torch.cat(sample)
 
         labels = torch.tensor(
             labels, dtype=torch.long
-        )  # Conversion to tensor to ensure backwards compatibility.
-
+        )
+        
         # Compatible with lightly
         if fnames:
-            return views, labels, fnames
+            return samples, labels, fnames
         # Compatible with Plato.
-        return views, labels
-
+        return samples, labels
 
 class Trainer(basic.Trainer):
     """A personalized federated learning trainer with self-supervised learning."""
