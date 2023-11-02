@@ -27,7 +27,7 @@ data:
 trainer:
 
     # The maximum number of training rounds
-    rounds: 2
+    rounds: 5
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -36,7 +36,7 @@ trainer:
     target_accuracy: 0.94
 
     # Number of epoches for local training in each communication round
-    epochs: 3
+    epochs: 5
     batch_size: 128
     optimizer: LARS
     lr_scheduler: MultiStepLR
@@ -83,7 +83,7 @@ parameters:
 
     learning_rate:
         gamma: 0.1
-        milestone_steps: 150ep,350ep
+        milestone_steps: 80ep,120ep
 
     loss_criterion:
         eps: 1.0E-8
