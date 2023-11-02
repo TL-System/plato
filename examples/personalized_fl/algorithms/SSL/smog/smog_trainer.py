@@ -51,7 +51,7 @@ class Trainer(ssl_trainer.Trainer):
 
         if not self.current_round > Config().trainer.rounds:
             # Update the global step
-            self.global_step += batch
+            self.global_step += 1
 
             if self.global_step > 0 and self.global_step % self.reset_interval == 0:
                 # Reset group features and weights every some iterations
