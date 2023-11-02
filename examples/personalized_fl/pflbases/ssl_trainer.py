@@ -1,5 +1,14 @@
 """
-A base trainer to perform training and testing loops for self-supervised learning.
+A base trainer to perform training and testing loops for federated self-supervised 
+learning (SSL).
+
+Federated SSL trains the global model based on the data loader and objective function 
+of SSL algorithms. For this unsupervised learning process, we cannot test the model directly 
+as the model only extracts features from the data. Therefore, we use the KNN as a classifier
+to get the accuracy of the global model during the regular federated training process.
+
+In the personalization phase, each client can train the personalized model, 
+a linear layer, based on the features extracted by the trained global model.
 """
 
 import logging
@@ -15,10 +24,10 @@ from plato.trainers import optimizers, lr_schedulers, loss_criterion
 
 
 class SSLSamples(UserList):
-    """An SSL sample, which is the inputs to the model in SSL methods."""
+    """A container for SSL sample, which contains multiple views as a list."""
 
     def to(self, device):
-        """Assign the tensor item into the specific device."""
+        """Assign a list of views into the specific device."""
         for example_idx, example in enumerate(self.data):
             if isinstance(example, torch.Tensor):
                 example = example.to(device)
@@ -38,18 +47,18 @@ class MultiViewCollateWrapper(MultiViewCollate):
         batch = [batch[i] + (" ",) for i in range(len(batch))]
 
         # Process first two parts with the lightly collate
-        samples, labels, _ = super().__call__(batch)
+        views, labels, _ = super().__call__(batch)
 
         # Assign views, which is a list of tensors, into SSLSamples
-        samples = SSLSamples(samples)
+        samples = SSLSamples(views)
         return samples, labels
 
 
 class Trainer(basic.Trainer):
-    """A personalized federated learning trainer with self-supervised learning."""
+    """A basic trainer for personalized FL with SSL."""
 
     def __init__(self, model=None, callbacks=None):
-        """Initializing the trainer with the provided model."""
+        """Initialize the trainer."""
         super().__init__(model=model, callbacks=callbacks)
 
         # Datasets for personalization.
@@ -92,7 +101,7 @@ class Trainer(basic.Trainer):
             )
 
     def get_optimizer(self, model):
-        """Returns the optimizer for SSL and personalization."""
+        """Return the optimizer for SSL and personalization."""
         if self.current_round <= Config().trainer.rounds:
             return super().get_optimizer(model)
         # Define the optimizer for the personalized model
@@ -105,9 +114,9 @@ class Trainer(basic.Trainer):
         )
 
     def get_ssl_criterion(self):
-        """
-        Get the loss criterion for the SSL.
-        Some SSL algorithms will overwrite this function for specific loss functions.
+        """Get the loss criterion for the SSL.
+        Some SSL algorithms, for example, BYOL, will overwrite this function for
+        specific loss functions.
         """
 
         # Get loss criterion for the SSL
@@ -123,7 +132,7 @@ class Trainer(basic.Trainer):
 
     def get_loss_criterion(self):
         """Returns the loss criterion for the SSL."""
-        # Get loss criterion for the personalization
+        # Get loss criterion for the subsequent training process
         if self.current_round > Config().trainer.rounds:
             loss_criterion_type = Config().algorithm.personalization.loss_criterion
             loss_criterion_params = {}
@@ -156,6 +165,7 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         """Set the config before training."""
         if self.current_round > Config().trainer.rounds:
+            # Set the config for the personalization
             config["batch_size"] = Config().algorithm.personalization.batch_size
             config["epochs"] = Config().algorithm.personalization.epochs
 
@@ -165,9 +175,11 @@ class Trainer(basic.Trainer):
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop."""
 
+        # Perform the SSL training in the first Config().trainer.rounds rounds
         if not self.current_round > Config().trainer.rounds:
             return super().perform_forward_and_backward_passes(config, examples, labels)
 
+        # Perform the personalization after the final round
         # Perform the local update on self.local_layers
         self.optimizer.zero_grad()
 
@@ -189,7 +201,7 @@ class Trainer(basic.Trainer):
         return loss
 
     def collect_encodings(self, data_loader):
-        """Collecting the encodings of the data."""
+        """Collect encodings of the data by using self.model."""
         samples_encoding = None
         samples_label = None
         self.model.eval()
@@ -210,7 +222,7 @@ class Trainer(basic.Trainer):
         return samples_encoding, samples_label
 
     def test_model(self, config, testset, sampler=None, **kwargs):
-        """Testing the model to report the accuracy in each round."""
+        """Test the model to report the accuracy in each round."""
         batch_size = config["batch_size"]
         if self.current_round > Config().trainer.rounds:
             # Test the personalized model after the final round.
@@ -264,14 +276,14 @@ class Trainer(basic.Trainer):
             train_encodings, train_labels = self.collect_encodings(train_loader)
             test_encodings, test_labels = self.collect_encodings(test_loader)
 
-            # KNN.
+            # Build the KNN and Perform the prediction
             distances = torch.cdist(test_encodings, train_encodings, p=2)
             knn = distances.topk(1, largest=False)
             nearest_idx = knn.indices
             predicted_labels = train_labels[nearest_idx].view(-1)
             test_labels = test_labels.view(-1)
 
-            # compute the accuracy
+            # Compute the accuracy
             num_correct = torch.sum(predicted_labels == test_labels).item()
             accuracy = num_correct / len(test_labels)
 
