@@ -4,7 +4,7 @@ A trainer for FedRep approach.
 from plato.trainers import basic
 from plato.config import Config
 
-from pflbases import trainer_utils
+from plato.utils import trainer_utils
 
 
 class Trainer(basic.Trainer):
