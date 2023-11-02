@@ -1,11 +1,3 @@
-
-## Core Components
-
-- the _completion_ callbacks placed under `client_callbacks` merge other models into the `self.model` parameters. 
-    > For example, when the whole model is A+B, you can set the global model to be A while the local model is B. Then, the completion callback will merge B into A to obtain the whole model before local update.
-
---- 
-
 ## Implemented Algorithms
 
 To better compare the performance of different personalized federated learning approaches, we implemented the following algorithms.
@@ -13,7 +5,6 @@ To better compare the performance of different personalized federated learning a
 ### Baseline Algorithm
 
 We implemented the FedAvg with finetuning, referred to as FedAvg_finetune, as the baseline algorithm for personalized federated learning (FL). The code is available under `algorithms/fedavg_finetune/`.
-
 
 ### Classical personalized FL approaches
 
@@ -34,13 +25,6 @@ Learning", ICML21, citation 289](https://arxiv.org/abs/2102.07078) - [Official c
 A model-agnostic meta-learning approach", NeurIPS 2019, citation 502](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html) - [Third-party code](https://github.com/jhoon-oh/FedBABU)
 
 - {hermes} [Li et al., "Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients", ACM MobiCom 21, citation 75](https://www.ang-li.com/assets/pdf/hermes.pdf) - None
-
-### Personalized FL algorithms with self-supervised learning
-
-In the context of self-supervised learning (SSL), the model is trained to learn representations from unlabeled data. Thus, the model is capable of extracting generic representations. A higher performance can be achieved in subsequent tasks with the trained model as the encoder. Such a benefit of SSL is introduced into personalized FL by relying on the learning objective of SSL to train the global model. After reaching convergence, each client can download the trained global model to extract features from local samples. A high-quality personalized model, typically a linear network, is prone to be achieved under those extracted features. The code is available under `SSL/`.
-
-- {SimCLR} [Chen et al., "A Simple Framework for Contrastive Learning of Visual Representations", Arxiv 2020, citation 374](https://arxiv.org/abs/2002.05709) - [Office code](https://github.com/google-research/simclr)
-
 
 2. Perform the algorithms by running:
 
@@ -80,41 +64,6 @@ python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10
 
 ```bash
 python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
-```
-
----
-
-```bash
-python algorithms/SSL/simclr/simclr.py -c algorithms/configs/SSL/simclr_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```bash
-python algorithms/SSL/simsiam/simsiam.py -c algorithms/configs/SSL/simsiam_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```bash
-python algorithms/SSL/smog/smog.py -c algorithms/configs/SSL/smog_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```bash
-python algorithms/SSL/swav/swav.py -c algorithms/configs/SSL/swav_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-This mocov2 may have some problems because the loss is not decreasing.
-```bash
-python algorithms/SSL/moco/mocov2.py -c algorithms/configs/SSL/mocov2_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```bash
-python algorithms/SSL/byol/byol.py -c algorithms/configs/SSL/byol_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```bash
-python algorithms/SSL/fedema/fedema.py -c algorithms/configs/SSL/fedema_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```bash
-python algorithms/SSL/calibre/calibre.py -c algorithms/configs/SSL/calibre_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 
