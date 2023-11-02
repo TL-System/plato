@@ -46,25 +46,23 @@ class SMoG(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
-        self.encoding_dim = self.encoder.encoding_dim
-        projection_hidden_dim = Config().trainer.projection_hidden_dim
-        projection_out_dim = Config().trainer.projection_out_dim
-        prediction_hidden_dim = Config().trainer.prediction_hidden_dim
-        prediction_out_dim = Config().trainer.prediction_out_dim
-
         # Define the projector.
-        self.projection_head = SMoGProjectionHead(
-            self.encoding_dim, projection_hidden_dim, projection_out_dim
+        self.projector = SMoGProjectionHead(
+            self.encoder.encoding_dim,
+            Config().trainer.projection_hidden_dim,
+            Config().trainer.projection_out_dim,
         )
-        self.prediction_head = SMoGPredictionHead(
-            projection_out_dim, prediction_hidden_dim, prediction_out_dim
+        self.predictor = SMoGPredictionHead(
+            Config().trainer.projection_out_dim,
+            Config().trainer.prediction_hidden_dim,
+            Config().trainer.prediction_out_dim,
         )
 
         self.encoder_momentum = copy.deepcopy(self.encoder)
-        self.projection_head_momentum = copy.deepcopy(self.projection_head)
+        self.projector_momentum = copy.deepcopy(self.projector)
 
         deactivate_requires_grad(self.encoder_momentum)
-        deactivate_requires_grad(self.projection_head_momentum)
+        deactivate_requires_grad(self.projector_momentum)
 
         self.n_groups = Config().trainer.n_groups
         n_prototypes = Config().trainer.n_prototypes
@@ -81,7 +79,6 @@ class SMoG(nn.Module):
     def _cluster_features(self, features: torch.Tensor) -> torch.Tensor:
         """Cluster the features using sklearn."""
         # Cluster the features using sklearn
-        # (note: faiss is probably more efficient).
         features = features.cpu().numpy()
         kmeans = KMeans(self.n_groups).fit(features)
         clustered = torch.from_numpy(kmeans.cluster_centers_).float()
@@ -90,49 +87,47 @@ class SMoG(nn.Module):
 
     def reset_group_features(self, memory_bank):
         """Reset the group features based on the clusters."""
-        # See https://arxiv.org/pdf/2207.06167.pdf Table 7b).
         features = memory_bank.bank
         group_features = self._cluster_features(features.t())
         self.smog.set_group_features(group_features)
 
     def reset_momentum_weights(self):
         """Reset the momentum weights."""
-        # See https://arxiv.org/pdf/2207.06167.pdf Table 7b).
         self.encoder_momentum = copy.deepcopy(self.encoder)
-        self.projection_head_momentum = copy.deepcopy(self.projection_head)
+        self.projector_momentum = copy.deepcopy(self.projector)
         deactivate_requires_grad(self.encoder_momentum)
-        deactivate_requires_grad(self.projection_head_momentum)
+        deactivate_requires_grad(self.projector_momentum)
 
     def forward_view(self, views):
-        """Forward views of the samples."""
-        features = self.encoder(views).flatten(start_dim=1)
-        encoded = self.projection_head(features)
-        predicted = self.prediction_head(encoded)
-        return encoded, predicted
+        """Foward one view sample to get the output."""
+        encoded_features = self.encoder(views).flatten(start_dim=1)
+        projected_features = self.projector(encoded_features)
+        prediction = self.predictor(projected_features)
+        return projected_features, prediction
 
     def forward_momentum(self, samples):
-        """Forward the momentum mechanism."""
+        """Foward one view sample to get the output in a momentum manner."""
         features = self.encoder_momentum(samples).flatten(start_dim=1)
-        encoded = self.projection_head_momentum(features)
+        encoded = self.projector_momentum(features)
         return encoded
 
     def forward(self, multiview_samples):
         """Forward the multiview samples."""
-        views1, views2 = multiview_samples
+        view1, view2 = multiview_samples
 
         if self.n_iteration % 2:
             # Swap batches every two iterations.
-            views2, views1 = views1, views2
+            view2, view1 = view1, view2
 
-        views1_encoded, views1_predicted = self.forward_view(views1)
+        view1_encoded, view1_predicted = self.forward_view(view1)
 
-        views2_encoded = self.forward_momentum(views2)
+        view2_encoded = self.forward_momentum(view2)
 
         # Update group features and get group assignments.
-        assignments = self.smog.assign_groups(views2_encoded)
-        group_features = self.smog.get_updated_group_features(views1_encoded)
+        assignments = self.smog.assign_groups(view2_encoded)
+        group_features = self.smog.get_updated_group_features(view1_encoded)
         logits = self.smog(
-            views1_predicted, group_features, temperature=self.temperature
+            view1_predicted, group_features, temperature=self.temperature
         )
         self.smog.set_group_features(group_features)
 

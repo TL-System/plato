@@ -32,8 +32,9 @@ class Trainer(ssl_trainer.Trainer):
             if hasattr(Config().trainer, "reset_interval")
             else 300
         )
-        memory_bank_size = self.reset_interval * Config().trainer.batch_size
-        self.memory_bank = MemoryBankModule(size=memory_bank_size)
+        self.memory_bank = MemoryBankModule(
+            size=self.reset_interval * Config().trainer.batch_size
+        )
 
     def model_forward(self, examples):
         """Forward the input examples to the model."""
@@ -69,44 +70,37 @@ class Trainer(ssl_trainer.Trainer):
                     self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
                 )
                 update_momentum(
-                    self.model.projection_head,
-                    self.model.projection_head_momentum,
+                    self.model.projector,
+                    self.model.projector_momentum,
                     m=self.momentum_val,
                 )
 
             # update the local iteration
             self.model.n_iteration = batch
 
-    def load_memory_bank(self):
-        """Load the memory bank."""
-        model_path = Config().params["model_path"]
-        filename_bank = f"client_{self.client_id}_bank.pth"
-        filename_ptr = f"client_{self.client_id}_ptr.pth"
-        bank_path = os.path.join(model_path, filename_bank)
-        ptr_path = os.path.join(model_path, filename_ptr)
-
-        if os.path.exists(bank_path):
-            self.memory_bank.bank = torch.load(bank_path)
-            self.memory_bank.bank_ptr = torch.load(ptr_path)
-
-    def save_memory_bank(self):
-        """Save the memory bank."""
-
-        model_path = Config().params["model_path"]
-        filename_bank = f"client_{self.client_id}_bank.pth"
-        filename_ptr = f"client_{self.client_id}_ptr.pth"
-
-        bank_path = os.path.join(model_path, filename_bank)
-        ptr_path = os.path.join(model_path, filename_ptr)
-        torch.save(self.memory_bank.bank, bank_path)
-        torch.save(self.memory_bank.bank_ptr, ptr_path)
-
     def train_run_start(self, config):
+        """Load the memory bank from file system."""
         super().train_run_start(config)
         if not self.current_round > Config().trainer.rounds:
-            self.load_memory_bank()
+            model_path = Config().params["model_path"]
+            filename_bank = f"client_{self.client_id}_bank.pth"
+            filename_ptr = f"client_{self.client_id}_ptr.pth"
+            bank_path = os.path.join(model_path, filename_bank)
+            ptr_path = os.path.join(model_path, filename_ptr)
+
+            if os.path.exists(bank_path):
+                self.memory_bank.bank = torch.load(bank_path)
+                self.memory_bank.bank_ptr = torch.load(ptr_path)
 
     def train_run_end(self, config):
+        """Save the memory bank to the file system."""
         super().train_run_end(config)
         if not self.current_round > Config().trainer.rounds:
-            self.save_memory_bank()
+            model_path = Config().params["model_path"]
+            filename_bank = f"client_{self.client_id}_bank.pth"
+            filename_ptr = f"client_{self.client_id}_ptr.pth"
+
+            bank_path = os.path.join(model_path, filename_bank)
+            ptr_path = os.path.join(model_path, filename_ptr)
+            torch.save(self.memory_bank.bank, bank_path)
+            torch.save(self.memory_bank.bank_ptr, ptr_path)

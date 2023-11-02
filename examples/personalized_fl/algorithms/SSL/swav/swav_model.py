@@ -45,8 +45,8 @@ class SwaV(nn.Module):
     def forward_view(self, view_sample):
         """Foward views of the samples"""
         encoded_sample = self.encoder(view_sample).flatten(start_dim=1)
-        projection_sample = self.projector(encoded_sample)
-        normalized_sample = nn.functional.normalize(projection_sample, dim=1, p=2)
+        projected_sample = self.projector(encoded_sample)
+        normalized_sample = nn.functional.normalize(projected_sample, dim=1, p=2)
         outputs = self.prototypes(normalized_sample)
         return outputs
 
