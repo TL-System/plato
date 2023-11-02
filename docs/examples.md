@@ -190,7 +190,7 @@ FedRep belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/fedrep/fedrep.py -c algorithms/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedrep/fedrep.py -c examples/personalized_fl/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -206,7 +206,7 @@ FedBABU belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/fedbabu/fedbabu.py -c algorithms/configs/fedbabu_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -222,7 +222,7 @@ APFL belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/apfl/apfl.py -c examples/personalized_fl/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -238,7 +238,7 @@ FedPer belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/fedper/fedper.py -c algorithms/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -254,7 +254,7 @@ LG-FedAvg belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/lgfedavg/lgfedavg.py -c algorithms/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/lgfedavg/lgfedavg.py -c examples/personalized_fl/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -270,7 +270,7 @@ Ditto belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/ditto/ditto.py -c algorithms/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/ditto/ditto.py -c examples/personalized_fl/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -286,7 +286,7 @@ PerFedAvg belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/perfedavg/perfedavg.py -c examples/personalized_fl/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -304,7 +304,7 @@ Hermes belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/hermes/hermes.py -c examples/personalized_fl/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
