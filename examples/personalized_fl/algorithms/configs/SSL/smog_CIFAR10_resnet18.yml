@@ -46,9 +46,9 @@ trainer:
     model_name: SMoG
     encoder_name: resnet_18
 
-    projection_hidden_dim: 2048
+    projection_hidden_dim: 1024
     projection_out_dim: 128
-    prediction_hidden_dim: 2048
+    prediction_hidden_dim: 1024
     prediction_out_dim: 128
 
     n_groups: 300
