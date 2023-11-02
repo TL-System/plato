@@ -4,10 +4,10 @@ The implementation for the SimSiam [1] method.
 [1]. Xinlei Chen, et al., Exploring Simple Siamese Representation Learning.
 https://arxiv.org/pdf/2011.10566.pdf
 
+Reference:
 Source code: https://github.com/facebookresearch/simsiam
 Third-party code: https://github.com/PatrickHua/SimSiam
 """
-
 
 from pflbases import fedavg_personalized
 
@@ -22,13 +22,14 @@ def main():
     """
     A personalized federated learning session for SimSiam approach.
     """
-    trainer = simsiam_trainer.Trainer
     client = ssl_client.Client(
         model=simsiam_model.SimSiam,
         datasource=ssl_datasources.SSLDataSource,
-        trainer=trainer,
+        trainer=simsiam_trainer.Trainer,
     )
-    server = fedavg_personalized.Server(model=simsiam_model.SimSiam, trainer=trainer)
+    server = fedavg_personalized.Server(
+        model=simsiam_model.SimSiam, trainer=simsiam_trainer.Trainer
+    )
 
     server.run(client)
 
