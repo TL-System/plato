@@ -84,7 +84,9 @@ class Server(fedavg_personalized.Server):
             if client_id not in clients_id:
                 continue
 
-            aggregated_encoder = self.algorithm.extract_encoder()
+            aggregated_encoder = utils.extract_encoder(
+                self.algorithm.model, encoder_layer_names
+            )
 
             client_encoder = utils.extract_encoder(
                 model_layers=client_parameters,
