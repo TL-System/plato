@@ -41,12 +41,12 @@ class MultiViewCollateWrapper(MultiViewCollate):
         labels = []
         fnames = []
         for raw in batch:
-            img, label = raw[0], raw[1]
-            for i, view in enumerate(img):
+            views, label = raw[0], raw[1]
+            for i, view in enumerate(views):
                 samples[i].append(view.unsqueeze(0))
             labels.append(label)
             if len(raw) == 3:
-                fnames.append(raw[3])
+                fnames.append(raw[2])
 
         for i, sample in enumerate(samples):
             samples[i] = torch.cat(sample)
