@@ -12,8 +12,7 @@ the work https://github.com/spijkervet/SimCLR.git.
 """
 
 
-from pflbases import fedavg_personalized_server
-from pflbases import fedavg_partial
+from pflbases import fedavg_personalized
 
 from pflbases.models import SSL
 from pflbases import ssl_datasources
@@ -30,9 +29,8 @@ def main():
         model=SSL.SimCLR,
         datasource=ssl_datasources.TransformedDataSource,
         trainer=trainer,
-        algorithm=fedavg_partial.Algorithm,
     )
-    server = fedavg_personalized_server.Server(model=SSL.SimCLR, trainer=trainer)
+    server = fedavg_personalized.Server(model=SSL.SimCLR, trainer=trainer)
 
     server.run(client)
 
