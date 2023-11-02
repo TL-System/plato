@@ -17,11 +17,6 @@ class Trainer(basic.Trainer):
 
         # the iterator for the dataloader
         self.iter_trainloader = None
-        # Another model used for calculating meta gradients.
-        if model is None:
-            self.meta_model = models_registry.get()
-        else:
-            self.meta_model = model()
 
     def train_epoch_start(self, config):
         """Defining the iterator for the train dataloader."""
@@ -39,28 +34,29 @@ class Trainer(basic.Trainer):
             beta = Config().algorithm.beta
 
             # Put the current model weights into the other meta model
-            for model_param, meta_model_param in zip(
-                self.model.parameters(), self.meta_model.parameters()
-            ):
-                meta_model_param.data = copy.deepcopy(model_param.data)
+            past_model_params = copy.deepcopy(list(self.model.parameters()))
 
             # Step 1
-            # Update meta model with learning rate alpha.
+            # Update model with learning rate alpha.
             for g in self.optimizer.param_groups:
                 g["lr"] = alpha
 
             self.optimizer.zero_grad()
-            logits = self.meta_model(examples)
+            logits = self.model(examples)
             loss = self._loss_criterion(logits, labels)
             loss.backward()
             self.optimizer.step()
 
             # Step 2
             # Calculate the meta gradients
+            for g in self.optimizer.param_groups:
+                g["lr"] = beta
+
+            self.optimizer.zero_grad()
             examples, labels = next(self.iter_trainloader)
             examples, labels = examples.to(self.device), labels.to(self.device)
 
-            logits = self.meta_model(examples)
+            logits = self.model(examples)
 
             loss = self._loss_criterion(logits, labels)
             self._loss_tracker.update(loss, labels.size(0))
@@ -69,13 +65,12 @@ class Trainer(basic.Trainer):
             # Step 3
             # Update model weights with meta model's gradients
             # The model parameter is only updated here, in each iteration.
-            # Use the gradients by meta modelin the second step
-            #   to update weights before the first step
-            for model_param, meta_model_param in zip(
-                self.model.parameters(), self.meta_model.parameters()
+            # Use the gradients by step 2 to update the weights before step 1.
+            for model_param, past_model_param in zip(
+                self.model.parameters(), past_model_params
             ):
-                model_param.data = (
-                    model_param.data - beta * meta_model_param.grad
-                ).clone()
+                model_param.data = past_model_param.data.clone()
+
+            self.optimizer.step()
 
             return loss
