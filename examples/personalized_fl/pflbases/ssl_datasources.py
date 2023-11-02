@@ -12,7 +12,23 @@ from lightly import transforms
 from plato.datasources import base
 from plato.datasources import registry as datasources_registry
 from plato.config import Config
-from plato.utils import visual_augmentations
+
+
+MNIST_NORMALIZE = {"mean": [0.1307], "std": [0.3081]}
+FashionMNIST_NORMALIZE = {"mean": [0.1307], "std": [0.3081]}
+CIFAR10_NORMALIZE = {"mean": [0.491, 0.482, 0.447], "std": [0.247, 0.243, 0.262]}
+CIFAR100_NORMALIZE = {"mean": [0.491, 0.482, 0.447], "std": [0.247, 0.243, 0.262]}
+IMAGENET_NORMALIZE = {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}
+STL10_NORMALIZE = {"mean": [0.4914, 0.4823, 0.4466], "std": [0.247, 0.243, 0.261]}
+
+datasets_normalization = {
+    "MNIST": MNIST_NORMALIZE,
+    "FashionMNIST": FashionMNIST_NORMALIZE,
+    "CIFAR10": CIFAR10_NORMALIZE,
+    "CIFAR100": CIFAR100_NORMALIZE,
+    "IMAGENET": IMAGENET_NORMALIZE,
+    "STL10": STL10_NORMALIZE,
+}
 
 
 # All transforms for different SSL algorithms
@@ -49,9 +65,7 @@ def get_transforms():
 
         # Get the data normalization for the datasource
         datasource_name = Config().data.datasource
-        transform_params["normalize"] = visual_augmentations.datasets_normalization[
-            datasource_name
-        ]
+        transform_params["normalize"] = datasets_normalization[datasource_name]
         # Get the SSL transform
         if transform_name in registered_transforms:
             dataset_transform = registered_transforms[transform_name](
