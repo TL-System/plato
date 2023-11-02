@@ -9,6 +9,7 @@ from plato.config import Config
 from plato.utils import visual_augmentations
 
 
+# All transforms for different SSL algorithms
 registered_transforms = {
     "SimCLR": transforms.SimCLRTransform,
     "DINO": transforms.DINOTransform,

@@ -7,7 +7,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """A base to prepare the datasource for self-supervised learning
+    """A base client to prepare the datasource for self-supervised learning
     in the personalization."""
 
     def __init__(
