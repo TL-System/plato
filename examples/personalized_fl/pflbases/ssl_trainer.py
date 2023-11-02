@@ -7,8 +7,8 @@ of SSL algorithms. For this unsupervised learning process, we cannot test the mo
 as the model only extracts features from the data. Therefore, we use the KNN as a classifier
 to get the accuracy of the global model during the regular federated training process.
 
-In the personalization phase, each client can train the personalized model, 
-a linear layer, based on the features extracted by the trained global model.
+In the personalization phase, each client trains a linear layer locally, 
+based on the features extracted by the trained global model.
 """
 
 import logging
@@ -42,7 +42,7 @@ class MultiViewCollateWrapper(MultiViewCollate):
     Plato."""
 
     def __call__(self, batch):
-        """Turns a batch of tuples into single tuple."""
+        """Turns a batch of tuples into a single tuple."""
         # Add a fname to each sample to make the batch compatible with lightly
         batch = [batch[i] + (" ",) for i in range(len(batch))]
 
@@ -114,7 +114,8 @@ class Trainer(basic.Trainer):
         )
 
     def get_ssl_criterion(self):
-        """Get the loss criterion for the SSL.
+        """
+        Get the loss criterion for the SSL.
         Some SSL algorithms, for example, BYOL, will overwrite this function for
         specific loss functions.
         """
@@ -162,7 +163,7 @@ class Trainer(basic.Trainer):
                 lr_scheduler=lr_scheduler,
                 lr_params=lr_params,
             )
-        # Get the lr scheduler for the SSL
+        # Get the lr scheduler for SSL
         return super().get_lr_scheduler(config, optimizer)
 
     def train_run_start(self, config):
@@ -180,7 +181,7 @@ class Trainer(basic.Trainer):
         """Perform forward and backward passes in the training loop.
         This function needs to reuse the optimization code of Plato as
         during personalization, the encoder of the self.model will be used to
-        extract features to the local layers to use.
+        extract features into the local layers.
         """
 
         # Perform the SSL training in the first Config().trainer.rounds rounds
