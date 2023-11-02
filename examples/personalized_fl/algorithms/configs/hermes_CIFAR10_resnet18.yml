@@ -54,7 +54,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
 
     personalization:
 

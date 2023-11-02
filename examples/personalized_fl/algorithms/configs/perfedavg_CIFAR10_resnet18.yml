@@ -32,7 +32,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
 
     # Important hyper-parameters
     # False for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
