@@ -85,7 +85,7 @@ class Server(fedavg_personalized.Server):
                 continue
 
             aggregated_encoder = utils.extract_encoder(
-                self.algorithm.model, encoder_layer_names
+                self.algorithm.model.state_dict(), encoder_layer_names
             )
 
             client_encoder = utils.extract_encoder(
