@@ -81,7 +81,7 @@ def get_transforms():
     return data_transforms
 
 
-# pylint: disable=W0223
+# pylint: disable=abstract-method
 class SSLDataSource(base.DataSource):
     """A base datasource to define the DataSource for self-supervised
     learning."""
