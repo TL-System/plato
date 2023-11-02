@@ -3,7 +3,6 @@ A base trainer to perform training and testing loops for self-supervised learnin
 """
 
 import logging
-from warnings import warn
 from collections import UserList
 
 import torch
@@ -12,10 +11,11 @@ from lightly.data.multi_view_collate import MultiViewCollate
 from plato.trainers import loss_criterion
 from plato.config import Config
 from plato.trainers import basic
+from plato.models import registry as models_registry
 
 
-class ExamplesList(UserList):
-    """The list containing multiple examples."""
+class SSLSamples(UserList):
+    """A SSL sample."""
 
     def to(self, device):
         """Assign the tensor item into the specific device."""
@@ -36,11 +36,8 @@ class MultiViewCollateWrapper(MultiViewCollate):
 
     def __call__(self, batch):
         """Turns a batch of tuples into single tuple."""
-        if len(batch) == 0:
-            warn("MultiViewCollate received empty batch.")
-            return [], [], []
 
-        views = ExamplesList([[] for _ in range(len(batch[0][0]))])
+        views = SSLSamples([[] for _ in range(len(batch[0][0]))])
         labels = []
         fnames = []
         for sample in batch:
@@ -73,39 +70,31 @@ class Trainer(basic.Trainer):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
 
-        # Dataset for personalization.
+        # Datasets for personalization.
         self.personalized_trainset = None
         self.personalized_testset = None
 
-        # By default, if `personalized_sampler` is not set up, it will
-        # be equal to the `sampler`.
-        self.personalized_sampler = None
-        self.personalized_testset_sampler = None
+        # Define the personalized model
+        model_type = Config().algorithm.personalization.model_type
+        model_params = Config().parameters.personalization.model._asdict()
+        model_params["input_dim"] = self.model.encoding_dim
+        model_params["output_dim"] = model_params["num_classes"]
+        self.personalized_model = models_registry.get(
+            model_name=Config().algorithm.personalization.model_name,
+            model_type=model_type,
+            model_params=model_params,
+        )
 
-    def set_personalized_trainset(self, dataset, sampler):
-        """set the trainset."""
-        self.personalized_trainset = dataset
-        self.personalized_sampler = sampler
-
-    def set_personalized_testset(self, dataset, sampler):
-        """set the testset."""
-        self.personalized_testset = dataset
-        self.personalized_testset_sampler = sampler
-
-    def get_personalized_model_params(self):
-        """Getting parameters of the personalized model."""
-        # one must set the parameters for the personalized model
-        pers_model_params = Config().parameters.personalization.model._asdict()
-        pers_model_params["input_dim"] = self.model.encoding_dim
-        pers_model_params["output_dim"] = pers_model_params["num_classes"]
-        return pers_model_params
+    def set_personalized_datasets(self, trainset, testset):
+        """Set the trainset."""
+        self.personalized_trainset = trainset
+        self.personalized_testset = testset
 
     def get_personalized_train_loader(
         self, batch_size, trainset=None, sampler=None, **kwargs
     ):
         """Obtain the trainset data loader for the personalization."""
         trainset = self.personalized_trainset
-        sampler = self.personalized_sampler.get()
 
         return torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
@@ -128,19 +117,6 @@ class Trainer(basic.Trainer):
                 collate_fn=collate_fn,
             )
 
-    # pylint: disable=unused-argument
-    def get_personalized_test_loader(
-        self, batch_size, testset=None, sampler=None, **kwargs
-    ):
-        """Getting one test loader for the personalized."""
-
-        return torch.utils.data.DataLoader(
-            dataset=self.personalized_testset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler,
-        )
-
     def plato_ssl_loss_wrapper(self):
         """A wrapper to connect ssl loss with plato."""
         defined_ssl_loss = loss_criterion.get()
@@ -156,13 +132,9 @@ class Trainer(basic.Trainer):
     def get_loss_criterion(self):
         """Returns the loss criterion."""
         if self.current_round > Config().trainer.rounds:
-            return self.plato_ssl_loss_wrapper()
+            return self.get_loss_criterion()
 
-        logging.info(
-            "[Client #%d] Using the personalized loss_criterion.", self.client_id
-        )
-
-        return self.get_personalized_loss_criterion()
+        return self.plato_ssl_loss_wrapper()
 
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
@@ -206,10 +178,11 @@ class Trainer(basic.Trainer):
         logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
         batch_size = config["batch_size"]
 
-        train_loader = self.get_personalized_train_loader(batch_size=batch_size)
-        test_loader = self.get_personalized_test_loader(
-            batch_size=batch_size, sampler=sampler
+        train_loader = self.get_personalized_train_loader(batch_size=20)
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
         )
+
         train_encodings, train_labels = self.collect_data_encodings(train_loader)
         test_encodings, test_labels = self.collect_data_encodings(test_loader)
 
