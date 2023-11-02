@@ -2,6 +2,7 @@
 A personalized federated learning trainer using Ditto.
 """
 import os
+import copy
 import logging
 
 import torch
@@ -31,7 +32,7 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         super().train_run_start(config)
-        self.initial_wnet_params = self.model.cpu().state_dict()
+        self.initial_wnet_params = copy.deepcopy(self.model.cpu().state_dict())
 
     def train_run_end(self, config):
         """Performing the personalized learning of Ditto."""
