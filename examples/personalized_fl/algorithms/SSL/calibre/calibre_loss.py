@@ -64,7 +64,7 @@ class CalibreLoss(nn.Module):
         self.loss_weights_params_weight = losses_weight._asdict()
 
         self.loss_weights_params = OrderedDict()
-        self.loss_functions = OrderedDict()
+        self.loss_functionstions = OrderedDict()
 
         if main_loss not in losses_weight:
             weight = 1.0
@@ -87,14 +87,14 @@ class CalibreLoss(nn.Module):
         # another one from the membership functions of this class
         for loss_name in self.loss_weights_params:
             if hasattr(self, loss_name):
-                loss_func = getattr(self, loss_name)
+                loss_functions = getattr(self, loss_name)
             else:
-                loss_func = loss_criterion.get(
+                loss_functions = loss_criterion.get(
                     loss_criterion=loss_name,
                     loss_criterion_params=self.loss_weights_params[loss_name]["params"],
                 )
 
-            self.loss_funcs[loss_name] = loss_func
+            self.loss_functionss[loss_name] = loss_functions
 
     def prototype_regularizers(self, encodings, projections, **kwargs):
         """Compute the L_p and L_n losses mentioned the paper."""
@@ -192,7 +192,7 @@ class CalibreLoss(nn.Module):
                 )
                 total_loss += computed_loss
             else:
-                computed_loss = self.loss_functions[loss_name](*projections)
+                computed_loss = self.loss_functionstions[loss_name](*projections)
 
                 total_loss += loss_weight * computed_loss
 
