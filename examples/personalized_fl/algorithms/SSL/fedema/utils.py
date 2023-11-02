@@ -1,6 +1,21 @@
 """
 Tools to compute the model statistic.
 """
+from collections import OrderedDict
+
+
+def extract_encoder(model_layers, encoder_layer_names):
+    """Extract the encoder layers from the model layers."""
+    return OrderedDict(
+        [
+            (name, param)
+            for name, param in model_layers.items()
+            if any(
+                param_name in name.strip().split(".")
+                for param_name in encoder_layer_names
+            )
+        ]
+    )
 
 
 def get_model_statistic(model_parameters):

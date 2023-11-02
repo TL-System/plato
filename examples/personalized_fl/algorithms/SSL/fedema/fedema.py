@@ -14,6 +14,7 @@ import fedema_server
 import fedema_trainer
 import fedema_callback
 import fedema_model
+import fedema_algorithm
 
 
 def main():
@@ -28,8 +29,7 @@ def main():
         ],
     )
     server = fedema_server.Server(
-        model=fedema_model.BYOLModel,
-        trainer=trainer,
+        model=fedema_model.BYOLModel, trainer=trainer, algorithm=fedema_algorithm
     )
 
     server.run(client)
