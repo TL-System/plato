@@ -370,6 +370,27 @@ python algorithms/smog/smog.py -c configs/smog/smog_CIFAR10_resnet18_noniid.yml 
 ```
 ````
 
+#### Federated Learning Algorithms based on Neural Architecture Search and Model Search
+````{admonition} **PerFedRLNAS**
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided. 
+
+NASVIT search space:
+```shell
+python ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
+```
+MobileNetV3 search space (synchronous mode):
+```
+python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
+```
+MobileNetV3 search space (asynchronous mode):
+```
+python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
+```
+DARTS search space
+```
+python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
+```
+````
 
 #### Algorithms Not Yet Categorized
 
@@ -458,27 +479,6 @@ python ./examples/fedtp/fedtp.py -c ./examples/fedtp/FedTP_CIFAR10_ViT_NonIID03_
 
 ```{note}
 Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo;
-````
-
-````{admonition} **PerFedRLNAS**
-PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided. 
-
-NASVIT search space:
-```shell
-python ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
-```
-MobileNetV3 search space (synchronous mode):
-```
-python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
-```
-MobileNetV3 search space (asynchronous mode):
-```
-python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
-```
-DARTS search space
-```
-python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
-```
 ````
 
 ````{admonition} **SysHeteroFL**
