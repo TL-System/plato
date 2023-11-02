@@ -4,7 +4,7 @@ The necessary tools used by trainers.
 
 
 def freeze_model(model, layer_names=None):
-    """Freezing a part of the model."""
+    """Freeze a part of the model."""
     if layer_names is not None:
         frozen_params = []
         for name, param in model.named_parameters():
@@ -14,7 +14,7 @@ def freeze_model(model, layer_names=None):
 
 
 def activate_model(model, layer_names=None):
-    """Defreezing a part of the model."""
+    """Defreeze a part of the model."""
     if layer_names is not None:
         for name, param in model.named_parameters():
             if any(param_name in name for param_name in layer_names):
