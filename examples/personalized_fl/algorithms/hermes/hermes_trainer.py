@@ -52,15 +52,17 @@ class Trainer(basic.Trainer):
         accuracy = self.test_model(config, self.testset, None)
         self.pruned_amount = pruning.compute_pruned_amount(self.model, self.client_id)
 
-        # Merge the incoming server payload model with the mask to create the model for training
-        self.model = self.merge_model(self.model)
+        # Apply the most to the incoming server payload model to create the model for training
+        self.model = self.apply_mask(self.model)
 
         # Send the model to the device used for training
         self.model.to(self.device)
         self.model.train()
 
         logging.info(
-            "[Client #%d] Evaluated Accuracy: %.2f%%", self.client_id, accuracy * 100
+            "[Client #%d] Evaluated Accuracy for pruning: %.2f%%",
+            self.client_id,
+            accuracy * 100,
         )
 
         if (
@@ -102,7 +104,7 @@ class Trainer(basic.Trainer):
                 "[Client #%d] Pruned Amount: %.2f%%", self.client_id, self.pruned_amount
             )
 
-    def merge_model(self, model):
+    def apply_mask(self, model):
         """Applies the mask onto the incoming personalized model."""
         model_name = Config().trainer.model_name
         model_path = Config().params["model_path"]
