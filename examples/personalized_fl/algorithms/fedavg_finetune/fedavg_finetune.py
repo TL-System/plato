@@ -14,7 +14,7 @@ learning.
 from plato.clients import simple
 from plato.trainers import basic
 
-from pflbases import fedavg_personalized
+from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     """
     trainer = basic.Trainer
     client = simple.Client(trainer=trainer)
-    server = fedavg_personalized.Server(trainer=trainer)
+    server = personalized_server.Server(trainer=trainer)
 
     server.run(client)
 
