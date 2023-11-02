@@ -77,7 +77,7 @@ class Trainer(basic.Trainer):
         # Define the personalized model
         model_type = Config().algorithm.personalization.model_type
         model_params = Config().parameters.personalization.model._asdict()
-        model_params["input_dim"] = self.model.encoding_dim
+        model_params["input_dim"] = self.model.encoder.encoding_dim
         model_params["output_dim"] = model_params["num_classes"]
         self.personalized_model = models_registry.get(
             model_name=Config().algorithm.personalization.model_name,
@@ -128,9 +128,11 @@ class Trainer(basic.Trainer):
         # Get loss criterion for the personalization
         if self.current_round > Config().trainer.rounds:
             loss_criterion_type = Config().algorithm.personalization.loss_criterion
-            loss_criterion_params = (
-                Config().parameters.personalization.loss_criterion._asdict()
-            )
+            loss_criterion_params = {}
+            if hasattr(Config().parameters.personalization, "loss_criterion"):
+                loss_criterion_params = (
+                    Config().parameters.personalization.loss_criterion._asdict()
+                )
             return loss_criterion.get(
                 loss_criterion=loss_criterion_type,
                 loss_criterion_params=loss_criterion_params,
@@ -162,23 +164,14 @@ class Trainer(basic.Trainer):
         # Get the lr scheduler for the SSL
         return super().get_lr_scheduler(config, optimizer)
 
-    def personalized_model_forward(self, examples, **kwargs):
-        """Forward the input examples to the personalized model."""
-
-        # Extract representation from the trained
-        # frozen encoder of ssl.
-        # No optimization is reuqired by this encoder.
-        with torch.no_grad():
-            features = self.model.encoder(examples)
-
-        # Perfrom the training and compute the loss
-        return self.personalized_model(features)
-
     def train_run_start(self, config):
         """Set the config before training."""
         if self.current_round > Config().trainer.rounds:
             config["batch_size"] = Config().algorithm.personalization.batch_size
             config["epochs"] = Config().algorithm.personalization.epochs
+
+            self.personalized_model.to(self.device)
+            self.personalized_model.train()
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop."""
