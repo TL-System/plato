@@ -101,7 +101,7 @@ class Server(fedavg_personalized.Server):
             )
 
             # the global L2 norm over a list of tensors.
-            l2_distance = ModelEMA.get_parameters_diff(
+            l2_distance = utils.get_parameters_diff(
                 parameter_a=aggregated_encoder,
                 parameter_b=client_encoder,
             )

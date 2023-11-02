@@ -1,11 +1,10 @@
 """
-Customize the processor for FedEMA.
+Customized processor for FedEMA.
 """
 import logging
 from typing import Any
 
 import utils
-from moving_average import ModelEMA
 
 from plato.config import Config
 from plato.callbacks.client import ClientCallback
@@ -46,7 +45,7 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         )
 
         # Compute the divergence between encoders of local and global models
-        l2_distance = ModelEMA.get_parameters_diff(
+        l2_distance = utils.get_parameters_diff(
             parameter_a=local_encoder_layers,
             parameter_b=global_encoder_layers,
         )
@@ -54,10 +53,10 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         # Perform EMA update
         divergence_scale = min(l2_distance * divergence_scale, 1)
 
-        ema_operator = ModelEMA(beta=divergence_scale)
-        ema_parameters = ema_operator.update_parameters_moving_average(
+        ema_parameters = utils.update_parameters_moving_average(
             previous_parameters=local_model_layers,
             current_parameters=global_layers,
+            beta=divergence_scale,
         )
         # Update the ema parameters
         data[0].update(ema_parameters)
