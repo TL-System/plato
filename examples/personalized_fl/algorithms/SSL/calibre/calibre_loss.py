@@ -4,8 +4,6 @@ The implementation of the losses for the Calibre approach.
 It includes NTXentLoss as the main loss, while:
     - prototype-oriented contrastive regularizer
     - prototype-based meta regularizer
-    - prototype_contrastive_representation_loss
-    - meta_prototype_contrastive_representation_loss
     as optional auxiliary losses.
 
 The one related loss is proposed in the paper:
@@ -18,7 +16,6 @@ from collections import OrderedDict
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from lightly import loss as lightly_loss
 
 from plato.trainers import loss_criterion
@@ -183,94 +180,6 @@ class CalibreLoss(nn.Module):
         )
 
         return l_p, l_n
-
-    def prototype_contrastive_representation_loss(self, outputs, labels):
-        """Compute loss to support the a client specific representation.
-
-        Takes `features` and `labels` as input, and return the loss.
-
-        If both `labels` and `mask` are None, it degenerates to SimCLR's
-        unsupervised contrastive loss.
-
-        Args:
-            encoded_z1 (torch.tensor): the obtaind features. batch_size, feature_dim.
-            encoded_z2 (torch.tensor): the obtaind features. batch_size, feature_dim.
-            labels: ground truth of shape [bsz].
-
-        Returns:
-            A loss scalar.
-
-        """
-        # Combine two inputs features into one
-        # encoded_z1: batch_size, fea_dim
-        # encoded_z2: batch_size, fea_dim
-        # features: batch_size, 2, fea_dim
-        encoded_z1, encoded_z2 = outputs
-        batch_size = encoded_z1.shape[0]
-
-        device = encoded_z1.get_device() if encoded_z1.is_cuda else torch.device("cpu")
-
-        encoded_z1 = F.normalize(encoded_z1, dim=1)
-        encoded_z2 = F.normalize(encoded_z2, dim=1)
-
-        # batch_size, 2, dim
-        features = torch.cat([encoded_z1.unsqueeze(1), encoded_z2.unsqueeze(1)], dim=1)
-
-        features = features.view(features.shape[0], features.shape[1], -1)
-
-        labels = labels.contiguous().view(-1, 1)
-        if labels.shape[0] != batch_size:
-            raise ValueError("Num of labels does not match num of features")
-        # mask: contrastive mask of shape [bsz, bsz], mask_{i,j}=1 if sample j
-        #     has the same class as sample i. Can be asymmetric.
-        mask = torch.eq(labels, labels.T).float().to(device)
-
-        # obtain the number of cotrastive items
-        contrast_count = features.shape[1]
-        # obtain the combined features
-        # batch_size * contrast_count, feature_dim
-        contrast_feature = torch.cat(torch.unbind(features, dim=1), dim=0)
-
-        if self.contrast_mode == "one":
-            anchor_feature = features[:, 0]
-            anchor_count = 1
-        elif self.contrast_mode == "all":
-            anchor_feature = contrast_feature
-            anchor_count = contrast_count
-        else:
-            raise ValueError("Unknown mode: {}".format(self.contrast_mode))
-
-        # compute logits
-        anchor_dot_contrast = torch.div(
-            torch.matmul(anchor_feature, contrast_feature.T), self.temperature
-        )
-        # for numerical stability
-        logits_max, _ = torch.max(anchor_dot_contrast, dim=1, keepdim=True)
-        logits = anchor_dot_contrast - logits_max.detach()
-
-        # tile mask
-        mask = mask.repeat(anchor_count, contrast_count)
-        # mask-out self-contrast cases
-        logits_mask = torch.scatter(
-            torch.ones_like(mask),
-            1,
-            torch.arange(batch_size * anchor_count).view(-1, 1).to(device),
-            0,
-        )
-        mask = mask * logits_mask
-
-        # compute log_prob
-        exp_logits = torch.exp(logits) * logits_mask
-        log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
-
-        # compute mean of log-likelihood over positive
-        mean_log_prob_pos = (mask * log_prob).sum(1) / mask.sum(1)
-
-        # loss
-        loss = -(self.temperature / self.base_temperature) * mean_log_prob_pos
-        loss = loss.view(anchor_count, batch_size).mean()
-
-        return loss
 
     def forward(self, *args, **kwargs):
         """Forward the loss computaton layer."""
