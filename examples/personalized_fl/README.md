@@ -124,10 +124,10 @@ python algorithms/SSL/calibre/calibre.py -c algorithms/configs/SSL/calibre_CIFAR
 All hyper-parameters should be placed under the `algorithm` block of the configuration file. 
 
 ### For `fedavg_personalized`
-- local_layer_names: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_personalized.py` as the algorithm, the `local_layer_names` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `local_layer_names` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
+- global_layer_names: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_personalized.py` as the algorithm, the `global_layer_names` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `global_layer_names` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
     ```yaml
     algorithm:
-        local_layer_names:
+        global_layer_names:
             - conv1
             - bn1
             - layer1
