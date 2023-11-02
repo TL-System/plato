@@ -8,11 +8,10 @@ from collections import UserList
 import torch
 from lightly.data.multi_view_collate import MultiViewCollate
 
-from plato.trainers import loss_criterion
 from plato.config import Config
 from plato.trainers import basic
 from plato.models import registry as models_registry
-from plato.trainers import optimizers
+from plato.trainers import optimizers, lr_schedulers, loss_criterion
 
 
 class SSLSamples(UserList):
@@ -86,15 +85,6 @@ class Trainer(basic.Trainer):
             model_params=model_params,
         )
 
-        # Define the optimizer for the personalized model
-        optimizer_name = Config().algorithm.personalization.optimizer
-        optimizer_params = Config().parameters.personalization.optimizer._asdict()
-        self.personalized_optimizer = optimizers.get(
-            self.personalized_model,
-            optimizer_name=optimizer_name,
-            optimizer_params=optimizer_params,
-        )
-
     def set_personalized_datasets(self, trainset, testset):
         """Set the trainset."""
         self.personalized_trainset = trainset
@@ -120,13 +110,33 @@ class Trainer(basic.Trainer):
                 collate_fn=collate_fn,
             )
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
-        # Get the loss for the personalization
-        if self.current_round > Config().trainer.rounds:
-            return self.get_loss_criterion()
+    def get_optimizer(self, model):
+        """Returns the optimizer for SSL and personalization."""
+        if self.current_round <= Config().trainer.rounds:
+            return super().get_optimizer(model)
+        # Define the optimizer for the personalized model
+        optimizer_name = Config().algorithm.personalization.optimizer
+        optimizer_params = Config().parameters.personalization.optimizer._asdict()
+        return optimizers.get(
+            self.personalized_model,
+            optimizer_name=optimizer_name,
+            optimizer_params=optimizer_params,
+        )
 
-        # Get the loss used by the SSL training process
+    def get_loss_criterion(self):
+        """Returns the loss criterion for the SSL."""
+        # Get loss criterion for the personalization
+        if self.current_round > Config().trainer.rounds:
+            loss_criterion_type = Config().algorithm.personalization.loss_criterion
+            loss_criterion_params = (
+                Config().parameters.personalization.loss_criterion._asdict()
+            )
+            return loss_criterion.get(
+                loss_criterion=loss_criterion_type,
+                loss_criterion_params=loss_criterion_params,
+            )
+
+        # Get loss criterion for the SSL
         ssl_loss_function = loss_criterion.get()
 
         def compute_plato_loss(outputs, labels):
@@ -136,6 +146,21 @@ class Trainer(basic.Trainer):
                 return ssl_loss_function(outputs)
 
         return compute_plato_loss
+
+    def get_lr_scheduler(self, config, optimizer):
+        # Get the lr scheduler for the personalization
+        if self.current_round > Config().trainer.rounds:
+            lr_scheduler = Config().algorithm.personalization.lr_scheduler
+            lr_params = Config().parameters.personalization.learning_rate._asdict()
+
+            return lr_schedulers.get(
+                optimizer,
+                len(self.train_loader),
+                lr_scheduler=lr_scheduler,
+                lr_params=lr_params,
+            )
+        # Get the lr scheduler for the SSL
+        return super().get_lr_scheduler(config, optimizer)
 
     def personalized_model_forward(self, examples, **kwargs):
         """Forward the input examples to the personalized model."""
@@ -148,6 +173,39 @@ class Trainer(basic.Trainer):
 
         # Perfrom the training and compute the loss
         return self.personalized_model(features)
+
+    def train_run_start(self, config):
+        """Set the config before training."""
+        if self.current_round > Config().trainer.rounds:
+            config["batch_size"] = Config().algorithm.personalization.batch_size
+            config["epochs"] = Config().algorithm.personalization.epochs
+
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        """Perform forward and backward passes in the training loop."""
+
+        if not self.current_round > Config().trainer.rounds:
+            return super().perform_forward_and_backward_passes(config, examples, labels)
+
+        # Perform the local update on self.personalized_model
+        self.optimizer.zero_grad()
+        # Extract representation from the trained
+        # frozen encoder of ssl.
+        # No optimization is reuqired by this encoder.
+        with torch.no_grad():
+            features = self.model.encoder(examples)
+        outputs = self.personalized_model(features)
+
+        loss = self._loss_criterion(outputs, labels)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
 
     def collect_encodings(self, data_loader):
         """Collecting the encodings of the data."""
