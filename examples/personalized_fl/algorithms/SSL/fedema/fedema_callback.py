@@ -26,15 +26,13 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         # Extract the `encoder_layer_names` of the model head
         assert hasattr(Config().algorithm, "encoder_layer_names")
 
-        local_model_layers = self.trainer.model.cpu().state_dict()
+        local_layers = self.trainer.model.cpu().state_dict()
         global_layers = data[0]
 
         encoder_layer_names = Config().algorithm.encoder_layer_names
 
         # Get encoder layers of the local and global models
-        local_encoder_layers = utils.extract_encoder(
-            local_model_layers, encoder_layer_names
-        )
+        local_encoder_layers = utils.extract_encoder(local_layers, encoder_layer_names)
         global_encoder_layers = utils.extract_encoder(
             global_layers, encoder_layer_names
         )
@@ -54,7 +52,7 @@ class GlobalLocalDivergenceProcessor(base.Processor):
         divergence_scale = min(l2_distance * divergence_scale, 1)
 
         ema_parameters = utils.update_parameters_moving_average(
-            previous_parameters=local_model_layers,
+            previous_parameters=local_layers,
             current_parameters=global_layers,
             beta=divergence_scale,
         )

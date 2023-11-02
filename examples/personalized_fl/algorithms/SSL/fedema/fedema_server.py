@@ -8,7 +8,6 @@ import os
 import logging
 
 import utils
-from moving_average import ModelEMA
 
 from plato.config import Config
 
@@ -34,15 +33,15 @@ class Server(fedavg_personalized.Server):
             client_id: 0.0 for client_id in range(1, self.total_clients + 1)
         }
 
-        # Whether to compute the divergence scale adaptively
-        # Use the default one if not provided
+        # Whether to compute the divergence scale adaptively.
+        # Use the default one if not provided.
         self.adaptive_divg_scale = (
             False
             if not hasattr(Config().algorithm, "adaptive_divergence_scale")
             else Config().algorithm.adaptive_divergence_scale
         )
-        # if the personalized divergence scale is set to be constant
-        # then all clients share the same scale
+        # If the personalized divergence scale is set to be constant
+        #   then all clients share the same scale
         if not self.adaptive_divg_scale:
             # must provide the default value in the config file
             default_scale = Config().algorithm.default_divergence_scale
@@ -50,35 +49,27 @@ class Server(fedavg_personalized.Server):
                 client_id: default_scale for client_id in self.clients_divg_scale
             }
 
-        self.tau = (
-            0.7
-            if not hasattr(Config().algorithm, "divergence_scale_tau")
-            else Config().algorithm.divergence_scale_tau
-        )
-        # Compute the scale before which round
-        self.divg_divg_before_round = (
-            1
-            if not hasattr(Config().algorithm, "compute_scale_before_round")
-            else Config().algorithm.compute_scale_before_round
-        )
-
     def weights_aggregated(self, updates):
         """Get client divergence based on the aggregated weights and
         the client's update.
         """
         # Get the clients id required to compute the divergence rate
         # which clients' scales are required to be computed.
-        do_clients_id = []
+        clients_id = []
 
         # if divergence is not required to be computed
         # adaptively
         if not self.adaptive_divg_scale:
-            return do_clients_id
+            return clients_id
         # if the computation round has been passed
-        if self.current_round > self.divg_divg_before_round:
-            return do_clients_id
+        if not hasattr(Config().algorithm, "compute_scale_before_round"):
+            divg_before_round = 1
+        else:
+            divg_before_round = Config().algorithm.compute_scale_before_round
+        if self.current_round > divg_before_round:
+            return clients_id
 
-        do_clients_id = [update.report.client_id for update in updates]
+        clients_id = [update.report.client_id for update in updates]
 
         # Compute the divergence scale based on the distance between
         # the updated local model and the aggregated global model
@@ -90,7 +81,7 @@ class Server(fedavg_personalized.Server):
             client_parameters = client_update.payload
             client_id = client_update.report.client_id
 
-            if client_id not in do_clients_id:
+            if client_id not in clients_id:
                 continue
 
             aggregated_encoder = self.algorithm.extract_encoder()
@@ -106,7 +97,11 @@ class Server(fedavg_personalized.Server):
                 parameter_b=client_encoder,
             )
 
-            client_divg_scale = self.tau / l2_distance
+            if not hasattr(Config().algorithm, "divergence_scale_tau"):
+                tau = 0.7
+            else:
+                tau = Config().algorithm.divergence_scale_tau
+            client_divg_scale = tau / l2_distance
 
             self.clients_divg_scale[client_id] = client_divg_scale
 
