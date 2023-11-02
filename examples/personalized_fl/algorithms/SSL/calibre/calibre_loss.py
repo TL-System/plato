@@ -54,78 +54,47 @@ class CalibreLoss(nn.Module):
         self.main_loss_params = main_loss_params
 
         # The auxiliary losses and the corresponding parameters
-        self.auxiliary_losses = auxiliary_losses
-        self.auxiliary_losses_params = auxiliary_losses_params
+        if auxiliary_losses is None:
+            auxiliary_losses = []
+        if auxiliary_losses_params is None:
+            auxiliary_losses_params = []
+        assert len(auxiliary_losses) == len(auxiliary_losses_params)
 
         # The weights of these losses set in the config file
-        self.losses_weight = losses_weight._asdict()
+        self.loss_weights_params_weight = losses_weight._asdict()
 
-        # A container for the loss name and its corresponding weight
-        self.losses = OrderedDict()
-        # A container for the loss name and its corresponding weight
+        self.loss_weights_params = OrderedDict()
         self.loss_functions = OrderedDict()
 
-        # Set the default values for the 'self.losses' container
-        self.set_default()
-        # Load loss and weight to the 'self.losses' container
-        self.set_losses()
-        # Align the loss name with its corresponding function
-        self.define_loss_functions()
+        if main_loss not in losses_weight:
+            weight = 1.0
+        else:
+            weight = losses_weight[main_loss]
+        self.loss_weights_params[main_loss] = {
+            "params": main_loss_params,
+            "weight": weight,
+        }
+        for loss in auxiliary_losses:
+            if loss not in losses_weight:
+                self.loss_weights_params[loss] = {
+                    "params": auxiliary_losses_params[loss]._asdict(),
+                    "weight": losses_weight[loss],
+                }
 
-    def set_default(self):
-        """Set the default values for losses."""
-
-        # First set the auxiliary loss part
-        self.auxiliary_losses = (
-            self.auxiliary_losses if self.auxiliary_losses is not None else []
-        )
-        self.auxiliary_losses_params = (
-            self.auxiliary_losses_params
-            if self.auxiliary_losses_params is not None
-            else []
-        )
-        # Each auxiliary losses corresponds to one piece of parameters
-        assert len(self.auxiliary_losses) == len(self.auxiliary_losses_params)
-
-        # Combine the main loss and auxiliary losses into the
-        # container
-        self.losses[self.main_loss] = {"params": {}, "weight": 0.0}
-        if self.main_loss not in self.losses_weight:
-            self.losses_weight[self.main_loss] = 1.0
-
-        for name in self.auxiliary_losses:
-            if name not in self.losses_weight:
-                self.losses_weight[name] = 0.0
-
-            self.losses[name] = {"params": {}, "weight": 0.0}
-
-    def set_losses(self):
-        """Set the losses and the corresponding parameters."""
-        # Visit the container to set the parameters
-        self.losses[self.main_loss]["params"] = self.main_loss_params
-        self.losses[self.main_loss]["weight"] = self.losses_weight[self.main_loss]
-
-        for loss in self.auxiliary_losses:
-            param = self.auxiliary_losses_params[loss]
-            self.losses[loss]["params"] = param._asdict()
-            self.losses[loss]["weight"] = self.losses_weight[loss]
-
-    def define_loss_functions(self):
-        """Define the loss functions."""
         # Align the loss name with its corresponding function
         # There are two types of functions:
         # the one from the existing package of SSL
         # another one from the membership functions of this class
-        for loss_name in self.losses:
+        for loss_name in self.loss_weights_params:
             if hasattr(self, loss_name):
                 loss_func = getattr(self, loss_name)
             else:
                 loss_func = loss_criterion.get(
                     loss_criterion=loss_name,
-                    loss_criterion_params=self.losses[loss_name]["params"],
+                    loss_criterion_params=self.loss_weights_params[loss_name]["params"],
                 )
 
-            self.loss_functions[loss_name] = loss_func
+            self.loss_funcs[loss_name] = loss_func
 
     def prototype_regularizers(self, encodings, projections, **kwargs):
         """Compute the L_p and L_n losses mentioned the paper."""
@@ -156,9 +125,7 @@ class CalibreLoss(nn.Module):
         # each with shape, [batch_size]
         pseudo_labels_a, pseudo_labels_b = torch.split(clusters_assignment, batch_size)
 
-        ##
         ## prototype-oriented contrastive regularizer
-        ##
         # Compute the prototype features based on projection
         # with shape, [n_clusters, projection_dim]
         prototypes_a = torch.stack(
@@ -180,9 +147,7 @@ class CalibreLoss(nn.Module):
         # Compute the L_p loss
         loss_fn = lightly_loss.NTXentLoss(memory_bank_size=0)
         l_p = loss_fn(prototypes_a, prototypes_b)
-        ##
-        ## Compute prototype-based meta regularizer
-        ##
+        # Compute prototype-based meta regularizer
         # Support set with shape, [n_clusters, encoding_dim]
         support_prototypes = torch.stack(
             [
@@ -207,15 +172,14 @@ class CalibreLoss(nn.Module):
         """Forward the loss computaton layer."""
         total_loss = 0.0
         # Extract terms from the input
-        labels = kwargs.get("labels", None)
         encodings = args[0]
         projections = args[1]
 
         # Visit the loss container to compute the whole loss
         # in which each term is loss_weight * loss
-        for loss_name in self.losses:
-            loss_weight = self.losses[loss_name]["weight"]
-            loss_params = self.losses[loss_name]["params"]
+        for loss_name in self.loss_weights_params:
+            loss_weight = self.loss_weights_params[loss_name]["weight"]
+            loss_params = self.loss_weights_params[loss_name]["params"]
 
             if loss_name == "prototype_regularizers":
                 regularizers_loss = self.prototype_regularizers(
