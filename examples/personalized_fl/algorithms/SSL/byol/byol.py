@@ -14,7 +14,7 @@ from pflbases import fedavg_partial
 from pflbases import ssl_client
 from pflbases import ssl_datasources
 
-from model import BYOLModel
+from byol_model import BYOLModel
 import byol_trainer
 
 
