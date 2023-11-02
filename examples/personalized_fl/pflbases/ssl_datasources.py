@@ -1,7 +1,7 @@
 """
 A base datasource for self-supervised learning.
 """
-from lightly.transforms import *
+from lightly import transforms
 
 from plato.datasources import base
 from plato.datasources import registry as datasources_registry
@@ -10,19 +10,19 @@ from plato.utils import visual_augmentations
 
 
 registered_transforms = {
-    "SimCLR": SimCLRTransform,
-    "DINO": DINOTransform,
-    "MAE": MAETransform,
-    "MoCoV1": MoCoV1Transform,
-    "MoCoV2": MoCoV2Transform,
-    "MSN": MSNTransform,
-    "PIRL": PIRLTransform,
-    "SimSiam": SimSiamTransform,
-    "SMoG": SMoGTransform,
-    "SwaV": SwaVTransform,
-    "VICReg": VICRegTransform,
-    "VICRegL": VICRegLTransform,
-    "FastSiam": FastSiamTransform,
+    "SimCLR": transforms.SimCLRTransform,
+    "DINO": transforms.DINOTransform,
+    "MAE": transforms.MAETransform,
+    "MoCoV1": transforms.MoCoV1Transform,
+    "MoCoV2": transforms.MoCoV2Transform,
+    "MSN": transforms.MSNTransform,
+    "PIRL": transforms.PIRLTransform,
+    "SimSiam": transforms.SimSiamTransform,
+    "SMoG": transforms.SMoGTransform,
+    "SwaV": transforms.SwaVTransform,
+    "VICReg": transforms.VICRegTransform,
+    "VICRegL": transforms.VICRegLTransform,
+    "FastSiam": transforms.FastSiamTransform,
 }
 
 
