@@ -32,7 +32,7 @@ trainer:
 
 algorithm:
     # Aggregation algorithm
-    type: fedavg
+    type: fedavg_personalized
 
     local_layer_names:
         - conv1
