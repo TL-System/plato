@@ -7,7 +7,6 @@ paper address: https://arxiv.org/pdf/2003.13461.pdf
 
 Official code: None
 Third-party code: 
-- https://github.com/lgcollins/FedRep
 - https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
 - https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
 

@@ -1,6 +1,4 @@
 
-`pflbases` offers a set of fundamental functions designed to facilitate the implementation of the Personalized Federated Learning (FL) algorithm. Its objective is to provide both fairness and reproducibility guarantees. 
-
 ## Core Components
 
 - the _completion_ callbacks placed under `client_callbacks` merge other models into the `self.model` parameters. 
@@ -10,7 +8,7 @@
 
 ## Implemented Algorithms
 
-To better compare the performance of different personalized federated learning approaches, we implemented the following algorithms using the `pflbases` framework. The code is available under `algorithms/`.
+To better compare the performance of different personalized federated learning approaches, we implemented the following algorithms.
 
 ### Baseline Algorithm
 
@@ -44,16 +42,7 @@ In the context of self-supervised learning (SSL), the model is trained to learn 
 - {SimCLR} [Chen et al., "A Simple Framework for Contrastive Learning of Visual Representations", Arxiv 2020, citation 374](https://arxiv.org/abs/2002.05709) - [Office code](https://github.com/google-research/simclr)
 
 
-## Algorithms Running
-
-1. Go to the folder `examples/personalized_fl`.
-2. Install pflbases by running 
-
-```bash
-pip install .
-```
-
-3. Perform the algorithms by running:
+2. Perform the algorithms by running:
 
 ```bash
 python algorithms/fedavg_finetune/fedavg_finetune.py -c algorithms/configs/fedavg_finetune_CIFAR10_resnet18.yml -b pflExperiments
@@ -132,7 +121,7 @@ python algorithms/SSL/calibre/calibre.py -c algorithms/configs/SSL/calibre_CIFAR
 
 ## Hyper-parameters
 
-All hyper-parameters of `pflbases` should be placed under the `algorithm` block of the configuration file. 
+All hyper-parameters should be placed under the `algorithm` block of the configuration file. 
 
 ### For `fedavg_personalized`
 - local_layer_names: This is a list in which each item is a string presenting the parameter name. When you utilize the `fedavg_personalized.py` as the algorithm, the `local_layer_names` is required to be set under the `algorithm` block of the configuration file. Then, only the parameters contained in the `local_layer_names` will be the global model to be exchanged between the server and clients. Thus, server aggregation will be performed only on these parameters. If this hyper-parameter is not set, all parameters of the defined model will be used by default. For example, 
@@ -173,16 +162,6 @@ All hyper-parameters related to personalization should be placed under the `pers
         personalization:
             # the ratio of clients participanting in training
             participating_clients_ratio: 0.6
-    ```
-
-- do_personalization_per_round: A boolean to indicate whether to perform personalization per round. Default: True. For example, 
-    ```yaml
-    algorithm:
-        personalization:
-
-            # whether the personalized model will be
-            # obtained in each round
-            do_personalization_per_round: true
     ```
 
 

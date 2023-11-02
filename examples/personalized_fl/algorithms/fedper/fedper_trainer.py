@@ -1,11 +1,9 @@
 """
 A personalized federated learning trainer for FedPer.
 """
-
-from pflbases import trainer_utils
-
 from plato.config import Config
 from plato.trainers import basic
+from plato.utils import trainer_utils
 
 
 class Trainer(basic.Trainer):
