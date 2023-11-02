@@ -9,7 +9,7 @@ from pflbases import fedavg_personalized
 
 
 class Server(fedavg_personalized.Server):
-    """A federated learning server using the Hermes algorithm."""
+    """A federated learning server using the Calibre algorithm."""
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -37,8 +37,8 @@ class Server(fedavg_personalized.Server):
         return await super().aggregate_deltas(updates, deltas_received)
 
     def weights_received(self, weights_received):
-        """Get the divergenec rates sent from clients."""
-        self.divergence_rates_received =  1 / torch.stack(
+        """Get the divergence rates from clients."""
+        self.divergence_rates_received = 1 / torch.stack(
             [weight[1] for weight in weights_received], dim=0
         )
         return [weight[0] for weight in weights_received]
