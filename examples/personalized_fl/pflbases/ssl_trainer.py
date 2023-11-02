@@ -211,6 +211,7 @@ class Trainer(basic.Trainer):
 
     def test_model(self, config, testset, sampler=None, **kwargs):
         """Testing the model to report the accuracy in each round."""
+        batch_size = config["batch_size"]
         if self.current_round > Config().trainer.rounds:
             # Test the personalized model after the final round.
             self.local_layers.eval()
@@ -220,14 +221,14 @@ class Trainer(basic.Trainer):
             self.model.to(self.device)
 
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=20, shuffle=False, sampler=sampler
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler
             )
 
             correct = 0
             total = 0
             accuracy = 0
             with torch.no_grad():
-                for _, (examples, labels) in enumerate(test_loader):
+                for examples, labels in test_loader:
                     examples, labels = examples.to(self.device), labels.to(self.device)
 
                     features = self.model.encoder(examples)
@@ -247,7 +248,6 @@ class Trainer(basic.Trainer):
             #   to use the KNN as a classifier to evaluate the extracted features.
 
             logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
-            batch_size = config["batch_size"]
 
             # Get the training loader and test loader
             train_loader = torch.utils.data.DataLoader(
@@ -259,6 +259,8 @@ class Trainer(basic.Trainer):
             test_loader = torch.utils.data.DataLoader(
                 testset, batch_size=batch_size, shuffle=False, sampler=sampler
             )
+            # For evaluating self-supervised performance, we need to calculate
+            #   distance between training samples and testing samples.
             train_encodings, train_labels = self.collect_encodings(train_loader)
             test_encodings, test_labels = self.collect_encodings(test_loader)
 
