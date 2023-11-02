@@ -87,7 +87,7 @@ python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
 SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
 
 ```shell
-python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.yml
+python examples/customized_client_training/scaffold/scaffold.py -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -99,7 +99,7 @@ Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federa
 To better handle system heterogeneity, the FedProx algorithm introduced a proximal term in the optimizer used by local training on the clients. It has been quite widely cited and compared with in the federated learning literature.
 
 ```shell
-python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
+python examples/customized_client_training/fedprox/fedprox.py -c examples/customized_client_training/fedprox/fedprox_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -110,7 +110,7 @@ T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federa
 ````{admonition} **FedDyn**
 FedDyn is proposed to provide communication savings by dynamically updating each participating device's regularizer in each round of training. It is a method proposed to solve data heterogeneity in federated learning.
 ```shell
-python examples/feddyn/feddyn.py -c examples/feddyn/feddyn_MNIST_lenet5.yml
+python examples/customized_client_training/feddyn/feddyn.py -c examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -175,7 +175,7 @@ Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant S
 Polaris is a client selection method for asynchronous federated learning. In this method, it selects clients via balancing between local device speed and local data quality from an optimization perspective. As it does not require extra information rather than local updates, Polaris is pluggable to any other federated aggregation methods.
 
 ```shell
-python3 examples/polaris/polaris.py -c examples/polaris/polaris_LeNet5.yml
+python3 examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_LeNet5.yml
 ```
 ```{note}
 Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
@@ -397,7 +397,7 @@ python algorithms/fedema/fedema.py -c configs/fedema/fedema_CIFAR10_resnet18_non
 FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
 
 ```shell
-python examples/fedrlnas/fedrlnas.py -c examples/fedrlnas/FedRLNAS_MNIST_DARTS.yml
+python examples/model_search/fedrlnas/fedrlnas.py -c examples/model_search/fedrlnas/FedRLNAS_MNIST_DARTS.yml
 ```
 
 ```{note}
@@ -410,19 +410,19 @@ PerFedRLNAS is an algorithm designed to personalize different models on each cli
 
 NASVIT search space:
 ```shell
-python ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
+python ./examples/model_search/pfedrlnas/VIT/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
 ```
 MobileNetV3 search space (synchronous mode):
 ```
-python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
+python ./examples/model_search/pfedrlnas/MobileNetV3/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
 ```
 MobileNetV3 search space (asynchronous mode):
 ```
-python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
+python ./examples/model_search/pfedrlnas/MobileNetV3/fednas.py -c ./examples/model_search/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
 ```
 DARTS search space
 ```
-python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
+python ./examples/model_search/pfedrlnas/DARTS/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
 ```
 ````
 
@@ -430,7 +430,7 @@ python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerF
 FedTP is proposed to improve personalized federated learning with transformer structured models. For each client, the attention maps in the transformer block are generated and updated by a hypernet working on the server, instead of being updated by average aggregation. The core part is in ```fedtp_server```: ```customize_server_payload``` reloads the weights of attention maps with attention generated by hypernet before sending the models to clients and ```aggregate_weights``` updates the hypernet besides doing averaging aggregation of other parts of the model. 
 
 ```shell
-python ./examples/fedtp/fedtp.py -c ./examples/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.yml
+python ./examples/model_search/fedtp/fedtp.py -c ./examples/model_search/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.yml
 ```
 
 ```{note}
@@ -441,7 +441,7 @@ Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization
 HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
 
 ```shell
-python examples/heterofl/heterofl.py -c examples/heterofl/heterofl_resnet18_dynamic.yml
+python examples/model_search/heterofl/heterofl.py -c examples/model_search/heterofl/heterofl_resnet18_dynamic.yml
 ```
 
 ```{note}
@@ -453,7 +453,7 @@ Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated
 FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
 
 ```shell
-python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
+python3 examples/model_search/fedrolex/fedrolex.py -c examples/model_search/fedrolex/example_ViT.yml
 ```
 
 ```{note}
@@ -466,7 +466,7 @@ Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolli
 FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
 
 ```shell
-python3 examples/fjord/fjord.py -c examples/fjord/fjord_resnet18_dynamic.yml
+python3 examples/model_search/fjord/fjord.py -c examples/model_search/fjord/fjord_resnet18_dynamic.yml
 ```
 
 ```{note}
@@ -479,7 +479,7 @@ Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterog
 AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
 
 ```shell
-python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
+python3 examples/model_search/anycostfl/anycostfl.py -c examples/model_search/anycostfl/example_ResNet.yml
 ```
 
 ```{note}
@@ -492,7 +492,7 @@ Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Hetero
 In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
 
 ```shell
-python3 ./examples/sysheterofl/sysheterofl.py -c examples/sysheterofl/config_ResNet152.yml
+python3 ./examples/model_search/sysheterofl/sysheterofl.py -c examples/model_search/sysheterofl/config_ResNet152.yml
 ```
 ````
 
