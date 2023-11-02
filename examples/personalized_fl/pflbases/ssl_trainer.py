@@ -15,7 +15,7 @@ from plato.trainers import optimizers, lr_schedulers, loss_criterion
 
 
 class SSLSamples(UserList):
-    """A SSL sample."""
+    """An SSL sample, which is the inputs to the model in SSL methods."""
 
     def to(self, device):
         """Assign the tensor item into the specific device."""
@@ -72,18 +72,17 @@ class Trainer(basic.Trainer):
         self.personalized_testset = None
 
         # Define the personalized model
-        model_type = Config().algorithm.personalization.model_type
         model_params = Config().parameters.personalization.model._asdict()
         model_params["input_dim"] = self.model.encoder.encoding_dim
         model_params["output_dim"] = model_params["num_classes"]
         self.personalized_model = models_registry.get(
             model_name=Config().algorithm.personalization.model_name,
-            model_type=model_type,
+            model_type=Config().algorithm.personalization.model_type,
             model_params=model_params,
         )
 
     def set_personalized_datasets(self, trainset, testset):
-        """Set the trainset."""
+        """Set the personalized trainset."""
         self.personalized_trainset = trainset
         self.personalized_testset = testset
 
@@ -183,8 +182,8 @@ class Trainer(basic.Trainer):
 
         # Perform the local update on self.personalized_model
         self.optimizer.zero_grad()
-        # Extract representation from the trained
-        # frozen encoder of ssl.
+        # Use the trained encoder to output features.
+        # Freeze the encoder of ssl.
         # No optimization is reuqired by this encoder.
         with torch.no_grad():
             features = self.model.encoder(examples)
@@ -208,7 +207,7 @@ class Trainer(basic.Trainer):
         samples_label = None
         self.model.eval()
         self.model.to(self.device)
-        for _, (examples, labels) in enumerate(data_loader):
+        for examples, labels in data_loader:
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
                 features = self.model.encoder(examples)
