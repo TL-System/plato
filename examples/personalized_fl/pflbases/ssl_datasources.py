@@ -1,8 +1,6 @@
 """
 A base datasource for self-supervised learning.
 """
-import logging
-
 from lightly.transforms import *
 
 from plato.datasources import base
@@ -31,8 +29,8 @@ registered_transforms = {
 def get_transforms():
     """Obtains train/test transforms for the corresponding data."""
     transforms_config = Config().algorithm.data_transforms._asdict()
-    data_transforms = {}
 
+    data_transforms = {}
     if "train_transform" in transforms_config:
         transform_config = transforms_config["train_transform"]._asdict()
         transform_name = transform_config["name"]
