@@ -12,6 +12,8 @@ from plato.config import Config
 
 
 class SwaV(nn.Module):
+    """The model structure for the SwaV."""
+
     def __init__(self, encoder=None):
         super().__init__()
 
@@ -41,18 +43,18 @@ class SwaV(nn.Module):
         )
         self.prototypes = SwaVPrototypes(projection_out_dim, n_prototypes=n_prototypes)
 
-    def forward_direct(self, samples):
-        encoded_samples = self.encoder(samples).flatten(start_dim=1)
+    def forward_view(self, views):
+        """Foward views of the samples"""
+        encoded_samples = self.encoder(views).flatten(start_dim=1)
         encoded_samples = self.projection_head(encoded_samples)
         encoded_samples = nn.functional.normalize(encoded_samples, dim=1, p=2)
         outputs = self.prototypes(encoded_samples)
         return outputs
 
     def forward(self, multiview_samples):
+        """Forward multiview samples."""
         self.prototypes.normalize()
-        multi_crop_features = [
-            self.forward_direct(sample) for sample in multiview_samples
-        ]
+        multi_crop_features = [self.forward_view(views) for views in multiview_samples]
         high_resolution = multi_crop_features[:2]
         low_resolution = multi_crop_features[2:]
 
