@@ -29,7 +29,9 @@ def main():
         ],
     )
     server = fedema_server.Server(
-        model=fedema_model.BYOLModel, trainer=trainer, algorithm=fedema_algorithm
+        model=fedema_model.BYOLModel,
+        trainer=trainer,
+        algorithm=fedema_algorithm.Algorithm,
     )
 
     server.run(client)

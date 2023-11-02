@@ -74,12 +74,11 @@ class ModelEMA:
     @staticmethod
     def get_parameters_diff(parameter_a: OrderedDictType, parameter_b: OrderedDictType):
         """Get the difference between two sets of parameters"""
-        # compute the divergence between encoders of local and global models
+        # Compute the divergence between encoders of local and global models
         l2_distance = 0.0
         for paraml, paramg in zip(parameter_a.items(), parameter_b.items()):
             diff = paraml[1] - paramg[1]
             # Calculate L2 norm and add to the total
             l2_distance += torch.sum(diff**2)
-            print("l2_distance: ", l2_distance)
 
         return l2_distance.sqrt()

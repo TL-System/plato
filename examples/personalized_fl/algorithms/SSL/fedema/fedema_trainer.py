@@ -1,7 +1,5 @@
 """
 Implementation of the trainer for FedEMA.
-
-This trainer is the one used in BYOL method of FedSSL.
 """
 
 from lightly.utils.scheduler import cosine_schedule
@@ -14,7 +12,7 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for BYOL to rewrite the loss wrappe."""
+    """A trainer for FedEMA."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
@@ -50,10 +48,10 @@ class Trainer(ssl_trainer.Trainer):
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
             update_momentum(
-                self.model.encoder, self.model.encoder_momentum, m=self.momentum_val
+                self.model.encoder, self.model.momentum_encoder, m=self.momentum_val
             )
             update_momentum(
-                self.model.projection_head,
-                self.model.projection_head_momentum,
+                self.model.projector,
+                self.model.momentum_projector,
                 m=self.momentum_val,
             )
