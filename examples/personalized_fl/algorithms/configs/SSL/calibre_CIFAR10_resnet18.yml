@@ -27,7 +27,7 @@ data:
 trainer:
     # LeNet5 model with the basic trainer
     # The maximum number of training rounds
-    rounds: 5
+    rounds: 10
 
     # The maximum number of clients running concurrently
     max_concurrency: 2
@@ -75,8 +75,8 @@ algorithm:
         # this loss contains two parts, including
         # l_p, l_n
         prototype_regularizers: 
-            - 0.5
-            - 0.6
+            - 0.3
+            - 0.3
 
     personalization:
 
