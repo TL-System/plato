@@ -1,11 +1,10 @@
 """
-A base server to perform personalized federated learning.
-
-Personalized federated learning starts from a number of regular rounds of federated
-learning. In these regular rounds, only a subset of the total clients can be selected
-to perform the local update (the ratio of which is a configuration setting). After all
-regular rounds are completed, it starts a final round of personalization, where a selected
-subset of clients perform local training using their local dataset.
+A personalized federated learning server that starts from a number of regular
+rounds of federated learning. In these regular rounds, only a subset of the
+total clients can be selected to perform the local update (the ratio of which is
+a configuration setting). After all regular rounds are completed, it starts a
+final round of personalization, where a selected subset of clients perform local
+training using their local dataset.
 """
 
 from plato.servers import fedavg
@@ -13,8 +12,11 @@ from plato.config import Config
 
 
 class Server(fedavg.Server):
-    """A base server to control how many clients will participate in the learning and
-    enable a final personalization round."""
+    """
+    A personalzed FL server that controls how many clients will participate in
+    the training process, and that adds a final personalization round with all
+    clients sampled.
+    """
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -31,8 +33,6 @@ class Server(fedavg.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose a subset of the clients to participate in each round."""
-        # Start personalization as the current round exceeds the total rounds
-        # set in the configuration file
         if self.current_round > Config().trainer.rounds:
             # In the final personalization round, choose from all clients
             return super().choose_clients(clients_pool, clients_count)

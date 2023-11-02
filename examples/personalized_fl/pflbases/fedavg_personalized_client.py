@@ -1,5 +1,6 @@
 """
-A base client for personalized federated learning
+A personalized federated learning client that saves its local layers before sending the shared global
+model to the server after local training.
 """
 from collections import OrderedDict
 
@@ -9,9 +10,8 @@ from plato.config import Config
 
 class Client(simple.Client):
     """
-    A base client class for personalized federated learning.
-    It will save local layers during outbound ready
-        after outbound payloads are processed and ready.
+    A personalized federated learning client that saves its local layers before sending the
+    shared global model to the server after local training.
     """
 
     def outbound_ready(self, report, outbound_processor):
@@ -31,7 +31,9 @@ class Client(simple.Client):
                     )
                 ]
             )
+
             model_path = Config().params["model_path"]
             model_name = Config().trainer.model_name
             filename = f"{model_path}/{model_name}_{self.client_id}_local_layers.pth"
+
             self.algorithm.save_local_layers(local_layers, filename)
