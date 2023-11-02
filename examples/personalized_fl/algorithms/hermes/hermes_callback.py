@@ -5,7 +5,7 @@ Callback for attaching a pruning mask to the payload if pruning had been conduct
 import os
 import pickle
 import logging
-from typing import OrderedDict
+from typing import OrderedDict as OrderedDictType
 
 
 from plato.callbacks.client import ClientCallback
@@ -24,17 +24,15 @@ class SendMaskProcessor(base.Processor):
 
         self.client_id = client_id
 
-    def process(self, data: OrderedDict):
+    def process(self, data: OrderedDictType):
         model_name = (
             Config().trainer.model_name
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
-        checkpoint_path = Config().params["checkpoint_path"]
+        model_path = Config().params["model_path"]
 
-        mask_filename = (
-            f"{checkpoint_path}/{model_name}_client{self.client_id}_mask.pth"
-        )
+        mask_filename = f"{model_path}/{model_name}_client{self.client_id}_mask.pth"
         if os.path.exists(mask_filename):
             with open(mask_filename, "rb") as payload_file:
                 client_mask = pickle.load(payload_file)

@@ -15,10 +15,10 @@ import pickle
 import hermes_pruning as pruning
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
-from pflbases import personalized_trainer
+from plato.trainers import basic
 
 
-class Trainer(personalized_trainer.Trainer):
+class Trainer(basic.Trainer):
     """A federated learning trainer of Hermes, used by both the client and the server."""
 
     def __init__(self, model=None, callbacks=None):
@@ -100,9 +100,9 @@ class Trainer(personalized_trainer.Trainer):
     def merge_model(self, model):
         """Applies the mask onto the incoming personalized model."""
         model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
+        model_path = Config().params["model_path"]
 
-        mask_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_mask.pth"
+        mask_path = f"{model_path}/{model_name}_client{self.client_id}_mask.pth"
         if not os.path.exists(mask_path):
             return self.model
         else:
@@ -114,12 +114,12 @@ class Trainer(personalized_trainer.Trainer):
     def save_mask(self, mask):
         """Saves the mask for merging in future rounds if pruning has occured."""
         model_name = Config().trainer.model_name
-        checkpoint_path = Config().params["checkpoint_path"]
+        model_path = Config().params["model_path"]
 
-        if not os.path.exists(checkpoint_path):
-            os.makedirs(checkpoint_path)
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
 
-        mask_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_mask.pth"
+        mask_path = f"{model_path}/{model_name}_client{self.client_id}_mask.pth"
 
         with open(mask_path, "wb") as payload_file:
             pickle.dump(mask, payload_file)

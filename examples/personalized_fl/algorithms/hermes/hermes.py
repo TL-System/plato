@@ -7,9 +7,7 @@ in Proc. 27th Annual International Conference on Mobile Computing and Networking
 """
 
 from pflbases import fedavg_partial
-from pflbases import personalized_client
-
-from pflbases.client_callbacks import base_callbacks
+from pflbases import fedavg_personalized_client
 
 from hermes_callback import HermesCallback
 import hermes_trainer
@@ -20,10 +18,10 @@ def main():
     """A Plato federated learning training session using the Hermes algorithm."""
     trainer = hermes_trainer.Trainer
 
-    client = personalized_client.Client(
+    client = fedavg_personalized_client.Client(
         trainer=trainer,
         algorithm=fedavg_partial.Algorithm,
-        callbacks=[base_callbacks.ClientPayloadCallback, HermesCallback],
+        callbacks=[HermesCallback],
     )
     server = hermes_server.Server(
         trainer=trainer,
