@@ -51,14 +51,14 @@ class BYOLModel(nn.Module):
         deactivate_requires_grad(self.momentum_projector)
 
     def forward_view(self, sample):
-        """Foward one sample to get the output."""
+        """Foward one view sample to get the output."""
         encoded_sample = self.encoder(sample).flatten(start_dim=1)
         projected_sample = self.projector(encoded_sample)
         output = self.predicter(projected_sample)
         return output
 
     def forward_momentum(self, sample):
-        """Foward one sample to get the output in a momentum manner."""
+        """Foward one view sample to get the output in a momentum manner."""
         encoded_example = self.momentum_encoder(sample).flatten(start_dim=1)
         projected_example = self.momentum_projector(encoded_example)
         projected_example = projected_example.detach()
