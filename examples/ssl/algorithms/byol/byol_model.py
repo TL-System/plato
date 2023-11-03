@@ -30,9 +30,7 @@ class BYOLModel(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
-        self.encoding_dim = self.encoder.encoding_dim
-
-        # A projector projects higher dimension features to output dimensions.
+        # A projector project higher dimension features to output dimensions.
         self.projector = BYOLProjectionHead(
             self.encoding_dim,
             Config().trainer.projection_hidden_dim,

@@ -20,9 +20,10 @@ import mocov2_trainer
 
 from plato.servers import fedavg_personalized as personalized_server
 
+
 def main():
     """
-    A personalized federated learning session for BYOL approach.
+    A personalized federated learning session for MoCoV2 approach.
     """
     client = ssl_client.Client(
         model=mocov2_model.MoCoV2,

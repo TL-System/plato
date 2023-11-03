@@ -1,5 +1,5 @@
 """
-A base trainer for simsiam algorithm.
+A trainer for simsiam algorithm.
 """
 
 from plato.trainers import loss_criterion
