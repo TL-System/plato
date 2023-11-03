@@ -41,7 +41,7 @@ class CalibreLoss(nn.Module):
         main_loss: str,
         main_loss_params: dict,
         auxiliary_losses: List[str] = None,
-        auxiliary_losses_params: List[dict] = None,
+        auxiliary_loss_params: List[dict] = None,
         losses_weight: List[float] = None,
         device: str = "cpu",
     ):
@@ -56,9 +56,9 @@ class CalibreLoss(nn.Module):
         # The auxiliary losses and the corresponding parameters
         if auxiliary_losses is None:
             auxiliary_losses = []
-        if auxiliary_losses_params is None:
-            auxiliary_losses_params = []
-        assert len(auxiliary_losses) == len(auxiliary_losses_params)
+        if auxiliary_loss_params is None:
+            auxiliary_loss_params = []
+        assert len(auxiliary_losses) == len(auxiliary_loss_params)
 
         # The weights of these losses set in the config file
         losses_weight = losses_weight._asdict()
@@ -77,7 +77,7 @@ class CalibreLoss(nn.Module):
         for loss in auxiliary_losses:
             if loss in losses_weight:
                 self.loss_weights_params[loss] = {
-                    "params": auxiliary_losses_params[loss]._asdict(),
+                    "params": auxiliary_loss_params[loss]._asdict(),
                     "weight": losses_weight[loss],
                 }
 
