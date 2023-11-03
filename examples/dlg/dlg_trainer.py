@@ -74,6 +74,15 @@ class Trainer(basic.Trainer):
         """Method called at the start of training run."""
         self.target_grad = None
 
+        if (
+            hasattr(Config().algorithm, "target_eval")
+            and Config().algorithm.target_eval
+        ):
+            # Set model into evaluation mode at client's training
+            self.model.eval()
+        else:
+            self.model.train()
+
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop."""
         # Store data in the first epoch (later epochs will still have the same partitioned data)
@@ -128,6 +137,8 @@ class Trainer(basic.Trainer):
             self.list_grad = list((_.detach().clone() for _ in grad))
 
         self._loss_tracker.update(loss, labels.size(0))
+
+        print(self.model.training)
 
         return loss
 

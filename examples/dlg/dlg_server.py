@@ -502,8 +502,18 @@ class Server(fedavg.Server):
         def closure():
             match_optimizer.zero_grad()
             self.trainer.model.to(Config().device())
-            # self.trainer.model.eval()
-            """Should reconstruction be conducted in train() or eval() mode?"""
+
+            # Set model mode for dummy data optimization
+            if (
+                hasattr(Config().algorithm, "dummy_eval")
+                and Config().algorithm.dummy_eval
+            ):
+                self.trainer.model.eval()
+            else:
+                self.trainer.model.train()
+
+            print(self.trainer.model.training)
+
             self.trainer.model.zero_grad()
             try:
                 dummy_pred, _ = self.trainer.model(dummy_data)
@@ -540,6 +550,16 @@ class Server(fedavg.Server):
 
         def closure():
             match_optimizer.zero_grad()
+
+            # Set model mode for dummy data optimization
+            if (
+                hasattr(Config().algorithm, "dummy_eval")
+                and Config().algorithm.dummy_eval
+            ):
+                model.eval()
+            else:
+                model.train()
+
             dummy_weight = self._loss_steps(dummy_data, labels, model)
 
             rec_loss = self._reconstruction_costs(
