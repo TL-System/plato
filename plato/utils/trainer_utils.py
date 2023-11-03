@@ -14,7 +14,7 @@ def freeze_model(model, layer_names=None):
 
 
 def activate_model(model, layer_names=None):
-    """Defreeze a part of the model."""
+    """Activate a part of the model."""
     if layer_names is not None:
         for name, param in model.named_parameters():
             if any(param_name in name for param_name in layer_names):
