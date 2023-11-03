@@ -27,11 +27,11 @@ class SSLSamples(UserList):
 
     def to(self, device):
         """Assign a list of views into the specific device."""
-        for example_idx, example in enumerate(self.data):
-            if isinstance(example, torch.Tensor):
-                example = example.to(device)
+        for view_idx, view in enumerate(self.data):
+            if isinstance(view, torch.Tensor):
+                view = view.to(device)
 
-            self[example_idx] = example
+            self[view_idx] = view
 
         return self.data
 
