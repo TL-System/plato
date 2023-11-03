@@ -17,10 +17,9 @@ import simsiam_model
 
 from plato.servers import fedavg_personalized as personalized_server
 
+
 def main():
-    """
-    A personalized federated learning session for SimSiam approach.
-    """
+    """The main running session for the SimSiam approach."""
     client = ssl_client.Client(
         model=simsiam_model.SimSiam,
         datasource=ssl_datasources.SSLDataSource,
