@@ -1,5 +1,5 @@
 """
-The implementation of Adaptive Personalized Federated Learning (APFL).
+An implementation of Adaptive Personalized Federated Learning (APFL).
 
 Y. Deng, et al., "Adaptive Personalized Federated Learning"
 
