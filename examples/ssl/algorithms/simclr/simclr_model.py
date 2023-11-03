@@ -1,5 +1,5 @@
 """
-Model speicifcally used in SimCLR algorithm.
+Model for the SimCLR algorithm.
 """
 from torch import nn
 from lightly.models.modules.heads import SimCLRProjectionHead
@@ -34,7 +34,7 @@ class SimCLRModel(nn.Module):
         )
 
     def forward(self, multiview_samples):
-        """Forward two batch of contrastive samples."""
+        """Forward the contrastive samples."""
         view_sample1, view_sample2 = multiview_samples
         encoded_sample1 = self.encoder(view_sample1)
         encoded_sample2 = self.encoder(view_sample2)
