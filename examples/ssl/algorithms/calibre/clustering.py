@@ -1,12 +1,12 @@
 """
-Clustering based on the encodinds.
+Clustering based on encodings.
 """
 
 import torch
 
 
 def kmeans_clustering(features, n_clusters, max_iters=100):
-    """Computing the keams"""
+    """Clustering input features with the K-means algorithm."""
     # Initialize centroids randomly
     centroids = features[torch.randperm(features.size(0))[:n_clusters]]
 
