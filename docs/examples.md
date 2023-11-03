@@ -22,7 +22,7 @@ python examples/server_aggregation/fedatt/fedatt.py -c examples/server_aggregati
 ```
 
 ```{note}
-S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. &ldquo;[Learning Private Neural Language Modeling with Attentive Aggregation](https://arxiv.org/abs/1812.07108),&rdquo; in the Proceedings of the 2019 International Joint Conference on Neural Networks (IJCNN), March 2019.
+S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. &ldquo;[Learning Private Neural Language Modeling with Attentive Aggregation](https://arxiv.org/abs/1812.07108),&rdquo; in Proc. International Joint Conference on Neural Networks (IJCNN), 2019.
 ```
 ````
 
@@ -34,11 +34,21 @@ python examples/server_aggregation/fedadp/fedadp.py -c examples/server_aggregati
 ```
 
 ```{note}
-H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Transactions on Cognitive Communications and Networking (TCCN 2021).
+H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Trans. on Cognitive Communications and Networking (TCCN), 2021.
 ```
 ````
 
-#### Asychronous Federated Learning Algorithms
+#### Secure Aggregation
+
+````{admonition} **MaskCrypt**
+MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
+
+```shell
+python examples/secure_aggregation/maskcrypt/maskcrypt.py -c examples/secure_aggregation/maskcrypt/maskcrypt_MNIST_lenet5.yml
+```
+````
+
+#### Asynchronous Federated Learning Algorithms
 
 ````{admonition} **FedAsync**
 FedAsync is one of the first algorithms proposed in the literature towards operating federated learning training sessions in *asynchronous* mode, which Plato supports natively. It advocated aggregating aggressively whenever only *one* client reported its local updates to the server.
@@ -51,23 +61,49 @@ python examples/async/fedasync/fedasync.py -c examples/async/fedasync/fedasync_C
 ```
 
 ```{note}
-C. Xie, S. Koyejo, I. Gupta. &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
+C. Xie, S. Koyejo, I. Gupta. &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. Annual Workshop on Optimization for Machine Learning (OPT), 2020.
+```
+````
+
+````{admonition} **Port**
+Port is one of the federated learning training sessions in *asynchronous* mode. The server will aggregate when it receives a minimum number of clients' updates, which can be tuned with 'minimum_clients_aggregated'. The 'staleness_bound' is also a common parameter in asynchronous FL, which limit the staleness of all clients' updates. 'request_update' is a special design in Port, to force clients report their updates and shut down the training process if their too slow. 'similarity_weight' and 'staleness_weight' are two hyper-parameters in Port, tuning the weights of them when the server do aggregation. 'max_sleep_time', 'sleep_simulation', 'avg_training_time' and 'simulation_distribution' are also important to define the arrival clients in Port.
+
+```shell
+python examples/async/port/port.py -c examples/async/port/port_cifar10.yml 
+```
+
+```{note}
+N. Su, B. Li. &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeexplore.ieee.org/document/9812885),&rdquo; in Proc. IEEE/ACM International Symposium on Quality of Service (IWQoS), 2022.
 ```
 ````
 
 #### Federated Unlearning
 
 ````{admonition} **Federated Unlearning**
-Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/fedunlearning/fedunlearning_server.py` and `examples/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
+Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/unlearning/fedunlearning/fedunlearning_server.py` and `examples/unlearning/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
 
 ```shell
-python examples/fedunlearning/fedunlearning.py -c examples/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.yml
+python examples/unlearning/fedunlearning/fedunlearning.py -c examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.yml
 ```
 
 ```{note}
 If the AdaHessian optimizer is used as in the example configuration file, it will reflect what the following paper proposed:
 
 Liu et al., &ldquo;[The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining](https://arxiv.org/abs/2203.07320),&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
+````{admonition} **Knot**
+Knot is implemented in `examples/unlearning`, which clusters the clients, and the server aggregation is carried out within each cluster only. Knot is designed under **asynchronous** mode, and unlearned by retraining from scratch in cluster. The global model will be aggregated at the end of the retraining process. Knot supports a wide range of tasks, including image classification and language tasks.
+
+```shell
+python examples/unlearning/knot/knot.py -c examples/unlearning/knot/knot_cifar10_resnet18.yml
+python examples/unlearning/knot/knot.py -c examples/unlearning/knot/knot_mnist_lenet5.yml
+python examples/unlearning/knot/knot.py -c examples/unlearning/knot/knot_purchase.yml
+```
+
+```{note}
+N. Su, B. Li. &ldquo;[Asynchronous Federated Unlearning](https://iqua.ece.toronto.edu/papers/ningxinsu-infocom23.pdf),&rdquo; in Proc. IEEE International Conference on Computer Communications (INFOCOM 2023).
 ```
 ````
 
@@ -87,7 +123,7 @@ python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
 SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
 
 ```shell
-python examples/scaffold/scaffold.py -c examples/scaffold/scaffold_MNIST_lenet5.yml
+python examples/customized_client_training/scaffold/scaffold.py -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -99,24 +135,36 @@ Karimireddy et al., &ldquo;[SCAFFOLD: Stochastic Controlled Averaging for Federa
 To better handle system heterogeneity, the FedProx algorithm introduced a proximal term in the optimizer used by local training on the clients. It has been quite widely cited and compared with in the federated learning literature.
 
 ```shell
-python examples/fedprox/fedprox.py -c examples/fedprox/fedprox_MNIST_lenet5.yml
+python examples/customized_client_training/fedprox/fedprox.py -c examples/customized_client_training/fedprox/fedprox_MNIST_lenet5.yml
 ```
 
 ```{note}
-T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; Proceedings of Machine Learning and Systems (MLSys), 2020.
+T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; in Proc. Machine Learning and Systems (MLSys), 2020.
 ```
 ````
 
 ````{admonition} **FedDyn**
 FedDyn is proposed to provide communication savings by dynamically updating each participating device's regularizer in each round of training. It is a method proposed to solve data heterogeneity in federated learning.
 ```shell
-python examples/feddyn/feddyn.py -c examples/feddyn/feddyn_MNIST_lenet5.yml
+python examples/customized_client_training/feddyn/feddyn.py -c examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.yml
 ```
 
 ```{note}
-Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations, 2021.
+Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations (ICLR), 2021.
 ```
 ````
+
+````{admonition} **FedTI**
+FedTI is to perform textual inversion under federated learning, which we can simply refer
+to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
+
+```shell
+python examples/customized_client_training/fedti/fedti.py -c examples/customized_client_training/fedti/StableDiffusionFed_iid_50.yml -b FedTI
+```
+```{note}
+Gal et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using Textual Inversion](https://arxiv.org/pdf/2208.01618.pdf), &rdquo; Arxiv, 2022.
+````
+
 
 #### Client Selection Algorithms
 
@@ -140,20 +188,19 @@ python examples/client_selection/pisces/pisces.py -c examples/client_selection/p
 ```
 
 ```{note}
-Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
-&rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
+Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf), &rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
 ```
 ````
 
 ````{admonition} **Oort**
-Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
+Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by default). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
 
 ```shell
 python examples/client_selection/oort/oort.py -c examples/client_selection/oort/oort_MNIST_lenet5.yml
 ```
 
 ```{note}
-Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
+Lai et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
 ```
 ````
 
@@ -161,7 +208,7 @@ Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant S
 Polaris is a client selection method for asynchronous federated learning. In this method, it selects clients via balancing between local device speed and local data quality from an optimization perspective. As it does not require extra information rather than local updates, Polaris is pluggable to any other federated aggregation methods.
 
 ```shell
-python3 examples/polaris/polaris.py -c examples/polaris/polaris_LeNet5.yml
+python3 examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_LeNet5.yml
 ```
 ```{note}
 Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
@@ -173,13 +220,14 @@ Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with 
 ````{admonition} **Split Learning**
 Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In split learning, each training iteration is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. Unlike federated learning, split learning clients sequentially interact with the server, and the global model is synchronized implicitly through the model on the server side, which is shared and updated by all clients.
 ```shell
-python examples/split_learning/split_learning.py -c examples/split_learning/split_learning_MNIST_lenet5.yml -l warn
+python ./run -c configs/CIFAR10/split_learning_resnet18.yml
 ```
 
 ```{note}
-Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. AI for Social Good Workshop, affiliated with the International Conference on Learning Representations (ICLR), 2018.
+Vepakomma et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. NeurIPS, 2018.
 ```
 ````
+
 
 #### Personalized Federated Learning Algorithms
 
@@ -190,12 +238,12 @@ FedRep belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/fedrep/fedrep.py -c algorithms/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedrep/fedrep.py -c examples/personalized_fl/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
 Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Federated Learning](http://proceedings.mlr.press/v139/collins21a/collins21a.pdf),
-&rdquo; in International Conference on Machine Learning, 2021.
+&rdquo; in Proc. International Conference on Machine Learning (ICML), 2021.
 ```
 ````
 
@@ -206,12 +254,12 @@ FedBABU belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/fedbabu/fedbabu.py -c algorithms/configs/fedbabu_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
 Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image Classification](https://openreview.net/forum?id=HuaYQfggn5u),
-&rdquo; in International Conference on Learning Representations (ICLR), 2022.
+&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2022.
 ```
 ````
 
@@ -222,11 +270,11 @@ APFL belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/apfl/apfl.py -c algorithms/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/apfl/apfl.py -c examples/personalized_fl/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
-Yuyang Deng, et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
+Deng et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
 &rdquo; in Arxiv, 2021.
 ```
 ````
@@ -238,11 +286,11 @@ FedPer belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/fedper/fedper.py -c algorithms/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
-Manoj Ghuhan Arivazhagan, et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
+Arivazhagan et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
 &rdquo; in Arxiv, 2019.
 ```
 ````
@@ -254,11 +302,11 @@ LG-FedAvg belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/lgfedavg/lgfedavg.py -c algorithms/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/lgfedavg/lgfedavg.py -c examples/personalized_fl/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
-Paul Pu Liang, et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
+Liang et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
 &rdquo; in Proc. NeurIPS, 2019.
 ```
 ````
@@ -270,11 +318,11 @@ Ditto belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/ditto/ditto.py -c algorithms/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/ditto/ditto.py -c examples/personalized_fl/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
-Tian Li, et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
+Li et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
 &rdquo; in Proc ICML, 2021.
 ```
 ````
@@ -286,11 +334,11 @@ PerFedAvg belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/perfedavg/perfedavg.py -c algorithms/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/perfedavg/perfedavg.py -c examples/personalized_fl/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
-Alireza Fallah, et al., &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
+Fallah et al., &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
 A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html),
 &rdquo; in Proc NeurIPS, 2020.
 ```
@@ -304,7 +352,7 @@ Hermes belongs to personalized federated learning.
 Please read `examples/personalized_fl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/hermes/hermes.py -c algorithms/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/hermes/hermes.py -c examples/personalized_fl/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
@@ -315,84 +363,197 @@ Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterog
 
 #### Personalized Federated Learning Algorithms based on Self-Supervised Learning
 
-````{admonition} **pFLSSL**
-pFLSSL achieves Personalized federated learning by introducing self-supervised learning (SSL) to the training schema. Specifically, there are two stages. In this first stage, one global model is trained based on SSL under the federated training paradigm. Each client, in the second stage, trains its personalized model based on the extracted features of the received global model. Therefore, due to the diversity of SSL approaches, pFLSSL includes:
+````{admonition} **Self Supervised Learning**
+This category aims to achieve personalized federated learning by introducing self-supervised learning (SSL) to the training schema. In the context of self-supervised learning (SSL), the model is trained to learn representations from unlabeled data. Thus, the model is capable of extracting generic representations. A higher performance can be achieved in subsequent tasks with the trained model as the encoder. Such a benefit of SSL is introduced into personalized FL by relying on the learning objective of SSL to train the global model. After reaching convergence, each client can download the trained global model to extract features from local samples. A high-quality personalized model, typically a linear network, is prone to be achieved under those extracted features. The code is available under `examples/ssl/`. And under `algorithms/` of the folder, the following algorithms are implemented:
+
 - SimCLR [1]
 - BYOL [2]
 - SimSiam [3]
 - MoCoV2 [4]
 - SwAV [5]
 - SMoG [6]
+- FedEMA [7] 
 
 Please read `examples/ssl/README.md` for more details about how to run the code.
 
 ```shell
-python algorithms/simclr/simclr.py -c configs/simclr/simclr_MNIST_lenet5_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr_MNIST_lenet5.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/simclr/simclr.py -c configs/simclr/simclr_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/byol/byol.py -c configs/byol/byol_MNIST_lenet5_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/byol/byol.py -c examples/ssl/configs/byol_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/simsiam/simsiam.py -c configs/simsiam/simsiam_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/simsiam/simsiam.py -c examples/ssl/configs/simsiam_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/moco/mocov2.py -c configs/moco/mocov2_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/moco/mocov2.py -c examples/ssl/configs/mocov2_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/swav/swav.py -c configs/swav/swav_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/swav/swav.py -c examples/ssl/configs/swav_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python algorithms/smog/smog.py -c configs/smog/smog_CIFAR10_resnet18_noniid.yml -b pflExperiments
+python examples/ssl/algorithms/smog/smog.py -c examples/ssl/configs/smog_CIFAR10_resnet18.yml -b pflExperiments
+```
+
+```shell
+python examples/ssl/algorithms/fedema/fedema.py -c examples/ssl/configs/fedema_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
-[1]. Ting Chen, et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
+[1]. Chen et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc. ICML, 2020.
 
-[2]. Jean-Bastien Grill, et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
+[2]. Grill et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. NeurIPS, 2020.
 
-[3]. Xinlei Chen, et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in ArXiv, 2020.
+[3]. Chen et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc. CVPR, 2021.
 
-[4]. Xinlei Chen, et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+[4]. Chen et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
 
-[5]. Mathilde Caron, et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
+[5]. Caron et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc. NeurIPS, 2022.
 
-[6]. Bo Pang, et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
+[6]. Pang et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. ECCV, 2022.
+
+[7]. Zhuang et al., &ldquo;[Divergence-aware federated self-supervised learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
 
 ```
 ````
 
-
-#### Algorithms Not Yet Categorized
-
+#### Federated Learning Algorithms based on Neural Architecture Search and Model Search
 ````{admonition} **FedRLNAS**
 FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
 
 ```shell
-python examples/fedrlnas/fedrlnas.py -c examples/fedrlnas/FedRLNAS_MNIST_DARTS.yml
+python examples/model_search/fedrlnas/fedrlnas.py -c examples/model_search/fedrlnas/FedRLNAS_MNIST_DARTS.yml
 ```
 
 ```{note}
-Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
+Yao et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
 ```
 ````
 
+````{admonition} **PerFedRLNAS**
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model structure and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided. 
 
-````{admonition} **MaskCrypt**
-MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
+NASVIT search space:
+```shell
+python ./examples/model_search/pfedrlnas/VIT/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
+```
+MobileNetV3 search space (synchronous mode):
+```
+python ./examples/model_search/pfedrlnas/MobileNetV3/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
+```
+MobileNetV3 search space (asynchronous mode):
+```
+python ./examples/model_search/pfedrlnas/MobileNetV3/fednas.py -c ./examples/model_search/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
+```
+DARTS search space
+```
+python ./examples/model_search/pfedrlnas/DARTS/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
+```
+````
+
+````{admonition} **FedTP**
+FedTP is proposed to improve personalized federated learning with transformer structured models. For each client, the attention maps in the transformer block are generated and updated by a hypernet working on the server, instead of being updated by average aggregation. The core part is in ```fedtp_server```: ```customize_server_payload``` reloads the weights of attention maps with attention generated by hypernet before sending the models to clients and ```aggregate_weights``` updates the hypernet besides doing averaging aggregation of other parts of the model. 
 
 ```shell
-python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_lenet5.yml
+python ./examples/model_search/fedtp/fedtp.py -c ./examples/model_search/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.yml
+```
+
+```{note}
+Li et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo; Arxiv, 2022.
+````
+
+````{admonition} **HeteroFL**
+HeteroFL is an algorithm aimed at solving heterogeneous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
+
+```shell
+python examples/model_search/heterofl/heterofl.py -c examples/model_search/heterofl/heterofl_resnet18_dynamic.yml
+```
+
+```{note}
+Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
+&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2021.
+````
+
+````{admonition} **FedRolex**
+FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogeneous federated learning. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/model_search/fedrolex/fedrolex.py -c examples/model_search/fedrolex/example_ViT.yml
+```
+
+```{note}
+Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
+&rdquo; in Proc. NeurIPS, 2022.
 ```
 ````
+
+````{admonition} **FjORD**
+FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogeneous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
+
+```shell
+python3 examples/model_search/fjord/fjord.py -c examples/model_search/fjord/fjord_resnet18_dynamic.yml
+```
+
+```{note}
+Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
+&rdquo; in Proc. NeurIPS, 2021.
+```
+````
+
+````{admonition} **AnyCostFL**
+AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
+
+```shell
+python3 examples/model_search/anycostfl/anycostfl.py -c examples/model_search/anycostfl/example_ResNet.yml
+```
+
+```{note}
+Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
+&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
+````{admonition} **SysHeteroFL**
+In the paper system-heterogeneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
+
+```shell
+python3 ./examples/model_search/sysheterofl/sysheterofl.py -c examples/model_search/sysheterofl/config_ResNet152.yml
+```
+````
+#### Three-layer Federated Learning Algorithms
+
+````{admonition} **Tempo**
+Tempo is proposed to improve training performance in three-layer federated learning. It adaptively tunes the number of each client's local training epochs based on the difference between its edge server's locally aggregated model and the current global model.
+
+```shell
+python examples/tempo/tempo.py -c examples/tempo/tempo_MNIST_lenet5.yml
+```
+
+```{note}
+Ying et al., &ldquo;[Tempo: Improving Training Performance in Cross-Silo Federated Learning](https://iqua.ece.toronto.edu/papers/chenying-icassp22.pdf),
+&rdquo; in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2022.
+```
+````
+
+````{admonition} **FedSaw**
+FedSaw is proposed to improve training performance in three-layer federated learning with L1-norm structured pruning. Edge servers and clients pruned their updates before sending them out. FedSaw adaptively tunes the pruning amount of each edge server and its clients based on the difference between the edge server's locally aggregated model and the current global model.
+
+```shell
+python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
+```
+````
+
+#### Algorithms Not Yet Categorized
+
 
 ````{admonition} **FedSCR**
 FedSCR uses structured pruning to prune each update’s entire filters and channels if their summed parameter values are below a particular threshold.
@@ -428,137 +589,12 @@ Vahidian et al., &ldquo;[Personalized Federated Learning by Structured and Unstr
 ```
 ````
 
-````{admonition} **Tempo**
-Tempo is proposed to improve training performance in three-layer federated learning. It adaptively tunes the number of each client's local training epochs based on the difference between its edge server's locally aggregated model and the current global model.
-
-```shell
-python examples/tempo/tempo.py -c examples/tempo/tempo_MNIST_lenet5.yml
-```
-
-```{note}
-Ying et al., &ldquo;[Tempo: Improving Training Performance in Cross-Silo Federated Learning](https://iqua.ece.toronto.edu/papers/chenying-icassp22.pdf),
-&rdquo; in Proc. IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2022.
-```
-````
-
-````{admonition} **FedSaw**
-FedSaw is proposed to improve training performance in three-layer federated learning with L1-norm structured pruning. Edge servers and clients pruned their updates before sending them out. FedSaw adaptively tunes the pruning amount of each edge server and its clients based on the difference between the edge server's locally aggregated model and the current global model.
-
-```shell
-python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
-```
-````
-
-````{admonition} **FedTP**
-FedTP is proposed to improve personalized federated learning with transformer structured models. For each client, the attention maps in the transformer block are generated and updated by a hypernet working on the server, instead of being updated by average aggregation. The core part is in ```fedtp_server```: ```customize_server_payload``` reloads the weights of attention maps with attention generated by hypernet before sending the models to clients and ```aggregate_weights``` updates the hypernet besides doing averaging aggregation of other parts of the model. 
-
-```shell
-python ./examples/fedtp/fedtp.py -c ./examples/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.yml
-```
-
-```{note}
-Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo;
-````
-
-````{admonition} **PerFedRLNAS**
-PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided. 
-
-NASVIT search space:
-```shell
-python ./examples/pfedrlnas/VIT/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
-```
-MobileNetV3 search space (synchronous mode):
-```
-python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
-```
-MobileNetV3 search space (asynchronous mode):
-```
-python ./examples/pfedrlnas/MobileNetV3/fednas.py -c ./examples/pfedrlnas/configs/MobileNetV3_CIFAR10_03_async.yml
-```
-DARTS search space
-```
-python ./examples/pfedrlnas/DARTS/fednas.py -c ./examples/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
-```
-````
-
-````{admonition} **SysHeteroFL**
-In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
-
-```shell
-python3 ./examples/sysheterofl/sysheterofl.py -c examples/sysheterofl/config_ResNet152.yml
-```
-````
-
-````{admonition} **HeteroFL**
-HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
-
-```shell
-python examples/heterofl/heterofl.py -c examples/heterofl/heterofl_resnet18_dynamic.yml
-```
-
-```{note}
-Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
-&rdquo; in International Conference on Learning Representations (ICLR), 2021.
-````
-
-````{admonition} **FedRolex**
-FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
-
-```shell
-python3 examples/fedrolex/fedrolex.py -c examples/fedrolex/example_ViT.yml
-```
-
-```{note}
-Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
-&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
-```
-````
-
-````{admonition} **FjORD**
-FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
-
-```shell
-python3 examples/fjord/fjord.py -c examples/fjord/fjord_resnet18_dynamic.yml
-```
-
-```{note}
-Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
-&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2021.
-```
-````
-
-````{admonition} **AnyCostFL**
-AnyCostFL is an on-demand system-heterogeneous federated learning method to assign models of different architectures to meet the resource budgets of devices in federated learning. In this algorithm, it adopts the similar policy to assign models of different channel pruning rates as the HeteroFL. But they prune the channel on the basis of the magnitude of the $l_2$ norms of the channels. In this implementation, models of ResNet and ViT are supported.
-
-```shell
-python3 examples/anycostfl/anycostfl.py -c examples/anycostfl/example_ResNet.yml
-```
-
-```{note}
-Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Heterogeneous Edge Device](https://arxiv.org/abs/2301.03062),
-&rdquo; in Proc. INFOCOM, 2022.
-```
-````
-
-
-````{admonition} **FedTI**
-FedTI is to perform textual inversion under federated learning, which we can simply refer
-to as federated textual inversion. This approach treats the learnable pseudo-word embedding as the global model, and thus allows clients to train cooperatively using the FL paradigm.
-
-```shell
-python examples/fedti/fedti.py -c examples/fedti/StableDiffusionFed_iid_50.yml -b FedTI
-```
-```{note}
-Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
-    Textual Inversion],
-&rdquo; 
-````
 
 
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |                                                                Method                                                                | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tested |
-|:------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
+| :----------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: |
 |                                [Adaptive Freezing](https://henryhxu.github.io/share/chen-icdcs21.pdf)                                | Change directory to `examples/adaptive_freezing` and run `python adaptive_freezing.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                           |  Yes   |
 | [Gradient-Instructed Frequency Tuning](https://github.com/TL-System/plato/blob/main/examples/adaptive_sync/papers/adaptive_sync.pdf) | Change directory to `examples/adaptive_sync` and run `python adaptive_sync.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                                   |  Yes   |
 |                                       [Attack Adaptive](https://arxiv.org/pdf/2102.05257.pdf)                                        | Change directory to `examples/attack_adaptive` and run `python attack_adaptive.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                               |  Yes   |
