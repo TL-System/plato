@@ -12,7 +12,7 @@ import calibre_server
 
 def main():
     """
-    A main running session for the Calibre approach.
+    A personalized federated learning session with Calibre.
     """
     client = ssl_client.Client(
         model=calibre_model.CalibreNet,

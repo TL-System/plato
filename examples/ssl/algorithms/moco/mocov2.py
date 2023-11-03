@@ -20,7 +20,9 @@ from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():
-    """The main running session for the MoCoV2 algorithm."""
+    """
+    A personalized federated learning session with MoCoV2.
+    """
     client = ssl_client.Client(
         model=mocov2_model.MoCoV2,
         datasource=ssl_datasources.SSLDataSource,
