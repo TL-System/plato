@@ -17,7 +17,7 @@ from plato.clients import fedavg_personalized as personalized_client
 
 def main():
     """
-    A personalized federated learning session for FedBABU algorithm under the supervised setting.
+    A personalized federated learning session with FedBABU.
     """
     trainer = fedbabu_trainer.Trainer
     client = personalized_client.Client(trainer=trainer)
