@@ -1,14 +1,12 @@
 """
-An implementation of the personalized learning variant of FedAvg.
+This implementation first trains a global model using conventional FedAvg until
+a target number of rounds has been reached. In the final `personalization`
+round, each client will use its local data samples to further fine-tune the
+shared global model for a number of epochs, and then the server will compute the
+average client test accuracy.
 
-The core idea is to achieve personalized FL in two stages:
-First, it trains a global model using conventional FedAvg until convergence. 
-Second, each client freezes the trained global model and optimizes the other 
-parts.
-
-Due to its simplicity, no work has been proposed that specifically discusses 
-this algorithm but only utilizes it as the baseline for personalized federated 
-learning.
+Due to its simplicity, no papers specifically discussed or proposed this
+algorithm; they only utilized it as their baseline for comparisons.
 """
 
 from plato.clients import fedavg_personalized as personalized_client
