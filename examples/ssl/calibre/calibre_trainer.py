@@ -7,12 +7,11 @@ import logging
 
 import torch
 
-from self_supervised_learning import ssl_trainer
+from plato.trainers import self_supervised_learning as ssl_trainer
+from plato.config import Config
 
 from calibre_loss import CalibreLoss
 from clustering import kmeans_clustering
-
-from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):

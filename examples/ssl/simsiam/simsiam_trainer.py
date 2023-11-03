@@ -3,8 +3,7 @@ A self-supervised federated learning trainer with SimSiam.
 """
 
 from plato.trainers import loss_criterion
-
-from self_supervised_learning import ssl_trainer
+from plato.trainers import self_supervised_learning as ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):
