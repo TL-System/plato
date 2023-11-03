@@ -1,7 +1,7 @@
 """
 An implementation of the FedBABU algorithm.
 
-J. Oh, et al., "FedBABU: Toward Enhanced Representation for Federated Image Classification,"
+Oh, et al., "FedBABU: Toward Enhanced Representation for Federated Image Classification,"
 in the Proceedings of ICLR 2022.
 
 https://openreview.net/pdf?id=HuaYQfggn5u
