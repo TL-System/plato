@@ -101,17 +101,13 @@ In general, the following is the recommended starting point for `.vscode/setting
 
 ```
 {
-	"python.linting.enabled": true,
-	"python.formatting.provider": "black", 
 	"editor.formatOnSave": true,
 	"workbench.editor.enablePreview": false
 }
 ```
 
-It goes without saying that `/absolute/path/to/project/home/directory` should be replaced with the actual path in the specific development environment.
-
 When working in Visual Studio Code as your development environment, two of our colour theme favourites are called `Bluloco` (both of its light and dark variants) and `City Lights` (dark). They are both excellent and very thoughtfully designed.
 
-It goes without saying that the `Python` extension is required to be installed in Visual Studio Code, which represents Microsoft's modern language server for Python.
+The `Black Formatter`, `PyLint`, and `Python` extensions are required to be installed in Visual Studio Code.
 
 ````
