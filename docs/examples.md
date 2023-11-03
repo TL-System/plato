@@ -38,6 +38,16 @@ H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighti
 ```
 ````
 
+
+````{admonition} **MaskCrypt**
+MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
+
+```shell
+python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_lenet5.yml
+```
+````
+
+
 #### Asychronous Federated Learning Algorithms
 
 ````{admonition} **FedAsync**
@@ -499,15 +509,6 @@ python3 ./examples/model_search/sysheterofl/sysheterofl.py -c examples/model_sea
 #### Algorithms Not Yet Categorized
 
 
-
-````{admonition} **MaskCrypt**
-MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
-
-```shell
-python examples/maskcrypt/maskcrypt.py -c examples/maskcrypt/maskcrypt_MNIST_lenet5.yml
-```
-````
-
 ````{admonition} **FedSCR**
 FedSCR uses structured pruning to prune each update’s entire filters and channels if their summed parameter values are below a particular threshold.
 
@@ -567,7 +568,7 @@ python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |                                                                Method                                                                | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tested |
-|:------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
+| :----------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: |
 |                                [Adaptive Freezing](https://henryhxu.github.io/share/chen-icdcs21.pdf)                                | Change directory to `examples/adaptive_freezing` and run `python adaptive_freezing.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                           |  Yes   |
 | [Gradient-Instructed Frequency Tuning](https://github.com/TL-System/plato/blob/main/examples/adaptive_sync/papers/adaptive_sync.pdf) | Change directory to `examples/adaptive_sync` and run `python adaptive_sync.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                                   |  Yes   |
 |                                       [Attack Adaptive](https://arxiv.org/pdf/2102.05257.pdf)                                        | Change directory to `examples/attack_adaptive` and run `python attack_adaptive.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                               |  Yes   |
