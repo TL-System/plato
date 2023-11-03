@@ -98,11 +98,11 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
         if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
             amount = pruning_rates[step]
             prune.ln_structured(layer, "weight", amount, norm, dim)
+            for name, buffer in layer.named_buffers():
+                if "mask" in name:
+                    mask.append(buffer.cpu().numpy())
             step += 1
             prune.remove(layer, "weight")
-    for name, buffer in model.named_buffers():
-        if "mask" in name:
-            mask.append(buffer.cpu().numpy())
 
     return mask
 
