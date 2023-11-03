@@ -7,13 +7,12 @@ https://arxiv.org/pdf/2011.10566.pdf
 Source code: https://github.com/facebookresearch/simsiam or https://github.com/PatrickHua/SimSiam
 """
 
-from self_supervised_learning import ssl_client
-from self_supervised_learning import ssl_datasources
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 import simsiam_trainer
 import simsiam_model
-
-from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():
@@ -22,7 +21,7 @@ def main():
     """
     client = ssl_client.Client(
         model=simsiam_model.SimSiam,
-        datasource=ssl_datasources.SSLDataSource,
+        datasource=ssl_datasource.SSLDataSource,
         trainer=simsiam_trainer.Trainer,
     )
     server = personalized_server.Server(

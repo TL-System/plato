@@ -1,8 +1,8 @@
 """
 An implementation of the Calibre algorithm.
 """
-from self_supervised_learning import ssl_datasources
-from self_supervised_learning import ssl_client
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 import calibre_model
 import calibre_trainer
@@ -16,7 +16,7 @@ def main():
     """
     client = ssl_client.Client(
         model=calibre_model.CalibreNet,
-        datasource=ssl_datasources.SSLDataSource,
+        datasource=ssl_datasource.SSLDataSource,
         trainer=calibre_trainer.Trainer,
         callbacks=[
             calibre_callback.CalibreCallback,

@@ -5,13 +5,12 @@ Bo Pang, et al., Unsupervised Visual Representation Learning by Synchronous Mome
 ECCV, 2022. https://arxiv.org/pdf/2006.07733.pdf.
 """
 
-from self_supervised_learning import ssl_client
-from self_supervised_learning import ssl_datasources
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 import smog_trainer
 import smog_model
-
-from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():
@@ -20,7 +19,7 @@ def main():
     """
     client = ssl_client.Client(
         model=smog_model.SMoG,
-        datasource=ssl_datasources.SSLDataSource,
+        datasource=ssl_datasource.SSLDataSource,
         trainer=smog_trainer.Trainer,
     )
     server = personalized_server.Server(

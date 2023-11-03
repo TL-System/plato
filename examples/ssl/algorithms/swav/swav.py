@@ -6,13 +6,11 @@ https://arxiv.org/abs/2006.09882, NeurIPS 2020.
 
 Source code: https://github.com/facebookresearch/swav.
 """
-from self_supervised_learning import ssl_client
-from self_supervised_learning import ssl_trainer
-from self_supervised_learning import ssl_datasources
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 import swav_model
-
-from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():
@@ -21,12 +19,9 @@ def main():
     """
     client = ssl_client.Client(
         model=swav_model.SwaV,
-        datasource=ssl_datasources.SSLDataSource,
-        trainer=ssl_trainer.Trainer,
+        datasource=ssl_datasource.SSLDataSource,
     )
-    server = personalized_server.Server(
-        model=swav_model.SwaV, trainer=ssl_trainer.Trainer
-    )
+    server = personalized_server.Server(model=swav_model.SwaV)
 
     server.run(client)
 

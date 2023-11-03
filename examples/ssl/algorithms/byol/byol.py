@@ -8,9 +8,8 @@ Source code: https://github.com/lucidrains/byol-pytorch or https://github.com/st
 """
 
 from plato.servers import fedavg_personalized as personalized_server
-
-from self_supervised_learning import ssl_client
-from self_supervised_learning import ssl_datasources
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 from byol_model import BYOLModel
 import byol_trainer
@@ -23,7 +22,7 @@ def main():
     trainer = byol_trainer.Trainer
     client = ssl_client.Client(
         model=BYOLModel,
-        datasource=ssl_datasources.SSLDataSource,
+        datasource=ssl_datasource.SSLDataSource,
         trainer=trainer,
     )
     server = personalized_server.Server(model=BYOLModel, trainer=trainer)

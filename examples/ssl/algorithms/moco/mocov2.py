@@ -10,13 +10,12 @@ https://arxiv.org/abs/2003.04297.
 Source code: https://github.com/facebookresearch/moco.
 
 """
-from self_supervised_learning import ssl_client
-from self_supervised_learning import ssl_datasources
+from plato.servers import fedavg_personalized as personalized_server
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 import mocov2_model
 import mocov2_trainer
-
-from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():
@@ -25,7 +24,7 @@ def main():
     """
     client = ssl_client.Client(
         model=mocov2_model.MoCoV2,
-        datasource=ssl_datasources.SSLDataSource,
+        datasource=ssl_datasource.SSLDataSource,
         trainer=mocov2_trainer.Trainer,
     )
     server = personalized_server.Server(

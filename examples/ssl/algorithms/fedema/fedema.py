@@ -5,8 +5,8 @@ Zhuang, et.al, "Divergence-aware Federated Self-Supervised Learning", ICLR22.
 https://arxiv.org/pdf/2204.04385.pdf.
 
 """
-from self_supervised_learning import ssl_datasources
-from self_supervised_learning import ssl_client
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 import fedema_server
 import fedema_trainer
@@ -20,7 +20,7 @@ def main():
     """
     client = ssl_client.Client(
         model=fedema_model.BYOLModel,
-        datasource=ssl_datasources.SSLDataSource,
+        datasource=ssl_datasource.SSLDataSource,
         trainer=fedema_trainer.Trainer,
         callbacks=[
             fedema_callback.FedEMACallback,
