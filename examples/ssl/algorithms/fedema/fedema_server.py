@@ -1,8 +1,5 @@
 """
-Implementation of the server for the FedEMA .
-
-Note:
-    Divergence is abbreviated as divg
+Implementation of the server for the FedEMA.
 """
 import os
 import logging
@@ -14,7 +11,7 @@ from plato.servers import fedavg_personalized as personalized_server
 
 
 class Server(personalized_server.Server):
-    """A personalized federated learning server using the pFL-CMA's EMA method."""
+    """A server for FedEMA method to compute the model divergence."""
 
     def __init__(
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
@@ -27,7 +24,7 @@ class Server(personalized_server.Server):
             callbacks=callbacks,
         )
 
-        # The lambda used in the paper
+        # Set the lambda used in the paper
         self.clients_divg_scale = {
             client_id: 0.0 for client_id in range(1, self.total_clients + 1)
         }
@@ -85,7 +82,8 @@ class Server(personalized_server.Server):
                     encoder_layer_names=encoder_layer_names,
                 )
 
-                # the global L2 norm over a list of tensors.
+                # Compute L2 norm between the aggregated encoder
+                # and client encoder
                 l2_distance = utils.get_parameters_diff(
                     parameter_a=aggregated_encoder,
                     parameter_b=client_encoder,
@@ -97,6 +95,7 @@ class Server(personalized_server.Server):
                     tau = Config().algorithm.divergence_scale_tau
                 client_divg_scale = tau / l2_distance
 
+                # Assign the divergence scale to the client
                 self.clients_divg_scale[client_id] = client_divg_scale
 
     def customize_server_payload(self, payload):
