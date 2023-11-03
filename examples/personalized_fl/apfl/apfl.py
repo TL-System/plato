@@ -1,15 +1,13 @@
 """
-The implementation of APFL method.
+The implementation of Adaptive Personalized Federated Learning (APFL).
 
-Yuyang Deng, et al., Adaptive Personalized Federated Learning
+Y. Deng, et al., "Adaptive Personalized Federated Learning"
 
-paper address: https://arxiv.org/pdf/2003.13461.pdf
+URL: https://arxiv.org/pdf/2003.13461.pdf
 
-Official code: None
 Third-party code: 
-- https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
-- https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
-
+https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
+https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
 """
 
 import apfl_trainer
@@ -20,7 +18,7 @@ from plato.clients import fedavg_personalized as personalized_client
 
 def main():
     """
-    A personalized federated learning session for APFL approach.
+    A personalized federated learning session using APFL.
     """
     trainer = apfl_trainer.Trainer
     client = personalized_client.Client(trainer=trainer)
