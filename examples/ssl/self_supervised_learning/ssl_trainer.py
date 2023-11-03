@@ -125,13 +125,13 @@ class Trainer(basic.Trainer):
         # We need to wrap the loss function to make it compatible
         # with different types of outputs
         # The types of the outputs can vary from Tensor to a list of Tensors
-        def compute_plato_loss(outputs, labels):
+        def compute_loss(outputs, labels):
             if isinstance(outputs, (list, tuple)):
                 return ssl_loss_function(*outputs)
             else:
                 return ssl_loss_function(outputs)
 
-        return compute_plato_loss
+        return compute_loss
 
     def get_loss_criterion(self):
         """Return the loss criterion for the SSL."""

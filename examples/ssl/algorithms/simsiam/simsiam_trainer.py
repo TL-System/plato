@@ -14,7 +14,7 @@ class Trainer(ssl_trainer.Trainer):
         """A wrapper to connect ssl loss with plato."""
         defined_ssl_loss = loss_criterion.get()
 
-        def compute_plato_loss(outputs, labels):
+        def compute_loss(outputs, labels):
             if isinstance(outputs, (list, tuple)):
                 loss = 0.5 * (
                     defined_ssl_loss(*outputs[0]) + defined_ssl_loss(*outputs[1])
@@ -23,4 +23,4 @@ class Trainer(ssl_trainer.Trainer):
             else:
                 return defined_ssl_loss(outputs)
 
-        return compute_plato_loss
+        return compute_loss

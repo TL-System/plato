@@ -58,13 +58,13 @@ class Trainer(ssl_trainer.Trainer):
             device=self.device,
         )
 
-        def compute_plato_loss(outputs, labels):
+        def compute_loss(outputs, labels):
             if isinstance(outputs, (list, tuple)):
                 return defined_ssl_loss(*outputs, labels=labels)
             else:
                 return defined_ssl_loss(outputs, labels=labels)
 
-        return compute_plato_loss
+        return compute_loss
 
     def compute_divergence_rate(self, encodings):
         """Compute the divergence rate of the local model"""
