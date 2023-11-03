@@ -2,11 +2,12 @@
 An implementation of the Ditto personalized federated learning algorithm.
 
 Reference:
-T. Li, et al., "Ditto: Fair and robust federated learning through personalization," 2021.
+T. Li, et al., "Ditto: Fair and robust federated learning through personalization," 
+in the Proceedings of ICML 2021.
 
-URL: https://proceedings.mlr.press/v139/li21h.html
+https://proceedings.mlr.press/v139/li21h.html
 
-Official code: https://github.com/litian96/ditto
+Source code: https://github.com/litian96/ditto
 """
 
 import ditto_trainer
