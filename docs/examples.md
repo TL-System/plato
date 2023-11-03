@@ -569,7 +569,7 @@ Wu et al., &ldquo;[FedSCR: Structure-Based Communication Reduction for Federated
 ````
 
 ````{admonition} **Sub-FedAvg**
-Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. local data and reduce. It iteratively prunes the parameters of the neural networks which results in removing the commonly shared parameters of clients’ models and keeping the personalized ones. Besides the original version for two-layer federated learning, the version for three-layer federated learning has been implemented as well.
+Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. local data. It iteratively prunes the parameters of each client’s local model during its local training, with the objective of removing the commonly shared parameters of local models and keeping the personalized ones. Besides the original version for two-layer federated learning, the version for three-layer federated learning has been implemented as well.
 
 For two-layer federated learning:
 
