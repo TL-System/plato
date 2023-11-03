@@ -15,9 +15,8 @@ from plato.models import registry as models_registry
 
 class Trainer(basic.Trainer):
     """
-    A trainer with Ditto, which first trains the global model for epochs and 
-    then trains the personalized model at the end of the local training; 
-    thereby the global model and personalized model can be jointly optimized.
+    A trainer with Ditto, which first trains the global model and then trains
+    the personalized model.
     """
 
     def __init__(self, model=None, callbacks=None):
@@ -37,14 +36,13 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         super().train_run_start(config)
 
-        # Maintain the initial value and status of the model at the begining of local training
-        # will be used when optimize the personalized model
+        # Make a copy of the model before local training starts, which will be used when optimizing
+        # the personalized model
         self.initial_wnet_params = copy.deepcopy(self.model.cpu().state_dict())
 
     def train_run_end(self, config):
         """
-        Optimize the personalized model for epochs following the algorithm 1
-        in Ditto Paper. 
+        Optimize the personalized model for epochs following Algorithm 1.
         """
         super().train_run_end(config)
 
@@ -73,10 +71,6 @@ class Trainer(basic.Trainer):
         self.personalized_model.to(self.device)
         self.personalized_model.train()
 
-        # Backpropagation in Ditto
-        # This loop is to optimize personalized model via SGD
-        # The gradient is the weighted difference between the
-        # current parameter and the previously maintained model value.
         for epoch in range(1, config["epochs"] + 1):
             epoch_loss_meter.reset()
             for __, (examples, labels) in enumerate(self.train_loader):
@@ -114,9 +108,9 @@ class Trainer(basic.Trainer):
                 config["epochs"],
                 epoch_loss_meter.average,
             )
-        
+
         self.personalized_model.to(torch.device("cpu"))
-        # Save personalized model
+
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_path}/{model_name}_{self.client_id}_v_net.pth"
