@@ -7,16 +7,13 @@ https://arxiv.org/abs/2006.09882, NeurIPS 2020.
 
 Source code: https://github.com/facebookresearch/swav
 """
-
-from plato.servers import fedavg_personalized as personalized_server
-
 from self_supervised_learning import ssl_client
 from self_supervised_learning import ssl_trainer
 from self_supervised_learning import ssl_datasources
 
-
 import swav_model
 
+from plato.servers import fedavg_personalized as personalized_server
 
 def main():
     """

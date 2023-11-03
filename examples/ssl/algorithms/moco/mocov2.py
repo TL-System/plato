@@ -12,15 +12,13 @@ https://arxiv.org/abs/2003.04297.
 The official code: https://github.com/facebookresearch/moco.
 
 """
-
-from plato.servers import fedavg_personalized as personalized_server
-
 from self_supervised_learning import ssl_client
 from self_supervised_learning import ssl_datasources
 
 import mocov2_model
 import mocov2_trainer
 
+from plato.servers import fedavg_personalized as personalized_server
 
 def main():
     """

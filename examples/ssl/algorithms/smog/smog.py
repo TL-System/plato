@@ -5,16 +5,13 @@ The implementation for the SMoG [1] method.
 ECCV, 2022. https://arxiv.org/pdf/2006.07733.pdf.
 """
 
-
-from plato.servers import fedavg_personalized as personalized_server
-
 from self_supervised_learning import ssl_client
 from self_supervised_learning import ssl_datasources
-
 
 import smog_trainer
 import smog_model
 
+from plato.servers import fedavg_personalized as personalized_server
 
 def main():
     """

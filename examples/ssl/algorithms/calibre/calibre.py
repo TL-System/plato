@@ -4,7 +4,6 @@ Implementation of our Calibre algorithm.
 from self_supervised_learning import ssl_datasources
 from self_supervised_learning import ssl_client
 
-
 import calibre_model
 import calibre_trainer
 import calibre_callback
