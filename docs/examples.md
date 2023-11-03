@@ -38,7 +38,7 @@ H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighti
 ```
 ````
 
-#### Secure Aggregation
+#### Secure Aggregation with Homomorphic Encryption
 
 ````{admonition} **MaskCrypt**
 MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
@@ -110,10 +110,10 @@ N. Su, B. Li. &ldquo;[Asynchronous Federated Unlearning](https://iqua.ece.toront
 #### Gradient Leakage Attacks and Defences
 
 ````{admonition} **Gradient leakage attacks and defenses**
-Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/dlg/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations.
+Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/gradient_leakage_attacks/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations. Refer to `examples/dlg/README.md` for more details.
 
 ```shell
-python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
+python examples/gradient_leakage_attacks/dlg.py -c examples/gradient_leakage_attacks/reconstruction_emnist.yml --cpu
 ```
 ````
 
