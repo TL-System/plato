@@ -1,9 +1,5 @@
 """
-The training loop that takes place on clients.
-
-As each client of Hermes does not hold the personalized model but receives one
-from the server, there is no need to do any operations on the
-personalized_model. But the received model will be personalized model directly.
+The trainer used by clients using Hermes.
 """
 
 import logging
@@ -41,8 +37,9 @@ class Trainer(basic.Trainer):
 
     def train_run_start(self, config):
         """Conducts pruning if needed before training."""
-        # Evaluate if structured pruning should be conducted
         super().train_run_start(config)
+
+        # Evaluate if structured pruning should be conducted
         self.datasource = datasources_registry.get(client_id=self.client_id)
         self.testset = self.datasource.get_test_set()
         logging.info(

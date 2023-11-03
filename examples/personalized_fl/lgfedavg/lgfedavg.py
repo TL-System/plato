@@ -1,8 +1,8 @@
 """
 An implementation of LG-FedAvg.
 
-P, Liang, et al., "Think Locally, Act Globally: Federated Learning
-with Local and Global Representations, " Arxiv 2020.
+P. Liang, et al., "Think Locally, Act Globally: Federated Learning
+with Local and Global Representations," Arxiv 2020.
 
 https://arxiv.org/abs/2001.01523
 
