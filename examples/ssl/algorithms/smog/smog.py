@@ -1,5 +1,5 @@
 """
-The implementation for the SMoG [1] method.
+The implementation for the SMoG [1] algorithm.
 
 [1]. Bo Pang, et al., Unsupervised Visual Representation Learning by Synchronous Momentum Grouping.
 ECCV, 2022. https://arxiv.org/pdf/2006.07733.pdf.
@@ -13,10 +13,9 @@ import smog_model
 
 from plato.servers import fedavg_personalized as personalized_server
 
+
 def main():
-    """
-    A personalized federated learning session for SMoG approach.
-    """
+    """The main running session for the SMoG algorithm."""
     client = ssl_client.Client(
         model=smog_model.SMoG,
         datasource=ssl_datasources.SSLDataSource,
