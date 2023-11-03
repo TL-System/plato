@@ -1,5 +1,5 @@
 """
-A federated learning training session using Hermes
+A federated learning training session using Hermes.
 
 A. Li, J. Sun, P. Li, Y. Pu, H. Li, and Y. Chen, 
 “Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients,”

@@ -16,7 +16,7 @@ from plato.config import Config
 class SendMaskProcessor(base.Processor):
     """
     Implements a processor for attaching a pruning mask to the payload if pruning
-    had been conducted
+    had been conducted.
     """
 
     def __init__(self, client_id, **kwargs) -> None:
