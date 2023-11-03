@@ -4,26 +4,21 @@ Clustering based on encodings.
 
 import torch
 
+from sklearn.cluster import KMeans
 
-def kmeans_clustering(features, n_clusters, max_iters=100):
-    """Clustering input features with the K-means algorithm."""
-    # Initialize centroids randomly
-    centroids = features[torch.randperm(features.size(0))[:n_clusters]]
 
-    for _ in range(max_iters):
-        # Assign each data point to the nearest centroid
-        distances = torch.cdist(features, centroids)  # Compute distances
-        cluster_ids = torch.argmin(distances, dim=1)  # Assign labels
+def kmeans_clustering(features, n_clusters, max_iter=200):
+    """Cluster features using the K-means algorithm."""
+    device = features.device
 
-        # Update centroids as the mean of the assigned data points
-        new_centroids = torch.stack(
-            [features[cluster_ids == i].mean(0) for i in range(n_clusters)]
-        )
+    features = features.detach().cpu().numpy()
+    kmeans = KMeans(n_init="auto", n_clusters=n_clusters, max_iter=max_iter).fit(
+        features
+    )
+    cluster_ids = torch.from_numpy(kmeans.labels_).int()
+    centroids = torch.from_numpy(kmeans.cluster_centers_).float()
+    centroids = torch.nn.functional.normalize(centroids, dim=1)
 
-        # Check for convergence
-        if torch.all(new_centroids == centroids):
-            break
-
-        centroids = new_centroids
-
+    cluster_ids = cluster_ids.to(device)
+    centroids = centroids.to(device)
     return cluster_ids, centroids
