@@ -32,7 +32,7 @@ class BYOLModel(nn.Module):
 
         self.encoding_dim = self.encoder.encoding_dim
 
-        # A projector project higher dimension features to output dimensions.
+        # A projector projects higher dimension features to output dimensions.
         self.projector = BYOLProjectionHead(
             self.encoding_dim,
             Config().trainer.projection_hidden_dim,
@@ -44,9 +44,12 @@ class BYOLModel(nn.Module):
             Config().trainer.prediction_out_dim,
         )
 
+        # The momentum encoder and projector, which are work in
+        # a momentum manner
         self.momentum_encoder = copy.deepcopy(self.encoder)
         self.momentum_projector = copy.deepcopy(self.projector)
 
+        # Deactivate the requires_grad flag for all parameters
         deactivate_requires_grad(self.momentum_encoder)
         deactivate_requires_grad(self.momentum_projector)
 

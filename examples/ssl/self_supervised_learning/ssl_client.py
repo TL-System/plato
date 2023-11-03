@@ -28,6 +28,7 @@ class Client(simple.Client):
             callbacks=callbacks,
             trainer_callbacks=trainer_callbacks,
         )
+        # The datasource used in personalization
         self.personalized_datasource = None
 
     def configure(self) -> None:
