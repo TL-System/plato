@@ -11,8 +11,8 @@ The third-party code: https://github.com/sthalles/PyTorch-BYOL
 
 from plato.servers import fedavg_personalized as personalized_server
 
-from sslbase import ssl_client
-from sslbase import ssl_datasources
+from self_supervised_learning import ssl_client
+from self_supervised_learning import ssl_datasources
 
 from byol_model import BYOLModel
 import byol_trainer
