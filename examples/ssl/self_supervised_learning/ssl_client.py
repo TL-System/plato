@@ -4,9 +4,9 @@ the personalization process, which will be performed after finishing the federat
 training with SSL. 
 
 Specifically, the conventional federated training process with SSL will train the 
-model with the SSL datasource and objective function. Yet, the personalized datasource
-follows the normal datasource of supervised learning. Therefore, this client has to 
-prepare the personalized datasource specifically. 
+model with the datasource and objective function of SSL. Yet, the datasource used in 
+personalization should be one of supervised learning. Therefore, this client has to 
+prepare the personalized datasource particularly. 
 """
 
 from plato.datasources import registry as datasources_registry
