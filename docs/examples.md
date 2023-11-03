@@ -426,7 +426,8 @@ python examples/ssl/algorithms/fedema/fedema.py -c examples/ssl/configs/fedema_C
 ```
 ````
 
-#### Federated Learning Algorithms based on Neural Architecture Search and Model Search
+#### Algorithms based on Neural Architecture Search and Model Search
+
 ````{admonition} **FedRLNAS**
 FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
 
@@ -535,7 +536,7 @@ python3 ./examples/model_search/sysheterofl/sysheterofl.py -c examples/model_sea
 Tempo is proposed to improve training performance in three-layer federated learning. It adaptively tunes the number of each client's local training epochs based on the difference between its edge server's locally aggregated model and the current global model.
 
 ```shell
-python examples/tempo/tempo.py -c examples/tempo/tempo_MNIST_lenet5.yml
+python examples/three_layer_fl/tempo/tempo.py -c examples/three_layer_fl/tempo/tempo_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -548,18 +549,17 @@ Ying et al., &ldquo;[Tempo: Improving Training Performance in Cross-Silo Federat
 FedSaw is proposed to improve training performance in three-layer federated learning with L1-norm structured pruning. Edge servers and clients pruned their updates before sending them out. FedSaw adaptively tunes the pruning amount of each edge server and its clients based on the difference between the edge server's locally aggregated model and the current global model.
 
 ```shell
-python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
+python examples/three_layer_fl/fedsaw/fedsaw.py -c examples/three_layer_fl/fedsaw/fedsaw_MNIST_lenet5.yml
 ```
 ````
 
-#### Algorithms Not Yet Categorized
-
+#### Model Pruning Algorithms
 
 ````{admonition} **FedSCR**
 FedSCR uses structured pruning to prune each update’s entire filters and channels if their summed parameter values are below a particular threshold.
 
 ```shell
-python examples/fedscr/fedscr.py -c examples/fedscr/fedscr_MNIST_lenet5.yml
+python examples/model_pruning/fedscr/fedscr.py -c examples/model_pruning/fedscr/fedscr_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -574,13 +574,13 @@ Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. l
 For two-layer federated learning:
 
 ```shell
-python examples/sub_fedavg/subfedavg.py -c examples/sub_fedavg/subfedavg_MNIST_lenet5.yml
+python examples/model_pruning/sub_fedavg/subfedavg.py -c examples/model_pruning/sub_fedavg/subfedavg_MNIST_lenet5.yml
 ```
 
 For three-layer federated learning:
 
 ```shell
-python examples/sub_fedavg/subcs.py -c examples/sub_fedavg/subcs_MNIST_lenet5.yml
+python examples/model_pruning/sub_fedavg/subcs.py -c examples/model_pruning/sub_fedavg/subcs_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -589,9 +589,7 @@ Vahidian et al., &ldquo;[Personalized Federated Learning by Structured and Unstr
 ```
 ````
 
-
-
-With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
+With the redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |                                                                Method                                                                | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tested |
 | :----------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: |
