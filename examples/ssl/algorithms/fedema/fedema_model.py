@@ -33,33 +33,38 @@ class BYOLModel(nn.Module):
 
         self.encoding_dim = self.encoder.encoding_dim
 
-        # A projector project higher dimension features to output dimensions.
+        # A projector projects higher dimension features to
+        # output dimensions
         self.projector = BYOLProjectionHead(
             self.encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )
+        # A predictor predicts the output from the projected features
         self.predictor = BYOLPredictionHead(
             Config().trainer.projection_out_dim,
             Config().trainer.prediction_hidden_dim,
             Config().trainer.prediction_out_dim,
         )
 
+        # The momentum encoder and projector, which are work in
+        # a momentum manner
         self.momentum_encoder = copy.deepcopy(self.encoder)
         self.momentum_projector = copy.deepcopy(self.projector)
 
+        # Deactivate the requires_grad flag for all parameters
         deactivate_requires_grad(self.momentum_encoder)
         deactivate_requires_grad(self.momentum_projector)
 
     def forward_view(self, sample):
-        """Foward one sample to get the output."""
+        """Foward one view to get the output."""
         encoded_sample = self.encoder(sample).flatten(start_dim=1)
         projected_sample = self.projector(encoded_sample)
         output = self.predictor(projected_sample)
         return output
 
     def forward_momentum(self, sample):
-        """Foward one sample to get the output in a momentum manner."""
+        """Foward one view to get the output in a momentum manner."""
         encoded_example = self.momentum_encoder(sample).flatten(start_dim=1)
         projected_example = self.momentum_projector(encoded_example)
         projected_example = projected_example.detach()
@@ -67,9 +72,9 @@ class BYOLModel(nn.Module):
 
     def forward(self, multiview_samples):
         """Main forward function of the model."""
-        sample1, sample2 = multiview_samples
-        output1 = self.forward_direct(sample1)
-        momentum1 = self.forward_momentum(sample1)
-        output2 = self.forward_direct(sample2)
-        momentum2 = self.forward_momentum(sample2)
+        view_sample1, view_sample2 = multiview_samples
+        output1 = self.forward_direct(view_sample1)
+        momentum1 = self.forward_momentum(view_sample1)
+        output2 = self.forward_direct(view_sample2)
+        momentum2 = self.forward_momentum(view_sample2)
         return (output1, momentum2), (output2, momentum1)
