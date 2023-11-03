@@ -1,5 +1,5 @@
 """
-Implementation of the trainer for Calibre algorithm.
+A personalized federated learning trainer with Calibre.
 """
 
 import os
@@ -16,8 +16,11 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for the Calibre algorithm to compute new loss and
-    get divergence."""
+    """
+    A trainer with Calibre, which computes Calibre's loss and computes the
+    divergence of clusters, showing the normalized distance between the points
+    and the centroid.
+    """
 
     def get_ssl_criterion(self):
         """Get the loss of Calibre."""
@@ -72,7 +75,10 @@ class Trainer(ssl_trainer.Trainer):
         return compute_loss
 
     def compute_divergence_rate(self, encodings):
-        """Compute the divergence rate of the local model"""
+        """
+        Compute the divergence rate, which is the normalized distance between the points
+        and the corresponding centroid.
+        """
         cluster_ids_x, cluster_centers = kmeans_clustering(encodings, n_clusters=10)
         clusters_id = torch.unique(cluster_ids_x, return_counts=False)
         clusters_divergence = torch.zeros(size=(len(clusters_id),), device=self.device)
@@ -96,7 +102,11 @@ class Trainer(ssl_trainer.Trainer):
         return optimizer
 
     def train_run_end(self, config):
-        """Get the features of local samples after training."""
+        """
+        Compute divergence rate based on the learned features of local samples
+        after training. The, the computed value will be saved to disk to be loaded
+        when the client sends it to the server.
+        """
         super().train_run_end(config)
 
         personalized_train_loader = torch.utils.data.DataLoader(

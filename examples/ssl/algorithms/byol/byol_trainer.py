@@ -13,8 +13,8 @@ from plato.config import Config
 class Trainer(ssl_trainer.Trainer):
     """
     A trainer with BYOL, which generates the BYOL's loss and computes the
-    momentum value at the start of each epoch; thus the model will be updated step-wise based
-    on this value in a momentum manner.
+    momentum value at the start of each epoch; thus the model will be updated
+    step-wise based on this value in a momentum manner.
     """
 
     def __init__(self, model=None, callbacks=None):

@@ -1,5 +1,5 @@
 """
-Implementation of the trainer for FedEMA.
+A personalized federated learning trainer with FedEMA.
 """
 
 from lightly.utils.scheduler import cosine_schedule
@@ -11,7 +11,11 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for FedEMA to compute the loss and momentum value."""
+    """
+    A trainer with FedEMA, which computes FedEMA's loss and computes the
+    momentum value at the start of each epoch; thus the model will be updated
+    step-wise based on this value in a momentum manner.
+    """
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
@@ -35,7 +39,9 @@ class Trainer(ssl_trainer.Trainer):
         return compute_loss
 
     def train_epoch_start(self, config):
-        """Update momentum value before starting the epoch."""
+        """
+        At the start of one epoch, the momentum value should be computed.
+        """
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
@@ -44,7 +50,10 @@ class Trainer(ssl_trainer.Trainer):
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
-        """Update momentum value before starting the step."""
+        """
+        At the start of every iteration, the model should be updated based on the
+        momentum value in a momentum manner.
+        """
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
             update_momentum(
