@@ -340,8 +340,9 @@ Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterog
 
 #### Personalized Federated Learning Algorithms based on Self-Supervised Learning
 
-````{admonition} **pFLSSL**
-pFLSSL achieves Personalized federated learning by introducing self-supervised learning (SSL) to the training schema. Specifically, there are two stages. In this first stage, one global model is trained based on SSL under the federated training paradigm. Each client, in the second stage, trains its personalized model based on the extracted features of the received global model. Therefore, due to the diversity of SSL approaches, pFLSSL includes:
+````{admonition} **Self Supervised Learning**
+This category aims to achieve personalized federated learning by introducing self-supervised learning (SSL) to the training schema. In the context of self-supervised learning (SSL), the model is trained to learn representations from unlabeled data. Thus, the model is capable of extracting generic representations. A higher performance can be achieved in subsequent tasks with the trained model as the encoder. Such a benefit of SSL is introduced into personalized FL by relying on the learning objective of SSL to train the global model. After reaching convergence, each client can download the trained global model to extract features from local samples. A high-quality personalized model, typically a linear network, is prone to be achieved under those extracted features. The code is available under `examples/ssl/`. And under `algorithms/` of the folder, the following algorithms are implemented:
+
 - SimCLR [1]
 - BYOL [2]
 - SimSiam [3]
@@ -389,11 +390,11 @@ python algorithms/fedema/fedema.py -c configs/fedema/fedema_CIFAR10_resnet18_non
 
 [2]. Jean-Bastien Grill, et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
 
-[3]. Xinlei Chen, et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in ArXiv, 2020.
+[3]. Xinlei Chen, et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc CVPR, 2021.
 
 [4]. Xinlei Chen, et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
 
-[5]. Mathilde Caron, et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2020.
+[5]. Mathilde Caron, et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2022.
 
 [6]. Bo Pang, et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
 
@@ -568,7 +569,7 @@ python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
 With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |                                                                Method                                                                | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tested |
-| :----------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: |
+|:------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
 |                                [Adaptive Freezing](https://henryhxu.github.io/share/chen-icdcs21.pdf)                                | Change directory to `examples/adaptive_freezing` and run `python adaptive_freezing.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                           |  Yes   |
 | [Gradient-Instructed Frequency Tuning](https://github.com/TL-System/plato/blob/main/examples/adaptive_sync/papers/adaptive_sync.pdf) | Change directory to `examples/adaptive_sync` and run `python adaptive_sync.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                                   |  Yes   |
 |                                       [Attack Adaptive](https://arxiv.org/pdf/2102.05257.pdf)                                        | Change directory to `examples/attack_adaptive` and run `python attack_adaptive.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                               |  Yes   |
