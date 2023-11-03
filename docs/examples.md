@@ -48,7 +48,6 @@ python examples/secure_aggregation/maskcrypt/maskcrypt.py -c examples/secure_agg
 ```
 ````
 
-
 #### Asychronous Federated Learning Algorithms
 
 ````{admonition} **FedAsync**
@@ -63,6 +62,18 @@ python examples/async/fedasync/fedasync.py -c examples/async/fedasync/fedasync_C
 
 ```{note}
 C. Xie, S. Koyejo, I. Gupta. &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
+```
+````
+
+````{admonition} **Port**
+Port is one of the federated learning training sessions in *asynchronous* mode. The server will aggregate when it receives a minimum number of clients' updates, which can be tuned with 'minimum_clients_aggregated'. The 'staleness_bound' is also a common parameter in asynchronous FL, which limit the staleness of all clients' updates. 'request_update' is a special design in Port, to force clients report their updates and shut down the training process if their too slow. 'similarity_weight' and 'staleness_weight' are two hyper-parameters in Port, tuning the weights of them when the server do aggregation. 'max_sleep_time', 'sleep_simulation', 'avg_training_time' and 'simulation_distribution' are also important to define the arrival clients in Port.
+
+```shell
+python examples/port/port.py -c examples/port/port_cifar10.yml 
+```
+
+```{note}
+N. Su, B. Li. &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeexplore.ieee.org/document/9812885),&rdquo; in Proc. IEEE/ACM International Symposium on Quality of Service (IWQoS 2022).
 ```
 ````
 
