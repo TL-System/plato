@@ -15,9 +15,9 @@ from plato.models import registry as models_registry
 
 class Trainer(basic.Trainer):
     """
-    A trainer with Ditto, which first trains the global model for epochs and then 
-    trains the personalized model at the end of the local training; 
-    thereby the global model and personalized model can be simultaneously optimized.
+    A trainer with Ditto, which first trains the global model for epochs and 
+    then trains the personalized model at the end of the local training; 
+    thereby the global model and personalized model can be jointly optimized.
     """
 
     def __init__(self, model=None, callbacks=None):

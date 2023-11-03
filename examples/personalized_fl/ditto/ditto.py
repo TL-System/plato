@@ -1,7 +1,6 @@
 """
 An implementation of the Ditto personalized federated learning algorithm.
 
-Reference:
 T. Li, et al., "Ditto: Fair and robust federated learning through personalization," 
 in the Proceedings of ICML 2021.
 
