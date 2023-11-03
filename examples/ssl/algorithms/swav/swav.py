@@ -15,9 +15,10 @@ import swav_model
 
 from plato.servers import fedavg_personalized as personalized_server
 
+
 def main():
     """
-    A pFL session for SwaV approach.
+    A personalized federated learning session for SwaV approach.
     """
     client = ssl_client.Client(
         model=swav_model.SwaV,
