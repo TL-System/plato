@@ -95,9 +95,3 @@ class SSLDataSource(base.DataSource):
         self.datasource = datasources_registry.get(**data_transforms)
         self.trainset = self.datasource.trainset
         self.testset = self.datasource.testset
-
-    def num_train_examples(self):
-        return len(self.trainset)
-
-    def num_test_examples(self):
-        return len(self.testset)
