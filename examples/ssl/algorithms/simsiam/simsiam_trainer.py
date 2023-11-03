@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer with SimSiam.
+A self-supervised federated learning trainer with SimSiam.
 """
 
 from plato.trainers import loss_criterion

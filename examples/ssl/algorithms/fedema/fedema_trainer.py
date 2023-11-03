@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer with FedEMA.
+A self-supervised federated learning trainer with FedEMA.
 """
 
 from lightly.utils.scheduler import cosine_schedule

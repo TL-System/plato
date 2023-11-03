@@ -18,7 +18,7 @@ import byol_trainer
 
 def main():
     """
-    A personalized federated learning session with BYOL.
+    A self-supervised federated learning session with BYOL.
     """
     trainer = byol_trainer.Trainer
     client = ssl_client.Client(

@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer with SMoG.
+A self-supervised federated learning trainer with SMoG.
 """
 import os
 

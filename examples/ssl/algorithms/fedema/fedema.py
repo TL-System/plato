@@ -16,7 +16,7 @@ import fedema_model
 
 def main():
     """
-    A personalized federated learning session with FedEMA.
+    A self-supervised federated learning session with FedEMA.
     """
     client = ssl_client.Client(
         model=fedema_model.BYOLModel,

@@ -16,7 +16,7 @@ from plato.servers import fedavg_personalized as personalized_server
 
 def main():
     """
-    A personalized federated learning session with SMoG.
+    A self-supervised federated learning session with SMoG.
     """
     client = ssl_client.Client(
         model=smog_model.SMoG,

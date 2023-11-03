@@ -17,7 +17,7 @@ from plato.servers import fedavg_personalized as personalized_server
 
 def main():
     """
-    A personalized federated learning session with SwAV.
+    A self-supervised federated learning session with SwAV.
     """
     client = ssl_client.Client(
         model=swav_model.SwaV,
