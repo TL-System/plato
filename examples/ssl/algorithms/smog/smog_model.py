@@ -1,5 +1,5 @@
 """
-A model for the SMoG method.
+The model for the SMoG algorithm.
 """
 import copy
 
@@ -19,7 +19,7 @@ from plato.config import Config
 
 
 class SMoG(nn.Module):
-    """Core structure of the SMoG model."""
+    """The structure of the SMoG model."""
 
     def __init__(self, encoder=None):
         super().__init__()
@@ -58,12 +58,15 @@ class SMoG(nn.Module):
             Config().trainer.prediction_out_dim,
         )
 
+        # Deepcopy the encoder and projector to create the momentum
         self.encoder_momentum = copy.deepcopy(self.encoder)
         self.projector_momentum = copy.deepcopy(self.projector)
 
+        # Deactivate the requires_grad flag for all parameters
         deactivate_requires_grad(self.encoder_momentum)
         deactivate_requires_grad(self.projector_momentum)
 
+        # Set the necessary hyper-parameter for SMoG
         self.n_groups = Config().trainer.n_groups
         n_prototypes = Config().trainer.n_prototypes
         beta = Config().trainer.smog_beta
@@ -98,16 +101,16 @@ class SMoG(nn.Module):
         deactivate_requires_grad(self.encoder_momentum)
         deactivate_requires_grad(self.projector_momentum)
 
-    def forward_view(self, views):
+    def forward_view(self, view_sample):
         """Foward one view sample to get the output."""
-        encoded_features = self.encoder(views).flatten(start_dim=1)
+        encoded_features = self.encoder(view_sample).flatten(start_dim=1)
         projected_features = self.projector(encoded_features)
         prediction = self.predictor(projected_features)
         return projected_features, prediction
 
-    def forward_momentum(self, samples):
+    def forward_momentum(self, view_sample):
         """Foward one view sample to get the output in a momentum manner."""
-        features = self.encoder_momentum(samples).flatten(start_dim=1)
+        features = self.encoder_momentum(view_sample).flatten(start_dim=1)
         encoded = self.projector_momentum(features)
         return encoded
 

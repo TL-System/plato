@@ -14,11 +14,12 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A base trainer for SMoG approach."""
+    """A trainer for SMoG algorithm to ."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
+        # The momentum value used to update the model
         self.momentum_val = 0
 
         # Set training steps
