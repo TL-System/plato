@@ -24,7 +24,7 @@ def get_version():
 
 
 setuptools.setup(
-    name="pfl-bases",
+    name="sslbase",
     version=get_version(),
     author="",
     license="Apache-2.0",
