@@ -445,7 +445,7 @@ python ./examples/model_search/fedtp/fedtp.py -c ./examples/model_search/fedtp/F
 ```
 
 ```{note}
-Hongxia et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo;
+Li et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo;
 ````
 
 ````{admonition} **HeteroFL**
