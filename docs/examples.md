@@ -354,11 +354,11 @@ This category aims to achieve personalized federated learning by introducing sel
 Please read `examples/ssl/README.md` for more details about how to run the code.
 
 ```shell
-python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr/simclr_MNIST_lenet5.yml -b pflExperiments
+python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr_MNIST_lenet5.yml -b pflExperiments
 ```
 
 ```shell
-python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr/simclr_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
@@ -366,23 +366,23 @@ python examples/ssl/algorithms/byol/byol.py -c examples/ssl/configs/byol_CIFAR10
 ```
 
 ```shell
-python examples/ssl/algorithms/simsiam/simsiam.py -c examples/ssl/configs/simsiam/simsiam_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/algorithms/simsiam/simsiam.py -c examples/ssl/configs/simsiam_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python examples/ssl/algorithms/moco/mocov2.py -c examples/ssl/configs/moco/mocov2_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/algorithms/moco/mocov2.py -c examples/ssl/configs/mocov2_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python examples/ssl/algorithms/swav/swav.py -c examples/ssl/configs/swav/swav_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/algorithms/swav/swav.py -c examples/ssl/configs/swav_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python examples/ssl/algorithms/smog/smog.py -c examples/ssl/configs/smog/smog_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/algorithms/smog/smog.py -c examples/ssl/configs/smog_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```shell
-python examples/ssl/algorithms/fedema/fedema.py -c examples/ssl/configs/fedema/fedema_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/algorithms/fedema/fedema.py -c examples/ssl/configs/fedema_CIFAR10_resnet18.yml -b pflExperiments
 ```
 
 ```{note}
