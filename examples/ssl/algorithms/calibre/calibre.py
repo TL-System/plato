@@ -1,5 +1,5 @@
 """
-Implementation of our Calibre algorithm.
+Implementation of the Calibre algorithm.
 """
 from self_supervised_learning import ssl_datasources
 from self_supervised_learning import ssl_client
@@ -12,7 +12,7 @@ import calibre_server
 
 def main():
     """
-    A personalized federated learning session for SimCLR approach.
+    A main running session for the Calibre approach.
     """
     client = ssl_client.Client(
         model=calibre_model.CalibreNet,

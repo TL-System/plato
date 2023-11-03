@@ -55,9 +55,3 @@ class CalibreCallback(ClientCallback):
         )
 
         outbound_processor.processors.insert(0, send_payload_processor)
-
-        logging.info(
-            "[%s] List of outbound processors: %s.",
-            client,
-            outbound_processor.processors,
-        )

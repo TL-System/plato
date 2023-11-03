@@ -16,11 +16,13 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for the Calibre method."""
+    """A trainer for the Calibre algorithm to compute new loss and
+    get divergence."""
 
     def get_ssl_criterion(self):
-        """A wrapper to connect ssl loss with plato."""
+        """Get the loss of Calibre."""
 
+        # Get the main loss criterion
         loss_criterion_name = (
             Config().trainer.loss_criterion
             if hasattr(Config.trainer, "loss_criterion")
@@ -32,6 +34,8 @@ class Trainer(ssl_trainer.Trainer):
             else {}
         )
 
+        # Get the auxiliary losses which are regularizers in the
+        # objective funct
         auxiliary_losses = (
             Config().algorithm.auxiliary_loss_criterions
             if hasattr(Config.algorithm, "auxiliary_loss_criterions")
@@ -43,6 +47,7 @@ class Trainer(ssl_trainer.Trainer):
             else {}
         )
 
+        # Get the weight for these losses
         losses_weight = (
             Config().algorithm.losses_weight
             if hasattr(Config.algorithm, "losses_weight")
@@ -81,7 +86,7 @@ class Trainer(ssl_trainer.Trainer):
         return torch.mean(clusters_divergence)
 
     def get_optimizer(self, model):
-        """Getting the optimizer"""
+        """Get the optimizer"""
         optimizer = super().get_optimizer(model)
         if self.current_round > Config().trainer.rounds:
             # Add another self.model's parameters to the existing optimizer

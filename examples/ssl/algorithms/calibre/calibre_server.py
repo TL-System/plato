@@ -37,7 +37,7 @@ class Server(personalized_server.Server):
         self.divergence_rates_received = []
 
     async def aggregate_deltas(self, updates, deltas_received):
-        """Add the divergence rates to deltas."""
+        """Apply the divergence rate as the weight to deltas."""
         total_divergence = torch.sum(self.divergence_rates_received)
         # Normalize the delta with the divergence rates
         for i, update in enumerate(deltas_received):
