@@ -1,5 +1,5 @@
 """
-A trainer for BYOL to rewrite the loss function.
+A personalized federated learning trainer with BYOL.
 """
 from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
@@ -11,7 +11,11 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for BYOL to rewrite the loss function."""
+    """
+    A trainer with BYOL, which generates the BYOL's loss and computes the
+    momentum value at the start of each epoch; thus the model will be updated step-wise based
+    on this value in a momentum manner.
+    """
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
@@ -19,7 +23,6 @@ class Trainer(ssl_trainer.Trainer):
         self.momentum_val = 0
 
     def get_ssl_criterion(self):
-        """A wrapper to connect ssl loss with plato."""
         defined_ssl_loss = loss_criterion.get()
 
         def compute_loss(outputs, labels):
@@ -34,7 +37,9 @@ class Trainer(ssl_trainer.Trainer):
         return compute_loss
 
     def train_epoch_start(self, config):
-        """Before the start of one epoch, the momentum value should be computed."""
+        """
+        At the start of one epoch, the momentum value should be computed.
+        """
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
@@ -43,8 +48,10 @@ class Trainer(ssl_trainer.Trainer):
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
-        """At the start of every iteration, the model should be used to generate
-        the momentum value."""
+        """
+        At the start of every iteration, the model should be updated based on the
+        momentum value in a momentum manner.
+        """
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
             update_momentum(
