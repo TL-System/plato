@@ -69,7 +69,7 @@ C. Xie, S. Koyejo, I. Gupta. &ldquo;[Asynchronous Federated Optimization](https:
 Port is one of the federated learning training sessions in *asynchronous* mode. The server will aggregate when it receives a minimum number of clients' updates, which can be tuned with 'minimum_clients_aggregated'. The 'staleness_bound' is also a common parameter in asynchronous FL, which limit the staleness of all clients' updates. 'request_update' is a special design in Port, to force clients report their updates and shut down the training process if their too slow. 'similarity_weight' and 'staleness_weight' are two hyper-parameters in Port, tuning the weights of them when the server do aggregation. 'max_sleep_time', 'sleep_simulation', 'avg_training_time' and 'simulation_distribution' are also important to define the arrival clients in Port.
 
 ```shell
-python examples/port/port.py -c examples/port/port_cifar10.yml 
+python examples/async/port/port.py -c examples/async/port/port_cifar10.yml 
 ```
 
 ```{note}
@@ -80,16 +80,30 @@ N. Su, B. Li. &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeex
 #### Federated Unlearning
 
 ````{admonition} **Federated Unlearning**
-Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/fedunlearning/fedunlearning_server.py` and `examples/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
+Federated unlearning is a concept proposed in the recent research literature that uses an unlearning algorithm, such as retraining from scratch, to guarantee that a client is able to remove all the effects of its local private data samples from the trained model.  In its implementation in `examples/unlearning/fedunlearning/fedunlearning_server.py` and `examples/unlearning/fedunlearning/fedunlearning_client.py`, a framework-agnostic implementation of federated unlearning overrides several methods in the client and server APIs, such as the server's `aggregate_deltas()` to implement federated unlearning.
 
 ```shell
-python examples/fedunlearning/fedunlearning.py -c examples/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.yml
+python examples/unlearning/fedunlearning/fedunlearning.py -c examples/unlearning/fedunlearning/fedunlearning_adahessian_MNIST_lenet5.yml
 ```
 
 ```{note}
 If the AdaHessian optimizer is used as in the example configuration file, it will reflect what the following paper proposed:
 
 Liu et al., &ldquo;[The Right to be Forgotten in Federated Learning: An Efficient Realization with Rapid Retraining](https://arxiv.org/abs/2203.07320),&rdquo; in Proc. INFOCOM, 2022.
+```
+````
+
+````{admonition} **Knot**
+Knot is implemented in `examples/unlearning`, which clusters the clients, and the server aggregation is carried out within each cluster only. Knot is designed under **asynchronous** mode, and unlearned by retraining from scratch in cluster. The global model will be aggregated at the end of the retraining process. Knot supports a wide range of tasks, including image classification and language tasks.
+
+```shell
+python examples/unlearning/knot/knot.py -c examples/unlearning/knot/knot_cifar10_resnet18.yml
+python examples/unlearning/knot/knot.py -c examples/unlearning/knot/knot_mnist_lenet5.yml
+python examples/unlearning/knot/knot.py -c examples/unlearning/knot/knot_purchase.yml
+```
+
+```{note}
+N. Su, B. Li. &ldquo;[Asynchronous Federated Unlearning](https://iqua.ece.toronto.edu/papers/ningxinsu-infocom23.pdf),&rdquo; in Proc. IEEE International Conference on Computer Communications (INFOCOM 2023).
 ```
 ````
 
