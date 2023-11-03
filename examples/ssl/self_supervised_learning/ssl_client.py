@@ -1,7 +1,12 @@
 """
-A self-supervised learning (SSL) setting the personalized datasource for 
-the client. The datasets used in personalization are different from the ones used in
-the regular federated learning with SSL.
+A self-supervised learning (SSL) client to prepare the personalized datasource for 
+the personalization process, which will be performed after finishing the federated 
+training with SSL. 
+
+Specifically, the conventional federated training process with SSL will train the 
+model with the SSL datasource and objective function. Yet, the personalized datasource
+follows the normal datasource of supervised learning. Therefore, this client has to 
+prepare the personalized datasource specifically. 
 """
 
 from plato.datasources import registry as datasources_registry

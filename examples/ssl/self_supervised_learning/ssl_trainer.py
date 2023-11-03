@@ -1,13 +1,16 @@
 """
 A self-supervised learning (SSL) trainer for SSL training and testing.
 
-Federated SSL trains the global model based on the data loader and objective function 
+Federated learning with SSL trains the global model based on the data loader and objective function 
 of SSL algorithms. For this unsupervised learning process, we cannot test the model directly 
 as the model only extracts features from the data. Therefore, we use the KNN as a classifier
 to get the accuracy of the global model during the regular federated training process.
 
-In the personalization phase, each client trains a linear layer locally, 
-based on the features extracted by the trained global model.
+In the personalization process, each client trains a linear layer locally, based on the features 
+extracted by the trained global model.
+
+We should note that the accuracy obtained by KNN during the regular federated training rounds 
+may not be used to compare with the accuracy in supervised learning methods. 
 """
 
 import logging
