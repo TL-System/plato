@@ -1,0 +1,20 @@
+# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+
+MODEL:
+  TYPE: NASVIT
+  NAME: NASVIT
+  DROP_PATH_RATE: 1e-2
+TRAIN:
+  CLIP_GRAD: 1.0
+  BASE_LR: 3e-4
+  EPOCHS: 400
+  WEIGHT_DECAY: 0.0 
+  WARMUP_EPOCHS: 5
+DATA:
+  IMG_SIZE: 224
+AUG:
+  MIXUP_SWITCH_PROB: .5
+  REPROB: 0.01
+  MIXUP: .01
+  CUTMIX: .01
+  AUTO_AUGMENT: 'rand-n1-m1-mstd0.5-inc1'
