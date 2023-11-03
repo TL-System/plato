@@ -20,9 +20,12 @@ class Trainer(ssl_trainer.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
+        # The momentum value used to update the model
+        # with Exponential Moving Average
         self.momentum_val = 0
 
     def get_ssl_criterion(self):
+        """Compute the loss proposed by BYOL."""
         defined_ssl_loss = loss_criterion.get()
 
         def compute_loss(outputs, labels):
@@ -54,6 +57,9 @@ class Trainer(ssl_trainer.Trainer):
         """
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
+            # Update the model based on the momentum value
+            # Specifically, it updates parameters of `encoder` with
+            # Exponential Moving Average of `encoder_momentum`
             update_momentum(
                 self.model.encoder, self.model.momentum_encoder, m=self.momentum_val
             )
