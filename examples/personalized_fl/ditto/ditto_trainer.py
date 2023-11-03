@@ -19,7 +19,7 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
-        # The lambda (used in the paper)
+        # lambda (proposed and used in the paper)
         self.ditto_lambda = Config().algorithm.ditto_lambda
 
         # The personalized model
@@ -28,7 +28,7 @@ class Trainer(basic.Trainer):
         else:
             self.personalized_model = model()
 
-        # The global model weights received from the server, which is the w^t in
+        # The global model weights received from the server, which is w^t in
         # the paper
         self.initial_wnet_params = None
 
