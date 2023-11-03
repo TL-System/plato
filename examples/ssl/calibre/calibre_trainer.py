@@ -44,7 +44,7 @@ class Trainer(ssl_trainer.Trainer):
             if hasattr(Config.algorithm, "auxiliary_loss_criterions")
             else []
         )
-        auxiliary_losses_params = (
+        auxiliary_loss_params = (
             Config().algorithm.auxiliary_loss_criterions_param._asdict()
             if hasattr(Config.algorithm, "auxiliary_loss_criterions_param")
             else {}
@@ -61,7 +61,7 @@ class Trainer(ssl_trainer.Trainer):
             main_loss=loss_criterion_name,
             main_loss_params=loss_criterion_params,
             auxiliary_losses=auxiliary_losses,
-            auxiliary_losses_params=auxiliary_losses_params,
+            auxiliary_loss_params=auxiliary_loss_params,
             losses_weight=losses_weight,
             device=self.device,
         )
