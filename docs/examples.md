@@ -22,7 +22,7 @@ python examples/server_aggregation/fedatt/fedatt.py -c examples/server_aggregati
 ```
 
 ```{note}
-S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. &ldquo;[Learning Private Neural Language Modeling with Attentive Aggregation](https://arxiv.org/abs/1812.07108),&rdquo; in the Proceedings of the 2019 International Joint Conference on Neural Networks (IJCNN), March 2019.
+Ji et al., &ldquo;[Learning Private Neural Language Modeling with Attentive Aggregation](https://arxiv.org/abs/1812.07108),&rdquo; in Proc. International Joint Conference on Neural Networks (IJCNN), 2019.
 ```
 ````
 
@@ -34,7 +34,7 @@ python examples/server_aggregation/fedadp/fedadp.py -c examples/server_aggregati
 ```
 
 ```{note}
-H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Transactions on Cognitive Communications and Networking (TCCN 2021).
+Wu & Wang, &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Trans. on Cognitive Communications and Networking (TCCN), 2021.
 ```
 ````
 
@@ -61,7 +61,7 @@ python examples/async/fedasync/fedasync.py -c examples/async/fedasync/fedasync_C
 ```
 
 ```{note}
-C. Xie, S. Koyejo, I. Gupta. &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
+Xie et al., &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. Annual Workshop on Optimization for Machine Learning (OPT), 2020.
 ```
 ````
 
@@ -73,7 +73,7 @@ python examples/async/port/port.py -c examples/async/port/port_cifar10.yml
 ```
 
 ```{note}
-N. Su, B. Li. &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeexplore.ieee.org/document/9812885),&rdquo; in Proc. IEEE/ACM International Symposium on Quality of Service (IWQoS 2022).
+Su & Li, &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeexplore.ieee.org/document/9812885),&rdquo; in Proc. IEEE/ACM International Symposium on Quality of Service (IWQoS), 2022.
 ```
 ````
 
@@ -139,7 +139,7 @@ python examples/customized_client_training/fedprox/fedprox.py -c examples/custom
 ```
 
 ```{note}
-T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; Proceedings of Machine Learning and Systems (MLSys), 2020.
+Li et al., &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf), &rdquo; in Proc. Machine Learning and Systems (MLSys), 2020.
 ```
 ````
 
@@ -150,7 +150,7 @@ python examples/customized_client_training/feddyn/feddyn.py -c examples/customiz
 ```
 
 ```{note}
-Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations, 2021.
+Acar et al., &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2021.
 ```
 ````
 
@@ -162,9 +162,7 @@ to as federated textual inversion. This approach treats the learnable pseudo-wor
 python examples/customized_client_training/fedti/fedti.py -c examples/customized_client_training/fedti/StableDiffusionFed_iid_50.yml -b FedTI
 ```
 ```{note}
-Rinon et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using 
-    Textual Inversion],
-&rdquo; 
+Gal et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using Textual Inversion](https://arxiv.org/pdf/2208.01618.pdf), &rdquo; Arxiv, 2022.
 ````
 
 
@@ -178,7 +176,7 @@ python examples/client_selection/afl/afl.py -c examples/client_selection/afl/afl
 ```
 
 ```{note}
-J. Goetz, K. Malik, D. Bui, S. Moon, H. Liu, A. Kumar. &ldquo;[Active Federated Learning](https://arxiv.org/abs/1909.12641),&rdquo; September 2019.
+Goetz et al., &ldquo;[Active Federated Learning](https://arxiv.org/abs/1909.12641),&rdquo; Arxiv, 2019.
 ```
 ````
 
@@ -190,8 +188,7 @@ python examples/client_selection/pisces/pisces.py -c examples/client_selection/p
 ```
 
 ```{note}
-Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf),
-&rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
+Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf), &rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
 ```
 ````
 
@@ -203,7 +200,7 @@ python examples/client_selection/oort/oort.py -c examples/client_selection/oort/
 ```
 
 ```{note}
-Lai, et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
+Lai et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
 ```
 ````
 
@@ -227,7 +224,7 @@ python ./run -c configs/CIFAR10/split_learning_resnet18.yml
 ```
 
 ```{note}
-Vepakomma, et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. AI for Social Good Workshop, affiliated with the International Conference on Learning Representations (ICLR), 2018.
+Vepakomma et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. NeurIPS, 2018.
 ```
 ````
 
@@ -246,7 +243,7 @@ python examples/personalized_fl/fedrep/fedrep.py -c examples/personalized_fl/con
 
 ```{note}
 Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Federated Learning](http://proceedings.mlr.press/v139/collins21a/collins21a.pdf),
-&rdquo; in International Conference on Machine Learning, 2021.
+&rdquo; in Proc. International Conference on Machine Learning (ICML), 2021.
 ```
 ````
 
@@ -262,7 +259,7 @@ python examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/c
 
 ```{note}
 Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image Classification](https://openreview.net/forum?id=HuaYQfggn5u),
-&rdquo; in International Conference on Learning Representations (ICLR), 2022.
+&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2022.
 ```
 ````
 
@@ -277,7 +274,7 @@ python examples/personalized_fl/apfl/apfl.py -c examples/personalized_fl/configs
 ```
 
 ```{note}
-Yuyang Deng, et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
+Deng et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
 &rdquo; in Arxiv, 2021.
 ```
 ````
@@ -293,7 +290,7 @@ python examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/con
 ```
 
 ```{note}
-Manoj Ghuhan Arivazhagan, et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
+Arivazhagan, et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
 &rdquo; in Arxiv, 2019.
 ```
 ````
@@ -309,7 +306,7 @@ python examples/personalized_fl/lgfedavg/lgfedavg.py -c examples/personalized_fl
 ```
 
 ```{note}
-Paul Pu Liang, et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
+Liang et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
 &rdquo; in Proc. NeurIPS, 2019.
 ```
 ````
@@ -325,7 +322,7 @@ python examples/personalized_fl/ditto/ditto.py -c examples/personalized_fl/confi
 ```
 
 ```{note}
-Tian Li, et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
+Li et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
 &rdquo; in Proc ICML, 2021.
 ```
 ````
@@ -341,7 +338,7 @@ python examples/personalized_fl/perfedavg/perfedavg.py -c examples/personalized_
 ```
 
 ```{note}
-Alireza Fallah, et al., &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
+Fallah et al., &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
 A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html),
 &rdquo; in Proc NeurIPS, 2020.
 ```
@@ -360,7 +357,7 @@ python examples/personalized_fl/hermes/hermes.py -c examples/personalized_fl/con
 
 ```{note}
 Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients](https://sites.duke.edu/angli/files/2021/10/2021_Mobicom_Hermes_v1.pdf),
-&rdquo; in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
+&rdquo; in Proc. Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
 ```
 ````
 
@@ -412,19 +409,19 @@ python examples/ssl/algorithms/fedema/fedema.py -c examples/ssl/configs/fedema_C
 ```
 
 ```{note}
-[1]. Ting Chen, et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc ICML, 2020.
+[1]. Chen et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc. ICML, 2020.
 
-[2]. Jean-Bastien Grill, et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc NeurIPS, 2020.
+[2]. Grill et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. NeurIPS, 2020.
 
-[3]. Xinlei Chen, et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc CVPR, 2021.
+[3]. Chen et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc. CVPR, 2021.
 
-[4]. Xinlei Chen, et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+[4]. Chen et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
 
-[5]. Mathilde Caron, et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc NeurIPS, 2022.
+[5]. Caron et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc. NeurIPS, 2022.
 
-[6]. Bo Pang, et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc ECCV, 2022.
+[6]. Pang et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. ECCV, 2022.
 
-[7]. W Zhuang, et al., &ldquo;[Divergence-aware federated self-supervised learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc ICLR, 2022.
+[7]. Zhuang et al., &ldquo;[Divergence-aware federated self-supervised learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
 
 ```
 ````
@@ -438,7 +435,7 @@ python examples/model_search/fedrlnas/fedrlnas.py -c examples/model_search/fedrl
 ```
 
 ```{note}
-Yao, et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
+Yao et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
 ```
 ````
 
@@ -471,7 +468,7 @@ python ./examples/model_search/fedtp/fedtp.py -c ./examples/model_search/fedtp/F
 ```
 
 ```{note}
-Li et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo;
+Li et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](https://arxiv.org/pdf/2211.01572v1.pdf).&rdquo; Arxiv, 2022.
 ````
 
 ````{admonition} **HeteroFL**
@@ -483,7 +480,7 @@ python examples/model_search/heterofl/heterofl.py -c examples/model_search/heter
 
 ```{note}
 Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated Learning for Heterogeneous Clients](https://openreview.net/forum?id=TNkPBBYFkXg),
-&rdquo; in International Conference on Learning Representations (ICLR), 2021.
+&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2021.
 ````
 
 ````{admonition} **FedRolex**
@@ -495,7 +492,7 @@ python3 examples/model_search/fedrolex/fedrolex.py -c examples/model_search/fedr
 
 ```{note}
 Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction](https://openreview.net/forum?id=OtxyysUdBE),
-&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2022.
+&rdquo; in Proc. NeurIPS, 2022.
 ```
 ````
 
@@ -508,7 +505,7 @@ python3 examples/model_search/fjord/fjord.py -c examples/model_search/fjord/fjor
 
 ```{note}
 Samuel et al., &ldquo;[FjORD: Fair and Accurate Federated Learning under heterogeneous targets with Ordered Dropout](https://proceedings.neurips.cc/paper/2021/hash/6aed000af86a084f9cb0264161e29dd3-Abstract.html),
-&rdquo; in Conference on Neural Information Processing Systems (NeurIPS), 2021.
+&rdquo; in Proc. NeurIPS, 2021.
 ```
 ````
 
