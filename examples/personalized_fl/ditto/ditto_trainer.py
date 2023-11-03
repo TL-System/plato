@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer using Ditto.
+A personalized federated learning trainer with Ditto.
 """
 import os
 import copy
@@ -19,17 +19,15 @@ class Trainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
-        # lambda (proposed and used in the paper)
         self.ditto_lambda = Config().algorithm.ditto_lambda
 
-        # The personalized model
+        # Get the personalized model
         if model is None:
             self.personalized_model = models_registry.get()
         else:
             self.personalized_model = model()
 
-        # The global model weights received from the server, which is w^t in
-        # the paper
+        # The global model weights, which is w^t in the paper
         self.initial_wnet_params = None
 
     def train_run_start(self, config):
@@ -38,7 +36,6 @@ class Trainer(basic.Trainer):
         self.initial_wnet_params = copy.deepcopy(self.model.cpu().state_dict())
 
     def train_run_end(self, config):
-        """Perform personalized training, proposed in Ditto."""
         super().train_run_end(config)
 
         logging.info(
