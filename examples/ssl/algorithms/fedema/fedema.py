@@ -15,7 +15,7 @@ import fedema_model
 
 
 def main():
-    """Running the FedEMA approach."""
+    """Running the FedEMA algorithm."""
     client = ssl_client.Client(
         model=fedema_model.BYOLModel,
         datasource=ssl_datasources.SSLDataSource,
