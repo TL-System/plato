@@ -48,7 +48,7 @@ python examples/secure_aggregation/maskcrypt/maskcrypt.py -c examples/secure_agg
 ```
 ````
 
-#### Asynchronous Federated Learning Algorithms
+#### Asychronous Federated Learning Algorithms
 
 ````{admonition} **FedAsync**
 FedAsync is one of the first algorithms proposed in the literature towards operating federated learning training sessions in *asynchronous* mode, which Plato supports natively. It advocated aggregating aggressively whenever only *one* client reported its local updates to the server.
@@ -193,7 +193,7 @@ Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchrono
 ````
 
 ````{admonition} **Oort**
-Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by default). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
+Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by defualt). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
 
 ```shell
 python examples/client_selection/oort/oort.py -c examples/client_selection/oort/oort_MNIST_lenet5.yml
@@ -440,7 +440,7 @@ Yao et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://i
 ````
 
 ````{admonition} **PerFedRLNAS**
-PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model structure and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided. 
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model strcuture and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided. 
 
 NASVIT search space:
 ```shell
@@ -472,7 +472,7 @@ Li et al., &ldquo;[FedTP: Federated Learning by Transformer Personalization](htt
 ````
 
 ````{admonition} **HeteroFL**
-HeteroFL is an algorithm aimed at solving heterogeneous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
+HeteroFL is an algorithm aimed at solving heterogenous computing resources requirements on different federated learning clients. They use five different complexities to compress the channel width of the model. In the implementation, we need to modify the model to implement those five complexities and scale modules. We provide examples of ```ResNet``` family and ```MobileNetV3``` family here. The core operations of assigning different complexities to the clients and aggregate models of complexities are in function ```get_local_parameters``` and ```aggregation``` respectively, in ```heterofl_algorithm.py```.
 
 ```shell
 python examples/model_search/heterofl/heterofl.py -c examples/model_search/heterofl/heterofl_resnet18_dynamic.yml
@@ -484,7 +484,7 @@ Diao et al., &ldquo;[HeteroFL: Computation and Communication Efficient Federated
 ````
 
 ````{admonition} **FedRolex**
-FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogeneous federated learning. In this implementation, models of ResNet and ViT are supported.
+FedRolex argues the statistical method of pruning channels in HeteroFL will cause unbalanced updates of the model parameters. In this algorithm, they introduce a rolling mechanism to evenly update the parameters of each channel in the system-heterogenous federated learning. In this implementation, models of ResNet and ViT are supported.
 
 ```shell
 python3 examples/model_search/fedrolex/fedrolex.py -c examples/model_search/fedrolex/example_ViT.yml
@@ -497,7 +497,7 @@ Alam et al., &ldquo;[FedRolex: Model-Heterogeneous Federated Learning with Rolli
 ````
 
 ````{admonition} **FjORD**
-FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogeneous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
+FjORD, different to FedRolex and HeteroFL, adopted a policy called ordered dropout to randomly select the pruning channels in the system-heterogenous federated learning. To further improve the performance of aggregating models of different architectures, they further proposed to conduct distillation on each device between bigger sub-networks and smaller subnetworks, if the devices have enough computation abilities.
 
 ```shell
 python3 examples/model_search/fjord/fjord.py -c examples/model_search/fjord/fjord_resnet18_dynamic.yml
@@ -523,7 +523,7 @@ Li et al., &ldquo;[AnycostFL: Efficient On-Demand Federated Learning over Hetero
 ````
 
 ````{admonition} **SysHeteroFL**
-In the paper system-heterogeneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
+In the paper system-heterogneous federated learning revisited through architecture search, it is proposed that assigning models of different architectures to the clients to achieve better performance when there are resource budgets on the clients. In this implementation, subnets of ResNet model with different architectures are sampled.
 
 ```shell
 python3 ./examples/model_search/sysheterofl/sysheterofl.py -c examples/model_search/sysheterofl/config_ResNet152.yml
