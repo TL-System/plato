@@ -32,7 +32,7 @@ class BYOLModel(nn.Module):
 
         # A projector project higher dimension features to output dimensions.
         self.projector = BYOLProjectionHead(
-            self.encoding_dim,
+            self.encoder.encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )
