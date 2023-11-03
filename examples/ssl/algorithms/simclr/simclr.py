@@ -1,13 +1,10 @@
 """
-The implementation for the SimCLR [1] method for personalized federated learning.
+An implementation of the SimCLR algorithm.
 
-[1]. Ting Chen, et al., A Simple Framework for Contrastive Learning of Visual Representations, 
+Ting Chen, et al., A Simple Framework for Contrastive Learning of Visual Representations, 
 ICML 2020. https://arxiv.org/abs/2002.05709
 
-The official code: https://github.com/google-research/simclr
-
-The structure of our SimCLR and the classifier is the same as the ones used in
-the work https://github.com/spijkervet/SimCLR.git.
+Source code: https://github.com/google-research/simclr or https://github.com/spijkervet/SimCLR.git.
 
 """
 from self_supervised_learning import ssl_datasources

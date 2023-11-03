@@ -1,11 +1,10 @@
 """
-The implementation for the SwAV [1] method.
+An implementation of the SwAV algorithm.
 
-Reference:
-[1]. Mathilde Caron, et al., Unsupervised Learning of Visual Features by Contrasting Cluster Assignments.
+Mathilde Caron, et al., Unsupervised Learning of Visual Features by Contrasting Cluster Assignments.
 https://arxiv.org/abs/2006.09882, NeurIPS 2020.
 
-Source code: https://github.com/facebookresearch/swav
+Source code: https://github.com/facebookresearch/swav.
 """
 from self_supervised_learning import ssl_client
 from self_supervised_learning import ssl_trainer

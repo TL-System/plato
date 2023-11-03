@@ -1,5 +1,5 @@
 """
-Implementation of the Calibre algorithm.
+An implementation of the Calibre algorithm.
 """
 from self_supervised_learning import ssl_datasources
 from self_supervised_learning import ssl_client

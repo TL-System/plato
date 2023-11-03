@@ -1,5 +1,5 @@
 """
-The implementation for the FedEMA proposed by the work [1].
+An implementation of the FedEMA algorithm.
 
 Zhuang, et.al, "Divergence-aware Federated Self-Supervised Learning", ICLR22.
 https://arxiv.org/pdf/2204.04385.pdf.

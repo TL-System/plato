@@ -1,12 +1,10 @@
 """
-The implementation for the SimSiam [1] method.
+An implementation of the SimSiam algorithm.
 
-[1]. Xinlei Chen, et al., Exploring Simple Siamese Representation Learning.
+Xinlei Chen, et al., Exploring Simple Siamese Representation Learning.
 https://arxiv.org/pdf/2011.10566.pdf
 
-Reference:
-Source code: https://github.com/facebookresearch/simsiam
-Third-party code: https://github.com/PatrickHua/SimSiam
+Source code: https://github.com/facebookresearch/simsiam or https://github.com/PatrickHua/SimSiam
 """
 
 from self_supervised_learning import ssl_client

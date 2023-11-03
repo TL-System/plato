@@ -1,15 +1,13 @@
 """
-The implementation for the MoCoV2 [2] method, which is the enhanced version of MoCoV1 [1],
-for personalized federated learning.
+An implementation of the MoCoV2 algorithm.
 
-Reference:
-[1]. Kaiming He, et al., Momentum Contrast for Unsupervised Visual Representation Learning, 
+Kaiming He, et al., Momentum Contrast for Unsupervised Visual Representation Learning, 
 CVPR 2020. https://arxiv.org/abs/1911.05722.
 
-[2]. Xinlei Chen, et al., Improved Baselines with Momentum Contrastive Learning, ArXiv, 2020.
+Xinlei Chen, et al., Improved Baselines with Momentum Contrastive Learning, ArXiv, 2020.
 https://arxiv.org/abs/2003.04297.
 
-The official code: https://github.com/facebookresearch/moco.
+Source code: https://github.com/facebookresearch/moco.
 
 """
 from self_supervised_learning import ssl_client
