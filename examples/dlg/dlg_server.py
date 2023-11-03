@@ -512,8 +512,6 @@ class Server(fedavg.Server):
             else:
                 self.trainer.model.train()
 
-            print(self.trainer.model.training)
-
             self.trainer.model.zero_grad()
             try:
                 dummy_pred, _ = self.trainer.model(dummy_data)
