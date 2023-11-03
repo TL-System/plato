@@ -22,7 +22,7 @@ python examples/server_aggregation/fedatt/fedatt.py -c examples/server_aggregati
 ```
 
 ```{note}
-Ji et al., &ldquo;[Learning Private Neural Language Modeling with Attentive Aggregation](https://arxiv.org/abs/1812.07108),&rdquo; in Proc. International Joint Conference on Neural Networks (IJCNN), 2019.
+S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. &ldquo;[Learning Private Neural Language Modeling with Attentive Aggregation](https://arxiv.org/abs/1812.07108),&rdquo; in Proc. International Joint Conference on Neural Networks (IJCNN), 2019.
 ```
 ````
 
@@ -34,7 +34,7 @@ python examples/server_aggregation/fedadp/fedadp.py -c examples/server_aggregati
 ```
 
 ```{note}
-Wu & Wang, &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Trans. on Cognitive Communications and Networking (TCCN), 2021.
+H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighting](https://ieeexplore.ieee.org/abstract/document/9442814),&rdquo; in IEEE Trans. on Cognitive Communications and Networking (TCCN), 2021.
 ```
 ````
 
@@ -61,7 +61,7 @@ python examples/async/fedasync/fedasync.py -c examples/async/fedasync/fedasync_C
 ```
 
 ```{note}
-Xie et al., &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. Annual Workshop on Optimization for Machine Learning (OPT), 2020.
+C. Xie, S. Koyejo, I. Gupta. &ldquo;[Asynchronous Federated Optimization](https://opt-ml.org/papers/2020/paper_28.pdf),&rdquo; in Proc. Annual Workshop on Optimization for Machine Learning (OPT), 2020.
 ```
 ````
 
@@ -73,7 +73,7 @@ python examples/async/port/port.py -c examples/async/port/port_cifar10.yml
 ```
 
 ```{note}
-Su & Li, &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeexplore.ieee.org/document/9812885),&rdquo; in Proc. IEEE/ACM International Symposium on Quality of Service (IWQoS), 2022.
+N. Su, B. Li. &ldquo;[How Asynchronous can Federated Learning Be?](https://ieeexplore.ieee.org/document/9812885),&rdquo; in Proc. IEEE/ACM International Symposium on Quality of Service (IWQoS), 2022.
 ```
 ````
 
@@ -139,7 +139,7 @@ python examples/customized_client_training/fedprox/fedprox.py -c examples/custom
 ```
 
 ```{note}
-Li et al., &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf), &rdquo; in Proc. Machine Learning and Systems (MLSys), 2020.
+T. Li, A. K. Sahu, M. Zaheer, M. Sanjabi, A. Talwalkar, V. Smith. &ldquo;[Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf),&rdquo; in Proc. Machine Learning and Systems (MLSys), 2020.
 ```
 ````
 
@@ -150,7 +150,7 @@ python examples/customized_client_training/feddyn/feddyn.py -c examples/customiz
 ```
 
 ```{note}
-Acar et al., &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2021.
+Acar, D.A.E., Zhao, Y., Navarro, R.M., Mattina, M., Whatmough, P.N. and Saligrama, V. &ldquo;[Federated learning based on dynamic regularization](https://openreview.net/forum?id=B7v4QMR6Z9w),&rdquo; Proceedings of International Conference on Learning Representations (ICLR), 2021.
 ```
 ````
 
@@ -176,7 +176,7 @@ python examples/client_selection/afl/afl.py -c examples/client_selection/afl/afl
 ```
 
 ```{note}
-Goetz et al., &ldquo;[Active Federated Learning](https://arxiv.org/abs/1909.12641),&rdquo; Arxiv, 2019.
+J. Goetz, K. Malik, D. Bui, S. Moon, H. Liu, A. Kumar. &ldquo;[Active Federated Learning](https://arxiv.org/abs/1909.12641),&rdquo; September 2019.
 ```
 ````
 
@@ -290,7 +290,7 @@ python examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/con
 ```
 
 ```{note}
-Arivazhagan, et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
+Arivazhagan et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
 &rdquo; in Arxiv, 2019.
 ```
 ````
@@ -357,7 +357,7 @@ python examples/personalized_fl/hermes/hermes.py -c examples/personalized_fl/con
 
 ```{note}
 Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterogeneous Mobile Clients](https://sites.duke.edu/angli/files/2021/10/2021_Mobicom_Hermes_v1.pdf),
-&rdquo; in Proc. Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
+&rdquo; in Proc. 27th Annual International Conference on Mobile Computing and Networking (MobiCom), 2021.
 ```
 ````
 
