@@ -60,7 +60,7 @@ class Server(personalized_server.Server):
 
         # To compute the divergence scale adaptively
         # and within the computing rounds
-        if self.adaptive_divg_scale and not (self.current_round > divg_before_round):
+        if self.adaptive_divg_scale and self.current_round <= divg_before_round:
             clients_id = [update.report.client_id for update in updates]
 
             # Compute the divergence scale based on the distance between
