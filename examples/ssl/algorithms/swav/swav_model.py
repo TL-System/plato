@@ -6,13 +6,12 @@ from torch import nn
 
 from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
 
-
 from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
 
 
 class SwaV(nn.Module):
-    """The model structure for the SwaV."""
+    """The structure of the SwAV Model."""
 
     def __init__(self, encoder=None):
         super().__init__()
