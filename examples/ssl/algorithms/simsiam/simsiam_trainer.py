@@ -1,5 +1,5 @@
 """
-A trainer for the simsiam algorithm.
+A personalized federated learning trainer with SimSiam.
 """
 
 from plato.trainers import loss_criterion
@@ -8,10 +8,10 @@ from self_supervised_learning import ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for SimSiam to compute the loss."""
+    """A trainer with SimSiam to compute the loss."""
 
     def get_ssl_criterion(self):
-        """A wrapper to connect ssl loss with plato."""
+        """Get the loss proposed by the SimSiam."""
         defined_ssl_loss = loss_criterion.get()
 
         def compute_loss(outputs, labels):
