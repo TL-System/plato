@@ -1,1 +1,0 @@
-ssl: A library of convenient classes for personalized federated learning algorithms based on self-supervised learning (SSL)
