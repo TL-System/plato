@@ -68,11 +68,13 @@ else:
 def get(client_id: int = 0, **kwargs):
     """Get the data source with the provided name."""
     datasource_name = (
-        kwargs["datasource_name"] if "datasource_name" in kwargs else Config().data.datasource
+        kwargs["datasource_name"]
+        if "datasource_name" in kwargs
+        else Config().data.datasource
     )
 
     logging.info("Data source: %s", datasource_name)
-    
+
     if datasource_name == "kinetics700":
         from plato.datasources import kinetics
 
@@ -102,6 +104,11 @@ def get(client_id: int = 0, **kwargs):
         from plato.datasources import yolov8
 
         return yolov8.DataSource(**kwargs)
+
+    if datasource_name == "self_supervised_learning":
+        from plato.datasources import self_supervised_learning
+
+        return self_supervised_learning.SSLDataSource(**kwargs)
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:
