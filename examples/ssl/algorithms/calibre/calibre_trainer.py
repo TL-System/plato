@@ -106,7 +106,7 @@ class Trainer(ssl_trainer.Trainer):
         sample_encodings = None
 
         with torch.no_grad():
-            for _, (examples, _) in enumerate(personalized_train_loader):
+            for examples, _ in personalized_train_loader:
                 examples = examples.to(self.device)
                 features = self.model.encoder(examples)
 

@@ -1,5 +1,5 @@
 """
-A base server for Calibre to perform divergence-aware global aggregation.
+A self supervised learning server for Calibre to perform divergence-aware global aggregation.
 
 After each client clusters local samples based on their encodings, there will be 
 local clusters where each cluster's divergence is computed as the normalized distance 
