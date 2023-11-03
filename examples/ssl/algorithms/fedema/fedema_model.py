@@ -13,7 +13,7 @@ from plato.models.cnn_encoder import Model as encoder_registry
 
 
 class BYOLModel(nn.Module):
-    """The model structure of BYOL."""
+    """The model structure of FedEMA."""
 
     def __init__(self, encoder=None):
         super().__init__()
@@ -54,19 +54,19 @@ class BYOLModel(nn.Module):
         deactivate_requires_grad(self.momentum_encoder)
         deactivate_requires_grad(self.momentum_projector)
 
-    def forward_view(self, sample):
+    def forward_view(self, view_sample):
         """Foward one view to get the output."""
-        encoded_sample = self.encoder(sample).flatten(start_dim=1)
-        projected_sample = self.projector(encoded_sample)
-        output = self.predictor(projected_sample)
+        encoded_view = self.encoder(view_sample).flatten(start_dim=1)
+        projected_view = self.projector(encoded_view)
+        output = self.predictor(projected_view)
         return output
 
-    def forward_momentum(self, sample):
+    def forward_momentum(self, view_sample):
         """Foward one view to get the output in a momentum manner."""
-        encoded_example = self.momentum_encoder(sample).flatten(start_dim=1)
-        projected_example = self.momentum_projector(encoded_example)
-        projected_example = projected_example.detach()
-        return projected_example
+        encoded_view = self.momentum_encoder(view_sample).flatten(start_dim=1)
+        projected_view = self.momentum_projector(encoded_view)
+        projected_view = projected_view.detach()
+        return projected_view
 
     def forward(self, multiview_samples):
         """Main forward function of the model."""

@@ -18,8 +18,8 @@ class GlobalLocalDivergenceProcessor(base.Processor):
     """
 
     def process(self, data: Any) -> Any:
-        """Processing the received payload by assigning layers of local model of
-        each client."""
+        """Process the received payload by updating the layers using
+        the model divergence."""
 
         divergence_scale = data[1]
 

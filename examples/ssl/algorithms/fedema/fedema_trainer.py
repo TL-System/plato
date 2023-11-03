@@ -11,11 +11,12 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A trainer for FedEMA."""
+    """A trainer for FedEMA to compute the loss and momentum value."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
 
+        # The momentum value used to update the model
         self.momentum_val = 0
 
     def get_ssl_criterion(self):
@@ -34,7 +35,7 @@ class Trainer(ssl_trainer.Trainer):
         return compute_loss
 
     def train_epoch_start(self, config):
-        """Operations before starting one epoch."""
+        """Update momentum value before starting the epoch."""
         super().train_epoch_start(config)
         epoch = self.current_epoch
         total_epochs = config["epochs"] * config["rounds"]
@@ -43,11 +44,7 @@ class Trainer(ssl_trainer.Trainer):
             self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
 
     def train_step_start(self, config, batch=None):
-        """
-        At the start of every iteration,
-            update the models for generating momentum
-            with new momemtum parameter: momentum value.
-        """
+        """Update momentum value before starting the step."""
         super().train_step_start(config)
         if not self.current_round > Config().trainer.rounds:
             update_momentum(

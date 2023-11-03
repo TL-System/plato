@@ -1,5 +1,5 @@
 """
-A base trainer for MoCoV2 algorithm.
+A base trainer for the MoCoV2 algorithm.
 """
 
 

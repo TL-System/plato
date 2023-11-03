@@ -21,7 +21,7 @@ from plato.servers import fedavg_personalized as personalized_server
 
 def main():
     """
-    A personalized federated learning session for SimCLR approach.
+    The main running session for the SimCLR approach.
     """
     client = ssl_client.Client(
         model=SimCLRModel,
