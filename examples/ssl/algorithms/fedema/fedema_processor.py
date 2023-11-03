@@ -1,6 +1,6 @@
 """
-Processors of FedEMA algorithm to be used in the callback part to process the 
-payload.
+An inbound processor for FedEMA to calculate the divergence between received payload
+and local saved model weights. And then add on such divergence to the payload.
 """
 
 import utils

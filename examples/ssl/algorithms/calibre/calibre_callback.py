@@ -3,7 +3,7 @@ Callback for adding the divergence rate to the payload.
 """
 
 
-import calibre_processors
+import calibre_processor
 
 from plato.callbacks.client import ClientCallback
 
@@ -18,7 +18,7 @@ class CalibreCallback(ClientCallback):
         """
         Insert a AddDivergenceRateProcessor to the list of outbound processors.
         """
-        send_payload_processor = calibre_processors.AddDivergenceRateProcessor(
+        send_payload_processor = calibre_processor.AddDivergenceRateProcessor(
             client_id=client.client_id,
             trainer=client.trainer,
             name="AddDivergenceRateProcessor",

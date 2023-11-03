@@ -1,6 +1,5 @@
 """
-Processors of Calibre algorithm to be used in the callback part to process the
-payload.
+An outbound prossor for Calibre algorithm to save the divergence on the client locally.
 """
 import os
 import logging

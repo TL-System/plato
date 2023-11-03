@@ -1,8 +1,8 @@
 """
-Customized processor for FedEMA.
+The Clientcallback used by FedEMA to add on FedEMA processor.
 """
 
-import fedema_processors
+import fedema_processor
 
 from plato.callbacks.client import ClientCallback
 
@@ -17,7 +17,7 @@ class FedEMACallback(ClientCallback):
         """
         Insert an GlobalLocalDivergenceProcessor to the list of inbound processors.
         """
-        extract_payload_processor = fedema_processors.GlobalLocalDivergenceProcessor(
+        extract_payload_processor = fedema_processor.GlobalLocalDivergenceProcessor(
             trainer=client.trainer,
             name="GlobalLocalDivergenceProcessor",
         )
