@@ -80,16 +80,16 @@ class Trainer(ssl_trainer.Trainer):
         and the corresponding centroid.
         """
         cluster_ids_x, cluster_centers = kmeans_clustering(encodings, n_clusters=10)
-        clusters_id = torch.unique(cluster_ids_x, return_counts=False)
-        clusters_divergence = torch.zeros(size=(len(clusters_id),), device=self.device)
-        for cluster_id in clusters_id:
+        cluster_ids = torch.unique(cluster_ids_x, return_counts=False)
+        cluster_divergence = torch.zeros(size=(len(cluster_ids),), device=self.device)
+        for cluster_id in cluster_ids:
             cluster_center = cluster_centers[cluster_id]
             cluster_elems = encodings[cluster_ids_x == cluster_id]
             distance = torch.norm(cluster_elems - cluster_center, dim=1)
             divergence = torch.mean(distance)
-            clusters_divergence[cluster_id] = divergence
+            cluster_divergence[cluster_id] = divergence
 
-        return torch.mean(clusters_divergence)
+        return torch.mean(cluster_divergence)
 
     def get_optimizer(self, model):
         """Get the optimizer"""
