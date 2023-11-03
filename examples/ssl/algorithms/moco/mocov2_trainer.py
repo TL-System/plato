@@ -11,7 +11,7 @@ from plato.config import Config
 
 
 class Trainer(ssl_trainer.Trainer):
-    """A personalized federated learning trainer with self-supervised learning."""
+    """A trainer to perform the training process of MoCoV2."""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
