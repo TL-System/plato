@@ -11,9 +11,9 @@ the work https://github.com/spijkervet/SimCLR.git.
 
 """
 from plato.servers import fedavg_personalized as personalized_server
-from ssl import ssl_datasources
-from ssl import ssl_client
-from ssl import ssl_trainer
+from self_supervised_learning import ssl_datasources
+from self_supervised_learning import ssl_client
+from self_supervised_learning import ssl_trainer
 
 from simclr_model import SimCLRModel
 

@@ -4,7 +4,7 @@ A base trainer for simsiam algorithm.
 
 from plato.trainers import loss_criterion
 
-from ssl import ssl_trainer
+from self_supervised_learning import ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):

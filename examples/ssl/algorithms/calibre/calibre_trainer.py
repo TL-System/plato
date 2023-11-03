@@ -7,7 +7,7 @@ import logging
 
 import torch
 
-from ssl import ssl_trainer
+from self_supervised_learning import ssl_trainer
 
 from calibre_loss import CalibreLoss
 from clustering import kmeans_clustering

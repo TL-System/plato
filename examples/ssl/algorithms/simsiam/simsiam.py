@@ -11,8 +11,8 @@ Third-party code: https://github.com/PatrickHua/SimSiam
 
 from plato.servers import fedavg_personalized as personalized_server
 
-from ssl import ssl_client
-from ssl import ssl_datasources
+from self_supervised_learning import ssl_client
+from self_supervised_learning import ssl_datasources
 
 import simsiam_trainer
 import simsiam_model

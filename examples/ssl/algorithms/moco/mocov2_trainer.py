@@ -6,7 +6,7 @@ A base trainer for MoCoV2 algorithm.
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
-from ssl import ssl_trainer
+from self_supervised_learning import ssl_trainer
 from plato.config import Config
 
 
