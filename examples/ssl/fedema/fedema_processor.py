@@ -3,10 +3,10 @@ An inbound processor for FedEMA to calculate the divergence between received pay
 and local saved model weights. And then add on such divergence to the payload.
 """
 
-import utils
-
 import logging
 from typing import Any
+
+import utils
 
 from plato.config import Config
 from plato.processors import base

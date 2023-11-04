@@ -1,5 +1,5 @@
 """
-The Clientcallback used by FedEMA to add on FedEMA processor.
+The ClientCallback used by FedEMA to add on the FedEMA processor.
 """
 
 import fedema_processor
