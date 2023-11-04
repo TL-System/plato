@@ -1,5 +1,5 @@
 """
-A model for the SwAV method.
+A model for the SwAV algorithm.
 """
 
 from torch import nn

@@ -1,13 +1,13 @@
 """
 An implementation of the MoCoV2 algorithm.
 
-Kaiming He, et al., Momentum Contrast for Unsupervised Visual Representation Learning, 
+K. He, et al., "Momentum Contrast for Unsupervised Visual Representation Learning," 
 CVPR 2020. https://arxiv.org/abs/1911.05722.
 
-Xinlei Chen, et al., Improved Baselines with Momentum Contrastive Learning, ArXiv, 2020.
+X. Chen, et al., "Improved Baselines with Momentum Contrastive Learning," ArXiv, 2020.
 https://arxiv.org/abs/2003.04297.
 
-Source code: https://github.com/facebookresearch/moco.
+Source code: https://github.com/facebookresearch/moco
 
 """
 from plato.servers import fedavg_personalized as personalized_server

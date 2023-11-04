@@ -1,10 +1,11 @@
 """
 An implementation of the SwAV algorithm.
 
-Mathilde Caron, et al., Unsupervised Learning of Visual Features by Contrasting Cluster Assignments.
-https://arxiv.org/abs/2006.09882, NeurIPS 2020.
+M. Caron, et al., "Unsupervised Learning of Visual Features by Contrasting Cluster Assignments," NeurIPS 2020.
 
-Source code: https://github.com/facebookresearch/swav.
+https://arxiv.org/abs/2006.09882
+
+Source code: https://github.com/facebookresearch/swav
 """
 from plato.servers import fedavg_personalized as personalized_server
 from plato.clients import self_supervised_learning as ssl_client

@@ -1,8 +1,9 @@
 """
 An implementation of the SimCLR algorithm.
 
-Ting Chen, et al., A Simple Framework for Contrastive Learning of Visual Representations, 
-ICML 2020. https://arxiv.org/abs/2002.05709
+T. Chen, et al., "A Simple Framework for Contrastive Learning of Visual Representations," ICML 2020. 
+
+https://arxiv.org/abs/2002.05709
 
 Source code: https://github.com/google-research/simclr or https://github.com/spijkervet/SimCLR.git.
 

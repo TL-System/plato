@@ -1,8 +1,9 @@
 """
 An implementation of the SMoG algorithm.
 
-Bo Pang, et al., Unsupervised Visual Representation Learning by Synchronous Momentum Grouping.
-ECCV, 2022. https://arxiv.org/pdf/2006.07733.pdf.
+B. Pang, et al., "Unsupervised Visual Representation Learning by Synchronous Momentum Grouping," ECCV, 2022. 
+
+https://arxiv.org/pdf/2006.07733.pdf
 """
 
 from plato.servers import fedavg_personalized as personalized_server

@@ -1,7 +1,7 @@
 """
 An implementation of the SimSiam algorithm.
 
-Xinlei Chen, et al., Exploring Simple Siamese Representation Learning.
+X. Chen, et al., "Exploring Simple Siamese Representation Learning."
 https://arxiv.org/pdf/2011.10566.pdf
 
 Source code: https://github.com/facebookresearch/simsiam or https://github.com/PatrickHua/SimSiam
