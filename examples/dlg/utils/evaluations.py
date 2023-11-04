@@ -1,11 +1,11 @@
 import math
 from statistics import mean
-
+from plato.config import Config
 import lpips
 import torch
 from torchmetrics import StructuralSimilarityIndexMeasure
 
-loss_fn = lpips.LPIPS(net="vgg")
+loss_fn = lpips.LPIPS(net="vgg").to(Config().device())
 
 
 def find_ssim(dummy_data, ground_truth):
@@ -34,7 +34,7 @@ def find_ssim(dummy_data, ground_truth):
 
 
 def find_ssim_library(dummy_data, ground_truth):
-    ssim = StructuralSimilarityIndexMeasure()
+    ssim = StructuralSimilarityIndexMeasure().to(Config().device())
     return ssim(dummy_data, ground_truth).item()
 
 
