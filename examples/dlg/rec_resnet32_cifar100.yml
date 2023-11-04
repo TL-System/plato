@@ -14,6 +14,7 @@ server:
     address: 127.0.0.1
     port: 8012
     simulate_wall_time: true
+    do_test: false
 
     random_seed: 1
 
@@ -71,7 +72,7 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 100
+    num_iters: 2000
     log_interval: 10
 
     # model mode
@@ -79,7 +80,7 @@ algorithm:
     dummy_eval: true
 
     # Dummy data initialization
-    init_data: half
+    init_data: randn # ["randn", "rand", "zeros", "half"]
     # Whether or not use customized initialization for model weights
     init_params: false
     # Whether sharing gradients or model weights
@@ -90,7 +91,7 @@ algorithm:
     # Matching weights (absolute) or weight updates (delta)
     use_updates: false
     # The number of times the attack will be attempted
-    trials: 3
+    trials: 1
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
