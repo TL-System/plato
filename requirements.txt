@@ -12,7 +12,3 @@ zstd
 torch-optimizer
 timm
 lightly
-scikit-learn
-pytest
-transformers
-peft

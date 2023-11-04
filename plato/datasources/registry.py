@@ -68,11 +68,13 @@ else:
 def get(client_id: int = 0, **kwargs):
     """Get the data source with the provided name."""
     datasource_name = (
-        kwargs["datasource_name"] if "datasource_name" in kwargs else Config().data.datasource
+        kwargs["datasource_name"]
+        if "datasource_name" in kwargs
+        else Config().data.datasource
     )
 
     logging.info("Data source: %s", datasource_name)
-    
+
     if datasource_name == "kinetics700":
         from plato.datasources import kinetics
 

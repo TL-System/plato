@@ -41,6 +41,11 @@ def get(model=None, callbacks=None):
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)
+
+    elif Config().trainer.type == "self_supervised_learning":
+        from plato.trainers import self_supervised_learning
+
+        return self_supervised_learning.Trainer(model=model, callbacks=callbacks)
     elif trainer_name in registered_trainers:
         return registered_trainers[trainer_name](model=model, callbacks=callbacks)
     else:

@@ -1,14 +1,13 @@
 """
-The implementation of Per-FedAvg method based on the plato's
-pFL code.
+A federated learning training session using Per-FedAvg.
 
-Reference
-Alireza Fallah, et al., Personalized federated learning with theoretical guarantees:
-A model-agnostic meta-learning approach, NeurIPS 2020.
-https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html
+A. Fallah, et al., “Personalized Federated Learning with Theoretical Guarantees:
+A Model-Agnostic Meta-Learning Approach,” in Proc. Advances in Neural
+Information Processing Systems (NeurIPS), 2020.
+
+https://dl.acm.org/doi/abs/10.5555/3495724.3496024
 
 Third-party code: https://github.com/jhoon-oh/FedBABU
-
 """
 
 import perfedavg_trainer
@@ -16,9 +15,10 @@ import perfedavg_trainer
 from plato.servers import fedavg_personalized as personalized_server
 from plato.clients import fedavg_personalized as personalized_client
 
+
 def main():
     """
-    A personalized federated learning session for PerFedAvg approach.
+    A personalized federated learning session using the Per-FedAvg algorithm.
     """
     trainer = perfedavg_trainer.Trainer
     client = personalized_client.Client(trainer=trainer)

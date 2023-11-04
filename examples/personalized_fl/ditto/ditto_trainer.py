@@ -1,5 +1,5 @@
 """
-A personalized federated learning trainer using Ditto.
+A personalized federated learning trainer with Ditto.
 """
 import os
 import copy
@@ -14,31 +14,36 @@ from plato.models import registry as models_registry
 
 
 class Trainer(basic.Trainer):
-    """A personalized federated learning trainer using the Ditto algorithm."""
+    """
+    A trainer with Ditto, which first trains the global model and then trains
+    the personalized model.
+    """
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
-
-        # The lambda (used in the paper)
+        # The lambda adjusts the gradients
         self.ditto_lambda = Config().algorithm.ditto_lambda
 
-        # The personalized model
+        # Get the personalized model
         if model is None:
             self.personalized_model = models_registry.get()
         else:
             self.personalized_model = model()
 
-        # The global model weights received from the server, which is the w^t in
-        # the paper
+        # The global model weights, which is w^t in the paper
         self.initial_wnet_params = None
 
     def train_run_start(self, config):
         super().train_run_start(config)
 
+        # Make a copy of the model before local training starts, which will be used when optimizing
+        # the personalized model
         self.initial_wnet_params = copy.deepcopy(self.model.cpu().state_dict())
 
     def train_run_end(self, config):
-        """Perform personalized training, proposed in Ditto."""
+        """
+        Optimize the personalized model for epochs following Algorithm 1.
+        """
         super().train_run_end(config)
 
         logging.info(
@@ -49,6 +54,7 @@ class Trainer(basic.Trainer):
             self.client_id,
         )
 
+        # Load personalized model
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
         filename = f"{model_path}/{model_name}_{self.client_id}_v_net.pth"
@@ -64,6 +70,7 @@ class Trainer(basic.Trainer):
 
         self.personalized_model.to(self.device)
         self.personalized_model.train()
+
         for epoch in range(1, config["epochs"] + 1):
             epoch_loss_meter.reset()
             for __, (examples, labels) in enumerate(self.train_loader):

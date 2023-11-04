@@ -69,7 +69,7 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
     mask = []
 
     if adjust_rate == 0:
-        for __, layer in model.named_parameters():
+        for layer in model.modules():
             if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
                 pruning_rates.append(pruning_rate)
     else:
@@ -93,18 +93,16 @@ def structured_pruning(model, pruning_rate, adjust_rate=0.0):
             ) / weight_nums[step]
             pruning_rates[step] = (pruning_rates[step] * 100) / (100 - adjust_rate)
 
-        step = 0
-
     step = 0
-    for __, layer in model.named_parameters():
+    for layer in model.modules():
         if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
             amount = pruning_rates[step]
             prune.ln_structured(layer, "weight", amount, norm, dim)
+            for name, buffer in layer.named_buffers():
+                if "mask" in name:
+                    mask.append(buffer.cpu().numpy())
             step += 1
-
-    for name, buffer in model.named_buffers():
-        if "mask" in name:
-            mask.append(buffer.cpu().numpy())
+            prune.remove(layer, "weight")
 
     return mask
 
@@ -122,5 +120,4 @@ def apply_mask(model, mask, device):
             device = layer.weight.device
             prune.custom_from_mask(layer, "weight", mask[step].to(device))
             step += 1
-
     return model

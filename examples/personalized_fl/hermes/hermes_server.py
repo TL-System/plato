@@ -96,7 +96,6 @@ class Server(personalized_server.Server):
 
     def update_client_model(self, aggregated_clients_models, updates):
         """Update clients' models."""
-
         for client_model, update in zip(aggregated_clients_models, updates):
             received_client_id = update.client_id
             if received_client_id in self.aggregated_clients_model:
@@ -105,11 +104,10 @@ class Server(personalized_server.Server):
     def customize_server_payload(self, payload):
         """Customizes the server payload before sending to the client."""
 
-        # If the client has already begun the learning of a personalized model
+        # If the client has already begun training a personalized model
         # in a previous communication round, the personalized file is loaded and
         # sent to the client for continued training. Otherwise, if the client is
         # selected for the first time, it receives the pre-initialized model.
-
         if self.selected_client_id in self.aggregated_clients_model:
             # replace the payload for the current client with the personalized model
             payload = self.aggregated_clients_model[self.selected_client_id]
