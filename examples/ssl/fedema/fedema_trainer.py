@@ -5,7 +5,7 @@ A self-supervised federated learning trainer with FedEMA.
 from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
 
-from self_supervised_learning import ssl_trainer
+from plato.trainers import self_supervised_learning as ssl_trainer
 from plato.trainers import loss_criterion
 from plato.config import Config
 
