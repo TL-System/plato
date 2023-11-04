@@ -22,7 +22,7 @@ from typing import List
 from collections import OrderedDict
 
 import torch
-import torch.nn as nn
+from torch import nn
 from lightly import loss as lightly_loss
 
 from clustering import kmeans_clustering

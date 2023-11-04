@@ -58,4 +58,4 @@ def get_prototype_loss(
     logits = -distances
 
     # Calculate logits with softmax
-    return F.cross_entropy(logits, query_labels)
+    return F.cross_entropy(logits, query_labels.long())

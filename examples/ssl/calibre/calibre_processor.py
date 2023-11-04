@@ -3,7 +3,7 @@ An outbound prossor for Calibre algorithm to save the divergence on the client l
 """
 import os
 import logging
-from typing import OrderedDict as OrderedDictType
+from typing import OrderedDict
 
 import torch
 
@@ -22,7 +22,7 @@ class AddDivergenceRateProcessor(base.Processor):
         self.client_id = client_id
         self.trainer = trainer
 
-    def process(self, data: OrderedDictType):
+    def process(self, data: OrderedDict):
         """Process the payload by adding the computed divergence rate to the payload."""
         model_path = Config().params["model_path"]
         filename = f"client_{self.client_id}_divergence_rate.pth"
