@@ -287,7 +287,7 @@ The round interval for a server commanding when to perform personalization. The 
 ```
 
 ```{admonition} do_personalization_group
-The group of clients that is required by the server to perform personalization. There are three options, including "total", "participant", and "nonparticipant". The default value is "participant", meaning the clients participating in training will be used to perform the personalization.
+The group of clients that is required by the server to perform personalization. There are three options, including "total", "participant", and "nonparticipant". The default value is "participant", meaning the clients participating in training will be used to perform personalization.
 ```
 
 ## data
