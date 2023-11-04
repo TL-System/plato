@@ -378,6 +378,11 @@ python examples/ssl/calibre/calibre.py -c examples/ssl/configs/calibre_CIFAR10_r
 
 [7] Zhuang et al., &ldquo;[Divergence-Aware Federated Self-Supervised Learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
 ```
+
+```
+Calibre is currently only supported on GPUs or Apple Silicon Chip. One should run on a GPU device or on MAC OS with adding the argument -m.
+```
+
 ````
 
 #### Algorithms based on Neural Architecture Search and Model Search
