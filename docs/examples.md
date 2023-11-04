@@ -351,6 +351,10 @@ This category aims to achieve personalized federated learning by introducing sel
 - FedEMA [7] 
 - Calibre
 
+```{note}
+Calibre is currently only supported on NVIDIA or M1/M2/M3 GPUs. To run on M1/M2/M3 GPUs, add the command-line argument `-m`.
+```
+
 ```shell
 python examples/ssl/simclr/simclr.py -c examples/ssl/configs/simclr_MNIST_lenet5.yml
 python examples/ssl/simclr/simclr.py -c examples/ssl/configs/simclr_CIFAR10_resnet18.yml
@@ -377,10 +381,6 @@ python examples/ssl/calibre/calibre.py -c examples/ssl/configs/calibre_CIFAR10_r
 [6] Pang et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. ECCV, 2022.
 
 [7] Zhuang et al., &ldquo;[Divergence-Aware Federated Self-Supervised Learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
-```
-
-```
-Calibre is currently only supported on GPUs or Apple Silicon Chip. One should run on a GPU device or on MAC OS with adding the argument -m.
 ```
 
 ````
