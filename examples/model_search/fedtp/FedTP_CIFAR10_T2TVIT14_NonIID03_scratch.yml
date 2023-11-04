@@ -139,11 +139,9 @@ trainer:
     pers_epoch_log_interval: 2
     pers_epoch_model_log_interval: 10
 
-    # The machine learning model,
-    # it behaves as the encoder for the ssl method
-    # the final fc layer will be removed
-    # however, in the central test, we do not use this
-    #   but use the custom model
+    # The machine learning model, it behaves as the encoder for the SSL method
+    # the final fc layer will be removed however, in the central test, we do not
+    # use this but use the custom model
     model_type: vit
     model_name: T2t_vit_14
     personalized_model_name: T2t_vit_14

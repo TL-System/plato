@@ -1,16 +1,17 @@
 """
 A self-supervised learning (SSL) trainer for SSL training and testing.
 
-Federated learning with SSL trains the global model based on the data loader and objective function 
-of SSL algorithms. For this unsupervised learning process, we cannot test the model directly 
-as the model only extracts features from the data. Therefore, we use the KNN as a classifier
-to get the accuracy of the global model during the regular federated training process.
+Federated learning with SSL trains the global model based on the data loader and
+objective function of SSL algorithms. For this unsupervised learning process, we
+cannot test the model directly as the model only extracts features from the
+data. Therefore, we use KNN as a classifier to get the accuracy of the global
+model during the regular federated training process.
 
-In the personalization process, each client trains a linear layer locally, based on the features 
-extracted by the trained global model.
+In the personalization process, each client trains a linear layer locally, based
+on the features extracted by the trained global model.
 
-We should note that the accuracy obtained by KNN during the regular federated training rounds 
-may not be used to compare with the accuracy in supervised learning methods. 
+The accuracy obtained by KNN during the regular federated training rounds may
+not be used to compare with the accuracy in supervised learning methods. 
 """
 
 import logging
@@ -40,8 +41,9 @@ class SSLSamples(UserList):
 
 
 class MultiViewCollateWrapper(MultiViewCollate):
-    """An interface to connect the collate from lightly with the data loading schema of
-    Plato."""
+    """
+    An interface to connect collate from lightly with the data loading schema in Plato.
+    """
 
     def __call__(self, batch):
         """Turn a batch of tuples into a single tuple."""
@@ -117,9 +119,8 @@ class Trainer(basic.Trainer):
 
     def get_ssl_criterion(self):
         """
-        Get the loss criterion for the SSL.
-        Some SSL algorithms, for example, BYOL, will overwrite this function for
-        specific loss functions.
+        Get the loss criterion for SSL. Some SSL algorithms, for example,
+        BYOL, will overwrite this function for specific loss functions.
         """
 
         # Get loss criterion for the SSL
@@ -128,16 +129,16 @@ class Trainer(basic.Trainer):
         # We need to wrap the loss function to make it compatible
         # with different types of outputs
         # The types of the outputs can vary from Tensor to a list of Tensors
-        def compute_loss(outputs, labels):
+        def compute_loss(outputs, __):
             if isinstance(outputs, (list, tuple)):
                 return ssl_loss_function(*outputs)
-            else:
-                return ssl_loss_function(outputs)
+
+            return ssl_loss_function(outputs)
 
         return compute_loss
 
     def get_loss_criterion(self):
-        """Return the loss criterion for the SSL."""
+        """Return the loss criterion for SSL."""
         # Get loss criterion for the subsequent training process
         if self.current_round > Config().trainer.rounds:
             loss_criterion_type = Config().algorithm.personalization.loss_criterion
@@ -186,7 +187,7 @@ class Trainer(basic.Trainer):
         extract features into the local layers.
         """
 
-        # Perform the SSL training in the first Config().trainer.rounds rounds
+        # Perform SSL training in the first `Config().trainer.rounds`` rounds
         if not self.current_round > Config().trainer.rounds:
             return super().perform_forward_and_backward_passes(config, examples, labels)
 
