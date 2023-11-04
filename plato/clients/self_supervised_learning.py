@@ -1,12 +1,12 @@
 """
-A self-supervised learning (SSL) client to prepare the personalized datasource for 
-the personalization process, which will be performed after finishing the federated 
-training with SSL. 
+A self-supervised learning (SSL) client prepares a personalized datasource for
+the personalization process, which will be performed after finishing the FL
+training process with SSL. 
 
-Specifically, the conventional federated training process with SSL will train the 
-model with the datasource and objective function of SSL. Yet, the datasource used in 
-personalization should be one of supervised learning. Therefore, this client has to 
-prepare the personalized datasource particularly. 
+Specifically, the conventional FL training process with SSL will train the model
+with the datasource and objective function of SSL. Yet, the datasource used in
+personalization should be one of supervised learning. Therefore, a client needs
+to prepare the personalized datasource. 
 """
 
 from plato.datasources import registry as datasources_registry
@@ -14,7 +14,7 @@ from plato.clients import simple
 
 
 class Client(simple.Client):
-    """An SSL client to prepare the datasource for the personalization."""
+    """An SSL client to prepare the datasource for personalization."""
 
     def __init__(
         self,

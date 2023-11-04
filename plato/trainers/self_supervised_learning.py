@@ -86,7 +86,7 @@ class Trainer(basic.Trainer):
 
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """Obtain the training loader based on the learning mode."""
-        # Get the training loader for the personalization
+        # Get the trainloader for personalization
         if self.current_round > Config().trainer.rounds:
             return torch.utils.data.DataLoader(
                 dataset=self.personalized_trainset,
@@ -155,7 +155,7 @@ class Trainer(basic.Trainer):
         return self.get_ssl_criterion()
 
     def get_lr_scheduler(self, config, optimizer):
-        # Get the lr scheduler for the personalization
+        # Get the lr scheduler for personalization
         if self.current_round > Config().trainer.rounds:
             lr_scheduler = Config().algorithm.personalization.lr_scheduler
             lr_params = Config().parameters.personalization.learning_rate._asdict()
@@ -191,7 +191,7 @@ class Trainer(basic.Trainer):
         if not self.current_round > Config().trainer.rounds:
             return super().perform_forward_and_backward_passes(config, examples, labels)
 
-        # Perform the personalization after the final round
+        # Perform personalization after the final round
         # Perform the local update on self.local_layers
         self.optimizer.zero_grad()
 
@@ -266,10 +266,10 @@ class Trainer(basic.Trainer):
 
             return accuracy
         else:
-            # Test the personalization in each round.
+            # Test the personalized model in each round.
 
             # For SSL, the way to test the trained model before personalization is
-            #   to use the KNN as a classifier to evaluate the extracted features.
+            # to use the KNN as a classifier to evaluate the extracted features.
 
             logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
 
@@ -284,11 +284,11 @@ class Trainer(basic.Trainer):
                 testset, batch_size=batch_size, shuffle=False, sampler=sampler
             )
             # For evaluating self-supervised performance, we need to calculate
-            #   distance between training samples and testing samples.
+            # distance between training samples and testing samples.
             train_encodings, train_labels = self.collect_encodings(train_loader)
             test_encodings, test_labels = self.collect_encodings(test_loader)
 
-            # Build the KNN and Perform the prediction
+            # Build KNN and perform the prediction
             distances = torch.cdist(test_encodings, train_encodings, p=2)
             knn = distances.topk(1, largest=False)
             nearest_idx = knn.indices
