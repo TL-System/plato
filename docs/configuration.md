@@ -34,6 +34,8 @@ The type of the server.
 - `split_learning` a client following the Split Learning algorithm. When this client is used, `clients.do_test` in configuration should be set as `False` because in split learning, we conduct the test on the server.
 
 - `fedavg_personalized` a client saves its local layers before sending the shared global model to the server after local training.
+
+- `self_supervised_learning` a client to prepare the datasource for personalized learning based on self-supervised learning.
 ```
 
 ```{admonition} **total_clients**
@@ -392,6 +394,7 @@ The type of the trainer. The following types are available:
 - `basic`: a basic trainer with a standard training loop.
 - `diff_privacy`: a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
 - `split_learning`: a trainer that supports the split learning framework.
+- `self_supervised_learning`: a trainer that supports personalized federated learning based on self supervised learning.
 
 ```{admonition} max_physical_batch_size
 The limit on the physical batch size when using the `diff_privacy` trainer.  The default value is 128. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.

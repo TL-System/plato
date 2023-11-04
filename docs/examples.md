@@ -38,7 +38,7 @@ H. Wu, P. Wang. &ldquo;[Fast-Convergent Federated Learning with Adaptive Weighti
 ```
 ````
 
-#### Secure Aggregation
+#### Secure Aggregation with Homomorphic Encryption
 
 ````{admonition} **MaskCrypt**
 MaskCrypt is a secure federated learning system based on homomorphic encryption. Instead of encrypting all the model updates, MaskCrypt encrypts only part of them to balance the tradeoff between security and efficiency. In this example, clients only select 5% of the model updates to encrypt during the learning process. The number of encrypted weights is determined by `encrypt_ratio`, which can be adjusted in the configuration file. A random mask will be adopted if `random_mask` is set to true.
@@ -110,10 +110,10 @@ N. Su, B. Li. &ldquo;[Asynchronous Federated Unlearning](https://iqua.ece.toront
 #### Gradient Leakage Attacks and Defences
 
 ````{admonition} **Gradient leakage attacks and defenses**
-Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/dlg/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations.
+Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/gradient_leakage_attacks/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations. Refer to `examples/dlg/README.md` for more details.
 
 ```shell
-python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
+python examples/gradient_leakage_attacks/dlg.py -c examples/gradient_leakage_attacks/reconstruction_emnist.yml --cpu
 ```
 ````
 
@@ -228,33 +228,33 @@ Vepakomma et al., &ldquo;[Split Learning for Health: Distributed Deep Learning w
 ```
 ````
 
+````{admonition} **Split Learning for Training ControlNet**
+ControlNet is a conditional image generation model that only finetunes the control network without updating parameters in the large diffusion model. It has a more complicated structure than the usual deep learning model. Hence, to train a ControlNet with split learning, the control network and a part of the diffusion model are on the clients and the remaining part of the diffusion model is on the server. The forwarding and backwarding processes are specifically designed according to the inputs and training targets of the image generation based on diffusion models.
+
+```shell
+python examples/split_learning/controlnet_split_learning/split_learning_main.py -c examples/split_learning/controlnet_split_learning/split_learning.yml
+```
+````
 
 #### Personalized Federated Learning Algorithms
 
 ````{admonition} **FedRep**
-FedRep is an algorithm for learning a shared data representation across clients and unique, personalized local ``heads'' for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
-
-FedRep belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+FedRep learns a shared data representation (the global layers) across clients and a unique, personalized local ``head'' (the local layers) for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
 
 ```shell
-python examples/personalized_fl/fedrep/fedrep.py -c examples/personalized_fl/configs/fedrep_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedrep/fedrep.py -c examples/personalized_fl/configs/fedrep_CIFAR10_resnet18.yml
 ```
 
 ```{note}
-Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Federated Learning](http://proceedings.mlr.press/v139/collins21a/collins21a.pdf),
-&rdquo; in Proc. International Conference on Machine Learning (ICML), 2021.
+Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Federated Learning](http://proceedings.mlr.press/v139/collins21a/collins21a.pdf), &rdquo; in Proc. International Conference on Machine Learning (ICML), 2021.
 ```
 ````
 
 ````{admonition} **FedBABU**
-FedBABU argued that a better federated global model performance does not constantly improve personalization. In this algorithm, it only updates the body of the model during FL training. In this implementation, the head is frozen at the beginning of each local training epoch through the API ```train_run_start```.
-
-FedBABU belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+FedBABU only updates the global layers of the model during FL training. The local layers are frozen at the beginning of each local training epoch.
 
 ```shell
-python examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml
 ```
 
 ```{note}
@@ -264,13 +264,10 @@ Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image 
 ````
 
 ````{admonition} **APFL**
-APFL is a synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by interpolating between local and personalized models. It has been quite widely cited and compared with in the personalized federated learning literature. In this example, once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
-
-APFL belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+APFL jointly optimizes the global model and personalized models by interpolating between local and personalized models. Once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
 
 ```shell
-python examples/personalized_fl/apfl/apfl.py -c examples/personalized_fl/configs/apfl_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/apfl/apfl.py -c examples/personalized_fl/configs/apfl_CIFAR10_resnet18.yml
 ```
 
 ```{note}
@@ -280,79 +277,58 @@ Deng et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org
 ````
 
 ````{admonition} **FedPer**
-FedPer is a synchronous personalized federated learning algorithm that learns a global representation and personalized heads, but makes simultaneous local updates for both sets of parameters, therefore makes the same number of local updates for the head and the representation on each local round.
-
-FedPer belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+FedPer learns a global representation and personalized heads, but makes simultaneous local updates for both sets of parameters, therefore makes the same number of local updates for the head and the representation on each local round.
 
 ```shell
-python examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/configs/fedper_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/configs/fedper_CIFAR10_resnet18.yml
 ```
 
 ```{note}
-Arivazhagan et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818),
-&rdquo; in Arxiv, 2019.
+Arivazhagan et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818), &rdquo; in Arxiv, 2019.
 ```
 ````
 
 ````{admonition} **LG-FedAvg**
-LG-FedAvg is a synchronous personalized federated learning algorithm that learns local representations and a global head. Therefore, only the head of one model is exchanged between the server and clients, while each client maintains a body of the model as its personalized encoder.
-
-LG-FedAvg belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+With LG-FedAvg only the global layers of a model are sent to the server for aggregation, while each client keeps local layers to itself.
 
 ```shell
-python examples/personalized_fl/lgfedavg/lgfedavg.py -c examples/personalized_fl/configs/lgfedavg_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/lgfedavg/lgfedavg.py -c examples/personalized_fl/configs/lgfedavg_CIFAR10_resnet18.yml
 ```
 
 ```{note}
-Liang et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523),
-&rdquo; in Proc. NeurIPS, 2019.
+Liang et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523), &rdquo; in Proc. NeurIPS, 2019.
 ```
 ````
 
 ````{admonition} **Ditto**
-Ditto is another synchronous personalized federated learning algorithm that jointly optimizes the global model and personalized models by learning local models that are encouraged to be close together by global regularization. In this example, once the global model is received, each client will carry out a regular local update followed by a Ditto solver to optimize the personalized model. 
-
-Ditto belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+Ditto jointly optimizes the global model and personalized models by learning local models that are encouraged to be close together by global regularization. In this example, once the global model is received, each client will carry out a regular local update and then optimizes the personalized model.
 
 ```shell
-python examples/personalized_fl/ditto/ditto.py -c examples/personalized_fl/configs/ditto_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/ditto/ditto.py -c examples/personalized_fl/configs/ditto_CIFAR10_resnet18.yml
 ```
 
 ```{note}
-Li et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html),
-&rdquo; in Proc ICML, 2021.
+Li et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html), &rdquo; in Proc ICML, 2021.
 ```
 ````
 
-````{admonition} **PerFedAvg**
-PerFedAvg focuses the personalized federated learning in which our goal is to find an initial shared model that current or new users can easily adapt to their local dataset by performing one or a few steps of gradient descent with respect to their own data. Specifically, it introduces the Model-Agnostic Meta-Learning (MAML) framework into the local update of federated learning.
-
-PerFedAvg belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
+````{admonition} **Per-FedAvg**
+Per-FedAvg uses the Model-Agnostic Meta-Learning (MAML) framework to perform local training during the regular training rounds. It performs two forward and backward passes with fixed learning rates in each iteration.
 
 ```shell
-python examples/personalized_fl/perfedavg/perfedavg.py -c examples/personalized_fl/configs/perfedavg_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/perfedavg/perfedavg.py -c examples/personalized_fl/configs/perfedavg_CIFAR10_resnet18.yml
 ```
 
 ```{note}
-Fallah et al., &ldquo;[Ditto: Personalized federated learning with theoretical guarantees:
-A model-agnostic meta-learning approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html),
-&rdquo; in Proc NeurIPS, 2020.
+Fallah et al., &ldquo;[Personalized Federated Learning with Theoretical Guarantees: A Model-Agnostic Meta-Learning Approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html), &rdquo; in Proc NeurIPS, 2020.
 ```
 ````
 
 ````{admonition} **Hermes**
 Hermes utilizes structured pruning to improve both communication efficiency and inference efficiency of federated learning. It prunes channels with the lowest magnitudes in each local model and adjusts the pruning amount based on each local model’s test accuracy and its previous pruning amount. When the server aggregates pruned updates, it only averages parameters that were not pruned on all clients.
 
-
-Hermes belongs to personalized federated learning.
-Please read `examples/personalized_fl/README.md` for more details about how to run the code.
-
 ```shell
-python examples/personalized_fl/hermes/hermes.py -c examples/personalized_fl/configs/hermes_CIFAR10_resnet18.yml -b pflExperiments
+python examples/personalized_fl/hermes/hermes.py -c examples/personalized_fl/configs/hermes_CIFAR10_resnet18.yml
 ```
 
 ```{note}
@@ -364,7 +340,7 @@ Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterog
 #### Personalized Federated Learning Algorithms based on Self-Supervised Learning
 
 ````{admonition} **Self Supervised Learning**
-This category aims to achieve personalized federated learning by introducing self-supervised learning (SSL) to the training schema. In the context of self-supervised learning (SSL), the model is trained to learn representations from unlabeled data. Thus, the model is capable of extracting generic representations. A higher performance can be achieved in subsequent tasks with the trained model as the encoder. Such a benefit of SSL is introduced into personalized FL by relying on the learning objective of SSL to train the global model. After reaching convergence, each client can download the trained global model to extract features from local samples. A high-quality personalized model, typically a linear network, is prone to be achieved under those extracted features. The code is available under `examples/ssl/`. And under `algorithms/` of the folder, the following algorithms are implemented:
+This category aims to achieve personalized federated learning by introducing self-supervised learning (SSL) to the training process. With SSL, an encoder model is trained to learn representations from unlabeled data. A higher performance can be achieved in subsequent tasks with the trained encoder. Only the encoder model is globally aggregated and shared during the regular training process. After reaching convergence, each client can download the trained global model to extract features from local samples. In this category, the following algorithms have been implemented:
 
 - SimCLR [1]
 - BYOL [2]
@@ -373,60 +349,44 @@ This category aims to achieve personalized federated learning by introducing sel
 - SwAV [5]
 - SMoG [6]
 - FedEMA [7] 
-
-Please read `examples/ssl/README.md` for more details about how to run the code.
-
-```shell
-python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr_MNIST_lenet5.yml -b pflExperiments
-```
+- Calibre
 
 ```shell
-python examples/ssl/algorithms/simclr/simclr.py -c examples/ssl/configs/simclr_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```shell
-python examples/ssl/algorithms/byol/byol.py -c examples/ssl/configs/byol_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```shell
-python examples/ssl/algorithms/simsiam/simsiam.py -c examples/ssl/configs/simsiam_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```shell
-python examples/ssl/algorithms/moco/mocov2.py -c examples/ssl/configs/mocov2_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```shell
-python examples/ssl/algorithms/swav/swav.py -c examples/ssl/configs/swav_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```shell
-python examples/ssl/algorithms/smog/smog.py -c examples/ssl/configs/smog_CIFAR10_resnet18.yml -b pflExperiments
-```
-
-```shell
-python examples/ssl/algorithms/fedema/fedema.py -c examples/ssl/configs/fedema_CIFAR10_resnet18.yml -b pflExperiments
+python examples/ssl/simclr/simclr.py -c examples/ssl/configs/simclr_MNIST_lenet5.yml
+python examples/ssl/simclr/simclr.py -c examples/ssl/configs/simclr_CIFAR10_resnet18.yml
+python examples/ssl/byol/byol.py -c examples/ssl/configs/byol_CIFAR10_resnet18.yml
+python examples/ssl/simsiam/simsiam.py -c examples/ssl/configs/simsiam_CIFAR10_resnet18.yml
+python examples/ssl/moco/mocov2.py -c examples/ssl/configs/mocov2_CIFAR10_resnet18.yml
+python examples/ssl/swav/swav.py -c examples/ssl/configs/swav_CIFAR10_resnet18.yml
+python examples/ssl/smog/smog.py -c examples/ssl/configs/smog_CIFAR10_resnet18.yml
+python examples/ssl/fedema/fedema.py -c examples/ssl/configs/fedema_CIFAR10_resnet18.yml
+python examples/ssl/calibre/calibre.py -c examples/ssl/configs/calibre_CIFAR10_resnet18.yml
 ```
 
 ```{note}
-[1]. Chen et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc. ICML, 2020.
+[1] Chen et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc. ICML, 2020.
 
-[2]. Grill et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. NeurIPS, 2020.
+[2] Grill et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. NeurIPS, 2020.
 
-[3]. Chen et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc. CVPR, 2021.
+[3] Chen et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc. CVPR, 2021.
 
-[4]. Chen et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+[4] Chen et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
 
-[5]. Caron et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc. NeurIPS, 2022.
+[5] Caron et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc. NeurIPS, 2022.
 
-[6]. Pang et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. ECCV, 2022.
+[6] Pang et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. ECCV, 2022.
 
-[7]. Zhuang et al., &ldquo;[Divergence-aware federated self-supervised learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
+[7] Zhuang et al., &ldquo;[Divergence-Aware Federated Self-Supervised Learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
+```
 
 ```
+Calibre is currently only supported on GPUs or Apple Silicon Chip. One should run on a GPU device or on MAC OS with adding the argument -m.
+```
+
 ````
 
-#### Federated Learning Algorithms based on Neural Architecture Search and Model Search
+#### Algorithms based on Neural Architecture Search and Model Search
+
 ````{admonition} **FedRLNAS**
 FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
 
@@ -535,7 +495,7 @@ python3 ./examples/model_search/sysheterofl/sysheterofl.py -c examples/model_sea
 Tempo is proposed to improve training performance in three-layer federated learning. It adaptively tunes the number of each client's local training epochs based on the difference between its edge server's locally aggregated model and the current global model.
 
 ```shell
-python examples/tempo/tempo.py -c examples/tempo/tempo_MNIST_lenet5.yml
+python examples/three_layer_fl/tempo/tempo.py -c examples/three_layer_fl/tempo/tempo_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -548,18 +508,17 @@ Ying et al., &ldquo;[Tempo: Improving Training Performance in Cross-Silo Federat
 FedSaw is proposed to improve training performance in three-layer federated learning with L1-norm structured pruning. Edge servers and clients pruned their updates before sending them out. FedSaw adaptively tunes the pruning amount of each edge server and its clients based on the difference between the edge server's locally aggregated model and the current global model.
 
 ```shell
-python examples/fedsaw/fedsaw.py -c examples/fedsaw/fedsaw_MNIST_lenet5.yml
+python examples/three_layer_fl/fedsaw/fedsaw.py -c examples/three_layer_fl/fedsaw/fedsaw_MNIST_lenet5.yml
 ```
 ````
 
-#### Algorithms Not Yet Categorized
-
+#### Model Pruning Algorithms
 
 ````{admonition} **FedSCR**
 FedSCR uses structured pruning to prune each update’s entire filters and channels if their summed parameter values are below a particular threshold.
 
 ```shell
-python examples/fedscr/fedscr.py -c examples/fedscr/fedscr_MNIST_lenet5.yml
+python examples/model_pruning/fedscr/fedscr.py -c examples/model_pruning/fedscr/fedscr_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -574,13 +533,13 @@ Sub-FedAvg aims to obtain a personalized model for each client with non-i.i.d. l
 For two-layer federated learning:
 
 ```shell
-python examples/sub_fedavg/subfedavg.py -c examples/sub_fedavg/subfedavg_MNIST_lenet5.yml
+python examples/model_pruning/sub_fedavg/subfedavg.py -c examples/model_pruning/sub_fedavg/subfedavg_MNIST_lenet5.yml
 ```
 
 For three-layer federated learning:
 
 ```shell
-python examples/sub_fedavg/subcs.py -c examples/sub_fedavg/subcs_MNIST_lenet5.yml
+python examples/model_pruning/sub_fedavg/subcs.py -c examples/model_pruning/sub_fedavg/subcs_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -589,12 +548,10 @@ Vahidian et al., &ldquo;[Personalized Federated Learning by Structured and Unstr
 ```
 ````
 
-
-
-With the recent redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
+With the redesign of the Plato API, the following list is outdated and will be updated as they are tested again.
 
 |                                                                Method                                                                | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                     | Tested |
-| :----------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: |
+|:------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
 |                                [Adaptive Freezing](https://henryhxu.github.io/share/chen-icdcs21.pdf)                                | Change directory to `examples/adaptive_freezing` and run `python adaptive_freezing.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                           |  Yes   |
 | [Gradient-Instructed Frequency Tuning](https://github.com/TL-System/plato/blob/main/examples/adaptive_sync/papers/adaptive_sync.pdf) | Change directory to `examples/adaptive_sync` and run `python adaptive_sync.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                                   |  Yes   |
 |                                       [Attack Adaptive](https://arxiv.org/pdf/2102.05257.pdf)                                        | Change directory to `examples/attack_adaptive` and run `python attack_adaptive.py -c <configuration file>`.                                                                                                                                                                                                                                                                                                                               |  Yes   |

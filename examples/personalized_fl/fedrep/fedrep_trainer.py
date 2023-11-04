@@ -1,5 +1,5 @@
 """
-A trainer for FedRep approach.
+A trainer with FedRep.
 """
 from plato.trainers import basic
 from plato.config import Config
@@ -8,10 +8,10 @@ from plato.utils import trainer_utils
 
 
 class Trainer(basic.Trainer):
-    """A trainer for FedRep."""
+    """A trainer with FedRep."""
 
     def train_run_start(self, config):
-        """Freeze the global layers during the personalization round."""
+        """Freeze the global layers during the final personalization round."""
         super().train_run_start(config)
 
         if self.current_round > Config().trainer.rounds:

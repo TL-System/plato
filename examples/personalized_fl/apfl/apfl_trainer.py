@@ -1,20 +1,20 @@
 """
-A personalized federated learning trainer For APFL.
+A personalized federated learning trainer using APFL.
 """
-import os
 import logging
+import os
+
 import numpy as np
 import torch
 
-from plato.trainers import basic
-from plato.models import registry as models_registry
 from plato.config import Config
+from plato.models import registry as models_registry
+from plato.trainers import basic
 
 
 class Trainer(basic.Trainer):
     """
-    A trainer using the APFL algorithm to jointly train the global and
-    personalized models.
+    A trainer using the APFL algorithm to train both global and personalized models.
     """
 
     def __init__(self, model=None, callbacks=None):
@@ -77,7 +77,7 @@ class Trainer(basic.Trainer):
         self.personalized_model.train()
 
     def train_run_end(self, config):
-        """Saving the alpha."""
+        """Saves alpha to a file identified by the client id, and saves the personalized model."""
         super().train_run_end(config)
 
         # Save the alpha to the file
@@ -94,7 +94,7 @@ class Trainer(basic.Trainer):
         torch.save(self.personalized_model.state_dict(), model_path)
 
     def train_step_end(self, config, batch=None, loss=None):
-        """Updating the alpha of APFL before each iteration."""
+        """Updates alpha in APFL before each iteration."""
         super().train_step_end(config, batch, loss)
 
         # Update alpha based on Eq. 10 in the paper

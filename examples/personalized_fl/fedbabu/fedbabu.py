@@ -1,7 +1,7 @@
 """
 An implementation of the FedBABU algorithm.
 
-J. Oh, et al., "FedBABU: Toward Enhanced Representation for Federated Image Classification,"
+Oh, et al., "FedBABU: Toward Enhanced Representation for Federated Image Classification,"
 in the Proceedings of ICLR 2022.
 
 https://openreview.net/pdf?id=HuaYQfggn5u
@@ -17,7 +17,7 @@ from plato.clients import fedavg_personalized as personalized_client
 
 def main():
     """
-    A personalized federated learning session for FedBABU algorithm under the supervised setting.
+    A personalized federated learning session with FedBABU.
     """
     trainer = fedbabu_trainer.Trainer
     client = personalized_client.Client(trainer=trainer)

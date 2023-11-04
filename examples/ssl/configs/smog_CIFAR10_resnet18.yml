@@ -25,6 +25,8 @@ data:
     !include cifar10_ssl_noniid.yml
 
 trainer:
+    type: self_supervised_learning
+   
     # The maximum number of training rounds
     rounds: 2
 

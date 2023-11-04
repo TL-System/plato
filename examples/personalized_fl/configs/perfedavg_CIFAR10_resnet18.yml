@@ -34,14 +34,10 @@ algorithm:
     # Aggregation algorithm
     type: fedavg_personalized
 
-    # Important hyper-parameters
-    # False for performing Per-FedAvg(FO), others for Per-FedAvg(HF)
-    hessian_free: False
     alpha: 0.01 # 1e-2
     beta: 0.001
 
     personalization:
-
         # the ratio of clients participanting in training
         participating_client_ratio: 1.0
         
