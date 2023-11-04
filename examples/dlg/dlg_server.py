@@ -183,9 +183,9 @@ class Server(fedavg.Server):
             target_weights = deltas_received[Config().algorithm.victim_client]
 
         gt_data, gt_labels, target_grad = (
-            update.payload[1],
-            update.payload[2],
-            update.payload[3],
+            update.payload[1].to(Config().device()),
+            update.payload[2].to(Config().device()),
+            [grad.to(Config().device()) for grad in update.payload[3]],
         )
 
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
