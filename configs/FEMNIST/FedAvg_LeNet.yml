@@ -6,10 +6,10 @@ clients:
     total_clients: 3597
 
     # The number of clients selected in each round
-    per_round: 3597
+    per_round: 3
 
     # Should the clients compute test accuracy locally?
-    do_test: false
+    do_test: true
 
     random_seed: 1
 
@@ -19,7 +19,7 @@ clients:
 server:
     address: 127.0.0.1
     port: 8015
-    do_test: true
+    do_test: false
     random_seed: 1
 
     simulate_wall_time: true
@@ -27,7 +27,6 @@ server:
 data:
     # The training and testing dataset
     datasource:  FEMNIST
-    data_path: /data/dixi
     sampler: all_inclusive
 ##
     testset_sampler: all_inclusive
