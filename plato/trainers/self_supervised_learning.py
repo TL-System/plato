@@ -42,7 +42,7 @@ class SSLSamples(UserList):
 
 class MultiViewCollateWrapper(MultiViewCollate):
     """
-    An interface to connect collate from lightly with the data loading schema in Plato.
+    An interface to connect collate from lightly with Plato's data loading mechanism.
     """
 
     def __call__(self, batch):
