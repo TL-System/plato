@@ -48,7 +48,6 @@ trainer:
     # The machine learning model
     model_type: huggingface
     model_name: gpt2
-    cut_layer_index: 2
 
     # Number of epoches for local training in each communication round
     epochs: 1
@@ -65,7 +64,7 @@ algorithm:
 parameters:
     model:
         num_classes: 10
-        cut_layer: relu2
+        cut_layer: 2
 
     optimizer:
         lr: 0.00005

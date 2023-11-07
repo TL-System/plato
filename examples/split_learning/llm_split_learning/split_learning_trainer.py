@@ -118,7 +118,7 @@ class Trainer(split_learning.Trainer):
             testset: The test dataset.
         """
         self.training_args.per_device_eval_batch_size = batch_size
-        self.model.copy_weight_from_training_model_to_testing_model()
+        self.model.copy_weight()
 
         tester = SampledHuggingFaceTrainer(
             model=self.model.base_model,

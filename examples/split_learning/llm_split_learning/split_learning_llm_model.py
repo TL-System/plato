@@ -28,7 +28,7 @@ class BaseModel(torch.nn.Module):
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
-        self.cut_layer = Config().trainer.cut_layer_index
+        self.cut_layer = Config().trainer.cut_layer
 
     def get_input_embeddings(self):
         """
@@ -91,7 +91,7 @@ class ServerModel(BaseModel):
             self.cut_layer :
         ]
 
-    def copy_weight_from_training_model_to_testing_model(self):
+    def self_copy_weight(self):
         """
         Copy the weights of the training model to the testing model
         """
