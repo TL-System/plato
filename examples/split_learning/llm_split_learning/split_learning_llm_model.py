@@ -52,8 +52,17 @@ class ClientModel(BaseModel):
         super().__init__(*args, **kwargs)
         # replace the layers in the base model
         # which should be on the cloud with Identity layers()
-        self.base_model.transformer.h = self.base_model.transformer.h[: self.cut_layer]
-        self.base_model.transformer.ln_f = torch.nn.Identity()
+        transformer_module = self.base_model
+        for module_name in Config().parameters.model.transformer_module_name.split("."):
+            transformer_module = getattr(transformer_module, module_name)
+        client_layers = transformer_module[: self.cut_layer]
+        client_module_names = Config().parameters.model.transformer_module_name.split(
+            "."
+        )
+        client_module = self.base_model
+        for module_name in client_module_names[:-1]:
+            client_module = getattr(client_module, module_name)
+        setattr(client_module, client_module_names[-1], client_layers)
         self.base_model.lm_head = torch.nn.Identity()
 
     def forward(self, inputs):
@@ -87,20 +96,34 @@ class ServerModel(BaseModel):
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
-        self.server_model.transformer.h = self.base_model.transformer.h[
-            self.cut_layer :
-        ]
+        transformer_module = self.base_model
+        for module_name in Config().parameters.model.transformer_module_name.split("."):
+            transformer_module = getattr(transformer_module, module_name)
+        server_layers = transformer_module[self.cut_layer :]
+        server_module_names = Config().parameters.model.transformer_module_name.split(
+            "."
+        )
+        server_module = self.server_model
+        for module_name in server_module_names[:-1]:
+            server_module = getattr(server_module, module_name)
+        setattr(server_module, server_module_names[-1], server_layers)
 
     def copy_weight(self):
         """
         Copy the weights of the training model to the testing model
         """
-        basic_name = "transformer.h."
+        basic_name = Config().parameters.model.transformer_module_name
         base_model_weights = self.base_model.state_dict()
         server_model_weights = self.server_model.state_dict()
+        transformer_module = self.base_model
+        for module_name in Config().parameters.model.transformer_module_name.split("."):
+            transformer_module = getattr(transformer_module, module_name)
         layers_name = [
-            basic_name + str(index)
-            for index in range(self.cut_layer, len(self.base_model.transformer.h))
+            basic_name + "." + str(index)
+            for index in range(
+                self.cut_layer,
+                len(transformer_module),
+            )
         ]
         for weight_name in base_model_weights.keys():
             for layer_index, layer_name in enumerate(layers_name):
@@ -108,7 +131,7 @@ class ServerModel(BaseModel):
                     suffix = weight_name[
                         weight_name.find(layer_name) + len(layer_name) :
                     ]
-                    server_weight_name = basic_name + str(layer_index) + suffix
+                    server_weight_name = basic_name + "." + str(layer_index) + suffix
                     base_model_weights[weight_name] = server_model_weights[
                         server_weight_name
                     ]
