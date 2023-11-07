@@ -236,6 +236,15 @@ python examples/split_learning/controlnet_split_learning/split_learning_main.py 
 ```
 ````
 
+````{admonition} **Split Learning for Training LLM**
+This is an example of fine-tuning the Huggingface large language model with split learning. The fine-tuning policy is to train the whole model. The cut layer in the configuration file should be set as a number, incidcating cutting at which transformer block in the transformer
+model.
+
+```shell
+python ./examples/split_learning/llm_split_learning/split_learning_main.py -c ./examples/split_learning/llm_split_learning/split_learning_wikitext103_gpt2.yml
+```
+````
+
 #### Personalized Federated Learning Algorithms
 
 ````{admonition} **FedRep**
