@@ -1,5 +1,4 @@
 """A split learning trainer for large language model fine-tuning"""
-import math
 from typing import Optional
 from collections import OrderedDict
 
@@ -101,13 +100,6 @@ class Trainer(split_learning.Trainer):
         embedding_size = self.model.get_input_embeddings().weight.shape[0]
         if len(self.tokenizer) > embedding_size:
             self.model.resize_token_embeddings(len(self.tokenizer))
-        # defined self trainer.
-        self.trainer = self
-        # self.training args for huggingface training
-        parser = HfArgumentParser(TrainingArguments)
-        (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--output_dir=/tmp", "--report_to=none"]
-        )
 
     # Redesign the evaluation stage.
     def test_model_split_learning(self, batch_size, testset, sampler=None):
@@ -133,10 +125,6 @@ class Trainer(split_learning.Trainer):
 
         metrics = tester.evaluate()
 
-        # try:
-        #     perplexity = math.exp(metrics["eval_loss"])
-        # except OverflowError:
-        #     perplexity = float("inf")
         # save other metric information such as accuracy
         tester.log_metrics("eval", metrics)
         tester.save_metrics("eval", metrics)
