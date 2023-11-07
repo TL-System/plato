@@ -122,7 +122,9 @@ class Trainer(basic.Trainer):
         outputs = self.model.forward_to(examples)
 
         # Backpropagate with gradients from the server
-        outputs.backward(self.gradients)
+        gradients=self.gradients
+        gradients[0]=gradients[0].to(self.device)
+        outputs.backward(gradients)
         self.optimizer.step()
 
         # No loss value on the client side
