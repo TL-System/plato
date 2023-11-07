@@ -91,7 +91,7 @@ class ServerModel(BaseModel):
             self.cut_layer :
         ]
 
-    def self_copy_weight(self):
+    def copy_weight(self):
         """
         Copy the weights of the training model to the testing model
         """

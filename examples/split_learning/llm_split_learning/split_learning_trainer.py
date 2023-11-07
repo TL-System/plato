@@ -100,6 +100,11 @@ class Trainer(split_learning.Trainer):
         embedding_size = self.model.get_input_embeddings().weight.shape[0]
         if len(self.tokenizer) > embedding_size:
             self.model.resize_token_embeddings(len(self.tokenizer))
+        # self.training args for huggingface training
+        parser = HfArgumentParser(TrainingArguments)
+        (self.training_args,) = parser.parse_args_into_dataclasses(
+            args=["--output_dir=/tmp", "--report_to=none"]
+        )
 
     # Redesign the evaluation stage.
     def test_model_split_learning(self, batch_size, testset, sampler=None):
