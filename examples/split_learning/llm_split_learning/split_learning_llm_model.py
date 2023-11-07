@@ -28,7 +28,7 @@ class BaseModel(torch.nn.Module):
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
-        self.cut_layer = Config().trainer.cut_layer
+        self.cut_layer = Config().parameters.model.cut_layer
 
     def get_input_embeddings(self):
         """
