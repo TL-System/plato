@@ -6,11 +6,11 @@ Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ip
 
 Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb` provides step-by-step instructions on running *Plato* on Google Colaboratory, while providing the facilities to use a secure shell to login and to open Visual Studio Code. To run Plato, just use the integrated terminal in the browser.
 
-## Running Plato on Compute Canada
+## Running Plato on Digital Research Alliance of Canada
 
 ### Installation
 
-SSH into a cluster on Compute Canada. Here we take [Graham](https://docs.alliancecan.ca/wiki/Graham) as an example, while [Cedar](https://docs.alliancecan.ca/wiki/Cedar) and [Narval](https://docs.alliancecan.ca/wiki/Narval/en) are also available. Then clone the *Plato* repository to your own directory:
+SSH into a cluster on Digital Research Alliance of Canada. Here we take [Graham](https://docs.alliancecan.ca/wiki/Graham) as an example, while [Cedar](https://docs.alliancecan.ca/wiki/Cedar) and [Narval](https://docs.alliancecan.ca/wiki/Narval/en) are also available. Then clone the *Plato* repository to your own directory:
 
 ```shell
 ssh <CCDB username>@graham.computecanada.ca
@@ -18,7 +18,7 @@ cd projects/def-baochun/<CCDB username>
 git clone https://github.com/TL-System/plato
 ```
 
-Your CCDB username can be located after signing into the [CCDB portal](https://ccdb.computecanada.ca/). Contact Baochun Li (`bli@ece.toronto.edu`) for a new account on Compute Canada.
+Your CCDB username can be located after signing into the [CCDB portal](https://ccdb.computecanada.ca/). Contact Baochun Li (`bli@ece.toronto.edu`) for a new account on Digital Research Alliance of Canada.
 
 ### Preparing the Python Runtime Environment
 
@@ -42,13 +42,13 @@ You can now activate your environment:
 source ~/.federated/bin/activate
 ```
 
-Due to the versioning difference for some Python packages on Compute Canada, some source files may need to be patched. Use the following command to patch these files:
+Due to the versioning difference for some Python packages on Digital Research Alliance of Canada, some source files may need to be patched. Use the following command to patch these files:
 
 ```shell
 bash ./docs/patches/patch_cc.sh
 ```
 
-The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for January 2022, Compute Canada provides GPU with CUDA version 11.2, so the command would be:
+The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for January 2022, Digital Research Alliance of Canada provides GPU with CUDA version 11.2, so the command would be:
 
 ```shell
 pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
@@ -144,7 +144,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 
 **Tip:** Make sure you use different `port` numbers under `server` in different jobs' configuration files before submitting your jobs if you plan to run them at the same time. This is because they may be allocated to the same node, which is especially common when you use the `Narval` cluster. In that case, if the `port` and `address` under `server` in your configuration files of the jobs are the same, you will get `OSError: [Errno 48] error while attempting to bind on address: address already in use`.
 
-If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Compute Canada using the `salloc` command:
+If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Digital Research Alliance of Canada using the `salloc` command:
 
 ```shell
 salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
@@ -172,7 +172,7 @@ Then you can run *Plato*:
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
 
-**Note:** On Compute Canada, if there are issues in the code that prevented it from running to completion, the two most possible reasons are:
+**Note:** On Digital Research Alliance of Canada, if there are issues in the code that prevented it from running to completion, the two most possible reasons are:
 
 If runtime exceptions occur that prevent a federated learning session from running to completion, the potential issues could be:
 
@@ -191,7 +191,7 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
 ### Running jobs of HuggingFace
 
-Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Compute Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
+Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Digital Research Alliance of Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
 
 1. Run the command first outside sbatch/salloc, for example, `./run -c <your configuration file>`, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
 
