@@ -122,8 +122,8 @@ class Trainer(basic.Trainer):
         outputs = self.model.forward_to(examples)
 
         # Backpropagate with gradients from the server
-        gradients=self.gradients
-        gradients[0]=gradients[0].to(self.device)
+        gradients = self.gradients
+        gradients[0] = gradients[0].to(self.device)
         outputs.backward(gradients)
         self.optimizer.step()
 
@@ -161,6 +161,9 @@ class Trainer(basic.Trainer):
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
+        if "/" in model_name:
+            model_name = model_name.replace("/", "_")
+
         model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
         torch.save(self.cut_layer_grad, model_gradients_path)
 
@@ -172,6 +175,9 @@ class Trainer(basic.Trainer):
         """Read gradients from a file."""
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
+
+        if "/" in model_name:
+            model_name = model_name.replace("/", "_")
 
         model_gradients_path = f"{model_path}/{model_name}_gradients.pth"
         logging.info(
