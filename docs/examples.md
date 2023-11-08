@@ -237,8 +237,7 @@ python examples/split_learning/controlnet_split_learning/split_learning_main.py 
 ````
 
 ````{admonition} **Split Learning for Training LLM**
-This is an example of fine-tuning the Huggingface large language model with split learning. The fine-tuning policy includes train the whole model and fine-tune with the LoRA algorithm. The cut layer in the configuration file should be set as a number, incidcating cutting at which transformer block in the transformer
-model.
+This is an example of fine-tuning the Hugging Face large language model with split learning. The fine-tuning policy includes training the whole model and fine-tuning with the LoRA algorithm. The cut layer in the configuration file should be set as an integer, indicating cutting at which transformer block in the transformer model.
 
 Fine-tune the whole model
 ```shell
