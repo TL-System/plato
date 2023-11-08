@@ -4,7 +4,22 @@ Obtain LLM models from Huggingface, specifically designed for split learning
 
 import torch
 from transformers import AutoModelForCausalLM, AutoConfig
+from peft import (
+    get_peft_model,
+    LoraConfig,
+    set_peft_model_state_dict,
+    get_peft_model_state_dict,
+)
 from plato.config import Config
+
+
+def get_lora_model(model):
+    """Apply LoRA optimization over the model"""
+    lora_config = Config().parameters.lora
+    model = get_peft_model(model, LoraConfig(**lora_config._asdict()))
+    model.print_trainable_parameters()
+    print(model)
+    return model
 
 
 class BaseModel(torch.nn.Module):
@@ -32,7 +47,6 @@ class BaseModel(torch.nn.Module):
             cache_dir=Config().params["model_path"] + "/huggingface",
             token=use_auth_token,
         )
-        print(self.base_model)
         self.cut_layer = Config().parameters.model.cut_layer
 
     def get_input_embeddings(self):
@@ -69,6 +83,10 @@ class ClientModel(BaseModel):
             client_module = getattr(client_module, module_name)
         setattr(client_module, client_module_names[-1], client_layers)
         self.base_model.lm_head = torch.nn.Identity()
+
+        # Apply LoRA optimization
+        if hasattr(Config().parameters, "lora"):
+            self.base_model = get_lora_model(self.base_model)
 
     def forward(self, inputs):
         """
@@ -112,6 +130,11 @@ class ServerModel(BaseModel):
         for module_name in server_module_names[:-1]:
             server_module = getattr(server_module, module_name)
         setattr(server_module, server_module_names[-1], server_layers)
+
+        # Apply LoRA optimization
+        if hasattr(Config().parameters, "lora"):
+            self.base_model = get_lora_model(self.base_model)
+            self.server_model = get_lora_model(self.server_model)
 
     def copy_weight(self):
         """
