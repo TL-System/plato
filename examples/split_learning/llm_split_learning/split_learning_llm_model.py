@@ -16,6 +16,17 @@ def get_lora_model(model):
     return model
 
 
+def get_module(start_module: torch.nn.Module, module_names):
+    """
+    Recursively get a pytorch module starting from the start module with
+        a given list of module names.
+    """
+    module = start_module
+    for module_name in module_names:
+        module = getattr(module, module_name)
+    return module
+
+
 class BaseModel(torch.nn.Module):
     """
     The basic model loading hugginface model used for the server model and the client model
@@ -72,12 +83,16 @@ class ClientModel(BaseModel):
         client_module_names = Config().parameters.model.transformer_module_name.split(
             "."
         )
-        client_module = self.base_model
-        for module_name in client_module_names[:-1]:
-            client_module = getattr(client_module, module_name)
+        client_module = get_module(self.base_model, client_module_names[:-1])
         setattr(client_module, client_module_names[-1], client_layers)
-        self.base_model.lm_head = torch.nn.Identity()
-
+        # Set layers not on the clients to Identity
+        for layer in Config().parameters.model.layers_after_transformer:
+            layer = layer.split(".")
+            if len(layer) > 1:
+                module = get_module(self.base_model, layer[:-1])
+                setattr(module, layer[-1], torch.nn.Identity())
+            else:
+                setattr(self.base_model, layer[0], torch.nn.Identity())
         # Apply LoRA optimization
         if hasattr(Config().parameters, "lora"):
             self.base_model = get_lora_model(self.base_model)
@@ -113,18 +128,16 @@ class ServerModel(BaseModel):
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
-        transformer_module = self.base_model
-        for module_name in Config().parameters.model.transformer_module_name.split("."):
-            transformer_module = getattr(transformer_module, module_name)
+        transformer_module = get_module(
+            self.base_model,
+            Config().parameters.model.transformer_module_name.split("."),
+        )
         server_layers = transformer_module[self.cut_layer :]
         server_module_names = Config().parameters.model.transformer_module_name.split(
             "."
         )
-        server_module = self.server_model
-        for module_name in server_module_names[:-1]:
-            server_module = getattr(server_module, module_name)
+        server_module = get_module(self.server_model, server_module_names[:-1])
         setattr(server_module, server_module_names[-1], server_layers)
-
         # Apply LoRA optimization
         if hasattr(Config().parameters, "lora"):
             self.base_model = get_lora_model(self.base_model)
@@ -140,6 +153,7 @@ class ServerModel(BaseModel):
             basic_name = "base_model.model." + basic_name
         base_model_weights = self.base_model.state_dict()
         server_model_weights = self.server_model.state_dict()
+
         transformer_module = self.base_model
         for module_name in basic_name.split("."):
             transformer_module = getattr(transformer_module, module_name)
@@ -151,6 +165,7 @@ class ServerModel(BaseModel):
             )
         ]
         for weight_name in base_model_weights.keys():
+            # Copy the weights of transformer blocks
             for layer_index, layer_name in enumerate(layer_names):
                 if layer_name in weight_name:
                     suffix = weight_name[
@@ -163,6 +178,12 @@ class ServerModel(BaseModel):
                     base_model_weights[weight_name] = server_model_weights[
                         server_weight_name
                     ]
+            # Copy the weights of layers after transformer blocks
+            for layer in Config().parameters.model.layers_after_transformer:
+                layer_name = basic_name + "." + layer
+                if layer_name in weight_name:
+                    base_model_weights[weight_name] = server_model_weights[weight_name]
+
         self.base_model.load_state_dict(base_model_weights)
 
     def forward_from(self, inputs, labels):

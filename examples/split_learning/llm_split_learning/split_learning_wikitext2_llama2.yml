@@ -66,6 +66,8 @@ parameters:
         num_classes: 10
         cut_layer: 2
         transformer_module_name: model.layers
+        layers_after_transformer:
+            - lm_head
 
     huggingface_token: # put your huggingface token here
 

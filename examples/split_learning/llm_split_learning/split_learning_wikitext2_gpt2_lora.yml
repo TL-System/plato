@@ -66,6 +66,9 @@ parameters:
         num_classes: 10
         cut_layer: 2
         transformer_module_name: transformer.h
+        layers_after_transformer:
+            - transformer.ln_f
+            - lm_head
 
     optimizer:
         lr: 0.00005

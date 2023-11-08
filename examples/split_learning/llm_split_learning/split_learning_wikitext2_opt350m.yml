@@ -66,6 +66,8 @@ parameters:
         num_classes: 10
         cut_layer: 2
         transformer_module_name: model.decoder.layers
+        layers_after_transformer:
+            - lm_head
 
     optimizer:
         lr: 0.00005
