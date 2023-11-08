@@ -4,12 +4,7 @@ Obtain LLM models from Huggingface, specifically designed for split learning
 
 import torch
 from transformers import AutoModelForCausalLM, AutoConfig
-from peft import (
-    get_peft_model,
-    LoraConfig,
-    set_peft_model_state_dict,
-    get_peft_model_state_dict,
-)
+from peft import get_peft_model, LoraConfig
 from plato.config import Config
 
 
