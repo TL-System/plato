@@ -15,10 +15,13 @@ class BaseModel(torch.nn.Module):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.model_name = Config().trainer.model_name
+        use_auth_token = None
+        if hasattr(Config().parameters, "huggingface_token"):
+            use_auth_token = Config().parameters.huggingface_token
         config_kwargs = {
             "cache_dir": None,
             "revision": "main",
-            "use_auth_token": None,
+            "use_auth_token": use_auth_token,
         }
 
         self.config = AutoConfig.from_pretrained(self.model_name, **config_kwargs)
@@ -27,7 +30,9 @@ class BaseModel(torch.nn.Module):
             self.model_name,
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
+            token=use_auth_token,
         )
+        print(self.base_model)
         self.cut_layer = Config().parameters.model.cut_layer
 
     def get_input_embeddings(self):
