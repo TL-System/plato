@@ -65,7 +65,7 @@ parameters:
     model:
         num_classes: 10
         cut_layer: 2
-        transformer_module_name: model.transformer.h
+        transformer_module_name: transformer.h
 
     optimizer:
         lr: 0.00005

@@ -18,7 +18,6 @@ def get_lora_model(model):
     lora_config = Config().parameters.lora
     model = get_peft_model(model, LoraConfig(**lora_config._asdict()))
     model.print_trainable_parameters()
-    print(model)
     return model
 
 
@@ -141,10 +140,13 @@ class ServerModel(BaseModel):
         Copy the weights of the training model to the testing model
         """
         basic_name = Config().parameters.model.transformer_module_name
+        # There will a module named base_model.model in LoRA model
+        if hasattr(Config().parameters, "lora"):
+            basic_name = "base_model.model." + basic_name
         base_model_weights = self.base_model.state_dict()
         server_model_weights = self.server_model.state_dict()
         transformer_module = self.base_model
-        for module_name in Config().parameters.model.transformer_module_name.split("."):
+        for module_name in basic_name.split("."):
             transformer_module = getattr(transformer_module, module_name)
         layer_names = [
             basic_name + "." + str(index)
