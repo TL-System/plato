@@ -118,7 +118,7 @@ class ServerModel(BaseModel):
         transformer_module = self.base_model
         for module_name in Config().parameters.model.transformer_module_name.split("."):
             transformer_module = getattr(transformer_module, module_name)
-        layers_name = [
+        layer_names = [
             basic_name + "." + str(index)
             for index in range(
                 self.cut_layer,
@@ -126,11 +126,14 @@ class ServerModel(BaseModel):
             )
         ]
         for weight_name in base_model_weights.keys():
-            for layer_index, layer_name in enumerate(layers_name):
+            for layer_index, layer_name in enumerate(layer_names):
                 if layer_name in weight_name:
                     suffix = weight_name[
                         weight_name.find(layer_name) + len(layer_name) :
                     ]
+                    # The name should be completely matched
+                    if not suffix[0] == ".":
+                        continue
                     server_weight_name = basic_name + "." + str(layer_index) + suffix
                     base_model_weights[weight_name] = server_model_weights[
                         server_weight_name
