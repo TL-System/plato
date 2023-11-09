@@ -104,7 +104,10 @@ class Trainer(split_learning.Trainer):
         parser = HfArgumentParser(TrainingArguments)
 
         (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--report_to=none"]
+            args=[
+                "--output_dir=" + Config.params["checkpoint_path"],
+                "--report_to=none",
+            ]
         )
 
     # Redesign the evaluation stage.
