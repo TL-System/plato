@@ -12,20 +12,15 @@ from plato.config import Config
 
 def main():
     """A Plato federated learning training session using the split learning algorithm."""
-    if hasattr(Config().parameters, "lora"):
-        client = Client(
-            trainer=split_learning_trainer.Trainer,
-            model=ClientModel,
-            algorithm=LoRAAlgorithm,
-        )
-        server = Server(
-            trainer=split_learning_trainer.Trainer,
-            model=ServerModel,
-            algorithm=LoRAAlgorithm,
-        )
-    else:
-        client = Client(trainer=split_learning_trainer.Trainer, model=ClientModel)
-        server = Server(trainer=split_learning_trainer.Trainer, model=ServerModel)
+
+    algorithm = LoRAAlgorithm if hasattr(Config().parameters, "lora") else None
+
+    client = Client(
+        trainer=split_learning_trainer.Trainer, model=ClientModel, algorithm=algorithm
+    )
+    server = Server(
+        trainer=split_learning_trainer.Trainer, model=ServerModel, algorithm=algorithm
+    )
     server.run(client)
 
 
