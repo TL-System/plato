@@ -114,10 +114,7 @@ class Server(fedavg.Server):
         Perform attack in attack around after the updated weights have been aggregated.
         """
         weights_received = [payload[0] for payload in weights_received]
-        if (
-            self.current_round == Config().algorithm.attack_round
-            and Config().algorithm.attack_method in ["DLG", "iDLG", "csDLG"]
-        ):
+        if Config().algorithm.attack_method in ["DLG", "iDLG", "csDLG"]:
             self.attack_method = Config().algorithm.attack_method
             self._deep_leakage_from_gradients(weights_received)
 
@@ -180,7 +177,8 @@ class Server(fedavg.Server):
         update = self.updates[Config().algorithm.victim_client]
         target_weights = update.payload[0]
         if not self.share_gradients and self.match_weights and self.use_updates:
-            target_weights = deltas_received[Config().algorithm.victim_client]
+            target_weights = deltas_received[Config().algorithm.victim_client].values()
+            target_weights = [weight.to(Config().device()) for weight in target_weights]
 
         gt_data, gt_labels, target_grad = (
             update.payload[1].to(Config().device()),
@@ -226,7 +224,9 @@ class Server(fedavg.Server):
             # Obtain the local updates from clients
             target_grad = []
             for delta in deltas_received[Config().algorithm.victim_client].values():
-                target_grad.append(-delta / Config().parameters.optimizer.lr)
+                target_grad.append(
+                    -delta.to(Config().device()) / Config().parameters.optimizer.lr
+                )
 
             total_local_steps = epochs * math.ceil(partition_size / batch_size)
             target_grad = [x / total_local_steps for x in target_grad]
@@ -387,114 +387,116 @@ class Server(fedavg.Server):
                 scheduler.step()
 
             # Project into image space
-            if Config().algorithm.boxed:
-                dummy_data.data = torch.max(
-                    torch.min(dummy_data, (1 - dm) / ds), -dm / ds
-                )
-
-            if math.isnan(current_loss):
-                logging.info("Not a number, ending this attack attempt")
-                break
-
-            if iters % log_interval == 0:
-                # Finding evaluation metrics
-                # should make these lines into a function to prevent repetition, but not sure how to
-                # without having too many parameters
-                eval_dict = get_evaluation_dict(
-                    dummy_data,
-                    gt_data,
-                    num_images,
-                    self.trainer.model.to(Config().device()),
-                    ds,
-                )
-                avg_data_mses.append(eval_dict["avg_data_mses"])
-                avg_feat_mses.append(eval_dict["avg_feat_mses"])
-                avg_lpips.append(eval_dict["avg_lpips"])
-                avg_psnr.append(eval_dict["avg_psnr"])
-                avg_ssim.append(eval_dict["avg_ssim"])
-
-                logging.info(
-                    "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
-                    self.attack_method,
-                    (trial_number + 1),
-                    self.defense_method,
-                    iters,
-                    losses[-1],
-                    avg_data_mses[-1],
-                    avg_feat_mses[-1],
-                    avg_lpips[-1],
-                    avg_psnr[-1],
-                    avg_ssim[-1],
-                )
-
-                if self.attack_method == "DLG":
-                    history.append(
-                        [
-                            [
-                                dummy_data[i],
-                                torch.argmax(dummy_labels[i], dim=-1).item(),
-                            ]
-                            for i in range(num_images)
-                        ]
-                    )
-                elif self.attack_method == "iDLG":
-                    history.append(
-                        [
-                            [
-                                dummy_data[i],
-                                est_labels[i].item(),
-                            ]
-                            for i in range(num_images)
-                        ]
-                    )
-                elif self.attack_method == "csDLG":
-                    history.append(
-                        [
-                            [
-                                dummy_data[i],
-                                torch.argmax(gt_labels[i], dim=-1),
-                            ]
-                            for i in range(num_images)
-                        ]
+            with torch.no_grad():
+                if Config().algorithm.boxed:
+                    dummy_data.data = torch.max(
+                        torch.min(dummy_data, (1 - dm) / ds), -dm / ds
                     )
 
-                new_row = [
-                    iters,
-                    round(losses[-1], 4),
-                    round(avg_data_mses[-1], 4),
-                    round(avg_feat_mses[-1], 4),
-                    round(avg_lpips[-1], 4),
-                    round(avg_psnr[-1], 4),
-                    round(avg_ssim[-1], 3),
-                ]
-                csv_processor.write_csv(trial_csv_file, new_row)
+                if math.isnan(current_loss):
+                    logging.info("Not a number, ending this attack attempt")
+                    break
 
-        # TODO: use other scoring criteria
-        if self.best_mse > avg_data_mses[-1]:
-            self.best_mse = avg_data_mses[-1]
-            self.best_trial = (
-                trial_number + 1
-            )  # the +1 is because we index from 1 and not 0
+                if iters % log_interval == 0:
+                    # Finding evaluation metrics
+                    # should make these lines into a function to prevent repetition, but not sure how to
+                    # without having too many parameters
+                    eval_dict = get_evaluation_dict(
+                        dummy_data,
+                        gt_data,
+                        num_images,
+                        self.trainer.model.to(Config().device()),
+                        ds,
+                    )
+                    avg_data_mses.append(eval_dict["avg_data_mses"])
+                    avg_feat_mses.append(eval_dict["avg_feat_mses"])
+                    avg_lpips.append(eval_dict["avg_lpips"])
+                    avg_psnr.append(eval_dict["avg_psnr"])
+                    avg_ssim.append(eval_dict["avg_ssim"])
 
-        reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
-        self._plot_reconstructed(num_images, history, reconstructed_path, dm, ds)
-        final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
-        final_result_path = f"{trial_result_path}/final_attack_result.pdf"
-        self._make_plot(num_images, final_tensor, None, final_result_path, dm, ds)
+                    logging.info(
+                        "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
+                        self.attack_method,
+                        (trial_number + 1),
+                        self.defense_method,
+                        iters,
+                        losses[-1],
+                        avg_data_mses[-1],
+                        avg_feat_mses[-1],
+                        avg_lpips[-1],
+                        avg_psnr[-1],
+                        avg_ssim[-1],
+                    )
 
-        # Save the tensors into a .pt file
-        tensor_file_path = f"{trial_result_path}/tensors.pt"
-        result = {
-            i
-            * log_interval: {
-                j: history[i][j][0].cpu().permute(1, 2, 0).detach().clone()
-                for j in range(num_images)
+                    if self.attack_method == "DLG":
+                        history.append(
+                            [
+                                [
+                                    dummy_data[i],
+                                    torch.argmax(dummy_labels[i], dim=-1).item(),
+                                ]
+                                for i in range(num_images)
+                            ]
+                        )
+                    elif self.attack_method == "iDLG":
+                        history.append(
+                            [
+                                [
+                                    dummy_data[i],
+                                    est_labels[i].item(),
+                                ]
+                                for i in range(num_images)
+                            ]
+                        )
+                    elif self.attack_method == "csDLG":
+                        history.append(
+                            [
+                                [
+                                    dummy_data[i],
+                                    torch.argmax(gt_labels[i], dim=-1).item(),
+                                ]
+                                for i in range(num_images)
+                            ]
+                        )
+
+                    new_row = [
+                        iters,
+                        round(losses[-1], 4),
+                        round(avg_data_mses[-1], 4),
+                        round(avg_feat_mses[-1], 4),
+                        round(avg_lpips[-1], 4),
+                        round(avg_psnr[-1], 4),
+                        round(avg_ssim[-1], 3),
+                    ]
+                    csv_processor.write_csv(trial_csv_file, new_row)
+
+        with torch.no_grad():
+            # TODO: use other scoring criteria
+            if self.best_mse > avg_data_mses[-1]:
+                self.best_mse = avg_data_mses[-1]
+                self.best_trial = (
+                    trial_number + 1
+                )  # the +1 is because we index from 1 and not 0
+
+            reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
+            self._plot_reconstructed(num_images, history, reconstructed_path, dm, ds)
+            final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
+            final_result_path = f"{trial_result_path}/final_attack_result.pdf"
+            self._make_plot(num_images, final_tensor, None, final_result_path, dm, ds)
+
+            # Save the tensors into a .pt file
+            tensor_file_path = f"{trial_result_path}/tensors.pt"
+            result = {
+                i
+                * log_interval: {
+                    j: history[i][j][0].cpu().permute(1, 2, 0)
+                    for j in range(num_images)
+                }
+                for i in range(len(history))
             }
-            for i in range(len(history))
-        }
-        torch.save(result, tensor_file_path)
+            torch.save(result, tensor_file_path)
 
-        logging.info("Attack %d complete", (trial_number + 1))
+            logging.info("Attack %d complete", (trial_number + 1))
 
     def _gradient_closure(self, match_optimizer, dummy_data, labels, target_grad):
         """Take a step to match the gradients."""
@@ -502,7 +504,6 @@ class Server(fedavg.Server):
         def closure():
             match_optimizer.zero_grad()
             self.trainer.model.to(Config().device())
-
             # Set model mode for dummy data optimization
             if (
                 hasattr(Config().algorithm, "dummy_eval")
@@ -511,8 +512,8 @@ class Server(fedavg.Server):
                 self.trainer.model.eval()
             else:
                 self.trainer.model.train()
-
             self.trainer.model.zero_grad()
+
             try:
                 dummy_pred, _ = self.trainer.model(dummy_data)
             except:
@@ -560,9 +561,7 @@ class Server(fedavg.Server):
 
             dummy_weight = self._loss_steps(dummy_data, labels, model)
 
-            rec_loss = self._reconstruction_costs(
-                [dummy_weight], list(target_weights.values())
-            )
+            rec_loss = self._reconstruction_costs([dummy_weight], target_weights)
             if (
                 hasattr(Config().algorithm, "total_variation")
                 and Config().algorithm.total_variation > 0
