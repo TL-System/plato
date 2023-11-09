@@ -102,8 +102,9 @@ class Trainer(split_learning.Trainer):
             self.model.resize_token_embeddings(len(self.tokenizer))
         # self.training args for huggingface training
         parser = HfArgumentParser(TrainingArguments)
+
         (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--output_dir=/tmp", "--report_to=none"]
+            args=["--report_to=none"]
         )
 
     # Redesign the evaluation stage.
@@ -132,8 +133,6 @@ class Trainer(split_learning.Trainer):
 
         # save other metric information such as accuracy
         tester.log_metrics("eval", metrics)
-        tester.save_metrics("eval", metrics)
-
         return metrics["eval_accuracy"]
 
     # Redesign the training stage specific to Split Learning.

@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 20
+    iteration: 1
 
 server:
     type: split_learning
