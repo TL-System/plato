@@ -40,8 +40,9 @@ class Model(nn.Module):
         x = self.layers(x)
         x = nn.AvgPool2d(2)(x)
         x = x.view(x.size(0), -1)
+        feature = x.clone().detach()
         x = self.fc(x)
-        return x
+        return x, feature
 
     @staticmethod
     def is_valid_model_name(model_name):
