@@ -41,6 +41,14 @@ class Server(fedavg.Server):
         self.next_client = True
         self.test_accuracy = 0.0
 
+        # Manually set up the testset since do_test is turned off in config
+        if self.datasource is None:
+            self.datasource = datasources_registry.get(client_id=0)
+            self.testset = self.datasource.get_test_set()
+            self.testset_sampler = all_inclusive.Sampler(
+                self.datasource, testing=True
+            )
+
     def choose_clients(self, clients_pool, clients_count):
         """Shuffle the clients and sequentially select them when the previous one is done."""
         if len(self.clients_list) == 0 and self.next_client:
@@ -81,14 +89,6 @@ class Server(fedavg.Server):
 
             # The weights after cut layer are not trained by clients
             self.algorithm.update_weights_before_cut(weights)
-
-            # Manually set up the testset since do_test is turned off in config
-            if self.datasource is None:
-                self.datasource = datasources_registry.get(client_id=0)
-                self.testset = self.datasource.get_test_set()
-                self.testset_sampler = all_inclusive.Sampler(
-                    self.datasource, testing=True
-                )
 
             self.test_accuracy = self.trainer.test(self.testset, self.testset_sampler)
 

@@ -49,16 +49,19 @@ class DataSource(base.DataSource):
         )
 
         model_name = Config().trainer.model_name
+        use_auth_token = None
+        if hasattr(Config().parameters, "huggingface_token"):
+            use_auth_token = Config().parameters.huggingface_token
         config_kwargs = {
             "cache_dir": Config().params["model_path"],
             "revision": "main",
-            "use_auth_token": None,
+            "use_auth_token": use_auth_token,
         }
         tokenizer_kwargs = {
             "cache_dir": Config().params["data_path"],
             "use_fast": True,
             "revision": "main",
-            "use_auth_token": None,
+            "use_auth_token": use_auth_token,
         }
 
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)

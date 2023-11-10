@@ -78,7 +78,10 @@ class Trainer(basic.Trainer):
 
         parser = HfArgumentParser(TrainingArguments)
         (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--output_dir=/tmp", "--report_to=none"]
+            args=[
+                "--output_dir=" + Config.params["checkpoint_path"],
+                "--report_to=none",
+            ]
         )
 
         model_name = Config().trainer.model_name

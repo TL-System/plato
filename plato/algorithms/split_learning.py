@@ -17,8 +17,6 @@ https://arxiv.org/pdf/2112.01637.pdf
 import logging
 import time
 
-import torch
-
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.datasources import feature_dataset
@@ -41,13 +39,10 @@ class Algorithm(fedavg.Algorithm):
         inputs, targets = self.trainer.get_train_samples(
             Config().trainer.batch_size, dataset, sampler
         )
-        with torch.no_grad():
-            inputs, targets = inputs.to(self.trainer.device), targets.to(
-                self.trainer.device
-            )
-            logits = self.model.forward_to(inputs)
-
-        features_dataset.append((logits.detach().cpu(), targets.detach().cpu()))
+        inputs = inputs.to(self.trainer.device)
+        targets = targets.to(self.trainer.device)
+        outputs, targets = self.trainer.forward_to_intermediate_feature(inputs, targets)
+        features_dataset.append((outputs, targets))
 
         toc = time.perf_counter()
         logging.warning(
@@ -88,16 +83,7 @@ class Algorithm(fedavg.Algorithm):
     def update_weights_before_cut(self, weights):
         """Update the weights before cut layer, called when testing accuracy."""
         current_weights = self.extract_weights()
-        cut_layer_idx = self.model.layers.index(self.model.cut_layer)
-
-        for i in range(0, cut_layer_idx):
-            weight_name = f"{self.model.layers[i]}.weight"
-            bias_name = f"{self.model.layers[i]}.bias"
-
-            if weight_name in current_weights:
-                current_weights[weight_name] = weights[weight_name]
-
-            if bias_name in current_weights:
-                current_weights[bias_name] = weights[bias_name]
-
+        current_weights = self.trainer.update_weights_before_cut(
+            current_weights, weights
+        )
         self.load_weights(current_weights)

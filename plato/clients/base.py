@@ -376,6 +376,8 @@ class Client:
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
+            if "/" in model_name:
+                model_name = model_name.replace("/", "_")
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = (
                 f"{checkpoint_path}/{model_name}_client_{self.client_id}.pth"
