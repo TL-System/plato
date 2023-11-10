@@ -48,11 +48,12 @@ class DishonestServer(split_learning_server.Server):
             and not self.attack_started
         ):
             # probably add some concurrency flag
-            proc = mp.Process(
-                target=self.attack,
-                args=(update),
-            )
-            proc.start()
+            # proc = mp.Process(
+            #     target=self.attack,
+            #     args=(update),
+            # )
+            # proc.start()
+            self.attack(update)
 
     def get_logged_items(self):
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
