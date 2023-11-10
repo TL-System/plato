@@ -175,9 +175,13 @@ class Server(fedavg.Server):
             baseline_weights, weights_received
         )
         update = self.updates[Config().algorithm.victim_client]
-        target_weights = update.payload[0]
-        if not self.share_gradients and self.match_weights and self.use_updates:
-            target_weights = deltas_received[Config().algorithm.victim_client]
+
+        target_weights = None
+        if not self.share_gradients and self.match_weights:
+            if self.use_updates:
+                target_weights = deltas_received[Config().algorithm.victim_client]
+            else:
+                target_weights = update.payload[0]
             # ignore running statistics in state_dict()
             states_to_save = []
             for name, _ in self.trainer.model.named_parameters():
