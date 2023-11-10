@@ -13,7 +13,7 @@ from plato.config import Config
 from plato.trainers import tracking
 
 
-class Trainer(HonestTrainer):
+class DishonestTrainer(HonestTrainer):
     """
     The trainer will use attack function to reconstruct the private data
         based on intermedaite feature.
