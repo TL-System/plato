@@ -610,6 +610,9 @@ class Server:
                         if hasattr(Config().trainer, "model_name")
                         else "custom"
                     )
+                    if "/" in model_name:
+                        model_name = model_name.replace("/", "_")
+
                     checkpoint_path = Config().params["checkpoint_path"]
 
                     payload_filename = (
@@ -781,6 +784,8 @@ class Server:
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
+            if "/" in model_name:
+                model_name = model_name.replace("/", "_")
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
             with open(payload_filename, "rb") as payload_file:
@@ -1217,6 +1222,8 @@ class Server:
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
+        if "/" in model_name:
+            model_name = model_name.replace("/", "_")
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
         logging.info(
             "[%s] Saving the checkpoint to %s/%s.", self, checkpoint_path, filename

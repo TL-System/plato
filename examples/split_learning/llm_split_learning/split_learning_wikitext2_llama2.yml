@@ -1,0 +1,80 @@
+clients:
+    # Type
+    type: split_learning
+
+    # The total number of clients
+    total_clients: 5
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    # Split learning iterations for each client
+    iteration: 20
+
+server:
+    type: split_learning
+    random_seed: 1
+    address: 127.0.0.1
+    port: 8001
+
+    # Server doesn't have to do test for every round in split learning
+    do_test: false
+
+data:
+    # The training and testing dataset
+    datasource: HuggingFace
+    dataset_name: wikitext
+    dataset_config: wikitext-2-v1
+
+    # Number of samples in each partition
+    partition_size: 12000
+
+    # Fixed random seed
+    random_seed: 1
+
+    # IID, biased, or sharded?
+    sampler: iid
+
+trainer:
+    # The type of the trainer
+    type: split_learning
+
+    # The maximum number of training rounds
+    rounds: 100000
+
+    # The machine learning model
+    model_type: huggingface
+    model_name: meta-llama/Llama-2-7b-hf
+
+    # Number of epoches for local training in each communication round
+    epochs: 1
+    batch_size: 4
+    optimizer: AdamW
+    
+algorithm:
+    # Aggregation algorithm
+    type: split_learning
+
+    # Split learning flag
+    split_learning: true
+
+parameters:
+    model:
+        num_classes: 10
+        cut_layer: 2
+        transformer_module_name: model.layers
+        layers_after_transformer:
+            - lm_head
+
+    huggingface_token: # put your huggingface token here
+
+    optimizer:
+        lr: 0.00005
+        eps: 0.00000001
+        weight_decay: 0.0
+
+results: 
+    types: round, accuracy, elapsed_time, comm_overhead
