@@ -28,10 +28,7 @@ class DishonestServer(split_learning_server.Server):
         """
         self.attack_started = True
         intermediate_features, labels = update
-        reconstructed_token_ids = self.trainer.attack(intermediate_features)
-        evaluation_metrics = self.trainer.evaluate_attack(
-            reconstructed_token_ids, labels
-        )
+        evaluation_metrics = self.trainer.attack(intermediate_features, labels)
         self.bleu_score = evaluation_metrics["BLEU"]
         self.rouge_score = evaluation_metrics["ROGUE"]
         self.attack_accuracy = evaluation_metrics["attack accuracy"]
