@@ -1,7 +1,6 @@
 """
-Obtain LLM models from Huggingface, specifically designed for split learning
+Obtain LLM models from HuggingFace, specifically designed for split learning
 """
-
 import torch
 from transformers import AutoModelForCausalLM, AutoConfig
 from peft import get_peft_model, LoraConfig
@@ -18,8 +17,8 @@ def get_lora_model(model):
 
 def get_module(start_module: torch.nn.Module, module_names):
     """
-    Recursively get a pytorch module starting from the start module with
-        a given list of module names.
+    Recursively get a PyTorch module starting from the start module with
+    a given list of module names.
     """
     module = start_module
     for module_name in module_names:
@@ -29,7 +28,7 @@ def get_module(start_module: torch.nn.Module, module_names):
 
 class BaseModel(torch.nn.Module):
     """
-    The basic model loading hugginface model used for the server model and the client model
+    The basic model loading HuggingFace model used for the server model and the client model
     """
 
     def __init__(self, *args, **kwargs) -> None:
@@ -122,7 +121,7 @@ class ServerModel(BaseModel):
         # In this design, we have two copies of the model
         # The first copy of the model is the whole model which is used for test.
         # The second copy of the model only contains the layers on the server
-        #   used for training.
+        # used for training.
         self.server_model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
             config=self.config,

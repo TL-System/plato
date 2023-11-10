@@ -100,7 +100,7 @@ class Trainer(split_learning.Trainer):
         embedding_size = self.model.get_input_embeddings().weight.shape[0]
         if len(self.tokenizer) > embedding_size:
             self.model.resize_token_embeddings(len(self.tokenizer))
-        # self.training args for huggingface training
+        # self.training args for HuggingFace training
         parser = HfArgumentParser(TrainingArguments)
 
         (self.training_args,) = parser.parse_args_into_dataclasses(
@@ -139,7 +139,7 @@ class Trainer(split_learning.Trainer):
         return metrics["eval_accuracy"]
 
     # Redesign the training stage specific to Split Learning.
-    def process_training_samples_before_retreiving(self, training_samples):
+    def process_training_samples_before_retrieving(self, training_samples):
         inputs = training_samples["input_ids"]
         labels = training_samples["labels"]
         for index, input_item in enumerate(inputs):
