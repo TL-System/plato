@@ -177,8 +177,20 @@ class Server(fedavg.Server):
         update = self.updates[Config().algorithm.victim_client]
         target_weights = update.payload[0]
         if not self.share_gradients and self.match_weights and self.use_updates:
-            target_weights = deltas_received[Config().algorithm.victim_client].values()
-            target_weights = [weight.to(Config().device()) for weight in target_weights]
+            target_weights = deltas_received[Config().algorithm.victim_client]
+            # ignore running statistics in state_dict()
+            states_to_save = []
+            for name, _ in self.trainer.model.named_parameters():
+                states_to_save.append(name)
+            states_to_remove = []
+            for name in target_weights.keys():
+                if name not in states_to_save:
+                    states_to_remove.append(name)
+            for name in states_to_remove:
+                del target_weights[name]
+            target_weights = [
+                weight.to(Config().device()) for weight in target_weights.values()
+            ]
 
         gt_data, gt_labels, target_grad = (
             update.payload[1].to(Config().device()),
@@ -579,16 +591,12 @@ class Server(fedavg.Server):
             patched_model_origin = deepcopy(patched_model)
 
         for epoch in range(epochs):
-            if batch_size == 1:
-                dummy_pred = patched_model(dummy_data, patched_model.parameters)
-                labels_ = labels
-            else:
-                idx = epoch % (dummy_data.shape[0] // batch_size)
-                dummy_pred = patched_model(
-                    dummy_data[idx * batch_size : (idx + 1) * batch_size],
-                    patched_model.parameters,
-                )
-                labels_ = labels[idx * batch_size : (idx + 1) * batch_size]
+            idx = epoch % (dummy_data.shape[0] // batch_size)
+            dummy_pred = patched_model(
+                dummy_data[idx * batch_size : (idx + 1) * batch_size],
+                patched_model.parameters,
+            )
+            labels_ = labels[idx * batch_size : (idx + 1) * batch_size]
 
             loss = cross_entropy(dummy_pred, labels_).sum()
 
