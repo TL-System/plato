@@ -80,8 +80,8 @@ class Trainer(HonestTrainer):
         self.model.guessed_client_model = self.model.guessed_client_model.to(
             self.device
         )
-        # IMPORTANT STEP: models are doing training in split learning
-        self.model.guessed_client_model.train()
+        # Server can set is as evaluation mode for ease of attack.
+        self.model.guessed_client_model.eval()
         intermediate_features = intermediate_features.to(self.device)
 
         self._loss_tracker_reconstructed_data.reset()
