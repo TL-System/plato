@@ -79,4 +79,4 @@ parameters:
         interval: 10
 
 results: 
-    types: round, accuracy, elapsed_time, comm_overhead
+    types: round, accuracy, elapsed_time, comm_overhead, BLEU, ROGUE, attack_accuracy
