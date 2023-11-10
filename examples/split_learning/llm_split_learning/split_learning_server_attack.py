@@ -16,8 +16,7 @@ class DishonestServer(split_learning_server.Server):
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
         super().__init__(model, datasource, algorithm, trainer, callbacks)
-        self.bleu_score = 0.0
-        self.rouge_score = 0.0
+        self.rouge = {}
         self.attack_accuracy = 0.0
         self.attack_started = False
 
@@ -29,9 +28,8 @@ class DishonestServer(split_learning_server.Server):
         self.attack_started = True
         intermediate_features, labels = update
         evaluation_metrics = self.trainer.attack(intermediate_features, labels)
-        self.bleu_score = evaluation_metrics["BLEU"]
-        self.rouge_score = evaluation_metrics["ROGUE"]
-        self.attack_accuracy = evaluation_metrics["attack accuracy"]
+        self.rouge = evaluation_metrics["ROUGE"]
+        self.attack_accuracy = evaluation_metrics["attack_accuracy"]
         self.attack_started = False
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
@@ -55,8 +53,18 @@ class DishonestServer(split_learning_server.Server):
     def get_logged_items(self):
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
         logged_items = super().get_logged_items()
-        logged_items["BLEU"] = self.bleu_score
-        logged_items["ROGUE"] = self.rouge_score
-        logged_items["attack accuracy"] = self.attack_accuracy
+        logged_items["attack_accuracy"] = self.attack_accuracy
+        logged_items["rouge1_fm"] = self.rouge["rouge1_fmeasure"].item()
+        logged_items["rouge1_p"] = self.rouge["rouge1_precision"].item()
+        logged_items["rouge1_r"] = self.rouge["rouge1_recall"].item()
+        logged_items["rouge2_fm"] = self.rouge["rouge2_fmeasure"].item()
+        logged_items["rouge2_p"] = self.rouge["rouge2_precision"].item()
+        logged_items["rouge2_r"] = self.rouge["rouge2_recall"].item()
+        logged_items["rougeL_fm"] = self.rouge["rougeL_fmeasure"].item()
+        logged_items["rougeL_p"] = self.rouge["rougeL_precision"].item()
+        logged_items["rougeL_r"] = self.rouge["rougeL_recall"].item()
+        logged_items["rougeLsum_fm"] = self.rouge["rougeLsum_fmeasure"].item()
+        logged_items["rougeLsum_p"] = self.rouge["rougeLsum_precision"].item()
+        logged_items["rougeLsum_r"] = self.rouge["rougeLsum_recall"].item()
 
         return logged_items

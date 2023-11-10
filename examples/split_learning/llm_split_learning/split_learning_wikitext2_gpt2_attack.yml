@@ -89,4 +89,4 @@ parameters:
         report_interval: 10
 
 results: 
-    types: round, accuracy, elapsed_time, comm_overhead, BLEU, ROGUE, attack_accuracy
+    types: round, accuracy, elapsed_time, comm_overhead, attack_accuracy,rouge1_fm,rouge1_p,rouge1_r,rouge2_fm,rouge2_p,rouge2_r,rougeL_fm,rougeL_p,rougeL_r,rougeLsum_fm,rougeLsum_p,rougeLsum_r

@@ -6,6 +6,7 @@ import os
 import logging
 
 import torch
+from torchmetrics.text.rouge import ROUGEScore
 
 from split_learning_trainer import Trainer as HonestTrainer
 from plato.config import Config
@@ -22,6 +23,9 @@ class Trainer(HonestTrainer):
         super().__init__(model, callbacks)
         self._loss_tracker_guessed_client = tracking.LossTracker()
         self._loss_tracker_reconstructed_data = tracking.LossTracker()
+        self.sample_counts = 0.0
+        self.accuracy_sum = 0.0
+        self.rouge_score = ROUGEScore()
 
     def train_attack_model(
         self, attack_parameters, reconstructed_data, intermediate_features
@@ -119,7 +123,7 @@ class Trainer(HonestTrainer):
         self.model.guessed_client_model = self.model.guessed_client_model.to(
             torch.device("cpu")
         )
-        intermediate_features = intermediate_features.cpu()
+        intermediate_features = intermediate_features.detach().cpu()
         # if attack method is embedding, we will generate the reconstructed input ids
         #   from the reconstructed embeddings.
         if attack_parameters == "embedding":
@@ -150,3 +154,18 @@ class Trainer(HonestTrainer):
         labels = labels.long()
 
         # calculate the evaluation metrics in attack
+        evaluation_metrics = dict()
+        # calculate accuracy
+        accuracy = torch.sum(
+            labels == reconstructed_data, dim=1
+        ) / reconstructed_data.size(1)
+        self.accuracy_sum += torch.sum(accuracy).item()
+        self.sample_counts += reconstructed_data.size(0)
+        evaluation_metrics["attack_accuracy"] = self.accuracy_sum / self.sample_counts
+
+        predicted_text = self.tokenizer.decode(
+            reconstructed_data.detach().cpu().numpy().tolist()
+        )
+        ground_truth = self.tokenizer.decode(labels.detach().cpu().numpy().tolist())
+        self.rouge_score.update(predicted_text, ground_truth)
+        evaluation_metrics["ROUGE"] = self.rouge_score.compute()
