@@ -13,7 +13,6 @@ Deep Learning." arXiv preprint arXiv:2112.01637 (2021).
 
 https://arxiv.org/pdf/2112.01637.pdf
 """
-
 import logging
 import os
 
@@ -99,7 +98,7 @@ class Trainer(basic.Trainer):
         data_loader = iter(data_loader)
         self.training_samples = next(data_loader)
         # Wrap the training samples with datasource and sampler to be fed into Plato trainer
-        self.training_samples = self.process_training_samples_before_retreiving(
+        self.training_samples = self.process_training_samples_before_retrieving(
             self.training_samples
         )
         return self.training_samples
@@ -190,7 +189,7 @@ class Trainer(basic.Trainer):
         """
         Evaluates the model with the provided test dataset and test sampler.
 
-        Auguments:
+        Arguments:
         testset: the test dataset.
         sampler: the test sampler. The default is None.
         kwargs (optional): Additional keyword arguments.
@@ -200,19 +199,19 @@ class Trainer(basic.Trainer):
         return accuracy
 
     # API functions for split learning
-    def process_training_samples_before_retreiving(self, training_samples) -> ...:
-        """Process training samples before completing retreiving samples."""
+    def process_training_samples_before_retrieving(self, training_samples) -> ...:
+        """Process training samples before completing retrieving samples."""
         return training_samples
 
     def process_samples_before_client_forwarding(self, examples) -> ...:
-        """Process the examples befor client conducting forwarding."""
+        """Process the examples before client conducting forwarding."""
         return examples
 
     # pylint:disable=unused-argument
     def server_forward_from(self, batch, config) -> (..., ..., int):
         """
         The event for server completing training by forwarding from intermediate features.
-        Uses may override this function for training different models with split learning.
+        Users may override this function for training different models with split learning.
 
         Inputs:
             batch: the batch of inputs for forwarding.

@@ -1,5 +1,5 @@
 """
-Use Split learning to finetune Huggingface large language model.
+Finetune HuggingFace large language models using split learning.
 """
 import split_learning_trainer
 from split_learning_llm_model import ServerModel, ClientModel
