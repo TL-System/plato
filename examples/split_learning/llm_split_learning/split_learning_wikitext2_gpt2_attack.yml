@@ -77,7 +77,6 @@ parameters:
 
     attack:
         interval: 10
-        method: input_ids
         optimizer:
             lr_guessed_client: 0.1
             lr_reconstructed_data: 0.1
