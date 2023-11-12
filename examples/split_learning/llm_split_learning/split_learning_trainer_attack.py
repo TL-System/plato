@@ -71,11 +71,6 @@ class DishonestTrainer(HonestTrainer):
             lr=attack_parameters.optimizer.lr_reconstructed_data,
             amsgrad=True,
         )
-        scheduler_reconstructed_data = torch.optim.lr_scheduler.StepLR(
-            optimizer_reconstructed_data,
-            step_size=attack_parameters.scheduler.step,
-            gamma=attack_parameters.scheduler.gamma,
-        )
         reconstructed_data = reconstructed_data.to(self.device)
         self.model.guessed_client_model = self.model.guessed_client_model.to(
             self.device
@@ -98,7 +93,6 @@ class DishonestTrainer(HonestTrainer):
                     loss, intermediate_features.size(0)
                 )
                 optimizer_reconstructed_data.step()
-            scheduler_reconstructed_data.step()
             # gradient descent on the guessed client model
             for _ in range(attack_parameters.inner_iterations):
                 optimizer_guessed_client.zero_grad()
@@ -169,3 +163,4 @@ class DishonestTrainer(HonestTrainer):
         ground_truth = self.tokenizer.decode(labels.detach().cpu().numpy().tolist())
         self.rouge_score.update(predicted_text, ground_truth)
         evaluation_metrics["ROUGE"] = self.rouge_score.compute()
+        return evaluation_metrics

@@ -80,10 +80,7 @@ parameters:
         method: input_ids
         optimizer:
             lr_guessed_client: 0.1
-            lr_reconstructed_data: 0.01
-        scheduler:
-            step: 100
-            gamma: 0.1
+            lr_reconstructed_data: 0.1
         outer_iterations: 100
         inner_iterations: 100
         report_interval: 10
