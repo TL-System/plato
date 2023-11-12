@@ -13,7 +13,7 @@ from split_learning_llm_model import (
 from plato.config import Config
 
 
-class ServerModelDisHonest(ServerModelHonest):
+class ServerModelCurious(ServerModelHonest):
     """
     The server model has an estimated client model
         with guessed parameters by the server.

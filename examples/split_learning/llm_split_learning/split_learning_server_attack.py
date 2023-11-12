@@ -1,5 +1,5 @@
 """
-A dishonest server which will try to attack and reconstruct user private data
+A curious server which will try to attack and reconstruct user private data
     with the received intermediate features.
 """
 import multiprocessing as mp
@@ -7,9 +7,9 @@ from plato.servers import split_learning as split_learning_server
 from plato.config import Config
 
 
-class DishonestServer(split_learning_server.Server):
+class CuriousServer(split_learning_server.Server):
     """
-    A dishonest server will decide whether to attack based on the given attacking interval.
+    A curious server will decide whether to attack based on the given attacking interval.
     """
 
     def __init__(

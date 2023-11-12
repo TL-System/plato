@@ -1,5 +1,5 @@
 """
-A dishonest split learning trainer which will try to reconstruct private data
+A curious split learning trainer which will try to reconstruct private data
     during split learning.
 """
 import os
@@ -9,11 +9,12 @@ import torch
 from torchmetrics.text.rouge import ROUGEScore
 
 from split_learning_trainer import Trainer as HonestTrainer
+from split_learning_llm_model import get_module
 from plato.config import Config
 from plato.trainers import tracking
 
 
-class DishonestTrainer(HonestTrainer):
+class CuriousTrainer(HonestTrainer):
     """
     The trainer will use attack function to reconstruct the private data
         based on intermedaite feature.
@@ -39,7 +40,9 @@ class DishonestTrainer(HonestTrainer):
             )
         else:
             outputs = self.model.guessed_client_model(inputs_embeds=reconstructed_data)
-        loss = torch.nn.functional.mse_loss(outputs[0], intermediate_features[0])
+        loss = torch.nn.functional.mse_loss(
+            outputs.logits, intermediate_features.logits
+        )
         loss.backward(retain_graph=True)
         return loss
 
@@ -114,7 +117,10 @@ class DishonestTrainer(HonestTrainer):
         intermediate_features = intermediate_features.detach().cpu()
         # We will generate the reconstructed input ids
         #   from the reconstructed embeddings.
-        embedding_weights = self.model.guessed_client_model.wte.weight.data
+        embedding_layer = get_module(
+            self.model.guessed_client_model, attack_parameters.embedding_layer
+        )
+        embedding_weights = embedding_layer.weight.data
         reconstructed_inputs = torch.zeros(
             reconstructed_data.size(0), reconstructed_data.size(1)
         )
