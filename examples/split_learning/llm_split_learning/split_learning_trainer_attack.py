@@ -39,9 +39,7 @@ class DishonestTrainer(HonestTrainer):
             )
         else:
             outputs = self.model.guessed_client_model(inputs_embeds=reconstructed_data)
-        loss = torch.nn.functional.mse_loss(
-            outputs.last_hidden_state, intermediate_features
-        )
+        loss = torch.nn.functional.mse_loss(outputs[0], intermediate_features[0])
         loss.backward(retain_graph=True)
         return loss
 
@@ -116,43 +114,38 @@ class DishonestTrainer(HonestTrainer):
         intermediate_features = intermediate_features.detach().cpu()
         # We will generate the reconstructed input ids
         #   from the reconstructed embeddings.
-        embedding_weights = self.model.guessed_client.wte.weight.data
-        embedding_weights = embedding_weights.reshape(
-            1, 1, embedding_weights.size(0), embedding_weights.size(1)
-        ).expand(
-            reconstructed_data.size(0),
-            reconstructed_data.size(1),
-            embedding_weights.size(0),
-            embedding_weights.size(1),
+        embedding_weights = self.model.guessed_client_model.wte.weight.data
+        reconstructed_inputs = torch.zeros(
+            reconstructed_data.size(0), reconstructed_data.size(1)
         )
-        reconstructed_data = reconstructed_data.reshape(
-            reconstructed_data.size(0),
-            reconstructed_data.size(1),
-            1,
-            reconstructed_data.size(2),
-        )
-        distance = torch.norm(
-            reconstructed_data - self.model.guessed_client.wte.weight.data,
-            dim=3,
-            p=2,
-        )
-        reconstructed_data = distance.argmin(dim=2)
+        for batch_id in range(reconstructed_data.size(0)):
+            for word_id in range(reconstructed_data.size(1)):
+                distance = (
+                    reconstructed_data[batch_id][word_id].reshape(1, -1)
+                    - embedding_weights
+                )
+                distance = torch.norm(
+                    distance,
+                    dim=1,
+                    p=2,
+                )
+                reconstructed_inputs[batch_id][word_id] = distance.argmin(dim=0).item()
 
-        reconstructed_data = reconstructed_data.long()
+        reconstructed_inputs = reconstructed_inputs.long()
         labels = labels.to(self.device)
         labels = labels.long()
 
         # calculate the evaluation metrics in attack
-        evaluation_metrics = dict()
+        evaluation_metrics = {}
         # calculate accuracy
         accuracy = torch.sum(
-            labels == reconstructed_data, dim=1
-        ) / reconstructed_data.size(1)
+            labels == reconstructed_inputs, dim=1
+        ) / reconstructed_inputs.size(1)
         self.accuracy_sum += torch.sum(accuracy).item()
-        self.sample_counts += reconstructed_data.size(0)
+        self.sample_counts += reconstructed_inputs.size(0)
         evaluation_metrics["attack_accuracy"] = self.accuracy_sum / self.sample_counts
 
-        predicted_text = self.tokenizer.batch_decode(reconstructed_data.detach().cpu())
+        predicted_text = self.tokenizer.batch_decode(reconstructed_inputs)
         ground_truth = self.tokenizer.batch_decode(labels.detach().cpu())
         self.rouge_score.update(predicted_text, ground_truth)
         evaluation_metrics["ROUGE"] = self.rouge_score.compute()
