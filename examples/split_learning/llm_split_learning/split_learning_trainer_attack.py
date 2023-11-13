@@ -28,21 +28,12 @@ class CuriousTrainer(HonestTrainer):
         self.accuracy_sum = 0.0
         self.rouge_score = ROUGEScore()
 
-    def train_attack_model(
-        self, attack_parameters, reconstructed_data, intermediate_features
-    ):
+    def train_attack_model(self, reconstructed_data, intermediate_features):
         """
         Train models for attack for one step.
         """
-        if attack_parameters.method == "input_ids":
-            outputs = self.model.guessed_client_model(
-                input_ids=reconstructed_data.long()
-            )
-        else:
-            outputs = self.model.guessed_client_model(inputs_embeds=reconstructed_data)
-        loss = torch.nn.functional.mse_loss(
-            outputs.logits, intermediate_features.logits
-        )
+        outputs = self.model.guessed_client_model(inputs_embeds=reconstructed_data)
+        loss = torch.nn.functional.mse_loss(outputs.logits, intermediate_features)
         loss.backward(retain_graph=True)
         return loss
 
@@ -52,15 +43,20 @@ class CuriousTrainer(HonestTrainer):
             1. Directly reconstruct the token ids.
             2. Reconstruct the embeddings and then reconstruct the token ids.
         """
-        self.model.calibrate_guessed_client()
+
         attack_parameters = Config().parameters.attack
+        if not (
+            hasattr(attack_parameters, "caliberate_guessed_client")
+            and not attack_parameters.caliberate_guessed_client
+        ):
+            self.model.caliberate_guessed_client()
         reconstructed_data = torch.zeros(intermediate_features.shape).requires_grad_(
             True
         )
 
         # Assign optimizer for attackings
-        optimizer_guessed_client = torch.optim.SGD(
-            self.model.guessed_client_model,
+        optimizer_guessed_client = torch.optim.AdamW(
+            self.model.guessed_client_model.parameters(),
             lr=attack_parameters.optimizer.lr_guessed_client,
         )
         optimizer_reconstructed_data = torch.optim.Adam(
@@ -84,7 +80,7 @@ class CuriousTrainer(HonestTrainer):
             for _ in range(attack_parameters.inner_iterations):
                 optimizer_reconstructed_data.zero_grad()
                 loss = self.train_attack_model(
-                    attack_parameters, reconstructed_data, intermediate_features
+                    reconstructed_data, intermediate_features
                 )
                 self._loss_tracker_reconstructed_data.update(
                     loss, intermediate_features.size(0)
@@ -94,7 +90,7 @@ class CuriousTrainer(HonestTrainer):
             for _ in range(attack_parameters.inner_iterations):
                 optimizer_guessed_client.zero_grad()
                 loss = self.train_attack_model(
-                    attack_parameters, reconstructed_data, intermediate_features
+                    reconstructed_data, intermediate_features
                 )
                 self._loss_tracker_guessed_client.update(
                     loss, intermediate_features.size(0)
@@ -108,7 +104,7 @@ class CuriousTrainer(HonestTrainer):
                     str(iteration),
                     str(attack_parameters.outer_iterations),
                     self._loss_tracker_reconstructed_data.average,
-                    self._loss_tracker_guessed_client.average(),
+                    self._loss_tracker_guessed_client.average,
                 )
 
         self.model.guessed_client_model = self.model.guessed_client_model.to(

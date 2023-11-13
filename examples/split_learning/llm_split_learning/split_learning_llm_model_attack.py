@@ -45,13 +45,14 @@ class ServerModelCurious(ServerModelHonest):
                 setattr(module, layer[-1], torch.nn.Identity())
             else:
                 setattr(self.base_model, layer[0], torch.nn.Identity())
+        self.guessed_client_model.lm_head = torch.nn.Identity()
         # Apply LoRA optimization
         if hasattr(Config().parameters, "lora"):
             self.guessed_client_model = get_lora_model(self.guessed_client_model)
 
-    def calibrate_guessed_client(self, caliberate=True):
+    def caliberate_guessed_client(self, caliberate=True):
         """
-        Calibrate the weights of the guessed client model to the weights of the client model,
+        Caliberate the weights of the guessed client model to the weights of the client model,
             if the client sent the model to the server for testing.
         We just need to do this before the server is ready to launch the attack.
         """
@@ -59,9 +60,13 @@ class ServerModelCurious(ServerModelHonest):
             base_model_weight = self.base_model.state_dict()
             guessed_client_model_weights = self.guessed_client_model.state_dict()
             for weight_name in guessed_client_model_weights.keys():
-                guessed_client_model_weights[weight_name] = base_model_weight[
-                    weight_name
-                ]
+                if not isinstance(
+                    guessed_client_model_weights[weight_name],
+                    torch.nn.Identity,
+                ):
+                    guessed_client_model_weights[weight_name] = base_model_weight[
+                        weight_name
+                    ]
             self.guessed_client_model.load_state_dict(guessed_client_model_weights)
         else:
             logging.info(

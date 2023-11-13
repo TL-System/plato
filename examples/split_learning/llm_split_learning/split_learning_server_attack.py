@@ -39,7 +39,7 @@ class CuriousServer(split_learning_server.Server):
             as the aggregation time is abnormally long.
         """
         self.attack_started = True
-        intermediate_features, labels = update
+        intermediate_features, labels = update[0]
         evaluation_metrics = self.trainer.attack(intermediate_features, labels)
         rouge_metrics = evaluation_metrics["ROUGE"]
         self.rouge["rouge1_fmeasure"] = rouge_metrics["rouge1_fmeasure"].item()
