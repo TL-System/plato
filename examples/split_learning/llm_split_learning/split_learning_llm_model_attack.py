@@ -41,10 +41,10 @@ class ServerModelCurious(ServerModelHonest):
         for layer in Config().parameters.model.layers_after_transformer:
             layer = layer.split(".")
             if len(layer) > 1:
-                module = get_module(self.base_model, layer[:-1])
+                module = get_module(self.guessed_client_model, layer[:-1])
                 setattr(module, layer[-1], torch.nn.Identity())
             else:
-                setattr(self.base_model, layer[0], torch.nn.Identity())
+                setattr(self.guessed_client_model, layer[0], torch.nn.Identity())
         self.guessed_client_model.lm_head = torch.nn.Identity()
         # Apply LoRA optimization
         if hasattr(Config().parameters, "lora"):

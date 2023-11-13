@@ -34,7 +34,7 @@ class CuriousTrainer(HonestTrainer):
         """
         outputs = self.model.guessed_client_model(inputs_embeds=reconstructed_data)
         loss = torch.nn.functional.mse_loss(outputs.logits, intermediate_features)
-        loss.backward(retain_graph=True)
+        loss.backward()
         return loss
 
     def attack(self, intermediate_features, labels):
@@ -114,7 +114,8 @@ class CuriousTrainer(HonestTrainer):
         # We will generate the reconstructed input ids
         #   from the reconstructed embeddings.
         embedding_layer = get_module(
-            self.model.guessed_client_model, attack_parameters.embedding_layer
+            self.model.guessed_client_model,
+            attack_parameters.embedding_layer.split("."),
         )
         embedding_weights = embedding_layer.weight.data
         reconstructed_inputs = torch.zeros(

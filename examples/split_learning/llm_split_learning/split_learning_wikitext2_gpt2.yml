@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 1
+    iteration: 20
 
 server:
     type: split_learning
@@ -63,7 +63,6 @@ algorithm:
 
 parameters:
     model:
-        num_classes: 10
         cut_layer: 2
         transformer_module_name: transformer.h
         layers_after_transformer:
