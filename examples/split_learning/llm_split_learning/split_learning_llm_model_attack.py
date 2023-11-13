@@ -50,13 +50,13 @@ class ServerModelCurious(ServerModelHonest):
         if hasattr(Config().parameters, "lora"):
             self.guessed_client_model = get_lora_model(self.guessed_client_model)
 
-    def caliberate_guessed_client(self, caliberate=True):
+    def calibrate_guessed_client(self, calibrate=True):
         """
-        Caliberate the weights of the guessed client model to the weights of the client model,
+        Calibrate the weights of the guessed client model to the weights of the client model,
             if the client sent the model to the server for testing.
         We just need to do this before the server is ready to launch the attack.
         """
-        if caliberate:
+        if calibrate:
             base_model_weight = self.base_model.state_dict()
             guessed_client_model_weights = self.guessed_client_model.state_dict()
             for weight_name in guessed_client_model_weights.keys():
@@ -70,5 +70,5 @@ class ServerModelCurious(ServerModelHonest):
             self.guessed_client_model.load_state_dict(guessed_client_model_weights)
         else:
             logging.info(
-                "In current attacks, the guessed client model weights are not caliberated"
+                "In current attacks, the guessed client model weights are not calibrated"
             )

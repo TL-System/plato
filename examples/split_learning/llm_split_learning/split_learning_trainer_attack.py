@@ -37,6 +37,7 @@ class CuriousTrainer(HonestTrainer):
         loss.backward()
         return loss
 
+    # pylint:disable=too-many-locals
     def attack(self, intermediate_features, labels):
         """
         In the attack for LLMs, the server have two policies to reconstruct the private data
@@ -46,15 +47,17 @@ class CuriousTrainer(HonestTrainer):
 
         attack_parameters = Config().parameters.attack
         if not (
-            hasattr(attack_parameters, "caliberate_guessed_client")
-            and not attack_parameters.caliberate_guessed_client
+            hasattr(attack_parameters, "calibrate_guessed_client")
+            and not attack_parameters.calibrate_guessed_client
         ):
-            self.model.caliberate_guessed_client()
+            self.model.calibrate_guessed_client()
         reconstructed_data = torch.zeros(intermediate_features.shape).requires_grad_(
             True
         )
 
         # Assign optimizer for attackings
+        # AdamW is the optimizer of language model. In the origin Unsplit,
+        #   they use SGD for ResNet.
         optimizer_guessed_client = torch.optim.AdamW(
             self.model.guessed_client_model.parameters(),
             lr=attack_parameters.optimizer.lr_guessed_client,
@@ -68,13 +71,14 @@ class CuriousTrainer(HonestTrainer):
         self.model.guessed_client_model = self.model.guessed_client_model.to(
             self.device
         )
-        # Server can set is as evaluation mode for ease of attack.
+        # Server can set is as evaluation mode for ease of attack
+        #   due to the randomness in norm layers, drop out layer.
         self.model.guessed_client_model.eval()
         intermediate_features = intermediate_features.to(self.device)
 
         self._loss_tracker_reconstructed_data.reset()
         self._loss_tracker_guessed_client.reset()
-        # begin Unsplit gradient descent.
+        # begin Unsplit gradient descent
         for iteration in range(attack_parameters.outer_iterations):
             # gradient descent on the reconstructed data
             for _ in range(attack_parameters.inner_iterations):
@@ -121,6 +125,7 @@ class CuriousTrainer(HonestTrainer):
         reconstructed_inputs = torch.zeros(
             reconstructed_data.size(0), reconstructed_data.size(1)
         )
+        # Use for loops will decrease the speed but save the memory.
         for batch_id in range(reconstructed_data.size(0)):
             for word_id in range(reconstructed_data.size(1)):
                 distance = (
@@ -147,7 +152,7 @@ class CuriousTrainer(HonestTrainer):
         self.accuracy_sum += torch.sum(accuracy).item()
         self.sample_counts += reconstructed_inputs.size(0)
         evaluation_metrics["attack_accuracy"] = self.accuracy_sum / self.sample_counts
-
+        # calculate Rouge scores
         predicted_text = self.tokenizer.batch_decode(reconstructed_inputs)
         ground_truth = self.tokenizer.batch_decode(labels.detach().cpu())
         self.rouge_score.update(predicted_text, ground_truth)

@@ -35,8 +35,8 @@ class CuriousServer(split_learning_server.Server):
 
     def attack(self, update):
         """
-        Conduct the attack in the background. Otherwise, the client will notice
-            as the aggregation time is abnormally long.
+        The function to conduct the attack and update metrics for
+            text generation to evaluate the attacks.
         """
         self.attack_started = True
         intermediate_features, labels = update[0]
@@ -69,6 +69,8 @@ class CuriousServer(split_learning_server.Server):
             and self.current_round % Config().parameters.attack.interval == 0
             and not self.attack_started
         ):
+            # Conduct the attack in the background. Otherwise, the client will notice
+            #   as the aggregation time is abnormally long.
             # probably add some concurrency flag
             # proc = mp.Process(
             #     target=self.attack,
