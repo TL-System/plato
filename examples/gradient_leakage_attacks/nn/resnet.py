@@ -1,15 +1,17 @@
 """
-The ResNet model (for the CIFAR-10 dataset only).
+The ResNet model used in Geiping's implementation.
 
 Reference:
-
-https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
+Geiping et al., "Inverting Gradients - How easy is it to break privacy in federated learning?,"
+in the Proceedings of NeurIPS 2020.
+https://github.com/JonasGeiping/invertinggradients
 """
 import torch
 import torch.nn as nn
 import torchvision
 import random
 import numpy as np
+from plato.config import Config
 
 
 def set_random_seed(seed=233):
@@ -111,14 +113,13 @@ class Model(torchvision.models.ResNet):
 
         for layer in self.layers:
             x = layer(x)
-    
+
         x = self.pool(x)
         x = torch.flatten(x, 1)
         feature = x.clone().detach()
         x = self.fc(x)
 
-        # return x, 
-        return x
+        return x, feature
 
     @staticmethod
     def is_valid_model_type(model_type):
@@ -129,59 +130,79 @@ class Model(torchvision.models.ResNet):
         )
 
     @staticmethod
-    def get(model_name=None, num_classes=None, **kwargs):
-        """Returns a suitable ResNet model according to its type."""
-        set_random_seed(1)
+    def resnet18():
+        return Model(
+            torchvision.models.resnet.BasicBlock,
+            [2, 2, 2, 2],
+            Config().parameters.model.num_classes,
+            base_width=64,
+        )
 
-        if not Model.is_valid_model_type(model_name):
-            raise ValueError(f"Invalid Resnet model name: {model_name}")
+    @staticmethod
+    def resnet32():
+        return Model(
+            torchvision.models.resnet.BasicBlock,
+            [5, 5, 5],
+            Config().parameters.model.num_classes,
+            base_width=16 * 10,
+        )
 
-        resnet_type = int(model_name.split("_")[1])
+    @staticmethod
+    def resnet34():
+        return Model(
+            torchvision.models.resnet.BasicBlock,
+            [3, 4, 6, 3],
+            Config().parameters.model.num_classes,
+            base_width=64,
+        )
 
-        if num_classes is None:
-            num_classes = 10
+    @staticmethod
+    def resnet50():
+        return Model(
+            torchvision.models.resnet.Bottleneck,
+            [3, 4, 6, 3],
+            Config().parameters.model.num_classes,
+            base_width=64,
+        )
 
-        if resnet_type == 18:
-            return Model(
-                torchvision.models.resnet.BasicBlock,
-                [2, 2, 2, 2],
-                num_classes,
-                base_width=64,
-            )
-        elif resnet_type == 34:
-            return Model(
-                torchvision.models.resnet.BasicBlock,
-                [3, 4, 6, 3],
-                num_classes,
-                base_width=64,
-            )
-        elif resnet_type == 50:
-            return Model(
-                torchvision.models.resnet.Bottleneck,
-                [3, 4, 6, 3],
-                num_classes,
-                base_width=64,
-            )
-        elif resnet_type == 101:
-            return Model(
-                torchvision.models.resnet.Bottleneck,
-                [3, 4, 23, 3],
-                num_classes,
-                base_width=64,
-            )
-        elif resnet_type == 152:
-            return Model(
-                torchvision.models.resnet.Bottleneck,
-                [3, 8, 36, 3],
-                num_classes,
-                base_width=64,
-            )
-        elif resnet_type == 32:
-            return Model(
-                torchvision.models.resnet.BasicBlock,
-                [5, 5, 5],
-                num_classes,
-                base_width=16 * 10,
-            )
+    @staticmethod
+    def resnet101():
+        return Model(
+            torchvision.models.resnet.Bottleneck,
+            [3, 4, 23, 3],
+            Config().parameters.model.num_classes,
+            base_width=64,
+        )
 
-        return None
+    @staticmethod
+    def resnet152():
+        return Model(
+            torchvision.models.resnet.Bottleneck,
+            [3, 8, 36, 3],
+            Config().parameters.model.num_classes,
+            base_width=64,
+        )
+
+
+def get(model_name=None):
+    """Returns a suitable ResNet model according to its type."""
+    set_random_seed(1)
+
+    if not Model.is_valid_model_type(model_name):
+        raise ValueError(f"Invalid Resnet model name: {model_name}")
+
+    resnet_type = int(model_name.split("_")[1])
+
+    if resnet_type == 18:
+        return Model.resnet18
+    elif resnet_type == 32:
+        return Model.resnet32
+    elif resnet_type == 34:
+        return Model.resnet34
+    elif resnet_type == 50:
+        return Model.resnet50
+    elif resnet_type == 101:
+        return Model.resnet101
+    elif resnet_type == 152:
+        return Model.resnet152
+    return None
