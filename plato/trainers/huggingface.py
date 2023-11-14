@@ -7,7 +7,13 @@ from typing import Optional
 
 from torch.utils.data import RandomSampler, Sampler
 
-from transformers import AutoConfig, AutoTokenizer, HfArgumentParser, TrainerCallback
+from transformers import (
+    AutoConfig,
+    AutoTokenizer,
+    HfArgumentParser,
+    TrainerCallback,
+    LlamaTokenizer,
+)
 from transformers import Trainer as HuggingFaceTrainer
 from transformers import TrainingArguments, default_data_collator
 
@@ -72,7 +78,10 @@ class Trainer(basic.Trainer):
 
         parser = HfArgumentParser(TrainingArguments)
         (self.training_args,) = parser.parse_args_into_dataclasses(
-            args=["--output_dir=/tmp", "--report_to=none"]
+            args=[
+                "--output_dir=" + Config.params["checkpoint_path"],
+                "--report_to=none",
+            ]
         )
 
         model_name = Config().trainer.model_name
@@ -89,9 +98,14 @@ class Trainer(basic.Trainer):
             "revision": "main",
             "use_auth_token": None,
         }
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, config=self.config, **tokenizer_kwargs
-        )
+        if "llama" in model_name:
+            self.tokenizer = LlamaTokenizer.from_pretrained(
+                model_name, config=self.config, **tokenizer_kwargs
+            )
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                model_name, config=self.config, **tokenizer_kwargs
+            )
 
     # pylint: disable=unused-argument
     def train_model(self, config, trainset, sampler, **kwargs):

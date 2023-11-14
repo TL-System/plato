@@ -16,12 +16,7 @@ elif hasattr(Config().trainer, "use_tensorflow"):
 
     registered_trainers = {"basic": basic_tensorflow.Trainer}
 else:
-    from plato.trainers import (
-        basic,
-        diff_privacy,
-        pascal_voc,
-        gan,
-    )
+    from plato.trainers import basic, diff_privacy, pascal_voc, gan, split_learning
 
     registered_trainers = {
         "basic": basic.Trainer,
@@ -29,6 +24,7 @@ else:
         "diff_privacy": diff_privacy.Trainer,
         "pascal_voc": pascal_voc.Trainer,
         "gan": gan.Trainer,
+        "split_learning": split_learning.Trainer,
     }
 
 
@@ -37,14 +33,19 @@ def get(model=None, callbacks=None):
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
 
-    if Config().trainer.model_name == "yolov5":
-        from plato.trainers import yolov5
+    if Config().trainer.model_name == "yolov8":
+        from plato.trainers import yolov8
 
-        return yolov5.Trainer()
+        return yolov8.Trainer()
     elif Config().trainer.type == "HuggingFace":
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)
+
+    elif Config().trainer.type == "self_supervised_learning":
+        from plato.trainers import self_supervised_learning
+
+        return self_supervised_learning.Trainer(model=model, callbacks=callbacks)
     elif trainer_name in registered_trainers:
         return registered_trainers[trainer_name](model=model, callbacks=callbacks)
     else:

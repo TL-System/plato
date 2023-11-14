@@ -8,13 +8,15 @@ import os
 import pickle
 import re
 import sys
+import time
 import uuid
 from abc import abstractmethod
-import numpy as np
 
+import numpy as np
 import socketio
-from plato.callbacks.handler import CallbackHandler
+
 from plato.callbacks.client import LogProgressCallback
+from plato.callbacks.handler import CallbackHandler
 from plato.config import Config
 from plato.utils import s3
 
@@ -84,6 +86,8 @@ class Client:
         self.inbound_processor = None
         self.payload = None
         self.report = None
+
+        self.processing_time = 0
 
         self.comm_simulation = (
             Config().clients.comm_simulation
@@ -213,7 +217,9 @@ class Client:
             "on_inbound_received", self, self.inbound_processor
         )
 
+        tic = time.perf_counter()
         processed_inbound_payload = self.inbound_processor.process(inbound_payload)
+        self.processing_time = time.perf_counter() - tic
 
         # Inbound data is processed, computing outbound response
         report, outbound_payload = await self.inbound_processed(
@@ -224,11 +230,14 @@ class Client:
         )
 
         # Outbound data is ready to be processed
+        tic = time.perf_counter()
         self.outbound_ready(report, self.outbound_processor)
         self.callback_handler.call_event(
             "on_outbound_ready", self, report, self.outbound_processor
         )
         processed_outbound_payload = self.outbound_processor.process(outbound_payload)
+        self.processing_time += time.perf_counter() - tic
+        report.processing_time = self.processing_time
 
         # Sending the client report as metadata to the server (payload to follow)
         await self.sio.emit(
@@ -367,6 +376,8 @@ class Client:
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
+            if "/" in model_name:
+                model_name = model_name.replace("/", "_")
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = (
                 f"{checkpoint_path}/{model_name}_client_{self.client_id}.pth"

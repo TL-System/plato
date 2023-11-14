@@ -7,7 +7,8 @@ import json
 import logging
 import os
 from collections import OrderedDict, namedtuple
-from typing import Any, IO
+from pathlib import Path
+from typing import IO, Any
 
 import numpy as np
 import yaml
@@ -36,21 +37,11 @@ class Config:
     _instance = None
 
     @staticmethod
+
     def construct_include(loader: Loader, node: yaml.Node) -> Any:
         """Include file referenced at node."""
-
-        filename = os.path.abspath(
-            os.path.join(loader.root_path, loader.construct_scalar(node))
-        )
-        extension = os.path.splitext(filename)[1].lstrip(".")
-
-        with open(filename, "r", encoding="utf-8") as config_file:
-            if extension in ("yaml", "yml"):
-                return yaml.load(config_file, Loader)
-            elif extension in ("json",):
-                return json.load(config_file)
-            else:
-                return "".join(config_file.readlines())
+        with open(Path(loader.name).parent.joinpath(loader.construct_yaml_str(node)).resolve(), 'r') as f:
+            return yaml.load(f, type(loader))
 
     def __new__(cls):
         if cls._instance is None:

@@ -32,6 +32,7 @@ class Server(fedavg.Server):
 
         self.current_global_round = 0
         self.average_accuracy = 0
+        self.std_accuracy = 0
 
         if Config().is_edge_server():
             # An edge client waits for the event that a certain number of
@@ -212,7 +213,10 @@ class Server(fedavg.Server):
             and Config().server.edge_do_test
         ):
             # Compute the average accuracy from client reports
-            self.average_accuracy = self.accuracy_averaging(self.updates)
+            (
+                self.average_accuracy,
+                self.std_accuracy,
+            ) = self.get_accuracy_mean_std(self.updates)
             logging.info(
                 "[%s] Average client accuracy: %.2f%%.",
                 self,
@@ -279,6 +283,7 @@ class Server(fedavg.Server):
                 )
         else:
             self.accuracy = self.average_accuracy
+            self.accuracy_std = self.std_accuracy
 
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)

@@ -87,6 +87,7 @@ class Server:
         self.algorithm = None
         self.trainer = None
         self.accuracy = 0
+        self.accuracy_std = 0
         self.reports = {}
         self.updates = []
         self.client_payload = {}
@@ -180,7 +181,7 @@ class Server:
 
     def configure(self) -> None:
         """Initializes configuration settings based on the configuration file."""
-        logging.info("[Server #%d] Configuring the server...", os.getpid())
+        logging.info("[%s] Configuring the server...", self)
 
         # Ping interval and timeout setup for the server
         self.ping_interval = (
@@ -609,6 +610,9 @@ class Server:
                         if hasattr(Config().trainer, "model_name")
                         else "custom"
                     )
+                    if "/" in model_name:
+                        model_name = model_name.replace("/", "_")
+
                     checkpoint_path = Config().params["checkpoint_path"]
 
                     payload_filename = (
@@ -780,6 +784,8 @@ class Server:
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
+            if "/" in model_name:
+                model_name = model_name.replace("/", "_")
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
             with open(payload_filename, "rb") as payload_file:
@@ -877,7 +883,10 @@ class Server:
 
         start_time = self.training_clients[client_id]["start_time"]
         finish_time = (
-            self.reports[sid].training_time + self.reports[sid].comm_time + start_time
+            self.reports[sid].training_time
+            + self.reports[sid].processing_time
+            + self.reports[sid].comm_time
+            + start_time
         )
         starting_round = self.training_clients[client_id]["starting_round"]
 
@@ -1213,6 +1222,8 @@ class Server:
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
+        if "/" in model_name:
+            model_name = model_name.replace("/", "_")
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
         logging.info(
             "[%s] Saving the checkpoint to %s/%s.", self, checkpoint_path, filename
