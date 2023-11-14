@@ -32,7 +32,7 @@ class Trainer(basic.Trainer):
             """Initializing the weights and biases in the model."""
             if hasattr(m, "weight"):
                 m.weight.data.uniform_(-0.5, 0.5)
-            if hasattr(m, "bias"):
+            if hasattr(m, "bias") and m.bias is not None:
                 m.bias.data.uniform_(-0.5, 0.5)
 
         super().__init__(model=model, callbacks=callbacks)
@@ -93,6 +93,15 @@ class Trainer(basic.Trainer):
         self.examples = examples
         self.model.zero_grad()
 
+        if (
+            hasattr(Config().algorithm, "target_eval")
+            and Config().algorithm.target_eval
+        ):
+            # Set model into evaluation mode at client's training
+            self.model.eval()
+        else:
+            self.model.train()
+
         # Compute gradients in the current step
         if (
             hasattr(Config().algorithm, "defense")
@@ -114,8 +123,10 @@ class Trainer(basic.Trainer):
                 )
                 self.list_grad.append(list((_.detach().clone() for _ in grad)))
         else:
-            outputs, self.feature_fc1_graph = self.model(examples)
-
+            try:
+                outputs, self.feature_fc1_graph = self.model(examples)
+            except:
+                outputs = self.model(examples)
             # Save the ground truth and gradients
             loss = self._loss_criterion(outputs, labels)
             grad = torch.autograd.grad(
