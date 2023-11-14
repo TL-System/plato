@@ -6,20 +6,20 @@ clients:
     total_clients: 10
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: false
 
 server:
     address: 127.0.0.1
-    port: 8020
-    simulate_wall_time: false
-    # model_path: models/fedavg/resnet18_cifar10
+    port: 8048
+    checkpoint_path: checkpoints/resnet152_cifar100
+    model_path: models/resnet152_cifar100
 
 data:
     # The training and testing dataset
-    datasource: CIFAR10
+    datasource: CIFAR100
 
     # Number of samples in each partition
     partition_size: 5000
@@ -32,7 +32,7 @@ trainer:
     type: basic
 
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 1000
 
     # The maximum number of clients running concurrently
     max_concurrency: 5
@@ -40,20 +40,24 @@ trainer:
     # The target accuracy
     target_accuracy: 0.80
 
+    # The machine learning model
+    model_name: resnet_152
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 10
     optimizer: SGD
     lr_scheduler: LambdaLR
 
-    # The machine learning model
-    model_name: resnet_18
-
 algorithm:
     # Aggregation algorithm
     type: fedavg
 
 parameters:
+    model:
+        # Number of classes
+        num_classes: 100
+
     optimizer:
         lr: 0.1
         momentum: 0.9
@@ -64,7 +68,7 @@ parameters:
         milestone_steps: 80ep,120ep
 
 results:
-    result_path: results/pretrain/resnet_cifar10
+    result_path: results/pretraining/resnet152_cifar100/
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time

@@ -12,7 +12,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8012
+    port: 8090
     simulate_wall_time: true
     do_test: false
 
@@ -21,6 +21,9 @@ server:
 data:
     # The training and testing dataset
     datasource: CIFAR100
+
+    # Where the dataset is located
+    # data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
     partition_size: 1
@@ -46,7 +49,7 @@ trainer:
     optimizer: SGD
 
     # The machine learning model
-    model_name: resnet_32
+    model_name: vgg_16
 
 algorithm:
     # Aggregation algorithm
@@ -73,10 +76,10 @@ algorithm:
     # One particular client, e.g., the first selected client
     victim_client: 0
     num_iters: 2000
-    log_interval: 10
+    log_interval: 100
 
     # model mode
-    target_eval: true
+    target_eval: false
     dummy_eval: true
 
     # Dummy data initialization
@@ -125,10 +128,13 @@ parameters:
         lr: 0.01
 
 results:
-    result_path: results/resnet32_cifar100
+    result_path: results/gradient_matching/vgg16_cifar100/untrained_train
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
 
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
+
+    # rows: 4
+    cols: 2
