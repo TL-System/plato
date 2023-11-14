@@ -23,8 +23,7 @@ def extract_root_set(
     if seed == None:
         index_pool = range(len(dataset))
     else:
-        index_pool = np.random.RandomState(seed=seed).permutation(
-            len(dataset))
+        index_pool = np.random.RandomState(seed=seed).permutation(len(dataset))
     for i in index_pool:
         current_class = dataset[i][1]
         if len(class2sample[current_class]) < sample_per_class:
@@ -38,7 +37,8 @@ def extract_root_set(
 def get_root_set_loader(trainset):
     rootset_indices, __ = extract_root_set(trainset)
     root_set = Subset(trainset, rootset_indices)
-    root_dataloader = DataLoader(root_set, batch_size=len(
-        root_set), num_workers=DEFAULT_NUM_WORKERS)
+    root_dataloader = DataLoader(
+        root_set, batch_size=len(root_set), num_workers=DEFAULT_NUM_WORKERS
+    )
 
     return root_dataloader
