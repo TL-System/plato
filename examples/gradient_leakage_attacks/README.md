@@ -24,9 +24,9 @@ Research on gradient leakage attack and defense using the Plato framework.
 ---
 
 # Running Plato with DLG attack
-Try replacing `reconstruction_emnist.yml` below with custom configuration files:
+Run the program under `examples/gradient_leakage_attacks` using the following cmd for example:
 ```
-python examples/dlg/dlg.py -c examples/dlg/reconstruction_emnist.yml --cpu
+python dlg.py -c untrained_eval_delta.yml
 ```
 
 ## DLG Related Configurations
@@ -34,35 +34,45 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 
 ### under `algorithm`
 
-- `attack_method: [DLG, iDLG, csDLG]` — DLG attack variants.
+- `attack_method: [DLG, iDLG, csDLG]` — DLG attack variants
 
-- `cost_fn: [l2, l1, max, sim, simlocal]` — different way to calculate the loss function used in DLG attack variants.
+- `cost_fn: [l2, l1, max, sim, simlocal]` — different way to calculate the loss function used in DLG attack variants
 
-- `total_variation: [float]` — weight for adding total data variation to the loss used in DLG attack variants.
+- `total_variation: [float]` — weight for adding total data variation to the loss used in DLG attack variants
 
-- `lr: float` — learning rate of the optimizer for data reconstruction
+- `rec_optim: ["Adam", "SGD", "LBFGS"]` — Optimizer used for reconstructing data; DLG uses LBFGS, csDLG uses Adam
+  
+- `rec_lr: float` — learning rate of the optimizer for data reconstruction
 
-- `attack_round: [int]` — which particular communication round to reconstruct data from gradients/weights obtained; 1st round is what literature usually assumes.
+- `lr_decay: [boolean]`, `cost_weights: ["linear", "exp", "equal"]`, `boxed: [boolean]` — hyperparameters for csDLG
 
-- `victim_client: [int]` — which particular client to reconstruct data from, e.g., the 1st selected client.
+- `attack_round: [int]` — which particular communication round to reconstruct data from gradients/weights obtained; 1st round is what literature usually assumes
 
-- `num_iters: [int]` — the number of iterations for matching gradients/weights.
+- `victim_client: [int]` — which particular client to reconstruct data from, e.g., the 1st selected client
 
-- `log_interval: [int]` — how often the matching loss, performance, etc., are logged.
+- `num_iters: [int]` — the number of iterations for matching gradients/weights
 
-- `init_params: [boolean]` — whether or not use explicit initialization for model weights.
+- `log_interval: [int]` — how often the matching loss, performance, etc., are logged
 
-- `share_gradients: [boolean]` — whether sharing gradients or model weights.
+- `target_eval: [boolean]` —  whether or not set model to `.eval()` mode at the client's local training
+
+- `dummy_eval: [boolean]` —  whether or not set model to `.eval()` mode at the server's dummy data optimization
+
+- `init_data: ["randn", "rand", "zeros", "half"]` — Dummy data initialization
+
+- `init_params: [boolean]` — whether or not use explicit initialization for model weights
+
+- `share_gradients: [boolean]` — whether sharing gradients or model weights
 
 - `match_weights: [boolean]` — when `share_gradients` is set to `false`, whether reconstructing data by directly matching weights or by matching gradients calculated from model updates.
 
-- `use_updates: [boolean]` — when `share_gradients` is set to `false` and `match_weights` is set to `true`, whether matching weights (absolute) or model updates (delta).
+- `use_updates: [boolean]` — when `share_gradients` is set to `false` and `match_weights` is set to `true`, whether matching weights (absolute) or model updates (delta)
 
-- `trials: [int]` - the number of times the attack will be performed, with different initializations for dummy data.
+- `trials: [int]` — the number of times the attack will be performed, with different initializations for dummy data
 
-- `random_seed: [int]` — the random seed for generating dummy data and label.
+- `random_seed: [int]` — the random seed for generating dummy data and label
 
-- `defense: [no, GC, DP, Soteria, GradDefense, Outpost(ours)]` — different defenses against DLG attacks.
+- `defense: [no, GC, DP, Soteria, GradDefense, Outpost(ours)]` — different defenses against DLG attacks
 
 - (for GC) `prune_pct: 80` 
 - (for DP) `epsilon: 0.1`
@@ -80,12 +90,14 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 
 ### under `results`
 
-- `subprocess: [int]` - the name of the subdirectory (subprocess) from which the file should be loaded from. Takes the latest one if not specified
+- `subprocess: [int]` — the name of the subdirectory (subprocess) from which the file should be loaded from. Takes the latest one if not specified
 
-- `trial: [int]` - the trial number to be plotted. Plots the best reconstruction based off MSE if not specified
+- `trial: [int]` — the trial number to be plotted. Plots the best reconstruction based off MSE if not specified
 
+- `cols/rows: [int]` — specify the number of columns or rows in the plotted figure
+  
 ## Plot Instructions
 
-Run ```python plot.py -c config_file``` where ```config_file``` is the same one used to run the DLG attack.
+Run ```python plot.py -c config_file``` where ```config_file``` is the same one used to run the DLG attack
 
 
