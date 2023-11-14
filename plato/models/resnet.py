@@ -5,112 +5,84 @@ Reference:
 
 https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
 """
-import torch
+import collections
+
 import torch.nn as nn
-import torchvision
-import random
-import numpy as np
+import torch.nn.functional as F
 
 
-def set_random_seed(seed=233):
-    """233 = 144 + 89 is my favorite number."""
-    torch.manual_seed(seed + 1)
-    torch.cuda.manual_seed(seed + 2)
-    torch.cuda.manual_seed_all(seed + 3)
-    np.random.seed(seed + 4)
-    torch.cuda.manual_seed_all(seed + 5)
-    random.seed(seed + 6)
+class BasicBlock(nn.Module):
+    expansion = 1
 
-
-class Model(torchvision.models.ResNet):
-    """ResNet generalization for CIFAR thingies."""
-
-    def __init__(
-        self,
-        block,
-        layers,
-        num_classes=10,
-        zero_init_residual=False,
-        groups=1,
-        base_width=64,
-        replace_stride_with_dilation=None,
-        norm_layer=None,
-        strides=[1, 2, 2, 2],
-        pool="avg",
-    ):
-        """Initialize as usual. Layers and strides are scriptable."""
-        super(torchvision.models.ResNet, self).__init__()  # nn.Module
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
-        self._norm_layer = norm_layer
-
-        self.dilation = 1
-        if replace_stride_with_dilation is None:
-            # each element in the tuple indicates if we should replace
-            # the 2x2 stride with a dilated convolution instead
-            replace_stride_with_dilation = [False, False, False, False]
-        if len(replace_stride_with_dilation) != 4:
-            raise ValueError(
-                "replace_stride_with_dilation should be None "
-                "or a 4-element tuple, got {}".format(replace_stride_with_dilation)
-            )
-        self.groups = groups
-
-        self.inplanes = base_width
-        self.base_width = 64  # Do this to circumvent BasicBlock errors. The value is not actually used.
+    def __init__(self, in_planes, planes, stride=1):
+        super().__init__()
         self.conv1 = nn.Conv2d(
-            3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False
+            in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False
         )
-        self.bn1 = norm_layer(self.inplanes)
-        self.relu = nn.ReLU(inplace=True)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(
+            planes, planes, kernel_size=3, stride=1, padding=1, bias=False
+        )
+        self.bn2 = nn.BatchNorm2d(planes)
 
-        self.layers = torch.nn.ModuleList()
-        width = self.inplanes
-        for idx, layer in enumerate(layers):
-            self.layers.append(
-                self._make_layer(
-                    block,
-                    width,
-                    layer,
-                    stride=strides[idx],
-                    dilate=replace_stride_with_dilation[idx],
-                )
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion * planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(
+                    in_planes,
+                    self.expansion * planes,
+                    kernel_size=1,
+                    stride=stride,
+                    bias=False,
+                ),
+                nn.BatchNorm2d(self.expansion * planes),
             )
-            width *= 2
 
-        self.pool = (
-            nn.AdaptiveAvgPool2d((1, 1))
-            if pool == "avg"
-            else nn.AdaptiveMaxPool2d((1, 1))
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
+
+
+class Bottleneck(nn.Module):
+    expansion = 4
+
+    def __init__(self, in_planes, planes, stride=1):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(
+            planes, planes, kernel_size=3, stride=stride, padding=1, bias=False
         )
-        self.fc = nn.Linear(width // 2 * block.expansion, num_classes)
+        self.bn2 = nn.BatchNorm2d(planes)
+        self.conv3 = nn.Conv2d(
+            planes, self.expansion * planes, kernel_size=1, bias=False
+        )
+        self.bn3 = nn.BatchNorm2d(self.expansion * planes)
 
-        # TODO: move initialization?
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != self.expansion * planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(
+                    in_planes,
+                    self.expansion * planes,
+                    kernel_size=1,
+                    stride=stride,
+                    bias=False,
+                ),
+                nn.BatchNorm2d(self.expansion * planes),
+            )
 
-        # Zero-initialize the last BN in each residual branch,
-        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
-        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
-        if zero_init_residual:
-            for m in self.modules():
-                if isinstance(m, torchvision.models.resnet.Bottleneck):
-                    nn.init.constant_(m.bn3.weight, 0)
-                elif isinstance(m, torchvision.models.resnet.BasicBlock):
-                    nn.init.constant_(m.bn2.weight, 0)
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.relu(self.bn2(self.conv2(out)))
+        out = self.bn3(self.conv3(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
 
-    def _forward_impl(self, x):
-        # See note [TorchScript super()]
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-
-        for layer in self.layers:
-            x = layer(x)
 
 class Model(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10, cut_layer=None):
@@ -124,12 +96,7 @@ class Model(nn.Module):
         self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 512, num_blocks[3], stride=2)
-        # CIFAR10
-        if num_classes == 10:
-            self.linear = nn.Linear(512 * block.expansion, num_classes)
-        # ImageNet
-        else:
-            self.linear = nn.Linear(41472 * block.expansion, num_classes)
+        self.linear = nn.Linear(512 * block.expansion, num_classes)
 
         # Preparing named layers so that the model can be split and straddle
         # across the client and the server
@@ -167,9 +134,8 @@ class Model(nn.Module):
         out = self.layer4(out)
         out = F.avg_pool2d(out, 4)
         out = out.view(out.size(0), -1)
-        feature = out
         out = self.linear(out)
-        return out, feature
+        return out
 
     def forward_to(self, x):
         """Forward pass, but only to the layer specified by cut_layer."""
@@ -195,14 +161,12 @@ class Model(nn.Module):
         return (
             model_type.startswith("resnet_")
             and len(model_type.split("_")) == 2
-            and int(model_type.split("_")[1]) in [18, 34, 50, 101, 152, 32]
+            and int(model_type.split("_")[1]) in [18, 34, 50, 101, 152]
         )
 
     @staticmethod
     def get(model_name=None, num_classes=None, cut_layer=None, **kwargs):
         """Returns a suitable ResNet model according to its type."""
-        set_random_seed(1)
-
         if not Model.is_valid_model_type(model_name):
             raise ValueError(f"Invalid Resnet model name: {model_name}")
 
