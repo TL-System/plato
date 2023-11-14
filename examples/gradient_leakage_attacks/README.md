@@ -24,7 +24,7 @@ Research on gradient leakage attack and defense using the Plato framework.
 ---
 
 # Running Plato with DLG attack
-Run the program under `examples/gradient_leakage_attacks` using the following cmd for example:
+Run the program using the following cmd under the directory `examples/gradient_leakage_attacks` for example, which launches the csDLG attack using delta matching against an untrained ResNet18 model in `.eval()` mode on CIFAR100 data:
 ```
 python dlg.py -c untrained_eval_delta.yml
 ```
@@ -54,9 +54,9 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 
 - `log_interval: [int]` — how often the matching loss, performance, etc., are logged
 
-- `target_eval: [boolean]` —  whether or not set model to `.eval()` mode at the client's local training
+- `target_eval: [boolean]` —  whether or not set model to `.eval()` mode at the client's local training process
 
-- `dummy_eval: [boolean]` —  whether or not set model to `.eval()` mode at the server's dummy data optimization
+- `dummy_eval: [boolean]` —  whether or not set model to `.eval()` mode at the server's dummy data optimization process
 
 - `init_data: ["randn", "rand", "zeros", "half"]` — Dummy data initialization
 
