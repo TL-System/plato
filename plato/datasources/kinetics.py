@@ -419,8 +419,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
         return generated_list_files_info
 
     def correct_current_config(self, loaded_plato_config, mode, modality_name):
-        """ Correct the loaded configuration settings based on
-            on-hand data information """
+        """Correct the loaded configuration settings based on on-hand data information."""
 
         # 1.1. convert plato config to dict type
         loaded_config = data_utils.config_to_dict(loaded_plato_config)

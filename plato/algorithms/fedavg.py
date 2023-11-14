@@ -1,6 +1,7 @@
 """
 The federated averaging algorithm for PyTorch.
 """
+
 from collections import OrderedDict
 
 from plato.algorithms import base

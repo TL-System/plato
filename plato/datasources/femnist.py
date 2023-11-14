@@ -123,10 +123,8 @@ class DataSource(base.DataSource):
 
         dataset = CustomDictDataset(loaded_data=loaded_data, transform=train_transform)
 
-        if client_id == 0:  # testing dataset on the server
-            self.testset = dataset
-        else:  # training dataset on one of the clients
-            self.trainset = dataset
+        self.testset = dataset
+        self.trainset = dataset
 
     @staticmethod
     def read_data(file_path):
