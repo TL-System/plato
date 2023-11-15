@@ -3,10 +3,10 @@ clients:
     type: simple
 
     # The total number of clients
-    total_clients: 10
+    total_clients: 1000
 
     # The number of clients selected in each round
-    per_round: 2
+    per_round: 200
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -14,15 +14,13 @@ clients:
 server:
     address: 127.0.0.1
     port: 8020
-    simulate_wall_time: false
-    # model_path: models/fedavg/resnet18_cifar10
 
 data:
     # The training and testing dataset
     datasource: CIFAR10
 
     # Number of samples in each partition
-    partition_size: 5000
+    partition_size: 1000
 
     # IID or non-IID?
     sampler: iid
@@ -35,7 +33,7 @@ trainer:
     rounds: 20
 
     # The maximum number of clients running concurrently
-    max_concurrency: 5
+    max_concurrency: 7
 
     # The target accuracy
     target_accuracy: 0.80
@@ -62,12 +60,3 @@ parameters:
     learning_rate:
         gamma: 0.1
         milestone_steps: 80ep,120ep
-
-results:
-    result_path: results/pretrain/resnet_cifar10
-
-    # Write the following parameter(s) into a CSV
-    types: round, accuracy, elapsed_time, round_time
-
-    # Plot results (x_axis-y_axis)
-    plot: round-accuracy, elapsed_time-accuracy

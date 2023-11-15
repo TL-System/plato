@@ -38,13 +38,6 @@ class TrainerCallback(ABC):
         :param batch: the current batch of training data.
         """
 
-    def on_train_step_start(self, trainer, config, batch, **kwargs):
-        """
-        Event called at the beginning of a training step.
-
-        :param batch: the current batch of training data.
-        """
-
     def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         """
         Event called at the end of a training step.
