@@ -595,29 +595,29 @@ class Server(fedavg.Server):
             patched_model_origin = deepcopy(patched_model)
 
         for epoch in range(epochs):
-            idx = epoch % (dummy_data.shape[0] // batch_size)
-            dummy_pred = patched_model(
-                dummy_data[idx * batch_size : (idx + 1) * batch_size],
-                patched_model.parameters,
-            )
-            labels_ = labels[idx * batch_size : (idx + 1) * batch_size]
-
-            loss = cross_entropy(dummy_pred, labels_).sum()
-
-            grad = torch.autograd.grad(
-                loss,
-                patched_model.parameters.values(),
-                retain_graph=True,
-                create_graph=True,
-                only_inputs=True,
-            )
-
-            patched_model.parameters = OrderedDict(
-                (name, param - Config().parameters.optimizer.lr * grad_part)
-                for ((name, param), grad_part) in zip(
-                    patched_model.parameters.items(), grad
+            for idx in range(int(math.ceil(dummy_data.shape[0] / batch_size))):
+                dummy_pred = patched_model(
+                    dummy_data[idx * batch_size : (idx + 1) * batch_size],
+                    patched_model.parameters,
                 )
-            )
+                labels_ = labels[idx * batch_size : (idx + 1) * batch_size]
+
+                loss = cross_entropy(dummy_pred, labels_).sum()
+
+                grad = torch.autograd.grad(
+                    loss,
+                    patched_model.parameters.values(),
+                    retain_graph=True,
+                    create_graph=True,
+                    only_inputs=True,
+                )
+
+                patched_model.parameters = OrderedDict(
+                    (name, param - Config().parameters.optimizer.lr * grad_part)
+                    for ((name, param), grad_part) in zip(
+                        patched_model.parameters.items(), grad
+                    )
+                )
         if self.use_updates:
             patched_model.parameters = OrderedDict(
                 (name, param - param_origin)
