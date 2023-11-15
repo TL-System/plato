@@ -16,8 +16,7 @@ def getFactor(num):
     return factors
 
 
-def getMatrixSize(total_params_num: int,
-                  Q: float):
+def getMatrixSize(total_params_num: int, Q: float):
     gradients_matrix_v = math.sqrt(Q * total_params_num)
 
     for factor in sorted(getFactor(total_params_num)):
@@ -29,7 +28,7 @@ def getMatrixSize(total_params_num: int,
 
     assert isinstance(gradients_matrix_v, int)
     assert isinstance(gradients_matrix_w, int)
-    assert (gradients_matrix_v * gradients_matrix_w == total_params_num)
+    assert gradients_matrix_v * gradients_matrix_w == total_params_num
 
     real_Q = gradients_matrix_v / gradients_matrix_w
 
@@ -40,10 +39,7 @@ def getCovarianceMatrix(matrix):
     return np.cov(matrix, rowvar=0)
 
 
-def denoise(gradients: list,
-            scale: float,
-            Q: float):
-
+def denoise(gradients: list, scale: float, Q: float):
     layer_dims_pool = []
     for layer in gradients:
         layer_dims = list((_ for _ in layer.shape))
@@ -66,11 +62,11 @@ def denoise(gradients: list,
 
     # print(total_params_num)
 
-    gradients_matrix_v, gradients_matrix_w, real_Q = \
-        getMatrixSize(total_params_num=total_params_num,
-                      Q=Q)
+    gradients_matrix_v, gradients_matrix_w, real_Q = getMatrixSize(
+        total_params_num=total_params_num, Q=Q
+    )
 
-    #print (gradients_matrix_v, gradients_matrix_w, real_Q)
+    # print (gradients_matrix_v, gradients_matrix_w, real_Q)
 
     # Flatten gradients
     gradients_flatten = []
@@ -80,14 +76,15 @@ def denoise(gradients: list,
 
     # print(len(gradients_flatten))
 
-    matrix_C = np.array(gradients_flatten).reshape(gradients_matrix_v,
-                                                   gradients_matrix_w)
+    matrix_C = np.array(gradients_flatten).reshape(
+        gradients_matrix_v, gradients_matrix_w
+    )
     covmatrix_CTC = getCovarianceMatrix(matrix_C)
 
     # print(covmatrix_CTC.shape)
 
-    lamda_min = ((1 - 1 / math.sqrt(real_Q)) ** 2) * (scale ** 2)
-    lamda_max = ((1 + 1 / math.sqrt(real_Q)) ** 2) * (scale ** 2)
+    lamda_min = ((1 - 1 / math.sqrt(real_Q)) ** 2) * (scale**2)
+    lamda_max = ((1 + 1 / math.sqrt(real_Q)) ** 2) * (scale**2)
 
     eigen_vals, eigen_vecs = np.linalg.eig(covmatrix_CTC)
 
@@ -116,15 +113,22 @@ def denoise(gradients: list,
             params_end_indice = layer_params_num_pool[layer_index] - 1
         else:
             params_start_indice = params_end_indice + 1
-            params_end_indice = params_start_indice + \
-                layer_params_num_pool[layer_index] - 1
+            params_end_indice = (
+                params_start_indice + layer_params_num_pool[layer_index] - 1
+            )
 
-        #print(params_start_indice, params_end_indice)
+        # print(params_start_indice, params_end_indice)
         # print(layer_dims_pool[layer_index])
 
-        layer_gradient = (torch.from_numpy(np.array(
-            compensated_gradients_flatten[params_start_indice:params_end_indice+1]))).reshape(
-                layer_dims_pool[layer_index])
+        layer_gradient = (
+            torch.from_numpy(
+                np.array(
+                    compensated_gradients_flatten[
+                        params_start_indice : params_end_indice + 1
+                    ]
+                )
+            )
+        ).reshape(layer_dims_pool[layer_index])
 
         gradients_compensated.append(layer_gradient)
 

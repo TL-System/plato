@@ -1,0 +1,140 @@
+clients:
+    # The total number of clients
+    total_clients: 1
+
+    # The number of clients selected in each round
+    per_round: 1
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    random_seed: 10
+
+server:
+    address: 127.0.0.1
+    port: 8080
+    simulate_wall_time: true
+    do_test: false
+
+    random_seed: 1
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR100
+
+    # Where the dataset is located
+    # data_path: data/tiny-imagenet-200
+
+    # Number of samples in each partition
+    partition_size: 8
+
+    # IID or non-IID?
+    sampler: iid
+
+    random_seed: 1
+
+trainer:
+    # The maximum number of training rounds
+    rounds: 1
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 4
+
+    # The target accuracy
+    target_accuracy: 1.0
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 8
+    optimizer: SGD
+
+    # The machine learning model
+    model_name: resnet_18
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+    ## Data reconstruction related configurations
+    # Choose from DLG (default), iDLG, csDLG
+    attack_method: csDLG
+    # For calculating the loss between dummy and target gradients/updates
+    # Choose from l2, l1, max, sim, simlocal
+    cost_fn: sim
+    # Weight for adding total data variation to the loss
+    total_variation: 0.01
+    # Optimizer used for reconstructing data
+    rec_optim: Adam # ["Adam", "SGD", "LBFGS"]
+    # Learning rate of the optimizer to reconstruct data
+    rec_lr: 0.1
+    lr_decay: true
+    cost_weights: equal # ["linear", "exp", "equal"]
+    boxed: true
+
+    # in a particular communication round (starting from 1)
+    attack_round: 1
+    # One particular client, e.g., the first selected client
+    victim_client: 0
+    num_iters: 8000
+    log_interval: 100
+
+    # model mode
+    target_eval: false
+    dummy_eval: true
+
+    # Dummy data initialization
+    init_data: randn # ["randn", "rand", "zeros", "half"]
+    # Whether or not use customized initialization for model weights
+    init_params: false
+    # Whether sharing gradients or model weights
+    share_gradients: false
+    # Do reconstruction by directly matching weights when it's true,
+    # otherwise by matching gradients calculated from updates
+    match_weights: true
+    # Matching weights (absolute) or weight updates (delta)
+    use_updates: true
+    # The number of times the attack will be attempted
+    trials: 1
+
+    ## Defense related
+    # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
+    defense: no
+    # for Outpost
+    beta: 0.125 # controls iteration decay speed
+    phi: 40 # the amount (%) of perturbation
+    prune_base: 80 # for pruning
+    noise_base: 0.8 # controls scale for gaussian noise
+    # for GradDefense
+    clip: true
+    slices_num: 10
+    perturb_slices_num: 5
+    scale: 0.01
+    Q: 6
+    # for Soteria
+    threshold: 50
+    # for GC
+    prune_pct: 80
+    # for DP
+    epsilon: 0.1
+
+    # The random seed for dummy data and label
+    random_seed: 10
+
+parameters:
+    model:
+        num_classes: 100
+
+    optimizer:
+        lr: 0.01
+
+results:
+    result_path: results/delta_matching/resnet18_cifar100/untrained_train
+
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, round_time
+
+    # Plot results (x_axis-y_axis)
+    plot: round-accuracy, elapsed_time-accuracy
+
+    # rows: 4
+    cols: 2
