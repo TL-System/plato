@@ -395,6 +395,7 @@ class Server(fedavg.Server):
                 match_optimizer, dummy_data, labels_, target_grad
             )
 
+        early_exit = False
         for iters in range(num_iters):
             current_loss = match_optimizer.step(closure)
             losses.append(current_loss.item())
@@ -411,6 +412,7 @@ class Server(fedavg.Server):
 
                 if math.isnan(current_loss):
                     logging.info("Not a number, ending this attack attempt")
+                    early_exit = True
                     break
 
                 if iters % log_interval == 0:
@@ -486,33 +488,42 @@ class Server(fedavg.Server):
                     ]
                     csv_processor.write_csv(trial_csv_file, new_row)
 
-        with torch.no_grad():
-            # TODO: use other scoring criteria
-            if self.best_mse > avg_data_mses[-1]:
-                self.best_mse = avg_data_mses[-1]
-                self.best_trial = (
-                    trial_number + 1
-                )  # the +1 is because we index from 1 and not 0
+        if not early_exit:
+            with torch.no_grad():
+                # TODO: use other scoring criteria
+                if self.best_mse > avg_data_mses[-1]:
+                    self.best_mse = avg_data_mses[-1]
+                    self.best_trial = (
+                        trial_number + 1
+                    )  # the +1 is because we index from 1 and not 0
 
-            reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
-            self._plot_reconstructed(num_images, history, reconstructed_path, dm, ds)
-            final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
-            final_result_path = f"{trial_result_path}/final_attack_result.pdf"
-            self._make_plot(num_images, final_tensor, None, final_result_path, dm, ds)
+                reconstructed_path = (
+                    f"{trial_result_path}/reconstruction_iterations.png"
+                )
+                self._plot_reconstructed(
+                    num_images, history, reconstructed_path, dm, ds
+                )
+                final_tensor = torch.stack(
+                    [history[-1][i][0] for i in range(num_images)]
+                )
+                final_result_path = f"{trial_result_path}/final_attack_result.pdf"
+                self._make_plot(
+                    num_images, final_tensor, None, final_result_path, dm, ds
+                )
 
-            # Save the tensors into a .pt file
-            tensor_file_path = f"{trial_result_path}/tensors.pt"
-            result = {
-                i
-                * log_interval: {
-                    j: history[i][j][0].cpu().permute(1, 2, 0)
-                    for j in range(num_images)
+                # Save the tensors into a .pt file
+                tensor_file_path = f"{trial_result_path}/tensors.pt"
+                result = {
+                    i
+                    * log_interval: {
+                        j: history[i][j][0].cpu().permute(1, 2, 0)
+                        for j in range(num_images)
+                    }
+                    for i in range(len(history))
                 }
-                for i in range(len(history))
-            }
-            torch.save(result, tensor_file_path)
+                torch.save(result, tensor_file_path)
 
-            logging.info("Attack %d complete", (trial_number + 1))
+                logging.info("Attack %d complete", (trial_number + 1))
 
     def _gradient_closure(self, match_optimizer, dummy_data, labels, target_grad):
         """Take a step to match the gradients."""
