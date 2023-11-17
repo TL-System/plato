@@ -22,7 +22,7 @@ data:
     datasource: CIFAR100
 
     # Number of samples in each partition
-    partition_size: 5000
+    partition_size: 6000
 
     # IID or non-IID?
     sampler: iid
