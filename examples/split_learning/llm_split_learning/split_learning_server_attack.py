@@ -42,7 +42,7 @@ class CuriousServer(split_learning_server.Server):
         intermediate_features, labels = update[0]
         evaluation_metrics = self.trainer.attack(intermediate_features, labels)
         rouge_metrics = evaluation_metrics["ROUGE"]
-        self.rouge["rouge1_fmeasure"] = rouge_metrics["rouge1_fmeasure"].item()
+        self.rouge["rouge1_fm"] = rouge_metrics["rouge1_fmeasure"].item()
         self.rouge["rouge1_p"] = rouge_metrics["rouge1_precision"].item()
         self.rouge["rouge1_r"] = rouge_metrics["rouge1_recall"].item()
         self.rouge["rouge2_fm"] = rouge_metrics["rouge2_fmeasure"].item()

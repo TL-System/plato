@@ -115,6 +115,7 @@ class CuriousTrainer(HonestTrainer):
             torch.device("cpu")
         )
         intermediate_features = intermediate_features.detach().cpu()
+        reconstructed_data = reconstructed_data.detach().cpu()
         # We will generate the reconstructed input ids
         #   from the reconstructed embeddings.
         embedding_layer = get_module(
