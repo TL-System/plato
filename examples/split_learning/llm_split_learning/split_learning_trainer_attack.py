@@ -141,7 +141,7 @@ class CuriousTrainer(HonestTrainer):
                 reconstructed_inputs[batch_id][word_id] = distance.argmin(dim=0).item()
 
         reconstructed_inputs = reconstructed_inputs.long()
-        labels = labels.to(self.device)
+        labels = labels.to(torch.device("cpu"))
         labels = labels.long()
 
         # calculate the evaluation metrics in attack
