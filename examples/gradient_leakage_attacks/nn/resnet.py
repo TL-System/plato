@@ -116,6 +116,20 @@ class Model(torchvision.models.ResNet):
 
         x = self.pool(x)
         x = torch.flatten(x, 1)
+        x = self.fc(x)
+
+        return x
+
+    def forward_feature(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+
+        for layer in self.layers:
+            x = layer(x)
+
+        x = self.pool(x)
+        x = torch.flatten(x, 1)
         feature = x.clone().detach()
         x = self.fc(x)
 

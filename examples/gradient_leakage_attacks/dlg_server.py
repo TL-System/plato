@@ -541,10 +541,7 @@ class Server(fedavg.Server):
                 self.trainer.model.train()
             self.trainer.model.zero_grad()
 
-            try:
-                dummy_pred, _ = self.trainer.model(dummy_data)
-            except:
-                dummy_pred = self.trainer.model(dummy_data)
+            dummy_pred = self.trainer.model(dummy_data)
 
             if self.attack_method == "DLG":
                 dummy_onehot_label = F.softmax(labels, dim=-1)
