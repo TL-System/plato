@@ -3,7 +3,7 @@ clients:
     type: split_learning
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 20
+    iteration: 5
 
 server:
     type: split_learning
@@ -43,7 +43,7 @@ trainer:
     type: split_learning
 
     # The maximum number of training rounds
-    rounds: 100000
+    rounds: 60
 
     # The machine learning model
     model_type: huggingface
@@ -63,7 +63,8 @@ algorithm:
 
 parameters:
     model:
-        cut_layer: 2
+        num_classes: 10
+        cut_layer: 1
         transformer_module_name: transformer.h
         layers_after_transformer:
             - transformer.ln_f
@@ -74,5 +75,16 @@ parameters:
         eps: 0.00000001
         weight_decay: 0.0
 
+    attack:
+        interval: 4
+        optimizer:
+            lr_guessed_client: 0.1
+            lr_reconstructed_data: 0.01
+        outer_iterations: 100
+        inner_iterations: 100
+        report_interval: 10
+        embedding_layer: transformer.wte
+        calibrate_guessed_client: false
+
 results: 
-    types: round, accuracy, elapsed_time, comm_overhead
+    types: round, accuracy, elapsed_time, comm_overhead, attack_accuracy,rouge1_fm,rouge1_p,rouge1_r,rouge2_fm,rouge2_p,rouge2_r,rougeL_fm,rougeL_p,rougeL_r,rougeLsum_fm,rougeLsum_p,rougeLsum_r
