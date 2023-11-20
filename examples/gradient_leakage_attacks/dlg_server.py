@@ -41,6 +41,7 @@ from utils.modules import PatchedModule
 from utils.utils import cross_entropy_for_onehot
 from utils.utils import total_variation as TV
 from utils import consts
+from utils.fishing import reconfigure_for_class_attack
 
 cross_entropy = torch.nn.CrossEntropyLoss(reduce="mean")
 tt = transforms.ToPILImage()
@@ -109,6 +110,18 @@ class Server(fedavg.Server):
         self.best_mse = math.inf
         # Save trail 1 as the best as default when results are all bad
         self.best_trial = 1
+        self.iter = 0
+
+    def customize_server_payload(self, payload):
+        """Customizes the server payload before sending to the client."""
+        tmp = payload
+        if hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing:
+            self.algorithm.model = reconfigure_for_class_attack(
+                self.trainer.model, target_classes=Config().algorithm.target_classes
+            )
+            self.trainer.model = self.algorithm.model
+            payload = self.algorithm.extract_weights()
+        return payload
 
     def weights_received(self, weights_received):
         """
@@ -397,7 +410,7 @@ class Server(fedavg.Server):
             )
 
         early_exit = False
-        for iters in range(num_iters):
+        for self.iters in range(num_iters):
             current_loss = match_optimizer.step(closure)
             losses.append(current_loss.item())
 
@@ -416,7 +429,7 @@ class Server(fedavg.Server):
                     early_exit = True
                     break
 
-                if iters % log_interval == 0:
+                if self.iters % log_interval == 0:
                     # Finding evaluation metrics
                     # should make these lines into a function to prevent repetition, but not sure how to
                     # without having too many parameters
@@ -438,7 +451,7 @@ class Server(fedavg.Server):
                         self.attack_method,
                         (trial_number + 1),
                         self.defense_method,
-                        iters,
+                        self.iters,
                         losses[-1],
                         avg_data_mses[-1],
                         avg_feat_mses[-1],
@@ -479,7 +492,7 @@ class Server(fedavg.Server):
                         )
 
                     new_row = [
-                        iters,
+                        self.iters,
                         round(losses[-1], 4),
                         round(avg_data_mses[-1], 4),
                         round(avg_feat_mses[-1], 4),
@@ -564,7 +577,11 @@ class Server(fedavg.Server):
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
             if self.attack_method == "csDLG":
-                dummy_data.grad.sign_()
+                if Config().algorithm.signed == "soft":
+                    scaling_factor = 1 - self.iter / num_iters
+                    dummy_data.grad.mul_(scaling_factor).tanh_().div_(scaling_factor)
+                else:
+                    dummy_data.grad.sign_()
             return rec_loss
 
         return closure
