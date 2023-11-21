@@ -28,7 +28,7 @@ data:
     # data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
-    partition_size: 100
+    partition_size: 256
 
     # IID or non-IID?
     sampler: iid
@@ -47,7 +47,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 100
+    batch_size: 256
     optimizer: SGD
 
     # The machine learning model
@@ -135,7 +135,7 @@ parameters:
         lr: 0.01
 
 results:
-    result_path: results/delta_matching/resnet18_cifar100/pretrained_eval
+    result_path: results/fishing/resnet18_cifar100/
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
@@ -143,5 +143,4 @@ results:
     # Plot results (x_axis-y_axis)
     plot: round-accuracy, elapsed_time-accuracy
 
-    # rows: 4
-    cols: 2
+    cols: 16
