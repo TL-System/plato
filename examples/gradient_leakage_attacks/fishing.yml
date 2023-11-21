@@ -100,7 +100,7 @@ algorithm:
 
     # fishing attack related
     fishing: true
-    target_classes: 0
+    target_classes: 1
     signed: soft
 
     ## Defense related
