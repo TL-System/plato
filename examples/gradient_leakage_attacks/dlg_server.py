@@ -128,11 +128,14 @@ class Server(fedavg.Server):
         self.ds = None
 
         # Fishing attack related
+        self.target_cls = 0
+        self.target_indx = None
         self.single_gradient_recovered = False
         self.feature_within_tolerance = False
         self.all_feature_val = []
         self.feature_loc = None
         self.rec_round = 0
+        self.modified_model = None
 
     def weights_received(self, weights_received):
         """
@@ -190,6 +193,17 @@ class Server(fedavg.Server):
                 avg_update[name] = update_compensated[i]
 
         return avg_update
+
+    def customize_server_payload(self, payload):
+        """Customizes the server payload before sending to the client."""
+        if (
+            hasattr(Config().algorithm, "fishing")
+            and Config().algorithm.fishing
+            and self.current_round > 1
+        ):
+            self.trainer.model = deepcopy(self.modified_model)
+            payload = self.algorithm.extract_weights()
+        return payload
 
     def _deep_leakage_from_gradients(self, weights_received):
         """Analyze periodic gradients from certain clients."""
@@ -712,10 +726,11 @@ class Server(fedavg.Server):
             logging.info(f"Found labels {t_labels} in first query.")
 
             # Find the target class index
-            self.target_indx = np.where(t_labels == Config().algorithm.target_cls)[0]
+            self.target_cls = Config().algorithm.target_cls
+            self.target_indx = np.where(t_labels == self.target_cls)[0]
             if self.target_indx.size == 0:
-                target_cls = np.unique(t_labels)[Config().algorithm.target_cls_idx]
-                self.target_indx = np.where(t_labels == target_cls)[0]
+                self.target_cls = np.unique(t_labels)[Config().algorithm.target_cls_idx]
+                self.target_indx = np.where(t_labels == self.target_cls)[0]
             self.labels_ = torch.argmax(gt_labels, dim=-1)[self.target_indx]
 
         if self.current_round == 1 and len(self.target_indx) == 1:
@@ -723,38 +738,37 @@ class Server(fedavg.Server):
             logging.info(f"Attacking label {self.labels_.item()} with cls attack.")
 
             # modify the parameters first
-            self.trainer.model = reconfigure_for_class_attack(
-                self.trainer.model, target_classes=Config().algorithm.target_cls
+            self.modified_model = reconfigure_for_class_attack(
+                self.trainer.model, target_classes=self.target_cls
             )
-            self.algorithm.model = self.trainer.model
 
             # Only target one data
             self.num_images = 1
             self.gt_labels = gt_labels[self.target_indx[0]].unsqueeze(0)
             self.rec_round = self.current_round + 1
+
         elif len(self.target_indx) > 1:
             # send several queries because of cls collision
             if self.current_round == 1:
                 logging.info(
                     f"Attacking label {self.labels_[0].item()} with binary attack."
                 )
-                num_collisions = (self.labels_ == Config().algorithm.target_cls).sum()
+                num_collisions = (self.labels_ == self.target_cls).sum()
                 logging.info(
-                    f"There are in total {num_collisions.item()} datapoints with label {Config().algorithm.target_cls}."
+                    f"There are in total {num_collisions.item()} datapoints with label {self.target_cls}."
                 )
 
                 # find the starting point and the feature entry gives the max avg value
-                self.trainer.model = reconfigure_for_class_attack(
-                    self.trainer.model, target_classes=Config().algorithm.target_cls
+                self.modified_model = reconfigure_for_class_attack(
+                    self.trainer.model, target_classes=self.target_cls
                 )
-                self.algorithm.model = self.trainer.model
             else:
                 # binary attack to recover all single gradients
                 avg_feature = torch.flatten(
                     reconstruct_feature(
                         target_grad,
                         target_weights,
-                        Config().algorithm.target_cls,
+                        self.target_cls,
                     )
                 )
                 if self.feature_loc is None:
@@ -768,7 +782,7 @@ class Server(fedavg.Server):
                     threshold=Config().algorithm.feat_threshold,
                 ):
                     curr_grad = list(target_grad)
-                    curr_grad[-1] = curr_grad[-1] * len(target_indx)
+                    curr_grad[-1] = curr_grad[-1] * len(self.target_indx)
                     curr_grad[:-1] = [
                         grad_ii
                         * len(self.target_indx)
@@ -777,14 +791,14 @@ class Server(fedavg.Server):
                     ]
                     recovered_single_gradients = [curr_grad]
                     # return to the model with multiplier=1, (better with larger multiplier, but not optimizable if it is too large)
-                    self.trainer.model = reconfigure_for_feature_attack(
+                    self.modified_model = reconfigure_for_feature_attack(
                         self.trainer.model,
                         feature_val,
                         self.feature_loc,
-                        target_classes=Config().algorithm.target_cls,
+                        target_classes=self.target_cls,
                         allow_reset_param_weights=True,
                     )
-                    self.algorithm.model = self.trainer.model
+                    self.trainer.model = deepcopy(self.modified_model)
 
                     # add reversed() because the ith is always more confident than i-1th
                     self.target_grad = list(reversed(recovered_single_gradients))[
@@ -800,13 +814,12 @@ class Server(fedavg.Server):
                     logging.info(
                         f"Querying feature {self.feature_loc} with feature val {feature_val}."
                     )
-                    self.trainer.model = reconfigure_for_feature_attack(
+                    self.modified_model = reconfigure_for_feature_attack(
                         self.trainer.model,
                         feature_val,
                         self.feature_loc,
-                        target_classes=Config().algorithm.target_cls,
+                        target_classes=self.target_cls,
                     )
-                    self.algorithm.model = self.trainer.model
 
     def _save_best(self):
         src_folder = f"{dlg_result_path}/t{self.best_trial}"
