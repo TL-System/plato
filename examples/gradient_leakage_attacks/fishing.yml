@@ -28,7 +28,7 @@ data:
     # data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
-    partition_size: 5
+    partition_size: 256
 
     # IID or non-IID?
     sampler: iid
@@ -37,7 +37,7 @@ data:
 
 trainer:
     # The maximum number of training rounds
-    rounds: 20
+    rounds: 100
 
     # The maximum number of clients running concurrently
     max_concurrency: 4
@@ -47,7 +47,7 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 5
+    batch_size: 256
     optimizer: SGD
 
     # The machine learning model
@@ -108,7 +108,7 @@ algorithm:
     target_cls: 1
     target_cls_idx: 0  # use the target class index when the target class cannot be found
     grad_idx: 0 # which gradient to attack
-    feat_threshold: 1 # When to identify two features as identical
+    feat_threshold: 0.01 # When to identify two features as identical
 
     ## Defense related
     # Choose from GradDefense, Soteria, GC (model compression), DP (differential privacy), Outpost (ours)...
