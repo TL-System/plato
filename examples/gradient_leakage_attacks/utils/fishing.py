@@ -21,7 +21,7 @@ def reconfigure_for_class_attack(model, target_classes=None):
     masked_bias[cls_to_obtain] = l_b[cls_to_obtain]
     l_b.copy_(masked_bias)
 
-    return model
+    return model.cpu().state_dict()
 
 
 @torch.no_grad()
@@ -51,7 +51,7 @@ def reconfigure_for_feature_attack(
     masked_bias[cls_to_obtain] = -feature_val * feat_multiplier
     l_b.copy_(masked_bias)
 
-    return model
+    return model.cpu().state_dict()
 
 
 def reconstruct_feature(shared_grad, shared_weights, cls_to_obtain):
