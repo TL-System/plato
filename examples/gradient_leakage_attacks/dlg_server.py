@@ -134,6 +134,7 @@ class Server(fedavg.Server):
         self.feature_within_tolerance = False
         self.all_feature_val = []
         self.feature_loc = None
+        self.start_round = None
         self.rec_round = 0
         self.modified_model_states = None
 
@@ -196,10 +197,12 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload):
         """Customizes the server payload before sending to the client."""
+        if self.start_round is None:
+            self.start_round = self.current_round
         if (
             hasattr(Config().algorithm, "fishing")
             and Config().algorithm.fishing
-            and self.current_round > 1
+            and self.current_round > self.start_round
         ):
             self.algorithm.load_weights(self.modified_model_states)
             payload = self.algorithm.extract_weights()
@@ -215,7 +218,7 @@ class Server(fedavg.Server):
         )
         update = self.updates[Config().algorithm.victim_client]
 
-        if self.current_round == 1:
+        if self.current_round == self.start_round:
             self.gt_data, self.gt_labels = (
                 update.payload[1].to(Config().device()),
                 update.payload[2].to(Config().device()),
@@ -723,7 +726,7 @@ class Server(fedavg.Server):
         return list(patched_model.parameters.values())
 
     def fishing_attack(self, target_grad, target_weights, gt_labels):
-        if self.current_round == 1:
+        if self.current_round == self.start_round:
             # Query the labels
             t_labels = torch.argmax(gt_labels, dim=-1).detach().cpu().numpy()
             logging.info(f"Found labels {t_labels} in first query.")
@@ -736,7 +739,7 @@ class Server(fedavg.Server):
                 self.target_indx = np.where(t_labels == self.target_cls)[0]
             self.labels_ = torch.argmax(gt_labels, dim=-1)[self.target_indx]
 
-        if self.current_round == 1 and len(self.target_indx) == 1:
+        if self.current_round == self.start_round and len(self.target_indx) == 1:
             # simple cls attack if there is no cls collision
             logging.info(f"Attacking label {self.labels_.item()} with cls attack.")
 
@@ -752,7 +755,7 @@ class Server(fedavg.Server):
 
         elif len(self.target_indx) > 1:
             # send several queries because of cls collision
-            if self.current_round == 1:
+            if self.current_round == self.start_round:
                 logging.info(
                     f"Attacking label {self.labels_[0].item()} with binary attack."
                 )
