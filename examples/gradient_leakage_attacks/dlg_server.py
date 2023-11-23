@@ -135,7 +135,7 @@ class Server(fedavg.Server):
         self.all_feature_val = []
         self.feature_loc = None
         self.rec_round = 0
-        self.modified_model = None
+        self.modified_model_states = None
 
     def weights_received(self, weights_received):
         """
@@ -201,7 +201,7 @@ class Server(fedavg.Server):
             and Config().algorithm.fishing
             and self.current_round > 1
         ):
-            self.trainer.model = deepcopy(self.modified_model)
+            self.algorithm.load_weights(self.modified_model_states)
             payload = self.algorithm.extract_weights()
         return payload
 
@@ -309,6 +309,9 @@ class Server(fedavg.Server):
                 )
 
             self._save_best()
+
+            logging.info("Attack finished.")
+            self.current_round = Config().trainer.rounds + 1
 
     def run_trial(
         self,
@@ -738,7 +741,7 @@ class Server(fedavg.Server):
             logging.info(f"Attacking label {self.labels_.item()} with cls attack.")
 
             # modify the parameters first
-            self.modified_model = reconfigure_for_class_attack(
+            self.modified_model_states = reconfigure_for_class_attack(
                 self.trainer.model, target_classes=self.target_cls
             )
 
@@ -759,7 +762,7 @@ class Server(fedavg.Server):
                 )
 
                 # find the starting point and the feature entry gives the max avg value
-                self.modified_model = reconfigure_for_class_attack(
+                self.modified_model_states = reconfigure_for_class_attack(
                     self.trainer.model, target_classes=self.target_cls
                 )
             else:
@@ -791,14 +794,14 @@ class Server(fedavg.Server):
                     ]
                     recovered_single_gradients = [curr_grad]
                     # return to the model with multiplier=1, (better with larger multiplier, but not optimizable if it is too large)
-                    self.modified_model = reconfigure_for_feature_attack(
+                    self.modified_model_states = reconfigure_for_feature_attack(
                         self.trainer.model,
                         feature_val,
                         self.feature_loc,
                         target_classes=self.target_cls,
                         allow_reset_param_weights=True,
                     )
-                    self.trainer.model = deepcopy(self.modified_model)
+                    self.algorithm.load_weights(self.modified_model_states)
 
                     # add reversed() because the ith is always more confident than i-1th
                     self.target_grad = list(reversed(recovered_single_gradients))[
@@ -814,7 +817,7 @@ class Server(fedavg.Server):
                     logging.info(
                         f"Querying feature {self.feature_loc} with feature val {feature_val}."
                     )
-                    self.modified_model = reconfigure_for_feature_attack(
+                    self.modified_model_states = reconfigure_for_feature_attack(
                         self.trainer.model,
                         feature_val,
                         self.feature_loc,
