@@ -37,10 +37,14 @@ class Config:
     _instance = None
 
     @staticmethod
-
     def construct_include(loader: Loader, node: yaml.Node) -> Any:
         """Include file referenced at node."""
-        with open(Path(loader.name).parent.joinpath(loader.construct_yaml_str(node)).resolve(), 'r') as f:
+        with open(
+            Path(loader.name)
+            .parent.joinpath(loader.construct_yaml_str(node))
+            .resolve(),
+            "r",
+        ) as f:
             return yaml.load(f, type(loader))
 
     def __new__(cls):
@@ -313,7 +317,7 @@ class Config:
 
         if torch.cuda.is_available():
             return torch.cuda.device_count()
-        elif Config.args.mps and torch.has_mps:
+        elif Config.args.mps and torch.backends.mps.is_built():
             return 1
         else:
             return 0
@@ -347,7 +351,7 @@ class Config:
                 else:
                     device = "cuda:0"
 
-            if Config.args.mps and torch.has_mps:
+            if Config.args.mps and torch.backends.mps.is_built():
                 device = "mps"
 
         return device
