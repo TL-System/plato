@@ -246,7 +246,6 @@ class Server(fedavg.Server):
             self._make_plot(
                 self.num_images,
                 self.gt_data,
-                self.gt_labels,
                 gt_result_path,
                 self.dm,
                 self.ds,
@@ -589,9 +588,7 @@ class Server(fedavg.Server):
                     [history[-1][i][0] for i in range(num_images)]
                 )
                 final_result_path = f"{trial_result_path}/final_attack_result.pdf"
-                self._make_plot(
-                    num_images, final_tensor, None, final_result_path, dm, ds
-                )
+                self._make_plot(num_images, final_tensor, final_result_path, dm, ds)
 
                 # Save the tensors into a .pt file
                 tensor_file_path = f"{trial_result_path}/tensors.pt"
@@ -735,6 +732,19 @@ class Server(fedavg.Server):
                 self.target_cls = np.unique(t_labels)[Config().algorithm.target_cls_idx]
                 self.target_indx = np.where(t_labels == self.target_cls)[0]
             self.labels_ = torch.argmax(gt_labels, dim=-1)[self.target_indx]
+
+            # Plot the images of the target class too for fishing attack
+            if hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing:
+                gt_target_cls = self.gt_data[self.target_indx]
+                gt_cls_path = f"{dlg_result_path}/gt_target_cls.pdf"
+                self._make_plot(
+                    self.target_indx.size,
+                    gt_target_cls,
+                    gt_cls_path,
+                    self.dm,
+                    self.ds,
+                    cols=self.target_indx.size,
+                )
 
         if self.current_round == self.start_round and len(self.target_indx) == 1:
             # simple cls attack if there is no cls collision
@@ -887,30 +897,29 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def _make_plot(num_images, image_data, image_labels, path, dm, ds):
+    def _make_plot(num_images, image_data, path, dm, ds, rows=None, cols=None):
         """Plot image data."""
 
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
-        if hasattr(Config().results, "rows"):
+        if rows is None and hasattr(Config().results, "rows"):
             rows = Config().results.rows
-            if hasattr(Config().results, "cols"):
-                cols = Config().results.cols
-            else:
-                cols = math.ceil(num_images / rows)
-        elif hasattr(Config().results, "cols"):
+        if cols is None and hasattr(Config().results, "cols"):
             cols = Config().results.cols
+
+        if rows is not None and cols is None:
+            cols = math.ceil(num_images / rows)
+        elif cols is not None and rows is None:
             rows = math.ceil(num_images / cols)
-        else:
+        elif rows is None and cols is None:
             # make the image wider by default
             # if you want the image to be taller by default then
             # switch the assignment statement for rows and cols variables
             logging.info("Using default dimensions for images")
             cols = math.ceil(math.sqrt(num_images))
             rows = math.ceil(num_images / cols)
-
-        if (rows * cols) < num_images:
+        elif (rows * cols) < num_images:
             logging.info("Row and column provided for plotting images is too small")
             logging.info("Using default dimensions for images")
             cols = math.ceil(math.sqrt(num_images))
