@@ -738,16 +738,16 @@ class Server(fedavg.Server):
 
             # Plot the images of the target class too for fishing attack
             if hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing:
-                gt_target_cls = self.gt_data[self.target_indx]
-                gt_cls_path = f"{dlg_result_path}/gt_target_cls.pdf"
-                self._make_plot(
-                    self.target_indx.size,
-                    gt_target_cls,
-                    gt_cls_path,
-                    self.dm,
-                    self.ds,
-                    cols=self.target_indx.size,
-                )
+                for i in self.target_indx:
+                    gt_target_cls = self.gt_data[i].unsqueeze(0)
+                    gt_cls_path = f"{dlg_result_path}/gt_target_cls_{self.target_cls}_indx_{i}.pdf"
+                    self._make_plot(
+                        1,
+                        gt_target_cls,
+                        gt_cls_path,
+                        self.dm,
+                        self.ds,
+                    )
 
         if self.current_round == self.start_round and len(self.target_indx) == 1:
             # simple cls attack if there is no cls collision
@@ -900,15 +900,16 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def _make_plot(num_images, image_data, path, dm, ds, rows=None, cols=None):
+    def _make_plot(num_images, image_data, path, dm, ds):
         """Plot image data."""
 
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
-        if rows is None and hasattr(Config().results, "rows"):
+        rows, cols = None, None
+        if hasattr(Config().results, "rows"):
             rows = Config().results.rows
-        if cols is None and hasattr(Config().results, "cols"):
+        if hasattr(Config().results, "cols"):
             cols = Config().results.cols
 
         if rows is not None and cols is None:
