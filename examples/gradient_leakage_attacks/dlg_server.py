@@ -790,7 +790,7 @@ class Server(fedavg.Server):
                 if self.feature_loc is None:
                     self.feature_loc = int(torch.argmax(avg_feature))
                 feature_val = float(avg_feature[self.feature_loc])
-                logging.info(f"And found avg feature val {feature_val}.")
+                logging.info(f"Found avg feature val {feature_val}.")
 
                 if check_with_tolerance(
                     feature_val,
@@ -937,12 +937,24 @@ class Server(fedavg.Server):
         image_data = image_data.detach().clone()
         image_data.mul_(ds).add_(dm).clamp_(0, 1)
         if num_images == 1:
-            gt_figure = plt.figure(figsize=(8, 8))
+            fig = plt.figure(figsize=(8, 8))
             plt.imshow(image_data[0].permute(1, 2, 0).cpu())
             plt.axis("off")
         else:
             fig, axes = plt.subplots(
-                nrows=rows, ncols=cols, figsize=(image_width, image_height)
+                nrows=rows,
+                ncols=cols,
+                gridspec_kw=dict(
+                    wspace=0.0,
+                    hspace=0.0,
+                    top=1.0 - 0.5 / (rows + 1),
+                    bottom=0.5 / (rows + 1),
+                    left=0.5 / (cols + 1),
+                    right=1 - 0.5 / (cols + 1),
+                ),
+                figsize=(image_width, image_height),
+                sharey="row",
+                sharex="col",
             )
             for i, title in enumerate(image_data):
                 axes.ravel()[i].imshow(image_data[i].permute(1, 2, 0).cpu())
