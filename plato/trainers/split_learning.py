@@ -117,7 +117,7 @@ class Trainer(basic.Trainer):
     def _client_train_loop(self, examples):
         """Complete the client side training with gradients from server."""
         self.optimizer.zero_grad()
-        examples = self.process_samples_before_client_forwarding(examples)
+        examples, batch_size = self.process_samples_before_client_forwarding(examples)
         outputs = self.model.forward_to(examples)
 
         # Backpropagate with gradients from the server
@@ -128,7 +128,7 @@ class Trainer(basic.Trainer):
 
         # No loss value on the client side
         loss = torch.zeros(1)
-        self._loss_tracker.update(loss, examples.size(0))
+        self._loss_tracker.update(loss, batch_size)
         return loss
 
     def _server_train_loop(self, config, examples, labels):
@@ -205,7 +205,7 @@ class Trainer(basic.Trainer):
 
     def process_samples_before_client_forwarding(self, examples) -> ...:
         """Process the examples before client conducting forwarding."""
-        return examples
+        return examples, examples.size(0)
 
     # pylint:disable=unused-argument
     def server_forward_from(self, batch, config) -> (..., ..., int):
