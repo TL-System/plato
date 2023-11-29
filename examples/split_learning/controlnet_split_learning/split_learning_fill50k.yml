@@ -22,18 +22,17 @@ server:
 
     # Server doesn't have to do test for every round in split learning
     do_test: false
-    # model_path: /scratch/dixiyao/controlnet/models/plato/models
-    # checkpoint_path: /scratch/dixiyao/controlnet/models/plato/checkpoints
 
 data:
     # The training and testing dataset
-    datasource: coco
-    val_dataset: coco
-    data_path: /scratch/dixiyao/
+    datasource: ControlNet
+    dataset_name: fill50k
+    val_dataset_name: fill50k
     condition: canny
 
     # Number of samples in each partition
     partition_size: 50000
+    testset_size: 1000
 
     # Fixed random seed
     random_seed: 1
@@ -43,7 +42,7 @@ data:
 
 trainer:
     # The type of the trainer
-    type: split_learning
+    type: split_learning_controlnet
 
     # The maximum number of training rounds
     rounds: 12500
@@ -56,22 +55,16 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 3
+    batch_size: 1
     optimizer: AdamW
     
 algorithm:
     # Aggregation algorithm
     type: split_learning
 
-    # Split learning flag
-    split_learning: true
-
 parameters:
-    model:
-        init_model_path: /scratch/dixiyao/controlnet/models/control_sd15_ini.ckpt
-        model_structure: examples/controlnet_split_learning/OrgModel/cldm_v15
     optimizer:
         lr: 0.00001
 
 results: 
-    types: round, accuracy, elapsed_time, comm_overhead, server_time, client_time, server_mem, client_mem
+    types: round, accuracy, elapsed_time, comm_overhead
