@@ -28,8 +28,8 @@ class DiffusionInputs(defaultdict):
         Convert the diffusion model inputs to the device.
         """
         self["jpg"] = self["jpg"].to(device)
-        self["txt"] = self["txt"].to(device)
         self["hint"] = self["hint"].to(device)
+        return self
 
 
 # pylint:disable=no-member

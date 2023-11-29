@@ -22,6 +22,13 @@ class Trainer(split_learning.Trainer):
         batch_size = examples["jpg"].size(0)
         return examples, batch_size
 
+    def process_training_samples_before_retrieving(self, training_samples):
+        inputs, targets = training_samples
+        diffusion_inputs = dataset_basic.DiffusionInputs()
+        for keys, values in inputs.items():
+            diffusion_inputs[keys] = values
+        return diffusion_inputs, targets
+
     # pylint:disable=unused-argument
     def server_forward_from(self, batch, config):
         examples, labels = batch
