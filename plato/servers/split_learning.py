@@ -42,12 +42,12 @@ class Server(fedavg.Server):
         self.test_accuracy = 0.0
 
         # Manually set up the testset since do_test is turned off in config
-        if self.datasource is None:
+        if self.datasource is None and self.custom_datasource is None:
             self.datasource = datasources_registry.get(client_id=0)
-            self.testset = self.datasource.get_test_set()
-            self.testset_sampler = all_inclusive.Sampler(
-                self.datasource, testing=True
-            )
+        elif self.datasource is None and self.custom_datasource is not None:
+            self.datasource = self.custom_datasource()
+        self.testset = self.datasource.get_test_set()
+        self.testset_sampler = all_inclusive.Sampler(self.datasource, testing=True)
 
     def choose_clients(self, clients_pool, clients_count):
         """Shuffle the clients and sequentially select them when the previous one is done."""

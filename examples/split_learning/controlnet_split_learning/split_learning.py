@@ -7,7 +7,8 @@ import sys
 
 sys.path.append(
     os.path.join(
-        os.path.abspath(os.getcwd()), "examples/controlnet_split_learning/ControlNet"
+        os.path.abspath(os.getcwd()),
+        "examples/split_learning/controlnet_split_learning/ControlNet",
     )
 )
 sys.path.append(os.path.join(os.path.abspath(os.getcwd()), "examples"))

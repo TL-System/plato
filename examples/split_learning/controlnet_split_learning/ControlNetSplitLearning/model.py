@@ -31,7 +31,7 @@ class ControlNetModel(torch.nn.Module):
         # First use cpu to load models. Pytorch Lightning will automatically move it to GPUs.
         config_name = ".yaml"
         model = create_model(
-            "examples/controlnet_split_learning/ControlNetSplitLearning/cldm_v15_"
+            "examples/split_learning/controlnet_split_learning/ControlNetSplitLearning/cldm_v15_"
             + class_name
             + config_name
         ).cpu()
