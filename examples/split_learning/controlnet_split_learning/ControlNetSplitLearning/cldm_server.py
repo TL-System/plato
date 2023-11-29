@@ -9,15 +9,19 @@ from ControlNet.ldm.modules.diffusionmodules.util import timestep_embedding
 # pylint:disable=no-member
 # pylint:disable=invalid-name
 # pylint:disable=too-few-public-methods
-class OurControlledUnetModel(ControlledUnetModel):
-    """Client Unet."""
+class ServerControlledUnetModel(ControlledUnetModel):
+    """Our design of UNet on the server."""
 
     # pylint:disable=unused-argument
     # pylint:disable
     def forward_train(
         self, sd_output, timesteps=None, context=None, control=None, **kwargs
     ):
-        "Forward function"
+        """
+        Forward function of UNet of the server model.
+        Inputs are processed outputs of the stable diffusion, timesteps,
+            processed prompts and processed conditions.
+        """
         with torch.no_grad():
             t_emb = timestep_embedding(
                 timesteps, self.model_channels, repeat_only=False
@@ -43,11 +47,14 @@ class OurControlledUnetModel(ControlledUnetModel):
         return self.out(h)
 
 
-class OurControlLDM(ControlLDM):
-    """On the client."""
+class ServerControlLDM(ControlLDM):
+    """Our design of ControlNet on the server."""
 
     def forward_train(self, control, sd_output, cond_txt, t):
-        "Forward function"
+        """
+        Forward function of ControlNet in the server model.
+        Inputs are processed conditions, outputs of stable diffusion and processed prompts.
+        """
         diffusion_model = self.model.diffusion_model
         control = self.control_model.forward_train(
             h=control,
@@ -64,12 +71,15 @@ class OurControlLDM(ControlLDM):
         return eps
 
 
-class OurControlNet(ControlNet):
-    """Our controlnet on the client"""
+class ServerControlNet(ControlNet):
+    """Our design of control network on the server."""
 
     # pylint:disable=unused-argument
     def forward_train(self, h, timesteps, context, **kwargs):
-        """Forward function."""
+        """
+        Forward function of control network in the server model.
+        Inputs are processed conditions, timsteps, and processed prompts.
+        """
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
         emb = self.time_embed(t_emb)
 
