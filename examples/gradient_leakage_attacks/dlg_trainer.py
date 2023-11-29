@@ -226,7 +226,7 @@ class Trainer(basic.Trainer):
                     self.list_grad = noise(dy_dx=self.list_grad, risk=risk)
 
             # cast grad back to tuple type
-            grad = tuple(self.list_grad)
+            grad = tuple([g.to(self.device) for g in self.list_grad])
 
         # Update model weights with gradients and learning rate
         for param, grad_part in zip(self.model.parameters(), grad):
