@@ -10,8 +10,10 @@ from torchvision.datasets.utils import verify_str_arg
 import torch
 import numpy as np
 
+from plato.datasources.base import DataSource
+
 # pylint:disable=relative-beyond-top-level
-from .dataset_basic import BasicDataset
+from .dataset_basic import BasicDataset, DiffusionInputs
 
 
 CSV = namedtuple("CSV", ["header", "index", "data"])
@@ -19,7 +21,7 @@ CSV = namedtuple("CSV", ["header", "index", "data"])
 
 # pylint:disable=no-member
 class CelebADataset(BasicDataset):
-    """Coco dataset"""
+    """CelebA dataset"""
 
     def __init__(
         self,
@@ -35,6 +37,9 @@ class CelebADataset(BasicDataset):
             "all": None,
         }
         self.root = path
+        if not os.path.exists(os.path.join(path, "celeba")):
+            celeba_url = "http://iqua.ece.toronto.edu/baochun/celeba.tar.gz"
+            DataSource.download(celeba_url, path)
         split_ = split_map[
             verify_str_arg(split.lower(), "split", ("train", "valid", "test", "all"))
         ]
@@ -67,7 +72,11 @@ class CelebADataset(BasicDataset):
         mask = mask.astype(np.float32) / 255.0
 
         sentence = "Good image"
-        return {"jpg": image, "hint": mask, "txt": sentence}, 0
+        inputs = DiffusionInputs()
+        inputs["jpg"] = image
+        inputs["hint"] = mask
+        inputs["txt"] = sentence
+        return inputs, 0
 
     def _load_csv(
         self,

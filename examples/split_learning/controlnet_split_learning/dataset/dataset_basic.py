@@ -2,6 +2,7 @@
 Basic dataset for applying other transfer.
 """
 import abc
+from collections import defaultdict
 
 import cv2
 from torch.utils.data import Dataset
@@ -15,6 +16,20 @@ from ControlNet.annotator.hed import HEDdetector
 from ControlNet.annotator.mlsd import MLSDdetector
 from ControlNet.annotator.canny import CannyDetector
 from ControlNet.annotator.util import HWC3
+
+
+class DiffusionInputs(defaultdict):
+    """
+    The inputs data structure of diffusion model inputs
+    """
+
+    def to(self, device):
+        """
+        Convert the diffusion model inputs to the device.
+        """
+        self["jpg"] = self["jpg"].to(device)
+        self["txt"] = self["txt"].to(device)
+        self["hint"] = self["hint"].to(device)
 
 
 # pylint:disable=no-member

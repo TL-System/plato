@@ -18,6 +18,9 @@ from ControlNet.annotator.mlsd import MLSDdetector
 from ControlNet.annotator.canny import CannyDetector
 from ControlNet.annotator.util import HWC3
 
+# pylint:disable=relative-beyond-top-level
+from .dataset_basic import DiffusionInputs
+
 
 # pylint:disable=no-member
 class OmniglotDataset(
@@ -58,7 +61,12 @@ class OmniglotDataset(
         mask = self.process(mask)
         mask = mask.astype(np.float32) / 255.0
 
-        return {"jpg": image, "txt": "Good image", "hint": mask}, 0
+        sentence = "Good image"
+        inputs = DiffusionInputs()
+        inputs["jpg"] = image
+        inputs["hint"] = mask
+        inputs["txt"] = sentence
+        return inputs, 0
 
     def process(self, condition):
         """To generate the condition according to the task."""
