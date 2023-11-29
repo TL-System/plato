@@ -797,7 +797,11 @@ class Server(fedavg.Server):
                     self.all_feature_val,
                     threshold=Config().algorithm.feat_threshold,
                 ):
-                    curr_grad = list(target_grad)
+                    if not self.share_gradients and self.match_weights:
+                        target = target_weights
+                    else:
+                        target = target_grad
+                    curr_grad = list(target)
                     curr_grad[-1] = curr_grad[-1] * len(self.target_indx)
                     curr_grad[:-1] = [
                         grad_ii
@@ -817,9 +821,14 @@ class Server(fedavg.Server):
                     self.algorithm.load_weights(self.modified_model_states)
 
                     # add reversed() because the ith is always more confident than i-1th
-                    self.target_grad = list(reversed(recovered_single_gradients))[
-                        Config().algorithm.grad_idx
-                    ]
+                    if not self.share_gradients and self.match_weights:
+                        self.target_weights = list(
+                            reversed(recovered_single_gradients)
+                        )[Config().algorithm.grad_idx]
+                    else:
+                        self.target_grad = list(reversed(recovered_single_gradients))[
+                            Config().algorithm.grad_idx
+                        ]
 
                     # Only target one data
                     self.num_images = 1
