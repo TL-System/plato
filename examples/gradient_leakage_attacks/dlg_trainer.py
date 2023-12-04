@@ -63,7 +63,7 @@ class Trainer(basic.Trainer):
                 self.sensitivity = compute_sens(
                     model=self.model.to(self.device),
                     rootset_loader=root_set_loader,
-                    device=Config().device(),
+                    device=self.device,
                 )
 
         return torch.utils.data.DataLoader(
