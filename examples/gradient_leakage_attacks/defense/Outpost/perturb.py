@@ -13,6 +13,7 @@ def compute_risk(model: nn.Module):
 
 
 def noise(dy_dx: list, risk: list):
+    torch.manual_seed(Config().algorithm.noise_random_seed)
     # Calculate empirical FIM
     fim = []
     flattened_fim = None
@@ -33,6 +34,7 @@ def noise(dy_dx: list, risk: list):
         thresh = np.percentile(flattened_weights, Config().algorithm.prune_base)
         grad_tensor = np.where(abs(grad_tensor) < thresh, 0, grad_tensor)
         # noise
+
         noise_base = torch.normal(
             0, risk[i] * Config().algorithm.noise_base, dy_dx[i].shape
         )
