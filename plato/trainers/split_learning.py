@@ -121,10 +121,13 @@ class Trainer(basic.Trainer):
         outputs = self.model.forward_to(examples)
 
         # Backpropagate with gradients from the server
-        gradients = self.gradients
-        gradients[0] = gradients[0].to(self.device)
-        outputs.backward(gradients)
-        self.optimizer.step()
+        gradients = self.gradients[0]
+        if gradients is None:
+            logging.warning("[Client #%d] Gradients from server is None.", os.getpid())
+        else:
+            gradients = gradients.to(self.device)
+            outputs.backward(gradients)
+            self.optimizer.step()
 
         # No loss value on the client side
         loss = torch.zeros(1)

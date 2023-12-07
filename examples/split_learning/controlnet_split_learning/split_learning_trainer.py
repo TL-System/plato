@@ -32,10 +32,17 @@ class Trainer(split_learning.Trainer):
     # pylint:disable=unused-argument
     def server_forward_from(self, batch, config):
         examples, labels = batch
-        control = torch.nn.Parameter(
-            examples["control_output"],
-            requires_grad=True,
-        )
+        # If we use privacy-preserving training, we do need to send gradients back
+        if not (
+            hasattr(Config().parameters.model, "privacy_preserving")
+            and Config().parameters.model.privacy_preserving
+        ):
+            control = torch.nn.Parameter(
+                examples["control_output"],
+                requires_grad=True,
+            )
+        else:
+            control = examples["control_output"]
         timestep = examples["timestep"]
         outputs = self.model.model.forward_train(
             control,
@@ -46,7 +53,14 @@ class Trainer(split_learning.Trainer):
         self.optimizer.zero_grad()
         loss = self.customize_loss_criterion(outputs, labels, timestep)
         loss.backward()
-        grad = control.grad
+        if not (
+            hasattr(Config().parameters.model, "privacy_preserving")
+            and Config().parameters.model.privacy_preserving
+        ):
+            grad = control.grad
+        else:
+            grad = None
+
         return loss, grad, labels.size(0)
 
     def customize_loss_criterion(self, outputs, labels, timestep):
