@@ -65,6 +65,7 @@ algorithm:
 parameters:
     model:
         model_structure_path: examples/split_learning/controlnet_split_learning/ControlNetSplitLearning/cldm_v15_
+    privacy_preserving: true
     optimizer:
         lr: 0.00001
 

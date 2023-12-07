@@ -3,8 +3,7 @@ from collections import defaultdict
 
 # pylint:disable=import-error
 import torch
-from ControlNet.cldm.cldm import ControlLDM, ControlNet, ControlledUnetModel
-from ControlNet.ldm.modules.diffusionmodules.util import timestep_embedding
+from ControlNet.cldm.cldm import ControlLDM, ControlNet
 from ControlNet.ldm.util import default
 
 
@@ -26,31 +25,6 @@ class IntermediateFeatures(defaultdict):
         return self
 
 
-# pylint:disable=no-member
-# pylint:disable=invalid-name
-# pylint:disable=too-few-public-methods
-class ClientControlledUnetModel(ControlledUnetModel):
-    """Our design of UNet on the client."""
-
-    # pylint:disable=unused-argument
-    def forward(self, x, timesteps=None, context=None, **kwargs):
-        """
-        Forward function of UNet of the server model.
-        Inputs are latent, timesteps and prompts.
-        """
-        hs = []
-        with torch.no_grad():
-            t_emb = timestep_embedding(
-                timesteps, self.model_channels, repeat_only=False
-            )
-            emb = self.time_embed(t_emb)
-            h = x.type(self.dtype)
-            h = self.input_blocks[0](h, emb, context)
-
-        hs.append(h)
-        return hs
-
-
 class ClientControlLDM(ControlLDM):
     """Our design of ControlNet on the client."""
 
@@ -65,11 +39,12 @@ class ClientControlLDM(ControlLDM):
 
         cond_txt = torch.cat(cond["c_crossattn"], 1)
         hint = torch.cat(cond["c_concat"], 1)
+        hint = 2 * hint - 1
+        hint = self.first_stage_model.encode(hint)
+        hint = self.get_first_stage_encoding(hint).detach()
         control = self.control_model(
             x=x_noisy,
             hint=hint,
-            timesteps=t,
-            context=cond_txt,
         )
         diffusion_encoder_output = diffusion_model(
             x=x_noisy,
@@ -77,20 +52,24 @@ class ClientControlLDM(ControlLDM):
             context=cond_txt,
         )
 
-        return control, diffusion_encoder_output, cond_txt
+        return control, diffusion_encoder_output
 
     def p_losses(self, x_start, cond, t, noise=None):
         "Return p_losses."
         noise = default(noise, lambda: torch.randn_like(x_start))
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
-        control, sd_output, cond_txt = self.apply_model(x_noisy, t, cond)
+        control, sd_output = self.apply_model(x_noisy, t, cond)
         intermediate_features = IntermediateFeatures()
         intermediate_features["control_output"] = control
         intermediate_features["sd_output"] = sd_output
         intermediate_features["noise"] = noise
         intermediate_features["timestep"] = t
-        intermediate_features["cond_txt"] = cond_txt
         return intermediate_features
+
+
+def symsigmoid(x):
+    "Symmetric sigmoid function $|x|*(2/sigma(x)-1)$"
+    return torch.abs(x) * (2 * torch.nn.functional.sigmoid(x) - 1)
 
 
 class ClientControlNet(ControlNet):
@@ -103,13 +82,8 @@ class ClientControlNet(ControlNet):
         Inputs are processed latent, conditions,
             timsteps, and processed prompts.
         """
-        t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
-        emb = self.time_embed(t_emb)
-
-        guided_hint = self.input_hint_block(hint, emb, context)
-
-        h = x.type(self.dtype)
-        h = self.input_blocks[0](h, emb, context)
-        h += guided_hint
-
+        h = hint + x.type(self.dtype)
+        h = symsigmoid(h)
+        # Here we need to quantizde fp16 and try it.
+        h = h.half()
         return h

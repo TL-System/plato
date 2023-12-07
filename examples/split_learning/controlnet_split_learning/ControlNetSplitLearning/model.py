@@ -30,11 +30,13 @@ class ControlNetModel(torch.nn.Module):
         checkpoint_path = Config.params["checkpoint_path"]
         # First use cpu to load models. Pytorch Lightning will automatically move it to GPUs.
         config_name = ".yaml"
-        model = create_model(
-            "examples/split_learning/controlnet_split_learning/ControlNetSplitLearning/cldm_v15_"
-            + class_name
-            + config_name
-        ).cpu()
+        structure_path = Config.params.model.model_structure_path
+        if (
+            hasattr(Config.params.model, "privacy_preserving")
+            and Config().parames.model.privacy_preserving
+        ):
+            structure_path += "_pp"
+        model = create_model(structure_path + class_name + config_name).cpu()
         control_net_model_path = os.path.join(checkpoint_path, "control_sd15_ini.ckpt")
         # get the controlnet initial model
         if not os.path.exists(control_net_model_path):
