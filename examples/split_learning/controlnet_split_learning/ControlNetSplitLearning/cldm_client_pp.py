@@ -52,18 +52,19 @@ class ClientControlLDM(ControlLDM):
             context=cond_txt,
         )
 
-        return control, diffusion_encoder_output
+        return control, diffusion_encoder_output, cond_txt
 
     def p_losses(self, x_start, cond, t, noise=None):
         "Return p_losses."
         noise = default(noise, lambda: torch.randn_like(x_start))
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
-        control, sd_output = self.apply_model(x_noisy, t, cond)
+        control, sd_output, cond_txt = self.apply_model(x_noisy, t, cond)
         intermediate_features = IntermediateFeatures()
         intermediate_features["control_output"] = control
         intermediate_features["sd_output"] = sd_output
         intermediate_features["noise"] = noise
         intermediate_features["timestep"] = t
+        intermediate_features["cond_txt"] = torch.zeros_like(cond_txt)
         return intermediate_features
 
 
@@ -76,7 +77,7 @@ class ClientControlNet(ControlNet):
     """Our design of control network on the client."""
 
     # pylint:disable=unused-argument
-    def forward(self, x, hint, timesteps, context, **kwargs):
+    def forward(self, x, hint, **kwargs):
         """
         Forward function of control network in the client model.
         Inputs are processed latent, conditions,
