@@ -1,4 +1,4 @@
-"""Load CoCo dataset."""
+"""The CelebA datasource for ControlNet."""
 import os
 import csv
 from collections import namedtuple
@@ -21,7 +21,7 @@ CSV = namedtuple("CSV", ["header", "index", "data"])
 
 # pylint:disable=no-member
 class CelebADataset(BasicDataset):
-    """CelebA dataset"""
+    """CelebA dataset."""
 
     def __init__(
         self,

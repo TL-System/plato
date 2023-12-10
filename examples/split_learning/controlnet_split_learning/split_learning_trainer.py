@@ -10,13 +10,13 @@ from torchmetrics.multimodal import clip_score
 import einops
 from pytorch_msssim import SSIM
 
-from dataset import dataset_basic
 from plato.config import Config
 from plato.trainers import split_learning
+from dataset import dataset_basic
 
 
 class Trainer(split_learning.Trainer):
-    """The split learning algorithm to train ControlNet."""
+    """A split learning trainer to train ControlNet."""
 
     def process_samples_before_client_forwarding(self, examples):
         batch_size = examples["jpg"].size(0)
@@ -32,7 +32,7 @@ class Trainer(split_learning.Trainer):
     # pylint:disable=unused-argument
     def server_forward_from(self, batch, config):
         examples, labels = batch
-        # If we use privacy-preserving training, we do need to send gradients back
+        # If we use privacy-preserving training, we do not need to send gradients back
         if not (
             hasattr(Config().parameters.model, "privacy_preserving")
             and Config().parameters.model.privacy_preserving
@@ -64,7 +64,7 @@ class Trainer(split_learning.Trainer):
         return loss, grad, labels.size(0)
 
     def customize_loss_criterion(self, outputs, labels, timestep):
-        "Customied loss criterion for diffusion model"
+        "Customized loss criterion for diffusion model"
         loss = self.model.model.get_loss(outputs, labels, mean=False).mean(
             dim=[1, 2, 3]
         )
@@ -74,7 +74,7 @@ class Trainer(split_learning.Trainer):
         return loss
 
     def log_condition(self, img, path):
-        "log image"
+        "Log image during validation."
         grid = torchvision.utils.make_grid(img, nrow=4)
         grid = grid.transpose(0, 1).transpose(1, 2).squeeze(-1)
         grid = grid.numpy()
@@ -120,11 +120,6 @@ class Trainer(split_learning.Trainer):
         metric_ssim = SSIM(data_range=1.0, size_average=True, channel=3)
         fidscore = fid.FrechetInceptionDistance(feature=64)
         clipscore = clip_score.CLIPScore()
-        #     model_name_or_path=os.path.join(
-        #         Config().data.data_path,
-        #         "controlnet/models/openai/clip-vit-large-patch14",
-        #     )
-        # )
         self.model.to(self.device)
         self.model.model.to(self.device)
         log_dir = Config().params["result_path"]

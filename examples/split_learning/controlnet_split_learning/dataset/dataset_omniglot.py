@@ -26,7 +26,7 @@ from .dataset_basic import DiffusionInputs
 class OmniglotDataset(
     Omniglot,
 ):
-    """Fill 50k dataset"""
+    """Omniglot dataset."""
 
     # pylint:disable=too-many-arguments
     def __init__(

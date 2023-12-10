@@ -20,12 +20,12 @@ from ControlNet.annotator.util import HWC3
 
 class DiffusionInputs(defaultdict):
     """
-    The inputs data structure of diffusion model inputs
+    The structure input data of diffusion model inputs.
     """
 
     def to(self, device):
         """
-        Convert the diffusion model inputs to the device.
+        Convert inputs of the diffusion model to the device.
         """
         self["jpg"] = self["jpg"].to(device)
         self["hint"] = self["hint"].to(device)
@@ -63,7 +63,7 @@ class BasicDataset(Dataset):
 
 
 def process_condition(task, condition):
-    """To generate the condition according to the task."""
+    """Generate the condition according to the task."""
     if task is None:
         return condition
     if task == "random":

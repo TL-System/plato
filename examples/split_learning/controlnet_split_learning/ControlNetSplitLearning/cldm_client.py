@@ -1,4 +1,4 @@
-"""Control Net on client"""
+"""ControlNet on client"""
 from collections import defaultdict
 
 # pylint:disable=import-error

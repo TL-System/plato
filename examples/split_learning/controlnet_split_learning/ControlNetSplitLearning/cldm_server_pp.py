@@ -1,4 +1,4 @@
-"""Control Net on client"""
+"""Privacy-preserving ControlNet on server"""
 import torch
 
 # pylint:disable=import-error

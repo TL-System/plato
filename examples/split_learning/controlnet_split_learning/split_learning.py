@@ -13,12 +13,11 @@ sys.path.append(
 )
 sys.path.append(os.path.join(os.path.abspath(os.getcwd()), "examples"))
 # pylint:disable=wrong-import-position
+from plato.servers.split_learning import Server
+from plato.clients.split_learning import Client
 from split_learning_trainer import Trainer
 from controlnet_datasource import DataSource
 from ControlNetSplitLearning.model import ClientModel, ServerModel
-
-from plato.servers.split_learning import Server
-from plato.clients.split_learning import Client
 
 
 def main():

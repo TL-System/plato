@@ -10,7 +10,7 @@ from plato.config import Config
 
 
 def get_node_name(name, parent_name):
-    """Get the name of each component of the controlnet"""
+    """Get the name of each component of the ControlNet"""
     if len(name) <= len(parent_name):
         return False, ""
     p = name[: len(parent_name)]
@@ -21,7 +21,7 @@ def get_node_name(name, parent_name):
 
 class ControlNetModel(torch.nn.Module):
     """
-    The model class with initilization of ControlNet with pre-trained diffusion model.
+    Initialize ControlNet with pre-trained diffusion model.
     """
 
     def __init__(self, class_name) -> None:
@@ -77,7 +77,7 @@ class ControlNetModel(torch.nn.Module):
 
     @abstractmethod
     def training_step(self, batch):
-        """The training step"""
+        """Training step"""
 
     @abstractmethod
     def validation_step(self, batch):
@@ -103,7 +103,7 @@ class ClientModel(ControlNetModel):
     def forward_to(self, batch):
         """
         The specific function for client model,
-        forward to get the intermediate feature.
+        forwarding to get the intermediate feature.
         """
         outputs = self.forward(batch)
         return outputs["control_output"]

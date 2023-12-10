@@ -1,4 +1,4 @@
-"""Control Net on client"""
+"""Privacy-preserving ControlNet on client"""
 from collections import defaultdict
 
 # pylint:disable=import-error
@@ -73,6 +73,7 @@ def symsigmoid(x):
     return torch.abs(x) * (2 * torch.nn.functional.sigmoid(x) - 1)
 
 
+# pylint:disable=too-few-public-methods
 class ClientControlNet(ControlNet):
     """Our design of control network on the client."""
 
