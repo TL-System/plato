@@ -1,5 +1,5 @@
 model:
-  target: OrgModel.cldm_server_safe.OurControlLDM
+  target: ControlNetSplitLearning.cldm_server_pp.ServerControlLDM
   params:
     linear_start: 0.00085
     linear_end: 0.0120
@@ -19,7 +19,7 @@ model:
     only_mid_control: False
 
     control_stage_config:
-      target: OrgModel.cldm_server_safe.OurControlNet
+      target: ControlNetSplitLearning.cldm_server_pp.ServerControlNet
       params:
         image_size: 32 # unused
         in_channels: 4
@@ -36,7 +36,7 @@ model:
         legacy: False
 
     unet_config:
-      target: OrgModel.cldm_server_safe.OurControlledUnetModel
+      target: ControlNetSplitLearning.cldm_server_pp.ServerControlledUnetModel
       params:
         image_size: 32 # unused
         in_channels: 4
@@ -77,5 +77,3 @@ model:
 
     cond_stage_config:
       target: ldm.modules.encoders.modules.FrozenCLIPEmbedder
-      params:
-        version: /scratch/dixiyao/controlnet/models/openai/clip-vit-large-patch14
