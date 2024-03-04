@@ -158,6 +158,7 @@ class Model:
         config_kwargs.update(kwargs)
 
         model_name = model_name.replace("@", "/")
+        model_name = "google/" + model_name
         config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
         return ResolutionAdjustedModel(model_name, config)
