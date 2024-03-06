@@ -685,6 +685,7 @@ class Server(fedavg.Server):
     def _loss_steps(self, dummy_data, labels, model):
         """Take a few gradient descent steps to fit the model to the given input."""
         patched_model = PatchedModule(model)
+
         if self.use_updates:
             patched_model_origin = deepcopy(patched_model)
 
