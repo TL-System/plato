@@ -19,10 +19,13 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: CIFAR100
+    datasource: TinyImageNet
+
+    # Where the dataset is located
+    data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
-    partition_size: 5000
+    partition_size: 10000
 
     # IID or non-IID?
     sampler: iid
@@ -41,13 +44,15 @@ trainer:
     target_accuracy: 0.80
 
     # The machine learning model
-    model_name: vit
+    model_type: vit
+    model_name: vit-base-patch16-224-in21k
 
     # Number of epoches for local training in each communication round
     epochs: 5
-    batch_size: 10
-    optimizer: SGD
-    lr_scheduler: LambdaLR
+    batch_size: 64
+    optimizer: AdamW
+    lr_scheduler: CosineAnnealingLR
+    global_lr_scheduler: true
 
 algorithm:
     # Aggregation algorithm
@@ -56,19 +61,20 @@ algorithm:
 parameters:
     model:
         # Number of classes
-        num_classes: 100
+        num_classes: 200
+        num_labels: 200
+        pretrained: false
 
     optimizer:
-        lr: 0.1
-        momentum: 0.9
-        weight_decay: 0.0001
+        lr: 0.00004
+        weight_decay: 0.00000001
 
     learning_rate:
-        gamma: 0.1
-        milestone_steps: 80ep,120ep
+        eta_min: 0
+        T_max: 30
 
 results:
-    result_path: results/pretraining/vit_cifar100_0.8/
+    result_path: results/pretraining/vit_tiny_0.8/
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
