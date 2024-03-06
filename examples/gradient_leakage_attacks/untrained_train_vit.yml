@@ -80,7 +80,7 @@ algorithm:
     log_interval: 100
 
     # model mode
-    target_eval: true
+    target_eval: false
     dummy_eval: true
 
     # Dummy data initialization

@@ -15,7 +15,7 @@ server:
     port: 8080
     simulate_wall_time: true
     do_test: false
-    
+
     random_seed: 1
 
 data:
@@ -88,12 +88,12 @@ algorithm:
     # Whether or not use customized initialization for model weights
     init_params: false
     # Whether sharing gradients or model weights
-    share_gradients: true
+    share_gradients: false
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
-    match_weights: false
+    match_weights: true
     # Matching weights (absolute) or weight updates (delta)
-    use_updates: false
+    use_updates: true
     # The number of times the attack will be attempted
     trials: 1
 
