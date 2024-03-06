@@ -20,10 +20,11 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: TinyImageNet
+    # datasource: TinyImageNet
+    datasource: CIFAR100
 
     # Where the dataset is located
-    data_path: data/tiny-imagenet-200
+    # data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
     partition_size: 1
@@ -123,15 +124,15 @@ algorithm:
 
 parameters:
     model:
-        num_classes: 200
-        num_labels: 200
+        num_classes: 100
+        num_labels: 100
         pretrained: false
 
     optimizer:
         lr: 0.01
 
 results:
-    result_path: results/gradient_matching/vit_tinyimagenet/untrained_eval
+    result_path: results/delta_matching/vit_tinyimagenet/untrained_eval
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
