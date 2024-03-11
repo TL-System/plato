@@ -31,9 +31,13 @@ data:
     random_seed: 1
 
     noise:
+        # target accuracy for pre-trained model
         noise_accuracy: 0.8
+        # type of pre-trained model
         noise_model: lenet5
+        # ratio of the wrong labels
         noise_ratio: 0.3
+        # 
         top_k: 5
 
 trainer:
