@@ -15,18 +15,26 @@ class NoisyDataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
+        # Save the process id of the server
+        self.cache_root =  os.path.expanduser("~/.cache")
+        self.server_id = os.getppid()
+
         self._wrapped_datasource = data_registry.get()
         noise_engine = NoiseEngine()
         noise_engine.add_noise(self._wrapped_datasource)
 
         self.trainset = self._wrapped_datasource.trainset
         self.testset = self._wrapped_datasource.testset
+        
+        # Save the initial noisy targets
+        self.init_noisy_targets = self.trainset.targtes
     
     def num_train_examples(self):
         return self._wrapped_datasource.num_train_examples()
 
     def num_test_examples(self):
         return self._wrapped_datasource.num_test_examples()
+
 
 
 class NoiseEngine:
@@ -39,6 +47,8 @@ class NoiseEngine:
         self.noise_accuracy = 0.8 if not hasattr(Config().data.noise, "noise_accuracy") else Config().data.noise.noise_accuracy
         self.top_k = 5 if not hasattr(Config().data.noise, "top_k") else Config().data.noise.top_k
         self.noise_ratio = 0.4 if not hasattr(Config().data.noise, "noise_ratio") else Config().data.noise.noise_ratio
+
+        self.random_seed = 1 if not hasattr(Config().data, "random_seed") else Config().data.random_seed
 
     def add_noise(self, datasource):
         if not os.path.exists(self.cache_root):
@@ -156,6 +166,7 @@ class NoiseEngine:
         noise_nums = int(total_nums * self.noise_ratio) 
 
         # Select indices to replace labels
+        random.seed(self.random_seed)
         nosie_indices = random.sample(range(total_nums), noise_nums)
 
         # Choose a label from TopK predicts
