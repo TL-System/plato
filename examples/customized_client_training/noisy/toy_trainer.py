@@ -133,15 +133,18 @@ class Trainer(basic.Trainer):
     def save_pseudo_labels(self, corrections):
         # Organize corrected labels, corrections should be formatted as
         # [[indices_1, labels_1], [indices_2, labels_2], ...]
-        indices = torch.cat([x[0] for x in corrections])
-        pseudo_labels = torch.cat([x[1] for x in corrections])
+        if len(corrections) > 0: 
+            indices = torch.cat([x[0] for x in corrections]) 
+            pseudo_labels = torch.cat([x[1] for x in corrections])
+            
+            # Dump pseudo labels to file
+            label_file = f"{self.server_id}-client-{self.client_id}-labels.pt"
+            label_file = os.path.join(self.cache_root, label_file)
+            torch.save([indices, pseudo_labels], label_file)
 
-        # Dump pseudo labels to file
-        label_file = f"{self.server_id}-client-{self.client_id}-labels.pt"
-        label_file = os.path.join(self.cache_root, label_file)
-        torch.save([indices, pseudo_labels], label_file)
-
-        logging.info(f" [Client #{self.client_id}] Replaced labels at {indices} to {pseudo_labels}")
+            logging.info(f" [Client #{self.client_id}] Replaced labels at {indices} to {pseudo_labels}")
+        else: 
+            logging.info(f"[Client #{self.client_id}] Keeps the label untouched.")
 
 
     def get_indexed_train_loader(self, batch_size, trainset, sampler):
