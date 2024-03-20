@@ -133,8 +133,8 @@ class Trainer(basic.Trainer):
     def save_pseudo_labels(self, corrections):
         # Organize corrected labels, corrections should be formatted as
         # [[indices_1, labels_1], [indices_2, labels_2], ...]
-        indices = torch.vstack([x[0] for x in corrections]).flatten()
-        pseudo_labels = torch.vstack([x[1] for x in corrections]).flatten()
+        indices = torch.cat([x[0] for x in corrections])
+        pseudo_labels = torch.cat([x[1] for x in corrections])
 
         # Dump pseudo labels to file
         label_file = f"{self.server_id}-client-{self.client_id}-labels.pt"
