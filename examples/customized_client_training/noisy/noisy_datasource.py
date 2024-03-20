@@ -20,6 +20,8 @@ class NoisyDataSource(base.DataSource):
         self.server_id = os.getppid()
 
         self._wrapped_datasource = data_registry.get()
+        self.init_clean_targets = self.clone_labels(self._wrapped_datasource.trainset.targets)
+
         noise_engine = NoiseEngine()
         noise_engine.add_noise(self._wrapped_datasource)
 
@@ -27,13 +29,65 @@ class NoisyDataSource(base.DataSource):
         self.testset = self._wrapped_datasource.testset
         
         # Save the initial noisy targets
-        self.init_noisy_targets = self.trainset.targtes
+        self.init_noisy_targets = self.clone_labels(self.trainset.targets)
     
     def num_train_examples(self):
         return self._wrapped_datasource.num_train_examples()
 
     def num_test_examples(self):
         return self._wrapped_datasource.num_test_examples()
+
+    def clone_labels(self, targets):
+        if isinstance(targets, torch.Tensor):
+            return targets.clone().detach()
+        elif isinstance(targets, list):
+            return targets.copy()
+        else:
+            raise TypeError(f"Cannot handle targets type: {type(targets)}")
+        
+
+    def read_client_labels(self, client_id):
+        # Read client's pseudo label from file, return initial
+        # noisy labels if file not exists.
+
+        label_file = f"{self.server_id}-client-{client_id}-labels.pt"
+        label_file = os.path.join(self.cache_root, label_file)
+
+        if isinstance(self.init_noisy_targets, torch.Tensor):
+            init_noisy_labels = self.init_noisy_targets.clone().detach()
+        else:
+            init_noisy_labels = torch.tensor(self.init_noisy_targets)
+
+        try:
+            [indices, pseudo_labels] =  torch.load(label_file)
+            init_noisy_labels[indices] = pseudo_labels
+            logging.info(f"Client [{client_id}] Read pseduo labels {pseudo_labels} at indices {indices} from file.")
+        except:
+            logging.warning("Client pseudo label file not exists, using initial noisy labels.")
+
+        return init_noisy_labels
+
+
+    def setup_client_datasource(self, client_id):
+        # Repalce the labels in trainset with client's pseudo labels
+        self.trainset.targets = self.read_client_labels(client_id)
+    
+    def eval_pseudo_acc(self, client_id, client_indices):
+        pseudo_labels = self.read_client_labels(client_id)[client_indices]
+        noisy_labels = self.init_noisy_targets[client_indices]
+        clean_labels = self.init_clean_targets[client_indices]
+
+        modifed_noisy_labels = sum(pseudo_labels != noisy_labels)
+        correct_change_from_wrong_noisy = sum(torch.logical_and(pseudo_labels != noisy_labels, pseudo_labels == clean_labels))
+        wrong_change_from_wrong_noisy =  sum(
+            torch.logical_and(clean_labels != noisy_labels, 
+                              torch.logical_and(pseudo_labels != noisy_labels, pseudo_labels != clean_labels)
+            )
+        )
+        wrong_change_from_correct_noisy = sum(torch.logical_and(pseudo_labels != noisy_labels, noisy_labels == clean_labels))
+
+        logging.info(f"[Client #{client_id}] Modified {modifed_noisy_labels} labels from , {correct_change_from_wrong_noisy} wrong labels are corrected, {wrong_change_from_wrong_noisy} wrong labels are changed but still wrong, {wrong_change_from_correct_noisy} correct noisy labels are changed to wrong.")
+        
 
 
 
