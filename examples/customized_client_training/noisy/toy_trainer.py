@@ -7,7 +7,29 @@ import os
 from torch.utils.data import Dataset
 from plato.config import Config
 from plato.trainers import basic
+import torch.nn as nn
+import torch.nn.functional as F
 
+class ELRLoss(nn.Module):
+    """ Early learning regularization loss from https://proceedings.neurips.cc/paper/2020/file/ea89621bee7c88b2c5be6681c8ef4906-Paper.pdf"""
+    def __init__(self, num_examp=60000, num_classes=10, beta=0.7):
+        super(ELRLoss, self).__init__()
+        self.device = Config().device()
+        self.target = torch.zeros(num_examp, num_classes).to(self.device) 
+        self.beta = beta
+        self.lamda = 0.1 # should read from configuration file.
+
+    def forward(self, outputs, labels, indices):
+        y_pred = F.softmax(outputs,dim=1)
+        y_pred = torch.clamp(y_pred, 1e-4, 1.0-1e-4)
+        y_pred_ = y_pred.data.detach()
+
+        self.target[indices] = self.beta * self.target[indices] + (1-self.beta) * ((y_pred_)/(y_pred_).sum(dim=1,keepdim=True))
+        ce_loss = F.cross_entropy(outputs, labels)
+        elr_loss = ((1-(self.target[indices] * y_pred).sum(dim=1)).log()).mean()
+        loss = ce_loss +  self.lamda * elr_loss
+        
+        return  loss
 class IndexedDataSet(Dataset):
     """A toy trainer to test noisy data source."""
     def __init__(self, dataset) -> None:
@@ -74,7 +96,7 @@ class Trainer(basic.Trainer):
                 examples, labels = examples.to(self.device), labels.to(self.device)
 
                 loss = self.perform_forward_and_backward_passes(
-                    config, examples, labels
+                    config, examples, labels, indices
                 )
                 if not corrected:
                     corrections.append(self.magic_label_correction(indices))
@@ -151,3 +173,33 @@ class Trainer(basic.Trainer):
         return torch.utils.data.DataLoader(
             dataset=IndexedDataSet(trainset), shuffle=False, batch_size=batch_size, sampler=sampler
         )
+    def get_loss_criterion(self):
+        #Returns the regularization loss criterion.
+        return ELRLoss()
+
+    def perform_forward_and_backward_passes(self, config, examples, labels,indices):
+        """Perform forward and backward passes in the training loop.
+
+        Arguments:
+        config: the configuration.
+        examples: data samples in the current batch.
+        labels: labels in the current batch.
+
+        Returns: loss values after the current batch has been processed."""
+        
+        self.optimizer.zero_grad()
+
+        outputs = self.model(examples)
+        
+        loss = self._loss_criterion(outputs, labels, indices)
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
+    
