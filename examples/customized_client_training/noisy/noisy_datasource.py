@@ -41,7 +41,7 @@ class NoisyDataSource(base.DataSource):
         if isinstance(targets, torch.Tensor):
             return targets.clone().detach()
         elif isinstance(targets, list):
-            return targets.copy()
+            return torch.tensor(targets)
         else:
             raise TypeError(f"Cannot handle targets type: {type(targets)}")
         
