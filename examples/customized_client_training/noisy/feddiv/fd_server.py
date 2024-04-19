@@ -5,10 +5,13 @@ FedDiv Server
 
 import random
 import torch
+import logging
 import numpy as np
 
 from plato.servers import fedavg
-from gmm_filter import GlobalFilterManager
+from plato.config import Config
+from feddiv.gmm_filter import GlobalFilterManager
+from plato.utils import fonts
 
 
 class Server(fedavg.Server):
@@ -22,21 +25,32 @@ class Server(fedavg.Server):
         # Warm up
         self.warm_up = True
         self.warm_up_clients = []
-        self.warm_up_iters = 0
-        self.current_warm_up_round = None
+        self.current_warm_up_round = 0
+        self.warm_up_rounds = Config().server.warm_up_rounds
 
         # Normal training
+        self.global_filter = None
+
+    def configure(self):
+        """Overide the configure function to setup noise filter"""
+        super().configure()
         self.global_filter = GlobalFilterManager(
-            init_dataset=None, components=2, seed=None, init_params="random"
+            components=2, seed=None, init_params="random"
         )
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose clients with no replacement in warm up phase."""
-        if self.warm_up:
-            if not len(self.warm_up_clients):
+
+        if not len(self.warm_up_clients):
+            self.current_warm_up_round += 1
+            if self.current_warm_up_round > self.warm_up_rounds:
+                self.warm_up = False
+                logging.info(fonts.colourize(f"[{self}] FedDiv warm up phase ends."))
+            else:
                 self.warm_up_clients = clients_pool[:]
                 random.shuffle(self.warm_up_clients)
-                self.warm_up_iters += 1
+
+        if self.warm_up:
             selected_clients = self.warm_up_clients[:clients_count]
             self.warm_up_clients = self.warm_up_clients[clients_count:]
             return selected_clients
@@ -45,19 +59,33 @@ class Server(fedavg.Server):
 
     def customize_server_payload(self, payload):
         """Customize the server payload before sending to the client."""
-        if self.current_round % 2 != 0:
-            return self.encrypted_model
-        else:
-            return self.final_mask
+        payload = {
+            "warm_up": self.warm_up,
+            "payload": payload,
+        }
+        if not self.warm_up:
+            payload["filter"] = {
+                "n_components": self.global_filter.components,
+                "random_state": self.global_filter.random_state,
+                "is_quiet": True,
+                "init_params": self.global_filter.init_params,
+                "weights_init": self.global_filter.model.weights_,
+                "means_init": self.global_filter.model.means_,
+                "precisions_init": self.global_filter.model.precisions_,
+                "covariances_init": self.global_filter.model.covariances_,
+            }
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        if self.current_round % 2 != 0:
-            # Clients send mask proposals in odd rounds, conduct mask consensus
-            self._mask_consensus(updates)
-            return baseline_weights
+        return payload
+
+    def weights_received(self, weights_received):
+        if self.warm_up:
+            # Directly return the model weights in warm up phase
+            return weights_received
         else:
-            # Clients send model updates in even rounds, conduct aggregation
-            aggregated_weights = await super().aggregate_weights(
-                updates, baseline_weights, weights_received
-            )
-            return aggregated_weights
+            data_sizes = [x["data_size"] for x in weights_received]
+            filter_updates = [x["filter_updates"] for x in weights_received]
+            self.global_filter.set_parameters_from_clients_models(filter_updates)
+            self.global_filter.weighted_average_clients_models(data_sizes)
+            self.global_filter.update_server_model()
+            model_weights = [x["model_weights"] for x in weights_received]
+            return model_weights
