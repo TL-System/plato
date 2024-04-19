@@ -5,23 +5,20 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy import linalg
 
+from sklearn import datasets, preprocessing
 import warnings
 from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
-
-
-
-
 class GlobalFilterManager():
-    def __init__(self, init_dataset, components=2, local_epochs=3, seed=False, init_params='random'):
+    def __init__(self, components=2, local_epochs=3, seed=False, init_params='random'):
         self.random_state = None
         if seed:
             self.random_state = int(seed)
         
         # Initialize GaussianMixture model
         self.model = GaussianMixture(
-            X=init_dataset,
+            X=None,
             n_components=components,
             random_state=self.random_state,
             is_quiet=True,
@@ -30,7 +27,6 @@ class GlobalFilterManager():
 
         self.init_params = init_params
         self.components = components
-        self.init_dataset = init_dataset
         self.local_epochs = local_epochs
         self.selected_clients = {}
 
@@ -40,8 +36,8 @@ class GlobalFilterManager():
         self.clients_covariances = []
         self.clients_weights = []
 
-        for client_id in server_cached_local_filter:
-            parameters = server_cached_local_filter[client_id]['parameters']
+        for filter_update in server_cached_local_filter:
+            parameters = filter_update['parameters']
             self.clients_means.append(parameters['means'][-1])
             self.clients_covariances.append(parameters['covariances'][-1])
             self.clients_weights.append(parameters['weights'][-1])
@@ -84,7 +80,7 @@ class GlobalFilterManager():
     def update_server_model(self):
         # Update server-side model
         self.model = GaussianMixture(
-            X=self.init_dataset,
+            X=None,
             n_components=self.components,
             random_state=self.random_state,
             is_quiet=True,
@@ -138,9 +134,12 @@ class GlobalFilterManager():
 
 class GaussianMixture(sklearn.mixture.GaussianMixture):
 
-    def __init__(self, X, n_components=3, covariance_type='full',
+    def __init__(self, X = None, n_components=3, covariance_type='full',
                  weights_init=None, means_init=None, precisions_init=None, covariances_init=None,
                  init_params='kmeans', tol=1e-3, random_state=None, is_quiet=False):
+
+        if not X:
+            X = self.gen_filter_data(random_state = 1)
 
         do_init = (weights_init is None) and (means_init is None) and (precisions_init is None) and (covariances_init is None)
         if do_init:
@@ -181,6 +180,29 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
         self.covariances_ = covariances_init
         # precisions_ is computed as before
         self._set_parameters(self._get_parameters())
+
+    def gen_filter_data(self, random_state = None):
+        """Generate the initial data for the filter (copied from FedDiv codebase)"""
+        if not random_state:
+            random_state = 1
+
+        data, labels = datasets.make_blobs(
+            n_samples=1000, n_features=1, centers=2, random_state=random_state, shuffle=False
+        )
+
+        scaler = preprocessing.StandardScaler()
+        scaler.fit(data)
+        data = scaler.transform(data)
+        train_dataset = np.array(data)
+
+        lb = preprocessing.LabelBinarizer()
+        lb.fit(labels)
+        labels = lb.transform(labels)
+        init_data = (train_dataset - min(train_dataset)) / (
+            max(train_dataset) - min(train_dataset)
+        )
+
+        return init_data
 
     def fit(self, X, epochs=1, labels=None, args=None, output_dir=None):
         self.history_ = {
