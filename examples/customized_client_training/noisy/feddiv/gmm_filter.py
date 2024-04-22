@@ -7,6 +7,7 @@ from scipy import linalg
 
 from sklearn import datasets, preprocessing
 import warnings
+import logging
 from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
@@ -89,8 +90,7 @@ class GlobalFilterManager():
             means_init=self.avg_clients_means,
             precisions_init=self.avg_clients_precisions
         )
-
-        return
+        logging.info(f"GMM stats: mean = {self.avg_clients_means}, weights = {self.avg_clients_weights}, precision = {self.avg_clients_precisions}.")
 
     def _update_model_parameters(self):
         # Update model parameters
