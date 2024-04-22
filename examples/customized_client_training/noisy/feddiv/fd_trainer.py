@@ -55,8 +55,8 @@ class Trainer(basic.Trainer):
         else:
             print("Debias file not exsits, Creating")
             de_bias = {}
-            de_bias["de_biased_labels"] = {x: 0 for x in sampler.subset_indices}
-            de_bias["de_biased_probs"] = {x: 0 for x in sampler.subset_indices}
+            de_bias["de_biased_labels"] = {x: 0 for x in sampler.get().indices}
+            de_bias["de_biased_probs"] = {x: 0 for x in sampler.get().indices}
             num_classes = Config().parameters.model.num_classes
             de_bias["phat"] = np.ones([1, num_classes], dtype=np.float32) / num_classes
             de_bias["counter"] = 0

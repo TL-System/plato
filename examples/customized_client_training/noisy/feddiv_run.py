@@ -13,7 +13,7 @@ def main():
         datasource = None
 
     trainer = fd_trainer.Trainer
-    client = fd_client.Client(datasource=datasource, trainer=trainer)
+    client = fd_client.Client(datasource=datasource, trainer=trainer, callbacks=[SetupPseudoLabelCallback, EvalPseudoLabelCallback])
     server = fd_server.Server(datasource=datasource, trainer=trainer)
     server.run(client)
 

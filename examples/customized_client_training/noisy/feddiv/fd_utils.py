@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 from scipy.special import softmax
 import copy
+import logging
 
 def get_output(loader, net, device, criterion=None):
     net.eval()
@@ -80,6 +81,8 @@ def local_data_splitting(loss, global_noise_filter):
     # The model is presumably a Gaussian Mixture Model or similar, where 'means_' is an attribute
     prob_clean = global_noise_filter.predict(normalized_loss.reshape(-1, 1))
     
+    logging.info(f"filter prediction: {prob_clean[:100]}")
+
     # Select the probability of being clean associated with the component of the model with the lowest mean
     # This assumes that the clean data is associated with the component that has the lowest mean loss
     prob_clean = prob_clean[:, global_noise_filter.means_.argmin()]
@@ -93,6 +96,7 @@ def local_data_splitting(loss, global_noise_filter):
     # Estimate the noise level in the dataset as the proportion of data points predicted to be noisy
     estimated_noisy_level = 1.0 - np.sum(pred_clean) / len(pred_clean)
 
+    logging.info(f"Estimated noisy level: {estimated_noisy_level}")
     # Compile the results into a dictionary
     local_split = {
         'pred_clean': pred_clean,
