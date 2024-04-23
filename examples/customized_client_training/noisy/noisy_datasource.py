@@ -88,7 +88,11 @@ class NoisyDataSource(base.DataSource):
 
         logging.info(f"[Client #{client_id}] Modified {modifed_noisy_labels} labels from , {correct_change_from_wrong_noisy} wrong labels are corrected, {wrong_change_from_wrong_noisy} wrong labels are changed but still wrong, {wrong_change_from_correct_noisy} correct noisy labels are changed to wrong.")
         
-
+        line = f"[Client #{client_id}] Modified {modifed_noisy_labels} labels from , {correct_change_from_wrong_noisy} wrong labels are corrected, {wrong_change_from_wrong_noisy} wrong labels are changed but still wrong, {wrong_change_from_correct_noisy} correct noisy labels are changed to wrong."
+        eval_file = "./eval_correction.txt"
+        with open(eval_file, 'a') as file:
+            file.write(line + '\n')
+        #torch.save([indices, pseudo_labels], label_file)
 
 
 class NoiseEngine:
