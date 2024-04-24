@@ -120,9 +120,8 @@ class NoisyDataSource(base.DataSource):
 
     def eval_pseudo_acc(self, client_id, client_indices):
         # Eval the cumulative pseudo labels
-        cumulative_pseudo_labels = self.read_cumulative_pseudo_labels(client_id)[
-            client_indices
-        ]
+        cumulative_pseudo_labels_all = self.read_cumulative_pseudo_labels(client_id)
+        cumulative_pseudo_labels = cumulative_pseudo_labels_all[client_indices]
         clean_labels_all = self.init_clean_targets[client_indices]
 
         clean_sample_nums_total = sum(cumulative_pseudo_labels == clean_labels_all)
@@ -132,25 +131,27 @@ class NoisyDataSource(base.DataSource):
         [updated_indices, updated_pseudo_labels] = self.read_last_round_label_updates(
             client_id
         )
-        noisy_labels = self.init_noisy_targets[updated_indices]
+        noisy_labels = cumulative_pseudo_labels_all[updated_indices]
         clean_labels = self.init_clean_targets[updated_indices]
 
-        label_modified_nums_this_round = sum(updated_pseudo_labels != noisy_labels)
+        label_modified_nums_this_round = len(updated_indices)
+        # label_modified_nums_this_round = sum(updated_pseudo_labels != noisy_labels)
 
         clean_label_modified_nums_this_round = sum(
             torch.logical_and(
                 updated_pseudo_labels != noisy_labels, noisy_labels == clean_labels
             )
         )
-        noisy_label_modified_nums_this_round = sum(
+
+        clean_label_remained_nums_this_round = sum(
             torch.logical_and(
-                updated_pseudo_labels != noisy_labels, noisy_labels != clean_labels
+                updated_pseudo_labels == clean_labels, noisy_labels == clean_labels
             )
         )
 
         correct_noisy_relabel_nums_this_round = sum(
             torch.logical_and(
-                updated_pseudo_labels != noisy_labels,
+                clean_labels != noisy_labels,
                 updated_pseudo_labels == clean_labels,
             )
         )
@@ -158,10 +159,7 @@ class NoisyDataSource(base.DataSource):
         wrong_noisy_relabel_nums_this_round = sum(
             torch.logical_and(
                 clean_labels != noisy_labels,
-                torch.logical_and(
-                    updated_pseudo_labels != noisy_labels,
-                    updated_pseudo_labels != clean_labels,
-                ),
+                updated_pseudo_labels != clean_labels,
             )
         )
         # Save the stats to csv
@@ -170,7 +168,7 @@ class NoisyDataSource(base.DataSource):
             "noisy_sample_nums_total": noisy_sample_nums_total,
             "label_modified_nums_this_round": label_modified_nums_this_round,
             "clean_label_modified_nums_this_round": clean_label_modified_nums_this_round,
-            "noisy_label_modified_nums_this_round": noisy_label_modified_nums_this_round,
+            "clean_label_remained_nums_this_round": clean_label_remained_nums_this_round,
             "correct_noisy_relabel_nums_this_round": correct_noisy_relabel_nums_this_round,
             "wrong_noisy_relabel_nums_this_round": wrong_noisy_relabel_nums_this_round,
         }
