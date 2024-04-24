@@ -2,14 +2,14 @@
 from plato.config import Config
 from  noisy_datasource import NoisyDataSource
 import toy_trainer
-from callbacks import SetupPseudoLabelCallback, EvalPseudoLabelCallback
+from callbacks import SetupPseudoLabelCallback
 from plato.servers import fedavg
 from plato.clients import simple
 
 def main():
     if hasattr(Config().data, "noise"):
         datasource = NoisyDataSource
-        callbacks = [SetupPseudoLabelCallback, EvalPseudoLabelCallback]
+        callbacks = [SetupPseudoLabelCallback]
     else:
         datasource = None
         callbacks = None
