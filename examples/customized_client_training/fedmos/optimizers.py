@@ -1,5 +1,4 @@
 import torch
-import time
 
 class FedMosOptimizer(torch.optim.Optimizer):
     def __init__(self, params, lr, a=1., mu=0.):
@@ -49,33 +48,7 @@ class FedMosOptimizer(torch.optim.Optimizer):
                 state['dt'] = gt + (1-a)*(dt - gt_prev)
                 state['gt_prev'] = gt.clone().detach()
                 # state['gt_prev'] = None
-
-    # def update_momentum(self, net_prev):
-    #     for group in self.param_groups:
-    #         for p, p_prev in zip(group['params'], net_prev.parameters()):
-    #             gt = p.grad.data # grad
-    #             if gt is None:
-    #                 continue
-    #             a = group['a']
-    #             state = self.state[p]
-    #             if len(state) == 0:
-    #                 # State initialization
-    #                 # state['gt_prev'] = torch.zeros_like(p.data)
-    #                 state['dt'] = gt.clone()
-    #                 continue
-
-    #                 # state['gt_prev'] = torch.zeros_like(p.data)
-    #                 # state['dt'] = gt.clone()
-
-    #             gt_prev = p_prev.grad.data
-    #             # assert not torch.allclose(gt, gt_prev), 'Please call clone_grad() in the preious step.'
-    #             dt = state['dt']
-    #             # print(torch.equal(dt-gt_prev, torch.zeros_like(dt-gt_prev)))
-    #             # print(dt-gt_prev)
-    #             state['dt'] = gt + (1-a)*(dt - gt_prev)
-    #             # state['gt_prev'] = gt.clone().detach()
-    #             # state['gt_prev'] = None
-
+                
     def step(self, local_net):
         for group in self.param_groups:
             # For different groups, we might want to use different lr, regularizer, ...

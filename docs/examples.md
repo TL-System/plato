@@ -165,6 +165,16 @@ python examples/customized_client_training/fedti/fedti.py -c examples/customized
 Gal et al., &ldquo;[POLARIS: An Image is Worth One Word: Personalizing Text-to-Image Generation using Textual Inversion](https://arxiv.org/pdf/2208.01618.pdf), &rdquo; Arxiv, 2022.
 ````
 
+````{admonition} **FedMos**
+FedMoS is a communication-efficient FL framework with coupled double momentum-based update and adaptive client selection, to jointly mitigate the intrinsic variance.
+
+```shell
+python examples/customized_client_training/fedmos/fedmos.py -c examples/customized_client_training/fedmos/fedmos_MNIST_lenet5.yml
+```
+```{note}
+X. Wang, Y. Chen, Y. Li, X. Liao, H. Jin and B. Li, "FedMoS: Taming Client Drift in Federated Learning with Double Momentum and Adaptive Selection," IEEE INFOCOM 2023.
+````
+
 
 #### Client Selection Algorithms
 
