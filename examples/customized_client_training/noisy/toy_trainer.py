@@ -36,7 +36,7 @@ class ELRLoss(nn.Module):
         
         return  loss
 
-class LIDLoss(nn.Module):
+class LIDLossbase(nn.Module):
     """Lid based soft labeling, which can be considered as a loss modification"""
     def __init__(self):
         super(LIDLoss, self).__init__()
@@ -55,6 +55,29 @@ class LIDLoss(nn.Module):
         outputs = torch.clamp(outputs, 1e-7, 1.0 - 1e-7)
 
         loss = -torch.mean(torch.sum(y_new * torch.log(outputs), axis=-1))
+        #logging.info(f"loss: %s", loss)
+        return loss
+
+class LIDLoss(nn.Module):
+    """Lid based soft labeling, which can be considered as a loss modification"""
+    def __init__(self):
+        super(LIDLoss, self).__init__()
+
+    def forward(self, outputs, labels, alpha):
+        # check embedings here 
+        self.device = Config().device()
+        #torch.autograd.set_detect_anomaly(True)
+
+        pred_labels = F.one_hot(torch.argmax(outputs, 1), num_classes=10)
+        labels = F.one_hot(labels, num_classes=10)
+
+        alpha = torch.tensor(alpha).to(self.device)
+        y_new = (alpha * labels.T + (1. - alpha) * pred_labels.T).T
+        # outputs =  outputs / torch.sum(outputs, axis=-1, keepdims=True)
+        # outputs = torch.clamp(outputs, 1e-7, 1.0 - 1e-7)
+
+        #loss = -torch.mean(torch.sum(y_new * torch.log(outputs), axis=-1))
+        loss = F.cross_entropy(outputs, y_new) + 5 * alpha.mean()
         #logging.info(f"loss: %s", loss)
         return loss
 
@@ -185,7 +208,16 @@ class Trainer(basic.Trainer):
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 
             # save lids locally
-            file_path = './lids'+ str(self.client_id) +'.csv' 
+            root_folder = "./lids"
+            if not os.path.exists(root_folder):
+                os.mkdir(root_folder)
+
+            client_folder = os.path.join(root_folder, str(self.server_id))
+            if not os.path.exists(client_folder):
+                os.mkdir(client_folder)
+
+            file_path = os.path.join(client_folder, f"client-{self.client_id}.csv")
+            #file_path = './lids'+ str(self.client_id) +'.csv' 
             with open(file_path, "a") as file:
                 file.write(str(np.mean(lid_batch)))
                 file.write("\n")
@@ -238,9 +270,9 @@ class Trainer(basic.Trainer):
             dataset=IndexedDataSet(trainset), shuffle=False, batch_size=batch_size, sampler=sampler
         )
      
-    # def get_loss_criterion(self):
-    #     #Returns the regularization loss criterion.
-    #     return LIDLoss() #ELRLoss()
+    def get_loss_criterion(self):
+        #Returns the regularization loss criterion.
+        return LIDLoss() #ELRLoss()
 
     def perform_forward_and_backward_passes(self, config, examples, labels, indices):
         """
@@ -266,7 +298,7 @@ class Trainer(basic.Trainer):
                 activation.append(output.detach().cpu().numpy())
                 # logging.info(f"in hook function: %s", activation)
             return hook 
-        h1 = self.model.relu4.register_forward_hook(getActivation('relu4'))
+        h1 = self.model.relu4.register_forward_hook(getActivation('relu4')) # self.model.layers[-1].bn for vgg16
         
         outputs = self.model(examples)
         
@@ -315,19 +347,19 @@ class Trainer(basic.Trainer):
                 # calculate 
                 alpha = -np.power (1/8 * lid / np.min(lid_dict[index]) - 1/8, 2)+1
                 #- 1/2 * np.exp(- 1 * lid / np.min(lid_dict[index])) * np.log(1/2*np.exp(- 1 * lid / np.min(lid_dict[index]))) # np.exp(-self.lamda * lid / np.min(lid_dict[index]))
-                #logging.info(f"alpha: %s",alpha)
-                #logging.info(f"min: %s", np.min(lid_dict[index]))
-                alphas.append(alpha)
+                #alphas.append(alpha)
 
                 # save alphas for study (should be remove later)
                 alpha_dict[index].append(alpha)
                 # threshold for label correction
                 if alpha <= 0.95: # 0.95: 
                     corrections.append([torch.tensor(index),torch.tensor(pre_label)])
-                    # refurbushable.append(index)
-                    # new_labels.append(pre_label)
-                    #logging.info(f"refurbushable: %s", refurbushable)
-                    #logging.info(f"new_labels: %s", pre_label)
+                    alphas.append(0.0)
+                
+                elif alpha>0.95 and alpha<0.97:
+                    alphas.append(alpha/2)
+                else:
+                    alphas.append(1.0)
 
                 # update lid_dict
                 if lid < lid_dict[index]:
@@ -339,8 +371,8 @@ class Trainer(basic.Trainer):
             else: 
                 # add into lid_dict
                 lid_dict[index] = lid #[lid]
-                alpha_dict[index] = [1]
-                alphas.append(1)
+                alpha_dict[index] = [1.0]
+                alphas.append(1.0)
 
         #logging.info(f"alpha_dict: %s",alpha_dict)
         torch.save(alpha_dict,alpha_file)
@@ -371,7 +403,10 @@ class Trainer(basic.Trainer):
         #loss = self._loss_criterion(outputs, labels, alphas)
 
         # this is for cross-entropy by defualt
-        loss = self._loss_criterion(outputs, labels)
+        loss = self._loss_criterion(outputs, labels,alphas)
+
+        # this loss is for regularization
+        #loss = self._loss_criterion(outputs, labels)#, indices)
 
         ###############below for selfie tracking
         """
