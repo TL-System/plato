@@ -1,0 +1,79 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 5
+
+    # The number of clients selected in each round
+    per_round: 5
+
+    comm_simulation: false
+
+
+server:
+    address: 127.0.0.1
+    port: 6092
+    
+    fedcorr:
+        stage_1_rounds: 5
+        stage_2_rounds: 80
+
+data:
+    # The training and testing dataset
+    datasource: MNIST
+
+    # Number of samples in each partition
+    partition_size: 2000
+
+    # IID or non-IID?
+    sampler: noniid
+    concentration: 0.5
+
+
+    # The random seed for sampling data
+    random_seed: 1
+
+    noise:
+        # target accuracy for pre-trained model
+        noise_accuracy: 0.8
+        # type of pre-trained model
+        noise_model: lenet5
+        # ratio of the wrong labels
+        noise_ratio: 0.4
+        # 
+        top_k: 5
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 5
+
+    # The target accuracy
+    target_accuracy: 0.99
+
+    # The machine learning model
+    model_name: lenet5
+
+    # Number of epoches for local training in each communication round
+    epochs: 1
+    batch_size: 128
+    optimizer: SGD
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:    
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0
