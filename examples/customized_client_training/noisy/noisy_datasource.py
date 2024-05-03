@@ -162,6 +162,20 @@ class NoisyDataSource(base.DataSource):
                 updated_pseudo_labels != clean_labels,
             )
         )
+
+        # Test code
+        if len(updated_indices):
+            cumulative_pseudo_labels_all[updated_indices] = updated_pseudo_labels
+        cumulative_pseudo_labels = cumulative_pseudo_labels_all[client_indices]
+        applied_clean_sample_nums_total = sum(cumulative_pseudo_labels == clean_labels_all)
+
+        if len(updated_indices):
+            if len(set(updated_indices.tolist()) - set(client_indices)) > 0:
+                print(123123)
+
+        if applied_clean_sample_nums_total != clean_sample_nums_total + correct_noisy_relabel_nums_this_round - clean_label_modified_nums_this_round:
+            print(123123)
+
         # Save the stats to csv
         stats = {
             "clean_sample_nums_total": clean_sample_nums_total,
@@ -185,7 +199,10 @@ class NoisyDataSource(base.DataSource):
 
         client_folder = os.path.join(root_folder, str(self.server_id))
         if not os.path.exists(client_folder):
-            os.mkdir(client_folder)
+            try:
+                os.mkdir(client_folder)
+            except FileExistsError:
+                pass
 
         csv_file = os.path.join(client_folder, f"pseudo-{client_id}.csv")
 
@@ -358,10 +375,13 @@ class NoiseEngine:
         total_nums = len(datasource.trainset)
         noise_nums = int(total_nums * self.noise_ratio)
 
+        if noise_nums == 0:
+            logging.warning(f"Replaced {noise_nums} labels with noisy predctions.")
+            return
         # Select indices to replace labels
         random.seed(self.random_seed)
         nosie_indices = random.sample(range(total_nums), noise_nums)
-
+        
         # Choose a label from TopK predicts
         rand_topK = torch.tensor(random.choices(range(1, self.top_k), k=noise_nums))
         offset = torch.arange(0, noise_nums).long() * self.top_k
