@@ -26,7 +26,7 @@ class Server(fedavg.Server):
         self.warm_up = True
         self.warm_up_clients = []
         self.current_warm_up_round = 0
-        self.warm_up_rounds = Config().server.warm_up_rounds
+        self.warm_up_rounds = Config().server.feddiv.warm_up_rounds
 
         # Normal training
         self.global_filter = None

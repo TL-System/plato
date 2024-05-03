@@ -132,7 +132,7 @@ class Trainer(basic.Trainer):
             pseudo_labels = torch.cat([torch.tensor(x[1]) for x in corrections])
 
             # Dump pseudo labels to file
-            label_file = f"{self.server_id}-client-{self.client_id}-labels.pt"
+            label_file = f"{self.server_id}-client-{self.client_id}-label-updates.pt"
             label_file = os.path.join(self.cache_root, label_file)
             torch.save([indices, pseudo_labels], label_file)
 
