@@ -48,7 +48,7 @@ class Trainer(basic.Trainer):
             loss.backward()
 
         self.optimizer.update_momentum()
-        self.optimizer.step(copy.deepcopy(self.local_param_tmpl))
+        self.optimizer.step(copy.deepcopy(self.local_param_tmpl), device=self.device)
 
         return loss
 
