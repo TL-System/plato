@@ -49,7 +49,7 @@ class FedMosOptimizer(torch.optim.Optimizer):
                 state['gt_prev'] = gt.clone().detach()
                 # state['gt_prev'] = None
                 
-    def step(self, local_net):
+    def step(self, local_net, device):
         for group in self.param_groups:
             # For different groups, we might want to use different lr, regularizer, ...
             for p, local_p in zip(group['params'], local_net.parameters()):
@@ -59,7 +59,7 @@ class FedMosOptimizer(torch.optim.Optimizer):
                 
                 lr, mu = group['lr'], group['mu']
                 dt = state['dt']
-                prox = p.data - local_p.data
+                prox = p.data.to(device) - local_p.data.to(device)
                 p.data.add_(dt, alpha=-lr)
                 p.data.add_(prox, alpha=-mu)
 
