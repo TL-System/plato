@@ -228,7 +228,11 @@ class NoiseEngine:
         self.device = None
         self.cache_root = os.path.expanduser("~/.cache")
         self.dataset_name = Config().data.datasource
-        self.noise_model = Config().data.noise.noise_model
+        self.noise_model = (
+            None
+            if not hasattr(Config().data.noise, "noise_model")
+            else Config().data.noise.noise_model
+        )
 
         self.noise_accuracy = (
             0.8
@@ -252,7 +256,27 @@ class NoiseEngine:
             else Config().data.random_seed
         )
 
+        self.cifar10N = (
+            False
+            if not hasattr(Config().data.noise, "cifar10N")
+            else True
+        )
+        self.cifar10N_path = None
+        self.cifar10N_split = None
+        if self.cifar10N:
+            self.cifar10N_path = Config().data.noise.cifar10N.path
+            self.cifar10N_split = Config().data.noise.cifar10N.split
+            assert self.cifar10N_split in ["worst", "aggre"]
+
+
     def add_noise(self, datasource):
+
+        if self.cifar10N:
+            logging.warn("Replace labels with CIFAR10N dataset.")
+            noise_label = torch.load(self.cifar10N_path)[f'{self.cifar10N_split}_label']
+            datasource.trainset.targets = noise_label.tolist()
+            return
+        
         if not os.path.exists(self.cache_root):
             os.mkdir(self.cache_root)
 
