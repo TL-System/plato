@@ -2,6 +2,7 @@ import torch
 import logging
 import random
 import time
+import copy
 import os
 import numpy as np
 
@@ -66,6 +67,27 @@ def lid_term(X, batch, k=20):
     return lids
 
 
+def mixup_data(x, y, alpha=1.0, use_cuda=True):
+    '''Returns mixed inputs, pairs of targets, and lambda'''
+    if alpha > 0:
+        lam = np.random.beta(alpha, alpha)
+    else:
+        lam = 1
+
+    batch_size = x.size()[0]
+    if use_cuda:
+        index = torch.randperm(batch_size).cuda()
+    else:
+        index = torch.randperm(batch_size)
+
+    mixed_x = lam * x + (1 - lam) * x[index, :]
+    y_a, y_b = y, y[index]
+    return mixed_x, y_a, y_b, lam
+
+
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
+
 class IndexedDataSet(Dataset):
     """A toy trainer to test noisy data source."""
 
@@ -93,6 +115,10 @@ class Trainer(basic.Trainer):
         self.confidence_thres = 0.5 # Need to be in config
         self.relabel_only = False
 
+        # Local Proximal Reg
+        self.init_model = None # Model before training
+        self.mu = 0.0 # Estimated noisy level
+
     def set_server_id(self, server_id):
         self.server_id = server_id
     
@@ -101,12 +127,15 @@ class Trainer(basic.Trainer):
 
     def set_relabel_only(self):
         self.relabel_only = True
+    
+    def set_noisy_level(self, mu):
+        self.mu = mu
 
     def train_model(self, config, trainset, sampler, **kwargs):
         # Normal training in warm up phase
         # if self.warm_up:
         #     return super().train_model(config, trainset, sampler, **kwargs)
-
+        self.init_model = copy.deepcopy(self.model)
         """Stage 1: Preprocessing"""
         if self.stage == 1:
             self.stage_1(config, trainset, sampler, **kwargs)
@@ -142,12 +171,12 @@ class Trainer(basic.Trainer):
         if os.path.exists(cumulative_loss_file):
             cumulative_loss = torch.load(cumulative_loss_file)
         else:
-            cumulative_loss = None
+            cumulative_loss = {}
 
         loss_dict = {}
         loss_for_relabel = []
         for index, loss_val in zip(local_indices, loss):
-            if cumulative_loss:
+            if index in cumulative_loss:
                 loss_dict[index] = loss_val + cumulative_loss[index]
             else:
                 loss_dict[index] = loss_val
@@ -173,6 +202,10 @@ class Trainer(basic.Trainer):
         real_indices = local_indices[relabel_idx]
         if len(relabel_idx):
             self.save_pseudo_labels([[list(real_indices), list(pseudo_labels)]])
+
+        mu_file = f"{self.server_id}_mu_{self.client_id}.pt"
+        mu_file = os.path.join(self.cache_root, mu_file)
+        torch.save(estimated_noisy_level, mu_file)
 
     def stage_2(self, config, trainset, sampler, **kwargs):
         if not self.relabel_only:
@@ -224,3 +257,33 @@ class Trainer(basic.Trainer):
             batch_size=batch_size,
             sampler=sampler,
         )
+
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        self.optimizer.zero_grad()
+
+        # Mixup augmentation
+        examples, targets_a, targets_b, lam = mixup_data(examples, labels)
+
+        outputs = self.model(examples)
+
+        # loss = self._loss_criterion(outputs, labels)
+        loss = mixup_criterion(self._loss_criterion, outputs, targets_a, targets_b, lam)
+
+        # Local Proximal Reg
+        if self.stage == 1:
+            w_diff = torch.tensor(0.).to(self.device)
+            for w, w_t in zip(self.init_model.parameters(), self.model.parameters()):
+                w_diff += torch.pow(torch.norm(w - w_t), 2) 
+            w_diff = torch.sqrt(w_diff)
+            loss += 5.0 * self.mu * w_diff
+
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
