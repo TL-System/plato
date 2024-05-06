@@ -135,7 +135,8 @@ class Trainer(basic.Trainer):
         # Normal training in warm up phase
         # if self.warm_up:
         #     return super().train_model(config, trainset, sampler, **kwargs)
-        self.init_model = copy.deepcopy(self.model)
+        self.init_model = copy.deepcopy(self.model).to(self.device)
+        self.skip_batch = True
         """Stage 1: Preprocessing"""
         if self.stage == 1:
             self.stage_1(config, trainset, sampler, **kwargs)
@@ -271,11 +272,14 @@ class Trainer(basic.Trainer):
 
         # Local Proximal Reg
         if self.stage == 1:
-            w_diff = torch.tensor(0.).to(self.device)
-            for w, w_t in zip(self.init_model.parameters(), self.model.parameters()):
-                w_diff += torch.pow(torch.norm(w - w_t), 2) 
-            w_diff = torch.sqrt(w_diff)
-            loss += 5.0 * self.mu * w_diff
+            if not self.skip_batch:
+                w_diff = torch.tensor(0.).to(self.device)
+                for w, w_t in zip(self.init_model.parameters(), self.model.parameters()):
+                    w_diff += torch.pow(torch.norm(w - w_t), 2) 
+                w_diff = torch.sqrt(w_diff)
+                loss +=  5.0 * self.mu * w_diff 
+            else:
+                self.skip_batch = False
 
         self._loss_tracker.update(loss, labels.size(0))
 
