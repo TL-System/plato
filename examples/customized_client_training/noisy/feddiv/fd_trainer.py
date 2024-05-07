@@ -15,6 +15,51 @@ import torch.nn.functional as F
 from torch.utils.data import SubsetRandomSampler
 
 
+def mixup_data(x, y, alpha=1.0, use_cuda=True):
+    # Sample lambda from a Beta distribution, or use 1 if alpha is not greater than 0
+    lam = np.random.beta(alpha, alpha) if alpha > 0 else 1.0
+
+    # Get the batch size from the input tensor
+    batch_size = x.size()[0]
+
+    # Generate a random permutation of the batch indices
+    if use_cuda:
+        index = torch.randperm(batch_size).cuda()
+    else:
+        index = torch.randperm(batch_size)
+
+    # Perform mixup by combining images according to lambda (lam)
+    mixed_x = lam * x + (1 - lam) * x[index, :]
+
+    # Get the corresponding pairs of targets
+    y_a, y_b = y, y[index]
+
+    # Return the mixed inputs, pair of targets, and the lambda value
+    return mixed_x, y_a, y_b, lam
+
+
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    # Calculate the mixup loss for the first component of the mix
+    loss_a = criterion(pred, y_a) * lam
+    # Calculate the mixup loss for the second component of the mix
+    loss_b = criterion(pred, y_b) * (1 - lam)
+    # The final loss is the sum of the individual losses
+    return loss_a + loss_b
+
+def regularization_penalty(log_probs_mixed):
+    num_classes = Config().parameters.model.num_classes
+    # Create a uniform distribution prior across all classes
+    prior = torch.ones(num_classes) / num_classes
+    # Move the prior to the same device as the log_probs_mixed tensor
+    prior = prior.to(log_probs_mixed.device)
+    # Calculate mean predicted probabilities across the batch
+    pred_mean = torch.softmax(log_probs_mixed, dim=1).mean(0)
+    # Calculate the KL divergence between the prior and mean predictions
+    penalty = torch.sum(prior * torch.log(prior / pred_mean))
+    
+    # Return the penalty scaled by the regularization coefficient
+    return penalty
+
 class IndexedDataSet(Dataset):
     """A toy trainer to test noisy data source."""
 
@@ -141,6 +186,32 @@ class Trainer(basic.Trainer):
             )
         else:
             logging.info(f"[Client #{self.client_id}] Keeps the label untouched.")
+
+    def perform_forward_and_backward_passes(self, config, examples, labels):
+        self.optimizer.zero_grad()
+
+        # Mixup augmentation
+        examples, targets_a, targets_b, lam = mixup_data(examples, labels)
+
+        outputs = self.model(examples)
+
+        # loss = self._loss_criterion(outputs, labels)
+        loss = mixup_criterion(self._loss_criterion, outputs, targets_a, targets_b, lam)
+        
+        # Reg
+        penalty = regularization_penalty(outputs)
+        loss += penalty
+
+        self._loss_tracker.update(loss, labels.size(0))
+
+        if "create_graph" in config:
+            loss.backward(create_graph=config["create_graph"])
+        else:
+            loss.backward()
+
+        self.optimizer.step()
+
+        return loss
 
     def get_indexed_train_loader(self, batch_size, trainset, sampler):
         return torch.utils.data.DataLoader(
