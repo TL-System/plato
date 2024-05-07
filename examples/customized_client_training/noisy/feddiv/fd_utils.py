@@ -81,8 +81,6 @@ def local_data_splitting(loss, global_noise_filter):
     # The model is presumably a Gaussian Mixture Model or similar, where 'means_' is an attribute
     prob_clean = global_noise_filter.predict(normalized_loss.reshape(-1, 1))
     
-    logging.info(f"filter prediction: {prob_clean[:100]}")
-
     # Select the probability of being clean associated with the component of the model with the lowest mean
     # This assumes that the clean data is associated with the component that has the lowest mean loss
     prob_clean = prob_clean[:, global_noise_filter.means_.argmin()]

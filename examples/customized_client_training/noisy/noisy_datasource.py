@@ -222,6 +222,8 @@ class NoisyDataSource(base.DataSource):
         if os.path.exists(label_file):
             os.remove(label_file)
 
+    def targets(self):
+        return self.init_noisy_targets
 
 class NoiseEngine:
     def __init__(self) -> None:
