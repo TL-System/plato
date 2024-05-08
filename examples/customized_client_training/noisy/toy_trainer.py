@@ -22,7 +22,7 @@ class ELRLoss(nn.Module):
         self.device = Config().device()
         self.target = torch.zeros(num_examp, num_classes).to(self.device) 
         self.beta = beta
-        self.lamda = 0 #1 #7 # should read from configuration file.
+        self.lamda = 7 #1 #7 # should read from configuration file.
 
     def forward(self, outputs, labels, indices):
         y_pred = F.softmax(outputs,dim=1)
@@ -72,13 +72,14 @@ class LIDLoss(nn.Module):
         labels = F.one_hot(labels, num_classes=10)
 
         alpha = torch.tensor(alpha).to(self.device)
+        #logging.info(f"alpha: %s",alpha)
         y_new = (alpha * labels.T + (1. - alpha) * pred_labels.T).T
         # outputs =  outputs / torch.sum(outputs, axis=-1, keepdims=True)
         # outputs = torch.clamp(outputs, 1e-7, 1.0 - 1e-7)
 
         #loss = -torch.mean(torch.sum(y_new * torch.log(outputs), axis=-1))
-        loss = F.cross_entropy(outputs, y_new) + 5 * alpha.mean()
-        #logging.info(f"loss: %s", loss)
+        loss = F.cross_entropy(outputs, y_new) + 5*alpha.mean()
+        #logging.info(f"reg_term: %s", reg_term)
         return loss
 
 class IndexedDataSet(Dataset):
@@ -154,21 +155,10 @@ class Trainer(basic.Trainer):
 
                 loss,lid,correction= self.perform_forward_and_backward_passes(
                     config, examples, labels, indices)
-                #)
                 if len(correction) > 0:
                     corrections.extend(correction)
-                    #logging.info(f"corrections: %s",corrections)
-                # logging.info(f"lids for this batch is: %s", lids)
+                    
                 lid_batch.extend(lid)
-                #corrections = [refurbushable,new_labels]
-               
-
-                # label correction for selfie
-                # if len(lid)>0:
-                #    corrections.append(new_labels)
-
-                # if not corrected:
-                #    corrections.append(self.magic_label_correction(indices))
 
                 self.train_step_end(config, batch=batch_id, loss=loss)
                 self.callback_handler.call_event(
@@ -217,11 +207,9 @@ class Trainer(basic.Trainer):
                 os.mkdir(client_folder)
 
             file_path = os.path.join(client_folder, f"client-{self.client_id}.csv")
-            #file_path = './lids'+ str(self.client_id) +'.csv' 
             with open(file_path, "a") as file:
                 file.write(str(np.mean(lid_batch)))
                 file.write("\n")
-            #logging.info(f"mean of lids this batch is: %.8lf", np.mean(lid_batch))
 
         self.save_pseudo_labels(corrections)
 
@@ -287,27 +275,25 @@ class Trainer(basic.Trainer):
         """ 
         
         self.optimizer.zero_grad()
+
         #below is for lid##########################################################
         # a dict to store the activations
         # add a hook to get intermediate results
-        
         activation = []
         def getActivation(name):
-        # the hook signature
             def hook(model, input, output):
                 activation.append(output.detach().cpu().numpy())
-                # logging.info(f"in hook function: %s", activation)
             return hook 
-        h1 = self.model.relu4.register_forward_hook(getActivation('relu4')) # self.model.layers[-1].bn for vgg16
-        
+        #h1 = self.model.relu4.register_forward_hook(getActivation('relu4')) # for lenet5
+        h1 = self.model.layers[-1].bn.register_forward_hook(getActivation('bn')) # for vgg16
+
         outputs = self.model(examples)
-        
-        lids = self.calculate_lid(activation) # try half
+
+        lids = self.calculate_lid(activation)
         # remove the hook
         h1.remove()
 
-        # lid is for each sample
-        # load min_lid from local file
+        # load lid history from local file
         cache_root =  os.path.expanduser("~/.cache")
         lid_file = f"{self.server_id}-{self.client_id}-lids.pt"
         lid_file = os.path.join(cache_root, lid_file)
@@ -317,96 +303,70 @@ class Trainer(basic.Trainer):
         alpha_file = os.path.join(cache_root, alpha_file)
 
         if not os.path.exists(alpha_file):
-            # Label file not exsits, create a new dic 
+            # Label file not exsits, create a new dict  
             alpha_dict = {}
         else: 
-            # load min from file
+            # load alpha from file
             alpha_dict =  torch.load(alpha_file)
 
 
         if not os.path.exists(lid_file):
-            # Label file not exsits, create a new dic 
+            # Label file not exsits, create a new dict 
             lid_dict = {}
         else: 
-            # load min from file
+            # load lid from file
             lid_dict =  torch.load(lid_file)
 
-        #logging.info(f"indics: %s", indices)
-        #min_lids = [lid_dict[index] for index in indices if index in lid_dict]
         alphas = []
         corrections = []
-        #refurbushable = []
-        #new_labels = []
+
         pred_outputs = torch.argmax(outputs, 1).tolist()
-        #logging.info(f"pre_outputs: %s", pred_outputs)
+    
         for lid, index, pre_label in zip(lids, indices,pred_outputs):
-            #logging.info(f"index: %s", index.item())
             index = index.item()
             if index in lid_dict:
+                # calculate the alpha value based on current lid and past values
+                alpha = -np.power (1/81 * lid / np.min(lid_dict[index]), 2)+1 # 1/8 for mnist; 1/81for cifar10
+                # alpha = -np.power (1/8 * lid / np.min(lid_dict[index]) - 1/8 , 2)+1
+                # alpha = -np.power (1/81 * lid / np.min(lid_dict[index]) - 1/81 , 2)+1
 
-                # calculate 
-                alpha = -np.power (1/8 * lid / np.min(lid_dict[index]) - 1/8, 2)+1
-                #- 1/2 * np.exp(- 1 * lid / np.min(lid_dict[index])) * np.log(1/2*np.exp(- 1 * lid / np.min(lid_dict[index]))) # np.exp(-self.lamda * lid / np.min(lid_dict[index]))
-                #alphas.append(alpha)
+                # save alphas for analysis 
+                alpha_dict[index].append(alpha) 
 
-                # save alphas for study (should be remove later)
-                alpha_dict[index].append(alpha)
-                # threshold for label correction
-                if alpha <= 0.95: # 0.95: 
+                # threshold for label correction and loss correction (hard-labeling and soft-labeling)
+                if alpha <= 0.5: #0.5: # 0.95: for mnist
                     corrections.append([torch.tensor(index),torch.tensor(pre_label)])
                     alphas.append(0.0)
                 
-                elif alpha>0.95 and alpha<0.97:
-                    alphas.append(alpha/2)
+                elif alpha>0.5 and alpha<0.75: #alpha>0.95 and alpha<0.97:#for mnist
+                    alphas.append(alpha)
                 else:
                     alphas.append(1.0)
 
                 # update lid_dict
-                if lid < lid_dict[index]:
-                    # replace with a smaller value
-                    lid_dict[index] = lid
+                # if lid < lid_dict[index]:
+                #     # replace with a smaller value
+                #     lid_dict[index] = lid
+
                 # recording lids tractory for samples
-                # this is to study lid changes on each sample
-                # lid_dict[index].append(lid)
+                lid_dict[index].append(lid)
             else: 
-                # add into lid_dict
                 lid_dict[index] = lid #[lid]
                 alpha_dict[index] = [1.0]
                 alphas.append(1.0)
 
-        #logging.info(f"alpha_dict: %s",alpha_dict)
         torch.save(alpha_dict,alpha_file)
-
-        # refurbushable = []
-        # loop over the dict and find index whose value is greater than a threshold
-        # for index, value in data_dict.items():
-        # # Check if the value is greater than the threshold
-        # if value > threshold:
-        #     # If it is, add the key to the list
-        #     keys_above_threshold.append(key)
-        # save lid_dict 
         torch.save(lid_dict, lid_file)
 
-        # i = 0
-        # for key, value in lid_dict.items():
-        #     logging.info(f"key: %s, value: %s", key, value)
-        #     i += 1
-        #     if i >= 10:
-        #         break
-            # below is useless
-            #expansion = lid / self.min_lid
-            # should update and preserve the min_lid
-            #alpha = np.exp(-self.lamda * expansion)
-        
         ######above is for lid only #################################################################
         # this loss is for lid 
-        #loss = self._loss_criterion(outputs, labels, alphas)
+        loss = self._loss_criterion(outputs, labels, alphas)
 
         # this is for cross-entropy by defualt
-        loss = self._loss_criterion(outputs, labels,alphas)
+        # loss = self._loss_criterion(outputs, labels)
 
         # this loss is for regularization
-        #loss = self._loss_criterion(outputs, labels)#, indices)
+        # loss = self._loss_criterion(outputs, labels, indices)
 
         ###############below for selfie tracking
         """
@@ -461,9 +421,6 @@ class Trainer(basic.Trainer):
         """
         #############################################
 
-
-        # this loss is for regularization
-        #loss = self._loss_criterion(outputs, labels)#, indices)
         self._loss_tracker.update(loss, labels.size(0))
 
         if "create_graph" in config:
@@ -472,8 +429,8 @@ class Trainer(basic.Trainer):
             loss.backward()
 
         self.optimizer.step()
-        #logging.info(f"refurbushable: %s", refurbushable)
-        return loss, lids, corrections #refurbushable, new_labels #lids #refurbushable 
+       
+        return loss, lids, corrections #corrections
      
 
     def calculate_lid(self, batch_data, k=40):
