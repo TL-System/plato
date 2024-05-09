@@ -351,7 +351,7 @@ class Trainer(basic.Trainer):
                 # recording lids tractory for samples
                 lid_dict[index].append(lid)
             else: 
-                lid_dict[index] = lid #[lid]
+                lid_dict[index] = [lid]
                 alpha_dict[index] = [1.0]
                 alphas.append(1.0)
 
