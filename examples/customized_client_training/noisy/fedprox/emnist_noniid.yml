@@ -1,0 +1,12 @@
+# The training and testing dataset
+datasource: EMNIST
+
+# Number of samples in each partition
+partition_size: 1128
+
+# IID or non-IID?
+sampler: noniid
+concentration: 1
+
+# The random seed for sampling data
+random_seed: 1
