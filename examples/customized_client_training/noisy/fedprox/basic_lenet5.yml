@@ -1,0 +1,19 @@
+# The type of the trainer
+type: basic
+
+# The maximum number of training rounds
+rounds: 20
+
+# The maximum number of clients running concurrently
+max_concurrency: 20
+
+# The target accuracy
+target_accuracy: 0.99
+
+# The machine learning model
+model_name: lenet5
+
+# Number of epoches for local training in each communication round
+epochs: 5
+batch_size: 32
+optimizer: SGD

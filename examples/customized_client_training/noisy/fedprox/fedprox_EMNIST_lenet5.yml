@@ -1,0 +1,45 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 1000
+
+    # The number of clients selected in each round
+    per_round: 100
+
+    # Should the clients compute test accuracy locally?
+    do_test: false
+
+    random_seed: 1
+
+    # FedProx hyperparameters
+    proximal_term_penalty_constant: 1
+
+server:
+    address: 127.0.0.1
+    do_test: true
+
+    # Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+    simulate_wall_time: true
+    port: 8010
+
+data:
+    # EMNIST non-iid distribution
+    !include emnist_noniid.yml
+
+trainer:
+    # LeNet-5 model with the basic trainer
+    !include basic_lenet5.yml
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    # LeNet-5 training params
+    !include lenet5_params.yml
+
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, round_time
