@@ -27,7 +27,8 @@ class Server(fedavg.Server):
         self.warm_up_clients = []
         self.current_warm_up_round = 0
         self.warm_up_rounds = Config().server.feddiv.warm_up_rounds
-
+        
+        self.clients_per_round_bak = Config().clients.per_round
         # Normal training
         self.global_filter = None
 
@@ -40,8 +41,12 @@ class Server(fedavg.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose clients with no replacement in warm up phase."""
+        # Resume the per round client number
+        self.clients_per_round = self.clients_per_round_bak
+        clients_count = self.clients_per_round
 
-        if not len(self.warm_up_clients):
+
+        if not len(self.warm_up_clients) and self.warm_up:
             self.current_warm_up_round += 1
             if self.current_warm_up_round > self.warm_up_rounds:
                 self.warm_up = False
@@ -53,6 +58,7 @@ class Server(fedavg.Server):
         if self.warm_up:
             selected_clients = self.warm_up_clients[:clients_count]
             self.warm_up_clients = self.warm_up_clients[clients_count:]
+            self.clients_per_round = len(selected_clients)
             return selected_clients
         else:
             return super().choose_clients(clients_pool, clients_count)

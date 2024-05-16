@@ -25,7 +25,7 @@ class Client(simple.Client):
         self.cache_root = os.path.expanduser("~/.cache")
 
     async def inbound_processed(self, processed_inbound_payload):
-        warm_up = processed_inbound_payload["warm_up"]
+        warm_up = processed_inbound_payload["warm_up"] if "warm_up" in processed_inbound_payload else None
         original_payload = processed_inbound_payload["payload"]
         self.trainer.warm_up = warm_up
         if warm_up:

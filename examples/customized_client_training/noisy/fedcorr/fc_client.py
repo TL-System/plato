@@ -39,7 +39,8 @@ class Client(simple.Client):
                 os.remove(label_file)
 
         self.eval_and_setup_pseudo_labels()
-
+        
+        logging.warn(f"{self} STAGE {stage}")
         if stage == 1:
             report, model_weights = await super().inbound_processed(original_payload)
             LID_file = f"{self.server_id}_LID_client_{self.client_id}.pt"

@@ -86,6 +86,11 @@ class Trainer(basic.Trainer):
         self.de_bias = None
         self.train_counter = None
 
+        self.mixup = False
+        if "mixup" in Config().server.feddiv:
+            self.mixup = Config().server.feddiv.mixup
+        
+
     def set_server_id(self, server_id):
         self.server_id = server_id
 
@@ -188,19 +193,22 @@ class Trainer(basic.Trainer):
             logging.info(f"[Client #{self.client_id}] Keeps the label untouched.")
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
+        if not self.mixup:
+            return super().perform_forward_and_backward_passes(config, examples, labels)
+    
         self.optimizer.zero_grad()
 
         # Mixup augmentation
-        examples, targets_a, targets_b, lam = mixup_data(examples, labels)
+        # examples, targets_a, targets_b, lam = mixup_data(examples, labels)
 
         outputs = self.model(examples)
 
-        # loss = self._loss_criterion(outputs, labels)
-        loss = mixup_criterion(self._loss_criterion, outputs, targets_a, targets_b, lam)
+        loss = self._loss_criterion(outputs, labels)
+        # loss = mixup_criterion(self._loss_criterion, outputs, targets_a, targets_b, lam)
         
         # Reg
-        penalty = regularization_penalty(outputs)
-        loss += penalty
+        # penalty = regularization_penalty(outputs)
+        # loss += penalty
 
         self._loss_tracker.update(loss, labels.size(0))
 

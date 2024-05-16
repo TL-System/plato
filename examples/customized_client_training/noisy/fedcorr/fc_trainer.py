@@ -119,6 +119,10 @@ class Trainer(basic.Trainer):
         self.init_model = None # Model before training
         self.mu = 0.0 # Estimated noisy level
 
+        self.mixup = False
+        if "mixup" in Config().server.fedcorr:
+            self.mixup = Config().server.fedcorr.mixup
+
     def set_server_id(self, server_id):
         self.server_id = server_id
     
@@ -245,9 +249,9 @@ class Trainer(basic.Trainer):
             label_file = os.path.join(self.cache_root, label_file)
             torch.save([indices, pseudo_labels], label_file)
 
-            logging.info(
-                f" [Client #{self.client_id}] Replaced labels at {indices} to {pseudo_labels}"
-            )
+            # logging.info(
+            #     f" [Client #{self.client_id}] Replaced labels at {indices} to {pseudo_labels}"
+            # )
         else:
             logging.info(f"[Client #{self.client_id}] Keeps the label untouched.")
 
@@ -260,6 +264,9 @@ class Trainer(basic.Trainer):
         )
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
+        if not self.mixup:
+            return super().perform_forward_and_backward_passes(config, examples, labels)
+        
         self.optimizer.zero_grad()
 
         # Mixup augmentation
@@ -267,19 +274,19 @@ class Trainer(basic.Trainer):
 
         outputs = self.model(examples)
 
-        # loss = self._loss_criterion(outputs, labels)
+        loss = self._loss_criterion(outputs, labels)
         loss = mixup_criterion(self._loss_criterion, outputs, targets_a, targets_b, lam)
 
-        # Local Proximal Reg
-        if self.stage == 1:
-            if not self.skip_batch:
-                w_diff = torch.tensor(0.).to(self.device)
-                for w, w_t in zip(self.init_model.parameters(), self.model.parameters()):
-                    w_diff += torch.pow(torch.norm(w - w_t), 2) 
-                w_diff = torch.sqrt(w_diff)
-                loss +=  5.0 * self.mu * w_diff 
-            else:
-                self.skip_batch = False
+        # # Local Proximal Reg
+        # if self.stage == 1:
+        #     if not self.skip_batch:
+        #         w_diff = torch.tensor(0.).to(self.device)
+        #         for w, w_t in zip(self.init_model.parameters(), self.model.parameters()):
+        #             w_diff += torch.pow(torch.norm(w - w_t), 2) 
+        #         w_diff = torch.sqrt(w_diff)
+        #         loss +=  5.0 * self.mu * w_diff 
+        #     else:
+        #         self.skip_batch = False
 
         self._loss_tracker.update(loss, labels.size(0))
 
