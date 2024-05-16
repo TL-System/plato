@@ -27,7 +27,7 @@ class Server(fedavg.Server):
         self.stage_1_rounds = Config().server.fedcorr.stage_1_rounds
         self.current_stage_1_round = 0
         self.non_selected_clients = []
-        
+
         self.noisy_clients = []
         self.clean_clients = []
         self.estimated_noisy_level = []
@@ -41,7 +41,11 @@ class Server(fedavg.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose clients with no replacement in warm up phase."""
-        
+
+        # Resume the per round client number
+        self.clients_per_round = self.clients_per_round_bak
+        clients_count = self.clients_per_round
+
         # Prepare the clients to be selected for current stage
         if self.stage == 1 and not len(self.non_selected_clients):
             self.current_stage_1_round += 1
@@ -56,21 +60,28 @@ class Server(fedavg.Server):
         if self.stage == 1:
             selected_clients = self.non_selected_clients[:clients_count]
             self.non_selected_clients = self.non_selected_clients[clients_count:]
+            self.clients_per_round = len(selected_clients)
             return selected_clients
         elif self.stage == 2:
-            self.clients_per_round = min(self.clients_per_round, len(self.clean_clients))
+            self.clients_per_round = min(
+                clients_count, len(self.clean_clients)
+            )
             self.current_stage_2_round += 1
             if self.current_stage_2_round <= self.stage_2_rounds:
                 # Select clean clients for normal training
                 logging.info(f"Clean clients:{self.clean_clients}")
-                return super().choose_clients(list(self.clean_clients), min(clients_count, len(self.clean_clients)))
+                return super().choose_clients(
+                    list(self.clean_clients),
+                    min(clients_count, len(self.clean_clients)),
+                )
             else:
                 logging.info(f"Noisy clients:{self.noisy_clients}")
                 self.stage = 3
                 self.clients_per_round = len(self.noisy_clients)
-                return super().choose_clients(self.noisy_clients, len(self.noisy_clients))
+                return super().choose_clients(
+                    self.noisy_clients, len(self.noisy_clients)
+                )
         elif self.stage == 3:
-            self.clients_per_round = self.clients_per_round_bak
             return super().choose_clients(clients_pool, self.clients_per_round)
 
     def customize_server_payload(self, payload):
@@ -85,18 +96,27 @@ class Server(fedavg.Server):
             payload["noisy_clients"] = None
         return payload
 
-    def split_clients(self,):
-        gmm_LID_accumulative = GaussianMixture(n_components=2, random_state=self.random_seed).fit(
-            np.array(self.LID_accumulative_client).reshape(-1, 1))
-        labels_LID_accumulative = gmm_LID_accumulative.predict(np.array(self.LID_accumulative_client).reshape(-1, 1))
+    def split_clients(
+        self,
+    ):
+        gmm_LID_accumulative = GaussianMixture(
+            n_components=2, random_state=self.random_seed
+        ).fit(np.array(self.LID_accumulative_client).reshape(-1, 1))
+        labels_LID_accumulative = gmm_LID_accumulative.predict(
+            np.array(self.LID_accumulative_client).reshape(-1, 1)
+        )
         clean_label = np.argsort(gmm_LID_accumulative.means_[:, 0])[0]
 
-        self.noisy_clients = (np.where(labels_LID_accumulative != clean_label)[0] + 1).tolist()
-        self.clean_clients = (np.where(labels_LID_accumulative == clean_label)[0] + 1).tolist()
-
+        self.noisy_clients = (
+            np.where(labels_LID_accumulative != clean_label)[0] + 1
+        ).tolist()
+        self.clean_clients = (
+            np.where(labels_LID_accumulative == clean_label)[0] + 1
+        ).tolist()
 
     def weights_received(self, weights_received):
         if self.stage == 1:
+            logging.warn("SERVER STATE 1")
             client_ids = np.array([x["client_id"] for x in weights_received]) - 1
             LID_clients = np.array([x["LID_client"] for x in weights_received])
             self.LID_accumulative_client[client_ids] = LID_clients
@@ -107,4 +127,5 @@ class Server(fedavg.Server):
             model_weights = [x["model_weights"] for x in weights_received]
             return model_weights
         else:
+            logging.warn("SERVER STATE 2 or 3")
             return weights_received
