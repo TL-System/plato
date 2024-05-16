@@ -78,7 +78,7 @@ class Server(fedavg.Server):
                 "weights_init": self.global_filter.model.weights_,
                 "means_init": self.global_filter.model.means_,
                 "precisions_init": self.global_filter.model.precisions_,
-                "covariances_init": self.global_filter.model.covariances_,
+                "covariances_": self.global_filter.model.covariances_,
             }
 
         return payload

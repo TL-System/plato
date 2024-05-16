@@ -10,7 +10,7 @@ def main():
         datasource = NoisyDataSource
     else:
         datasource = None
-
+    
     trainer = fc_trainer.Trainer
     client = fc_client.Client(datasource=datasource, trainer=trainer)
     server = fc_server.Server(datasource=datasource, trainer=trainer)

@@ -19,7 +19,6 @@ class GlobalFilterManager():
         
         # Initialize GaussianMixture model
         self.model = GaussianMixture(
-            X=None,
             n_components=components,
             random_state=self.random_state,
             is_quiet=True,
@@ -81,7 +80,6 @@ class GlobalFilterManager():
     def update_server_model(self):
         # Update server-side model
         self.model = GaussianMixture(
-            X=None,
             n_components=self.components,
             random_state=self.random_state,
             is_quiet=True,
@@ -134,12 +132,12 @@ class GlobalFilterManager():
 
 class GaussianMixture(sklearn.mixture.GaussianMixture):
 
-    def __init__(self, X = None, n_components=3, covariance_type='full',
-                 weights_init=None, means_init=None, precisions_init=None, covariances_init=None,
+    def __init__(self,  n_components=3, covariance_type='full',
+                 weights_init=None, means_init=None, precisions_init=None, covariances_=None,
                  init_params='kmeans', tol=1e-3, random_state=None, is_quiet=False):
 
-        if not X:
-            X = self.gen_filter_data(random_state = 1)
+        covariances_init = covariances_
+        X = self.gen_filter_data(random_state = 1)
 
         do_init = (weights_init is None) and (means_init is None) and (precisions_init is None) and (covariances_init is None)
         if do_init:
@@ -174,6 +172,7 @@ class GaussianMixture(sklearn.mixture.GaussianMixture):
             max_iter=1
         )
         self._is_quiet = is_quiet
+        self.is_quiet = is_quiet
         # The gaussian parameters are recomputed by KMeans or randomly, but since the init parameters are given they are discarded (covariances_ is not generated)
         self._initialize_parameters(X, np.random.RandomState(random_state))
         # covariances_ is copied from the initial model (since it has it)
