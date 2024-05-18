@@ -64,9 +64,9 @@ class NoisyDataSource(base.DataSource):
         try:
             [indices, pseudo_labels] = torch.load(label_file)
             init_noisy_labels[indices] = pseudo_labels
-            logging.info(
-                f"Client [{client_id}] Read pseduo labels {pseudo_labels} at indices {indices} from file."
-            )
+            # logging.info(
+            #     f"Client [{client_id}] Read pseduo labels {pseudo_labels} at indices {indices} from file."
+            # )
         except:
             logging.warning(
                 "Client pseudo label file not exists, using initial noisy labels."
@@ -268,7 +268,7 @@ class NoiseEngine:
         if self.cifar10N:
             self.cifar10N_path = Config().data.noise.cifar10N.path
             self.cifar10N_split = Config().data.noise.cifar10N.split
-            assert self.cifar10N_split in ["worst", "aggre"]
+            assert self.cifar10N_split in ["worse", "aggre"]
 
 
     def add_noise(self, datasource):
