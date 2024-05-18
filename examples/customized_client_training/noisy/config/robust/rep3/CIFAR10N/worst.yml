@@ -27,7 +27,7 @@ data:
     noise:
         cifar10N:
             path: "./CIFAR-10_human.pt"
-            split: "worst"
+            split: "worse"
 
 trainer:
     # The type of the trainer
