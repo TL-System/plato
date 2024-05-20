@@ -56,7 +56,7 @@ def calculate_normalized_loss(loss):
     max_loss = np.max(loss_array)
     
     # Apply the normalization formula
-    normalized_loss = (loss_array - min_loss) / (max_loss - min_loss)
+    normalized_loss = (loss_array - min_loss) / (max_loss - min_loss + 10e-6)
     
     return normalized_loss
 
