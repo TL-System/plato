@@ -17,6 +17,7 @@ in Advances in Neural Information Processing Systems 2020.
 
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
 """
+
 import asyncio
 import logging
 import math
@@ -538,7 +539,9 @@ class Server(fedavg.Server):
             if self.attack_method == "DLG":
                 dummy_onehot_label = F.softmax(labels, dim=-1)
                 dummy_loss = cross_entropy_for_onehot(dummy_pred, dummy_onehot_label)
-            elif self.attack_method in ["iDLG", "csDLG"]:
+            elif self.attack_method in "iDLG":
+                dummy_loss = cross_entropy(dummy_pred, labels)
+            elif self.attack_method in "csDLG":
                 dummy_loss = cross_entropy(dummy_pred, torch.argmax(labels, dim=-1))
 
             dummy_grad = torch.autograd.grad(
