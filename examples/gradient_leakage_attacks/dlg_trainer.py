@@ -227,7 +227,9 @@ class Trainer(basic.Trainer):
 
         # Update model weights with gradients and learning rate
         for param, grad_part in zip(self.model.parameters(), grad):
-            param.data = param.data - Config().parameters.optimizer.lr * grad_part
+            param.data = param.data - Config().parameters.optimizer.lr * grad_part.to(
+                self.device
+            )
 
         # Sum up the gradients for each local update
         try:
