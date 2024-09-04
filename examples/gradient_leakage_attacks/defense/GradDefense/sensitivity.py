@@ -15,6 +15,7 @@ def compute_sens(
 
     x = x.to(device).requires_grad_()
     y = y.to(device)
+    model = model.to(device)
 
     # Compute prediction and loss
     try:
