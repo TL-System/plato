@@ -2,12 +2,52 @@
 import os
 import json
 import random
+import zipfile
 
+import wget
 import cv2
 import numpy as np
 
 # pylint:disable=relative-beyond-top-level
-from .dataset_basic import BasicDataset
+from .dataset_basic import BasicDataset, DiffusionInputs
+
+
+def download_coco_diffusion(path):
+    "Download Coco17 dataset and extract captions and pixelmaps for diffusion process."
+    if not os.path.exists(os.path.join(path, "train2017")):
+        wget.download("http://images.cocodataset.org/zips/train2017.zip", path)
+        with zipfile.ZipFile(os.path.join(path, "train2017.zip"), "r") as zip_ref:
+            zip_ref.extractall()
+    if not os.path.exists(os.path.join(path, "val2017")):
+        wget.download("http://images.cocodataset.org/zips/val2017.zip", path)
+        with zipfile.ZipFile(os.path.join(path, "train2017.zip"), "r") as zip_ref:
+            zip_ref.extractall()
+    if not os.path.exists(
+        os.path.join(path, "annotations/captions_train2017.json")
+    ) or os.path.exists(os.path.join(path, "annotations/captions_val2017.json")):
+        wget.download(
+            "http://images.cocodataset.org/annotations/annotations_trainval2017.zip",
+            path,
+        )
+        with zipfile.ZipFile(
+            os.path.join(path, "annotations_trainval2017.zip"), "r"
+        ) as zip_ref:
+            zip_ref.extractall()
+    if not os.path.exists(
+        os.path.join(path, "annotations/stuff_train2017_pixelmaps")
+    ) or os.path.exists(os.path.join(path, "annotations/stuff_val2017_pixelmaps")):
+        wget.download(
+            "http://images.cocodataset.org/annotations/stuff_annotations_trainval2017.zip",
+            path,
+        )
+        with zipfile.ZipFile(
+            os.path.join(path, "annotations/stuff_train2017_pixelmaps.zip"), "r"
+        ) as zip_ref:
+            zip_ref.extractall()
+        with zipfile.ZipFile(
+            os.path.join(path, "annotations/stuff_val2017_pixelmaps.zip"), "r"
+        ) as zip_ref:
+            zip_ref.extractall()
 
 
 # pylint:disable=no-member
@@ -27,6 +67,8 @@ class CoCoDataset(BasicDataset):
     ):
         super().__init__(condition, device)
 
+        if not os.path.exists(path):
+            download_coco_diffusion(path)
         path_json = os.path.join(path, "annotations/captions_" + split + "2017.json")
         with open(path_json, "r", encoding="utf-8") as file:
             data = json.load(file)
@@ -67,7 +109,11 @@ class CoCoDataset(BasicDataset):
         mask = mask.astype(np.float32) / 255.0
 
         sentence = file["sentence"]
-        return {"jpg": image, "hint": mask, "txt": sentence}, 0
+        inputs = DiffusionInputs()
+        inputs["jpg"] = image
+        inputs["hint"] = mask
+        inputs["txt"] = sentence
+        return inputs, 0
 
     def __len__(self):
         return len(self.files)

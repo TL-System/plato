@@ -242,7 +242,7 @@ Vepakomma et al., &ldquo;[Split Learning for Health: Distributed Deep Learning w
 ControlNet is a conditional image generation model that only finetunes the control network without updating parameters in the large diffusion model. It has a more complicated structure than the usual deep learning model. Hence, to train a ControlNet with split learning, the control network and a part of the diffusion model are on the clients and the remaining part of the diffusion model is on the server. The forwarding and backwarding processes are specifically designed according to the inputs and training targets of the image generation based on diffusion models.
 
 ```shell
-python examples/split_learning/controlnet_split_learning/split_learning_main.py -c examples/split_learning/controlnet_split_learning/split_learning.yml
+python examples/split_learning/controlnet_split_learning/split_learning.py -c examples/split_learning/controlnet_split_learning/split_learning_fill50k.yml 
 ```
 ````
 
@@ -440,6 +440,10 @@ python ./examples/model_search/pfedrlnas/MobileNetV3/fednas.py -c ./examples/mod
 DARTS search space
 ```
 python ./examples/model_search/pfedrlnas/DARTS/fednas.py -c ./examples/model_search/pfedrlnas/configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml
+```
+
+```{note}
+Yao et al., &ldquo; PerFedRLNAS: One-for-all Personalized Federated Neural Architecture Search, &rdquo; in Proc.  38th Annual AAAI Conference on Artificial Intelligence (AAAI), 2024.
 ```
 ````
 
