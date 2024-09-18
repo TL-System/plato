@@ -1,4 +1,5 @@
 """A federated learning client for gradient leakage attacks."""
+
 import pickle
 
 from plato.clients import simple

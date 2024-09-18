@@ -1,6 +1,7 @@
 """
 A FedAvg training session with customized models.
 """
+
 from plato.servers import fedavg
 from plato.clients import simple
 import dlg_model
