@@ -6,6 +6,7 @@ Geiping et al., "Inverting Gradients - How easy is it to break privacy in federa
 in the Proceedings of NeurIPS 2020.
 https://github.com/JonasGeiping/invertinggradients
 """
+
 import torch
 import torch.nn as nn
 import torchvision

@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 12500
+    iteration: 5
 
 server:
     type: split_learning
@@ -22,18 +22,15 @@ server:
 
     # Server doesn't have to do test for every round in split learning
     do_test: false
-    # model_path: /scratch/dixiyao/controlnet/models/plato/models
-    # checkpoint_path: /scratch/dixiyao/controlnet/models/plato/checkpoints
 
 data:
     # The training and testing dataset
-    datasource: coco
-    val_dataset: coco
-    data_path: /scratch/dixiyao/
-    condition: canny
+    datasource: HuggingFace
+    dataset_name: wikitext
+    dataset_config: wikitext-2-v1
 
     # Number of samples in each partition
-    partition_size: 50000
+    partition_size: 12000
 
     # Fixed random seed
     random_seed: 1
@@ -46,17 +43,15 @@ trainer:
     type: split_learning
 
     # The maximum number of training rounds
-    rounds: 12500
-
-    # The target accuracy
-    target_accuracy: 0.95
+    rounds: 60
 
     # The machine learning model
-    model_name: controlnet
+    model_type: huggingface
+    model_name: gpt2
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 3
+    batch_size: 4
     optimizer: AdamW
     
 algorithm:
@@ -68,11 +63,28 @@ algorithm:
 
 parameters:
     model:
-        init_model_path: /scratch/dixiyao/controlnet/models/control_sd15_ini.ckpt
-        model_structure: examples/controlnet_split_learning/OrgModel/cldm_v15
-        safe: true
+        num_classes: 10
+        cut_layer: 1
+        transformer_module_name: transformer.h
+        layers_after_transformer:
+            - transformer.ln_f
+            - lm_head
+
     optimizer:
-        lr: 0.00001
+        lr: 0.00005
+        eps: 0.00000001
+        weight_decay: 0.0
+
+    attack:
+        interval: 4
+        optimizer:
+            lr_guessed_client: 0.1
+            lr_reconstructed_data: 0.01
+        outer_iterations: 100
+        inner_iterations: 100
+        report_interval: 10
+        embedding_layer: transformer.wte
+        calibrate_guessed_client: false
 
 results: 
-    types: round, accuracy, elapsed_time, comm_overhead, server_time, client_time, server_mem, client_mem
+    types: round, accuracy, elapsed_time, comm_overhead, attack_accuracy,rouge1_fm,rouge1_p,rouge1_r,rouge2_fm,rouge2_p,rouge2_r,rougeL_fm,rougeL_p,rougeL_r,rougeLsum_fm,rougeLsum_p,rougeLsum_r

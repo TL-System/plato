@@ -32,7 +32,7 @@ def noise(
     for sample_id in range(len(dy_dx)):
         gradients_flatten = []
         for layer in dy_dx[sample_id]:
-            layer_flatten = (torch.flatten(layer)).numpy()
+            layer_flatten = torch.flatten(layer).cpu().numpy()
             gradients_flatten.extend(layer_flatten)
         # print(len(gradients_flatten))
         gradients_flatten_pool.append(gradients_flatten)
