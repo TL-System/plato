@@ -643,7 +643,10 @@ class Server(fedavg.Server):
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
             if self.attack_method == "csDLG":
-                if Config().algorithm.signed == "soft":
+                if (
+                    hasattr(Config().algorithm, "signed")
+                    and Config().algorithm.signed == "soft"
+                ):
                     scaling_factor = 1 - self.iter / num_iters
                     dummy_data.grad.mul_(scaling_factor).tanh_().div_(scaling_factor)
                 else:
