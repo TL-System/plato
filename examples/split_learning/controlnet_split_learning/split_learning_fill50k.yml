@@ -3,7 +3,7 @@ clients:
     type: split_learning
 
     # The total number of clients
-    total_clients: 5
+    total_clients: 1
 
     # The number of clients selected in each round
     per_round: 1
@@ -12,7 +12,7 @@ clients:
     do_test: false
 
     # Split learning iterations for each client
-    iteration: 20
+    iteration: 12500
 
 server:
     type: split_learning
@@ -25,12 +25,14 @@ server:
 
 data:
     # The training and testing dataset
-    datasource: HuggingFace
-    dataset_name: wikitext
-    dataset_config: wikitext-2-v1
+    datasource: ControlNet
+    dataset_name: fill50k
+    val_dataset_name: fill50k
+    condition: canny
 
     # Number of samples in each partition
-    partition_size: 12000
+    partition_size: 50000
+    testset_size: 1000
 
     # Fixed random seed
     random_seed: 1
@@ -40,39 +42,31 @@ data:
 
 trainer:
     # The type of the trainer
-    type: split_learning
+    type: split_learning_controlnet
 
     # The maximum number of training rounds
-    rounds: 100000
+    rounds: 12500
+
+    # The target accuracy
+    target_accuracy: 0.95
 
     # The machine learning model
-    model_type: huggingface
-    model_name: gpt2
+    model_name: controlnet
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 4
+    batch_size: 1
     optimizer: AdamW
     
 algorithm:
     # Aggregation algorithm
     type: split_learning
 
-    # Split learning flag
-    split_learning: true
-
 parameters:
     model:
-        cut_layer: 2
-        transformer_module_name: transformer.h
-        layers_after_transformer:
-            - transformer.ln_f
-            - lm_head
-
+        model_structure_path: examples/split_learning/controlnet_split_learning/ControlNetSplitLearning/cldm_v15_
     optimizer:
-        lr: 0.00005
-        eps: 0.00000001
-        weight_decay: 0.0
+        lr: 0.00001
 
 results: 
     types: round, accuracy, elapsed_time, comm_overhead
