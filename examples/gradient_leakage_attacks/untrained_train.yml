@@ -49,7 +49,7 @@ trainer:
     optimizer: SGD
 
     # The machine learning model
-    model_name: vgg_16
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm

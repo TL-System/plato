@@ -26,7 +26,7 @@ data:
     # data_path: data/tiny-imagenet-200
 
     # Number of samples in each partition
-    partition_size: 8
+    partition_size: 1
 
     # IID or non-IID?
     sampler: iid
@@ -45,11 +45,11 @@ trainer:
 
     # Number of epoches for local training in each communication round
     epochs: 1
-    batch_size: 8
+    batch_size: 1
     optimizer: SGD
 
     # The machine learning model
-    model_name: vgg_16
+    model_name: resnet_18
 
 algorithm:
     # Aggregation algorithm
