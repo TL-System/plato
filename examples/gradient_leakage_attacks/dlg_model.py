@@ -25,6 +25,7 @@ def get(**kwargs: Union[str, dict]):
     if model_name.split("_")[0] == "resnet":
         return resnet.get(model_name=model_name)
 
+    # Set up model through plato's model library
     if Config().trainer.model_type == "vit":
         return None
 
