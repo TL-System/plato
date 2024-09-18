@@ -32,6 +32,13 @@ class Model(nn.Module):
 
     def forward(self, x):
         out = self.body(x)
+        out = out.view(out.size(0), -1)
+        out = self.fc(out)
+
+        return out
+
+    def forward_feature(self, x):
+        out = self.body(x)
         feature = out.view(out.size(0), -1)
         out = self.fc(feature)
 

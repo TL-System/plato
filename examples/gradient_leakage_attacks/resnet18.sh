@@ -5,4 +5,4 @@
 #SBATCH --mem=72G
 #SBATCH --output=resnet18.out
 
-./../../run -c fedavg_resnet18_cifar100.yml
+python fedavg_pretraining.py -c fedavg_resnet18_cifar100.yml
