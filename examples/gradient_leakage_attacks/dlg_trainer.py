@@ -1,17 +1,23 @@
+"""
+A federated learning trainer for gradient leakage attacks,
+where intermediate gradients can be transmitted, 
+and potential defense mechanisms can be applied.
+"""
+
 import math
 import pickle
 import random
-
 import numpy as np
 import torch
-from plato.config import Config
-from plato.trainers import basic
 from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
 from defense.Outpost.perturb import compute_risk
-from utils.utils import cross_entropy_for_onehot, label_to_onehot
+from utils.helpers import cross_entropy_for_onehot, label_to_onehot
+
+from plato.config import Config
+from plato.trainers import basic
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
@@ -63,7 +69,7 @@ class Trainer(basic.Trainer):
                 self.sensitivity = compute_sens(
                     model=self.model.to(self.device),
                     rootset_loader=root_set_loader,
-                    device=Config().device(),
+                    device=self.device,
                 )
 
         return torch.utils.data.DataLoader(
@@ -111,7 +117,7 @@ class Trainer(basic.Trainer):
         ):
             self.list_grad = []
             for example, label in zip(examples, labels):
-                outputs, _ = self.model(torch.unsqueeze(example, dim=0))
+                outputs = self.model(torch.unsqueeze(example, dim=0))
 
                 loss = self._loss_criterion(outputs, torch.unsqueeze(label, dim=0))
                 grad = torch.autograd.grad(
@@ -123,9 +129,12 @@ class Trainer(basic.Trainer):
                 )
                 self.list_grad.append(list((_.detach().clone() for _ in grad)))
         else:
-            try:
-                outputs, self.feature_fc1_graph = self.model(examples)
-            except:
+            if (
+                hasattr(Config().algorithm, "defense")
+                and Config().algorithm.defense == "Soteria"
+            ):
+                outputs, self.feature_fc1_graph = self.model.forward_feature(examples)
+            else:
                 outputs = self.model(examples)
             # Save the ground truth and gradients
             loss = self._loss_criterion(outputs, labels)
@@ -151,7 +160,7 @@ class Trainer(basic.Trainer):
                     hasattr(Config().algorithm, "clip")
                     and Config().algorithm.clip is True
                 ):
-                    from defense.GradDefense.clip import noise
+                    from defense.GradDefense.perturb import noise_with_clip as noise
                 else:
                     from defense.GradDefense.perturb import noise
                 self.list_grad = noise(
@@ -223,7 +232,7 @@ class Trainer(basic.Trainer):
                     self.list_grad = noise(dy_dx=self.list_grad, risk=risk)
 
             # cast grad back to tuple type
-            grad = tuple(self.list_grad)
+            grad = tuple([g.to(self.device) for g in self.list_grad])
 
         # Update model weights with gradients and learning rate
         for param, grad_part in zip(self.model.parameters(), grad):

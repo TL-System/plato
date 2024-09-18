@@ -13,5 +13,3 @@ torch-optimizer
 timm
 lightly
 evaluate
-matplotlib
-lpips

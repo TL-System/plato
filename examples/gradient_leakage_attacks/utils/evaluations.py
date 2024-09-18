@@ -1,14 +1,17 @@
+"""Metrics computation for gradient leakage attack evaluation"""
+
 import math
 from statistics import mean
-from plato.config import Config
 import lpips
 import torch
 from torchmetrics import StructuralSimilarityIndexMeasure
+from plato.config import Config
 
-loss_fn = lpips.LPIPS(net="vgg").to(Config().device())
+LOSS_FN = lpips.LPIPS(net="vgg").to(Config().device())
 
 
-def find_ssim(dummy_data, ground_truth):
+def compute_ssim(dummy_data, ground_truth):
+    """Compute SSIM."""
     # Assuming for now that the matching dummy_data and gt are given
     dummy_data = torch.flatten(dummy_data)
     ground_truth = torch.flatten(ground_truth)
@@ -33,12 +36,14 @@ def find_ssim(dummy_data, ground_truth):
     return (term1 * term2) / (term3 * term4)
 
 
-def find_ssim_library(dummy_data, ground_truth):
+def compute_ssim_library(dummy_data, ground_truth):
+    """Compute SSIM from library."""
     ssim = StructuralSimilarityIndexMeasure().to(Config().device())
     return ssim(dummy_data, ground_truth).item()
 
 
 def get_evaluation_dict(dummy_data, ground_truth, num_images, model, ds):
+    """Compute all evaluation metrics."""
     eval_dict = {}
     (
         eval_dict["data_mses"],
@@ -61,11 +66,11 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images, model, ds):
             )
             eval_dict["lpipss"][i] = min(
                 eval_dict["lpipss"][i],
-                loss_fn.forward(dummy_data[i], ground_truth[j]).item(),
+                LOSS_FN.forward(dummy_data[i], ground_truth[j]).item(),
             )
             eval_dict["ssims"][i] = max(
                 eval_dict["ssims"][i],
-                find_ssim_library(
+                compute_ssim_library(
                     torch.unsqueeze(dummy_data[i], dim=0),
                     torch.unsqueeze(ground_truth[j], dim=0),
                 ),
@@ -73,7 +78,7 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images, model, ds):
         # Find the mean for the MSE, LPIPS and PSNR
         eval_dict["avg_data_mses"] = mean(eval_dict["data_mses"])
         eval_dict["avg_lpips"] = mean(eval_dict["lpipss"])
-        eval_dict["avg_psnr"] = psnr(dummy_data, ground_truth, factor=1 / ds)
+        eval_dict["avg_psnr"] = compute_psnr(dummy_data, ground_truth, factor=1 / ds)
         eval_dict["avg_ssim"] = mean(eval_dict["ssims"])
         with torch.no_grad():
             eval_dict["avg_feat_mses"] = torch.mean(
@@ -83,9 +88,13 @@ def get_evaluation_dict(dummy_data, ground_truth, num_images, model, ds):
     return eval_dict
 
 
-def psnr(img_batch, ref_batch, batched=False, factor=1.0):
-    """This code based on https://github.com/JonasGeiping/invertinggradients.
-    Standard PSNR."""
+def compute_psnr(img_batch, ref_batch, batched=False, factor=1.0):
+    """
+    Compute PSNR.
+
+    This code based on https://github.com/JonasGeiping/invertinggradients.
+    Standard PSNR.
+    """
 
     def get_psnr(img_in, img_ref):
         mse = ((img_in - img_ref) ** 2).mean()
@@ -113,9 +122,10 @@ def psnr(img_batch, ref_batch, batched=False, factor=1.0):
 
 
 def covar(a, b):
+    """Compute covariance."""
     a_bar = torch.mean(a).item()
     b_bar = torch.mean(b).item()
     cov = 0
-    for i in range(len(a)):
+    for i in enumerate(a):
         cov += (a[i].item() - a_bar) * (b[i].item() - b_bar)
     return cov / (len(a) - 1)

@@ -1,21 +1,21 @@
 """
-An honest-but-curious federated learning server which can
-analyze periodic gradients from certain clients to
-perform the gradient leakage attacks and
+A federated learning server which can analyze periodic gradients 
+from certain clients to perform the gradient leakage attacks and
 reconstruct the training data of the victim clients.
-
 
 References:
 
 Zhu et al., "Deep Leakage from Gradients,"
 in Advances in Neural Information Processing Systems 2019.
-
 https://papers.nips.cc/paper/2019/file/60a6c4002cc7b29142def8871531281a-Paper.pdf
 
 Geiping et al., "Inverting Gradients - How easy is it to break privacy in federated learning?"
 in Advances in Neural Information Processing Systems 2020.
-
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
+
+Wen et al., "Fishing for User Data in Large-Batch Federated Learning via Gradient Magnification",
+in Proceedings of the 39th International Conference on Machine Learning (ICML), 2022.
+https://proceedings.mlr.press/v162/wen22a/wen22a.pdf
 """
 
 import asyncio
@@ -25,22 +25,29 @@ import os
 import shutil
 from collections import OrderedDict
 from copy import deepcopy
-
+import numpy as np
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
-from plato.config import Config
-from plato.servers import fedavg
-from plato.utils import csv_processor
 from torchvision import transforms
 
 from defense.GradDefense.compensate import denoise
 from utils.evaluations import get_evaluation_dict
 from utils.modules import PatchedModule
-from utils.utils import cross_entropy_for_onehot
-from utils.utils import total_variation as TV
+from utils.helpers import cross_entropy_for_onehot
+from utils.helpers import total_variation as TV
 from utils import consts
+from malicious_attacks.fishing import (
+    reconfigure_for_class_attack,
+    reconfigure_for_feature_attack,
+    reconstruct_feature,
+    check_with_tolerance,
+)
+
+from plato.servers import fedavg
+from plato.utils import csv_processor
+from plato.config import Config
 
 cross_entropy = torch.nn.CrossEntropyLoss(reduce="mean")
 tt = transforms.ToPILImage()
@@ -50,6 +57,7 @@ epochs = Config().trainer.epochs
 batch_size = Config().trainer.batch_size
 num_iters = Config().algorithm.num_iters
 log_interval = Config().algorithm.log_interval
+trials = Config().algorithm.trials
 dlg_result_path = f"{Config().params['result_path']}/{os.getpid()}"
 dlg_result_headers = [
     "Iteration",
@@ -109,6 +117,28 @@ class Server(fedavg.Server):
         self.best_mse = math.inf
         # Save trail 1 as the best as default when results are all bad
         self.best_trial = 1
+        self.iter = 0
+        self.labels_ = None
+
+        self.gt_data = None
+        self.gt_labels = None
+        self.target_grad = None
+        self.target_weights = None
+        # Assume the reconstructed data shape is known, which can be also derived from the target dataset
+        self.num_images = partition_size
+        self.dm = None
+        self.ds = None
+
+        # Fishing attack related
+        self.target_cls = 0
+        self.target_indx = None
+        self.single_gradient_recovered = False
+        self.feature_within_tolerance = False
+        self.all_feature_val = []
+        self.feature_loc = None
+        self.start_round = None
+        self.rec_round = 0
+        self.modified_model_states = None
 
     def weights_received(self, weights_received):
         """
@@ -122,7 +152,10 @@ class Server(fedavg.Server):
         return weights_received
 
     async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate weight updates from the clients using federated averaging with optional compensation."""
+        """
+        Aggregate weight updates from the clients using
+        federated averaging with optional compensation.
+        """
         # Extract the total number of samples
         self.total_samples = sum([update.report.num_samples for update in updates])
 
@@ -160,12 +193,25 @@ class Server(fedavg.Server):
             update_compensated = denoise(
                 gradients=update_perturbed,
                 scale=math.sqrt(_scale),
-                Q=Config().algorithm.Q,
+                q=Config().algorithm.Q,
             )
             for i, name in enumerate(avg_update.keys()):
                 avg_update[name] = update_compensated[i]
 
         return avg_update
+
+    def customize_server_payload(self, payload):
+        """Customizes the server payload before sending to the client."""
+        if self.start_round is None:
+            self.start_round = self.current_round
+        if (
+            hasattr(Config().algorithm, "fishing")
+            and Config().algorithm.fishing
+            and self.current_round > self.start_round
+        ):
+            self.algorithm.load_weights(self.modified_model_states)
+            payload = self.algorithm.extract_weights()
+        return payload
 
     def _deep_leakage_from_gradients(self, weights_received):
         """Analyze periodic gradients from certain clients."""
@@ -177,100 +223,107 @@ class Server(fedavg.Server):
         )
         update = self.updates[Config().algorithm.victim_client]
 
-        target_weights = None
+        if self.current_round == self.start_round:
+            self.gt_data, self.gt_labels = (
+                update.payload[1].to(Config().device()),
+                update.payload[2].to(Config().device()),
+            )
+            # Mean and std of data
+            if Config().data.datasource == "CIFAR10":
+                data_mean = consts.cifar10_mean
+                data_std = consts.cifar10_std
+            elif Config().data.datasource == "CIFAR100":
+                data_mean = consts.cifar100_mean
+                data_std = consts.cifar100_std
+            elif Config().data.datasource == "TinyImageNet":
+                data_mean = consts.imagenet_mean
+                data_std = consts.imagenet_std
+            elif Config().data.datasource == "MNIST":
+                data_mean = consts.mnist_mean
+                data_std = consts.mnist_std
+            self.dm = torch.as_tensor(
+                data_mean, device=Config().device(), dtype=torch.float
+            )[:, None, None]
+            self.ds = torch.as_tensor(
+                data_std, device=Config().device(), dtype=torch.float
+            )[:, None, None]
+
+            gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
+            self._make_plot(
+                self.num_images,
+                self.gt_data,
+                gt_result_path,
+                self.dm,
+                self.ds,
+            )
+
+        # Obtain target weight updates if matching updates
+        self.target_weights = None
         if not self.share_gradients and self.match_weights:
             if self.use_updates:
-                target_weights = deltas_received[Config().algorithm.victim_client]
+                self.target_weights = deltas_received[Config().algorithm.victim_client]
             else:
-                target_weights = update.payload[0]
+                self.target_weights = update.payload[0]
             # ignore running statistics in state_dict()
             states_to_save = []
             for name, _ in self.trainer.model.named_parameters():
                 states_to_save.append(name)
             states_to_remove = []
-            for name in target_weights.keys():
+            for name in self.target_weights.keys():
                 if name not in states_to_save:
                     states_to_remove.append(name)
             for name in states_to_remove:
-                del target_weights[name]
-            target_weights = [
-                weight.to(Config().device()) for weight in target_weights.values()
+                del self.target_weights[name]
+            self.target_weights = [
+                weight.to(Config().device()) for weight in self.target_weights.values()
             ]
 
-        gt_data, gt_labels, target_grad = (
-            update.payload[1].to(Config().device()),
-            update.payload[2].to(Config().device()),
-            [grad.to(Config().device()) for grad in update.payload[3]],
-        )
-
-        # Assume the reconstructed data shape is known, which can be also derived from the target dataset
-        num_images = partition_size
-        data_size = [num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]]
-
-        # Mean and std of data
-        if Config().data.datasource == "CIFAR10":
-            data_mean = consts.cifar10_mean
-            data_std = consts.cifar10_std
-        elif Config().data.datasource == "CIFAR100":
-            data_mean = consts.cifar100_mean
-            data_std = consts.cifar100_std
-        elif Config().data.datasource == "TinyImageNet":
-            data_mean = consts.imagenet_mean
-            data_std = consts.imagenet_std
-        elif Config().data.datasource == "MNIST":
-            data_mean = consts.mnist_mean
-            data_std = consts.mnist_std
-        dm = torch.as_tensor(data_mean, device=Config().device(), dtype=torch.float)[
-            :, None, None
-        ]
-        ds = torch.as_tensor(data_std, device=Config().device(), dtype=torch.float)[
-            :, None, None
-        ]
-
-        gt_result_path = f"{dlg_result_path}/ground_truth.pdf"
-        self._make_plot(num_images, gt_data, gt_labels, gt_result_path, dm, ds)
-
-        # The number of restarts
-        trials = 1
-        if hasattr(Config().algorithm, "trials"):
-            trials = Config().algorithm.trials
-
-        logging.info("Running %d Trials", trials)
-
+        # Obtain target gradients if matching gradients
+        self.target_grad = [grad.to(Config().device()) for grad in update.payload[3]]
         if not self.share_gradients and not self.match_weights:
             # Obtain the local updates from clients
-            target_grad = []
+            self.target_grad = []
             for delta in deltas_received[Config().algorithm.victim_client].values():
-                target_grad.append(
+                self.target_grad.append(
                     -delta.to(Config().device()) / Config().parameters.optimizer.lr
                 )
 
             total_local_steps = epochs * math.ceil(partition_size / batch_size)
-            target_grad = [x / total_local_steps for x in target_grad]
+            self.target_grad = [x / total_local_steps for x in self.target_grad]
 
-        # Generate dummy items and initialize optimizer
-        torch.manual_seed(Config().algorithm.random_seed)
+        if hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing:
+            self.fishing_attack(self.target_grad, self.target_weights, self.gt_labels)
 
-        for trial_number in range(trials):
-            self.run_trial(
-                trial_number,
-                num_images,
-                data_size,
-                target_weights,
-                target_grad,
-                gt_data,
-                gt_labels,
-                dm,
-                ds,
-            )
+        # Optimization-based attack
+        if (
+            not (hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing)
+            or self.current_round == self.rec_round
+        ):
+            # Generate dummy items and initialize optimizer
+            torch.manual_seed(Config().algorithm.random_seed)
 
-        self._save_best()
+            logging.info("Running %d Trials", trials)
+            for trial_number in range(trials):
+                self.run_trial(
+                    trial_number,
+                    self.num_images,
+                    self.target_weights,
+                    self.target_grad,
+                    self.gt_data,
+                    self.gt_labels,
+                    self.dm,
+                    self.ds,
+                )
+
+            self._save_best()
+
+            logging.info("Attack finished.")
+            self.current_round = Config().trainer.rounds + 1
 
     def run_trial(
         self,
         trial_number,
         num_images,
-        data_size,
         target_weights,
         target_grad,
         gt_data,
@@ -291,21 +344,54 @@ class Server(fedavg.Server):
 
         if Config().algorithm.init_data == "randn":
             dummy_data = (
-                torch.randn(data_size).to(Config().device()).requires_grad_(True)
+                torch.randn(
+                    [num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]]
+                )
+                .to(Config().device())
+                .requires_grad_(True)
             )
         elif Config().algorithm.init_data == "rand":
             dummy_data = (
-                ((torch.rand(data_size) - 0.5) * 2)
+                (
+                    (
+                        torch.rand(
+                            [
+                                num_images,
+                                gt_data.shape[1],
+                                gt_data.shape[2],
+                                gt_data.shape[3],
+                            ]
+                        )
+                        - 0.5
+                    )
+                    * 2
+                )
                 .to(Config().device())
                 .requires_grad_(True)
             )
         elif Config().algorithm.init_data == "zeros":
             dummy_data = (
-                torch.zeros(data_size).to(Config().device()).requires_grad_(True)
+                torch.zeros(
+                    [num_images, gt_data.shape[1], gt_data.shape[2], gt_data.shape[3]]
+                )
+                .to(Config().device())
+                .requires_grad_(True)
             )
         elif Config().algorithm.init_data == "half":
             dummy_data = (
-                (torch.ones(data_size) - 0.5).to(Config().device()).requires_grad_(True)
+                (
+                    torch.ones(
+                        [
+                            num_images,
+                            gt_data.shape[1],
+                            gt_data.shape[2],
+                            gt_data.shape[3],
+                        ]
+                    )
+                    - 0.5
+                )
+                .to(Config().device())
+                .requires_grad_(True)
             )
 
         dummy_labels = (
@@ -396,7 +482,8 @@ class Server(fedavg.Server):
                 match_optimizer, dummy_data, labels_, target_grad
             )
 
-        for iters in range(num_iters):
+        early_exit = False
+        for self.iter in range(num_iters):
             current_loss = match_optimizer.step(closure)
             losses.append(current_loss.item())
 
@@ -412,12 +499,10 @@ class Server(fedavg.Server):
 
                 if math.isnan(current_loss):
                     logging.info("Not a number, ending this attack attempt")
+                    early_exit = True
                     break
 
-                if iters % log_interval == 0:
-                    # Finding evaluation metrics
-                    # should make these lines into a function to prevent repetition, but not sure how to
-                    # without having too many parameters
+                if self.iter % log_interval == 0:
                     eval_dict = get_evaluation_dict(
                         dummy_data,
                         gt_data,
@@ -432,11 +517,13 @@ class Server(fedavg.Server):
                     avg_ssim.append(eval_dict["avg_ssim"])
 
                     logging.info(
-                        "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
+                        "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: "
+                        "Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, "
+                        "avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
                         self.attack_method,
                         (trial_number + 1),
                         self.defense_method,
-                        iters,
+                        self.iter,
                         losses[-1],
                         avg_data_mses[-1],
                         avg_feat_mses[-1],
@@ -477,7 +564,7 @@ class Server(fedavg.Server):
                         )
 
                     new_row = [
-                        iters,
+                        self.iter,
                         round(losses[-1], 4),
                         round(avg_data_mses[-1], 4),
                         round(avg_feat_mses[-1], 4),
@@ -487,33 +574,40 @@ class Server(fedavg.Server):
                     ]
                     csv_processor.write_csv(trial_csv_file, new_row)
 
-        with torch.no_grad():
-            # TODO: use other scoring criteria
-            if self.best_mse > avg_data_mses[-1]:
-                self.best_mse = avg_data_mses[-1]
-                self.best_trial = (
-                    trial_number + 1
-                )  # the +1 is because we index from 1 and not 0
+        if not early_exit:
+            with torch.no_grad():
+                # TODO: use other scoring criteria
+                if self.best_mse > avg_data_mses[-1]:
+                    self.best_mse = avg_data_mses[-1]
+                    self.best_trial = (
+                        trial_number + 1
+                    )  # the +1 is because we index from 1 and not 0
 
-            reconstructed_path = f"{trial_result_path}/reconstruction_iterations.png"
-            self._plot_reconstructed(num_images, history, reconstructed_path, dm, ds)
-            final_tensor = torch.stack([history[-1][i][0] for i in range(num_images)])
-            final_result_path = f"{trial_result_path}/final_attack_result.pdf"
-            self._make_plot(num_images, final_tensor, None, final_result_path, dm, ds)
+                reconstructed_path = (
+                    f"{trial_result_path}/reconstruction_iterations.png"
+                )
+                self._plot_reconstructed(
+                    num_images, history, reconstructed_path, dm, ds
+                )
+                final_tensor = torch.stack(
+                    [history[-1][i][0] for i in range(num_images)]
+                )
+                final_result_path = f"{trial_result_path}/final_attack_result.pdf"
+                self._make_plot(num_images, final_tensor, final_result_path, dm, ds)
 
-            # Save the tensors into a .pt file
-            tensor_file_path = f"{trial_result_path}/tensors.pt"
-            result = {
-                i
-                * log_interval: {
-                    j: history[i][j][0].cpu().permute(1, 2, 0)
-                    for j in range(num_images)
+                # Save the tensors into a .pt file
+                tensor_file_path = f"{trial_result_path}/tensors.pt"
+                result = {
+                    i
+                    * log_interval: {
+                        j: history[i][j][0].cpu().permute(1, 2, 0)
+                        for j in range(num_images)
+                    }
+                    for i in range(len(history))
                 }
-                for i in range(len(history))
-            }
-            torch.save(result, tensor_file_path)
+                torch.save(result, tensor_file_path)
 
-            logging.info("Attack %d complete", (trial_number + 1))
+                logging.info("Attack %d complete", (trial_number + 1))
 
     def _gradient_closure(self, match_optimizer, dummy_data, labels, target_grad):
         """Take a step to match the gradients."""
@@ -531,10 +625,7 @@ class Server(fedavg.Server):
                 self.trainer.model.train()
             self.trainer.model.zero_grad()
 
-            try:
-                dummy_pred, _ = self.trainer.model(dummy_data)
-            except:
-                dummy_pred = self.trainer.model(dummy_data)
+            dummy_pred = self.trainer.model(dummy_data)
 
             if self.attack_method == "DLG":
                 dummy_onehot_label = F.softmax(labels, dim=-1)
@@ -556,7 +647,14 @@ class Server(fedavg.Server):
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
             if self.attack_method == "csDLG":
-                dummy_data.grad.sign_()
+                if (
+                    hasattr(Config().algorithm, "signed")
+                    and Config().algorithm.signed == "soft"
+                ):
+                    scaling_factor = 1 - self.iter / num_iters
+                    dummy_data.grad.mul_(scaling_factor).tanh_().div_(scaling_factor)
+                else:
+                    dummy_data.grad.sign_()
             return rec_loss
 
         return closure
@@ -594,10 +692,11 @@ class Server(fedavg.Server):
     def _loss_steps(self, dummy_data, labels, model):
         """Take a few gradient descent steps to fit the model to the given input."""
         patched_model = PatchedModule(model)
+
         if self.use_updates:
             patched_model_origin = deepcopy(patched_model)
 
-        for epoch in range(epochs):
+        for _ in range(epochs):
             for idx in range(int(math.ceil(dummy_data.shape[0] / batch_size))):
                 dummy_pred = patched_model(
                     dummy_data[idx * batch_size : (idx + 1) * batch_size],
@@ -630,6 +729,133 @@ class Server(fedavg.Server):
                 )
             )
         return list(patched_model.parameters.values())
+
+    def fishing_attack(self, target_grad, target_weights, gt_labels):
+        """The fishing attack (https://github.com/JonasGeiping/breaching)."""
+        if self.current_round == self.start_round:
+            # Query the labels
+            t_labels = torch.argmax(gt_labels, dim=-1).detach().cpu().numpy()
+            logging.info(f"Found labels {t_labels} in first query.")
+
+            # Find the target class index
+            self.target_cls = Config().algorithm.target_cls
+            self.target_indx = np.where(t_labels == self.target_cls)[0]
+            if self.target_indx.size == 0:
+                self.target_cls = np.unique(t_labels)[Config().algorithm.target_cls_idx]
+                self.target_indx = np.where(t_labels == self.target_cls)[0]
+            self.labels_ = torch.argmax(gt_labels, dim=-1)[self.target_indx]
+
+            # Plot the images of the target class too for fishing attack
+            if hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing:
+                for i in self.target_indx:
+                    gt_target_cls = self.gt_data[i].unsqueeze(0)
+                    gt_cls_path = f"{dlg_result_path}/gt_target_cls_{self.target_cls}_indx_{i}.pdf"
+                    self._make_plot(
+                        1,
+                        gt_target_cls,
+                        gt_cls_path,
+                        self.dm,
+                        self.ds,
+                    )
+
+        if self.current_round == self.start_round and len(self.target_indx) == 1:
+            # simple cls attack if there is no cls collision
+            logging.info("Attacking label %d with cls attack.", self.labels_.item())
+
+            # modify the parameters first
+            self.modified_model_states = reconfigure_for_class_attack(
+                self.trainer.model, target_classes=self.target_cls
+            )
+
+            # Only target one data
+            self.num_images = 1
+            self.gt_labels = gt_labels[self.target_indx[0]].unsqueeze(0)
+            self.rec_round = self.current_round + 1
+
+        elif len(self.target_indx) > 1:
+            # send several queries because of cls collision
+            if self.current_round == self.start_round:
+                logging.info(
+                    "Attacking label %d with binary attack.", self.labels_[0].item()
+                )
+                num_collisions = (self.labels_ == self.target_cls).sum()
+                logging.info(
+                    f"There are in total {num_collisions.item()} datapoints with label {self.target_cls}."
+                )
+
+                # find the starting point and the feature entry gives the max avg value
+                self.modified_model_states = reconfigure_for_class_attack(
+                    self.trainer.model, target_classes=self.target_cls
+                )
+            else:
+                # binary attack to recover all single gradients
+                avg_feature = torch.flatten(
+                    reconstruct_feature(
+                        target_grad,
+                        target_weights,
+                        self.target_cls,
+                    )
+                )
+                if self.feature_loc is None:
+                    self.feature_loc = int(torch.argmax(avg_feature))
+                feature_val = float(avg_feature[self.feature_loc])
+                logging.info("Found avg feature val %.2f.", feature_val)
+
+                if check_with_tolerance(
+                    feature_val,
+                    self.all_feature_val,
+                    threshold=Config().algorithm.feat_threshold,
+                ):
+                    if not self.share_gradients and self.match_weights:
+                        target = target_weights
+                    else:
+                        target = target_grad
+                    curr_grad = list(target)
+                    curr_grad[-1] = curr_grad[-1] * len(self.target_indx)
+                    curr_grad[:-1] = [
+                        grad_ii
+                        * len(self.target_indx)
+                        / Config().algorithm.feat_multiplier
+                        for grad_ii in curr_grad[:-1]
+                    ]
+                    recovered_single_gradients = [curr_grad]
+                    # return to the model with multiplier=1, (better with larger multiplier, but not optimizable if it is too large)
+                    self.modified_model_states = reconfigure_for_feature_attack(
+                        self.trainer.model,
+                        feature_val,
+                        self.feature_loc,
+                        target_classes=self.target_cls,
+                        allow_reset_param_weights=True,
+                    )
+                    self.algorithm.load_weights(self.modified_model_states)
+
+                    # add reversed() because the ith is always more confident than i-1th
+                    if not self.share_gradients and self.match_weights:
+                        self.target_weights = list(
+                            reversed(recovered_single_gradients)
+                        )[Config().algorithm.grad_idx]
+                    else:
+                        self.target_grad = list(reversed(recovered_single_gradients))[
+                            Config().algorithm.grad_idx
+                        ]
+
+                    # Only target one data
+                    self.num_images = 1
+                    self.gt_labels = gt_labels[self.target_indx[0]].unsqueeze(0)
+                    self.rec_round = self.current_round
+                else:
+                    self.all_feature_val.append(feature_val)
+                    logging.info(
+                        "Querying feature %d with feature val %.2f.",
+                        self.feature_loc,
+                        feature_val,
+                    )
+                    self.modified_model_states = reconfigure_for_feature_attack(
+                        self.trainer.model,
+                        feature_val,
+                        self.feature_loc,
+                        target_classes=self.target_cls,
+                    )
 
     def _save_best(self):
         src_folder = f"{dlg_result_path}/t{self.best_trial}"
@@ -680,7 +906,7 @@ class Server(fedavg.Server):
                 elif cost_fn == "simlocal":
                     costs += (
                         1
-                        - torch.nn.functional.cosine_similarity(
+                        - F.cosine_similarity(
                             trial[i].flatten(), target[i].flatten(), 0, 1e-10
                         )
                         * weights[i]
@@ -694,30 +920,30 @@ class Server(fedavg.Server):
         return total_costs / len(dummy)
 
     @staticmethod
-    def _make_plot(num_images, image_data, image_labels, path, dm, ds):
+    def _make_plot(num_images, image_data, path, dm, ds):
         """Plot image data."""
 
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
+        rows, cols = None, None
         if hasattr(Config().results, "rows"):
             rows = Config().results.rows
-            if hasattr(Config().results, "cols"):
-                cols = Config().results.cols
-            else:
-                cols = math.ceil(num_images / rows)
-        elif hasattr(Config().results, "cols"):
+        if hasattr(Config().results, "cols"):
             cols = Config().results.cols
+
+        if rows is not None and cols is None:
+            cols = math.ceil(num_images / rows)
+        elif cols is not None and rows is None:
             rows = math.ceil(num_images / cols)
-        else:
+        elif rows is None and cols is None:
             # make the image wider by default
             # if you want the image to be taller by default then
             # switch the assignment statement for rows and cols variables
             logging.info("Using default dimensions for images")
             cols = math.ceil(math.sqrt(num_images))
             rows = math.ceil(num_images / cols)
-
-        if (rows * cols) < num_images:
+        elif (rows * cols) < num_images:
             logging.info("Row and column provided for plotting images is too small")
             logging.info("Using default dimensions for images")
             cols = math.ceil(math.sqrt(num_images))
@@ -731,15 +957,27 @@ class Server(fedavg.Server):
         image_data = image_data.detach().clone()
         image_data.mul_(ds).add_(dm).clamp_(0, 1)
         if num_images == 1:
-            gt_figure = plt.figure(figsize=(8, 8))
+            fig = plt.figure(figsize=(8, 8))
             plt.imshow(image_data[0].permute(1, 2, 0).cpu())
             plt.axis("off")
         else:
             fig, axes = plt.subplots(
-                nrows=rows, ncols=cols, figsize=(image_width, image_height)
+                nrows=rows,
+                ncols=cols,
+                gridspec_kw=dict(
+                    wspace=0.0,
+                    hspace=0.0,
+                    top=1.0 - 0.5 / (rows + 1),
+                    bottom=0.5 / (rows + 1),
+                    left=0.5 / (cols + 1),
+                    right=1 - 0.5 / (cols + 1),
+                ),
+                figsize=(image_width, image_height),
+                sharey="row",
+                sharex="col",
             )
-            for i, title in enumerate(image_data):
-                axes.ravel()[i].imshow(image_data[i].permute(1, 2, 0).cpu())
+            for i, img in enumerate(image_data):
+                axes.ravel()[i].imshow(img.permute(1, 2, 0).cpu())
                 axes.ravel()[i].set_axis_off()
             for i in range(num_images, product):
                 axes.ravel()[i].set_axis_off()
@@ -757,7 +995,7 @@ class Server(fedavg.Server):
         rows = math.ceil(len(history) / 2)
         outer = gridspec.GridSpec(rows, 2, wspace=0.2, hspace=0.2)
 
-        for i, item in enumerate(history):
+        for i, _ in enumerate(history):
             inner = gridspec.GridSpecFromSubplotSpec(
                 1, num_images, subplot_spec=outer[i]
             )
