@@ -47,9 +47,8 @@ class PatchedModule(torch.nn.Module):
         # But if not ...
         param_gen = iter(parameters.values())
         method_pile = []
-        counter = 0
 
-        for name, module in self.net.named_modules():
+        for _, module in self.net.named_modules():
             if isinstance(module, torch.nn.Conv2d):
                 ext_weight = next(param_gen)
                 if module.bias is not None:
@@ -122,7 +121,7 @@ class PatchedModule(torch.nn.Module):
             output = self.net(inputs)
 
         # Undo Patch
-        for name, module in self.net.named_modules():
+        for _, module in self.net.named_modules():
             if isinstance(module, torch.nn.modules.conv.Conv2d):
                 module.forward = method_pile.pop(0)
             elif isinstance(module, torch.nn.BatchNorm2d):

@@ -1,17 +1,23 @@
+"""
+A federated learning trainer for gradient leakage attacks,
+where intermediate gradients can be transmitted, 
+and potential defense mechanisms can be applied.
+"""
+
 import math
 import pickle
 import random
-
 import numpy as np
 import torch
-from plato.config import Config
-from plato.trainers import basic
 from torchvision import transforms
 
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
 from defense.Outpost.perturb import compute_risk
-from utils.utils import cross_entropy_for_onehot, label_to_onehot
+from utils.helpers import cross_entropy_for_onehot, label_to_onehot
+
+from plato.config import Config
+from plato.trainers import basic
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
@@ -154,7 +160,7 @@ class Trainer(basic.Trainer):
                     hasattr(Config().algorithm, "clip")
                     and Config().algorithm.clip is True
                 ):
-                    from defense.GradDefense.clip import noise
+                    from defense.GradDefense.perturb import noise_with_clip as noise
                 else:
                     from defense.GradDefense.perturb import noise
                 self.list_grad = noise(

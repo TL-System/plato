@@ -11,6 +11,8 @@ from plato.config import Config
 
 
 class Model(nn.Module):
+    """The LeNet model."""
+
     def __init__(self, num_classes=Config().parameters.model.num_classes):
         super().__init__()
         act = nn.Sigmoid
@@ -32,6 +34,7 @@ class Model(nn.Module):
         self.fc = nn.Sequential(nn.Linear(in_size, num_classes))
 
     def forward(self, x):
+        """Model forwarding."""
         out = self.body(x)
         out = out.view(out.size(0), -1)
         out = self.fc(out)
@@ -39,6 +42,7 @@ class Model(nn.Module):
         return out
 
     def forward_feature(self, x):
+        """Model forwarding returning intermediate feature."""
         out = self.body(x)
         feature = out.view(out.size(0), -1)
         out = self.fc(feature)

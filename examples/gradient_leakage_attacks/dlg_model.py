@@ -4,13 +4,12 @@ An extra return object named `feature` is added in each model's forward function
 which will be used in the defense Soteria.
 """
 
-from plato.config import Config
 from typing import Union
-
 from nn import (
     lenet,
     resnet,
 )
+from plato.config import Config
 
 
 def get(**kwargs: Union[str, dict]):

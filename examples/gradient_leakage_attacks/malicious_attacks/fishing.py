@@ -1,11 +1,12 @@
-import torch
 import numbers
 import copy
+import torch
 from plato.config import Config
 
 
 @torch.no_grad()
 def reconfigure_for_class_attack(model, target_classes=None):
+    """Reconfigure the model for class attack."""
     model = copy.deepcopy(model)
     cls_to_obtain = wrap_indices(target_classes)
 
@@ -32,6 +33,7 @@ def reconfigure_for_feature_attack(
     target_classes=None,
     allow_reset_param_weights=False,
 ):
+    """Reconfigure the model for feature attack."""
     model = copy.deepcopy(model)
     cls_to_obtain = wrap_indices(target_classes)
     feature_loc = wrap_indices(feature_loc)
@@ -55,6 +57,7 @@ def reconfigure_for_feature_attack(
 
 
 def reconstruct_feature(shared_grad, shared_weights, cls_to_obtain):
+    """Reconstruct features."""
     # Use weight or delta updates
     if shared_weights is not None:
         shared_grad = shared_weights
@@ -64,19 +67,21 @@ def reconstruct_feature(shared_grad, shared_weights, cls_to_obtain):
 
     if bias[cls_to_obtain] != 0:
         return grads_fc_debiased[cls_to_obtain]
-    else:
-        return torch.zeros_like(grads_fc_debiased[0])
+
+    return torch.zeros_like(grads_fc_debiased[0])
 
 
 def wrap_indices(indices):
+    """Wrap indices."""
     if isinstance(indices, numbers.Number):
         return [indices]
     else:
         return list(indices)
 
 
-def check_with_tolerance(value, list, threshold=1e-3):
-    for i in list:
+def check_with_tolerance(value, feature_list, threshold=1e-3):
+    """Check features with tolerance."""
+    for i in feature_list:
         if abs(value - i) < threshold:
             return True
 
