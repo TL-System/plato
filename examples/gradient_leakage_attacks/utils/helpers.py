@@ -1,8 +1,11 @@
+"""Helper methods"""
+
 import torch
 import torch.nn.functional as F
 
 
 def label_to_onehot(target, num_classes=10):
+    """Convert labels to one-hot."""
     target = torch.unsqueeze(target, 1)
     onehot_target = torch.zeros(target.size(0), num_classes, device=target.device)
     onehot_target.scatter_(1, target, 1)
@@ -10,6 +13,7 @@ def label_to_onehot(target, num_classes=10):
 
 
 def cross_entropy_for_onehot(pred, target):
+    """Calculate cross entropy loss for one-hot labels."""
     return torch.mean(torch.sum(-target * F.log_softmax(pred, dim=-1), 1))
 
 

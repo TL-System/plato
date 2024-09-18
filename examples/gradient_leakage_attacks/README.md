@@ -23,7 +23,7 @@ Research on gradient leakage attack and defense using the Plato framework.
 - {GC} gradient compression (referred to Soteria's code) 
 ---
 
-# Running Plato with DLG attack
+## Run FL with DLG attack
 Run the program using the following cmd under the directory `examples/gradient_leakage_attacks` for example, which launches the csDLG attack using delta matching against an untrained ResNet18 model in `.eval()` mode on CIFAR100 data:
 ```
 python dlg.py -c untrained_eval_delta.yml
@@ -87,6 +87,9 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 - (for Outpost) `prune_base: 80` — pruning percentage
 - (for Outpost) `noise_base: 0.8` — scale for gaussian noise
 
+### under `trainer`
+
+- `model_type: vit` — needed when using ViTs as the model; specify the ViT model name such as `vit-base-patch16-224-in21k` to `model_name` at the same time
 
 ### under `results`
 
@@ -95,9 +98,5 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 - `trial: [int]` — the trial number to be plotted. Plots the best reconstruction based off MSE if not specified
 
 - `cols/rows: [int]` — specify the number of columns or rows in the plotted figure
-  
-## Plot Instructions
-
-Run ```python plot.py -c config_file``` where ```config_file``` is the same one used to run the DLG attack
 
 

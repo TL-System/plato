@@ -1,26 +1,31 @@
+"""
+Dataloader of GradDefense
+
+Reference:
+Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning," INFOCOM 2022.
+https://github.com/wangjunxiao/GradDefense
+"""
+
 import numpy as np
-import torch
 from torch.utils.data import Subset
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Dataset
 
 DEFAULT_NUM_WORKERS = 8
-rootset_per_class = 5
-rootset_size = 50
-
-# TODO: total_num_samples is not used
+ROOTSET_PER_CLASS = 5
+ROOTSET_SIZE = 50
 
 
 def extract_root_set(
     dataset: Dataset,
-    sample_per_class: int = rootset_per_class,
-    total_num_samples: int = rootset_size,
+    sample_per_class: int = ROOTSET_PER_CLASS,
     seed: int = None,
 ):
+    """Extract root dataset."""
     num_classes = len(dataset.classes)
     class2sample = {i: [] for i in range(num_classes)}
     select_indices = []
-    if seed == None:
+    if seed is None:
         index_pool = range(len(dataset))
     else:
         index_pool = np.random.RandomState(seed=seed).permutation(len(dataset))
@@ -35,6 +40,7 @@ def extract_root_set(
 
 
 def get_root_set_loader(trainset):
+    """Obtain root dataset loader."""
     rootset_indices, __ = extract_root_set(trainset)
     root_set = Subset(trainset, rootset_indices)
     root_dataloader = DataLoader(

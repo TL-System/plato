@@ -4,13 +4,12 @@ An extra return object named `feature` is added in each model's forward function
 which will be used in the defense Soteria.
 """
 
-from plato.config import Config
 from typing import Union
-
 from nn import (
     lenet,
     resnet,
 )
+from plato.config import Config
 
 
 def get(**kwargs: Union[str, dict]):
@@ -24,5 +23,9 @@ def get(**kwargs: Union[str, dict]):
 
     if model_name.split("_")[0] == "resnet":
         return resnet.get(model_name=model_name)
+
+    # Set up model through plato's model library
+    if Config().trainer.model_type == "vit":
+        return None
 
     raise ValueError(f"No such model: {model_name}")

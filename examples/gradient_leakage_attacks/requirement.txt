@@ -1,0 +1,4 @@
+matplotlib
+lpips
+torchmetrics
+statistics

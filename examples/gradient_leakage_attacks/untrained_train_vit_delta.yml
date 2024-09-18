@@ -12,7 +12,7 @@ clients:
 
 server:
     address: 127.0.0.1
-    port: 8090
+    port: 8080
     simulate_wall_time: true
     do_test: false
 
@@ -20,6 +20,7 @@ server:
 
 data:
     # The training and testing dataset
+    # datasource: TinyImageNet
     datasource: CIFAR100
 
     # Where the dataset is located
@@ -49,7 +50,8 @@ trainer:
     optimizer: SGD
 
     # The machine learning model
-    model_name: resnet_18
+    model_type: vit
+    model_name: vit-base-patch16-224-in21k
 
 algorithm:
     # Aggregation algorithm
@@ -75,7 +77,7 @@ algorithm:
     attack_round: 1
     # One particular client, e.g., the first selected client
     victim_client: 0
-    num_iters: 2000
+    num_iters: 6000
     log_interval: 100
 
     # model mode
@@ -87,12 +89,12 @@ algorithm:
     # Whether or not use customized initialization for model weights
     init_params: false
     # Whether sharing gradients or model weights
-    share_gradients: true
+    share_gradients: false
     # Do reconstruction by directly matching weights when it's true,
     # otherwise by matching gradients calculated from updates
-    match_weights: false
+    match_weights: true
     # Matching weights (absolute) or weight updates (delta)
-    use_updates: false
+    use_updates: true
     # The number of times the attack will be attempted
     trials: 1
 
@@ -123,12 +125,14 @@ algorithm:
 parameters:
     model:
         num_classes: 100
+        num_labels: 100
+        pretrained: false
 
     optimizer:
         lr: 0.01
 
 results:
-    result_path: results/gradient_matching/vgg16_cifar100/untrained_train
+    result_path: results/delta_matching/vit_tinyimagenet/untrained_train
 
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, round_time
