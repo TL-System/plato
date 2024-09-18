@@ -87,6 +87,9 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 - (for Outpost) `prune_base: 80` — pruning percentage
 - (for Outpost) `noise_base: 0.8` — scale for gaussian noise
 
+### under `trainer`
+
+- `model_type: vit` — needed when using ViTs as the model; specify the ViT model name such as `vit-base-patch16-224-in21k` to `model_name` at the same time
 
 ### under `results`
 
