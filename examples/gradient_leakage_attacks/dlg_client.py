@@ -7,6 +7,8 @@ from plato.config import Config
 
 
 class Client(simple.Client):
+    """A federated learning client for gradient leakage attacks."""
+
     async def inbound_processed(self, processed_inbound_payload):
         """Add extra information along with the original payload for attack validation at server."""
         report, outbound_payload = await super().inbound_processed(

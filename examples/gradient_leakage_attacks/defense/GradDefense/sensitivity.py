@@ -1,3 +1,11 @@
+"""
+Sensitivity computation of GradDefense
+
+Reference:
+Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning," INFOCOM 2022.
+https://github.com/wangjunxiao/GradDefense
+"""
+
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
@@ -9,9 +17,8 @@ def compute_sens(
     device: torch.device,
     loss_fn=nn.CrossEntropyLoss(),
 ):
+    """Compute sensitivity."""
     x, y = next(iter(rootset_loader))
-    # print('x shape is', x.shape)
-    # print('y shape is', y.shape)
 
     x = x.to(device).requires_grad_()
     y = y.to(device)
@@ -22,6 +29,7 @@ def compute_sens(
         pred, _ = model(x)
     except:
         pred = model(x)
+
     loss = loss_fn(pred, y)
     # Backward propagation
     dy_dx = torch.autograd.grad(

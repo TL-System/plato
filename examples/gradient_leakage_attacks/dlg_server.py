@@ -1,21 +1,21 @@
 """
-An honest-but-curious federated learning server which can
-analyze periodic gradients from certain clients to
-perform the gradient leakage attacks and
+A federated learning server which can analyze periodic gradients 
+from certain clients to perform the gradient leakage attacks and
 reconstruct the training data of the victim clients.
-
 
 References:
 
 Zhu et al., "Deep Leakage from Gradients,"
 in Advances in Neural Information Processing Systems 2019.
-
 https://papers.nips.cc/paper/2019/file/60a6c4002cc7b29142def8871531281a-Paper.pdf
 
 Geiping et al., "Inverting Gradients - How easy is it to break privacy in federated learning?"
 in Advances in Neural Information Processing Systems 2020.
-
 https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-Paper.pdf
+
+Wen et al., "Fishing for User Data in Large-Batch Federated Learning via Gradient Magnification",
+in Proceedings of the 39th International Conference on Machine Learning (ICML), 2022.
+https://proceedings.mlr.press/v162/wen22a/wen22a.pdf
 """
 
 import asyncio
@@ -30,23 +30,24 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
-from plato.config import Config
-from plato.servers import fedavg
-from plato.utils import csv_processor
 from torchvision import transforms
 
 from defense.GradDefense.compensate import denoise
 from utils.evaluations import get_evaluation_dict
 from utils.modules import PatchedModule
-from utils.utils import cross_entropy_for_onehot
-from utils.utils import total_variation as TV
+from utils.helpers import cross_entropy_for_onehot
+from utils.helpers import total_variation as TV
 from utils import consts
-from utils.fishing import (
+from malicious_attacks.fishing import (
     reconfigure_for_class_attack,
     reconfigure_for_feature_attack,
     reconstruct_feature,
     check_with_tolerance,
 )
+
+from plato.servers import fedavg
+from plato.utils import csv_processor
+from plato.config import Config
 
 cross_entropy = torch.nn.CrossEntropyLoss(reduce="mean")
 tt = transforms.ToPILImage()
@@ -117,6 +118,7 @@ class Server(fedavg.Server):
         # Save trail 1 as the best as default when results are all bad
         self.best_trial = 1
         self.iter = 0
+        self.labels_ = None
 
         self.gt_data = None
         self.gt_labels = None
@@ -150,7 +152,10 @@ class Server(fedavg.Server):
         return weights_received
 
     async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate weight updates from the clients using federated averaging with optional compensation."""
+        """
+        Aggregate weight updates from the clients using
+        federated averaging with optional compensation.
+        """
         # Extract the total number of samples
         self.total_samples = sum([update.report.num_samples for update in updates])
 
@@ -188,7 +193,7 @@ class Server(fedavg.Server):
             update_compensated = denoise(
                 gradients=update_perturbed,
                 scale=math.sqrt(_scale),
-                Q=Config().algorithm.Q,
+                q=Config().algorithm.Q,
             )
             for i, name in enumerate(avg_update.keys()):
                 avg_update[name] = update_compensated[i]
@@ -478,7 +483,7 @@ class Server(fedavg.Server):
             )
 
         early_exit = False
-        for self.iters in range(num_iters):
+        for self.iter in range(num_iters):
             current_loss = match_optimizer.step(closure)
             losses.append(current_loss.item())
 
@@ -497,10 +502,7 @@ class Server(fedavg.Server):
                     early_exit = True
                     break
 
-                if self.iters % log_interval == 0:
-                    # Finding evaluation metrics
-                    # should make these lines into a function to prevent repetition, but not sure how to
-                    # without having too many parameters
+                if self.iter % log_interval == 0:
                     eval_dict = get_evaluation_dict(
                         dummy_data,
                         gt_data,
@@ -515,11 +517,13 @@ class Server(fedavg.Server):
                     avg_ssim.append(eval_dict["avg_ssim"])
 
                     logging.info(
-                        "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
+                        "[%s Gradient Leakage Attack %d with %s defense...] Iter %d: "
+                        "Loss = %.4f, avg Data MSE = %.4f, avg Feature MSE = %.4f, "
+                        "avg LPIPS = %.4f, avg PSNR = %.4f dB, avg SSIM = %.4f",
                         self.attack_method,
                         (trial_number + 1),
                         self.defense_method,
-                        self.iters,
+                        self.iter,
                         losses[-1],
                         avg_data_mses[-1],
                         avg_feat_mses[-1],
@@ -560,7 +564,7 @@ class Server(fedavg.Server):
                         )
 
                     new_row = [
-                        self.iters,
+                        self.iter,
                         round(losses[-1], 4),
                         round(avg_data_mses[-1], 4),
                         round(avg_feat_mses[-1], 4),
@@ -692,7 +696,7 @@ class Server(fedavg.Server):
         if self.use_updates:
             patched_model_origin = deepcopy(patched_model)
 
-        for epoch in range(epochs):
+        for _ in range(epochs):
             for idx in range(int(math.ceil(dummy_data.shape[0] / batch_size))):
                 dummy_pred = patched_model(
                     dummy_data[idx * batch_size : (idx + 1) * batch_size],
@@ -727,6 +731,7 @@ class Server(fedavg.Server):
         return list(patched_model.parameters.values())
 
     def fishing_attack(self, target_grad, target_weights, gt_labels):
+        """The fishing attack (https://github.com/JonasGeiping/breaching)."""
         if self.current_round == self.start_round:
             # Query the labels
             t_labels = torch.argmax(gt_labels, dim=-1).detach().cpu().numpy()
@@ -755,7 +760,7 @@ class Server(fedavg.Server):
 
         if self.current_round == self.start_round and len(self.target_indx) == 1:
             # simple cls attack if there is no cls collision
-            logging.info(f"Attacking label {self.labels_.item()} with cls attack.")
+            logging.info("Attacking label %d with cls attack.", self.labels_.item())
 
             # modify the parameters first
             self.modified_model_states = reconfigure_for_class_attack(
@@ -771,7 +776,7 @@ class Server(fedavg.Server):
             # send several queries because of cls collision
             if self.current_round == self.start_round:
                 logging.info(
-                    f"Attacking label {self.labels_[0].item()} with binary attack."
+                    "Attacking label %d with binary attack.", self.labels_[0].item()
                 )
                 num_collisions = (self.labels_ == self.target_cls).sum()
                 logging.info(
@@ -794,7 +799,7 @@ class Server(fedavg.Server):
                 if self.feature_loc is None:
                     self.feature_loc = int(torch.argmax(avg_feature))
                 feature_val = float(avg_feature[self.feature_loc])
-                logging.info(f"Found avg feature val {feature_val}.")
+                logging.info("Found avg feature val %.2f.", feature_val)
 
                 if check_with_tolerance(
                     feature_val,
@@ -841,7 +846,9 @@ class Server(fedavg.Server):
                 else:
                     self.all_feature_val.append(feature_val)
                     logging.info(
-                        f"Querying feature {self.feature_loc} with feature val {feature_val}."
+                        "Querying feature %d with feature val %.2f.",
+                        self.feature_loc,
+                        feature_val,
                     )
                     self.modified_model_states = reconfigure_for_feature_attack(
                         self.trainer.model,
@@ -899,7 +906,7 @@ class Server(fedavg.Server):
                 elif cost_fn == "simlocal":
                     costs += (
                         1
-                        - torch.nn.functional.cosine_similarity(
+                        - F.cosine_similarity(
                             trial[i].flatten(), target[i].flatten(), 0, 1e-10
                         )
                         * weights[i]
@@ -969,8 +976,8 @@ class Server(fedavg.Server):
                 sharey="row",
                 sharex="col",
             )
-            for i, title in enumerate(image_data):
-                axes.ravel()[i].imshow(image_data[i].permute(1, 2, 0).cpu())
+            for i, img in enumerate(image_data):
+                axes.ravel()[i].imshow(img.permute(1, 2, 0).cpu())
                 axes.ravel()[i].set_axis_off()
             for i in range(num_images, product):
                 axes.ravel()[i].set_axis_off()
@@ -988,7 +995,7 @@ class Server(fedavg.Server):
         rows = math.ceil(len(history) / 2)
         outer = gridspec.GridSpec(rows, 2, wspace=0.2, hspace=0.2)
 
-        for i, item in enumerate(history):
+        for i, _ in enumerate(history):
             inner = gridspec.GridSpecFromSubplotSpec(
                 1, num_images, subplot_spec=outer[i]
             )

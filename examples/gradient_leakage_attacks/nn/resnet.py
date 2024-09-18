@@ -7,10 +7,10 @@ in the Proceedings of NeurIPS 2020.
 https://github.com/JonasGeiping/invertinggradients
 """
 
-import torch
-import torch.nn as nn
-import torchvision
 import random
+import torch
+from torch import nn
+import torchvision
 import numpy as np
 from plato.config import Config
 
@@ -107,7 +107,7 @@ class Model(torchvision.models.ResNet):
                     nn.init.constant_(m.bn2.weight, 0)
 
     def _forward_impl(self, x):
-        # See note [TorchScript super()]
+        """Model forwarding."""
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -122,6 +122,7 @@ class Model(torchvision.models.ResNet):
         return x
 
     def forward_feature(self, x):
+        """Model forwarding returning intermediate feature."""
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)

@@ -98,9 +98,5 @@ Try tuning the following hyperparameters in `.yml` configuration files.
 - `trial: [int]` — the trial number to be plotted. Plots the best reconstruction based off MSE if not specified
 
 - `cols/rows: [int]` — specify the number of columns or rows in the plotted figure
-  
-## Plot Instructions
-
-Run ```python plot.py -c config_file``` where ```config_file``` is the same one used to run the DLG attack
 
 
