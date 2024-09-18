@@ -23,7 +23,7 @@ Research on gradient leakage attack and defense using the Plato framework.
 - {GC} gradient compression (referred to Soteria's code) 
 ---
 
-# Running Plato with DLG attack
+## Run FL with DLG attack
 Run the program using the following cmd under the directory `examples/gradient_leakage_attacks` for example, which launches the csDLG attack using delta matching against an untrained ResNet18 model in `.eval()` mode on CIFAR100 data:
 ```
 python dlg.py -c untrained_eval_delta.yml

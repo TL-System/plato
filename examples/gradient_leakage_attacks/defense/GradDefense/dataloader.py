@@ -8,8 +8,6 @@ DEFAULT_NUM_WORKERS = 8
 rootset_per_class = 5
 rootset_size = 50
 
-# TODO: total_num_samples is not used
-
 
 def extract_root_set(
     dataset: Dataset,
