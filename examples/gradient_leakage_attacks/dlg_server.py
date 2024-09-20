@@ -241,6 +241,9 @@ class Server(fedavg.Server):
             elif Config().data.datasource == "MNIST":
                 data_mean = consts.mnist_mean
                 data_std = consts.mnist_std
+            elif Config().data.datasource == "EMNIST":
+                data_mean = consts.emnist_mean
+                data_std = consts.emnist_std
             self.dm = torch.as_tensor(
                 data_mean, device=Config().device(), dtype=torch.float
             )[:, None, None]
