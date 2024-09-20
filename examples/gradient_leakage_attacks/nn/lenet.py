@@ -16,7 +16,7 @@ class Model(nn.Module):
     def __init__(self, num_classes=Config().parameters.model.num_classes):
         super().__init__()
         act = nn.Sigmoid
-        if Config().data.datasource == "EMNIST":
+        if Config().data.datasource in ["MNIST", "EMNIST"]:
             in_channel = 1
             in_size = 588
         if Config().data.datasource.startswith("CIFAR"):

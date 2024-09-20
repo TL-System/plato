@@ -8,5 +8,7 @@ cifar100_mean = [0.485, 0.456, 0.406]
 cifar100_std = [0.229, 0.224, 0.225]
 mnist_mean = (0.13066373765468597,)
 mnist_std = (0.30810782313346863,)
+emnist_mean = (0.1736,)
+emnist_std = (0.3248,)
 imagenet_mean = [0.485, 0.456, 0.406]
 imagenet_std = [0.229, 0.224, 0.225]
