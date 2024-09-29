@@ -2,7 +2,7 @@
 An implementation of the attack-defence scenario.
 
 """
-from plato.servers.fedavg import Server
+from detector_server import Server
 from plato.clients.simple import Client
 from plato.trainers.basic import Trainer
 
