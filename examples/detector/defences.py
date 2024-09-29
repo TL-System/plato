@@ -1,12 +1,10 @@
 import torch
 import logging
 from plato.config import Config
-from scipy.stats import norm
 from collections import OrderedDict
 import numpy as np
 
 registered_defences = {}
-
 
 def get():
 
