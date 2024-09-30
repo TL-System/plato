@@ -1,6 +1,4 @@
-#Below are steps for reproduce AsyncFilter experiments:
-
-# Installation
+# Reproducing AsyncFilter
 
 ## Setting up your Python environment
 
@@ -25,28 +23,61 @@ In macOS (without GPU support), the recommended command would be:
 ```shell
 pip install torch==1.13.1 torchvision==0.14.1
 ```
-
-## Installing Plato
-
-Additionally, we will install the current GitHub version of *Plato* as a local pip package:
+Additionally, install scikit-learn package: 
 
 ```shell
+pip install scikit-learn
+```
+## Installing Plato
+
+Navigate to the Plato directory and install the latest version from GitHub as a local pip package:
+
+```shell
+cd ../..
 pip install .
 ```
 
-# Running experiments
-## set up the configuration file
-As we have numerous experiments in our paper, we provided some configuration files as examples. For example, for Sec. 5.2, to run asyncfilter on cifar-10 datasets:
+# Running experiments in plato/examples/detector folder
+Navigate to the examples/detector folder to start running experiments:
+```shell
+cd examples/detector
+```
+
+## Set up the configuration file
+A variety of configuration files are provided for different experiments. Below are examples for reproducing key experiments from the paper:
+
+### Example 1: Section 5.2 - Running AsyncFilter on CIFAR-10
+#### Download the dataset
+
+```shell
+python detector.py -c asyncfilter_cifar_2.yml -d
+```
+
+#### Run the experiments
 ```shell
 python detector.py -c asyncfilter_cifar_2.yml
 ``` 
-for Sec. 5.3, to run asyncilter under LIE attack on CINIC-10 dataset with the concentration factor of 0.01: 
+### Example 2: Section 5.3 - Running AsyncFilter Under LIE Attack on CINIC-10 (Concentration Factor: 0.01)
+#### Download the dataset
+
+```shell
+python detector.py -c asyncfilter_cinic_3.yml -d
+```
+#### Run the experiments
 ```shell
 python detector.py -c asyncfilter_cinic_3.yml
 ```
-for Sec.5.6, to run asyncfilter under LIE attack on FashionMNIST dataset with the server staleness limit of 10: 
+### Example 3: Section 5.6 - Running AsyncFilter Under LIE Attack on FashionMNIST (Server Staleness Limit: 10)
 
+#### Download the dataset
+
+```shell
+python detector.py -c asyncfilter_fashionmnist_6.yml -d
+```
+#### Run the experiments
 ```shell
 python detector.py -c asyncfilter_fashionmnist_6.yml
 ```
 
+### Customizing Experiments
+For further experimentation, you can modify the configuration files to suit your requirements and reproduce the results.
