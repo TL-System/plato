@@ -50,9 +50,9 @@ class Server(fedavg.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         # remove clients in blacklist from available clients pool
-        logging.info(f"len of clients pool before removal: %d", len(clients_pool))
+        #logging.info(f"len of clients pool before removal: %d", len(clients_pool))
         clients_pool = list(filter(lambda x: x not in self.blacklist, clients_pool))
-        logging.info(f"len of cliets pool after removal: %d", len(clients_pool))
+        #logging.info(f"len of cliets pool after removal: %d", len(clients_pool))
 
         selected_clients = super().choose_clients(clients_pool, clients_count)
 
@@ -149,7 +149,7 @@ class Server(fedavg.Server):
         received_ids = [update.client_id for update in self.updates]
         received_staleness = [update.staleness for update in self.updates]
         malicious_ids, weights_approved = defence(baseline_weights, weights_attacked, deltas_attacked,received_ids,received_staleness)
-        logging.info(f"received_ids: %s", received_ids)
+        
         ids = [received_ids[i] for i in malicious_ids]
 
         cummulative_detect = 0

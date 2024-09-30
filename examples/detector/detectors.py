@@ -195,7 +195,7 @@ def detection_cos(score):
 
 def pre_data_for_visualization(deltas_attacked, received_staleness):
     # saved received local deltas for round x
-    logging.info(f"starting preparing data for visualization")
+    #logging.info(f"starting preparing data for visualization")
     flattened_deltas_attacked = flatten_weights(deltas_attacked)
     # list to torch tensor
     received_staleness = torch.tensor(received_staleness)
@@ -209,7 +209,6 @@ def pre_data_for_visualization(deltas_attacked, received_staleness):
     except FileExistsError:
         pass
     
-    logging.info(f"creating folder...")
     try:
         # List all files and directories in the given folder
         items = os.listdir(model_path)
@@ -222,7 +221,7 @@ def pre_data_for_visualization(deltas_attacked, received_staleness):
     except Exception as e:
         pass
 
-    logging.info(f"saving reveived deltas...")
+    #logging.info(f"saving reveived deltas...")
     file_path = f"{model_path}/"+ file_count + ".pkl"
     with open(file_path, "wb") as file:
         pickle.dump(flattened_deltas_attacked, file)
@@ -239,9 +238,9 @@ def async_filter(baseline_weights,weights_attacked,deltas_attacked,received_ids,
     flattened_weights_attacked = flatten_weights(weights_attacked)
     
     # only for visualization
-    pre_data_for_visualization(deltas_attacked, received_staleness)
+    #pre_data_for_visualization(deltas_attacked, received_staleness)
 
-    file_path = "/data/ykang/records/async_record"+ str(os.getpid()) + ".pkl"
+    file_path = "./async_record"+ str(os.getpid()) + ".pkl"
     if os.path.exists(file_path):
         logging.info(f"loading parameters from file.")
         with open(file_path, "rb") as file:
@@ -256,7 +255,6 @@ def async_filter(baseline_weights,weights_attacked,deltas_attacked,received_ids,
     for i, (staleness,weights) in enumerate(zip (received_staleness, flattened_weights_attacked)):
         weight_groups[staleness].append(weights)
         id_groups[staleness].append(i)
-    logging.info(f"received_staleness: %s",received_staleness)
     
     # calcuate cos_similarity within a group and identify statistical outliers
     all_mali_ids = []
