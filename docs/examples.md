@@ -538,6 +538,19 @@ FedSaw is proposed to improve training performance in three-layer federated lear
 python examples/three_layer_fl/fedsaw/fedsaw.py -c examples/three_layer_fl/fedsaw/fedsaw_MNIST_lenet5.yml
 ```
 ````
+#### Poisoning Detection Algorithms 
+````{admonition} **AsyncFilter**
+AsyncFilter is proposed to defend against untargeted poisoning attacks in asynchronous federated learning with a server filter. With statistical analysis, AsyncFilter identifies potential poisoned model updates and filters them out before the server aggregation stage. 
+
+```shell
+python examples/detector/detector.py -c examples/detector/asyncfilter_fashion_6.yml
+```
+
+```{note}
+Kang et al., &ldquo;[AsyncFilter: Detecting Poisoning Attacks in Asynchronous Federated Learning](http://iqua.ece.toronto.edu/papers/ykang-middleware25.pdf)
+&rdquo: in the Proceedings of the 25th ACM/IFIP International Middleware Conference (Middleware), 2024.
+```
+````
 
 #### Model Pruning Algorithms
 
