@@ -77,12 +77,12 @@ def bulyan(updates, baseline_weights, weights_attacked):
     """Aggregate weight updates from the clients using bulyan."""
 
     total_clients = Config().clients.total_clients
-    num_attackers = len(Config().clients.attacker_ids)  # ?
+    num_attackers = len(Config().clients.attacker_ids)
 
     remaining_weights = flatten_weights(weights_attacked)
     bulyan_cluster = []
 
-    # Search for bulyan cluster based on distance
+    # Search for bulyan cluster based on distances
     while (len(bulyan_cluster) < (total_clients - 2 * num_attackers)) and (
         len(bulyan_cluster) < (total_clients - 2 - num_attackers)
     ):
@@ -104,7 +104,7 @@ def bulyan(updates, baseline_weights, weights_attacked):
             : len(remaining_weights) - 2 - num_attackers
         ]
 
-        # Add candidate into bulyan cluster
+        # Add candidates into bulyan cluster
         bulyan_cluster = (
             remaining_weights[indices[0]][None, :]
             if not len(bulyan_cluster)
@@ -149,7 +149,7 @@ def krum(updates, baseline_weights, weights_attacked):
 
     remaining_weights = flatten_weights(weights_attacked)
 
-    num_attackers_selected = 2  # ?
+    num_attackers_selected = 2  
 
     distances = []
     for weight in remaining_weights:
@@ -339,7 +339,7 @@ def afa(updates, baseline_weights, weights_attacked):
                     bad_set.append(remove_id)
                 
         else:
-            for counter, weight in enumerate(flattened_weights):  #  we for loop this
+            for counter, weight in enumerate(flattened_weights): 
                 if cos_sims[counter] > (model_median + epsilon * model_std):
                     remove_set.append(1)
                     remove_id = (
@@ -353,7 +353,7 @@ def afa(updates, baseline_weights, weights_attacked):
                     temp_tensor2 = flattened_weights_copy[delete_id + 1 :]
                     flattened_weights_copy = torch.cat(
                         (temp_tensor1, temp_tensor2), dim=0
-                    )  # but we changes it in the loop, maybe we should get a copy
+                    )  
                     bad_set.append(remove_id)
 
         epsilon += delta_ep

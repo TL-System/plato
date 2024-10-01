@@ -1,0 +1,88 @@
+clients:
+    # Type
+    type: simple
+
+    # The total number of clients
+    total_clients: 100
+
+    # The number of clients selected in each round
+    per_round: 100
+
+    # Should the clients compute test accuracy locally?
+    do_test: true
+    random_seed: 1
+    speed_simulation: true
+
+    # The distribution of client speeds
+    simulation_distribution:
+        distribution: zipf # zipf is used.
+        s: 1.2
+    sleep_simulation: true
+
+    # If we are simulating client training times, what is the average training time?
+    avg_training_time: 10
+    attack_type: LIE
+    lambada_value: 2
+    attacker_ids: 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 #,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50
+
+server:
+    address: 127.0.0.1
+    port: 5002
+    random_seed: 1
+    sychronous: false
+    simulate_wall_time: true
+    minimum_clients_aggregated: 40
+    staleness_bound: 10
+    checkpoint_path: results/CIFAR/test/checkpoint
+    model_path: results/CIFAR/test/model
+
+
+data:
+    # The training and testing dataset
+    datasource: CIFAR10
+
+    # Number of samples in each partition
+    partition_size: 10000
+
+    # IID or non-IID?
+    sampler: noniid
+    concentration: 0.1
+    random_seed: 1
+
+trainer:
+    # The type of the trainer
+    type: basic
+
+    # The maximum number of training rounds
+    rounds: 100
+
+    # The maximum number of clients running concurrently
+    max_concurrency: 2
+
+    # The target accuracy
+    target_accuracy: 0.88
+
+    # The machine learning model
+    model_name: vgg_16
+
+    # Number of epoches for local training in each communication round
+    epochs: 5
+    batch_size: 128
+    optimizer: Adam
+
+algorithm:
+    # Aggregation algorithm
+    type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+
+    optimizer:
+        lr: 0.01
+        weight_decay: 0.0
+results:
+    # Write the following parameter(s) into a CSV
+    types: round, accuracy, elapsed_time, comm_time, round_time
+    result_path: /data/ykang/plato/results/asyncfilter/cifar
+
