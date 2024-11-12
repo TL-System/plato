@@ -1,6 +1,7 @@
 """
 A federated learning server using federated averaging to aggregate updates after homomorphic encryption.
 """
+
 from functools import reduce
 from plato.servers import fedavg
 from plato.utils import homo_enc
@@ -36,7 +37,7 @@ class Server(fedavg.Server):
 
         for key in extract_model.keys():
             self.weight_shapes[key] = extract_model[key].size()
-            self.para_nums[key] = reduce(lambda a, b: a * b, self.weight_shapes[key])
+            self.para_nums[key] = extract_model[key].numel()
 
         self.encrypted_model = homo_enc.encrypt_weights(
             extract_model, True, self.context, []
