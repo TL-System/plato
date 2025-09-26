@@ -7,11 +7,11 @@ name = "plato-learn"
 version = "0.1.0"
 description = "Packaged version of the Plato framework for federated learning research"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.12"
 license = "Apache-2.0"
 
 dependencies = [
-    "numpy>=2.0.0",
+    "numpy>=1.21.0",
     "torch>=2.0.0",
     "torchvision>=0.15.0",
     "python-socketio>=5.0.0",
@@ -28,11 +28,15 @@ dependencies = [
     "timm>=0.9.0",
     "torch-optimizer>=0.3.0",
     "zstd>=1.5.0",
+    "protobuf<4.21.0",
 ]
 
 [project.optional-dependencies]
-# Framework alternatives
-tensorflow = ["tensorflow>=2.10.0", "tensorflow-datasets>=4.8.0"]
+# Framework alternatives  
+tensorflow = [
+    "tensorflow==2.13.0",
+    "tensorflow-datasets==4.8.3",
+]
 mindspore = ["mindspore>=2.0.0"]
 
 # Development tools
