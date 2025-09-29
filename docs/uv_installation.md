@@ -1,10 +1,10 @@
-# Installation with UV
+# Installation with uv
 
-UV is a modern, fast Python package manager that provides significant performance improvements over conda and pip. This guide covers installation using UV as the package manager.
+uv is a modern, fast Python package manager that provides significant performance improvements over conda and pip. This guide covers installation using uv as the package manager.
 
 ## Installation Steps
 
-### 1. Install UV
+### 1. Install uv
 
 **Linux/macOS (recommended):**
 ```shell
@@ -20,7 +20,7 @@ After installation, restart your terminal or run:
 ```shell
 source $HOME/.local/bin/env
 ```
-For detailed installation instructions, refer to the [official UV documentation](https://docs.astral.sh/uv/getting-started/installation/).
+For detailed installation instructions, refer to the [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
 ### 2. Clone the Repository
 
 ```shell
@@ -44,15 +44,6 @@ This includes:
 - `black` for code formatting
 - `pylint` for code linting
 
-**For TensorFlow support:**
-```shell
-uv sync --extra tensorflow
-```
-
-**For MindSpore support:**
-```shell
-uv sync --extra mindspore
-```
 
 ### 4. GPU Support Configuration
 
@@ -61,7 +52,7 @@ uv sync --extra mindspore
 nvidia-smi
 ```
 
-The PyTorch installation will automatically detect and use the appropriate CUDA version. UV handles PyTorch dependencies intelligently through the project configuration.
+The PyTorch installation will automatically detect and use the appropriate CUDA version. uv handles PyTorch dependencies intelligently through the project configuration.
 
 **For macOS (CPU-only):**
 No additional configuration needed - PyTorch CPU version will be installed automatically.
@@ -77,7 +68,7 @@ If you're migrating from a conda environment:
    conda env export > conda_environment.yml
    ```
 
-2. **Follow this UV installation guide**
+2. **Follow this uv installation guide**
 
 3. **Remove old conda environment** (optional):
    ```shell
