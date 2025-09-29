@@ -7,37 +7,29 @@ name = "plato-learn"
 version = "0.1.0"
 description = "Packaged version of the Plato framework for federated learning research"
 readme = "README.md"
-requires-python = ">=3.9,<3.10"
+requires-python = ">=3.12"
 license = "Apache-2.0"
 
 dependencies = [
-    "numpy>=1.21.0",
-    "torch==1.13.1",
-    "torchvision==0.14.1",
-    "python-socketio>=5.0.0",
-    "aiohttp>=3.8.0",
-    "requests>=2.28.0",
-    "pyyaml>=6.0.0",
-    "datasets>=4.0.0",
-    "transformers>=4.20.0",
-    "boto3>=1.20.0",
-    "evaluate>=0.4.0",
-    "gym>=0.26.0",
-    "lightly>=1.4.0",
-    "opacus>=1.4.0",
-    "timm>=0.9.0",
+    "aiohttp>=3.12.15",
+    "boto3>=1.40.41",
+    "datasets>=4.1.1",
+    "evaluate>=0.4.6",
+    "gym>=0.26.2",
+    "lightly>=1.5.22",
+    "numpy>=2.3.3",
+    "opacus>=1.5.4",
+    "python-socketio>=5.13.0",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "timm>=1.0.20",
+    "torch>=2.8.0",
     "torch-optimizer>=0.3.0",
-    "zstd>=1.5.0",
-    "protobuf<4.21.0",
+    "torchvision>=0.23.0",
+    "transformers>=4.56.2",
+    "zstd>=1.5.7.2",
 ]
 
-[project.optional-dependencies]
-# Framework alternatives  
-tensorflow = [
-    "tensorflow==2.13.0",
-    "tensorflow-datasets==4.8.3",
-]
-mindspore = ["mindspore>=2.0.0", "Pillow==9.5.0"]
 
 # Development tools
 dev = ["pytest>=7.0.0", "black>=22.0.0", "pylint>=2.15.0"]
