@@ -30,7 +30,7 @@ dependencies = [
     "zstd>=1.5.7.2",
 ]
 
-
+[project.optional-dependencies]
 # Development tools
 dev = ["pytest>=7.0.0", "black>=22.0.0", "pylint>=2.15.0"]
 
