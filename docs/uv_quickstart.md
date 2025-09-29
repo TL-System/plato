@@ -11,7 +11,7 @@ source .venv/bin/activate
 To start a federated learning training workload, run `uv run [Python file] -c [configuration file] ...`. For example:
 
 ```shell
-uv run plato.py -c configs
+uv run plato.py -c configs/MNIST/fedavg_lenet5.yml
 ```
 - `-c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 - `-b`: the base path, to be used to contain all models, datasets, checkpoints, and results.
@@ -24,7 +24,7 @@ _Plato_ uses the YAML format for its configuration files to manage the runtime c
 
 In `examples/`, a number of research projects that were developed using Plato as the federated learning framework have been included. To run them, just run the main Python program in each of the directories with a suitable configuration file. For example, to run the basic project examples/basic/basic.py, run the command:
 ```shell
-uv run examples/basic/basic.py -c examples/outdated/fedrep/fedrep_MNIST_lenet5.yml
+uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.yml
 ```
 Here is another example:
 ```shell
