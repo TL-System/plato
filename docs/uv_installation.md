@@ -20,7 +20,7 @@ After installation, restart your terminal or run:
 ```shell
 source $HOME/.local/bin/env
 ```
-
+For detailed installation instructions, refer to the [official UV documentation](https://docs.astral.sh/uv/getting-started/installation/).
 ### 2. Clone the Repository
 
 ```shell
