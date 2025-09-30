@@ -65,7 +65,9 @@ def get(**kwargs: Any) -> Any:
         trainer = getattr(config, "trainer")
         if hasattr(trainer, "model_type"):
             model_type = getattr(trainer, "model_type")
-    elif model_name:
+
+    # If model_type is still empty, derive it from model_name
+    if not model_type and model_name:
         model_type = model_name.split("_")[0]
 
     # Get model parameters
