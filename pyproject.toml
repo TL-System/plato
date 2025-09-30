@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "plato-learn"
-version = "0.1.0"
-description = "Packaged version of the Plato framework for federated learning research"
+version = "1.0"
+description = "Plato: a research framework for federated learning"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"
