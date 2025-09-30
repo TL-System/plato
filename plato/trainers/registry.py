@@ -2,30 +2,22 @@
 Having a registry of all available classes is convenient for retrieving an instance
 based on a configuration at run-time.
 """
+
 import logging
 
 from plato.config import Config
 
-if hasattr(Config().trainer, "use_mindspore"):
-    from plato.trainers.mindspore import basic as basic_mindspore
 
-    registered_trainers = {"basic": basic_mindspore.Trainer}
+from plato.trainers import basic, diff_privacy, pascal_voc, gan, split_learning
 
-elif hasattr(Config().trainer, "use_tensorflow"):
-    from plato.trainers.tensorflow import basic as basic_tensorflow
-
-    registered_trainers = {"basic": basic_tensorflow.Trainer}
-else:
-    from plato.trainers import basic, diff_privacy, pascal_voc, gan, split_learning
-
-    registered_trainers = {
-        "basic": basic.Trainer,
-        "timm_basic": basic.TrainerWithTimmScheduler,
-        "diff_privacy": diff_privacy.Trainer,
-        "pascal_voc": pascal_voc.Trainer,
-        "gan": gan.Trainer,
-        "split_learning": split_learning.Trainer,
-    }
+registered_trainers = {
+    "basic": basic.Trainer,
+    "timm_basic": basic.TrainerWithTimmScheduler,
+    "diff_privacy": diff_privacy.Trainer,
+    "pascal_voc": pascal_voc.Trainer,
+    "gan": gan.Trainer,
+    "split_learning": split_learning.Trainer,
+}
 
 
 def get(model=None, callbacks=None):
