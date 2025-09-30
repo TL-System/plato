@@ -1,8 +1,9 @@
-#!/usr/bin/env python
 """
 Starting point for a Plato federated learning training session.
 """
+
 import os
+
 from plato.servers import registry as server_registry
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -11,7 +12,6 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 def main():
-    """Starting point for a Plato federated learning training session."""
     server = server_registry.get()
     server.run()
 
