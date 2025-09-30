@@ -4,3 +4,4 @@ theme:
   name: material
   font:
     text: Inter
+    code: IBM Plex Mono
