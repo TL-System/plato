@@ -46,3 +46,8 @@ line-length = 88
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]
+
+[tool.uv.workspace]
+members = [
+    "examples/secure_aggregation/maskcrypt",
+]
