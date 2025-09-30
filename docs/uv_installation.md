@@ -20,10 +20,10 @@ git clone git@github.com:TL-System/plato.git
 cd plato
 ```
 
-Then install its dependencies:
+You can then run `uv run` directly, for example:
 
 ```shell
-uv sync
+uv run plato.py -c configs/MNIST/fedavg_lenet5.yml
 ```
 
 You may also need some additional packages:
