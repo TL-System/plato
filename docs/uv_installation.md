@@ -34,8 +34,6 @@ uv sync --extra dev
 
 This includes:
 - `pytest` for testing
-- `black` for code formatting
-- `pylint` for code linting
 
 
 ### 4. GPU Support Configuration

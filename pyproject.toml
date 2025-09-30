@@ -32,9 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "black",
-    "pylint"
+    "pytest"
 ]
 
 [project.urls]
