@@ -50,4 +50,5 @@ packages = ["plato"]
 [tool.uv.workspace]
 members = [
     "examples/secure_aggregation/maskcrypt",
+    "examples/unlearning/fedunlearning",
 ]
