@@ -25,12 +25,6 @@ jobs:
         run: bash ./scripts/actions/install_cuda_ubuntu.sh
         shell: bash
 
-      - name: Unit tests
-        shell: bash -l {0}
-        run: |
-          cd tests
-          find . -name '*.py' -exec uv run {} \;
-
       - name: Training workloads
         run: |
           mkdir ./models/pretrained
