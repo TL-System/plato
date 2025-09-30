@@ -11,11 +11,18 @@ import re
 import time
 
 import torch
+
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.models import registry as models_registry
-from plato.trainers import base, loss_criterion, lr_schedulers, optimizers, tracking
+from plato.trainers import (
+    base,
+    loss_criterion,
+    lr_schedulers,
+    optimizers,
+    tracking,
+)
 
 
 class Trainer(base.Trainer):
@@ -64,7 +71,9 @@ class Trainer(base.Trainer):
 
     def save_model(self, filename=None, location=None):
         """Saving the model to a file."""
-        model_path = Config().params["model_path"] if location is None else location
+        model_path = (
+            Config().params["model_path"] if location is None else location
+        )
         model_name = Config().trainer.model_name
 
         try:
@@ -87,13 +96,19 @@ class Trainer(base.Trainer):
             pickle.dump(self.run_history, history_file)
 
         if self.client_id == 0:
-            logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
+            logging.info(
+                "[Server #%d] Model saved to %s.", os.getpid(), model_path
+            )
         else:
-            logging.info("[Client #%d] Model saved to %s.", self.client_id, model_path)
+            logging.info(
+                "[Client #%d] Model saved to %s.", self.client_id, model_path
+            )
 
     def load_model(self, filename=None, location=None):
         """Loading pre-trained model weights from a file."""
-        model_path = Config().params["model_path"] if location is None else location
+        model_path = (
+            Config().params["model_path"] if location is None else location
+        )
         model_name = Config().trainer.model_name
 
         if filename is not None:
@@ -107,14 +122,18 @@ class Trainer(base.Trainer):
             )
         else:
             logging.info(
-                "[Client #%d] Loading a model from %s.", self.client_id, model_path
+                "[Client #%d] Loading a model from %s.",
+                self.client_id,
+                model_path,
             )
 
         pretrained = None
         if torch.cuda.is_available():
             pretrained = torch.load(model_path)
         else:
-            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
+            pretrained = torch.load(
+                model_path, map_location=torch.device("cpu")
+            )
         self.model.load_state_dict(pretrained, strict=True)
 
         with open(model_path + ".pkl", "rb") as history_file:
@@ -208,7 +227,9 @@ class Trainer(base.Trainer):
         # Initializing the optimizer
         self.optimizer = self.get_optimizer(self.model)
         self.lr_scheduler = self.get_lr_scheduler(config, self.optimizer)
-        self.optimizer = self._adjust_lr(config, self.lr_scheduler, self.optimizer)
+        self.optimizer = self._adjust_lr(
+            config, self.lr_scheduler, self.optimizer
+        )
 
         self.model.to(self.device)
         self.model.train()
@@ -218,7 +239,9 @@ class Trainer(base.Trainer):
         for self.current_epoch in range(1, total_epochs + 1):
             self._loss_tracker.reset()
             self.train_epoch_start(config)
-            self.callback_handler.call_event("on_train_epoch_start", self, config)
+            self.callback_handler.call_event(
+                "on_train_epoch_start", self, config
+            )
 
             for batch_id, (examples, labels) in enumerate(self.train_loader):
                 self.train_step_start(config, batch=batch_id)
@@ -226,7 +249,10 @@ class Trainer(base.Trainer):
                     "on_train_step_start", self, config, batch=batch_id
                 )
 
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 loss = self.perform_forward_and_backward_passes(
                     config, examples, labels
@@ -259,11 +285,15 @@ class Trainer(base.Trainer):
             ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
+                filename = (
+                    f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
+                )
                 self.save_model(filename)
                 self.model.to(self.device)
 
-            self.run_history.update_metric("train_loss", self._loss_tracker.average)
+            self.run_history.update_metric(
+                "train_loss", self._loss_tracker.average
+            )
             self.train_epoch_end(config)
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 
@@ -302,11 +332,15 @@ class Trainer(base.Trainer):
             train_proc.join()
 
             model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            filename = (
+                f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            )
 
             try:
                 self.load_model(filename)
-            except OSError as error:  # the model file is not found, training failed
+            except (
+                OSError
+            ) as error:  # the model file is not found, training failed
                 raise ValueError(
                     f"Training on client {self.client_id} failed."
                 ) from error
@@ -343,7 +377,9 @@ class Trainer(base.Trainer):
             if sampler is None:
                 accuracy = self.test_model(config, testset, **kwargs)
             else:
-                accuracy = self.test_model(config, testset, sampler.get(), **kwargs)
+                accuracy = self.test_model(
+                    config, testset, sampler.get(), **kwargs
+                )
 
         except Exception as testing_exception:
             logging.info("Testing on client #%d failed.", self.client_id)
@@ -374,7 +410,9 @@ class Trainer(base.Trainer):
                 mp.set_start_method("spawn", force=True)
 
             proc = mp.Process(
-                target=self.test_process, args=(config, testset, sampler), kwargs=kwargs
+                target=self.test_process,
+                args=(config, testset, sampler),
+                kwargs=kwargs,
             )
             proc.start()
             proc.join()
@@ -382,11 +420,11 @@ class Trainer(base.Trainer):
             accuracy = -1
             try:
                 model_name = Config().trainer.model_name
-                filename = (
-                    f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-                )
+                filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
                 accuracy = self.load_accuracy(filename)
-            except OSError as error:  # the model file is not found, training failed
+            except (
+                OSError
+            ) as error:  # the model file is not found, training failed
                 raise ValueError(
                     f"Testing on client #{self.client_id} failed."
                 ) from error
@@ -425,7 +463,9 @@ class Trainer(base.Trainer):
             model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
 
             if model_training_time < requested_time:
-                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+                model_path = (
+                    f"{Config().params['model_path']}/{model_checkpoint}"
+                )
 
                 pretrained = None
                 if torch.cuda.is_available():
@@ -463,7 +503,10 @@ class Trainer(base.Trainer):
         sampler: the sampler for the trainloader to use.
         """
         return torch.utils.data.DataLoader(
-            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+            dataset=trainset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
         )
 
     # pylint: disable=unused-argument
@@ -488,7 +531,10 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 outputs = self.model(examples)
 
@@ -522,7 +568,9 @@ class Trainer(base.Trainer):
         if self.lr_scheduler is not None:
             self.lr_scheduler.step()
 
-    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
+    def _adjust_lr(
+        self, config, lr_scheduler, optimizer
+    ) -> torch.optim.Optimizer:
         """Returns an optimizer with an initial learning rate that has been
         adjusted according to the current round, so that learning rate
         schedulers can be effective throughout the communication rounds."""
@@ -609,12 +657,19 @@ class TrainerWithTimmScheduler(Trainer):
         super().train_epoch_end(config)
 
         if self.lr_scheduler is not None:
-            if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
-                self.lr_scheduler.step(self.past_epochs + self.current_epoch + 1)
+            if (
+                "global_lr_scheduler" in config
+                and config["global_lr_scheduler"]
+            ):
+                self.lr_scheduler.step(
+                    self.past_epochs + self.current_epoch + 1
+                )
             else:
                 self.lr_scheduler.step(self.current_epoch + 1)
 
-    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
+    def _adjust_lr(
+        self, config, lr_scheduler, optimizer
+    ) -> torch.optim.Optimizer:
         """Returns an optimizer with an initial learning rate that has been
         adjusted according to the current round, so that learning rate
         schedulers can be effective throughout the communication rounds."""
