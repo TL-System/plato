@@ -1,12 +1,5 @@
 # Quickstart
 
-## Activate uv
-First of all, make sure the uv environment is active:
-```shell
-uv sync
-source .venv/bin/activate
-```
-
 ## Running Plato using a configuration file
 To start a federated learning training workload, run `uv run [Python file] -c [configuration file] ...`. For example:
 
