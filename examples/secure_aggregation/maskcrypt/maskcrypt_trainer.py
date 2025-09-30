@@ -1,4 +1,5 @@
 """The customized trainer designed for MaskCrpyt."""
+
 import logging
 import os
 import torch
@@ -78,4 +79,4 @@ class Trainer(basic.Trainer):
         else:
             model_path = f"{model_path}/{model_name}.pth"
 
-        return torch.load(model_path)
+        return torch.load(model_path, weights_only=False)
