@@ -155,9 +155,6 @@ results/
 # Sphinx documentation
 docs/_build/
 
-# TensorFlow datasets
-tensorflow_datasets/
-
 # Homomorphic encryption
 .ckks_context/
 yolov8n.pt
