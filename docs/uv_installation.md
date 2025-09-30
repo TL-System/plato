@@ -7,6 +7,12 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.local/bin/env
 ```
 
+To upgrade `uv`, run the command:
+
+```
+uv self update
+```
+
 To start working with Plato, first clone its git repository:
 
 ```shell
