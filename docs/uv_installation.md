@@ -1,44 +1,31 @@
-# Installation with uv
+# Working with Plato
 
-uv is a modern, fast Python package manager that provides significant performance improvements over conda and pip. This guide covers installation using uv as the package manager.
+Plato uses `uv` as its package manager, which is a modern, fast Python package manager that provides significant performance improvements over `conda` environments. To install `uv`, refer to its [official documentation](https://docs.astral.sh/uv/getting-started/installation/), or simply run the following commands:
 
-## Installation Steps
-
-### 1. Install uv
-
-**Linux/macOS (recommended):**
 ```shell
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-**Alternative installation via pip:**
-```shell
-pip install uv
-```
-
-After installation, restart your terminal or run:
-```shell
 source $HOME/.local/bin/env
 ```
-For detailed installation instructions, refer to the [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
-### 2. Clone the Repository
+
+To start working with Plato, first clone its git repository:
 
 ```shell
-git clone https://github.com/TL-System/plato.git
+git clone git@github.com:TL-System/plato.git
 cd plato
 ```
 
-### 3. Install Plato and Dependencies
+Then install its dependencies:
 
-**For regular use:**
 ```shell
 uv sync
 ```
 
-**For development with additional tools:**
+You may also need some additional packages:
+
 ```shell
 uv sync --extra dev
 ```
+
 This includes:
 - `pytest` for testing
 - `black` for code formatting
@@ -92,5 +79,3 @@ Add to your `.vscode/settings.json`:
     "workbench.editor.enablePreview": false
 }
 ```
-
-
