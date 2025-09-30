@@ -120,13 +120,8 @@ class Client(base.Client):
 
     def _allocate_data(self) -> None:
         """Allocate training or testing dataset of this client."""
-        if hasattr(Config().trainer, "use_mindspore"):
-            # MindSpore requires samplers to be used while constructing
-            # the dataset
-            self.trainset = self.datasource.get_train_set(self.sampler)
-        else:
-            # PyTorch uses samplers when loading data with a data loader
-            self.trainset = self.datasource.get_train_set()
+        # PyTorch uses samplers when loading data with a data loader
+        self.trainset = self.datasource.get_train_set()
 
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             # Set the testset if local testing is needed

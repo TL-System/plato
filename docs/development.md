@@ -25,7 +25,7 @@ The external interface of this module is contained in `datasources/registry.py`.
 
 ### Samplers 
 
-A `Sampler` is responsible for sampling a dataset for local training or testing at each client in the federated learning workload. This is used to *simulate* a local dataset that is available locally at the client, using either an i.i.d. or non-i.i.d. distribution. For non-i.i.d. distributions, an example sampler that is based on the Dirichlet distribution (with a configurable concentration bias) is provided. Samplers are passed as one of the parameters to a PyTorch `Dataloader` or MindSpore `Dataset` instance.
+A `Sampler` is responsible for sampling a dataset for local training or testing at each client in the federated learning workload. This is used to *simulate* a local dataset that is available locally at the client, using either an i.i.d. or non-i.i.d. distribution. For non-i.i.d. distributions, an example sampler that is based on the Dirichlet distribution (with a configurable concentration bias) is provided. Samplers are passed as one of the parameters to a PyTorch `Dataloader` instance.
 
 ### Models
 
@@ -40,10 +40,10 @@ Most federated learning algorithms can be divided into four components: a *clien
 - The *server* implements all algorithm logic on the server side. Typically, one would subclass from the `fedavg.Server` class to reuse some of the useful methods there, but it is also possible to subclass from the `base.Server` class.
 
     ```{note}
-    Implementations for both the client and the server should be neutral across various deep learning frameworks, such as PyTorch, TensorFlow, and MindSpore.
+    Implementations for both the client and the server should be neutral across various deep learning frameworks, such as PyTorch.
     ```
 
-- Framework-specific algorithm logic should be implemented in an *algorithm* module. Typically, one would subclass from the PyTorch-based `fedavg.Algorithm` class if PyTorch is to be used. If other frameworks, for example TensorFlow, is to be used, one can subclass from the `tensorflow.fedavg.Algorithm` class. Several frequently-used algorithms are provided in `algorithms/`, while more examples are provided outside the framework in `examples/`.
+- Framework-specific algorithm logic should be implemented in an *algorithm* module. Typically, one would subclass from the PyTorch-based `fedavg.Algorithm` class. Several frequently-used algorithms are provided in `algorithms/`, while more examples are provided outside the framework in `examples/`.
 
 - Custom training loops should be implemented as a *trainer* class. If a PyTorch-based trainer is to be implemented, one may subclass from the `basic.Trainer` class. See the **Trainers** section in API reference documentation for customizing the training loops using inheritance or callbacks.
 

@@ -4,47 +4,39 @@ The registry for machine learning models.
 Having a registry of all available classes is convenient for retrieving an instance
 based on a configuration at run-time.
 """
+
 from typing import Union
 
 from plato.config import Config
 
-if hasattr(Config().trainer, "use_mindspore"):
-    from plato.models.mindspore import lenet5 as lenet5_mindspore
+from plato.models import (
+    lenet5,
+    dcgan,
+    multilayer,
+    resnet,
+    vgg,
+    cnn_encoder,
+    general_multilayer,
+    torch_hub,
+    huggingface,
+    vit,
+)
 
-    registered_models = {"lenet5": lenet5_mindspore.Model}
-elif hasattr(Config().trainer, "use_tensorflow"):
-    from plato.models.tensorflow import lenet5 as lenet5_tensorflow
+registered_models = {
+    "lenet5": lenet5.Model,
+    "dcgan": dcgan.Model,
+    "multilayer": multilayer.Model,
+}
 
-    registered_models = {"lenet5": lenet5_tensorflow.Model}
-else:
-    from plato.models import (
-        lenet5,
-        dcgan,
-        multilayer,
-        resnet,
-        vgg,
-        cnn_encoder,
-        general_multilayer,
-        torch_hub,
-        huggingface,
-        vit,
-    )
-
-    registered_models = {
-        "lenet5": lenet5.Model,
-        "dcgan": dcgan.Model,
-        "multilayer": multilayer.Model,
-    }
-
-    registered_factories = {
-        "resnet": resnet.Model,
-        "vgg": vgg.Model,
-        "cnn_encoder": cnn_encoder.Model,
-        "general_multilayer": general_multilayer.Model,
-        "torch_hub": torch_hub.Model,
-        "huggingface": huggingface.Model,
-        "vit": vit.Model,
-    }
+registered_factories = {
+    "resnet": resnet.Model,
+    "vgg": vgg.Model,
+    "cnn_encoder": cnn_encoder.Model,
+    "general_multilayer": general_multilayer.Model,
+    "torch_hub": torch_hub.Model,
+    "huggingface": huggingface.Model,
+    "vit": vit.Model,
+}
 
 
 def get(**kwargs: Union[str, dict]):

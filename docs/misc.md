@@ -46,17 +46,37 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ## Running Continuous Integration tests as GitHub actions
 
-Continuous Integration (CI) tests have been set up for the PyTorch, TensorFlow, and MindSpore frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
+Continuous Integration (CI) tests have been set up for the PyTorch frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
 
 ## Uninstalling Plato
 
-Remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
+### conda
+If you still use conda, remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
 
 ```shell
 conda env remove -n plato
 rm -rf plato/
 ```
 
-where `plato` (or `tensorflow` or `mindspore`) is the name of the `conda` environment that *Plato* runs in.
+where `plato` is the name of the `conda` environment that *Plato* runs in.
+
+### uv
+If you installed Plato using `uv`, you can uninstall it by:
+
+1. Remove the local uv environment
+By default, uv puts the environment under .venv/ (if you’re using "uv sync" in a project). To “uninstall” it:
+```shell
+rm -rf .venv
+```
+
+2. Clean uv’s cache
+This will remove cached isolated tool environments, etc.
+```shell
+uv cache clean
+```
+
+3. (Optional)Uninstall uv itself
+If you no longer use uv, you could follow [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/#uninstallation)
+
 
 For more specific documentation on how Plato can be run on GPU runtime environments such as Google Colaboratory or Compute Canada, refer to `docs/Running.md`.

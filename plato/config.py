@@ -2,6 +2,7 @@
 Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
+
 import argparse
 import json
 import logging
@@ -304,14 +305,6 @@ class Config:
     @staticmethod
     def gpu_count() -> int:
         """Returns the number of GPUs available for training."""
-        if hasattr(Config().trainer, "use_mindspore"):
-            return 0
-
-        if hasattr(Config().trainer, "use_tensorflow"):
-            import tensorflow as tf
-
-            gpus = tf.config.experimental.list_physical_devices("GPU")
-            return len(gpus)
 
         import torch
 
@@ -330,28 +323,17 @@ class Config:
         if Config.args.cpu:
             return device
 
-        if hasattr(Config().trainer, "use_mindspore"):
-            pass
-        elif hasattr(Config().trainer, "use_tensorflow"):
-            import tensorflow as tf
+        import torch
 
-            gpus = tf.config.experimental.list_physical_devices("GPU")
-            if len(gpus) > 0:
-                device = "GPU"
-                tf.config.experimental.set_visible_devices(gpus[0], "GPU")
+        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+            if Config.gpu_count() > 1 and isinstance(Config.args.id, int):
+                # A client will always run on the same GPU
+                gpu_id = Config.args.id % torch.cuda.device_count()
+                device = f"cuda:{gpu_id}"
+            else:
+                device = "cuda:0"
 
-        else:
-            import torch
-
-            if torch.cuda.is_available() and torch.cuda.device_count() > 0:
-                if Config.gpu_count() > 1 and isinstance(Config.args.id, int):
-                    # A client will always run on the same GPU
-                    gpu_id = Config.args.id % torch.cuda.device_count()
-                    device = f"cuda:{gpu_id}"
-                else:
-                    device = "cuda:0"
-
-            if Config.args.mps and torch.backends.mps.is_built():
-                device = "mps"
+        if Config.args.mps and torch.backends.mps.is_built():
+            device = "mps"
 
         return device
