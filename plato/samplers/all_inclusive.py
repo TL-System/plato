@@ -2,6 +2,7 @@
 Samples all the data from a dataset. Applicable in cases where the dataset comes from
 local sources only. Used by the Federated EMNIST dataset and the MistNet server.
 """
+
 import random
 
 from plato.samplers import base
@@ -29,18 +30,12 @@ class Sampler(base.Sampler):
             self.data_samples = range(len(datasource.get_train_set()))
 
     def get(self):
-        if hasattr(Config().trainer, "use_mindspore"):
-            return list(self.data_samples)
-        elif hasattr(Config().trainer, "use_tensorflow"):
-            return list(self.data_samples)
-        else:
-            import torch
 
-            gen = torch.Generator()
-            gen.manual_seed(self.random_seed)
-            return torch.utils.data.SubsetRandomSampler(
-                self.data_samples, generator=gen
-            )
+        import torch
+
+        gen = torch.Generator()
+        gen.manual_seed(self.random_seed)
+        return torch.utils.data.SubsetRandomSampler(self.data_samples, generator=gen)
 
     def num_samples(self):
         """Returns the length of the dataset after sampling."""

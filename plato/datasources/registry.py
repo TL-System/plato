@@ -7,62 +7,44 @@ import logging
 
 from plato.config import Config
 
-if hasattr(Config().trainer, "use_mindspore"):
-    from plato.datasources.mindspore import mnist as mnist_mindspore
+from plato.datasources import (
+    mnist,
+    fashion_mnist,
+    emnist,
+    cifar10,
+    cifar100,
+    cinic10,
+    purchase,
+    texas,
+    huggingface,
+    pascal_voc,
+    tiny_imagenet,
+    femnist,
+    feature,
+    qoenflx,
+    celeba,
+    stl10,
+)
 
-    registered_datasources = {"MNIST": mnist_mindspore}
-    registered_partitioned_datasources = {}
+registered_datasources = {
+    "MNIST": mnist,
+    "FashionMNIST": fashion_mnist,
+    "EMNIST": emnist,
+    "CIFAR10": cifar10,
+    "CIFAR100": cifar100,
+    "CINIC10": cinic10,
+    "Purchase": purchase,
+    "Texas": texas,
+    "HuggingFace": huggingface,
+    "PASCAL_VOC": pascal_voc,
+    "TinyImageNet": tiny_imagenet,
+    "Feature": feature,
+    "QoENFLX": qoenflx,
+    "CelebA": celeba,
+    "STL10": stl10,
+}
 
-elif hasattr(Config().trainer, "use_tensorflow"):
-    from plato.datasources.tensorflow import (
-        mnist as mnist_tensorflow,
-        fashion_mnist as fashion_mnist_tensorflow,
-    )
-
-    registered_datasources = {
-        "MNIST": mnist_tensorflow,
-        "FashionMNIST": fashion_mnist_tensorflow,
-    }
-
-else:
-    from plato.datasources import (
-        mnist,
-        fashion_mnist,
-        emnist,
-        cifar10,
-        cifar100,
-        cinic10,
-        purchase,
-        texas,
-        huggingface,
-        pascal_voc,
-        tiny_imagenet,
-        femnist,
-        feature,
-        qoenflx,
-        celeba,
-        stl10,
-    )
-
-    registered_datasources = {
-        "MNIST": mnist,
-        "FashionMNIST": fashion_mnist,
-        "EMNIST": emnist,
-        "CIFAR10": cifar10,
-        "CIFAR100": cifar100,
-        "CINIC10": cinic10,
-        "Purchase": purchase,
-        "Texas": texas,
-        "HuggingFace": huggingface,
-        "PASCAL_VOC": pascal_voc,
-        "TinyImageNet": tiny_imagenet,
-        "Feature": feature,
-        "QoENFLX": qoenflx,
-        "CelebA": celeba,
-        "STL10": stl10,
-    }
-
-    registered_partitioned_datasources = {"FEMNIST": femnist}
+registered_partitioned_datasources = {"FEMNIST": femnist}
 
 
 def get(client_id: int = 0, **kwargs):

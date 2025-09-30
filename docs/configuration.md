@@ -342,8 +342,6 @@ How to divide the entire dataset to the clients. The following options are avail
 
 - `iid`
 
-- `iid_mindspore`
-
 - `noniid`: Could have *concentration* attribute to specify the concentration parameter in the Dirichlet distribution
 
 ```{admonition} concentration

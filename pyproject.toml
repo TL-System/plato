@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "plato-learn"
+version = "1.0"
+description = "Plato: a research framework for federated learning"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+
+dependencies = [
+    "aiohttp",
+    "boto3",
+    "datasets",
+    "evaluate",
+    "gym",
+    "lightly",
+    "numpy",
+    "opacus",
+    "python-socketio",
+    "pyyaml",
+    "requests",
+    "timm",
+    "torch",
+    "torch-optimizer",
+    "torchvision",
+    "transformers",
+    "zstd",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "pylint"
+]
+
+[project.urls]
+Homepage = "https://github.com/TL-System/plato"
+Repository = "https://github.com/TL-System/plato"
+Documentation = "https://platodocs.netlify.app/"
+
+# Basic tool configuration
+[tool.black]
+line-length = 88
+
+[tool.hatch.build.targets.wheel]
+packages = ["plato"]
