@@ -4,7 +4,7 @@ import unittest
 import warnings
 from collections import namedtuple
 
-os.environ["config_file"] = "tests/TestsConfig/fedavg_tests.yml"
+os.environ["config_file"] = "TestsConfig/fedavg_tests.yml"
 
 import numpy as np
 

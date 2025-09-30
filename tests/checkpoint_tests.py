@@ -3,7 +3,7 @@ import os
 import logging
 import unittest
 
-os.environ["config_file"] = "tests/TestsConfig/models_config.yml"
+os.environ["config_file"] = "TestsConfig/models_config.yml"
 
 from plato.models import registry as models_registry
 from plato.config import Config

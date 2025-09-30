@@ -7,27 +7,27 @@ For example, when you want to test the label_quantity_noniid_sampler.
 
  1 Uncomment the configuration file for the dataset you want to test
     # os.environ[
-    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+    'config_file'] = 'TestsConfig/label_quantity_noniid_sampler.yml'
     to   os.environ[
-    'config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+    'config_file'] = 'TestsConfig/label_quantity_noniid_sampler.yml'
 
  2 Run the following command in the root directory.
-    python tests/sampler_tests.py
+    python sampler_tests.py
 
 """
 
 import os
 import unittest
 
-# os.environ['config_file'] = 'tests/TestsConfig/distribution_noniid_sampler.yml'
+# os.environ['config_file'] = 'TestsConfig/distribution_noniid_sampler.yml'
 
-# os.environ['config_file'] = 'tests/TestsConfig/label_quantity_noniid_sampler.yml'
+# os.environ['config_file'] = 'TestsConfig/label_quantity_noniid_sampler.yml'
 
 # os.environ[
-#     'config_file'] = 'tests/TestsConfig/mixed_label_quantity_noniid_sampler.yml'
+#     'config_file'] = 'TestsConfig/mixed_label_quantity_noniid_sampler.yml'
 
 os.environ[
-    'config_file'] = 'tests/TestsConfig/sample_quantity_noniid_sampler.yml'
+    'config_file'] = 'TestsConfig/sample_quantity_noniid_sampler.yml'
 
 import numpy as np
 
