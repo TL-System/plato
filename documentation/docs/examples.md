@@ -182,3 +182,25 @@ uv run examples/client_selection/oort/oort.py -c examples/client_selection/oort/
 Lai et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
 ```
 ````
+````{admonition} **Polaris**
+Polaris is a client selection method for asynchronous federated learning. In this method, it selects clients via balancing between local device speed and local data quality from an optimization perspective. As it does not require extra information rather than local updates, Polaris is pluggable to any other federated aggregation methods.
+If you have downloaded the dataset, you can run the following command to start the training:
+
+```shell
+uv run examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_FEMNIST_LeNet5.yml
+```
+
+If not:
+```shell
+uv run examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_FEMNIST_LeNet5.yml -d
+```
+After downloading the dataset, you can run the following command to start the training:
+
+```shell
+uv run examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_FEMNIST_LeNet5.yml
+```
+
+```{note}
+Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
+&rdquo;
+````
