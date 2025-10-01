@@ -145,3 +145,16 @@ uv run examples/customized_client_training/fedmos/fedmos.py -c examples/customiz
 ```{note}
 X. Wang, Y. Chen, Y. Li, X. Liao, H. Jin and B. Li, "FedMoS: Taming Client Drift in Federated Learning with Double Momentum and Adaptive Selection," IEEE INFOCOM 2023.
 ````
+#### Client Selection Algorithms
+
+````{admonition} **Active Federated Learning**
+Active Federated Learning is a client selection algorithm, where clients were selected not uniformly at random in each round, but with a probability conditioned on the current model and the data on the client to maximize training efficiency. The objective was to reduce the number of required training iterations while maintaining the same model accuracy. In its implementation in `examples/afl/afl_server.py`, the server overrides `choose_clients()` to implement a custom client selection algorithm, and overrides `weights_aggregated()` to extract additional information from client reports.
+
+```shell
+uv run examples/client_selection/afl/afl.py -c examples/client_selection/afl/afl_FashionMNIST_lenet5.yml
+```
+
+```{note}
+J. Goetz, K. Malik, D. Bui, S. Moon, H. Liu, A. Kumar. &ldquo;[Active Federated Learning](https://arxiv.org/abs/1909.12641),&rdquo; September 2019.
+```
+````
