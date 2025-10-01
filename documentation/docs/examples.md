@@ -204,3 +204,32 @@ uv run examples/client_selection/polaris/polaris.py -c examples/client_selection
 Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with Client Selection],
 &rdquo;
 ````
+
+#### Split Learning Algorithms
+
+````{admonition} **Split Learning**
+Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In split learning, each training iteration is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. Unlike federated learning, split learning clients sequentially interact with the server, and the global model is synchronized implicitly through the model on the server side, which is shared and updated by all clients.
+```shell
+# If you haven't downloaded the dataset, please run the following command:
+uv run plato.py -c configs/CIFAR10/split_learning_resnet18.yml -d
+# Then run the following command (or you have downloaded the dataset):
+uv run plato.py -c configs/CIFAR10/split_learning_resnet18.yml
+```
+
+```{note}
+Vepakomma et al., &ldquo;[Split Learning for Health: Distributed Deep Learning without Sharing Raw Patient Data](https://arxiv.org/abs/1812.00564),&rdquo; in Proc. NeurIPS, 2018.
+```
+````
+
+````{admonition} **Split Learning for Training LLM**
+This is an example of fine-tuning the Hugging Face large language model with split learning. The fine-tuning policy includes training the whole model and fine-tuning with the LoRA algorithm. The cut layer in the configuration file should be set as an integer, indicating cutting at which transformer block in the transformer model.
+
+Fine-tune the whole model
+```shell
+uv run ./examples/split_learning/llm_split_learning/split_learning_main.py -c ./examples/split_learning/llm_split_learning/split_learning_wikitext103_gpt2.yml
+```
+Fine-tune with LoRA
+```shell
+uv run ./examples/split_learning/llm_split_learning/split_learning_main.py -c ./examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2_lora.yml
+```
+````
