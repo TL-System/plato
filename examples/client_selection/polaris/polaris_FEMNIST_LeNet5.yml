@@ -39,8 +39,9 @@ server:
     step_window: 2
     penalty: 2
     exploration_factor: 0.9
-    desired_duration: 50
-      # What is the staleness bound, beyond which the server should wait for stale clients?
+    desired_duration:
+        50
+        # What is the staleness bound, beyond which the server should wait for stale clients?
     staleness_bound: 10
 
     checkpoint_path: results/FEMNIST/test/checkpoint
@@ -93,7 +94,7 @@ algorithm:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_path: /data/ykang/plato/results/polairs2/FEMNIST/verify
+    result_path: ./results/polairs2/FEMNIST/verify
 
 parameters:
     optimizer:
@@ -101,6 +102,4 @@ parameters:
         momentum: 0.9
         weight_decay: 0
     model:
-      num_classes: 62
-
-
+        num_classes: 62
