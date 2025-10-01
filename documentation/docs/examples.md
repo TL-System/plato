@@ -158,3 +158,27 @@ uv run examples/client_selection/afl/afl.py -c examples/client_selection/afl/afl
 J. Goetz, K. Malik, D. Bui, S. Moon, H. Liu, A. Kumar. &ldquo;[Active Federated Learning](https://arxiv.org/abs/1909.12641),&rdquo; September 2019.
 ```
 ````
+
+````{admonition} **Pisces**
+Pisces is an asynchronous federated learning algorithm that performs biased client selection based on overall utilities and weighted server aggregation based on staleness. In this example, a client running the Pisces algorithm calculates its statistical utility and report it together with model updates to Pisces server. The server then evaluates the overall utility for each client based on the reported statistical utility and client staleness, and selects clients for the next communication round. The algorithm also attempts to detect outliers via DBSCAN for better robustness.
+
+```shell
+uv run examples/client_selection/pisces/pisces.py -c examples/client_selection/pisces/pisces_MNIST_lenet5.yml
+```
+
+```{note}
+Jiang et al., &ldquo;[Pisces: Efficient Federated Learning via Guided Asynchronous Training](https://arxiv.org/pdf/2206.09264.pdf), &rdquo; in Proc. ACM Symposium on Cloud Computing (SoCC), 2022.
+```
+````
+
+````{admonition} **Oort**
+Oort is a federated learning algorithm that performs biased client selection based on both statistical utility and system utility. Originally, Oort is proposed for synchronous federated learning. In this example, it was adapted to support both synchronous and asynchronous federated learning. Notably, the Oort server maintains a blacklist for clients that have been selected too many times (10 by default). If `per_round` / `total_clients` is large, e.g. 2/5, the Oort server may not work correctly because most clients are in the blacklist and there will not be a sufficient number of clients that can be selected.
+
+```shell
+uv run examples/client_selection/oort/oort.py -c examples/client_selection/oort/oort_MNIST_lenet5.yml
+```
+
+```{note}
+Lai et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Selection](https://www.usenix.org/system/files/osdi21-lai.pdf),&rdquo; in Proc. USENIX Symposium on Operating Systems Design and Implementation (OSDI), 2021.
+```
+````
