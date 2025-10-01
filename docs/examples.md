@@ -113,7 +113,7 @@ N. Su, B. Li. &ldquo;[Asynchronous Federated Unlearning](https://iqua.ece.toront
 Gradient leakage attacks and their defenses have been extensively studied in the research literature on federated learning.  In `examples/gradient_leakage_attacks/`, several attacks, including `DLG`, `iDLG`, and `csDLG`, have been implemented, as well as several defense mechanisms, including `Soteria`, `GradDefense`, `Differential Privacy`, `Gradient Compression`, and `Outpost`. A variety of methods in the trainer API has been used in their implementations. Refer to `examples/dlg/README.md` for more details.
 
 ```shell
-python examples/gradient_leakage_attacks/dlg.py -c examples/gradient_leakage_attacks/reconstruction_emnist.yml --cpu
+python examples/gradient_leakage_attacks/dlg.py -c examples/gradient_leakage_attacks/untrained_eval.yml
 ```
 ````
 
