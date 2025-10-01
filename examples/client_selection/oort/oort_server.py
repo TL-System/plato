@@ -167,6 +167,10 @@ class Server(fedavg.Server):
             ]
 
             if len(probabilities) > 0 and exploited_clients_count > 0:
+                # Convert to numpy array and normalize to ensure sum is exactly 1.0
+                probabilities = np.array(probabilities)
+                probabilities = probabilities / probabilities.sum()
+
                 selected_clients = np.random.choice(
                     exploited_clients,
                     min(len(exploited_clients), exploited_clients_count),
