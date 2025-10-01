@@ -52,4 +52,5 @@ members = [
     "examples/secure_aggregation/maskcrypt",
     "examples/unlearning/fedunlearning",
     "examples/unlearning/knot",
+    "examples/client_selection/pisces",
 ]
