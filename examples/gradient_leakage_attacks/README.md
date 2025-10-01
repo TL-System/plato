@@ -29,6 +29,17 @@ Run the program using the following cmd under the directory `examples/gradient_l
 python dlg.py -c untrained_eval_delta.yml
 ```
 
+## Run Standard FL Training
+Prepare a pre-trained model for DLG attack evaluation by running one of the examples below:
+```bash
+# ResNet-18 on CIFAR-100
+python fedavg_pretraining.py -c fedavg_resnet18_cifar100.yml
+
+# ResNet-152 on CIFAR-100
+python fedavg_pretraining.py -c fedavg_resnet152_cifar100.yml
+```
+
+
 ## DLG Related Configurations
 Try tuning the following hyperparameters in `.yml` configuration files.
 
