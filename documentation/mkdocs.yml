@@ -1,4 +1,4 @@
-site_name: Plato Documentation
+site_name: Plato
 site_url: https://mydomain.org/plato
 theme:
   name: material
