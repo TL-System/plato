@@ -3,6 +3,7 @@
 In `examples/`, we included a wide variety of examples that showcased how third-party deep learning frameworks, such as [Catalyst](https://catalyst-team.github.io/catalyst/), can be used, and how a collection of federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer`. We also included detailed tutorials on how Plato can be run on Google Colab. Here is a list of the examples we included.
 
 ### Before Starting:
+#### Downloading the Dataset
 If you have not yet downloaded the dataset, run the command with the "-d" flag. Once you see the following message:
 
 ```shell
@@ -15,6 +16,12 @@ For example:
 ```shell
 uv run examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -d
 uv run examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml
+```
+#### Dependencies
+Plato uses "uv" to organize dependencies in a hierarchical manner. Packages required only for specific features are defined in the 'pyproject.toml' file within their respective directories, rather than in the root directory. To run an example with its specific dependencies, navigate to the corresponding example folder and execute "uv run". For example:
+```
+cd examples/ssl/smog
+uv run smog.py -c ../../../examples/ssl/configs/smog_CIFAR10_resnet18.yml
 ```
 
 #### Support for Third-Party Frameworks
