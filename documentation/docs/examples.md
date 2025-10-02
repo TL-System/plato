@@ -285,3 +285,39 @@ uv run examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/con
 Arivazhagan et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818), &rdquo; in Arxiv, 2019.
 ```
 ````
+
+````{admonition} **LG-FedAvg**
+With LG-FedAvg only the global layers of a model are sent to the server for aggregation, while each client keeps local layers to itself.
+
+```shell
+uv run examples/personalized_fl/lgfedavg/lgfedavg.py -c examples/personalized_fl/configs/lgfedavg_CIFAR10_resnet18.yml
+```
+
+```{note}
+Liang et al., &ldquo;[Think Locally, Act Globally: Federated Learning with Local and Global Representations](https://arxiv.org/abs/2001.01523), &rdquo; in Proc. NeurIPS, 2019.
+```
+````
+
+````{admonition} **Ditto**
+Ditto jointly optimizes the global model and personalized models by learning local models that are encouraged to be close together by global regularization. In this example, once the global model is received, each client will carry out a regular local update and then optimizes the personalized model.
+
+```shell
+uv run examples/personalized_fl/ditto/ditto.py -c examples/personalized_fl/configs/ditto_CIFAR10_resnet18.yml
+```
+
+```{note}
+Li et al., &ldquo;[Ditto: Fair and robust federated learning through personalization](https://proceedings.mlr.press/v139/li21h.html), &rdquo; in Proc ICML, 2021.
+```
+````
+
+````{admonition} **Per-FedAvg**
+Per-FedAvg uses the Model-Agnostic Meta-Learning (MAML) framework to perform local training during the regular training rounds. It performs two forward and backward passes with fixed learning rates in each iteration.
+
+```shell
+uv run examples/personalized_fl/perfedavg/perfedavg.py -c examples/personalized_fl/configs/perfedavg_CIFAR10_resnet18.yml
+```
+
+```{note}
+Fallah et al., &ldquo;[Personalized Federated Learning with Theoretical Guarantees: A Model-Agnostic Meta-Learning Approach](https://proceedings.neurips.cc/paper/2020/hash/24389bfe4fe2eba8bf9aa9203a44cdad-Abstract.html), &rdquo; in Proc NeurIPS, 2020.
+```
+````
