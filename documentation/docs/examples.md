@@ -349,3 +349,72 @@ Li et al., &ldquo;[Hermes: An Efficient Federated Learning Framework for Heterog
 ```
 
 ````
+#### Personalized Federated Learning Algorithms based on Self-Supervised Learning
+
+````{admonition} Self Supervised Learning
+
+This category aims to achieve personalized federated learning by introducing self-supervised learning (SSL) to the training process. With SSL, an encoder model is trained to learn representations from unlabeled data. A higher performance can be achieved in subsequent tasks with the trained encoder. Only the encoder model is globally aggregated and shared during the regular training process. After reaching convergence, each client can download the trained global model to extract features from local samples. In this category, the following algorithms have been implemented:
+
+- SimCLR [1]
+
+- BYOL [2]
+
+- SimSiam [3]
+
+- MoCoV2 [4]
+
+- SwAV [5]
+
+- SMoG [6]
+
+- FedEMA [7]
+
+- Calibre
+
+```{note}
+
+Calibre is currently only supported on NVIDIA or M1/M2/M3 GPUs. To run on M1/M2/M3 GPUs, add the command-line argument -m.
+
+```
+
+```shell
+
+uv run examples/ssl/simclr/simclr.py -c examples/ssl/configs/simclr_CIFAR10_resnet18.yml
+
+uv run examples/ssl/byol/byol.py -c examples/ssl/configs/byol_CIFAR10_resnet18.yml
+
+uv run examples/ssl/simsiam/simsiam.py -c examples/ssl/configs/simsiam_CIFAR10_resnet18.yml
+
+uv run examples/ssl/moco/mocov2.py -c examples/ssl/configs/mocov2_CIFAR10_resnet18.yml
+
+uv run examples/ssl/swav/swav.py -c examples/ssl/configs/swav_CIFAR10_resnet18.yml
+
+uv run examples/ssl/smog/smog.py -c examples/ssl/configs/smog_CIFAR10_resnet18.yml
+
+uv run examples/ssl/fedema/fedema.py -c examples/ssl/configs/fedema_CIFAR10_resnet18.yml
+
+# [TODO: fix the bugs or remove it]
+
+uv run examples/ssl/calibre/calibre.py -c examples/ssl/configs/calibre_CIFAR10_resnet18.yml
+
+```
+
+```{note}
+
+[1] Chen et al., &ldquo;[A Simple Framework for Contrastive Learning of Visual Representations](https://arxiv.org/abs/2002.05709),&rdquo; in Proc. ICML, 2020.
+
+[2] Grill et al., &ldquo;[Bootstrap Your Own Latent A New Approach to Self-Supervised Learning](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. NeurIPS, 2020.
+
+[3] Chen et al., &ldquo;[Exploring Simple Siamese Representation Learning](https://arxiv.org/pdf/2011.10566.pdf), &rdquo; in Proc. CVPR, 2021.
+
+[4] Chen et al., &ldquo;[Improved Baselines with Momentum Contrastive Learning](https://arxiv.org/abs/2003.04297), &rdquo; in ArXiv, 2020.
+
+[5] Caron et al., &ldquo;[Unsupervised Learning of Visual Features by Contrasting Cluster Assignments](https://arxiv.org/abs/2006.09882), &rdquo; in Proc. NeurIPS, 2022.
+
+[6] Pang et al., &ldquo;[Unsupervised Visual Representation Learning by Synchronous Momentum Grouping](https://arxiv.org/pdf/2006.07733.pdf), &rdquo; in Proc. ECCV, 2022.
+
+[7] Zhuang et al., &ldquo;[Divergence-Aware Federated Self-Supervised Learning](https://arxiv.org/pdf/2204.04385.pdf), &rdquo; in Proc. ICLR, 2022.
+
+```
+
+````
