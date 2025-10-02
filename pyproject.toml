@@ -54,4 +54,5 @@ members = [
     "examples/unlearning/knot",
     "examples/client_selection/pisces",
     "examples/client_selection/polaris",
+    "examples/split_learning/llm_split_learning",
 ]
