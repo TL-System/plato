@@ -1,5 +1,4 @@
 clients:
-
     # The total number of clients
     total_clients: 10
 
@@ -26,7 +25,7 @@ data:
 
 trainer:
     type: self_supervised_learning
-   
+
     # LeNet5 model with the basic trainer
     # The maximum number of training rounds
     rounds: 10
@@ -63,7 +62,6 @@ algorithm:
             parameters:
                 input_size: 32
 
-
     auxiliary_loss_criterions:
         - prototype_regularizers
 
@@ -71,18 +69,16 @@ algorithm:
         prototype_regularizers:
             n_clusters: 10
             distance_type: euclidean
-    
+
     losses_weight:
         NTXentLoss: 1.0
         # this loss contains two parts, including
         # l_p, l_n
-        prototype_regularizers: 
+        prototype_regularizers:
             - 0.3
             - 0.3
 
-    personalization:
-
-        !include ssl_personalization.yml
+    personalization: !include ssl_personalization.yml
 
 parameters:
     optimizer:
@@ -100,8 +96,7 @@ parameters:
     model:
         num_classes: 10
 
-    personalization:
-        !include resnet18_pers_params.yml
+    personalization: !include resnet18_pers_params.yml
 
 results:
     # Write the following parameter(s) into a CSV
