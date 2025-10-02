@@ -104,7 +104,7 @@ N. Su, B. Li. &ldquo;[Asynchronous Federated Unlearning](https://iqua.ece.toront
 SCAFFOLD is a synchronous federated learning algorithm that performs server aggregation with control variates to better handle statistical heterogeneity. It has been quite widely cited and compared with in the federated learning literature. In this example, two processors, called `ExtractControlVariatesProcessor` and `SendControlVariateProcessor`, have been introduced to the client using a callback class, called `ScaffoldCallback`. They are used for sending control variates between the clients and the server. Each client also tries to maintain its own control variates for local optimization using files.
 
 ```shell
-python examples/customized_client_training/scaffold/scaffold.py -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.yml
+uv run examples/customized_client_training/scaffold/scaffold.py -c examples/customized_client_training/scaffold/scaffold_MNIST_lenet5.yml
 ```
 
 ```{note}
@@ -231,5 +231,57 @@ uv run ./examples/split_learning/llm_split_learning/split_learning_main.py -c ./
 Fine-tune with LoRA
 ```shell
 uv run ./examples/split_learning/llm_split_learning/split_learning_main.py -c ./examples/split_learning/llm_split_learning/split_learning_wikitext2_gpt2_lora.yml
+```
+````
+
+#### Personalized Federated Learning Algorithms
+
+````{admonition} **FedRep**
+FedRep learns a shared data representation (the global layers) across clients and a unique, personalized local ``head'' (the local layers) for each client. In this implementation, after each round of local training, only the representation on each client is retrieved and uploaded to the server for aggregation.
+
+```shell
+uv run examples/personalized_fl/fedrep/fedrep.py -c examples/personalized_fl/configs/fedrep_CIFAR10_resnet18.yml
+```
+
+```{note}
+Collins et al., &ldquo;[Exploiting Shared Representations for Personalized Federated Learning](http://proceedings.mlr.press/v139/collins21a/collins21a.pdf), &rdquo; in Proc. International Conference on Machine Learning (ICML), 2021.
+```
+````
+
+````{admonition} **FedBABU**
+FedBABU only updates the global layers of the model during FL training. The local layers are frozen at the beginning of each local training epoch.
+
+```shell
+uv run examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml
+```
+
+```{note}
+Oh et al., &ldquo;[FedBABU: Towards Enhanced Representation for Federated Image Classification](https://openreview.net/forum?id=HuaYQfggn5u),
+&rdquo; in Proc. International Conference on Learning Representations (ICLR), 2022.
+```
+````
+
+````{admonition} **APFL**
+APFL jointly optimizes the global model and personalized models by interpolating between local and personalized models. Once the global model is received, each client will carry out a regular local update, and then conduct a personalized optimization to acquire a trained personalized model. The trained global model and the personalized model will subsequently be combined using the parameter "alpha," which can be dynamically updated.
+
+```shell
+uv run examples/personalized_fl/apfl/apfl.py -c examples/personalized_fl/configs/apfl_CIFAR10_resnet18.yml
+```
+
+```{note}
+Deng et al., &ldquo;[Adaptive Personalized Federated Learning](https://arxiv.org/abs/2003.13461),
+&rdquo; in Arxiv, 2021.
+```
+````
+
+````{admonition} **FedPer**
+FedPer learns a global representation and personalized heads, but makes simultaneous local updates for both sets of parameters, therefore makes the same number of local updates for the head and the representation on each local round.
+
+```shell
+uv run examples/personalized_fl/fedper/fedper.py -c examples/personalized_fl/configs/fedper_CIFAR10_resnet18.yml
+```
+
+```{note}
+Arivazhagan et al., &ldquo;[Federated learning with personalization layers](https://arxiv.org/abs/1912.00818), &rdquo; in Arxiv, 2019.
 ```
 ````
