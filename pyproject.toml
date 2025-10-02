@@ -55,4 +55,5 @@ members = [
     "examples/client_selection/pisces",
     "examples/client_selection/polaris",
     "examples/split_learning/llm_split_learning",
+    "examples/ssl/smog",
 ]
