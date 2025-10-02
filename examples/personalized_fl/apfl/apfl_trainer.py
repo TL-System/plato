@@ -1,6 +1,7 @@
 """
 A personalized federated learning trainer using APFL.
 """
+
 import logging
 import os
 
@@ -58,7 +59,7 @@ class Trainer(basic.Trainer):
         filename = f"client_{self.client_id}_alpha.pth"
         save_path = os.path.join(model_path, filename)
         if os.path.exists(save_path):
-            self.alpha = torch.load(save_path)
+            self.alpha = torch.load(save_path, weights_only=False)
 
         # Load the personalized model
         model_name = Config().trainer.model_name
