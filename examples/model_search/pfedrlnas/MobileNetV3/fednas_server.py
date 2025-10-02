@@ -1,6 +1,7 @@
 """
 Customized Server for PerFedRLNAS.
 """
+
 import os
 import sys
 import logging
@@ -71,9 +72,7 @@ class ServerSync(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
@@ -114,15 +113,35 @@ class ServerSync(fedavg.Server):
             cfg = self.subnets_config[i]
             if cfg:
                 logging.info("the config of client %s is %s", str(i), str(cfg))
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+
+        # Use model_path if available, otherwise use default models/pretrained directory
+        if hasattr(Config().server, "model_path"):
+            model_dir = Config().server.model_path
+        else:
+            model_dir = "./models/pretrained"
+
+        save_config = f"{model_dir}/subnet_configs.pickle"
+
+        # Create directory if it doesn't exist
+        os.makedirs(model_dir, exist_ok=True)
+
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
 
     def save_to_checkpoint(self) -> None:
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+        # Use model_path if available, otherwise use default models/pretrained directory
+        if hasattr(Config().server, "model_path"):
+            model_dir = Config().server.model_path
+        else:
+            model_dir = "./models/pretrained"
+
+        # Create directory if it doesn't exist
+        os.makedirs(model_dir, exist_ok=True)
+
+        save_config = f"{model_dir}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
-        save_config = f"{Config().server.model_path}/baselines.pickle"
+        save_config = f"{model_dir}/baselines.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.algorithm.model.baseline, file)
         return super().save_to_checkpoint()
@@ -163,9 +182,7 @@ class ServerAsync(ServerSync):
         if self.datasource is None:
             self.datasource = datasource
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]

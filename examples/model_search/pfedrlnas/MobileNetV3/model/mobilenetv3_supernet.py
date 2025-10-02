@@ -16,7 +16,7 @@ from plato.config import Config
 
 from .config import get_config
 
-sys.path.append("./examples/pfedrlnas/")
+sys.path.append("./examples/model_search/pfedrlnas/")
 from VIT.nasvit_wrapper.dynamic_layers import (
     DynamicMBConvLayer,
     DynamicConvBnActLayer,

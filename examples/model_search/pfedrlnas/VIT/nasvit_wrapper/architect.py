@@ -63,7 +63,12 @@ class Architect(nn.Module):
         ]
         self.baseline = {}
         if Config().args.resume:
-            save_config = f"{Config().server.model_path}/baselines.pickle"
+            # Use model_path if available, otherwise use default models/pretrained directory
+            if hasattr(Config().server, 'model_path'):
+                model_dir = Config().server.model_path
+            else:
+                model_dir = "./models/pretrained"
+            save_config = f"{model_dir}/baselines.pickle"
             if os.path.exists(save_config):
                 with open(save_config, "rb") as file:
                     self.baseline = pickle.load(file)
@@ -82,6 +87,9 @@ class Architect(nn.Module):
         else:
             grads = self._compute_grad(rewards, epoch_index, client_id_list)
         for index, client_id in enumerate(client_id_list):
+            # Ensure gradient tensor exists before copying
+            if self.alphas[client_id - 1].grad is None:
+                self.alphas[client_id - 1].grad = torch.zeros_like(self.alphas[client_id - 1])
             self.alphas[client_id - 1].grad.copy_(grads[index])
             self.optimizers[client_id - 1].step()
             self.optimizers[client_id - 1].zero_grad()
