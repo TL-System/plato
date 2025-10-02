@@ -2,6 +2,21 @@
 
 In `examples/`, we included a wide variety of examples that showcased how third-party deep learning frameworks, such as [Catalyst](https://catalyst-team.github.io/catalyst/), can be used, and how a collection of federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer`. We also included detailed tutorials on how Plato can be run on Google Colab. Here is a list of the examples we included.
 
+### Before Starting:
+If you have not yet downloaded the dataset, run the command with the "-d" flag. Once you see the following message:
+
+```shell
+The dataset has been successfully downloaded. Re-run the experiment without '-d' or '--download'.
+```
+
+re-run the command without the "-d" flag.
+
+For example:
+```shell
+uv run examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -d
+uv run examples/personalized_fl/fedbabu/fedbabu.py -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml
+```
+
 #### Support for Third-Party Frameworks
 
 #### Server Aggregation Algorithms
@@ -184,17 +199,6 @@ Lai et al., &ldquo;[Oort: Efficient Federated Learning via Guided Participant Se
 ````
 ````{admonition} **Polaris**
 Polaris is a client selection method for asynchronous federated learning. In this method, it selects clients via balancing between local device speed and local data quality from an optimization perspective. As it does not require extra information rather than local updates, Polaris is pluggable to any other federated aggregation methods.
-If you have downloaded the dataset, you can run the following command to start the training:
-
-```shell
-uv run examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_FEMNIST_LeNet5.yml
-```
-
-If not:
-```shell
-uv run examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_FEMNIST_LeNet5.yml -d
-```
-After downloading the dataset, you can run the following command to start the training:
 
 ```shell
 uv run examples/client_selection/polaris/polaris.py -c examples/client_selection/polaris/polaris_FEMNIST_LeNet5.yml
@@ -210,9 +214,6 @@ Kang et al., &ldquo;[POLARIS: Accelerating Asynchronous Federated Learning with 
 ````{admonition} **Split Learning**
 Split learning aims to collaboratively train deep learning models with the server performing a portion of the training process. In split learning, each training iteration is separated into two phases: the clients first send extracted features at a specific cut layer to the server, and then the server continues the forward pass and computes gradients, which will be sent back to the clients to complete the backward pass of the training. Unlike federated learning, split learning clients sequentially interact with the server, and the global model is synchronized implicitly through the model on the server side, which is shared and updated by all clients.
 ```shell
-# If you haven't downloaded the dataset, please run the following command:
-uv run plato.py -c configs/CIFAR10/split_learning_resnet18.yml -d
-# Then run the following command (or you have downloaded the dataset):
 uv run plato.py -c configs/CIFAR10/split_learning_resnet18.yml
 ```
 
