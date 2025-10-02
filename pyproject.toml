@@ -56,4 +56,5 @@ members = [
     "examples/client_selection/polaris",
     "examples/split_learning/llm_split_learning",
     "examples/ssl/smog",
+    "examples/model_search/pfedrlnas/VIT",
 ]
