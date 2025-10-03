@@ -62,6 +62,13 @@ class Architect(nn.Module):
         reduce_grad = self._compute_grad(
             self.alphas_reduce, rewards, epoch_index_reduce
         )
+        
+        # Initialize gradients if they don't exist
+        if self.alphas_normal.grad is None:
+            self.alphas_normal.grad = torch.zeros_like(self.alphas_normal)
+        if self.alphas_reduce.grad is None:
+            self.alphas_reduce.grad = torch.zeros_like(self.alphas_reduce)
+            
         self.alphas_normal.grad.copy_(normal_grad)
         self.alphas_reduce.grad.copy_(reduce_grad)
         self.optimizer.step()

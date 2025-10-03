@@ -70,15 +70,25 @@ class Server(fedavg.Server):
             if cfg:
                 logging.info("the config of client %s is %s", str(i), str(cfg))
                 cfgs.append(cfg)
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+        # Use model_path if available, otherwise use default models/pretrained directory
+        if hasattr(Config().server, 'model_path'):
+            model_dir = Config().server.model_path
+        else:
+            model_dir = "./models/pretrained"
+        save_config = f"{model_dir}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump((cfgs), file)
 
     def save_to_checkpoint(self) -> None:
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+        # Use model_path if available, otherwise use default models/pretrained directory
+        if hasattr(Config().server, 'model_path'):
+            model_dir = Config().server.model_path
+        else:
+            model_dir = "./models/pretrained"
+        save_config = f"{model_dir}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
-        save_config = f"{Config().server.model_path}/baselines.pickle"
+        save_config = f"{model_dir}/baselines.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.algorithm.model.baseline, file)
         return super().save_to_checkpoint()
