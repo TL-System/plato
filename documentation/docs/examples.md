@@ -418,3 +418,30 @@ uv run examples/ssl/calibre/calibre.py -c examples/ssl/configs/calibre_CIFAR10_r
 ```
 
 ````
+#### Algorithms based on Neural Architecture Search and Model Search
+
+````{admonition} FedRLNAS
+
+FedRLNAS is an algorithm designed to conduct Federated Neural Architecture Search without sending the entire supernet to the clients. Instead, clients still perform conventional model training as in Federated Averaging, and the server will search for the best model architecture. In this example, the server overrides ```aggregate_weights()``` to aggregate updates from subnets of different architectures into the supernet, and implements architecture parameter updates in ```weights_aggregated()```. In its implementation, only only DARTS search space is supported.
+
+```shell
+
+uv run examples/model_search/fedrlnas/fedrlnas.py -c examples/model_search/fedrlnas/FedRLNAS_MNIST_DARTS.yml
+
+```
+
+```{note}
+
+Yao et al., &ldquo;[Federated Model Search via Reinforcement Learning](https://ieeexplore.ieee.org/document/9546522),&rdquo; in Proc. International Conference on Distributed Computing Systems (ICDCS), 2021.
+
+```
+
+````
+````{admonition} **PerFedRLNAS**
+PerFedRLNAS is an algorithm designed to personalize different models on each client considering data and system heterogeneity, via Federated Neural Architecture Search. Different from FedRLNAS, where the server searches a uniform architecture for all clients. In this algorithm, each client will be given a different model structure and learn personalized architecture and model weights. In this example, the update rules and sample rules are redesigned to support this feature. In current implementation, examples of NASVIT MobileNetV3, and DARTS search space are provided.
+
+NASVIT search space:
+```shell
+cd examples/model_search/pfedrlnas/VIT
+uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
+```
