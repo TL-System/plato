@@ -158,7 +158,9 @@ class Model:
         config_kwargs.update(kwargs)
 
         model_name = model_name.replace("@", "/")
-        model_name = "google/" + model_name
+        # Only prepend "google/" if the model name doesn't already contain a namespace
+        if "/" not in model_name:
+            model_name = "google/" + model_name
         config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
         return ResolutionAdjustedModel(model_name, config)
