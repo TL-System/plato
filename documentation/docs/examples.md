@@ -445,3 +445,24 @@ NASVIT search space:
 cd examples/model_search/pfedrlnas/VIT
 uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_NASVIT_NonIID01.yml
 ```
+MobileNetV3 search space (synchronous mode):
+```
+cd examples/model_search/pfedrlnas/MobileNetV3
+uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_Mobilenet_NonIID03.yml
+```
+MobileNetV3 search space (asynchronous mode):
+```
+cd examples/model_search/pfedrlnas/MobileNetV3
+uv run fednas.py -c ../configs/MobileNetV3_CIFAR10_03_async.yml
+```
+
+DARTS search space
+```
+cd examples/model_search/pfedrlnas/DARTS
+uv run fednas.py -c ../configs/PerFedRLNAS_CIFAR10_DARTS_NonIID_03.yml -d
+```
+
+```{note}
+Yao et al., &ldquo; PerFedRLNAS: One-for-all Personalized Federated Neural Architecture Search, &rdquo; in Proc.  38th Annual AAAI Conference on Artificial Intelligence (AAAI), 2024.
+```
+````
