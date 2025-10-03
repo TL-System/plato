@@ -136,9 +136,9 @@ def calculate_similarity(model_path, model, update, staleness):
         for __, weight in model.cpu().state_dict().items():
             current = torch.cat((current, weight.view(-1)))
 
-            deltas = torch.zeros(0)
+        deltas = torch.zeros(0)
         for __, delta in update.items():
             deltas = torch.cat((deltas, delta.view(-1)))
 
-    similarity = F.cosine_similarity(current - previous, deltas, dim=0)
+        similarity = F.cosine_similarity(current - previous, deltas, dim=0)
     return similarity
