@@ -59,4 +59,5 @@ members = [
     "examples/model_search/pfedrlnas/VIT",
     "examples/model_search/pfedrlnas/MobileNetV3",
     "examples/model_search/heterofl",
+    "examples/model_search/fedrolex",
 ]
