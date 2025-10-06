@@ -37,7 +37,6 @@ server:
     checkpoint_path: results/fashion/test/checkpoint
     model_path: results/fashion/test/model
 
-
 data:
     # The training and testing dataset
     datasource: FashionMNIST
@@ -65,7 +64,7 @@ trainer:
 
     # The machine learning model
     model_name: lenet5
-    
+
     # Number of epoches for local training in each communication round
     epochs: 5
     batch_size: 32
@@ -83,4 +82,4 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_path: /data/ykang/plato/results/asyncfilter/fashionmnist
+    result_path: ./plato/results/asyncfilter/fashionmnist
