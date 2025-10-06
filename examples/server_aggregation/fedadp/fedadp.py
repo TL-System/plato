@@ -3,8 +3,8 @@ A federated learning training session using the FedAdp algorithm.
 
 Reference:
 
-Wu et al., "Fast-Convergent Federated Learning with Adaptive Weighting,"
-in IEEE Transactions on Cognitive Communications and Networking (TCCN'21).
+H. Wu, P. Wang. "Fast-Convergent Federated Learning with Adaptive Weighting," in IEEE Trans.
+on Cognitive Communications and Networking (TCCN), 2021.
 
 https://ieeexplore.ieee.org/abstract/document/9442814
 """

@@ -3,11 +3,13 @@ A federated learning training session using FedAtt.
 
 Reference:
 
-Ji et al., "Learning Private Neural Language Modeling with Attentive Aggregation,"
-in the Proceedings of the 2019 International Joint Conference on Neural Networks (IJCNN).
+S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. "Learning Private Neural Language Modeling
+with Attentive Aggregation," in Proc. International Joint Conference on Neural Networks (IJCNN),
+2019.
 
 https://arxiv.org/abs/1812.07108
 """
+
 import fedatt_algorithm
 import fedatt_server
 
