@@ -10,8 +10,9 @@ class Algorithm(fedavg.Algorithm):
         self, baseline_weights, weights_received, mixing=0.9, **kwargs
     ):
         """Aggregates the weights received into baseline weights."""
-        # Actually update the global model's weights (PyTorch-only implementation)
+        # Actually update the global model's weights
         updated_weights = OrderedDict()
+
         for name, weight in baseline_weights.items():
             updated_weights[name] = (
                 weight * (1 - mixing) + weights_received[0][name] * mixing
