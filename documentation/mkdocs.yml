@@ -13,17 +13,17 @@ nav:
   - Running Plato: running.md
   - Examples:
       - Getting Started: examples/Getting Started.md
-      - Third-Party Framework Support:
-          - Server Aggregation Algorithms: examples/Support for Third-Party Frameworks/1. Server Aggregation Algorithms.md
-          - Secure Aggregation with Homomorphic Encryption: examples/Support for Third-Party Frameworks/2. Secure Aggregation with Homomorphic Encryption.md
-          - Asynchronous Federated Learning: examples/Support for Third-Party Frameworks/3. Asynchronous Federated Learning Algorithms.md
-          - Federated Unlearning: examples/Support for Third-Party Frameworks/4. Federated Unlearning.md
-          - Customized Client Training Loops: examples/Support for Third-Party Frameworks/5. Algorithms with Customized Client Training Loops.md
-          - Client Selection Algorithms: examples/Support for Third-Party Frameworks/6. Client Selection Algorithms.md
-          - Split Learning Algorithms: examples/Support for Third-Party Frameworks/7. Split Learning Algorithms.md
-          - Personalized Federated Learning: examples/Support for Third-Party Frameworks/8. Personalized Federated Learning Algorithms.md
-          - Self-Supervised Personalized FL: examples/Support for Third-Party Frameworks/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning.md
-          - Neural Architecture Search: examples/Support for Third-Party Frameworks/10. Algorithms based on Neural Architecture Search and Model Search.md
-          - Three-layer Federated Learning: examples/Support for Third-Party Frameworks/11. Three-layer Federated Learning Algorithms.md
-          - Poisoning Detection: examples/Support for Third-Party Frameworks/12. Poisoning Detection Algorithms.md
-          - Model Pruning: examples/Support for Third-Party Frameworks/13. Model Pruning Algorithms.md
+      - Algorithms:
+          - Server Aggregation Algorithms: examples/algorithms/1. Server Aggregation Algorithms.md
+          - Secure Aggregation with Homomorphic Encryption: examples/algorithms/2. Secure Aggregation with Homomorphic Encryption.md
+          - Asynchronous Federated Learning: examples/algorithms/3. Asynchronous Federated Learning Algorithms.md
+          - Federated Unlearning: examples/algorithms/4. Federated Unlearning.md
+          - Customized Client Training Loops: examples/algorithms/5. Algorithms with Customized Client Training Loops.md
+          - Client Selection Algorithms: examples/algorithms/6. Client Selection Algorithms.md
+          - Split Learning Algorithms: examples/algorithms/7. Split Learning Algorithms.md
+          - Personalized Federated Learning: examples/algorithms/8. Personalized Federated Learning Algorithms.md
+          - Self-Supervised Personalized FL: examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning.md
+          - Neural Architecture Search: examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md
+          - Three-layer Federated Learning: examples/algorithms/11. Three-layer Federated Learning Algorithms.md
+          - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
+          - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md

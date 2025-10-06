@@ -1,33 +1,34 @@
 # Getting Started
-In `examples/`, we included a wide variety of examples that showcased how third-party deep learning frameworks, such as [Catalyst](https://catalyst-team.github.io/catalyst/), can be used, and how a collection of federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer`. We also included detailed tutorials on how Plato can be run on Google Colab. Here is a list of the examples we included.
+
+In `examples/`, we included a wide variety of examples that showed how federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer` classes.
 
 ## Available Examples
 
-- [Server Aggregation Algorithms](Support%20for%20Third-Party%20Frameworks/1.%20Server%20Aggregation%20Algorithms.md)
+- [Server Aggregation Algorithms](algorithms/1.%20Server%20Aggregation%20Algorithms.md)
 
-- [Secure Aggregation with Homomorphic Encryption](Support%20for%20Third-Party%20Frameworks/2.%20Secure%20Aggregation%20with%20Homomorphic%20Encryption.md)
+- [Secure Aggregation with Homomorphic Encryption](algorithms/2.%20Secure%20Aggregation%20with%20Homomorphic%20Encryption.md)
 
-- [Asynchronous Federated Learning Algorithms](Support%20for%20Third-Party%20Frameworks/3.%20Asynchronous%20Federated%20Learning%20Algorithms.md)
+- [Asynchronous Federated Learning Algorithms](algorithms/3.%20Asynchronous%20Federated%20Learning%20Algorithms.md)
 
-- [Federated Unlearning](Support%20for%20Third-Party%20Frameworks/4.%20Federated%20Unlearning.md)
+- [Federated Unlearning](algorithms/4.%20Federated%20Unlearning.md)
 
-- [Algorithms with Customized Client Training Loops](Support%20for%20Third-Party%20Frameworks/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops.md)
+- [Algorithms with Customized Client Training Loops](algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops.md)
 
-- [Client Selection Algorithms](Support%20for%20Third-Party%20Frameworks/6.%20Client%20Selection%20Algorithms.md)
+- [Client Selection Algorithms](algorithms/6.%20Client%20Selection%20Algorithms.md)
 
-- [Split Learning Algorithms](Support%20for%20Third-Party%20Frameworks/7.%20Split%20Learning%20Algorithms.md)
+- [Split Learning Algorithms](algorithms/7.%20Split%20Learning%20Algorithms.md)
 
-- [Personalized Federated Learning Algorithms](Support%20for%20Third-Party%20Frameworks/8.%20Personalized%20Federated%20Learning%20Algorithms.md)
+- [Personalized Federated Learning Algorithms](algorithms/8.%20Personalized%20Federated%20Learning%20Algorithms.md)
 
-- [Personalized Federated Learning Algorithms based on Self-Supervised Learning](Support%20for%20Third-Party%20Frameworks/9.%20Personalized%20Federated%20Learning%20Algorithms%20based%20on%20Self-Supervised%20Learning.md)
+- [Personalized Federated Learning Algorithms based on Self-Supervised Learning](algorithms/9.%20Personalized%20Federated%20Learning%20Algorithms%20based%20on%20Self-Supervised%20Learning.md)
 
-- [Algorithms based on Neural Architecture Search and Model Search](Support%20for%20Third-Party%20Frameworks/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search.md)
+- [Algorithms based on Neural Architecture Search and Model Search](algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search.md)
 
-- [Three-layer Federated Learning Algorithms](Support%20for%20Third-Party%20Frameworks/11.%20Three-layer%20Federated%20Learning%20Algorithms.md)
+- [Three-layer Federated Learning Algorithms](algorithms/11.%20Three-layer%20Federated%20Learning%20Algorithms.md)
 
-- [Poisoning Detection Algorithms](Support%20for%20Third-Party%20Frameworks/12.%20Poisoning%20Detection%20Algorithms.md)
+- [Poisoning Detection Algorithms](algorithms/12.%20Poisoning%20Detection%20Algorithms.md)
 
-- [Model Pruning Algorithms](Support%20for%20Third-Party%20Frameworks/13.%20Model%20Pruning%20Algorithms.md)
+- [Model Pruning Algorithms](algorithms/13.%20Model%20Pruning%20Algorithms.md)
 
 ---
 
