@@ -1,13 +1,15 @@
 """
-A federated learning server using FedAtt.
+Server aggregation using FedAtt.
 
 Reference:
 
-Ji et al., "Learning Private Neural Language Modeling with Attentive Aggregation,"
-in the Proceedings of the 2019 International Joint Conference on Neural Networks (IJCNN).
+S. Ji, S. Pan, G. Long, X. Li, J. Jiang, Z. Huang. "Learning Private Neural Language Modeling
+with Attentive Aggregation," in Proc. International Joint Conference on Neural Networks (IJCNN),
+2019.
 
 https://arxiv.org/abs/1812.07108
 """
+
 from collections import OrderedDict
 
 import torch
@@ -20,9 +22,13 @@ from plato.config import Config
 class Algorithm(fedavg.Algorithm):
     """The federated learning algorithm for FedAtt, used by the server."""
 
-    async def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
+    async def aggregate_weights(
+        self, baseline_weights, weights_received, **kwargs
+    ):
         """Perform attentive aggregation with the attention mechanism."""
-        deltas_received = self.compute_weight_deltas(baseline_weights, weights_received)
+        deltas_received = self.compute_weight_deltas(
+            baseline_weights, weights_received
+        )
 
         att_update = {
             name: self.trainer.zeros(weights.shape)
