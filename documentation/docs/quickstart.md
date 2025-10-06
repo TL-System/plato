@@ -31,3 +31,38 @@ Here is another example:
 ```shell
 uv run examples/customized_client_training/feddyn/feddyn.py -c examples/customized_client_training/feddyn/feddyn_MNIST_lenet5.yml
 ```
+
+# Running Plato in a Docker container
+Most of the codebase in Plato is designed to be framework-agnostic, so that it is relatively straightfoward to use Plato with a variety of deep learning frameworks beyond PyTorch, which is the default framwork it is using.
+
+To build such a Docker image, use the provided Dockerfile for PyTorch:
+
+```shell
+docker build -t plato -f Dockerfile .
+```
+
+To run the docker image that was just built, use the command:
+```shell
+# Make sure it's executable
+chmod +x dockerrun.sh
+
+# Run the container
+./dockerrun.sh
+```
+
+Or if GPUs are available, use the command:
+```shell
+./dockerrun_gpu.sh
+```
+
+To remove all the containers after they are run, use the command:
+```shell
+docker rm $(docker ps -a -q)
+```
+
+To remove the plato Docker image, use the command:
+```shell
+docker rmi plato
+```
+
+The provided `Dockerfile` helps to build a Docker image running Ubuntu 24.04, with a virtual environment called `plato` pre-configured to support PyTorch 2.8.0 and Python 3.12.6.
