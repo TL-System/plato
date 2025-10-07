@@ -43,3 +43,9 @@ nav:
                 - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
                 - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
                 - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
+    - Deployment Guide: deployment.md
+    - Miscellaneous: misc.md
+    - API Reference:
+          - Trainers: API Reference/trainers.md
+          - Servers: API Reference/servers.md
+          - Clients: API Reference/clients.md
