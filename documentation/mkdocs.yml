@@ -14,7 +14,17 @@ nav:
     - Installation: install.md
     - Quick Start: quickstart.md
     - Running Plato: running.md
-    - Configuration: config.md
+    - Configuration:
+          - Configuration Settings: Configuration Settings/config setting.md
+          - General: Configuration Settings/general.md
+          - Clients: Configuration Settings/clients.md
+          - Server: Configuration Settings/server.md
+          - Data: Configuration Settings/data.md
+          - Trainer: Configuration Settings/trainer.md
+          - Algorithm: Configuration Settings/algorithm.md
+          - Results: Configuration Settings/results.md
+          - Parameters: Configuration Settings/parameters.md
+
     - Developer's Guide: development.md
     - Examples:
           - Getting Started: examples/Getting Started.md
