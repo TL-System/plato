@@ -61,4 +61,5 @@ members = [
     "examples/model_search/heterofl",
     "examples/model_search/fedrolex",
     "examples/detector",
+    "examples/gradient_leakage_attacks",
 ]
