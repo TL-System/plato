@@ -5,12 +5,16 @@ theme:
   font:
     text: Inter
     code: IBM Plex Mono
-
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
 nav:
   - Home: index.md
   - Installation: install.md
   - Quick Start: quickstart.md
   - Running Plato: running.md
+  - Configuration: Config.md
   - Examples:
       - Getting Started: examples/Getting Started.md
       - Algorithms:
@@ -27,3 +31,4 @@ nav:
           - Three-layer Federated Learning: examples/algorithms/11. Three-layer Federated Learning Algorithms.md
           - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
           - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
+          - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
