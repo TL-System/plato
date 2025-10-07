@@ -15,6 +15,7 @@ nav:
     - Quick Start: quickstart.md
     - Running Plato: running.md
     - Configuration: config.md
+    - Developer's Guide: development.md
     - Examples:
           - Getting Started: examples/Getting Started.md
           - Algorithms:
