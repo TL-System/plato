@@ -13,6 +13,7 @@ nav:
   - Home: index.md
   - Installation: install.md
   - Quick Start: quickstart.md
+  - Running Plato on Digital Research Alliance of Canada: ccdb.md
   - Examples:
       - Getting Started: examples/Getting Started.md
       - Algorithms:
