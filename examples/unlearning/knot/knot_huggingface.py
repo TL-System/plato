@@ -2,10 +2,10 @@
 Knot: a clustered aggregation mechanism designed for federated unlearning.
 """
 
-import knot_server
 import knot_algorithm
 import knot_client
 import knot_huggingface_trainer
+import knot_server
 
 
 def main():
@@ -16,6 +16,7 @@ def main():
     trainer = knot_huggingface_trainer.Trainer
     client = knot_client.Client(algorithm=algorithm, trainer=trainer)
     server = knot_server.Server(algorithm=algorithm, trainer=trainer)
+
     server.run(client)
 
 

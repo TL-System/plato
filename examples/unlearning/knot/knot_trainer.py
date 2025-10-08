@@ -3,8 +3,6 @@ A customized trainer for the federated unlearning baseline clustering algorithm.
 
 """
 
-import asyncio
-
 import torch
 
 from plato.config import Config
@@ -38,7 +36,10 @@ class Trainer(basic.Trainer):
             )
         else:
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False, sampler=sampler
+                testset,
+                batch_size=config["batch_size"],
+                shuffle=False,
+                sampler=sampler,
             )
 
         for cluster_id in updated_cluster_ids:
@@ -51,7 +52,10 @@ class Trainer(basic.Trainer):
             total = 0
             with torch.no_grad():
                 for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(self.device)
+                    examples, labels = (
+                        examples.to(self.device),
+                        labels.to(self.device),
+                    )
 
                     outputs = cluster_model(examples)
 
