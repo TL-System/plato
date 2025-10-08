@@ -44,31 +44,40 @@ Continuous Integration (CI) tests have been set up for PyTorch in `.github/workf
 ## Uninstalling Plato
 
 ### uv
-If you installed Plato using `uv`, you can uninstall it by:
 
-1. Remove the local uv environment
-By default, uv puts the environment under .venv/ (if you’re using "uv sync" in a project). To “uninstall” it:
+If you installed Plato using `uv`, you can uninstall it by simply removing the local environment:
+
 ```bash
 rm -rf .venv
 ```
 
-2. Clean uv’s cache
-This will remove cached isolated tool environments, etc.
+Optionally, you may also clean `uv`’s cache:
+
 ```bash
 uv cache clean
 ```
 
-3. (Optional)Uninstall uv itself
-If you no longer use uv, you could follow [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/#uninstallation)
+Finally, you can uninstall `uv` itself by following the [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/#uninstallation).
 
-### conda
-If you still use conda, remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
+## Setting up Zed for formatting and linting
 
-```bash
-conda env remove -n plato
-rm -rf plato/
+If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. In order to properly set up its YAML validation, add the following to your local configuration:
+
+```json
+"languages": {
+  "YAML": {
+    "language_servers": ["yaml-language-server"]
+  }
+}
+"lsp": {
+  "yaml-language-server": {
+    "settings": {
+      "yaml": {
+        "customTags": ["!include scalar"]
+      }
+    }
+  }
+}
 ```
 
-where `plato` is the name of the `conda` environment that *Plato* runs in.
-
-For more specific documentation on how Plato can be run on GPU runtime environments such as Google Colaboratory or Compute Canada, refer to `docs/Running.md`.
+This will help avoid tagging `!include` directives as invalid.
