@@ -4,7 +4,8 @@ be customized in Plato and executed in a standalone fashion.
 
 To run this example:
 
-python examples/customized/custom_server.py -c examples/customized/server.yml
+cd examples/customized
+uv run custom_server.py -c server.yml
 """
 
 import logging

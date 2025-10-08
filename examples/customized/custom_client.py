@@ -3,7 +3,8 @@ An example for running Plato with custom clients.
 
 To run this example:
 
-python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
+cd examples/customized
+uv run custom_client.py -c client.yml -i <client_id>
 """
 
 import asyncio
