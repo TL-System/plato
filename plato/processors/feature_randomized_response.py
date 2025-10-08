@@ -1,6 +1,7 @@
 """
 Implements a Processor for applying local differential privacy using randomized response.
 """
+
 import logging
 from typing import Any
 
@@ -13,10 +14,11 @@ class Processor(feature.Processor):
     """
     Implements a Processor for applying local differential privacy using randomized response.
     """
+
     def __init__(self, **kwargs) -> None:
         def func(logits, targets):
             logits = unary_encoding.encode(logits)
-            
+
             if Config().algorithm.epsilon is None:
                 return logits, targets
 
@@ -42,6 +44,7 @@ class Processor(feature.Processor):
 
         logging.info(
             "[Client #%d] Local differential privacy (using randomized response) applied.",
-            self.client_id)
+            self.client_id,
+        )
 
         return output

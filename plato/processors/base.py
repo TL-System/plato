@@ -2,6 +2,7 @@
 The Processor class is designed for pre-processing data payloads before or after they
 are transmitted over the network between the clients and the servers.
 """
+
 from abc import abstractmethod
 from collections.abc import Iterable
 from typing import Any

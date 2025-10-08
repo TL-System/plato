@@ -18,7 +18,6 @@ class Processor(model.Processor):
         super().__init__(**kwargs)
 
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
-
         if Config().algorithm.epsilon is None:
             return layer
 

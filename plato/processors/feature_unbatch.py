@@ -1,10 +1,12 @@
 """
 Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
 """
+
 import logging
 from typing import Any
 
 import numpy as np
+
 from plato.processors import base
 
 
@@ -12,6 +14,7 @@ class Processor(base.Processor):
     """
     Implements a Processor for unbatching MistNet PyTorch features into the dataset form.
     """
+
     def __init__(self, client_id=None, **kwargs) -> None:
         super().__init__(**kwargs)
 
@@ -27,7 +30,10 @@ class Processor(base.Processor):
             for i in np.arange(logits.shape[0]):  # each sample in the batch
                 feature_dataset.append((logits[i].clone(), targets[i].clone()))
 
-        logging.info("[Client #%d] Features extracted from %s examples.",
-                     self.client_id, len(feature_dataset))
+        logging.info(
+            "[Client #%d] Features extracted from %s examples.",
+            self.client_id,
+            len(feature_dataset),
+        )
 
         return feature_dataset

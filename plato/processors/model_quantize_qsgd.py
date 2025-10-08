@@ -14,9 +14,10 @@ Advances in neural information processing systems.
 https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
 
-from typing import Any
 import random
 from struct import pack, unpack
+from typing import Any
+
 import torch
 
 from plato.processors import model
@@ -55,7 +56,9 @@ class Processor(model.Processor):
                 num = value.item()
                 if num < 0:
                     num = abs(num) ^ unpack("!i", b"\x00\x00\x00\x80")[0]
-                content += pack("!I", num)[3:4]  # present each parameter in 1 byte
+                content += pack("!I", num)[
+                    3:4
+                ]  # present each parameter in 1 byte
             return content
 
         # Step 1: quantization
