@@ -1,5 +1,5 @@
-""" 
-An example for running Plato with custom clients. 
+"""
+An example for running Plato with custom clients.
 
 To run this example:
 
@@ -26,8 +26,12 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST("./data", train=True, download=True, transform=ToTensor())
-        self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
+        self.trainset = MNIST(
+            "./data", train=True, download=True, transform=ToTensor()
+        )
+        self.testset = MNIST(
+            "./data", train=False, download=True, transform=ToTensor()
+        )
 
 
 class Trainer(basic.Trainer):
@@ -73,7 +77,10 @@ class Trainer(basic.Trainer):
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 examples = examples.view(len(examples), -1)
                 outputs = self.model(examples)
