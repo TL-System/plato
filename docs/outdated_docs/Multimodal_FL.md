@@ -11,7 +11,7 @@ Multi-modal federated learning involves using several sensory modalities such as
 
 You can install them using the following commands:
 
-```shell
+```bash
 pip install youtube-dl ffmpeg av scikit-image
 ```
 
@@ -24,20 +24,20 @@ pip install youtube-dl ffmpeg av scikit-image
 	`conda install pytorch cudatoolkit=10.1 torchvision -c pytorch`
 
  3. Install mmaction manually:
- 
+
  You can install `mmcv` directly if your computer contains GPU:
 
- ```shell
+ ```bash
  pip install mmcv-full
  ```
- 
+
  If your computer only contains CPU:
- 
- ```shell
+
+ ```bash
  pip --default-timeout 45 install mmcv-full==1.3.8 -f https://download.openmmlab.com/mmcv/dist/cpu/torch1.9.0/index.html
  ```
- 
- ```shell
+
+ ```bash
  git clone https://github.com/open-mmlab/mmaction2.git
  cd mmaction2
  pip install -r requirements/build.txt
@@ -46,7 +46,7 @@ pip install youtube-dl ffmpeg av scikit-image
 
  5. Install `einops` using
  `pip install einops`
- 
+
  6. Prepare `mmaction2`: First move `flow_extraction.py` from the `mmaction2/tools/misc**` directory to the *root directory of tools*, and then move the `mmaction2/tools` to the corresponding `mmaction2/mmaction`.
 
 # Non-IID Samplers

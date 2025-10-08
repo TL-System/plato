@@ -68,20 +68,20 @@ If there is a need for using load balancing available from `nginx`, sticky sessi
 
 After the configuration file is created, create a symbolic link in `/etc/nginx/sites-enabled`:
 
-```shell
+```bash
 sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
 ```
 
 Then test and restart the web server:
 
-```shell
+```bash
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
 The Plato federated learning server can be started as usual. For example:
 
-```shell
+```bash
 cd examples/customized
 uv run custom_server.py
 ```
@@ -95,7 +95,7 @@ server:
 ```
 
 And then run the clients as usual. For example:
-```shell
+```bash
 uv run custom_client.py -i 1
 ```
 
@@ -234,7 +234,7 @@ server {
 
 After the configuration file is modified, test it to make sure that there are no syntax errors:
 
-```shell
+```bash
 $ sudo nginx -t
 ```
 
@@ -314,7 +314,7 @@ $ uv sync
 
 The Plato federated learning server can be started as usual. For example:
 
-```shell
+```bash
 $ cd examples/customized
 $ uv run custom_server.py
 ```
@@ -332,7 +332,7 @@ server:
 
 And then run the client as usual. For example:
 
-```shell
+```bash
 $ uv run custom_client.py -i 1
 ```
 

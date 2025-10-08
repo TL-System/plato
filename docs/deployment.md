@@ -2,7 +2,7 @@
 
 ## General notes on deploying the Plato federated learning server in the cloud
 
-The Plato federated learning server is designed to use Socket.IO over HTTP and HTTPS, and can be easily deployed in a production server environment in the public cloud. 
+The Plato federated learning server is designed to use Socket.IO over HTTP and HTTPS, and can be easily deployed in a production server environment in the public cloud.
 
 To deploy such a production federated learning server in a virtual machine from any public cloud provider, a `nginx` web server will first need to be installed to serve as a reverse proxy server. To install the `nginx` web server in Ubuntu 20.04, follow Step 1 in the guide on [How To Install Linux, Nginx, MySQL, PHP (LEMP stack) on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-ubuntu-20-04).
 
@@ -65,20 +65,20 @@ server {
 
 After the configuration file is created, create a symbolic link in `/etc/nginx/sites-enabled`:
 
-```shell
+```bash
 sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
 ```
 
 Then test and restart the web server:
 
-```shell
+```bash
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
 The Plato federated learning server can be started as usual. For example:
 
-```shell
+```bash
 cd examples
 python custom_server.py
 ```
@@ -92,7 +92,7 @@ server:
 ```
 
 And then run the clients as usual. For example:
-```shell
+```bash
 python custom_client.py -i 1
 ```
 
@@ -100,7 +100,7 @@ There is no need to specify the port number for production servers deployed in t
 
 ## Deploying a Plato Federated Learning Server with DigitalOcean
 
-Here is some more detailed documentation on deploying a Plato federated learning server in one of the production environments: DigitalOcean. 
+Here is some more detailed documentation on deploying a Plato federated learning server in one of the production environments: DigitalOcean.
 
 ### Prerequisites
 
@@ -110,11 +110,11 @@ First thing first, create an account on [DigitalOcean](https://www.digitalocean.
 
 For your future convenience, follow [this tutorial](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to use SSH keys with your **Droplets** (DigitalOcean Droplets are Linux-based virtual machines that run on top of virtualized hardware. Each Droplet you create is a new server you can use.)
 
-Then go back to your DigitalOcean homepage (control panel), click the green button `Create` on the upper right corner and choose `Droplets`.  Here we need to create a droplet to use it as your Plato federated learning server. Choose Ubuntu 20.04 (LTS) x64 image. 
+Then go back to your DigitalOcean homepage (control panel), click the green button `Create` on the upper right corner and choose `Droplets`.  Here we need to create a droplet to use it as your Plato federated learning server. Choose Ubuntu 20.04 (LTS) x64 image.
 
 **Note**: Don't forget to check `IPv6` in the `Select additional options` to enable public IPv6 networking, so that you can SSH to your server right after you create it.
 
-After creating your droplet, click `Droplets` under `MANAGE` on the left-hand side of your control panel, you will see the name of the droplet you just create. Click it and you will see all the information of it, including its IP address. 
+After creating your droplet, click `Droplets` under `MANAGE` on the left-hand side of your control panel, you will see the name of the droplet you just create. Click it and you will see all the information of it, including its IP address.
 
 Open terminal on your local machine and you should be able to log in to your droplet as the `root` user:
 
@@ -130,13 +130,13 @@ Purchase a domain name that will be used later. A recommended place to purchase 
 
 ### Installing Nginx
 
-To deploy a production federated learning server in a virtual machine from any public cloud provider, a `nginx` web server will first need to be installed to serve as a reverse proxy server. 
+To deploy a production federated learning server in a virtual machine from any public cloud provider, a `nginx` web server will first need to be installed to serve as a reverse proxy server.
 
-To install the `nginx` web server in Ubuntu 20.04, follow the guide on [How To Install Nginx on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04), including Step 5 – Setting Up Server Blocks (Recommended). It will help you set up a domain, which will be used very soon. 
+To install the `nginx` web server in Ubuntu 20.04, follow the guide on [How To Install Nginx on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04), including Step 5 – Setting Up Server Blocks (Recommended). It will help you set up a domain, which will be used very soon.
 
-### Generating SSL certificates 
+### Generating SSL certificates
 
-To generate SSL certificates of your domain name for free, please go to [Cloudflare](https://cloudflare.com). 
+To generate SSL certificates of your domain name for free, please go to [Cloudflare](https://cloudflare.com).
 
 Click `Add Site` to add your domain name. They will give you two Cloudflare nameservers. Add these two nameservers as your `CustomDNS` on Namecheap by following [this guideline](https://www.namecheap.com/support/knowledgebase/article.aspx/767/10/how-to-change-dns-for-a-domain/).
 
@@ -147,11 +147,11 @@ Then on the page of your domain name on Cloudflare, click `DNS` and add the foll
 |A     | your domain name | IPv4 address of your DigitalOcean Droplet |
 |CNAME |   www            |your domain name      |
 
-Finally, click `SSL/TLS` and then `Origin Server` to `Create Certificate`. Follow their steps to install a certificate. You should get an `Origin Certificate` and a `Private Key`. 
+Finally, click `SSL/TLS` and then `Origin Server` to `Create Certificate`. Follow their steps to install a certificate. You should get an `Origin Certificate` and a `Private Key`.
 
 Log in to your droplet and copy your `Origin Certificate` and `Private Key` to `/etc/nginx/ssl/<your domain name>.cer` and `/etc/nginx/ssl/<your domain name>.key`, respectively.
 
-**Note**: On Cloudflare, under `SSL/TLS`, please make sure you 
+**Note**: On Cloudflare, under `SSL/TLS`, please make sure you
 
 1. choose **`Full`** Encrypts end-to-end, using a self signed certificate on the server under `Overview`;
 2. check `Always Use HTTPS` under `Edge Certificates`.
@@ -220,7 +220,7 @@ server {
 
 After the configuration file is modified, test it to make sure that there are no syntax errors:
 
-```shell
+```bash
 $ sudo nginx -t
 ```
 
@@ -261,7 +261,7 @@ $ source ~/.bashrc
 
 Update your `conda` environment, and then create a new `conda` environment with Python 3.8 using the command:
 
-```shell
+```bash
 $ conda update conda
 $ conda create -n federated python=3.8
 $ conda activate federated
@@ -291,13 +291,13 @@ pip install . --no-cache-dir
 $ vim ~/.bashrc
 ```
 
-Then add 
+Then add
 
 ```
 alias plato='cd <directory of plato>/; conda activate federated'
 ```
 
-After saving this change and exiting, 
+After saving this change and exiting,
 
 ```
 $ source ~/.bashrc
@@ -310,7 +310,7 @@ Next time, after you SSH into this server, just type `plato`:)
 
 The Plato federated learning server can be started as usual. For example:
 
-```shell
+```bash
 $ cd examples/customized
 $ python custom_server.py
 ```
@@ -323,11 +323,11 @@ server:
     use_https: true
 ```
 
-**Note**: Do **NOT** specify `port: 8000` in a client's configuration file. 
+**Note**: Do **NOT** specify `port: 8000` in a client's configuration file.
 
 And then run the client as usual. For example:
 
-```shell
+```bash
 $ python custom_client.py -i 1
 ```
 

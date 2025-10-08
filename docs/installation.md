@@ -4,7 +4,7 @@
 
 It is recommended that [Miniforge](https://github.com/conda-forge/miniforge) is used to manage Python packages. Before using *Plato*, first install Miniforge, update your `conda` environment, and then create a new `conda` environment with Python 3.9 using the command:
 
-```shell
+```bash
 conda update conda -y
 conda create -n plato -y python=3.9
 conda activate plato
@@ -14,13 +14,13 @@ where `plato` is the preferred name of your new environment.
 
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). The typical command in Linux with CUDA GPU support, for example, would be:
 
-```shell
+```bash
 pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117  --extra-index-url https://download.pytorch.org/whl/cu117
 ```
 
 The CUDA version, used in the command above, can be obtained on Ubuntu Linux systems by using the command:
 
-```shell
+```bash
 nvidia-smi
 ```
 
@@ -28,7 +28,7 @@ Although PyTorch 2.0 will mostly likely work with Plato, it has not been as thor
 
 In macOS (without GPU support), the recommended command would be:
 
-```shell
+```bash
 pip install torch==1.13.1 torchvision==0.14.1
 ```
 
@@ -36,7 +36,7 @@ pip install torch==1.13.1 torchvision==0.14.1
 
 To use *Plato* as a Python framework, you only need to install it as a pip package:
 
-```shell
+```bash
 pip install plato-learn
 ```
 
@@ -48,19 +48,19 @@ If you wish to modify the source code in *Plato* (rather than just using it as a
 
 We will need to install several packages using `pip` as well:
 
-```shell
+```bash
 pip install -r requirements.txt --upgrade
 ```
 
 We will need to install both [PyLint](https://en.wikipedia.org/wiki/Pylint) and [Black](https://github.com/psf/black) (the official Python formatter in Plato):
 
-```shell
+```bash
 pip install black pylint
 ```
 
 Finally, we will install the current GitHub version of *Plato* as a local pip package:
 
-```shell
+```bash
 pip install .
 ```
 
@@ -68,32 +68,32 @@ pip install .
 
 After the initial installation of the required Python packages, use the following command to upgrade all the installed packages at any time:
 
-```shell
+```bash
 python upgrade_packages.py
 ```
 
 If you are using a M1 or M2 Mac computer, a handy way to install [Miniforge](https://github.com/conda-forge/miniforge) is to do it using the command:
 
-```shell
+```bash
 brew install miniforge
 ```
 
 On M1 or M2 Mac computers, before installing the required packages in the conda environment, you may need to install the [Rust compiler](https://www.rust-lang.org/tools/install) first in order to install the `tokenizers` package:
 
-```shell
+```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 or simply
 
-```shell
+```bash
 brew install rust
 ```
 
 If you use Visual Studio Code, it is recommended to use `black` to reformat the code every time it is saved by adding the following settings to .`.vscode/settings.json`:
 
 ```
-"python.formatting.provider": "black", 
+"python.formatting.provider": "black",
 "editor.formatOnSave": true
 ```
 

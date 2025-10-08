@@ -43,20 +43,20 @@ Before running any examples, you'll need to complete two important steps:
 
 On your first run, you must download the required dataset using the `-d` flag:
 
-```shell
+```bash
 uv run examples/personalized_fl/fedbabu/fedbabu.py \
   -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -d
 ```
 
 Wait for the confirmation message:
 
-```shell
+```bash
 The dataset has been successfully downloaded. Re-run the experiment without '-d' or '--download'.
 ```
 
 Then run the command again **without** the `-d` flag:
 
-```shell
+```bash
 uv run examples/personalized_fl/fedbabu/fedbabu.py \
   -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml
 ```
@@ -72,7 +72,7 @@ To run an example with its dependencies:
 
 **Example:**
 
-```shell
+```bash
 cd examples/ssl/smog
 uv run smog.py -c ../../../examples/ssl/configs/smog_CIFAR10_resnet18.yml
 ```

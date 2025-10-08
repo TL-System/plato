@@ -48,13 +48,13 @@ If you installed Plato using `uv`, you can uninstall it by:
 
 1. Remove the local uv environment
 By default, uv puts the environment under .venv/ (if you’re using "uv sync" in a project). To “uninstall” it:
-```shell
+```bash
 rm -rf .venv
 ```
 
 2. Clean uv’s cache
 This will remove cached isolated tool environments, etc.
-```shell
+```bash
 uv cache clean
 ```
 
@@ -64,7 +64,7 @@ If you no longer use uv, you could follow [official uv documentation](https://do
 ### conda
 If you still use conda, remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
 
-```shell
+```bash
 conda env remove -n plato
 rm -rf plato/
 ```

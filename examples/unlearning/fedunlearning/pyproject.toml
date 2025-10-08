@@ -5,6 +5,6 @@ description = "Federated Unlearning"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "catboost>=1.2.8",
-    "scikit-learn>=1.7.2",
+    "catboost",
+    "scikit-learn",
 ]
