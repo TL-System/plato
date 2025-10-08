@@ -31,15 +31,15 @@ nav:
           - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
           - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
   - Configuration:
-      - Configuration Settings: Configuration Settings/config setting.md
-      - General: Configuration Settings/general.md
-      - Clients: Configuration Settings/clients.md
-      - Server: Configuration Settings/server.md
-      - Data: Configuration Settings/data.md
-      - Trainer: Configuration Settings/trainer.md
-      - Algorithm: Configuration Settings/algorithm.md
-      - Results: Configuration Settings/results.md
-      - Parameters: Configuration Settings/parameters.md
+      - Configuration Settings: configuration/overview.md
+      - General: configuration/general.md
+      - Clients: configuration/clients.md
+      - Server: configuration/server.md
+      - Data: configuration/data.md
+      - Trainer: configuration/trainer.md
+      - Algorithm: configuration/algorithm.md
+      - Results: configuration/results.md
+      - Parameters: configuration/parameters.md
   - Developer's Guide: development.md
   - Deployment Guide: deployment.md
   - Miscellaneous: misc.md

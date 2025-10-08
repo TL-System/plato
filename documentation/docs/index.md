@@ -15,15 +15,15 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
 !!! tip "Configuration Settings"
     Comprehensive guides for configuring all aspects of Plato.
 
-    - **[Configuration Settings](Configuration%20Settings/config%20setting.md)** - Overview of configuration options
-    - **[General](Configuration%20Settings/general.md)** - General configuration settings
-    - **[Clients](Configuration%20Settings/clients.md)** - Client configuration
-    - **[Server](Configuration%20Settings/server.md)** - Server configuration
-    - **[Data](Configuration%20Settings/data.md)** - Data handling configuration
-    - **[Trainer](Configuration%20Settings/trainer.md)** - Training configuration
-    - **[Algorithm](Configuration%20Settings/algorithm.md)** - Algorithm configuration
-    - **[Results](Configuration%20Settings/results.md)** - Results and logging configuration
-    - **[Parameters](Configuration%20Settings/parameters.md)** - Parameter configuration
+    - **[Configuration Settings](configuration/overview.md)** - Overview of configuration options
+    - **[General](configuration/general.md)** - General configuration settings
+    - **[Clients](configuration/clients.md)** - Client configuration
+    - **[Server](configuration/server.md)** - Server configuration
+    - **[Data](configuration/data.md)** - Data handling configuration
+    - **[Trainer](configuration/trainer.md)** - Training configuration
+    - **[Algorithm](configuration/algorithm.md)** - Algorithm configuration
+    - **[Results](configuration/results.md)** - Results and logging configuration
+    - **[Parameters](configuration/parameters.md)** - Parameter configuration
 
 ## Examples
 
