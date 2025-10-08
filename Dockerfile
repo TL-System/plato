@@ -17,4 +17,4 @@ ENV PATH="/root/.local/bin:$PATH"
 ENV UV_SYSTEM_PYTHON=1
 
 # Set default command to use uv run
-CMD ["uv", "run", "plato.py", "-c", "configs/MNIST/fedavg_lenet5.yml"]
+CMD ["/bin/bash"]
