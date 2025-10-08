@@ -70,7 +70,7 @@
     - `SGD`
 
 !!! example "lr_scheduler"
-    The learning rate scheduler. The following learning rate schedulers from PyTorch are supported:
+    The learning rate scheduler. The following learning rate schedulers are supported:
 
     - `CosineAnnealingLR`
     - `LambdaLR`

@@ -9,7 +9,6 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
 
     - **[Installation](install.md)** - Install Plato and set up your development environment
     - **[Quick Start](quickstart.md)** - Get started with Plato quickly
-    - **[Running Plato](running.md)** - Learn how to run Plato in different environments
 
 ## Configuration
 
@@ -19,7 +18,7 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
     - **[Configuration Settings](Configuration%20Settings/config%20setting.md)** - Overview of configuration options
     - **[General](Configuration%20Settings/general.md)** - General configuration settings
     - **[Clients](Configuration%20Settings/clients.md)** - Client configuration
-    - **[Server](Configuration%20Settings/server.md)** - Server configuration  
+    - **[Server](Configuration%20Settings/server.md)** - Server configuration
     - **[Data](Configuration%20Settings/data.md)** - Data handling configuration
     - **[Trainer](Configuration%20Settings/trainer.md)** - Training configuration
     - **[Algorithm](Configuration%20Settings/algorithm.md)** - Algorithm configuration

@@ -71,18 +71,18 @@
 !!! example "outbound_processors"
     A list of processors for the client to apply on the payload before sending it out to the server. Multiple processors are permitted.
 
-    - `feature_randomized_response` Activate randomized response on features for PyTorch MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
-    - `feature_laplace` Add random noise with laplace distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
-    - `feature_gaussian` Add random noise with gaussian distribution to features for PyTorch MistNet. Must be placed before `feature_unbatch`.
-    - `feature_quantize` Quantize features for PyTorch MistNet. Must not be used together with `outbound_feature_ndarrays`.
-    - `feature_unbatch` Unbatch features for PyTorch MistNet clients, must use this processor for every PyTorch MistNet client before sending.
+    - `feature_randomized_response` Activate randomized response on features for MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
+    - `feature_laplace` Add random noise with laplace distribution to features for MistNet. Must be placed before `feature_unbatch`.
+    - `feature_gaussian` Add random noise with gaussian distribution to features for MistNet. Must be placed before `feature_unbatch`.
+    - `feature_quantize` Quantize features for MistNet. Must not be used together with `outbound_feature_ndarrays`.
+    - `feature_unbatch` Unbatch features for MistNet clients, must use this processor for every MistNet client before sending.
     - `outbound_feature_ndarrays` Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
     - `model_deepcopy` Return a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
-    - `model_randomized_response` Activate randomized response on model parameters for PyTorch, must also set `algorithm.epsilon` to activate.
-    - `model_quantize` Quantize model parameters for PyTorch.
-    - `model_quantize_qsgd` Quantize model parameters for PyTorch with QSGD.
-    - `unstructured_pruning` Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
-    - `structured_pruning` Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+    - `model_randomized_response` Activate randomized response on model parameters, must also set `algorithm.epsilon` to activate.
+    - `model_quantize` Quantize model parameters.
+    - `model_quantize_qsgd` Quantize model parameters with QSGD.
+    - `unstructured_pruning` Process unstructured pruning on model weights. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+    - `structured_pruning` Process structured pruning on model weights. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
     - `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
     - `model_encrypt` Encrypts the model parameters using homomorphic encryption.
 

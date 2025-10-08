@@ -39,7 +39,7 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 ## Running Continuous Integration tests as GitHub actions
 
-Continuous Integration (CI) tests have been set up for the PyTorch frameworks in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
+Continuous Integration (CI) tests have been set up for PyTorch in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
 
 ## Uninstalling Plato
 

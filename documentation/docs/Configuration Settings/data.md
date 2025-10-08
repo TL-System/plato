@@ -77,6 +77,4 @@
     The number of samples in each client's dataset.
 
 !!! example "testset_size"
-    The number of samples in the server's test dataset when server-side evaluation is conducted;
-
-    PyTorch only (for now).
+    The number of samples in the server's test dataset when server-side evaluation is conducted.

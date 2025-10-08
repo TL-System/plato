@@ -85,18 +85,18 @@
 !!! example "outbound_processors"
     A list of processors to apply on the payload before sending it out to the clients. Multiple processors are permitted.
 
-    - `unstructured_pruning` Process unstructured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
-    - `structured_pruning` Process structured pruning on model weights for PyTorch. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+    - `unstructured_pruning` Process unstructured pruning on model weights. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
+    - `structured_pruning` Process structured pruning on model weights. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
     - `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
 
 !!! example "inbound_processors"
     A list of processors to apply on the payload right after receiving. Multiple processors are permitted.
 
     - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
-    - `inbound_feature_tensors` Convert PyTorch tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `outbound_feature_ndarrays`.
-    - `feature_dequantize` Dequantize features for PyTorch MistNet. Must not be used together with `inbound_feature_tensors`.
-    - `model_dequantize` Dequantize PyTorch model parameters back to the 32-bit floating number format.
-    - `model_dequantize_qsgd` Dequantize PyTorch model parameters quantized with QSGD.
+    - `inbound_feature_tensors` Convert tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `outbound_feature_ndarrays`.
+    - `feature_dequantize` Dequantize features for MistNet. Must not be used together with `inbound_feature_tensors`.
+    - `model_dequantize` Dequantize model parameters back to the 32-bit floating number format.
+    - `model_dequantize_qsgd` Dequantize model parameters quantized with QSGD.
 
 !!! example "downlink_bandwidth"
     The server's estimated downlink capacity (server to clients or central server to edge servers in cross-silo training) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section).
