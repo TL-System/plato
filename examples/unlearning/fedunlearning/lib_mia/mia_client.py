@@ -9,6 +9,7 @@ Shokri et al., "Membership Inference Attacks Against Machine Learning Models," i
 https://ieeexplore.ieee.org/document/9521274
 https://arxiv.org/pdf/1610.05820.pdf
 """
+
 from types import SimpleNamespace
 
 from plato.clients import simple
@@ -18,7 +19,12 @@ class Client(simple.Client):
     """A federated learning client of federated unlearning with local PGA."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
