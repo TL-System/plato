@@ -1,21 +1,28 @@
 """
 A MaskCrypt client with selective homomorphic encryption support.
 """
+
+import pickle
 import random
 import time
+
+import maskcrypt_utils
 import torch
-import pickle
 
 from plato.clients import simple
 from plato.config import Config
-import maskcrypt_utils
 
 
 class Client(simple.Client):
     """A MaskCrypt client with selective homomorphic encryption support."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
@@ -49,6 +56,7 @@ class Client(simple.Client):
                 self.algorithm.extract_weights(), self.trainer.get_gradient()
             )
             self.model_buffer[self.client_id] = (report, model_weights)
+
             return report, mask_proposal
         else:
             # Set final encryption mask and send model updates to server
@@ -57,6 +65,7 @@ class Client(simple.Client):
             # Set training_time to a non-zero value to avoid heapq.heappush error in base.Server Line 886
             report.training_time = 0.001
             report.comm_time = time.time()
+
             return report, weights
 
     def _get_exposed_weights(self):
@@ -66,6 +75,7 @@ class Client(simple.Client):
             self.checkpoint_path
             + f"/{self.attack_prep_dir}/{model_name}_est_{self.client_id}.pth"
         )
+
         return maskcrypt_utils.get_est(est_filename)
 
     def _compute_mask(self, latest_weights, gradients):
@@ -80,18 +90,21 @@ class Client(simple.Client):
                 for _, name in enumerate(latest_weights)
             ]
         )
+
         # Store the plain model weights
         plain_filename = (
             f"{self.checkpoint_path}/{self.attack_prep_dir}/"
             + f"{Config().trainer.model_name}_plain_{self.client_id}.pth"
         )
+
         with open(plain_filename, "wb") as plain_file:
             pickle.dump(latest_flat, plain_file)
 
         if self.random_mask:
             # Return a random mask when enabled in config file
             rand_mask = random.sample(
-                range(len(exposed_flat)), int(self.encrypt_ratio * len(exposed_flat))
+                range(len(exposed_flat)),
+                int(self.encrypt_ratio * len(exposed_flat)),
             )
             return torch.tensor(rand_mask)
 

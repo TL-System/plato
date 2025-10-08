@@ -2,13 +2,13 @@
 Customize the inbound and outbound processors for MaskCrypt clients through callbacks.
 """
 
+from typing import Any
+
 import maskcrypt_utils
 
-from typing import Any
-from plato.processors import base
 from plato.callbacks.client import ClientCallback
-from plato.processors import model_encrypt, model_decrypt
 from plato.config import Config
+from plato.processors import base, model_decrypt, model_encrypt
 
 
 class ModelEstimateProcessor(base.Processor):
@@ -22,6 +22,7 @@ class ModelEstimateProcessor(base.Processor):
 
     def process(self, data: Any) -> Any:
         maskcrypt_utils.update_est(Config(), self.client_id, data)
+
         return data
 
 
@@ -49,6 +50,7 @@ class MaskCryptCallback(ClientCallback):
 
     def on_outbound_ready(self, client, report, outbound_processor):
         current_round = client.current_round
+
         if current_round % 2 == 0:
             # Clients send model weights to server in even rounds, add encrypt processor
             outbound_processor.processors.append(
