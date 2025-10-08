@@ -11,12 +11,12 @@ Retraining," in Proc. INFOCOM, 2022.
 
 Reference: https://arxiv.org/abs/2203.07320
 """
+
 import numpy as np
 import torch
-from torch.utils.data import SubsetRandomSampler
-
 from plato.config import Config
 from plato.samplers import iid
+from torch.utils.data import SubsetRandomSampler
 
 
 class Sampler(iid.Sampler):
@@ -49,14 +49,20 @@ class Sampler(iid.Sampler):
         assert len(indices) == total_size
 
         # Compute the indices of data in the subset for this client
-        self.subset_indices = indices[(int(client_id) - 1) : total_size : total_clients]
+        self.subset_indices = indices[
+            (int(client_id) - 1) : total_size : total_clients
+        ]
         subset_length = int(len(self.subset_indices))
         deleted_subset_length = int(subset_length * deleted_data_ratio)
         deleted_index = np.random.choice(
             range(subset_length), deleted_subset_length, replace=False
         )
-        self.deleted_subset_indices = [self.subset_indices[i] for i in deleted_index]
-        self.subset_indices = list(np.delete(self.subset_indices, deleted_index))
+        self.deleted_subset_indices = [
+            self.subset_indices[i] for i in deleted_index
+        ]
+        self.subset_indices = list(
+            np.delete(self.subset_indices, deleted_index)
+        )
 
     def get_negative(self):
         """Obtains an instance of the sampler for the data to be deleted (unlearned)."""
