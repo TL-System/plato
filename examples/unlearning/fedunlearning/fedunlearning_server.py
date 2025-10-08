@@ -11,11 +11,13 @@ Retraining," in Proc. INFOCOM, 2022.
 
 Reference: https://arxiv.org/abs/2203.07320
 """
+
 import logging
 import os
 
+from lib_mia import mia_server
+
 from plato.config import Config
-from plato.utils.lib_mia import mia_server
 
 
 class Server(mia_server.Server):
@@ -34,7 +36,12 @@ class Server(mia_server.Server):
     """
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
@@ -54,7 +61,7 @@ class Server(mia_server.Server):
     def clients_selected(self, selected_clients):
         """Remembers the first round that a particular client ID was selected."""
         for client_id in selected_clients:
-            if not client_id in self.round_first_selected:
+            if client_id not in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
     def training_will_start(self) -> None:
@@ -79,14 +86,18 @@ class Server(mia_server.Server):
             map(lambda update: update.staleness <= self.current_round, updates)
         )
         recent_updates = list(
-            filter(lambda update: update.staleness <= self.current_round, updates)
+            filter(
+                lambda update: update.staleness <= self.current_round, updates
+            )
         )
 
         recent_deltas_received = [
             delta for delta, fresh in zip(deltas_received, recent_mask) if fresh
         ]
 
-        return await super().aggregate_deltas(recent_updates, recent_deltas_received)
+        return await super().aggregate_deltas(
+            recent_updates, recent_deltas_received
+        )
 
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
@@ -155,4 +166,6 @@ class Server(mia_server.Server):
                         self.current_round,
                     )
 
-                    self._restore_random_states(self.current_round, checkpoint_path)
+                    self._restore_random_states(
+                        self.current_round, checkpoint_path
+                    )

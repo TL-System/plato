@@ -11,19 +11,25 @@ Retraining," in Proc. INFOCOM, 2022.
 
 Reference: https://arxiv.org/abs/2203.07320
 """
+
 import logging
 
 import unlearning_iid
+from lib_mia import mia_client
 
 from plato.config import Config
-from plato.utils.lib_mia import mia_client
 
 
 class Client(mia_client.Client):
     """A federated learning client of federated unlearning."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
@@ -47,7 +53,10 @@ class Client(mia_client.Client):
 
         client_pool = Config().clients.clients_requesting_deletion
 
-        if self.client_id in client_pool and self.current_round <= previous_round:
+        if (
+            self.client_id in client_pool
+            and self.current_round <= previous_round
+        ):
             if self.client_id not in self.unlearning_clients:
                 self.unlearning_clients.append(self.client_id)
 

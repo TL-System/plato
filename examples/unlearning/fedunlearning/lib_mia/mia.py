@@ -9,6 +9,7 @@ Shokri et al., "Membership Inference Attacks Against Machine Learning Models," i
 https://ieeexplore.ieee.org/document/9521274
 https://arxiv.org/pdf/1610.05820.pdf
 """
+
 import logging
 
 import numpy as np
@@ -25,6 +26,7 @@ def train_attack_model(shadow_model, in_dataloader, out_dataloader):
     """Train attack model with shadow models."""
     logging.info("Training attack model")
 
+    shadow_model = shadow_model.to(Config().device())
     pred_4_mem = torch.zeros([1, Config().data.num_classes])
     pred_4_mem = pred_4_mem.to(Config().device())
     with torch.no_grad():
@@ -59,20 +61,27 @@ def train_attack_model(shadow_model, in_dataloader, out_dataloader):
 
     att_X = np.vstack((pred_4_mem, pred_4_nonmem))
     att_X.sort(axis=1)
-    att_y = np.hstack((np.ones(pred_4_mem.shape[0]), np.zeros(pred_4_nonmem.shape[0])))
+    att_y = np.hstack(
+        (np.ones(pred_4_mem.shape[0]), np.zeros(pred_4_nonmem.shape[0]))
+    )
     att_y = att_y.astype(np.int16)
 
-    X_train, X_test, y_train, y_test = train_test_split(att_X, att_y, test_size=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(
+        att_X, att_y, test_size=0.1
+    )
 
     attacker.fit(X_train, y_train)
 
     return attacker
 
 
-def launch_attack(target_model, attack_model, attack_dataloader, out_dataloader):
+def launch_attack(
+    target_model, attack_model, attack_dataloader, out_dataloader
+):
     """Launch attack toward the target model."""
     logging.info("Launching attack")
 
+    target_model = target_model.to(Config().device())
     # The posteriors of unlearned/forgotten data through the target model
     unlearn_X = torch.zeros([1, Config().data.num_classes])
     unlearn_X = unlearn_X.to(Config().device())
