@@ -43,8 +43,6 @@ Continuous Integration (CI) tests have been set up for PyTorch in `.github/workf
 
 ## Uninstalling Plato
 
-### uv
-
 If you installed Plato using `uv`, you can uninstall it by simply removing the local environment:
 
 ```bash
