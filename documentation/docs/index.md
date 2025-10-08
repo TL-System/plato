@@ -15,15 +15,15 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
 !!! tip "Configuration Settings"
     Comprehensive guides for configuring all aspects of Plato.
 
-    - **[Configuration Settings](configuration/overview.md)** - Overview of configuration options
-    - **[General](configuration/general.md)** - General configuration settings
-    - **[Clients](configuration/clients.md)** - Client configuration
-    - **[Server](configuration/server.md)** - Server configuration
-    - **[Data](configuration/data.md)** - Data handling configuration
-    - **[Trainer](configuration/trainer.md)** - Training configuration
-    - **[Algorithm](configuration/algorithm.md)** - Algorithm configuration
-    - **[Results](configuration/results.md)** - Results and logging configuration
-    - **[Parameters](configuration/parameters.md)** - Parameter configuration
+    - **[Configuration Settings](configurations/overview.md)** - Overview of configuration options
+    - **[General](configurations/general.md)** - General configuration settings
+    - **[Clients](configurations/clients.md)** - Client configuration
+    - **[Server](configurations/server.md)** - Server configuration
+    - **[Data](configurations/data.md)** - Data handling configuration
+    - **[Trainer](configurations/trainer.md)** - Training configuration
+    - **[Algorithm](configurations/algorithm.md)** - Algorithm configuration
+    - **[Results](configurations/results.md)** - Results and logging configuration
+    - **[Parameters](configurations/parameters.md)** - Parameter configuration
 
 ## Examples
 
@@ -61,9 +61,9 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
 !!! tip "API Documentation"
     Detailed API reference for customizing Plato components.
 
-    - **[Trainers](API%20Reference/trainers.md)** - Customizing training loops and callbacks
-    - **[Servers](API%20Reference/servers.md)** - Customizing server behavior and aggregation
-    - **[Clients](API%20Reference/clients.md)** - Customizing client behavior and processing
+    - **[Trainers](references/trainers.md)** - Customizing training loops and callbacks
+    - **[Servers](references/servers.md)** - Customizing server behavior and aggregation
+    - **[Clients](references/clients.md)** - Customizing client behavior and processing
 
 ## Additional Resources
 
