@@ -3,7 +3,6 @@ A customized server with asynchronous client selection
 """
 import logging
 
-from turtle import up, update
 from plato.config import Config
 from plato.servers import fedavg
 from cvxopt import matrix, log, solvers, sparse
