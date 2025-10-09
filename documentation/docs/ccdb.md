@@ -40,7 +40,6 @@ You can then create your own Python virtual environment (for example, one called
 ```bash
 virtualenv --no-download ~/.federated # creating your own virtual environment
 source ~/.federated/bin/activate
-pip install --no-index --upgrade pip
 ```
 
 Then install uv if it's not already available:
@@ -183,3 +182,42 @@ After the job is done, use `exit` at the command to relinquish the job allocatio
         This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
         Potential solutions: Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
+
+
+### Running jobs of HuggingFace
+
+Running a job of HuggingFace requires connecting to the Internet to download the dataset and the model. However, Digital Research Alliance of Canada doesn't allow Internet connections inside sbatch/salloc. Therefore, they need to be pre-downloaded via the following steps:
+
+1. Run the command first outside sbatch/salloc, for example, `uv run --active plato.py -c <your configuration file>`, and use `control + C` to terminate the program right after the first client starts training. After this step, the dataset and the model should be automatically downloaded.
+
+2. Switch to running it inside sbatch/salloc, and add `TRANSFORMERS_OFFLINE=1` before the command. The below is a sample job script:
+
+```
+#!/bin/bash
+#SBATCH --time=4:00:00
+#SBATCH --nodes=1
+#SBATCH --gres=gpu:1
+#SBATCH --mem=498G
+#SBATCH --account=def-baochun
+#SBATCH --output=test.out
+
+# Limit OpenBLAS threads
+export OPENBLAS_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+module load python/3.12
+source ~/.federated/bin/activate
+
+# Running the test.sh under examples/async/fedbuff
+TRANSFORMERS_OFFLINE=1 uv run --active fedbuff.py -c fedbuff_cifar10.yml
+```
+
+
+### Removing the Python virtual environment
+
+To remove the environment after experiments are completed, just delete the directory:
+
+```bash
+rm -rf ~/.federated
+```
