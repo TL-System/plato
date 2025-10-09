@@ -41,6 +41,10 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         else Config().parameters.optimizer._asdict()
     )
 
+    # Ensure eps is a float
+    if "eps" in optimizer_params:
+        optimizer_params["eps"] = float(optimizer_params["eps"])
+
     optimizer = registered_optimizers.get(optimizer_name)
     if optimizer is not None:
         return optimizer(model.parameters(), **optimizer_params)
