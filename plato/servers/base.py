@@ -37,7 +37,7 @@ class ServerEvents(socketio.AsyncNamespace):
         """Upon a new connection from a client."""
         logging.info("[Server #%d] A new client just connected.", os.getpid())
 
-    async def on_disconnect(self, sid,reason=None):
+    async def on_disconnect(self, sid, reason=None):
         """Upon a disconnection event."""
         logging.info(
             "[Server #%d] An existing client just disconnected.", os.getpid()
