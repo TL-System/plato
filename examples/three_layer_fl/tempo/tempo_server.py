@@ -59,6 +59,13 @@ class Server(fedavg_cs.Server):
 
     def _compute_local_epoch(self, weights_diff_list):
         """A method to compute local epochs."""
+        # Handle empty weights_diff_list
+        if not weights_diff_list:
+            self.local_epoch_list = [
+                Config().trainer.epochs for i in range(Config().algorithm.total_silos)
+            ]
+            return
+
         log_list = [math.log(i) for i in weights_diff_list]
         min_log = min(log_list)
         max_log = max(log_list)
@@ -82,16 +89,20 @@ class Server(fedavg_cs.Server):
         weights_diff_list = []
         for i in range(Config().algorithm.total_silos):
             client_id = i + 1 + Config().clients.total_clients
-            (report, weights) = [
-                (update.report, update.payload)
-                for update in self.updates
-                if int(update.client_id) == client_id
-            ][0]
-            num_samples = report.num_samples
 
-            weights_diff = self.compute_weights_difference(weights, num_samples)
+            try:
+                (report, weights) = [
+                    (update.report, update.payload)
+                    for update in self.updates
+                    if int(update.client_id) == client_id
+                ][0]
 
-            weights_diff_list.append(weights_diff)
+                num_samples = report.num_samples
+                weights_diff = self.compute_weights_difference(weights, num_samples)
+                weights_diff_list.append(weights_diff)
+            except IndexError:
+                # Skip this silo if no updates found
+                continue
 
         return weights_diff_list
 
