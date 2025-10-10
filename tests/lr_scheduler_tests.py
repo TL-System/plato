@@ -1,4 +1,5 @@
 """Unit tests for the learning rate scheduler."""
+
 import os
 import unittest
 import warnings

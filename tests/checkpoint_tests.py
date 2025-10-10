@@ -1,4 +1,5 @@
 """Unit tests for checkpoint operations."""
+
 import os
 import logging
 import unittest

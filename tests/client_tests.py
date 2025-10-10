@@ -1,6 +1,7 @@
 """
 Testing a federated learning client.
 """
+
 import os
 import asyncio
 

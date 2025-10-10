@@ -43,7 +43,17 @@ Documentation = "https://platodocs.netlify.app/"
 
 # Basic tool configuration
 [tool.ruff]
-include = ["pyproject.toml", "plato/**/*.py", "examples/**/*.py"]
+exclude = [
+    ".venv",
+    "plato/models/dvit",
+    "plato/models/t2tvit",
+]
+include = [
+    "pyproject.toml",
+    "plato/**/*.py",
+    "tests/**/*.py",
+    "examples/**/*.py",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]
