@@ -72,12 +72,30 @@ class TrainerAsync(BasicTrainer):
         self.batch_size = config["batch_size"]
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        torch.cuda.synchronize(self.device)
-        torch.cuda.reset_peak_memory_stats(self.device)
+        # Get the device type
+        device_type = (
+            self.device.type if hasattr(self.device, "type") else str(self.device)
+        )
+
+        # Synchronize or reset memory tracking
+        if device_type == "cuda":
+            torch.cuda.synchronize(self.device)
+            torch.cuda.reset_peak_memory_stats(self.device)
+        elif device_type == "mps":
+            torch.mps.synchronize()
+            # MPS currently doesn't expose memory stats APIs, skip reset_peak_memory_stats for MPS
+
+        # Perform forward + backward passes
         loss = super().perform_forward_and_backward_passes(config, examples, labels)
-        torch.cuda.synchronize(self.device)
-        max_mem = torch.cuda.max_memory_allocated(self.device) / 1024**3
-        self.max_mem_allocated = max(max_mem, self.max_mem_allocated)
+
+        # Post-training synchronization and memory tracking
+        if device_type == "cuda":
+            torch.cuda.synchronize(self.device)
+            max_mem = torch.cuda.max_memory_allocated(self.device) / 1024**3
+            self.max_mem_allocated = max(max_mem, self.max_mem_allocated)
+        elif device_type == "mps":
+            torch.mps.synchronize()
+
         return loss
 
     def train_step_end(self, config, batch=None, loss=None):
