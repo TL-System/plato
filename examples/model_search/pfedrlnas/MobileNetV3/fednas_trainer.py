@@ -1,20 +1,20 @@
 """
 Customized Trainer for PerFedRLNAS.
 """
+
 import logging
-import random
 import os
 import pickle
+import random
 import re
+
 import torch
+from plato.config import Config
+from plato.trainers import basic
 
 import fednas_specific
 import fedtools
 from model.mobilenetv3_supernet import NasDynamicModel
-
-from plato.trainers import basic
-from plato.config import Config
-
 
 if Config().trainer.lr_scheduler == "timm":
     BasicTrainer = basic.TrainerWithTimmScheduler
@@ -74,7 +74,9 @@ class TrainerAsync(BasicTrainer):
     def perform_forward_and_backward_passes(self, config, examples, labels):
         # Get the device type
         device_type = (
-            self.device.type if hasattr(self.device, "type") else str(self.device)
+            self.device.type
+            if hasattr(self.device, "type")
+            else str(self.device)
         )
 
         # Synchronize or reset memory tracking
@@ -86,7 +88,9 @@ class TrainerAsync(BasicTrainer):
             # MPS currently doesn't expose memory stats APIs, skip reset_peak_memory_stats for MPS
 
         # Perform forward + backward passes
-        loss = super().perform_forward_and_backward_passes(config, examples, labels)
+        loss = super().perform_forward_and_backward_passes(
+            config, examples, labels
+        )
 
         # Post-training synchronization and memory tracking
         if device_type == "cuda":
@@ -131,7 +135,8 @@ class TrainerAsync(BasicTrainer):
             model_name = config["model_name"]
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.mem"
             self.save_memory(
-                (self.max_mem_allocated, self.exceed_memory, self.sim_mem), filename
+                (self.max_mem_allocated, self.exceed_memory, self.sim_mem),
+                filename,
             )
 
     # pylint: disable=unused-argument
@@ -203,7 +208,9 @@ class TrainerAsync(BasicTrainer):
             model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
 
             if model_training_time < requested_time:
-                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+                model_path = (
+                    f"{Config().params['model_path']}/{model_checkpoint}"
+                )
 
                 pretrained = None
                 if torch.cuda.is_available():
@@ -233,8 +240,12 @@ class TrainerAsync(BasicTrainer):
         if torch.cuda.is_available():
             pretrained = torch.load(model_path)
         else:
-            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
-        model = fedtools.sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
+            pretrained = torch.load(
+                model_path, map_location=torch.device("cpu")
+            )
+        model = fedtools.sample_subnet_w_config(
+            NasDynamicModel(), subnet_config, False
+        )
         model.load_state_dict(pretrained, strict=True)
 
         logging.info(
