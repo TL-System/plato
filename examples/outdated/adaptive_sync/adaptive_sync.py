@@ -14,7 +14,7 @@ import adaptive_sync_client
 
 
 def main():
-    """ A Plato federated learning training session using Adaptive Synchronization Frequency. """
+    """A Plato federated learning training session using Adaptive Synchronization Frequency."""
     algorithm = adaptive_sync_algorithm.Algorithm
     client = adaptive_sync_client.Client(algorithm=algorithm)
     server = fedavg.Server(algorithm=algorithm)

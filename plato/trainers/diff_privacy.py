@@ -55,9 +55,7 @@ class Trainer(basic.Trainer):
         # without the sampler. We will finally use Opacus to recreate the dataloader from the
         # simple dataloader (with poisson sampling).
         trainset = Subset(trainset, list(sampler))
-        self.train_loader = self.get_train_loader(
-            batch_size, trainset, sampler=None
-        )
+        self.train_loader = self.get_train_loader(batch_size, trainset, sampler=None)
 
         # Initializing the loss criterion
         _loss_criterion = self.get_loss_criterion()
@@ -77,22 +75,16 @@ class Trainer(basic.Trainer):
 
         privacy_engine = PrivacyEngine(accountant="rdp", secure_mode=False)
 
-        self.model, optimizer, train_loader = (
-            privacy_engine.make_private_with_epsilon(
-                module=self.model,
-                optimizer=optimizer,
-                data_loader=self.train_loader,
-                target_epsilon=config["dp_epsilon"]
-                if "dp_epsilon" in config
-                else 10.0,
-                target_delta=config["dp_delta"]
-                if "dp_delta" in config
-                else 1e-5,
-                epochs=total_epochs,
-                max_grad_norm=config["dp_max_grad_norm"]
-                if "max_grad_norm" in config
-                else 1.0,
-            )
+        self.model, optimizer, train_loader = privacy_engine.make_private_with_epsilon(
+            module=self.model,
+            optimizer=optimizer,
+            data_loader=self.train_loader,
+            target_epsilon=config["dp_epsilon"] if "dp_epsilon" in config else 10.0,
+            target_delta=config["dp_delta"] if "dp_delta" in config else 1e-5,
+            epochs=total_epochs,
+            max_grad_norm=config["dp_max_grad_norm"]
+            if "max_grad_norm" in config
+            else 1.0,
         )
 
         self.model.train()
@@ -105,13 +97,9 @@ class Trainer(basic.Trainer):
             ) as memory_safe_train_loader:
                 self._loss_tracker.reset()
                 self.train_epoch_start(config)
-                self.callback_handler.call_event(
-                    "on_train_epoch_start", self, config
-                )
+                self.callback_handler.call_event("on_train_epoch_start", self, config)
 
-                for batch_id, (examples, labels) in enumerate(
-                    memory_safe_train_loader
-                ):
+                for batch_id, (examples, labels) in enumerate(memory_safe_train_loader):
                     examples, labels = (
                         examples.to(self.device),
                         labels.to(self.device),
@@ -161,15 +149,11 @@ class Trainer(basic.Trainer):
             ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = (
-                    f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
-                )
+                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
                 self.save_model(filename)
                 self.model.to(self.device)
 
-            self.run_history.update_metric(
-                "train_loss", self._loss_tracker.average
-            )
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
             self.train_epoch_end(config)
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 

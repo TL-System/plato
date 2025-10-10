@@ -4,6 +4,7 @@ The registry that contains all available secure aggregation in federated learnin
 Having a registry of all available classes is convenient for retrieving an instance based
 on a configuration at run-time.
 """
+
 import torch
 import logging
 from plato.config import Config
@@ -100,17 +101,13 @@ def bulyan(updates, baseline_weights, weights_attacked):
         scores = torch.sum(
             distances[:, : len(remaining_weights) - 2 - num_attackers], dim=1
         )
-        indices = torch.argsort(scores)[
-            : len(remaining_weights) - 2 - num_attackers
-        ]
+        indices = torch.argsort(scores)[: len(remaining_weights) - 2 - num_attackers]
 
         # Add candidates into bulyan cluster
         bulyan_cluster = (
             remaining_weights[indices[0]][None, :]
             if not len(bulyan_cluster)
-            else torch.cat(
-                (bulyan_cluster, remaining_weights[indices[0]][None, :]), 0
-            )
+            else torch.cat((bulyan_cluster, remaining_weights[indices[0]][None, :]), 0)
         )
 
         # Remove candidates from remainings
@@ -149,7 +146,7 @@ def krum(updates, baseline_weights, weights_attacked):
 
     remaining_weights = flatten_weights(weights_attacked)
 
-    num_attackers_selected = 2  
+    num_attackers_selected = 2
 
     distances = []
     for weight in remaining_weights:
@@ -201,9 +198,7 @@ def multi_krum(updates, baseline_weights, weights_attacked):
         candidates = (
             remaining_weights[indices[0]][None, :]
             if not len(candidates)
-            else torch.cat(
-                (candidates, remaining_weights[indices[0]][None, :]), 0
-            )
+            else torch.cat((candidates, remaining_weights[indices[0]][None, :]), 0)
         )
 
         # Remove candidates from remainings
@@ -325,9 +320,7 @@ def afa(updates, baseline_weights, weights_attacked):
                 if cos_sims[counter] < (model_median - epsilon * model_std):
                     remove_set.append(1)
                     remove_id = (
-                        afa_index_finder(
-                            weight, retrive_flattened_weights[counter:]
-                        )
+                        afa_index_finder(weight, retrive_flattened_weights[counter:])
                         + counter
                     )
                     delete_id = afa_index_finder(weight, flattened_weights_copy)
@@ -337,15 +330,13 @@ def afa(updates, baseline_weights, weights_attacked):
                         (temp_tensor1, temp_tensor2), dim=0
                     )
                     bad_set.append(remove_id)
-                
+
         else:
-            for counter, weight in enumerate(flattened_weights): 
+            for counter, weight in enumerate(flattened_weights):
                 if cos_sims[counter] > (model_median + epsilon * model_std):
                     remove_set.append(1)
                     remove_id = (
-                        afa_index_finder(
-                            weight, retrive_flattened_weights[counter:]
-                        )
+                        afa_index_finder(weight, retrive_flattened_weights[counter:])
                         + counter
                     )
                     delete_id = afa_index_finder(weight, flattened_weights_copy)
@@ -353,7 +344,7 @@ def afa(updates, baseline_weights, weights_attacked):
                     temp_tensor2 = flattened_weights_copy[delete_id + 1 :]
                     flattened_weights_copy = torch.cat(
                         (temp_tensor1, temp_tensor2), dim=0
-                    )  
+                    )
                     bad_set.append(remove_id)
 
         epsilon += delta_ep
@@ -377,7 +368,7 @@ def afa(updates, baseline_weights, weights_attacked):
     # Perform aggregation
     p_sum = 0
     final_update = torch.zeros(flattened_weights[0].shape)
-    
+
     for counter, weight in enumerate(flattened_weights):
         tmp = afa_index_finder(weight, retrive_flattened_weights[counter:])
         if tmp != -1:
@@ -439,7 +430,7 @@ def fl_trust(updates, baseline, weights_attacked):
         )
 
     mean_weights = torch.sum(candidates, dim=0)
-    
+
     # Update global model
     start_index = 0
     avg_update = OrderedDict()

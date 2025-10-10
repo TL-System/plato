@@ -106,9 +106,7 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
 
     # Step 1: decrypt the encrypted weights
     plaintext_weights_vector = None
-    unencrypted_weights, encrypted_weights, indices = extract_encrypted_model(
-        data
-    )
+    unencrypted_weights, encrypted_weights, indices = extract_encrypted_model(data)
 
     if len(indices) != 0:
         decrypted_vector = np.array(encrypted_weights.decrypt())
@@ -130,9 +128,7 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
     weight_index = 0
 
     for name, shape in weight_shapes.items():
-        decrypted_weights[name] = plaintext_weights_vector[
-            weight_index
-        ].reshape(shape)
+        decrypted_weights[name] = plaintext_weights_vector[weight_index].reshape(shape)
         try:
             decrypted_weights[name] = torch.from_numpy(decrypted_weights[name])
         except Exception:

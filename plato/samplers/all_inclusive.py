@@ -30,7 +30,6 @@ class Sampler(base.Sampler):
             self.data_samples = range(len(datasource.get_train_set()))
 
     def get(self):
-
         import torch
 
         gen = torch.Generator()

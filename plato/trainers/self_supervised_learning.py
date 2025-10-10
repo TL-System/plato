@@ -11,7 +11,7 @@ In the personalization process, each client trains a linear layer locally, based
 on the features extracted by the trained global model.
 
 The accuracy obtained by KNN during the regular federated training rounds may
-not be used to compare with the accuracy in supervised learning methods. 
+not be used to compare with the accuracy in supervised learning methods.
 """
 
 import logging

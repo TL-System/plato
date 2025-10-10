@@ -1,5 +1,5 @@
-""" This part of the code heavily depends on the
-    tools/data/build_file_lists.py provided by the mmaction
+"""This part of the code heavily depends on the
+tools/data/build_file_lists.py provided by the mmaction
 
 """
 
@@ -7,9 +7,15 @@ import csv
 import random
 
 from mmaction.tools.data.parse_file_list import (
-    parse_diving48_splits, parse_hmdb51_split, parse_jester_splits,
-    parse_mit_splits, parse_mmit_splits, parse_sthv1_splits,
-    parse_sthv2_splits, parse_ucf101_splits)
+    parse_diving48_splits,
+    parse_hmdb51_split,
+    parse_jester_splits,
+    parse_mit_splits,
+    parse_mmit_splits,
+    parse_sthv1_splits,
+    parse_sthv2_splits,
+    parse_ucf101_splits,
+)
 
 
 def build_list(split, frame_info, shuffle=False):
@@ -32,37 +38,47 @@ def build_list(split, frame_info, shuffle=False):
             rgb_cnt = frame_info[item[0]][1]
             flow_cnt = frame_info[item[0]][2]
             if isinstance(item[1], int):
-                rgb_list.append(f'{item[0]} {rgb_cnt} {item[1]}\n')
-                flow_list.append(f'{item[0]} {flow_cnt} {item[1]}\n')
+                rgb_list.append(f"{item[0]} {rgb_cnt} {item[1]}\n")
+                flow_list.append(f"{item[0]} {flow_cnt} {item[1]}\n")
             elif isinstance(item[1], list):
                 # only for multi-label datasets like mmit
-                rgb_list.append(f'{item[0]} {rgb_cnt} ' +
-                                ' '.join([str(digit)
-                                          for digit in item[1]]) + '\n')
-                rgb_list.append(f'{item[0]} {flow_cnt} ' +
-                                ' '.join([str(digit)
-                                          for digit in item[1]]) + '\n')
+                rgb_list.append(
+                    f"{item[0]} {rgb_cnt} "
+                    + " ".join([str(digit) for digit in item[1]])
+                    + "\n"
+                )
+                rgb_list.append(
+                    f"{item[0]} {flow_cnt} "
+                    + " ".join([str(digit) for digit in item[1]])
+                    + "\n"
+                )
             else:
                 raise ValueError(
-                    'frame_info should be ' +
-                    '[`video`(str), `label`(int)|`labels(list[int])`')
+                    "frame_info should be "
+                    + "[`video`(str), `label`(int)|`labels(list[int])`"
+                )
         else:
             # videos
             if isinstance(item[1], int):
-                rgb_list.append(f'{frame_info[item[0]][0]} {item[1]}\n')
-                flow_list.append(f'{frame_info[item[0]][0]} {item[1]}\n')
+                rgb_list.append(f"{frame_info[item[0]][0]} {item[1]}\n")
+                flow_list.append(f"{frame_info[item[0]][0]} {item[1]}\n")
             elif isinstance(item[1], list):
                 # only for multi-label datasets like mmit
-                rgb_list.append(f'{frame_info[item[0]][0]} ' +
-                                ' '.join([str(digit)
-                                          for digit in item[1]]) + '\n')
-                flow_list.append(f'{frame_info[item[0]][0]} ' +
-                                 ' '.join([str(digit)
-                                           for digit in item[1]]) + '\n')
+                rgb_list.append(
+                    f"{frame_info[item[0]][0]} "
+                    + " ".join([str(digit) for digit in item[1]])
+                    + "\n"
+                )
+                flow_list.append(
+                    f"{frame_info[item[0]][0]} "
+                    + " ".join([str(digit) for digit in item[1]])
+                    + "\n"
+                )
             else:
                 raise ValueError(
-                    'frame_info should be ' +
-                    '[`video`(str), `label`(int)|`labels(list[int])`')
+                    "frame_info should be "
+                    + "[`video`(str), `label`(int)|`labels(list[int])`"
+                )
     if shuffle:
         random.shuffle(rgb_list)
         random.shuffle(flow_list)
@@ -86,6 +102,7 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
     Returns:
         list: "train", "val", "test" splits of Kinetics.
     """
+
     def convert_label(label_str, keep_whitespaces=False):
         """Convert label name to a formal string.
 
@@ -99,9 +116,9 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
             str: Converted string.
         """
         if not keep_whitespaces:
-            return label_str.replace('"', '').replace(' ', '_')
+            return label_str.replace('"', "").replace(" ", "_")
         else:
-            return label_str.replace('"', '')
+            return label_str.replace('"', "")
 
     def line_to_map(line_str, test=False):
         """A function to map line string to video and label.
@@ -118,21 +135,21 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
         if test:  # x:  ['---v8pgm1eQ', '0', '10', 'test']
             # video = f'{x[0]}_{int(x[1]):06d}_{int(x[2]):06d}'
             # video = f'{x[1]}_{int(float(x[2])):06d}_{int(float(x[3])):06d}'
-            video = f'{line_str[0]}_{int(float(line_str[1])):06d}_{int(float(line_str[2])):06d}'
+            video = f"{line_str[0]}_{int(float(line_str[1])):06d}_{int(float(line_str[2])):06d}"
             label = -1  # label unknown
             return video, label
         else:  # ['clay pottery making', '---0dWlqevI', '19', '29', 'train']
-            video = f'{line_str[1]}_{int(float(line_str[2])):06d}_{int(float(line_str[3])):06d}'
+            video = f"{line_str[1]}_{int(float(line_str[2])):06d}_{int(float(line_str[3])):06d}"
             if level == 2:
-                video = f'{convert_label(line_str[0])}/{video}'
+                video = f"{convert_label(line_str[0])}/{video}"
             else:
                 assert level == 1
             label = class_mapping[convert_label(line_str[0])]
             return video, label
 
-    train_file = kinetics_anntation_files_info['train']
-    test_file = kinetics_anntation_files_info['test']
-    val_file = kinetics_anntation_files_info['val']
+    train_file = kinetics_anntation_files_info["train"]
+    test_file = kinetics_anntation_files_info["test"]
+    val_file = kinetics_anntation_files_info["val"]
 
     csv_reader = csv.reader(open(train_file))
     # skip the first line
@@ -153,40 +170,43 @@ def parse_kinetics_splits(kinetics_anntation_files_info, level, dataset_name):
     next(csv_reader)
     test_list = [line_to_map(x, test=True) for x in csv_reader]
 
-    splits = ((train_list, val_list, test_list), )
+    splits = ((train_list, val_list, test_list),)
     splits = {"train": train_list, "test": test_list, "val": val_list}
     return splits
 
 
 def obtain_data_splits_info(
-        data_annos_files_info,  # a dict containing the data original splits' file path
-        data_fir_level=2,
-        data_name="kinetics700"):
-    """ Parse the raw data file to obtain different splits info """
-    if data_name == 'ucf101':
+    data_annos_files_info,  # a dict containing the data original splits' file path
+    data_fir_level=2,
+    data_name="kinetics700",
+):
+    """Parse the raw data file to obtain different splits info"""
+    if data_name == "ucf101":
         splits = parse_ucf101_splits(data_fir_level)
-    elif data_name == 'sthv1':
+    elif data_name == "sthv1":
         splits = parse_sthv1_splits(data_fir_level)
-    elif data_name == 'sthv2':
+    elif data_name == "sthv2":
         splits = parse_sthv2_splits(data_fir_level)
-    elif data_name == 'mit':
+    elif data_name == "mit":
         splits = parse_mit_splits()
-    elif data_name == 'mmit':
+    elif data_name == "mmit":
         splits = parse_mmit_splits()
-    elif data_name in ['kinetics400', 'kinetics600', 'kinetics700']:
+    elif data_name in ["kinetics400", "kinetics600", "kinetics700"]:
         kinetics_anntation_files_info = data_annos_files_info
-        splits = parse_kinetics_splits(kinetics_anntation_files_info,
-                                       data_fir_level, data_name)
-    elif data_name == 'hmdb51':
+        splits = parse_kinetics_splits(
+            kinetics_anntation_files_info, data_fir_level, data_name
+        )
+    elif data_name == "hmdb51":
         splits = parse_hmdb51_split(data_fir_level)
-    elif data_name == 'jester':
+    elif data_name == "jester":
         splits = parse_jester_splits(data_fir_level)
-    elif data_name == 'diving48':
+    elif data_name == "diving48":
         splits = parse_diving48_splits()
     else:
         raise ValueError(
             f"Supported datasets are 'ucf101, sthv1, sthv2', 'jester', "
             f"'mmit', 'mit', 'kinetics400', 'kinetics600', 'kinetics700', but "
-            f'got {data_name}')
+            f"got {data_name}"
+        )
 
     return splits

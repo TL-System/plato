@@ -2,6 +2,7 @@
 A sampler for orthogonal cross-silo federated learning.
 Each insitution's clients have data of different classes.
 """
+
 import numpy as np
 import torch
 from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler

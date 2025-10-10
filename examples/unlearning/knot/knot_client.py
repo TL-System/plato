@@ -21,20 +21,14 @@ class Client(simple.Client):
         """
         client_pool = Config().clients.clients_requesting_deletion
 
-        if (
-            self.client_id in client_pool
-            and "rollback_round" in server_response
-        ):
+        if self.client_id in client_pool and "rollback_round" in server_response:
             logging.info(
                 "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
                 self,
                 Config().clients.deleted_data_ratio * 100,
             )
 
-            if (
-                not hasattr(Config().data, "reload_data")
-                or Config().data.reload_data
-            ):
+            if not hasattr(Config().data, "reload_data") or Config().data.reload_data:
                 logging.info("[%s] Loading the dataset.", self)
                 self._load_data()
 

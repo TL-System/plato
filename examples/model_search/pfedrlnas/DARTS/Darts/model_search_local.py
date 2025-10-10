@@ -31,6 +31,7 @@ class MixedOp(nn.Module):
 
 class Cell(nn.Module):
     "Darts Cell."
+
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-locals
 

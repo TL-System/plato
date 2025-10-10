@@ -90,9 +90,7 @@ class CalibreLoss(nn.Module):
             else:
                 loss_functions = loss_criterion.get(
                     loss_criterion=loss_name,
-                    loss_criterion_params=self.loss_weights_params[loss_name][
-                        "params"
-                    ],
+                    loss_criterion_params=self.loss_weights_params[loss_name]["params"],
                 )
 
             self.loss_functions[loss_name] = loss_functions
@@ -124,9 +122,7 @@ class CalibreLoss(nn.Module):
 
         # Split into two parts corresponding to a, and b
         # each with shape, [batch_size]
-        pseudo_labels_a, pseudo_labels_b = torch.split(
-            clusters_assignment, batch_size
-        )
+        pseudo_labels_a, pseudo_labels_b = torch.split(clusters_assignment, batch_size)
 
         ## prototype-oriented contrastive regularizer
         # Compute the prototype features based on projection

@@ -1,6 +1,6 @@
 """
 A federated learning trainer for gradient leakage attacks,
-where intermediate gradients can be transmitted, 
+where intermediate gradients can be transmitted,
 and potential defense mechanisms can be applied.
 """
 
@@ -180,9 +180,12 @@ class Trainer(basic.Trainer):
                         deviation_f1_target, retain_graph=True
                     )
                     deviation_f1_x = self.examples.grad.data
-                    deviation_f1_x_norm[:, f] = torch.norm(
-                        deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
-                    ) / (self.feature_fc1_graph.data[:, f])
+                    deviation_f1_x_norm[:, f] = (
+                        torch.norm(
+                            deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
+                        )
+                        / (self.feature_fc1_graph.data[:, f])
+                    )
                     self.model.zero_grad()
                     self.examples.grad.data.zero_()
                     deviation_f1_target[:, f] = 0

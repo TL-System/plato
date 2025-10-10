@@ -42,8 +42,8 @@ Repository = "https://github.com/TL-System/plato"
 Documentation = "https://platodocs.netlify.app/"
 
 # Basic tool configuration
-[tool.black]
-line-length = 88
+[tool.ruff]
+include = ["pyproject.toml", "plato/**/*.py", "examples/**/*.py"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]

@@ -1,6 +1,7 @@
 """
 The model for the SMoG algorithm.
 """
+
 import copy
 
 import torch

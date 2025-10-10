@@ -30,21 +30,20 @@ def validate_one_subnet(
     args,
     logger=None,
 ):
-    batch_time = AverageMeter('Time', ':6.3f')
-    losses = AverageMeter('Loss', ':.4e')
-    top1 = AverageMeter('Acc@1', ':6.2f')
-    top5 = AverageMeter('Acc@5', ':6.2f')
+    batch_time = AverageMeter("Time", ":6.3f")
+    losses = AverageMeter("Loss", ":.4e")
+    top1 = AverageMeter("Acc@1", ":6.2f")
+    top5 = AverageMeter("Acc@5", ":6.2f")
     progress = ProgressMeter(
-                len(val_loader),
-                [batch_time, losses, top1, top5],
-                prefix='Test: ')
+        len(val_loader), [batch_time, losses, top1, top5], prefix="Test: "
+    )
 
-    log_helper('evaluating...', logger)
-    #evaluation
+    log_helper("evaluating...", logger)
+    # evaluation
     end = time.time()
 
     subnet.cuda(args.gpu)
-    subnet.eval() # freeze again all running stats
+    subnet.eval()  # freeze again all running stats
 
     for batch_idx, (images, target) in enumerate(val_loader):
         images = images.cuda(args.gpu, non_blocking=True)
@@ -59,13 +58,13 @@ def validate_one_subnet(
 
         batch_size = images.size(0)
 
-        if args.distributed and getattr(args, 'distributed_val', True):
+        if args.distributed and getattr(args, "distributed_val", True):
             corr1, corr5, loss = acc1 * batch_size, acc5 * batch_size, loss * batch_size
             stats = torch.tensor([corr1, corr5, loss, batch_size], device=args.gpu)
             dist.barrier()  # synchronizes all processes
             dist.all_reduce(stats, op=torch.distributed.ReduceOp.SUM)
             corr1, corr5, loss, batch_size = stats.tolist()
-            acc1, acc5, loss = corr1 / batch_size, corr5 / batch_size, loss/batch_size
+            acc1, acc5, loss = corr1 / batch_size, corr5 / batch_size, loss / batch_size
 
         top1.update(acc1, batch_size)
         top5.update(acc5, batch_size)
@@ -77,11 +76,15 @@ def validate_one_subnet(
         if batch_idx % args.print_freq == 0:
             progress.display(batch_idx, logger)
 
-    log_helper(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}, Top1: {top1.sum}/{top1.count}'
-            .format(top1=top1, top5=top5), logger)
+    log_helper(
+        " * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}, Top1: {top1.sum}/{top1.count}".format(
+            top1=top1, top5=top5
+        ),
+        logger,
+    )
 
     # compute flops
-    if getattr(subnet, 'module', None):
+    if getattr(subnet, "module", None):
         resolution = subnet.module.resolution
     else:
         resolution = subnet.resolution
@@ -89,5 +92,3 @@ def validate_one_subnet(
 
     flops, params = count_net_flops_and_params(subnet, data_shape)
     return float(top1.avg), float(top5.avg), float(losses.avg), flops, params
-
-

@@ -31,11 +31,12 @@ class DynamicMultimodalModule(nn.Module):
                                             different modalities, 'rgb_model', 'audio_model',
                                             'flow_model', 'text_model'
     """
+
     def __init__(
         self,
         support_modality_names,
         multimodal_nets_configs,  # multimodal_data_model
-        is_fused_head=True
+        is_fused_head=True,
     ):  # a cls head makes prediction based on the fused multimodal feature
         super().__init__()
 
@@ -47,10 +48,9 @@ class DynamicMultimodalModule(nn.Module):
 
         self.is_fused_head = is_fused_head
 
-        assert all([
-            s_net in multimodal_nets_configs.keys()
-            for s_net in self.support_nets
-        ])
+        assert all(
+            [s_net in multimodal_nets_configs.keys() for s_net in self.support_nets]
+        )
         self.name_net_mapper = {}
         self.modality_fea_dims_mapper = {}
         for idx, modality_net in enumerate(self.support_nets):
@@ -67,26 +67,26 @@ class DynamicMultimodalModule(nn.Module):
                     fea_dims = net_config["cls_head"]["in_channels"]
                     self.modality_fea_dims_mapper[modality_name] = fea_dims
 
-                self.name_net_mapper[
-                    modality_name] = base_net.BaseClassificationNet(
-                        net_configs=net_config,
-                        is_head_included=is_head_included)
+                self.name_net_mapper[modality_name] = base_net.BaseClassificationNet(
+                    net_configs=net_config, is_head_included=is_head_included
+                )
 
         if is_fused_head:
-
             fuse_net_config = multimodal_nets_configs["fuse_model"]
 
             if "modalities_feature_dim" in list(fuse_net_config.keys()):
                 self.modality_fea_dims_mapper.update(
-                    fuse_net_config["modalities_feature_dim"])
+                    fuse_net_config["modalities_feature_dim"]
+                )
 
             self.cat_fusion_net = fusion_net.ConcatFusionNet(
                 support_modalities=support_modality_names,
                 modalities_fea_dim=self.modality_fea_dims_mapper,
-                net_configs=fuse_net_config)
+                net_configs=fuse_net_config,
+            )
 
     def assing_weights(self, net_name, weights):
-        """ Assign the weights to the specific network """
+        """Assign the weights to the specific network"""
         self.name_net_mapper[net_name].load_state_dict(weights, strict=True)
 
     def _freeze_stages(self):
@@ -98,7 +98,7 @@ class DynamicMultimodalModule(nn.Module):
                 param.requires_grad = False
 
         for i in range(1, self.frozen_stages + 1):
-            layer_module = getattr(self, f'layer{i}')
+            layer_module = getattr(self, f"layer{i}")
             layer_module.eval()
             for param in layer_module.parameters():
                 param.requires_grad = False
@@ -117,7 +117,6 @@ class DynamicMultimodalModule(nn.Module):
         modalities_features_container = dict()
 
         for modality_name in data_container.keys():
-
             modality_net = self.name_net_mapper[modality_name]
             modality_ipt_data = data_container[modality_name]
             batch_size = modality_ipt_data.shape[0]
@@ -129,9 +128,9 @@ class DynamicMultimodalModule(nn.Module):
             logging.debug("batch_size: %s", batch_size)
 
             # obtain the modality fea and the class opt
-            modality_opt = modality_net.forward(ipt_data=modality_ipt_data,
-                                                label=label,
-                                                return_loss=return_loss)
+            modality_opt = modality_net.forward(
+                ipt_data=modality_ipt_data, label=label, return_loss=return_loss
+            )
 
             modalities_features_container[modality_name] = modality_opt[0]
             modalities_pred_scores_container[modality_name] = modality_opt[1]
@@ -142,9 +141,11 @@ class DynamicMultimodalModule(nn.Module):
             #   The order should follow the that in the support_modality_names
             fused_feat = self.cat_fusion_net.create_fusion_feature(
                 batch_size=batch_size,
-                modalities_features_container=modalities_features_container)
+                modalities_features_container=modalities_features_container,
+            )
             fused_cls_score, fused_loss = self.cat_fusion_net.forward(
-                fused_feat, label, return_loss=return_loss)
+                fused_feat, label, return_loss=return_loss
+            )
             modalities_pred_scores_container["fused"] = fused_cls_score
             modalities_losses_container["fused"] = fused_loss
 

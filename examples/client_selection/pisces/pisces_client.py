@@ -8,6 +8,7 @@ Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 
 URL: https://arxiv.org/abs/2206.09264
 """
+
 from types import SimpleNamespace
 import numpy as np
 from plato.clients import simple

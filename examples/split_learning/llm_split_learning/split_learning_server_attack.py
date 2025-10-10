@@ -2,6 +2,7 @@
 A curious server which will try to attack and reconstruct user private data
     with the received intermediate features.
 """
+
 import multiprocessing as mp
 from plato.servers import split_learning as split_learning_server
 from plato.config import Config

@@ -7,12 +7,14 @@ Paper: https://ieeexplore.ieee.org/document/10228957
 
 Source code: https://github.com/Distributed-Learning-Networking-Group/FedMoS
 """
+
 import copy
 
 from plato.config import Config
 from plato.trainers import basic
 
 from optimizers import FedMosOptimizer
+
 
 # pylint:disable=no-member
 class Trainer(basic.Trainer):
@@ -25,13 +27,16 @@ class Trainer(basic.Trainer):
         self.local_param_tmpl = None
 
     def get_optimizer(self, model):
-        """ Get the optimizer of the Fedmos."""
+        """Get the optimizer of the Fedmos."""
         a = Config().algorithm.a if hasattr(Config().algorithm, "a") else 0.9
         mu = Config().algorithm.mu if hasattr(Config().algorithm, "mu") else 0.9
-        lr = Config().parameters.optimizer.lr if hasattr(Config().parameters.optimizer, "lr") else 0.01
+        lr = (
+            Config().parameters.optimizer.lr
+            if hasattr(Config().parameters.optimizer, "lr")
+            else 0.01
+        )
 
         return FedMosOptimizer(model.parameters(), lr=lr, a=a, mu=mu)
-
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Perform forward and backward passes in the training loop."""

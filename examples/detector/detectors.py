@@ -10,10 +10,10 @@ import torch.nn.functional as F
 from collections import OrderedDict
 
 # Configure logging
-logging.basicConfig(filename='app.log', filemode='w', level=logging.INFO)
+logging.basicConfig(filename="app.log", filemode="w", level=logging.INFO)
+
 
 def get():
-
     detector_type = (
         Config().server.detector_type
         if hasattr(Config().server, "detector_type")
@@ -53,7 +53,6 @@ def flatten_weights(weights):
 
 
 def flatten_weight(weight):
-
     flattened_weight = []
     for name in weight.keys():
         flattened_weight = (
@@ -71,11 +70,11 @@ def lbfgs(weights_attacked, global_weights_record, gradients_record, last_weight
     gradients = torch.stack(gradients_record)
     global_times_gradients = torch.matmul(global_weights, gradients.T)
     global_times_global = torch.matmul(global_weights, global_weights.T)
-    
+
     # Get its diagonal matrix and lower triangular submatrix
     R_k = np.triu(global_times_gradients.numpy())
     L_k = global_times_gradients - torch.tensor(R_k)
-    
+
     # Step 3 in Algorithm 1
     sigma_k = torch.matmul(
         torch.transpose(global_weights_record[-1], 0, -1), gradients_record[-1]
@@ -83,19 +82,18 @@ def lbfgs(weights_attacked, global_weights_record, gradients_record, last_weight
         torch.matmul(torch.transpose(gradients_record[-1], 0, -1), gradients_record[-1])
     )
     D_k_diag = torch.diag(global_times_gradients)
-    
+
     upper_mat = torch.cat(((sigma_k * global_times_global), L_k), dim=1)
     lower_mat = torch.cat((L_k.T, -torch.diag(D_k_diag)), dim=1)
     mat = torch.cat((upper_mat, lower_mat), dim=0)
     mat_inv = torch.inverse(mat)
 
-    v = (
-        weights_attacked - last_weights
-    )  # deltas_attacked from selected clients
+    v = weights_attacked - last_weights  # deltas_attacked from selected clients
     v = torch.mean(v, dim=0)
     approx_prod = sigma_k * v
     p_mat = torch.cat(
-        (torch.matmul(global_weights, (sigma_k * v).T), torch.matmul(gradients, v.T)), dim=0
+        (torch.matmul(global_weights, (sigma_k * v).T), torch.matmul(gradients, v.T)),
+        dim=0,
     )
     approx_prod -= torch.matmul(
         torch.matmul(
@@ -107,7 +105,6 @@ def lbfgs(weights_attacked, global_weights_record, gradients_record, last_weight
 
 
 def gap_statistics(score):
-    
     nrefs = 10
     ks = range(1, 3)
     gaps = np.zeros(len(ks))
@@ -124,7 +121,7 @@ def gap_statistics(score):
         Wk = np.sum(
             [np.square(score[m] - center[label_pred[m]]) for m in range(len(score))]
         )
-        
+
         WkRef = np.zeros(nrefs)
         for j in range(nrefs):
             rand = np.random.uniform(0, 1, len(score))
@@ -161,7 +158,7 @@ def detection(score):
     # Print the members in each cluster
     for cluster in np.unique(label_pred):
         cluster_members = score[label_pred == cluster]
-        logging.info(f"Cluster {cluster + 1} members: %s",cluster_members)
+        logging.info(f"Cluster {cluster + 1} members: %s", cluster_members)
     if np.mean(score[label_pred == 0]) < np.mean(score[label_pred == 1]):
         # cluster with smaller mean value is clean clients
         clean_ids = np.where(label_pred == 0)[0]
@@ -169,8 +166,9 @@ def detection(score):
     else:
         clean_ids = np.where(label_pred == 1)[0]
         malicious_ids = np.where(label_pred == 0)[0]
-    #logging.info(f"clean_ids: %s", clean_ids)
+    # logging.info(f"clean_ids: %s", clean_ids)
     return malicious_ids, clean_ids
+
 
 def detection_cos(score):
     estimator = KMeans(n_clusters=3)
@@ -179,23 +177,34 @@ def detection_cos(score):
     # Print the members in each cluster
     for cluster in np.unique(label_pred):
         cluster_members = score[label_pred == cluster]
-        logging.info(f"Cluster {cluster + 1} members: %s",cluster_members)
-    if ((np.mean(score[label_pred == 0]) > np.mean(score[label_pred == 1])) and (np.mean(score[label_pred == 0]) > np.mean(score[label_pred == 2]))):
+        logging.info(f"Cluster {cluster + 1} members: %s", cluster_members)
+    if (np.mean(score[label_pred == 0]) > np.mean(score[label_pred == 1])) and (
+        np.mean(score[label_pred == 0]) > np.mean(score[label_pred == 2])
+    ):
         # cluster with larger value is attacker
-        clean_ids = np.concatenate((np.where(label_pred == 1)[0], np.where(label_pred == 2)[0]))
+        clean_ids = np.concatenate(
+            (np.where(label_pred == 1)[0], np.where(label_pred == 2)[0])
+        )
         malicious_ids = np.where(label_pred == 0)[0]
-    elif ((np.mean(score[label_pred == 1]) > np.mean(score[label_pred == 0])) and (np.mean(score[label_pred == 1]) > np.mean(score[label_pred == 2]))):
-        clean_ids = np.concatenate((np.where(label_pred == 0)[0], np.where(label_pred == 2)[0]))
+    elif (np.mean(score[label_pred == 1]) > np.mean(score[label_pred == 0])) and (
+        np.mean(score[label_pred == 1]) > np.mean(score[label_pred == 2])
+    ):
+        clean_ids = np.concatenate(
+            (np.where(label_pred == 0)[0], np.where(label_pred == 2)[0])
+        )
         malicious_ids = np.where(label_pred == 1)[0]
-    else: 
-        clean_ids = np.concatenate((np.where(label_pred == 1)[0], np.where(label_pred == 0)[0]))
+    else:
+        clean_ids = np.concatenate(
+            (np.where(label_pred == 1)[0], np.where(label_pred == 0)[0])
+        )
         malicious_ids = np.where(label_pred == 2)[0]
-  
-    return  malicious_ids, clean_ids
+
+    return malicious_ids, clean_ids
+
 
 def pre_data_for_visualization(deltas_attacked, received_staleness):
     # saved received local deltas for round x
-    #logging.info(f"starting preparing data for visualization")
+    # logging.info(f"starting preparing data for visualization")
     flattened_deltas_attacked = flatten_weights(deltas_attacked)
     # list to torch tensor
     received_staleness = torch.tensor(received_staleness)
@@ -208,85 +217,104 @@ def pre_data_for_visualization(deltas_attacked, received_staleness):
             os.makedirs(model_path)
     except FileExistsError:
         pass
-    
+
     try:
         # List all files and directories in the given folder
         items = os.listdir(model_path)
 
         # Count the number of files (ignoring directories)
-        file_count = sum(1 for item in items if os.path.isfile(os.path.join(model_path, item)))
+        file_count = sum(
+            1 for item in items if os.path.isfile(os.path.join(model_path, item))
+        )
 
-        file_count = str(file_count + 1) # plus one so can be directly used in the following code when create folder for each communication round
-    
+        file_count = str(
+            file_count + 1
+        )  # plus one so can be directly used in the following code when create folder for each communication round
+
     except Exception as e:
         pass
 
-    #logging.info(f"saving reveived deltas...")
-    file_path = f"{model_path}/"+ file_count + ".pkl"
+    # logging.info(f"saving reveived deltas...")
+    file_path = f"{model_path}/" + file_count + ".pkl"
     with open(file_path, "wb") as file:
         pickle.dump(flattened_deltas_attacked, file)
-        pickle.dump(received_staleness,file)
+        pickle.dump(received_staleness, file)
+
+    logging.info(
+        "[Server #%d] Model saved to %s at round %s.",
+        os.getpid(),
+        file_path,
+        file_count,
+    )
 
 
-    logging.info("[Server #%d] Model saved to %s at round %s.", os.getpid(), file_path, file_count)
-
-
-
-def async_filter(baseline_weights,weights_attacked,deltas_attacked,received_ids,received_staleness):
+def async_filter(
+    baseline_weights,
+    weights_attacked,
+    deltas_attacked,
+    received_ids,
+    received_staleness,
+):
     # first group clients based on their staleness
     staleness_bound = Config().server.staleness_bound
     flattened_weights_attacked = flatten_weights(weights_attacked)
-    
-    # only for visualization
-    #pre_data_for_visualization(deltas_attacked, received_staleness)
 
-    file_path = "./async_record"+ str(os.getpid()) + ".pkl"
+    # only for visualization
+    # pre_data_for_visualization(deltas_attacked, received_staleness)
+
+    file_path = "./async_record" + str(os.getpid()) + ".pkl"
     if os.path.exists(file_path):
         logging.info(f"loading parameters from file.")
         with open(file_path, "rb") as file:
             global_weights_record = pickle.load(file)
             global_num_record = pickle.load(file)
-    else: 
+    else:
         global_weights_record = []
         global_num_record = []
 
     weight_groups = {i: [] for i in range(20)}
-    id_groups= {i:[] for i in range(20)}
-    for i, (staleness,weights) in enumerate(zip (received_staleness, flattened_weights_attacked)):
+    id_groups = {i: [] for i in range(20)}
+    for i, (staleness, weights) in enumerate(
+        zip(received_staleness, flattened_weights_attacked)
+    ):
         weight_groups[staleness].append(weights)
         id_groups[staleness].append(i)
-    
+
     # calcuate cos_similarity within a group and identify statistical outliers
     all_mali_ids = []
-    avg_current = torch.zeros_like(torch.mean(weights,dim=0))
+    avg_current = torch.zeros_like(torch.mean(weights, dim=0))
     num_current = 0
     for staleness, weights in weight_groups.items():
-        if len(weights)>=3:
+        if len(weights) >= 3:
             weights = torch.stack(weights)
             # find out avg at the same round
             if staleness == 0:
-                avg = torch.mean(weights,dim=0) + 1e-10
+                avg = torch.mean(weights, dim=0) + 1e-10
                 avg_current = avg
                 num_current = len(weight_groups[0])
             else:
-                avg = (global_weights_record[-1*staleness]*global_num_record[-1*staleness] + torch.mean(weights,dim=0)*len(weight_groups[staleness])) / (global_num_record[-1*staleness]+len(weight_groups[staleness]))
+                avg = (
+                    global_weights_record[-1 * staleness]
+                    * global_num_record[-1 * staleness]
+                    + torch.mean(weights, dim=0) * len(weight_groups[staleness])
+                ) / (global_num_record[-1 * staleness] + len(weight_groups[staleness]))
                 # update record
-                global_weights_record[-1*staleness] = avg
-                global_num_record[-1*staleness] += len(weight_groups[staleness])
+                global_weights_record[-1 * staleness] = avg
+                global_num_record[-1 * staleness] += len(weight_groups[staleness])
 
             similarity = F.cosine_similarity(weights, avg).numpy()
             logging.info(f"Group %d cosine similarity: %s", staleness, similarity)
             # whether or not to normalization is a question
 
-            distance = torch.norm((avg - weights), dim=1).numpy() 
-            
-            distance = distance / np.sum(distance) #normalization
-            
+            distance = torch.norm((avg - weights), dim=1).numpy()
+
+            distance = distance / np.sum(distance)  # normalization
+
             logging.info("applying 3 clustering for comparison")
             malicious_ids2, clean_ids = detection_cos(distance)
-            
-            malicious_ids=malicious_ids2
-            
+
+            malicious_ids = malicious_ids2
+
             malicious_ids = [id_groups[staleness][id] for id in malicious_ids.tolist()]
             logging.info(f"malicious in this group: %s", malicious_ids)
             all_mali_ids.extend(malicious_ids)
@@ -294,10 +322,10 @@ def async_filter(baseline_weights,weights_attacked,deltas_attacked,received_ids,
     # save into local file
     global_weights_record.append(avg_current)
     global_num_record.append(num_current)
-    file_path = "./async_record"+ str(os.getpid()) + ".pkl"
+    file_path = "./async_record" + str(os.getpid()) + ".pkl"
     with open(file_path, "wb") as file:
         pickle.dump(global_weights_record, file)
-        pickle.dump(global_num_record,file)
+        pickle.dump(global_num_record, file)
 
     # remove suspecious weights
     clean_weights = []
@@ -305,12 +333,19 @@ def async_filter(baseline_weights,weights_attacked,deltas_attacked,received_ids,
         if i not in all_mali_ids:
             clean_weights.append(weight)
 
-    return all_mali_ids,clean_weights
+    return all_mali_ids, clean_weights
 
-def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_ids,received_staleness):
-    #https://arxiv.org/pdf/2207.09209.pdf
+
+def fl_detector(
+    baseline_weights,
+    weights_attacked,
+    deltas_attacked,
+    received_ids,
+    received_staleness,
+):
+    # https://arxiv.org/pdf/2207.09209.pdf
     # torch.set_printoptions(threshold=10**8)
-    #malicious_ids_list = [] # for test case only, will be remove after finished
+    # malicious_ids_list = [] # for test case only, will be remove after finished
 
     clean_weights = weights_attacked
 
@@ -318,12 +353,14 @@ def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_id
     flattened_baseline_weights = flatten_weight(baseline_weights)
     flattened_deltas_attacked = flatten_weights(deltas_attacked)
     id_temp = [x - 1 for x in received_ids]
-    local_update_current = torch.stack([x[1] for x in sorted(zip(id_temp, flattened_deltas_attacked))])
+    local_update_current = torch.stack(
+        [x[1] for x in sorted(zip(id_temp, flattened_deltas_attacked))]
+    )
 
     window_size = 0
     malicious_ids = []
 
-    file_path = "./record"+ str(os.getpid()) + ".pkl"
+    file_path = "./record" + str(os.getpid()) + ".pkl"
     if os.path.exists(file_path):
         logging.info(f"loading parameters from file.")
         with open(file_path, "rb") as file:
@@ -334,19 +371,19 @@ def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_id
             last_weights = pickle.load(file)
             last_gradients = pickle.load(file)
             malicious_score_dict = pickle.load(file)
-            
-        # get weights for received clients at this round only 
+
+        # get weights for received clients at this round only
         malicious_score = []
-        #last_move = []
+        # last_move = []
         for received_id in received_ids:
-            #last_move.append(last_move_dict[received_id]) # for avg
-            malicious_score.append(list(filter(lambda x: x is not None, malicious_score_dict[received_id]))) # for fldetector
-        
-        moving_avg = torch.mean(flattened_deltas_attacked,dim=0) + 1e-10 # for avg
-       
+            # last_move.append(last_move_dict[received_id]) # for avg
+            malicious_score.append(
+                list(filter(lambda x: x is not None, malicious_score_dict[received_id]))
+            )  # for fldetector
+
+        moving_avg = torch.mean(flattened_deltas_attacked, dim=0) + 1e-10  # for avg
 
         if len(global_weights_record) >= window_size + 1:
-
             """Below are fldetector"""
             # Make predication by Cauchy mean value theorem in fldetector
             hvp = lbfgs(
@@ -355,9 +392,9 @@ def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_id
                 gradients_record,
                 last_weights,
             )
-            
+
             pred_grad = torch.add(last_gradients, hvp)
-            
+
             # Calculate distance for scoring
             distance1 = torch.norm(
                 (pred_grad - flattened_deltas_attacked), dim=1
@@ -370,11 +407,13 @@ def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_id
             # add new distance score into malicious score record
             # moving averaging
             malicious_score_current = []
-            for scores, dist in zip(malicious_score, distance1): 
+            for scores, dist in zip(malicious_score, distance1):
                 scores.append(dist)
-                score = sum(scores)/len(scores)
+                score = sum(scores) / len(scores)
                 malicious_score_current.append(score)
-            logging.info(f"the malicious score current round: %s", malicious_score_current)
+            logging.info(
+                f"the malicious score current round: %s", malicious_score_current
+            )
             # cluserting and detection (smaller score represents benign clients)
             malicious_ids, clean_ids = detection(
                 np.array(malicious_score_current)
@@ -392,22 +431,26 @@ def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_id
         gradients_record = []
         last_gradients = torch.zeros(len(flattened_baseline_weights))
         last_weights = torch.zeros(len(flattened_baseline_weights))
-        malicious_score_dict = {client_id + 1: [] for client_id in range(Config().clients.total_clients)}#len(received_ids)*[0]
-        distance1 = len(received_ids)*[None] # none to keep update consistent
-        
+        malicious_score_dict = {
+            client_id + 1: [] for client_id in range(Config().clients.total_clients)
+        }  # len(received_ids)*[0]
+        distance1 = len(received_ids) * [None]  # none to keep update consistent
+
     # update record
-    for index, received_id in enumerate(received_ids): #self_consistency_pre):
-        malicious_score_dict[received_id].append(distance1[index]) # distance should be initialized (this one is for fldetector)
+    for index, received_id in enumerate(received_ids):  # self_consistency_pre):
+        malicious_score_dict[received_id].append(
+            distance1[index]
+        )  # distance should be initialized (this one is for fldetector)
 
     global_weights_record.append(flattened_baseline_weights - last_weights)
     gradients_record.append(
         torch.mean(flattened_deltas_attacked, dim=0) - last_gradients
     )
     last_weights = flattened_baseline_weights
-    last_gradients= torch.mean(flattened_deltas_attacked, dim=0) 
-     
+    last_gradients = torch.mean(flattened_deltas_attacked, dim=0)
+
     # save into local file
-    file_path = "./record"+ str(os.getpid()) + ".pkl"
+    file_path = "./record" + str(os.getpid()) + ".pkl"
     with open(file_path, "wb") as file:
         pickle.dump(global_weights_record, file)
         pickle.dump(gradients_record, file)
@@ -417,7 +460,8 @@ def fl_detector(baseline_weights, weights_attacked, deltas_attacked, received_id
     logging.info(f"malicious_ids: %s", malicious_ids)
     return malicious_ids, clean_weights
 
+
 registered_detectors = {
     "FLDetector": fl_detector,
-    "AsyncFilter":async_filter,
+    "AsyncFilter": async_filter,
 }

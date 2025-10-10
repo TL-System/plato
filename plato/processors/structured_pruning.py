@@ -41,21 +41,15 @@ class Processor(model.Processor):
                         module, "weight", self.amount, n=self.norm, dim=self.dim
                     )
                 elif self.pruning_method == "random":
-                    prune.random_structured(
-                        module, "weight", self.amount, dim=self.dim
-                    )
+                    prune.random_structured(module, "weight", self.amount, dim=self.dim)
                 prune.remove(module, "weight")
 
         output = self.model.cpu().state_dict()
 
         if self.client_id is None:
-            logging.info(
-                "[Server #%d] Structured pruning applied.", self.server_id
-            )
+            logging.info("[Server #%d] Structured pruning applied.", self.server_id)
         else:
-            logging.info(
-                "[Client #%d] Structured pruning applied.", self.client_id
-            )
+            logging.info("[Client #%d] Structured pruning applied.", self.client_id)
 
         return output
 

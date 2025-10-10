@@ -1,6 +1,7 @@
 """
 A self-supervised federated learning trainer with BYOL.
 """
+
 from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
 

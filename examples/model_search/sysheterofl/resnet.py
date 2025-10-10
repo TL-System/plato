@@ -1,6 +1,7 @@
 """
 In HeteroFL, the model needs to specifically designed to fit in the algorithm.
 """
+
 import numpy as np
 from torch import nn
 import torch.nn.functional as F

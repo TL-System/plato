@@ -60,23 +60,17 @@ def train_attack_model(shadow_model, in_dataloader, out_dataloader):
 
     att_X = np.vstack((pred_4_mem, pred_4_nonmem))
     att_X.sort(axis=1)
-    att_y = np.hstack(
-        (np.ones(pred_4_mem.shape[0]), np.zeros(pred_4_nonmem.shape[0]))
-    )
+    att_y = np.hstack((np.ones(pred_4_mem.shape[0]), np.zeros(pred_4_nonmem.shape[0])))
     att_y = att_y.astype(np.int16)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        att_X, att_y, test_size=0.1
-    )
+    X_train, X_test, y_train, y_test = train_test_split(att_X, att_y, test_size=0.1)
 
     attacker.fit(X_train, y_train)
 
     return attacker
 
 
-def launch_attack(
-    target_model, attack_model, attack_dataloader, out_dataloader
-):
+def launch_attack(target_model, attack_model, attack_dataloader, out_dataloader):
     """Launch attack toward the target model."""
     logging.info("Launching attack")
 

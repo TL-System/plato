@@ -74,9 +74,7 @@ class Algorithm(fedavg.Algorithm):
         """Extract the weights received from a client and compute the deltas."""
         # Extract baseline model weights
         if cluster_id is None:
-            return super().compute_weight_deltas(
-                baseline_weights, weights_received
-            )
+            return super().compute_weight_deltas(baseline_weights, weights_received)
         else:
             baseline_weights = self.extract_weights(
                 client_id=self.get_client_id(cluster_id)

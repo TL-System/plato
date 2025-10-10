@@ -46,9 +46,7 @@ class Trainer(basic.Trainer):
                 self.gradient[name] = torch.zeros(state_dict[name].shape)
 
         model_type = config["model_name"]
-        filename = (
-            f"{model_type}_gradient_{self.client_id}_{config['run_id']}.pth"
-        )
+        filename = f"{model_type}_gradient_{self.client_id}_{config['run_id']}.pth"
 
         self._save_gradient(filename)
 
@@ -62,9 +60,7 @@ class Trainer(basic.Trainer):
 
     def _save_gradient(self, filename=None, location=None):
         """Saving the gradients to a file."""
-        model_path = (
-            Config().params["model_path"] if location is None else location
-        )
+        model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
         try:
@@ -82,9 +78,7 @@ class Trainer(basic.Trainer):
 
     def _load_gradient(self, filename=None, location=None):
         """Load gradients from a file."""
-        model_path = (
-            Config().params["model_path"] if location is None else location
-        )
+        model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:

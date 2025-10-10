@@ -24,7 +24,8 @@ from plato.models.multimodal import fc_net
 
 
 class ConcatFusionNet(nn.Module):
-    """ This supports concat the features of different modalities to one vector"""
+    """This supports concat the features of different modalities to one vector"""
+
     def __init__(self, support_modalities, modalities_fea_dim, net_configs):
         super(ConcatFusionNet, self).__init__()
 
@@ -66,7 +67,7 @@ class ConcatFusionNet(nn.Module):
         return fused_feat
 
     def forward(self, fused_features, gt_labels, return_loss):
-        """ Forward the network """
+        """Forward the network"""
         fused_cls_score = self._fuse_net(fused_features)
 
         if return_loss:

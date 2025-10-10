@@ -1,6 +1,7 @@
 """
 A self-supervised federated learning trainer with SMoG.
 """
+
 import os
 
 import torch

@@ -5,6 +5,7 @@ federated learning server.
 Having a registry of all available classes is convenient for retrieving an
 instance based on a configuration at run-time.
 """
+
 import logging
 
 from plato.config import Config

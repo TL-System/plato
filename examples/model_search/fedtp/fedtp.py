@@ -13,6 +13,7 @@ arXiv preprint arXiv:2211.01572 (2022).
 
 https://arxiv.org/pdf/2211.01572v1.pdf.
 """
+
 import fedtp_server
 
 from plato.clients.simple import Client

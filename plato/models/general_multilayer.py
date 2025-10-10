@@ -19,6 +19,7 @@ Trick: One may just drop the Dropout (when you have BN) as BN eliminates the nee
 some cases, since intuitively BN provides similar regularization benefits as Dropout.
 
 """
+
 from typing import Union, Dict, List
 from collections import OrderedDict
 

@@ -183,7 +183,7 @@ class ViT(nn.Module):
         dropout=0.1,
         emb_dropout=0.1,
         model_rate=1.0,
-        configs=None
+        configs=None,
     ):
         super().__init__()
         image_height, image_width = pair(image_size)
@@ -196,9 +196,9 @@ class ViT(nn.Module):
         mlp_dim = int(mlp_dim * model_rate)
         dim_head = int(model_rate * dim_head)
 
-        assert (
-            image_height % patch_height == 0 and image_width % patch_width == 0
-        ), "Image dimensions must be divisible by the patch size."
+        assert image_height % patch_height == 0 and image_width % patch_width == 0, (
+            "Image dimensions must be divisible by the patch size."
+        )
 
         num_patches = (image_height // patch_height) * (image_width // patch_width)
         patch_dim = channels * patch_height * patch_width

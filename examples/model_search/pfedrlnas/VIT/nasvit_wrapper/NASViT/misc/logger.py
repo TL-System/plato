@@ -89,5 +89,3 @@ def get_default_logger(name):
         logger.addHandler(ch)
 
     return logger
-
-

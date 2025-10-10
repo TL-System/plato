@@ -8,6 +8,7 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 
 https://arxiv.org/pdf/1910.06378.pdf
 """
+
 from collections import OrderedDict
 
 from plato.config import Config
@@ -43,7 +44,9 @@ class Server(fedavg.Server):
         # Update server control variate
         for client_control_variate_delta in self.received_client_control_variates:
             for name, param in client_control_variate_delta.items():
-                self.server_control_variate[name] += param.cpu() * (1 / Config().clients.total_clients)
+                self.server_control_variate[name] += param.cpu() * (
+                    1 / Config().clients.total_clients
+                )
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."

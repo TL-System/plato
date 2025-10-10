@@ -2,12 +2,13 @@
 Finetune HuggingFace large language models using split learning and implement the Unsplit attack.
 
 Reference of Unsplit  attack:
-E. Erdoğan, A. Küpçü, and A. Çiçek, "UnSplit: Data-Oblivious Model Inversion, 
+E. Erdoğan, A. Küpçü, and A. Çiçek, "UnSplit: Data-Oblivious Model Inversion,
 Model Stealing, and Label Inference Attacks against Split Learning," in
 proceedings of the 21st Workshop on Privacy in the Electronic Society (WPES'22),
-Association for Computing Machinery, New York, NY, USA, 
+Association for Computing Machinery, New York, NY, USA,
 115–124. https://doi.org/10.1145/3559613.3563201.
 """
+
 from split_learning_trainer_attack import CuriousTrainer, HonestTrainer
 from split_learning_llm_model import ClientModel
 from split_learning_llm_model_attack import ServerModelCurious

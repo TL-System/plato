@@ -10,14 +10,14 @@ Unpublished
 
 import os
 
-os.environ['config_file'] = 'attack-adaptive_MNIST_lenet5.yml'
+os.environ["config_file"] = "attack-adaptive_MNIST_lenet5.yml"
 
 import attack_adaptive_server
 
 
 def main():
-    """ A Plato federated learning training session using the attack-adaptive
-    federation algorithm. """
+    """A Plato federated learning training session using the attack-adaptive
+    federation algorithm."""
     server = attack_adaptive_server.Server()
     server.run()
 

@@ -152,9 +152,9 @@ class Algorithm(fedavg.Algorithm):
                             : local_weights[key].shape[1],
                         ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 1:
-                        global_parameters[key][
-                            : local_weights[key].shape[0]
-                        ] += copy.deepcopy(local_weights[key])
+                        global_parameters[key][: local_weights[key].shape[0]] += (
+                            copy.deepcopy(local_weights[key])
+                        )
                         count[: local_weights[key].shape[0]] += torch.ones(
                             local_weights[key].shape
                         )

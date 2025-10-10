@@ -1,6 +1,7 @@
 """
 FjORD algorithm trainer.
 """
+
 import numpy as np
 
 from plato.config import Config
@@ -46,8 +47,6 @@ class Server(fedavg.Server):
         )
         return super().customize_server_response(server_response, client_id)
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         return self.algorithm.aggregation(weights_received)

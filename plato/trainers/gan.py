@@ -4,6 +4,7 @@ The training and testing loops for GAN models.
 Reference:
 https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 """
+
 import logging
 import math
 import os
@@ -270,8 +271,9 @@ class Trainer(basic.Trainer):
                 real_features.extend(list(feature_real))
                 fake_features.extend(list(feature_fake))
 
-            real_features, fake_features = np.stack(real_features), np.stack(
-                fake_features
+            real_features, fake_features = (
+                np.stack(real_features),
+                np.stack(fake_features),
             )
             # Calculate the Frechet Distance between the feature distribution
             # of real data from testset and the feature distribution of data

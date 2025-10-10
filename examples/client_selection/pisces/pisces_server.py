@@ -106,10 +106,9 @@ class Server(fedavg.Server):
     def weights_aggregated(self, updates):
         """Calculate client utility and update the record on the server"""
         for update in updates:
-            self.client_utilities[
-                update.client_id
-            ] = update.report.statistical_utility * self._calculate_staleness_factor(
-                update.client_id
+            self.client_utilities[update.client_id] = (
+                update.report.statistical_utility
+                * self._calculate_staleness_factor(update.client_id)
             )
 
             if self.robustness:

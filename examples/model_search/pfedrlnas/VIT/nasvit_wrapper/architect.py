@@ -1,6 +1,7 @@
 """
 NAS architect in PerFedRLNAS, a wrapper over the supernet.
 """
+
 import os
 import pickle
 import copy
@@ -64,7 +65,7 @@ class Architect(nn.Module):
         self.baseline = {}
         if Config().args.resume:
             # Use model_path if available, otherwise use default models/pretrained directory
-            if hasattr(Config().server, 'model_path'):
+            if hasattr(Config().server, "model_path"):
                 model_dir = Config().server.model_path
             else:
                 model_dir = "./models/pretrained"
@@ -89,7 +90,9 @@ class Architect(nn.Module):
         for index, client_id in enumerate(client_id_list):
             # Ensure gradient tensor exists before copying
             if self.alphas[client_id - 1].grad is None:
-                self.alphas[client_id - 1].grad = torch.zeros_like(self.alphas[client_id - 1])
+                self.alphas[client_id - 1].grad = torch.zeros_like(
+                    self.alphas[client_id - 1]
+                )
             self.alphas[client_id - 1].grad.copy_(grads[index])
             self.optimizers[client_id - 1].step()
             self.optimizers[client_id - 1].zero_grad()
@@ -102,8 +105,7 @@ class Architect(nn.Module):
             for edge_idx in range(len(self.stop_index) - 1):
                 prob = F.softmax(
                     alpha[
-                        self.stop_index[edge_idx]
-                        + 1 : self.stop_index[edge_idx + 1]
+                        self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx + 1]
                         + 1
                     ],
                     dim=-1,
@@ -116,7 +118,7 @@ class Architect(nn.Module):
                 client_grad[index[edge_idx]] = index_prob - 1
                 grad[
                     self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx + 1] + 1
-                ] += (reward * client_grad)
+                ] += reward * client_grad
             grads.append(grad)
         return grads
 
@@ -162,8 +164,7 @@ class Architect(nn.Module):
             for edge_idx in range(len(self.stop_index) - 1):
                 prob = F.softmax(
                     alpha[
-                        self.stop_index[edge_idx]
-                        + 1 : self.stop_index[edge_idx + 1]
+                        self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx + 1]
                         + 1
                     ],
                     dim=-1,
@@ -179,9 +180,9 @@ class Architect(nn.Module):
                     finverse = torch.pinverse(
                         torch.matmul(dalpha, torch.transpose(dalpha, 0, 1))
                     )
-                grad[
-                    self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx] + 1
-                ] += reward * torch.matmul(finverse, client_grad)
+                grad[self.stop_index[edge_idx] + 1 : self.stop_index[edge_idx] + 1] += (
+                    reward * torch.matmul(finverse, client_grad)
+                )
             grads.append(grad)
         return grads
 
@@ -254,8 +255,9 @@ class Architect(nn.Module):
                     - self.stop_index[stop_index_point - 1]
                 )
                 prob = alpha[
-                    self.stop_index[stop_index_point - 1]
-                    + 1 : self.stop_index[stop_index_point]
+                    self.stop_index[stop_index_point - 1] + 1 : self.stop_index[
+                        stop_index_point
+                    ]
                     + 1
                 ]
                 candidate_list.append(candidate_candidate[self.get_index(prob, length)])

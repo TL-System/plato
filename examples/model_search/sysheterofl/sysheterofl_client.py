@@ -1,6 +1,7 @@
 """
 The client for paper system-heterogenous federated learning through architecture search.
 """
+
 from plato.config import Config
 from plato.clients import simple
 

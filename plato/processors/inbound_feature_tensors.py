@@ -29,9 +29,7 @@ class Processor(base.Processor):
         for logit, target in data:
             # Uses torch.as_tensor() as opposed to torch.tensor() to avoid data copying
             # according to https://pytorch.org/docs/stable/generated/torch.tensor.html
-            feature_dataset.append(
-                (torch.as_tensor(logit), torch.as_tensor(target))
-            )
+            feature_dataset.append((torch.as_tensor(logit), torch.as_tensor(target)))
 
         logging.info(
             "[Server #%d] Features converted from ndarrays to PyTorch tensors.",

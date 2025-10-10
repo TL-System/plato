@@ -1,7 +1,8 @@
 """
-An LLM model on the server which has certain hack functions helping recover the 
+An LLM model on the server which has certain hack functions helping recover the
     private data on the clients
 """
+
 import logging
 import torch
 from transformers import AutoModelForCausalLM

@@ -1,6 +1,7 @@
 """
 A federated learning training session using FEI.
 """
+
 import logging
 
 import fei_agent
@@ -9,7 +10,7 @@ import fei_server
 
 
 def main():
-    """ A Plato federated learning training session using the FEI algorithm. """
+    """A Plato federated learning training session using the FEI algorithm."""
     logging.info("Starting RL Environment's process.")
     client = fei_client.Client()
     agent = fei_agent.RLAgent()

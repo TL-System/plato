@@ -17,9 +17,7 @@ class Server(fedavg.Server):
     """The federated learning server using the FedAtt algorithm."""
 
     # pylint: disable=unused-argument
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate weight updates from the clients using FedAtt."""
         return await self.algorithm.aggregate_weights(
             baseline_weights, weights_received

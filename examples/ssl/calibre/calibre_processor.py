@@ -1,6 +1,7 @@
 """
 An outbound prossor for Calibre algorithm to save the divergence on the client locally.
 """
+
 import os
 import logging
 from typing import OrderedDict

@@ -49,8 +49,8 @@ def profile(model, input_size=(1, 3, 224, 224), custom_ops=None):
         if len(list(m_.children())) > 0:
             return
 
-        m_.register_buffer('total_ops', torch.zeros(1))
-        m_.register_buffer('total_params', torch.zeros(1))
+        m_.register_buffer("total_ops", torch.zeros(1))
+        m_.register_buffer("total_params", torch.zeros(1))
 
         for p in m_.parameters():
             m_.total_params += torch.Tensor([p.numel()])
@@ -107,6 +107,4 @@ def count_net_flops_and_params(net, data_shape=(1, 3, 224, 224)):
 
     net = copy.deepcopy(net)
     flop, nparams = profile(net, data_shape)
-    return flop /1e6, nparams /1e6
-
-
+    return flop / 1e6, nparams / 1e6

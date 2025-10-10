@@ -5,6 +5,7 @@ import torch.nn as nn
 
 from .activations import *
 
+
 def make_divisible(v, divisor=8, min_value=1):
     """
     forked from slim:
@@ -44,18 +45,17 @@ def int2list(val, repeat_time=1):
         return [val for _ in range(repeat_time)]
 
 
-
 def get_same_padding(kernel_size):
     if isinstance(kernel_size, tuple):
-        assert len(kernel_size) == 2, 'invalid kernel size: %s' % kernel_size
+        assert len(kernel_size) == 2, "invalid kernel size: %s" % kernel_size
         p1 = get_same_padding(kernel_size[0])
         p2 = get_same_padding(kernel_size[1])
         return p1, p2
 
     if kernel_size == 2:
         return 0
-    assert isinstance(kernel_size, int), 'kernel size should be either `int` or `tuple`'
-    assert kernel_size % 2 > 0, 'kernel size should be odd number'
+    assert isinstance(kernel_size, int), "kernel size should be either `int` or `tuple`"
+    assert kernel_size % 2 > 0, "kernel size should be odd number"
     return kernel_size // 2
 
 
@@ -69,36 +69,36 @@ def copy_bn(target_bn, src_bn):
 
 
 def build_activation(act_func, inplace=True):
-    if act_func == 'relu':
+    if act_func == "relu":
         return nn.ReLU(inplace=inplace)
-    elif act_func == 'relu6':
+    elif act_func == "relu6":
         return nn.ReLU6(inplace=inplace)
-    elif act_func == 'tanh':
+    elif act_func == "tanh":
         return nn.Tanh()
-    elif act_func == 'sigmoid':
+    elif act_func == "sigmoid":
         return nn.Sigmoid()
-    elif act_func == 'h_swish':
+    elif act_func == "h_swish":
         return Hswish(inplace=inplace)
-    elif act_func == 'h_sigmoid':
+    elif act_func == "h_sigmoid":
         return Hsigmoid(inplace=inplace)
-    elif act_func == 'swish':
+    elif act_func == "swish":
         return MemoryEfficientSwish()
     elif act_func is None:
         return None
     else:
-        raise ValueError('do not support: %s' % act_func)
+        raise ValueError("do not support: %s" % act_func)
 
 
 def drop_connect(inputs, p, training):
     """Drop connect.
-        Args:
-            input (tensor: BCWH): Input of this structure.
-            p (float: 0.0~1.0): Probability of drop connection.
-            training (bool): The running mode.
-        Returns:
-            output: Output after drop connection.
+    Args:
+        input (tensor: BCWH): Input of this structure.
+        p (float: 0.0~1.0): Probability of drop connection.
+        training (bool): The running mode.
+    Returns:
+        output: Output after drop connection.
     """
-    assert 0 <= p <= 1, 'p must be in range of [0,1]'
+    assert 0 <= p <= 1, "p must be in range of [0,1]"
     if not training:
         return inputs
     batch_size = inputs.shape[0]
@@ -106,10 +106,10 @@ def drop_connect(inputs, p, training):
 
     # generate binary_tensor mask according to probability (p for 0, 1-p for 1)
     random_tensor = keep_prob
-    random_tensor += torch.rand([batch_size, 1, 1, 1], dtype=inputs.dtype, device=inputs.device)
+    random_tensor += torch.rand(
+        [batch_size, 1, 1, 1], dtype=inputs.dtype, device=inputs.device
+    )
     binary_tensor = torch.floor(random_tensor)
 
     output = inputs / keep_prob * binary_tensor
     return output
-
-

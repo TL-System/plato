@@ -62,9 +62,7 @@ class Server(fedavg.Server):
         learned_indices = []
         unlearned_indices = []
         for c in self.sample_indices.values():
-            learned_indices += list(
-                set(c["learned_indices"]) - set(learned_indices)
-            )
+            learned_indices += list(set(c["learned_indices"]) - set(learned_indices))
             unlearned_indices += list(
                 set(c["unlearned_indices"]) - set(unlearned_indices)
             )
@@ -72,9 +70,7 @@ class Server(fedavg.Server):
         gen = torch.Generator()
         gen.manual_seed(Config().data.random_seed)
         learned_sampler = SubsetRandomSampler(learned_indices, generator=gen)
-        unlearned_sampler = SubsetRandomSampler(
-            unlearned_indices, generator=gen
-        )
+        unlearned_sampler = SubsetRandomSampler(unlearned_indices, generator=gen)
 
         # Member data, i.e., data seen so far by clients
         learned_dataloader = torch.utils.data.DataLoader(
@@ -105,9 +101,7 @@ class Server(fedavg.Server):
             shadow_model, learned_dataloader, out_dataloader
         )
 
-        launch_attack(
-            target_model, attack_model, unlearned_dataloader, out_dataloader
-        )
+        launch_attack(target_model, attack_model, unlearned_dataloader, out_dataloader)
 
     def get_shadow_model(self):
         """Load the shadow model, which is the current global model in this case."""

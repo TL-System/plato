@@ -1,7 +1,7 @@
 """
 An implementation of the SMoG algorithm.
 
-B. Pang, et al., "Unsupervised Visual Representation Learning by Synchronous Momentum Grouping," ECCV, 2022. 
+B. Pang, et al., "Unsupervised Visual Representation Learning by Synchronous Momentum Grouping," ECCV, 2022.
 
 https://arxiv.org/pdf/2006.07733.pdf
 """

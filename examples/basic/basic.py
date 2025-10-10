@@ -3,6 +3,7 @@ This example uses a very simple model and the MNIST dataset to show how the mode
 the training and validation datasets, as well as the training and testing loops can
 be customized in Plato.
 """
+
 from functools import partial
 
 import torch

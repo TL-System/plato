@@ -75,7 +75,7 @@ from plato.datasources.datalib import flickr30kE_utils
 
 
 def collate_fn(batch):
-    """ The construction of the loaded batch of data
+    """The construction of the loaded batch of data
 
     Args:
         batch (list): [a list in which each element contains the data for one task,
@@ -89,16 +89,18 @@ def collate_fn(batch):
 
 
 class Flickr30KEDataset(multimodal_base.MultiModalDataset):
-    """ Prepare the Flickr30K Entities dataset."""
+    """Prepare the Flickr30K Entities dataset."""
 
-    def __init__(self,
-                 dataset_info,
-                 phase,
-                 phase_info,
-                 data_types,
-                 modality_sampler=None,
-                 transform_image_dec_func=None,
-                 transform_text_func=None):
+    def __init__(
+        self,
+        dataset_info,
+        phase,
+        phase_info,
+        data_types,
+        modality_sampler=None,
+        transform_image_dec_func=None,
+        transform_text_func=None,
+    ):
         super().__init__()
 
         self.phase = phase
@@ -108,8 +110,7 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         self.transform_image_dec_func = transform_image_dec_func
         self.transform_text_func = transform_text_func
 
-        self.phase_samples_name = list(
-            self.phase_multimodal_data_record.keys())
+        self.phase_samples_name = list(self.phase_multimodal_data_record.keys())
 
         self.supported_modalities = ["rgb", "text"]
 
@@ -123,48 +124,61 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         return len(self.phase_multimodal_data_record)
 
     def get_sample_image_data(self, image_id):
-        """ Get one image data as the sample """
+        """Get one image data as the sample"""
         # get the image data
         image_phase_path = self.phase_info[self.data_types[0]]["path"]
         image_phase_format = self.phase_info[self.data_types[0]]["format"]
 
         image_data = io.imread(
-            os.path.join(image_phase_path,
-                         str(image_id) + image_phase_format))
+            os.path.join(image_phase_path, str(image_id) + image_phase_format)
+        )
         image_data = cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB)
 
         return image_data
 
     def extract_sample_anno_data(self, image_anno_sent):
-        """ Extract the annotation. """
+        """Extract the annotation."""
         sentence = image_anno_sent["sentence"]  # a string
         sentence_phrases = image_anno_sent["sentence_phrases"]  # a list
         sentence_phrases_type = image_anno_sent[
-            "sentence_phrases_type"]  # a nested list
+            "sentence_phrases_type"
+        ]  # a nested list
         sentence_phrases_id = image_anno_sent["sentence_phrases_id"]  # a list
         sentence_phrases_boxes = image_anno_sent[
-            "sentence_phrases_boxes"]  # a nested list
+            "sentence_phrases_boxes"
+        ]  # a nested list
 
-        return sentence, sentence_phrases, sentence_phrases_type, \
-                sentence_phrases_id, sentence_phrases_boxes
+        return (
+            sentence,
+            sentence_phrases,
+            sentence_phrases_type,
+            sentence_phrases_id,
+            sentence_phrases_boxes,
+        )
 
     def get_one_multimodal_sample(self, sample_idx):
-        """ Obtain one sample from the Flickr30K Entities dataset. """
+        """Obtain one sample from the Flickr30K Entities dataset."""
         samle_retrieval_name = self.phase_samples_name[sample_idx]
         image_file_name = os.path.basename(samle_retrieval_name)
         image_id = os.path.splitext(image_file_name)[0]
 
         image_data = self.get_sample_image_data(image_id)
 
-        image_anno_sent = self.phase_multimodal_data_record[
-            samle_retrieval_name]
+        image_anno_sent = self.phase_multimodal_data_record[samle_retrieval_name]
 
-        sentence, sentence_phrases, \
-            sentence_phrases_type, sentence_phrases_id, \
-            sentence_phrases_boxes = self.extract_sample_anno_data(image_anno_sent)
+        (
+            sentence,
+            sentence_phrases,
+            sentence_phrases_type,
+            sentence_phrases_id,
+            sentence_phrases_boxes,
+        ) = self.extract_sample_anno_data(image_anno_sent)
 
-        caption = sentence if any(isinstance(iter_i, list) for iter_i in sentence) \
-                                            else [[sentence]]
+        caption = (
+            sentence
+            if any(isinstance(iter_i, list) for iter_i in sentence)
+            else [[sentence]]
+        )
         flatten_caption_phrase_bboxs = [
             box for boxes in sentence_phrases_boxes for box in boxes
         ]
@@ -174,17 +188,18 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         caption_phrases_cate_id = sentence_phrases_id
 
         if self.transform_image_dec_func is not None:
-
             transformed = self.transform_image_dec_func(
                 image=image_data,
                 bboxes=flatten_caption_phrase_bboxs,
-                category_ids=range(len(flatten_caption_phrase_bboxs)))
+                category_ids=range(len(flatten_caption_phrase_bboxs)),
+            )
 
             image_data = transformed["image"]
             image_data = torch.from_numpy(image_data)
             flatten_caption_phrase_bboxs = transformed["bboxes"]
             caption_phrase_bboxs = flickr30kE_utils.phrase_boxes_alignment(
-                flatten_caption_phrase_bboxs, sentence_phrases_boxes)
+                flatten_caption_phrase_bboxs, sentence_phrases_boxes
+            )
 
         else:
             caption_phrase_bboxs = sentence_phrases_boxes
@@ -196,13 +211,14 @@ class Flickr30KEDataset(multimodal_base.MultiModalDataset):
         box_data = BoxData(caption_phrase_bboxs=caption_phrase_bboxs)
         taget_data = TargetData(
             caption_phrases_cate=caption_phrases_cate,
-            caption_phrases_cate_id=caption_phrases_cate_id)
+            caption_phrases_cate_id=caption_phrases_cate_id,
+        )
 
         return {
             "rgb": image_data,
             "text": text_data,
             "box": box_data,
-            "target": taget_data
+            "target": taget_data,
         }
 
 
@@ -216,7 +232,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         self.modality_names = ["image", "text"]
 
-        _path = Config().params['data_path']
+        _path = Config().params["data_path"]
         self._data_path_process(data_path=_path, base_data_name=self.data_name)
 
         raw_data_name = self.data_name + "Raw"
@@ -224,9 +240,11 @@ class DataSource(multimodal_base.MultiModalDataSource):
 
         download_url = Config().data.download_url
 
-        self._download_arrange_data(download_url_address=download_url,
-                                    data_path=base_data_path,
-                                    extract_to_dir=base_data_path)
+        self._download_arrange_data(
+            download_url_address=download_url,
+            data_path=base_data_path,
+            extract_to_dir=base_data_path,
+        )
 
         # define the path of different data source,
         #   the annotation is .xml, the sentence is in .txt
@@ -239,41 +257,42 @@ class DataSource(multimodal_base.MultiModalDataSource):
             raw_file_format = self.raw_data_file_format[raw_type_idx]
             data_type = self.data_types[raw_type_idx]
 
-            raw_type_path = os.path.join(base_data_path, raw_data_name,
-                                         raw_type)
+            raw_type_path = os.path.join(base_data_path, raw_data_name, raw_type)
 
             self.mm_data_info[data_type] = dict()
             self.mm_data_info[data_type]["path"] = raw_type_path
             self.mm_data_info[data_type]["format"] = raw_file_format
-            self.mm_data_info[data_type]["num_samples"] = len(
-                os.listdir(raw_type_path))
+            self.mm_data_info[data_type]["num_samples"] = len(os.listdir(raw_type_path))
 
         # generate path/type information for splits
         for split_type in list(self.splits_info.keys()):
             self.splits_info[split_type]["split_file"] = os.path.join(
-                base_data_path, raw_data_name, split_type + ".txt")
+                base_data_path, raw_data_name, split_type + ".txt"
+            )
             split_path = self.splits_info[split_type]["path"]
             for dt_type_idx, dt_type in enumerate(self.data_types):
                 dt_type_format = self.raw_data_file_format[dt_type_idx]
 
                 self.splits_info[split_type][dt_type] = dict()
                 self.splits_info[split_type][dt_type]["path"] = os.path.join(
-                    split_path, ("{}_{}").format(split_type, dt_type))
-                self.splits_info[split_type][dt_type][
-                    "format"] = dt_type_format
+                    split_path, ("{}_{}").format(split_type, dt_type)
+                )
+                self.splits_info[split_type][dt_type]["format"] = dt_type_format
 
         # distribution data to splits
         self.create_splits_data()
 
         # generate the splits information txt for further utilization
-        flickr30kE_utils.integrate_data_to_json(splits_info=self.splits_info,
-                                                mm_data_info=self.mm_data_info,
-                                                data_types=self.data_types,
-                                                split_wise=True,
-                                                globally=True)
+        flickr30kE_utils.integrate_data_to_json(
+            splits_info=self.splits_info,
+            mm_data_info=self.mm_data_info,
+            data_types=self.data_types,
+            split_wise=True,
+            globally=True,
+        )
 
     def create_splits_data(self):
-        """ Create datasets for different splits """
+        """Create datasets for different splits"""
         # saveing the images and entities to the corresponding directory
         for split_type in list(self.splits_info.keys()):
             logging.info("Creating split %s data..........", split_type)
@@ -282,16 +301,13 @@ class DataSource(multimodal_base.MultiModalDataSource):
             split_info_file = self.splits_info[split_type]["split_file"]
             with open(split_info_file, "r") as loaded_file:
                 split_data_samples = [
-                    sample_id.split("\n")[0]
-                    for sample_id in loaded_file.readlines()
+                    sample_id.split("\n")[0] for sample_id in loaded_file.readlines()
                 ]
-            self.splits_info[split_type]["num_samples"] = len(
-                split_data_samples)
+            self.splits_info[split_type]["num_samples"] = len(split_data_samples)
 
             # 1. create directory for the splited data if necessary
             for dt_type in self.data_types:
-                split_dt_type_path = self.splits_info[split_type][dt_type][
-                    "path"]
+                split_dt_type_path = self.splits_info[split_type][dt_type]["path"]
 
                 if not self._exists(split_dt_type_path):
                     os.makedirs(split_dt_type_path, exist_ok=True)
@@ -302,8 +318,7 @@ class DataSource(multimodal_base.MultiModalDataSource):
                 raw_data_type_path = self.mm_data_info[dt_type]["path"]
                 raw_data_format = self.mm_data_info[dt_type]["format"]
                 split_samples_path = [
-                    os.path.join(raw_data_type_path,
-                                 sample_id + raw_data_format)
+                    os.path.join(raw_data_type_path, sample_id + raw_data_format)
                     for sample_id in split_data_samples
                 ]
                 # 2. saving the splited data into the target file
@@ -312,33 +327,35 @@ class DataSource(multimodal_base.MultiModalDataSource):
         logging.info("Done.")
 
     def get_phase_data_info(self, phase):
-        """ Obtain the data information for the required phrase """
+        """Obtain the data information for the required phrase"""
         path = self.splits_info[phase]["path"]
         save_path = os.path.join(path, phase + "_integrated_data.json")
-        with open(save_path, 'r') as outfile:
+        with open(save_path, "r") as outfile:
             phase_data_info = json.load(outfile)
         return phase_data_info
 
     def get_phase_dataset(self, phase, modality_sampler):
-        """ Obtain the dataset for the specific phase """
+        """Obtain the dataset for the specific phase"""
         phase_data_info = self.get_phase_data_info(phase)
         phase_split_info = self.splits_info[phase]
-        dataset = Flickr30KEDataset(dataset_info=phase_data_info,
-                                    phase_info=phase_split_info,
-                                    data_types=self.data_types,
-                                    phase=phase,
-                                    modality_sampler=modality_sampler)
+        dataset = Flickr30KEDataset(
+            dataset_info=phase_data_info,
+            phase_info=phase_split_info,
+            data_types=self.data_types,
+            phase=phase,
+            modality_sampler=modality_sampler,
+        )
         return dataset
 
     def get_train_set(self, modality_sampler=None):
-        """ Obtains the training dataset. """
+        """Obtains the training dataset."""
         phase = "train"
 
         self.trainset = self.get_phase_dataset(phase, modality_sampler)
         return self.trainset
 
     def get_test_set(self, modality_sampler=None):
-        """ Obtains the validation dataset. """
+        """Obtains the validation dataset."""
         phase = "test"
 
         self.testset = self.get_phase_dataset(phase, modality_sampler)

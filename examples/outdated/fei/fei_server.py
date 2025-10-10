@@ -1,6 +1,7 @@
 """
 A federated learning server with RL Agent FEI.
 """
+
 import numpy as np
 from plato.config import Config
 from plato.utils.reinforcement_learning import rl_server

@@ -1,6 +1,7 @@
 """
 Obtaining the loss criterion for training workloads according to the configuration file.
 """
+
 from typing import Union
 
 from torch import nn

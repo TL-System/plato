@@ -8,7 +8,7 @@ This sampler can introduce the hardest non-IID data scenarios because it contain
         The number of classes contained in clients follows the Dirichlet distribution
         that is parameterized by the "label_concentration".
     - Quantity skewness - equals to the sampler called "sample_quantity_noniid.py".
-	    The local dataset sizes of clients follow the  Dirichlet distribution that is
+            The local dataset sizes of clients follow the  Dirichlet distribution that is
         parameterized by the "client_quantity_concentration".
 
     For example,
@@ -34,6 +34,7 @@ This sampler can introduce the hardest non-IID data scenarios because it contain
                 ...
                 clientN 1       50      1      1      1
 """
+
 import numpy as np
 import torch
 

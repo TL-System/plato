@@ -15,9 +15,7 @@ class Processor(feature.Processor):
     Implements a Processor for applying quantization to MistNet PyTorch features.
     """
 
-    def __init__(
-        self, scale=0.1, zero_point=10, dtype=torch.quint8, **kwargs
-    ) -> None:
+    def __init__(self, scale=0.1, zero_point=10, dtype=torch.quint8, **kwargs) -> None:
         def func(logits, targets):
             logits = torch.quantize_per_tensor(logits, scale, zero_point, dtype)
             return logits, targets

@@ -1,6 +1,7 @@
 """
 The training loop that takes place on clients of FedSCR.
 """
+
 from collections import OrderedDict
 
 import copy
@@ -247,7 +248,7 @@ class Trainer(basic.Trainer):
             delta += torch.sum(tensor).numpy()
 
         model = self.model.named_modules()
-        for (__, module) in model:
+        for __, module in model:
             if isinstance(module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
                 tensor = module.weight.data.cpu()
                 total += torch.sum(tensor).numpy()

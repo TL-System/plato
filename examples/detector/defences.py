@@ -6,8 +6,8 @@ import numpy as np
 
 registered_defences = {}
 
-def get():
 
+def get():
     defence_type = (
         Config().server.defence_type
         if hasattr(Config().server, "defence_type")
@@ -24,6 +24,7 @@ def get():
         return registered_defence
 
     raise ValueError(f"No such defence: {defence_type}")
+
 
 def flatten_weights(weights):
     flattened_weights = []
@@ -44,9 +45,10 @@ def flatten_weights(weights):
         )
     return flattened_weights
 
+
 def median(weights_attacked):
-        """Aggregate weight updates from the clients using median."""
-        """
+    """Aggregate weight updates from the clients using median."""
+    """
 
         deltas_received = self.compute_weight_deltas(updates)
         reports = [report for (__, report, __, __) in updates]
@@ -81,31 +83,30 @@ def median(weights_attacked):
         n_clients = all_deltas_vector.shape[0]
         logging.info("[%s] n_clients: %d", self, n_clients)
         logging.info("[%s] n_attackers: %d", self, n_attackers)
-        """ 
-        weights_attacked = flatten_weights(weights_attacked)
+        """
+    weights_attacked = flatten_weights(weights_attacked)
 
-        median_delta_vector = torch.median(weights_attacked, dim=0)[0]
-        # name list?
-        #median_update = {
-        #    name: self.trainer.zeros(weights.shape)
-        #    for name, weights in deltas_received[0].items()
-        #}
+    median_delta_vector = torch.median(weights_attacked, dim=0)[0]
+    # name list?
+    # median_update = {
+    #    name: self.trainer.zeros(weights.shape)
+    #    for name, weights in deltas_received[0].items()
+    # }
 
-        start_index = 0
-        median_update = OrderedDict()
+    start_index = 0
+    median_update = OrderedDict()
 
-        for weight in weights_attacked:
-            for name in weight.keys():
-                median_update[name] = median_delta_vector[
+    for weight in weights_attacked:
+        for name in weight.keys():
+            median_update[name] = median_delta_vector[
                 start_index : start_index + len(median_update[name].view(-1))
             ].reshape(median_update[name].shape)
-            start_index = start_index + len(median_update[name].view(-1))
+        start_index = start_index + len(median_update[name].view(-1))
 
-        #for name in name_list:
-            #median_update[name] = median_delta_vector[
-                #start_index : start_index + len(median_update[name].view(-1))
-            #].reshape(median_update[name].shape)
-            #start_index = start_index + len(median_update[name].view(-1))
-        logging.info(f"Finished Median server aggregation.")
-        return median_update
-
+    # for name in name_list:
+    # median_update[name] = median_delta_vector[
+    # start_index : start_index + len(median_update[name].view(-1))
+    # ].reshape(median_update[name].shape)
+    # start_index = start_index + len(median_update[name].view(-1))
+    logging.info(f"Finished Median server aggregation.")
+    return median_update

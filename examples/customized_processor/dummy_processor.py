@@ -17,7 +17,6 @@ class DummyProcessor(base.Processor):
         self.current_round = current_round
 
     def process(self, data: Any) -> Any:
-
         logging.info(
             "[Client #%s] Customized dummmy processor is activated at round %s.",
             self.client_id,

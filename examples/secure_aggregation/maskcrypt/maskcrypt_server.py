@@ -38,9 +38,7 @@ class Server(fedavg_he.Server):
         else:
             return self.final_mask
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         if self.current_round % 2 != 0:
             # Clients send mask proposals in odd rounds, conduct mask consensus
             self._mask_consensus(updates)

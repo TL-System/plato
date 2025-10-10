@@ -56,9 +56,7 @@ class Processor(model.Processor):
                 num = value.item()
                 if num < 0:
                     num = abs(num) ^ unpack("!i", b"\x00\x00\x00\x80")[0]
-                content += pack("!I", num)[
-                    3:4
-                ]  # present each parameter in 1 byte
+                content += pack("!I", num)[3:4]  # present each parameter in 1 byte
             return content
 
         # Step 1: quantization

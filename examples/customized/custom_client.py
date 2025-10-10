@@ -27,12 +27,8 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST(
-            "./data", train=True, download=True, transform=ToTensor()
-        )
-        self.testset = MNIST(
-            "./data", train=False, download=True, transform=ToTensor()
-        )
+        self.trainset = MNIST("./data", train=True, download=True, transform=ToTensor())
+        self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
 
 
 class Trainer(basic.Trainer):

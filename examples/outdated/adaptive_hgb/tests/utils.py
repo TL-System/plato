@@ -3,32 +3,32 @@ Useful functions to test the correctness of samplers
 
 
 """
+
 import torch
 import collections
 
 
 def dicts_equal(dict1, dict2):
-    """ Whether two dicts are same with each other """
+    """Whether two dicts are same with each other"""
     return dict1.keys() == dict2.keys() and dict1.values() == dict2.values()
 
 
-def verify_working_correctness(Sampler,
-                               dataset_source,
-                               client_id,
-                               num_of_batches=10,
-                               batch_size=5):
-    """ Ensure the sampler can work well in this dataset """
+def verify_working_correctness(
+    Sampler, dataset_source, client_id, num_of_batches=10, batch_size=5
+):
+    """Ensure the sampler can work well in this dataset"""
     test_sampler = Sampler(datasource=dataset_source, client_id=client_id)
     dataset = dataset_source.get_train_set()
 
-    data_loader = torch.utils.data.DataLoader(dataset=dataset,
-                                              shuffle=False,
-                                              batch_size=batch_size,
-                                              sampler=test_sampler.get())
+    data_loader = torch.utils.data.DataLoader(
+        dataset=dataset,
+        shuffle=False,
+        batch_size=batch_size,
+        sampler=test_sampler.get(),
+    )
 
     extract_idx = 0
     for examples, labels in data_loader:
-
         examples = examples.view(len(examples), -1)
 
         print("labels: ", labels)
@@ -38,17 +38,13 @@ def verify_working_correctness(Sampler,
             break
 
 
-def extract_assigend_data_info(dataset,
-                               sampler,
-                               num_of_batches=None,
-                               batch_size=5):
-    """ Obtain the data information including the classes
-    contained and the samples assigned to each class """
+def extract_assigend_data_info(dataset, sampler, num_of_batches=None, batch_size=5):
+    """Obtain the data information including the classes
+    contained and the samples assigned to each class"""
 
-    data_loader = torch.utils.data.DataLoader(dataset=dataset,
-                                              shuffle=False,
-                                              batch_size=batch_size,
-                                              sampler=sampler.get())
+    data_loader = torch.utils.data.DataLoader(
+        dataset=dataset, shuffle=False, batch_size=batch_size, sampler=sampler.get()
+    )
     if num_of_batches is None:
         num_of_batches = len(data_loader)
     # record all the classes that are assigned to this client
@@ -67,20 +63,20 @@ def extract_assigend_data_info(dataset,
         if extract_idx > num_of_batches:
             break
 
-    assigned_classes_sample = dict(
-        collections.Counter(assigned_samples_labels))
+    assigned_classes_sample = dict(collections.Counter(assigned_samples_labels))
     assigned_classes = set(assigned_samples_labels)
-    return len(
-        assigned_samples_labels), assigned_classes, assigned_classes_sample
+    return len(assigned_samples_labels), assigned_classes, assigned_classes_sample
 
 
-def verify_client_local_data_correctness(Sampler,
-                                         dataset_source,
-                                         client_id,
-                                         num_of_iterations=5,
-                                         batch_size=5,
-                                         is_presented=False):
-    """ Verify the local data generated for this client by the sampler is same all the time """
+def verify_client_local_data_correctness(
+    Sampler,
+    dataset_source,
+    client_id,
+    num_of_iterations=5,
+    batch_size=5,
+    is_presented=False,
+):
+    """Verify the local data generated for this client by the sampler is same all the time"""
 
     dataset = dataset_source.get_train_set()
 
@@ -93,8 +89,11 @@ def verify_client_local_data_correctness(Sampler,
         # we redefine the sampler in each iteration
         test_sampler = Sampler(datasource=dataset_source, client_id=client_id)
 
-        total_samples_n, assigned_classes, assigned_classes_sample = extract_assigend_data_info(
-            dataset, test_sampler, num_of_batches=None, batch_size=batch_size)
+        total_samples_n, assigned_classes, assigned_classes_sample = (
+            extract_assigend_data_info(
+                dataset, test_sampler, num_of_batches=None, batch_size=batch_size
+            )
+        )
 
         if is_presented:
             print("The iteration: ", iter_i)
@@ -111,7 +110,8 @@ def verify_client_local_data_correctness(Sampler,
             continue
 
         if pervios_iter_classes == assigned_classes and dicts_equal(
-                pervios_iter_classes_sample, assigned_classes_sample):
+            pervios_iter_classes_sample, assigned_classes_sample
+        ):
             verify_count += 1
 
         if is_presented:
@@ -123,13 +123,15 @@ def verify_client_local_data_correctness(Sampler,
     return verify_flag
 
 
-def verify_difference_between_clients(clients_id,
-                                      Sampler,
-                                      dataset_source,
-                                      num_of_batches=None,
-                                      batch_size=5,
-                                      is_presented=False):
-    """ Check the difference between the clients """
+def verify_difference_between_clients(
+    clients_id,
+    Sampler,
+    dataset_source,
+    num_of_batches=None,
+    batch_size=5,
+    is_presented=False,
+):
+    """Check the difference between the clients"""
     assert isinstance(clients_id, list)
     dataset = dataset_source.get_train_set()
 
@@ -139,13 +141,14 @@ def verify_difference_between_clients(clients_id,
 
     for client_id in clients_id:
         test_sampler = Sampler(datasource=dataset_source, client_id=client_id)
-        client_total_samples, \
-            assigned_classes, \
-                assigned_classes_sample = extract_assigend_data_info(
-            dataset,
-            sampler=test_sampler,
-            num_of_batches=num_of_batches,
-            batch_size=batch_size)
+        client_total_samples, assigned_classes, assigned_classes_sample = (
+            extract_assigend_data_info(
+                dataset,
+                sampler=test_sampler,
+                num_of_batches=num_of_batches,
+                batch_size=batch_size,
+            )
+        )
 
         clients_global_info["classes_number"].append(len(assigned_classes))
         clients_global_info["samples_number"].append(client_total_samples)

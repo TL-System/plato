@@ -68,9 +68,7 @@ def solve(
     G = sparse([[w_max, w_min, greater_than_zero, less_than_one]])
 
     # Building matrix h for the right hand side of inequality constraints
-    print(
-        "Producing matrix h for the right hand side of inequality constraints..."
-    )
+    print("Producing matrix h for the right hand side of inequality constraints...")
 
     h_workload_upper = [workload_max for x in range(tpc_count)]
     h_workload_lower = [-workload_min for x in range(tpc_count)]
@@ -80,10 +78,7 @@ def solve(
 
     h = matrix(
         list(
-            h_workload_upper
-            + h_workload_lower
-            + h_greater_than_zero
-            + h_less_than_one
+            h_workload_upper + h_workload_lower + h_greater_than_zero + h_less_than_one
         )
     )
 
@@ -98,9 +93,7 @@ def solve(
     A = sparse([[reviews]])
 
     # building matrix b for the right hand side of equality constraints
-    print(
-        "Producing matrix b for the right hand side of equality constraints..."
-    )
+    print("Producing matrix b for the right hand side of equality constraints...")
     b_reviews_per_paper = [paper_nominal * 1.0 for x in range(paper_count)]
 
     b = matrix(list(b_reviews_per_paper))
@@ -135,9 +128,7 @@ def solve(
                     % (tpc, paper + 1, assignment[tpc][paper])
                 )
             else:
-                assignment[tpc][paper] = round(
-                    sol["x"][tpc * paper_count + paper]
-                )
+                assignment[tpc][paper] = round(sol["x"][tpc * paper_count + paper])
                 print(
                     "Alert: The result for cluster '%d' and client '%d' is not an integer. "
                     " Its value is forcefully set to: %f"

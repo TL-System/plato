@@ -53,9 +53,7 @@ class Server(fedavg.Server):
 
         for i, update in enumerate(deltas_received):
             for name, delta in update.items():
-                self.global_grads[name] += delta * (
-                    num_samples[i] / total_samples
-                )
+                self.global_grads[name] += delta * (num_samples[i] / total_samples)
 
         # Get adaptive weighting based on both node contribution and date size
         self.adaptive_weighting = self.calc_adaptive_weighting(
@@ -87,9 +85,7 @@ class Server(fedavg.Server):
         for i, contrib in enumerate(contribs):
             total_weight += num_samples[i] * math.exp(contrib)
         for i, contrib in enumerate(contribs):
-            adaptive_weighting[i] = (
-                num_samples[i] * math.exp(contrib)
-            ) / total_weight
+            adaptive_weighting[i] = (num_samples[i] * math.exp(contrib)) / total_weight
 
         return adaptive_weighting
 
@@ -105,9 +101,7 @@ class Server(fedavg.Server):
         for i, update in enumerate(updates):
             local_grads = self.process_grad(update)
             inner = np.inner(self.global_grads, local_grads)
-            norms = np.linalg.norm(self.global_grads) * np.linalg.norm(
-                local_grads
-            )
+            norms = np.linalg.norm(self.global_grads) * np.linalg.norm(local_grads)
             angles[i] = np.arccos(np.clip(inner / norms, -1.0, 1.0))
 
         for i, angle in enumerate(angles):
@@ -122,16 +116,11 @@ class Server(fedavg.Server):
 
             # Non-linear mapping to node contribution
             alpha = (
-                Config().algorithm.alpha
-                if hasattr(Config().algorithm, "alpha")
-                else 5
+                Config().algorithm.alpha if hasattr(Config().algorithm, "alpha") else 5
             )
 
             contribs[i] = alpha * (
-                1
-                - math.exp(
-                    -math.exp(-alpha * (self.local_angles[client_id] - 1))
-                )
+                1 - math.exp(-math.exp(-alpha * (self.local_angles[client_id] - 1)))
             )
 
         return contribs
@@ -139,9 +128,7 @@ class Server(fedavg.Server):
     @staticmethod
     def process_grad(grads):
         """Convert gradients to a flattened 1-D array."""
-        grads = list(
-            dict(sorted(grads.items(), key=lambda x: x[0].lower())).values()
-        )
+        grads = list(dict(sorted(grads.items(), key=lambda x: x[0].lower())).values())
 
         flattened = grads[0]
         for i in range(1, len(grads)):

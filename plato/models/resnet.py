@@ -5,6 +5,7 @@ Reference:
 
 https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
 """
+
 import collections
 
 import torch.nn as nn

@@ -17,9 +17,9 @@ def kmeans_clustering(features, n_clusters, max_iter=200):
     if torch.isnan(torch.from_numpy(features)).any():
         features = torch.nan_to_num(torch.from_numpy(features), nan=0.0).numpy()
 
-    kmeans = KMeans(
-        n_init="auto", n_clusters=n_clusters, max_iter=max_iter
-    ).fit(features)
+    kmeans = KMeans(n_init="auto", n_clusters=n_clusters, max_iter=max_iter).fit(
+        features
+    )
     cluster_ids = torch.from_numpy(kmeans.labels_).long()
     centroids = torch.from_numpy(kmeans.cluster_centers_).float()
     centroids = torch.nn.functional.normalize(centroids, dim=1, eps=1e-8)

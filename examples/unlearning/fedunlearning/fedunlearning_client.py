@@ -53,10 +53,7 @@ class Client(mia_client.Client):
 
         client_pool = Config().clients.clients_requesting_deletion
 
-        if (
-            self.client_id in client_pool
-            and self.current_round <= previous_round
-        ):
+        if self.client_id in client_pool and self.current_round <= previous_round:
             if self.client_id not in self.unlearning_clients:
                 self.unlearning_clients.append(self.client_id)
 

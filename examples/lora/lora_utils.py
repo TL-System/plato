@@ -91,9 +91,7 @@ class Trainer(huggingface.Trainer):
 
         self.trainer.train()
 
-    def test_model(
-        self, config, testset, sampler=None, **kwargs
-    ):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
         """The testing loop for HuggingFace models.
 
         Arguments:

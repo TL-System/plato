@@ -1,10 +1,12 @@
-""" An example for running Plato with custom clients. """
+"""An example for running Plato with custom clients."""
+
 import asyncio
 import os
 
-os.environ['config_file'] = './mistnet_lenet5_client.yml'
+os.environ["config_file"] = "./mistnet_lenet5_client.yml"
 
 from plato.clients import mistnet
+
 
 def main():
     """

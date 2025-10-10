@@ -2,7 +2,6 @@
 Callback for adding the divergence rate to the payload.
 """
 
-
 import calibre_processor
 
 from plato.callbacks.client import ClientCallback

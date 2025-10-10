@@ -89,13 +89,9 @@ def get(
         inbound_processors = config.inbound_processors
 
     for processor in outbound_processors:
-        logging.info(
-            "%s: Using Processor for sending payload: %s", user, processor
-        )
+        logging.info("%s: Using Processor for sending payload: %s", user, processor)
     for processor in inbound_processors:
-        logging.info(
-            "%s: Using Processor for receiving payload: %s", user, processor
-        )
+        logging.info("%s: Using Processor for receiving payload: %s", user, processor)
 
     # Check if HE processors are needed based on server configuration
     if hasattr(config, "type") and config.type == "fedavg_he":

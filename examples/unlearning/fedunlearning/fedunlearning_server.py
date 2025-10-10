@@ -86,18 +86,14 @@ class Server(mia_server.Server):
             map(lambda update: update.staleness <= self.current_round, updates)
         )
         recent_updates = list(
-            filter(
-                lambda update: update.staleness <= self.current_round, updates
-            )
+            filter(lambda update: update.staleness <= self.current_round, updates)
         )
 
         recent_deltas_received = [
             delta for delta, fresh in zip(deltas_received, recent_mask) if fresh
         ]
 
-        return await super().aggregate_deltas(
-            recent_updates, recent_deltas_received
-        )
+        return await super().aggregate_deltas(recent_updates, recent_deltas_received)
 
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
@@ -166,6 +162,4 @@ class Server(mia_server.Server):
                         self.current_round,
                     )
 
-                    self._restore_random_states(
-                        self.current_round, checkpoint_path
-                    )
+                    self._restore_random_states(self.current_round, checkpoint_path)

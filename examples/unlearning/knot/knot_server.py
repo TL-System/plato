@@ -35,9 +35,7 @@ class Server(fedunlearning_server.Server):
        target round has reached.
     """
 
-    def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None
-    ):
+    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(
             model=model,
             datasource=datasource,
@@ -140,9 +138,7 @@ class Server(fedunlearning_server.Server):
                 if client_id not in self.round_first_selected:
                     self.round_first_selected[client_id] = self.current_round
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """
         Aggregate the reported weight updates from the selected clients,
         according to each client's clustering assignment, using the
@@ -187,9 +183,7 @@ class Server(fedunlearning_server.Server):
             if self.clustered_retraining[self.clusters[client_id]] is True:
                 if (
                     abs(client_update.staleness)
-                    <= self.current_round
-                    - Config().clients.data_deletion_round
-                    - 1
+                    <= self.current_round - Config().clients.data_deletion_round - 1
                 ):
                     if self.clusters[client_id] in self.clustered_updates:
                         self.clustered_updates[self.clusters[client_id]].append(
@@ -206,9 +200,7 @@ class Server(fedunlearning_server.Server):
                         client_update
                     )
                 else:
-                    self.clustered_updates[self.clusters[client_id]] = [
-                        client_update
-                    ]
+                    self.clustered_updates[self.clusters[client_id]] = [client_update]
 
             for cluster_id, update in self.clustered_updates.items():
                 if len(update) != 0:
@@ -220,16 +212,12 @@ class Server(fedunlearning_server.Server):
                         weights_received,
                         cluster_id=cluster_id,
                     )
-                    deltas = await self.aggregate_deltas(
-                        update, deltas_received
-                    )
+                    deltas = await self.aggregate_deltas(update, deltas_received)
                     updated_weights = self.algorithm.update_weights(
                         deltas, cluster_id=cluster_id
                     )
 
-                    self.algorithm.load_weights(
-                        updated_weights, cluster_id=cluster_id
-                    )
+                    self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
 
         return baseline_weights
 
@@ -258,9 +246,7 @@ class Server(fedunlearning_server.Server):
 
         if hasattr(Config().server, "do_test") and Config().server.do_test:
             # Retrieve the model from the cluster with the highest accuracy
-            self.trainer.model.load_state_dict(
-                self._aggregate_models(), strict=True
-            )
+            self.trainer.model.load_state_dict(self._aggregate_models(), strict=True)
 
     def clients_processed(self):
         """Determining the rollback round and roll back to that round, if retraining is needed
@@ -288,9 +274,7 @@ class Server(fedunlearning_server.Server):
 
                 # Loading the model from round 0
                 rollback_round = 0
-                filename = (
-                    f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
-                )
+                filename = f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
 
                 self._load_model(cluster_id, filename, checkpoint_path)
 
@@ -351,7 +335,9 @@ class Server(fedunlearning_server.Server):
                     # When the current_round matches the data deletion round, load the model from
                     # `rollback_round`.
                     rollback_round = self.rollback_round[cluster_id]
-                    filename = f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
+                    filename = (
+                        f"checkpoint_{model_name}_{rollback_round}_{cluster_id}.pth"
+                    )
 
                     self._load_model(cluster_id, filename, checkpoint_path)
 
@@ -365,9 +351,7 @@ class Server(fedunlearning_server.Server):
         if self.current_round >= 2:
             self.initialize_optimization = False
 
-    def customize_server_response(
-        self, server_response: dict, client_id
-    ) -> dict:
+    def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Returns a customrized server response with any additional information."""
         server_response = super().customize_server_response(
             server_response, client_id=client_id
@@ -412,9 +396,7 @@ class Server(fedunlearning_server.Server):
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
-            filename = (
-                f"checkpoint_{model_name}_{self.current_round}_{cluster_id}.pth"
-            )
+            filename = f"checkpoint_{model_name}_{self.current_round}_{cluster_id}.pth"
             logging.info(
                 "[%s] Saving the checkpoint for cluster #%s to %s/%s.",
                 self,
@@ -469,9 +451,7 @@ class Server(fedunlearning_server.Server):
 
     def _load_model(self, cluster_id, filename=None, location=None):
         """Loading pre-trained model weights before retraining from a file."""
-        model_path = (
-            Config().params["model_path"] if location is None else location
-        )
+        model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
         if filename is not None:
@@ -479,9 +459,7 @@ class Server(fedunlearning_server.Server):
         else:
             model_path = f"{model_path}/{model_name}.pth"
 
-        logging.info(
-            "[Server #%d] Loading a model from %s.", os.getpid(), model_path
-        )
+        logging.info("[Server #%d] Loading a model from %s.", os.getpid(), model_path)
 
         if cluster_id in self.algorithm.models:
             model = self.algorithm.models[cluster_id]
@@ -492,9 +470,7 @@ class Server(fedunlearning_server.Server):
 
     def _save_model(self, cluster_id, filename=None, location=None):
         """Saving the model to a file."""
-        model_path = (
-            Config().params["model_path"] if location is None else location
-        )
+        model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
         try:
@@ -521,9 +497,7 @@ class Server(fedunlearning_server.Server):
         self.num_clusters = Config().server.clusters
 
         if hasattr(Config().server, "do_optimized_clustering"):
-            self.initialize_optimization = (
-                Config().server.do_optimized_clustering
-            )
+            self.initialize_optimization = Config().server.do_optimized_clustering
         else:
             self.initialize_optimization = False
 
@@ -553,9 +527,7 @@ class Server(fedunlearning_server.Server):
             self.recent_history_size = 5
 
         # Initializing a record of global test accuracies
-        self.recent_global_accuracies = deque(
-            [], maxlen=self.recent_history_size
-        )
+        self.recent_global_accuracies = deque([], maxlen=self.recent_history_size)
 
     def _clustering_clients(self):
         """
@@ -678,17 +650,14 @@ class Server(fedunlearning_server.Server):
         """Extract the training time from the report in client updates."""
         # Initialize a dictionary that maps client_ids to its training times
         client_training_times = {
-            client_id: 0
-            for client_id in range(1, Config().clients.total_clients + 1)
+            client_id: 0 for client_id in range(1, Config().clients.total_clients + 1)
         }
 
         for update in updates:
             if client_training_times[update.client_id] != 0:
                 continue
 
-            client_training_times[update.client_id] = (
-                update.report.training_time
-            )
+            client_training_times[update.client_id] = update.report.training_time
 
         return client_training_times
 
@@ -730,9 +699,7 @@ class Server(fedunlearning_server.Server):
             for __, delta in update.items():
                 deltas = torch.cat((deltas, delta.view(-1)))
 
-            similarity = (
-                F.cosine_similarity(current - initial, deltas, dim=0) + 1
-            ) / 2
+            similarity = (F.cosine_similarity(current - initial, deltas, dim=0) + 1) / 2
             self.clients_similarity[client_id] = similarity.item()
 
     def _convert_to_solver(self, client_training_times):
@@ -854,9 +821,7 @@ class Server(fedunlearning_server.Server):
 
         index_of_value_1 = numpy.array(numpy.argwhere(assignment_array == 1))
 
-        self.clusters = dict(
-            zip(index_of_value_1[:, 1] + 1, index_of_value_1[:, 0])
-        )
+        self.clusters = dict(zip(index_of_value_1[:, 1] + 1, index_of_value_1[:, 0]))
         self.algorithm.init_clusters(self.clusters)
 
         logging.info(

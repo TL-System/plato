@@ -20,7 +20,7 @@ import adaptive_freezing_algorithm
 
 
 def main():
-    """ A Plato federated learning training session using Adaptive Parameter Freezing. """
+    """A Plato federated learning training session using Adaptive Parameter Freezing."""
     algorithm = adaptive_freezing_algorithm.Algorithm
     client = adaptive_freezing_client.Client(algorithm=algorithm)
     server = fedavg.Server(algorithm=algorithm)

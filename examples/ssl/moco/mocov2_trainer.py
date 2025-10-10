@@ -2,7 +2,6 @@
 A self-supervised federated learning trainer with MoCoV2.
 """
 
-
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 

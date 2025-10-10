@@ -37,9 +37,7 @@ class Server(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]

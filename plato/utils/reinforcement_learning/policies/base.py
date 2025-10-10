@@ -12,7 +12,8 @@ from torch import nn
 
 
 class ReplayMemory:
-    """ A simple example of replay memory buffer. """
+    """A simple example of replay memory buffer."""
+
     def __init__(self, state_dim, action_dim, capacity, seed):
         random.seed(seed)
         self.device = Config().device()
@@ -37,9 +38,7 @@ class ReplayMemory:
         self.size = min(self.size + 1, self.capacity)
 
     def sample(self):
-        ind = np.random.randint(0,
-                                self.size,
-                                size=int(Config().algorithm.batch_size))
+        ind = np.random.randint(0, self.size, size=int(Config().algorithm.batch_size))
 
         state = self.state[ind]
         action = self.action[ind]
@@ -86,68 +85,77 @@ class Critic(nn.Module):
 
 
 class Policy(ABC):
-    """ A simple example of DRL policy. """
+    """A simple example of DRL policy."""
+
     def __init__(self, state_dim, action_dim):
         self.max_action = Config().algorithm.max_action
         self.device = Config().device()
         self.total_it = 0
 
         # Initialize NNs
-        self.actor = Actor(state_dim, action_dim,
-                           self.max_action).to(self.device)
+        self.actor = Actor(state_dim, action_dim, self.max_action).to(self.device)
         self.actor_target = copy.deepcopy(self.actor)
         self.actor_optimizer = torch.optim.Adam(
-            self.actor.parameters(), lr=Config().algorithm.learning_rate)
+            self.actor.parameters(), lr=Config().algorithm.learning_rate
+        )
 
         self.critic = Critic(state_dim, action_dim).to(self.device)
         self.critic_target = copy.deepcopy(self.critic)
         self.critic_optimizer = torch.optim.Adam(
-            self.critic.parameters(), lr=Config().algorithm.learning_rate)
+            self.critic.parameters(), lr=Config().algorithm.learning_rate
+        )
         # Initialize replay memory
-        self.replay_buffer = ReplayMemory(state_dim, action_dim,
-                                          Config().algorithm.replay_size,
-                                          Config().algorithm.replay_seed)
+        self.replay_buffer = ReplayMemory(
+            state_dim,
+            action_dim,
+            Config().algorithm.replay_size,
+            Config().algorithm.replay_seed,
+        )
 
     def save_model(self, ep=None):
-        """ Saving the model to a file. """
+        """Saving the model to a file."""
         model_name = Config().algorithm.model_name
-        model_path = f'./models/{model_name}/'
+        model_path = f"./models/{model_name}/"
         if not os.path.exists(model_path):
             os.makedirs(model_path)
         if ep is not None:
-            model_path += 'iter' + str(ep) + '_'
+            model_path += "iter" + str(ep) + "_"
 
-        torch.save(self.actor.state_dict(), model_path + 'actor.pth')
-        torch.save(self.actor_optimizer.state_dict(),
-                   model_path + "actor_optimizer.pth")
-        torch.save(self.critic.state_dict(), model_path + 'critic.pth')
-        torch.save(self.critic_optimizer.state_dict(),
-                   model_path + "critic_optimizer.pth")
+        torch.save(self.actor.state_dict(), model_path + "actor.pth")
+        torch.save(
+            self.actor_optimizer.state_dict(), model_path + "actor_optimizer.pth"
+        )
+        torch.save(self.critic.state_dict(), model_path + "critic.pth")
+        torch.save(
+            self.critic_optimizer.state_dict(), model_path + "critic_optimizer.pth"
+        )
 
         logging.info("[RL Agent] Model saved to %s.", model_path)
 
     def load_model(self, ep=None):
-        """ Loading pre-trained model weights from a file. """
+        """Loading pre-trained model weights from a file."""
         model_name = Config().algorithm.model_name
-        model_path = f'./models/{model_name}/'
+        model_path = f"./models/{model_name}/"
         if ep is not None:
-            model_path += 'iter' + str(ep) + '_'
+            model_path += "iter" + str(ep) + "_"
 
         logging.info("[RL Agent] Loading a model from %s.", model_path)
 
-        self.actor.load_state_dict(torch.load(model_path + 'actor.pth'))
+        self.actor.load_state_dict(torch.load(model_path + "actor.pth"))
         self.actor_optimizer.load_state_dict(
-            torch.load(model_path + 'actor_optimizer.pth'))
-        self.critic.load_state_dict(torch.load(model_path + 'critic.pth'))
+            torch.load(model_path + "actor_optimizer.pth")
+        )
+        self.critic.load_state_dict(torch.load(model_path + "critic.pth"))
         self.critic_optimizer.load_state_dict(
-            torch.load(model_path + 'critic_optimizer.pth'))
+            torch.load(model_path + "critic_optimizer.pth")
+        )
 
     @abstractmethod
     def select_action(self, state, hidden=None, test=False):
-        """ Select action from policy. """
+        """Select action from policy."""
         raise NotImplementedError("Please Implement this method")
 
     @abstractmethod
     def update(self):
-        """ Update policy. """
+        """Update policy."""
         raise NotImplementedError("Please Implement this method")

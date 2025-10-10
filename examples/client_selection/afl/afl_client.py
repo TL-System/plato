@@ -9,6 +9,7 @@ Goetz et al., "Active Federated Learning", 2019.
 
 https://arxiv.org/pdf/1909.12641.pdf
 """
+
 import logging
 import math
 from types import SimpleNamespace

@@ -2,6 +2,7 @@
 A curious split learning trainer which will try to reconstruct private data
     during split learning.
 """
+
 import os
 import logging
 

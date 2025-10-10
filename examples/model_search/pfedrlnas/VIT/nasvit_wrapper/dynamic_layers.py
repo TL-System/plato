@@ -20,6 +20,7 @@ def copy_bn(target_bn, src_bn):
         src_bn.running_var.data[:feature_dim]
     )
 
+
 # pylint:disable=abstract-method
 class DynamicMBConvLayer(dynamic_layers.DynamicMBConvLayer):
     """
