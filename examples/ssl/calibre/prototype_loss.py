@@ -45,9 +45,9 @@ def get_prototype_loss(
     # 1. get the distance function
     dis_fn = distance_fns[distance_type]
 
-    # 2. normalize the inputs
-    prototypes = nn.functional.normalize(prototypes, dim=1)
-    queries = nn.functional.normalize(queries, dim=1)
+    # 2. normalize the inputs with epsilon to prevent NaN from zero-norm vectors
+    prototypes = nn.functional.normalize(prototypes, dim=1, eps=1e-8)
+    queries = nn.functional.normalize(queries, dim=1, eps=1e-8)
 
     # 3. compute the distances
     # with shape, [n_proto, n_samples]

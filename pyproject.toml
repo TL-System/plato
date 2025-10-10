@@ -55,7 +55,7 @@ members = [
     "examples/client_selection/pisces",
     "examples/client_selection/polaris",
     "examples/split_learning/llm_split_learning",
-    "examples/ssl/smog",
+    "examples/ssl/calibre",
     "examples/model_search/pfedrlnas/VIT",
     "examples/model_search/pfedrlnas/MobileNetV3",
     "examples/model_search/heterofl",
