@@ -1,11 +1,21 @@
-# Compiling the documentation
+To install Material for MkDocs, run:
 
 ```bash
-pip install -r requirements.txt --upgrade
-make html
-open _build/html/index.html
+uv venv
+source .venv/bin/activate
+uv pip install mkdocs-material
 ```
 
-The following reference has been useful for building the Sphinx continuous integration using Netlify:
+To serve the website for development, run:
 
-[https://github.com/HangarOrg/sphinx-netlify-cicd](https://github.com/HangarOrg/sphinx-netlify-cicd)
+```bash
+mkdocs serve
+```
+
+To compile it to a static website, run:
+
+```bash
+mkdocs build
+```
+
+The static website will be available in `/sites` directory.

@@ -40,3 +40,28 @@ uv run fedatt.py -c fedatt_FashionMNIST_lenet5.yml
 ```
 
 This will make sure that any additional Python packages, specified in the local `pyproject.yaml` configuration, will be installed first.
+
+!!! tip "Building the `plato-learn` PyPi package"
+    The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
+
+    1. Clean previous builds (optional):
+    ```bash
+    rm -rf dist/ build/ *.egg-info
+    ```
+
+    2. Build the package:
+    ```bash
+    uv build
+    ```
+
+    3. Publish to PyPI:
+        ```bash
+        uv publish
+        ```
+
+        Or if you need to specify the PyPi token explicitly:
+        ```bash
+        uv publish --token <your-pypi-token>
+        ```
+
+    The `uv` tool will handle all the build process using the modern, PEP 517-compliant `hatchling` backend specified in `pyproject.toml`, making it much simpler than the old `python setup.py sdist bdist_wheel` approach.

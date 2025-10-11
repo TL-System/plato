@@ -1,0 +1,25 @@
+[build]
+  # Set the base directory to the docs folder where mkdocs.yml is located
+  base = "docs"
+  
+  # The command to build the MkDocs site
+  command = "pip install -r requirements.txt && mkdocs build"
+  
+  # The directory where the built site will be located
+  publish = "site"
+
+# Production context: All deploys from the main branch will use these settings
+[context.production]
+  command = "pip install -r requirements.txt && mkdocs build"
+
+# Deploy Preview context: All deploys generated from a pull/merge request will use these settings
+[context.deploy-preview]
+  command = "pip install -r requirements.txt && mkdocs build"
+
+# Branch deploy context: All deploys that are not from a pull/merge request or the main branch
+[context.branch-deploy]
+  command = "pip install -r requirements.txt && mkdocs build"
+
+# Python version specification
+[build.environment]
+  PYTHON_VERSION = "3.11"

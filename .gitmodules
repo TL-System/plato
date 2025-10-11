@@ -4,9 +4,3 @@
 [submodule "plato/models/t2tvit"]
 	path = plato/models/t2tvit
 	url = https://github.com/yitu-opensource/T2T-ViT
-[submodule "examples/pfedrlnas/VIT/nasvit_wrapper/NASViT"]
-	path = examples/pfedrlnas/VIT/nasvit_wrapper/NASViT
-	url = https://github.com/facebookresearch/NASViT
-[submodule "examples/controlnet_split_learning/ControlNet"]
-	path = examples/split_learning/controlnet_split_learning/ControlNet
-	url = https://github.com/lllyasviel/ControlNet
