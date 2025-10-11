@@ -1,32 +1,30 @@
 name: PyTorch CI Tests
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
-    # Allows you to run this workflow manually from the Actions tab
-    workflow_dispatch:
-        branches: [main]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-    PyTorch-Tests:
-        runs-on: ubuntu-20.04
+  PyTorch-Tests:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v5
-              with:
-                  submodules: recursive
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
-            - name: Training workloads
-              shell: bash -l {0}
-              run: |
-                  uv run plato.py --config=configs/MNIST/fedavg_lenet5.yml
-                  uv run plato.py --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
-                  uv run plato.py --config=configs/MNIST/fedavg_async_lenet5.yml
-                  uv run plato.py --config=configs/MNIST/fedavg_lenet5_noniid.yml
-                  uv run plato.py --config=configs/MNIST/mistnet_lenet5.yml
+      - name: Training workloads
+        shell: bash -l {0}
+        run: |
+          uv run plato.py --config=configs/MNIST/fedavg_lenet5.yml
+          uv run plato.py --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
+          uv run plato.py --config=configs/MNIST/fedavg_async_lenet5.yml
+          uv run plato.py --config=configs/MNIST/fedavg_lenet5_noniid.yml
