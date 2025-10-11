@@ -33,20 +33,22 @@ class Server(fedavg.Server):
 
     def weights_received(self, weights_received):
         """Compute control variates from clients' updated weights."""
-        self.received_client_control_variates = [
-            weight[1] for weight in weights_received
-        ]
-
+        # Each weight is [model_weights, Δc_i]. Save Δc_i for Eq. (5) update.
+        self.received_client_control_variates = [weight[1] for weight in weights_received]
         return [weight[0] for weight in weights_received]
 
     def weights_aggregated(self, updates):
-        """Method called after the updated weights have been aggregated."""
-        # Update server control variate
-        for client_control_variate_delta in self.received_client_control_variates:
-            for name, param in client_control_variate_delta.items():
-                self.server_control_variate[name] += param.cpu() * (
-                    1 / Config().clients.total_clients
-                )
+        """Method called after the updated weights have been aggregated.
+        Update server control variate per SCAFFOLD Eq. (5):
+        c ← c + (1/m) ∑ Δc_i over participating clients.
+        """
+        deltas = [d for d in self.received_client_control_variates if d is not None]
+        if not deltas:
+            return
+        N = Config().clients.total_clients
+        for name in self.server_control_variate:
+            incr = sum(d[name].cpu() for d in deltas) * (1.0 / N)
+            self.server_control_variate[name] += incr
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."
