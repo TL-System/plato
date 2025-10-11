@@ -2,7 +2,7 @@
 
 In `examples/`, we included a wide variety of examples that showed how federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer` classes.
 
-### Downloading the dataset
+### Downloading the Dataset
 
 When you first run some of the examples, you'll may need to first download the dataset they use using the `-d` flag. For example, before running the [Calibre](algorithms/9.%20Personalized%20Federated%20Learning%20Algorithms%20based%20on%20Self-Supervised%20Learning.md) example, you should first run:
 

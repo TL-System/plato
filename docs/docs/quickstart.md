@@ -1,6 +1,6 @@
 # Quick Start
 
-## Running Plato directly using `uv`
+## Running Plato Directly Using `uv`
 
 To start a federated learning training workload with only a configuration file, run `uv run [Python file] -c [configuration file] ...`. For example:
 
