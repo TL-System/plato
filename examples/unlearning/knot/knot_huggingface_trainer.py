@@ -2,12 +2,12 @@
 A customized trainer for the federated unlearning baseline clustering algorithm.
 
 """
+
 import math
 
 from transformers import Trainer as HuggingFaceTrainer
 from transformers import default_data_collator
 
-from plato.config import Config
 from plato.trainers import huggingface
 
 
@@ -15,7 +15,7 @@ class Trainer(huggingface.Trainer):
     """A federated learning trainer using the Knot algorithm."""
 
     async def server_clustered_test(self, testset, sampler=None, **kwargs):
-        """ Separately perfrom the model test for all clutsers. """
+        """Separately perfrom the model test for all clutsers."""
         # The models within each cluster should be provided in the argument,
         # and it should be a dictionary in which the keys are cluster IDs,
         # and the values are the corresponding models
@@ -39,7 +39,8 @@ class Trainer(huggingface.Trainer):
                 train_dataset=None,
                 eval_dataset=testset,
                 tokenizer=self.tokenizer,
-                data_collator=default_data_collator)
+                data_collator=default_data_collator,
+            )
 
             metrics = self.trainer.evaluate()
 

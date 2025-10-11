@@ -11,11 +11,13 @@ Retraining," in Proc. INFOCOM, 2022.
 
 Reference: https://arxiv.org/abs/2203.07320
 """
+
 import logging
 import os
 
 from plato.config import Config
-from plato.utils.lib_mia import mia_server
+
+from lib_mia import mia_server
 
 
 class Server(mia_server.Server):
@@ -34,7 +36,12 @@ class Server(mia_server.Server):
     """
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
@@ -54,7 +61,7 @@ class Server(mia_server.Server):
     def clients_selected(self, selected_clients):
         """Remembers the first round that a particular client ID was selected."""
         for client_id in selected_clients:
-            if not client_id in self.round_first_selected:
+            if client_id not in self.round_first_selected:
                 self.round_first_selected[client_id] = self.current_round
 
     def training_will_start(self) -> None:

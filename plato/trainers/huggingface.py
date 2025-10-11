@@ -2,6 +2,7 @@
 Training and testing loops for HuggingFace's transformer models for natural
 language processing.
 """
+
 import math
 from typing import Optional
 
@@ -133,9 +134,7 @@ class Trainer(basic.Trainer):
 
         self.trainer.train()
 
-    def test_model(
-        self, config, testset, sampler=None, **kwargs
-    ):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
         """The testing loop for HuggingFace models.
 
         Arguments:

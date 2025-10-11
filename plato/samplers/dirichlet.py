@@ -1,6 +1,7 @@
 """
 Samples data from a dataset, biased across labels according to the Dirichlet distribution.
 """
+
 import numpy as np
 import torch
 from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler

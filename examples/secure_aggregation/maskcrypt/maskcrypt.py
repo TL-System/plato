@@ -1,10 +1,10 @@
 """
 MaskCrypt: Federated Learning with Selective Homomorphic Encryption.
 """
-import maskcrypt_trainer
+
 import maskcrypt_client
 import maskcrypt_server
-
+import maskcrypt_trainer
 from maskcrypt_callbacks import MaskCryptCallback
 
 
@@ -13,6 +13,7 @@ def main():
     trainer = maskcrypt_trainer.Trainer
     client = maskcrypt_client.Client(trainer=trainer, callbacks=[MaskCryptCallback])
     server = maskcrypt_server.Server(trainer=trainer)
+
     server.run(client)
 
 

@@ -1,0 +1,70 @@
+# Minimal configuration for the basic.py example
+# This demonstrates how to run Plato with custom model, datasource, and trainer
+# while still providing the framework-required configuration parameters
+
+clients:
+  # Type of client (basic client implementation)
+  type: simple
+
+  # Total number of clients in the federated learning setup
+  total_clients: 2
+
+  # Number of clients selected per round
+  per_round: 2
+
+  # Whether clients should compute test accuracy locally
+  do_test: false
+
+server:
+  # Server address
+  address: 127.0.0.1
+
+  # Server port
+  port: 8000
+
+  # Random seed for reproducibility
+  random_seed: 1
+
+data:
+  # Custom datasource (overridden in basic.py)
+  datasource: MNIST
+
+  # Random seed for data sampling
+  random_seed: 1
+
+  # i.i.d. or non-i.i.d.
+  sampler: iid
+
+  # Number of samples in each partition
+  partition_size: 20000
+
+trainer:
+  # Type of trainer (basic trainer implementation)
+  type: basic
+
+  # Maximum number of training rounds
+  rounds: 5
+
+  # Maximum number of clients running concurrently
+  max_concurrency: 2
+
+  # Target accuracy to stop training
+  target_accuracy: 0.95
+
+  # Number of epochs for local training in each round
+  epochs: 1
+
+  # Batch size for training
+  batch_size: 32
+
+  # The machine learning model
+  model_name: lenet5
+
+algorithm:
+  # Aggregation algorithm
+  type: fedavg
+
+parameters:
+  model:
+    # Number of classes in the dataset
+    num_classes: 10

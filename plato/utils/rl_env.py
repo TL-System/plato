@@ -19,7 +19,8 @@ from gym import spaces
 
 class RLEnv(gym.Env):
     """The environment of federated learning."""
-    metadata = {'render.modes': ['fl']}
+
+    metadata = {"render.modes": ["fl"]}
 
     def __init__(self, rl_agent):
         super().__init__()
@@ -40,18 +41,16 @@ class RLEnv(gym.Env):
         # The reasons behind:
         # https://stable-baselines3.readthedocs.io/en/master/guide/rl_tips.html#tips-and-tricks-when-creating-a-custom-environment
         n_actions = 1
-        self.action_space = spaces.Box(low=-1,
-                                       high=1,
-                                       shape=(n_actions, ),
-                                       dtype="float32")
+        self.action_space = spaces.Box(
+            low=-1, high=1, shape=(n_actions,), dtype="float32"
+        )
 
         # Use only global model accurarcy as state for now
         self.n_states = 1
         # Also normalize observation space for better RL training
-        self.observation_space = spaces.Box(low=-1,
-                                            high=1,
-                                            shape=(self.n_states, ),
-                                            dtype="float32")
+        self.observation_space = spaces.Box(
+            low=-1, high=1, shape=(self.n_states,), dtype="float32"
+        )
 
         self.state = [0 for i in range(self.n_states)]
 
@@ -76,8 +75,10 @@ class RLEnv(gym.Env):
 
     def step(self, action):
         """One step of reinforcement learning."""
-        assert self.action_space.contains(
-            action), "%r (%s) invalid" % (action, type(action))
+        assert self.action_space.contains(action), "%r (%s) invalid" % (
+            action,
+            type(action),
+        )
         self.time_step += 1
         reward = float(0)
         self.is_episode_done = False
@@ -92,7 +93,8 @@ class RLEnv(gym.Env):
         logging.info("RL Agent: Start time step #%s...", self.time_step)
         logging.info(
             "Each edge server will run %s rounds of local aggregation.",
-            current_edge_agg_num)
+            current_edge_agg_num,
+        )
 
         # Pass the tuned parameter to RL agent
         self.rl_agent.get_tuned_para(current_edge_agg_num, self.time_step)
@@ -101,10 +103,10 @@ class RLEnv(gym.Env):
         current_loop = asyncio.get_event_loop()
         get_state_task = current_loop.create_task(self.wait_for_state())
         current_loop.run_until_complete(get_state_task)
-        #print('State:', self.state)
+        # print('State:', self.state)
 
         self.normalize_state()
-        #print('Normalized state:', self.state)
+        # print('Normalized state:', self.state)
 
         reward = self.get_reward()
         info = {}
@@ -145,7 +147,7 @@ class RLEnv(gym.Env):
         reward = accuracy
         return reward
 
-    def render(self, mode='rl'):
+    def render(self, mode="rl"):
         pass
 
     def close(self):

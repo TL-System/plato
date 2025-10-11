@@ -1,5 +1,5 @@
 """
-A federated learning server which can analyze periodic gradients 
+A federated learning server which can analyze periodic gradients
 from certain clients to perform the gradient leakage attacks and
 reconstruct the training data of the victim clients.
 
@@ -601,8 +601,7 @@ class Server(fedavg.Server):
                 # Save the tensors into a .pt file
                 tensor_file_path = f"{trial_result_path}/tensors.pt"
                 result = {
-                    i
-                    * log_interval: {
+                    i * log_interval: {
                         j: history[i][j][0].cpu().permute(1, 2, 0)
                         for j in range(num_images)
                     }

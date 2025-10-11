@@ -11,19 +11,25 @@ Retraining," in Proc. INFOCOM, 2022.
 
 Reference: https://arxiv.org/abs/2203.07320
 """
+
 import logging
 
-import unlearning_iid
-
 from plato.config import Config
-from plato.utils.lib_mia import mia_client
+
+import unlearning_iid
+from lib_mia import mia_client
 
 
 class Client(mia_client.Client):
     """A federated learning client of federated unlearning."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,

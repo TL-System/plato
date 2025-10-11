@@ -1,0 +1,50 @@
+site_name: Plato
+site_url: https://mydomain.org/plato
+theme:
+  name: material
+  font:
+    text: Inter
+    code: IBM Plex Mono
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Quick Start: quickstart.md
+  - Digital Research Alliance of Canada: ccdb.md
+  - Examples:
+      - Getting Started: examples/Getting Started.md
+      - Algorithms:
+          - Server Aggregation Algorithms: examples/algorithms/1. Server Aggregation Algorithms.md
+          - Secure Aggregation with Homomorphic Encryption: examples/algorithms/2. Secure Aggregation with Homomorphic Encryption.md
+          - Asynchronous Federated Learning: examples/algorithms/3. Asynchronous Federated Learning Algorithms.md
+          - Federated Unlearning: examples/algorithms/4. Federated Unlearning.md
+          - Customized Client Training Loops: examples/algorithms/5. Algorithms with Customized Client Training Loops.md
+          - Client Selection Algorithms: examples/algorithms/6. Client Selection Algorithms.md
+          - Split Learning Algorithms: examples/algorithms/7. Split Learning Algorithms.md
+          - Personalized Federated Learning: examples/algorithms/8. Personalized Federated Learning Algorithms.md
+          - Self-Supervised Personalized FL: examples/algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning.md
+          - Neural Architecture Search: examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md
+          - Three-layer Federated Learning: examples/algorithms/11. Three-layer Federated Learning Algorithms.md
+          - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
+          - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
+          - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
+  - Configuration:
+      - Configuration Settings: configurations/overview.md
+      - General: configurations/general.md
+      - Clients: configurations/clients.md
+      - Server: configurations/server.md
+      - Data: configurations/data.md
+      - Trainer: configurations/trainer.md
+      - Algorithm: configurations/algorithm.md
+      - Results: configurations/results.md
+      - Parameters: configurations/parameters.md
+  - API Reference:
+      - Trainers: references/trainers.md
+      - Servers: references/servers.md
+      - Clients: references/clients.md
+  - Developer's Guide: development.md
+  - Deployment Guide: deployment.md
+  - Miscellaneous Notes: misc.md

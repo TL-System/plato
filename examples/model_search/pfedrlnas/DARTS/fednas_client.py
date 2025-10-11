@@ -1,6 +1,7 @@
 """
 Implement new algorithm: personalized federarted NAS.
 """
+
 from types import SimpleNamespace
 
 from plato.clients import simple

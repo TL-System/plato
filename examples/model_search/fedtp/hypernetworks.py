@@ -3,6 +3,7 @@ Hypernetworks used in FedTP.
 
 Modified based on https://github.com/zhyczy/FedTP/blob/main/models/Hypernetworks.py.
 """
+
 from collections import OrderedDict
 
 from torch import nn
@@ -200,13 +201,13 @@ class ShakesHyper(nn.Module):
                 layer_d_v_value = layer_d_v_value_hyper(features).view(
                     self.inner_dim, self.dim
                 )
-                weights[
-                    "encoder.layer_stack." + str(dep) + ".slf_attn.w_qs.weight"
-                ] = layer_d_q_value
-                weights[
-                    "encoder.layer_stack." + str(dep) + ".slf_attn.w_ks.weight"
-                ] = layer_d_k_value
-                weights[
-                    "encoder.layer_stack." + str(dep) + ".slf_attn.w_vs.weight"
-                ] = layer_d_v_value
+                weights["encoder.layer_stack." + str(dep) + ".slf_attn.w_qs.weight"] = (
+                    layer_d_q_value
+                )
+                weights["encoder.layer_stack." + str(dep) + ".slf_attn.w_ks.weight"] = (
+                    layer_d_k_value
+                )
+                weights["encoder.layer_stack." + str(dep) + ".slf_attn.w_vs.weight"] = (
+                    layer_d_v_value
+                )
         return weights

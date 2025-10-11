@@ -1,6 +1,7 @@
 """
 NAS architect in PerFedRLNAS, a wrapper over the supernet.
 """
+
 import copy
 import pickle
 import sys
@@ -53,7 +54,12 @@ class Architect(architect.Architect):
         ]
         self.baseline = {}
         if Config().args.resume:
-            save_config = f"{Config().server.model_path}/baselines.pickle"
+            # Use model_path if available, otherwise use default models/pretrained directory
+            if hasattr(Config().server, "model_path"):
+                model_dir = Config().server.model_path
+            else:
+                model_dir = "./models/pretrained"
+            save_config = f"{model_dir}/baselines.pickle"
             if os.path.exists(save_config):
                 with open(save_config, "rb") as file:
                     self.baseline = pickle.load(file)

@@ -11,11 +11,18 @@ import re
 import time
 
 import torch
+
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.models import registry as models_registry
-from plato.trainers import base, loss_criterion, lr_schedulers, optimizers, tracking
+from plato.trainers import (
+    base,
+    loss_criterion,
+    lr_schedulers,
+    optimizers,
+    tracking,
+)
 
 
 class Trainer(base.Trainer):
@@ -107,7 +114,9 @@ class Trainer(base.Trainer):
             )
         else:
             logging.info(
-                "[Client #%d] Loading a model from %s.", self.client_id, model_path
+                "[Client #%d] Loading a model from %s.",
+                self.client_id,
+                model_path,
             )
 
         pretrained = None
@@ -226,7 +235,10 @@ class Trainer(base.Trainer):
                     "on_train_step_start", self, config, batch=batch_id
                 )
 
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 loss = self.perform_forward_and_backward_passes(
                     config, examples, labels
@@ -374,7 +386,9 @@ class Trainer(base.Trainer):
                 mp.set_start_method("spawn", force=True)
 
             proc = mp.Process(
-                target=self.test_process, args=(config, testset, sampler), kwargs=kwargs
+                target=self.test_process,
+                args=(config, testset, sampler),
+                kwargs=kwargs,
             )
             proc.start()
             proc.join()
@@ -463,7 +477,10 @@ class Trainer(base.Trainer):
         sampler: the sampler for the trainloader to use.
         """
         return torch.utils.data.DataLoader(
-            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+            dataset=trainset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
         )
 
     # pylint: disable=unused-argument
@@ -488,7 +505,10 @@ class Trainer(base.Trainer):
         self.model.to(self.device)
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 outputs = self.model(examples)
 

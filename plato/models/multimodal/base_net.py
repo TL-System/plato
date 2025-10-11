@@ -2,6 +2,7 @@
 The base class used for all following classes
 
 """
+
 import torch
 import torch.nn as nn
 
@@ -9,7 +10,8 @@ from mmaction.models import build_model
 
 
 class BaseClassificationNet(nn.Module):
-    """ Base class for classification networks """
+    """Base class for classification networks"""
+
     def __init__(self, net_configs, is_head_included=True):
         super(BaseClassificationNet, self).__init__()
 
@@ -23,13 +25,13 @@ class BaseClassificationNet(nn.Module):
         self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
     def get_net(self):
-        """ Get the built network """
+        """Get the built network"""
         return self._net
 
     def forward_train(self, ipt_data, labels, **kwargs):
         """Defines the computation performed at every call when training."""
 
-        ipt_data_sz = ipt_data.reshape((-1, ) + ipt_data.shape[2:])
+        ipt_data_sz = ipt_data.reshape((-1,) + ipt_data.shape[2:])
 
         # 1. forward the backbone
         data_feat = self._net.extract_feat(ipt_data_sz)
@@ -54,7 +56,7 @@ class BaseClassificationNet(nn.Module):
     def forward_test(self, ipt_data, **kwargs):
         """Defines the computation performed at every call when training."""
 
-        ipt_data = ipt_data.reshape((-1, ) + ipt_data.shape[2:])
+        ipt_data = ipt_data.reshape((-1,) + ipt_data.shape[2:])
         # 1. forward the backbone
         data_feat = self._net.extract_feat(ipt_data)
         # 2. forward the classification head if possible and obtain the losses
@@ -79,7 +81,7 @@ class BaseClassificationNet(nn.Module):
 
         if return_loss:
             if label is None:
-                raise ValueError('Label should not be None.')
+                raise ValueError("Label should not be None.")
             if self._net.blending is not None:
                 blended_ipt_data, label = self._net.blending(ipt_data, label)
             else:

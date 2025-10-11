@@ -8,7 +8,7 @@ from yacs.config import CfgNode as CN
 _C = CN()
 
 # Base config files
-_C.BASE = ['']
+_C.BASE = [""]
 
 # -----------------------------------------------------------------------------
 # Data settings
@@ -17,36 +17,36 @@ _C.DATA = CN()
 # Batch size for a single GPU, could be overwritten by command line argument
 _C.DATA.BATCH_SIZE = 128
 # Path to dataset, could be overwritten by command line argument
-_C.DATA.DATA_PATH = './datasets/imagenet'
+_C.DATA.DATA_PATH = "./datasets/imagenet"
 # Dataset name
-_C.DATA.DATASET = 'imagenet'
+_C.DATA.DATASET = "imagenet"
 # Input image size
 _C.DATA.IMG_SIZE = 224
 # Interpolation to resize image (random, bilinear, bicubic)
 # _C.DATA.INTERPOLATION = 'bilinear'
-_C.DATA.INTERPOLATION = 'bicubic'
+_C.DATA.INTERPOLATION = "bicubic"
 # Use zipped dataset instead of folder dataset
 # could be overwritten by command line argument
 _C.DATA.ZIP_MODE = False
 # Cache Data in Memory, could be overwritten by command line argument
-_C.DATA.CACHE_MODE = 'part'
+_C.DATA.CACHE_MODE = "part"
 # Pin CPU memory in DataLoader for more efficient (sometimes) transfer to GPU.
 _C.DATA.PIN_MEMORY = False
 # Number of data loading threads
-_C.DATA.NUM_WORKERS = 6 # 24
+_C.DATA.NUM_WORKERS = 6  # 24
 # Prefetch factor
-_C.DATA.PREFETCH_FACTOR = 4 # 12
+_C.DATA.PREFETCH_FACTOR = 4  # 12
 
 # -----------------------------------------------------------------------------
 # Model settings
 # -----------------------------------------------------------------------------
 _C.MODEL = CN()
 # Model type
-_C.MODEL.TYPE = 'vit'
+_C.MODEL.TYPE = "vit"
 # Model name
-_C.MODEL.NAME = 'vit'
+_C.MODEL.NAME = "vit"
 # Checkpoint to resume, could be overwritten by command line argument
-_C.MODEL.RESUME = 'ckpt_360.pth'
+_C.MODEL.RESUME = "ckpt_360.pth"
 # Number of classes, overwritten in data preparation
 _C.MODEL.NUM_CLASSES = 1000
 # Dropout rate
@@ -82,7 +82,7 @@ _C.TRAIN.USE_CONV_PROJ = True
 _C.TRAIN.MAX = 192
 # LR scheduler
 _C.TRAIN.LR_SCHEDULER = CN()
-_C.TRAIN.LR_SCHEDULER.NAME = 'cosine'
+_C.TRAIN.LR_SCHEDULER.NAME = "cosine"
 # Epoch interval to decay LR, used in StepLRScheduler
 _C.TRAIN.LR_SCHEDULER.DECAY_EPOCHS = 30
 # LR decay rate, used in StepLRScheduler
@@ -90,7 +90,7 @@ _C.TRAIN.LR_SCHEDULER.DECAY_RATE = 0.1
 
 # Optimizer
 _C.TRAIN.OPTIMIZER = CN()
-_C.TRAIN.OPTIMIZER.NAME = 'adamw'
+_C.TRAIN.OPTIMIZER.NAME = "adamw"
 # Optimizer Epsilon
 _C.TRAIN.OPTIMIZER.EPS = 1e-8
 # Optimizer Betas
@@ -105,11 +105,11 @@ _C.AUG = CN()
 # Color jitter factor
 _C.AUG.COLOR_JITTER = 0.4
 # Use AutoAugment policy. "v0" or "original"
-_C.AUG.AUTO_AUGMENT = 'rand-n1-m1-mstd0.5-inc1'
+_C.AUG.AUTO_AUGMENT = "rand-n1-m1-mstd0.5-inc1"
 # Random erase prob
 _C.AUG.REPROB = 0.01
 # Random erase mode
-_C.AUG.REMODE = 'pixel'
+_C.AUG.REMODE = "pixel"
 # Random erase count
 _C.AUG.RECOUNT = 1
 # Mixup alpha, mixup enabled if > 0
@@ -123,7 +123,7 @@ _C.AUG.MIXUP_PROB = 1.0
 # Probability of switching to cutmix when both mixup and cutmix enabled
 _C.AUG.MIXUP_SWITCH_PROB = 0.5
 # How to apply mixup/cutmix params. Per "batch", "pair", or "elem"
-_C.AUG.MIXUP_MODE = 'batch'
+_C.AUG.MIXUP_MODE = "batch"
 
 # -----------------------------------------------------------------------------
 # Testing settings
@@ -137,11 +137,11 @@ _C.TEST.CROP = True
 # -----------------------------------------------------------------------------
 # Mixed precision opt level, if O0, no amp is used ('O0', 'O1', 'O2')
 # overwritten by command line argument
-_C.AMP_OPT_LEVEL = ''
+_C.AMP_OPT_LEVEL = ""
 # Path to output folder, overwritten by command line argument
-_C.OUTPUT = ''
+_C.OUTPUT = ""
 # Tag of experiment, overwritten by command line argument
-_C.TAG = 'default'
+_C.TAG = "default"
 # Frequency to save checkpoint
 _C.SAVE_FREQ = 1
 # Frequency to logging info
@@ -158,7 +158,7 @@ _C.LOCAL_RANK = 0
 
 _C.distributed = True
 _C.multiprocessing_distributed = True
-_C.arch = 'attentive_nas_dynamic_model'
+_C.arch = "attentive_nas_dynamic_model"
 _C.sandwich_rule = True
 _C.inplace_distill = True
 _C.post_bn_calibration_batch_num = 64
@@ -169,7 +169,7 @@ _C.supernet_config.use_v3_head = True
 _C.supernet_config.resolutions = [192, 224, 256, 288]
 _C.supernet_config.first_conv = CN()
 _C.supernet_config.first_conv.c = [16, 24]
-_C.supernet_config.first_conv.act_func = 'swish'
+_C.supernet_config.first_conv.act_func = "swish"
 _C.supernet_config.first_conv.s = 2
 
 _C.supernet_config.mb1 = CN()
@@ -178,7 +178,7 @@ _C.supernet_config.mb1.d = [1, 2]
 _C.supernet_config.mb1.k = [3, 5]
 _C.supernet_config.mb1.t = [1]
 _C.supernet_config.mb1.s = 1
-_C.supernet_config.mb1.act_func = 'swish'
+_C.supernet_config.mb1.act_func = "swish"
 _C.supernet_config.mb1.se = False
 
 _C.supernet_config.mb2 = CN()
@@ -187,7 +187,7 @@ _C.supernet_config.mb2.d = [3, 4, 5]
 _C.supernet_config.mb2.k = [3, 5]
 _C.supernet_config.mb2.t = [4, 5, 6]
 _C.supernet_config.mb2.s = 2
-_C.supernet_config.mb2.act_func = 'swish'
+_C.supernet_config.mb2.act_func = "swish"
 _C.supernet_config.mb2.se = False
 
 _C.supernet_config.mb3 = CN()
@@ -196,7 +196,7 @@ _C.supernet_config.mb3.d = [3, 4, 5, 6]
 _C.supernet_config.mb3.k = [3]
 _C.supernet_config.mb3.t = [4, 5, 6]
 _C.supernet_config.mb3.s = 2
-_C.supernet_config.mb3.act_func = 'swish'
+_C.supernet_config.mb3.act_func = "swish"
 _C.supernet_config.mb3.se = True
 
 _C.supernet_config.mb4 = CN()
@@ -205,7 +205,7 @@ _C.supernet_config.mb4.d = [3, 4, 5, 6]
 _C.supernet_config.mb4.k = [3]
 _C.supernet_config.mb4.t = [4, 5, 6]
 _C.supernet_config.mb4.s = 2
-_C.supernet_config.mb4.act_func = 'swish'
+_C.supernet_config.mb4.act_func = "swish"
 _C.supernet_config.mb4.se = False
 
 _C.supernet_config.mb5 = CN()
@@ -214,17 +214,17 @@ _C.supernet_config.mb5.d = [3, 4, 5, 6, 7, 8, 9]
 _C.supernet_config.mb5.k = [3]
 _C.supernet_config.mb5.t = [4, 5, 6]
 _C.supernet_config.mb5.s = 2
-_C.supernet_config.mb5.act_func = 'swish'
+_C.supernet_config.mb5.act_func = "swish"
 _C.supernet_config.mb5.se = True
 
 
 _C.supernet_config.mb6 = CN()
-_C.supernet_config.mb6.c = [160, 168, 176, 184] # [168, 176, 184, 192]
+_C.supernet_config.mb6.c = [160, 168, 176, 184]  # [168, 176, 184, 192]
 _C.supernet_config.mb6.d = [3, 4, 5, 6, 7, 8]
 _C.supernet_config.mb6.k = [3]
 _C.supernet_config.mb6.t = [6]
 _C.supernet_config.mb6.s = 1
-_C.supernet_config.mb6.act_func = 'swish'
+_C.supernet_config.mb6.act_func = "swish"
 _C.supernet_config.mb6.se = True
 
 _C.supernet_config.mb7 = CN()
@@ -233,26 +233,27 @@ _C.supernet_config.mb7.d = [3, 4, 5, 6]
 _C.supernet_config.mb7.k = [3]
 _C.supernet_config.mb7.t = [6]
 _C.supernet_config.mb7.s = 2
-_C.supernet_config.mb7.act_func = 'swish'
+_C.supernet_config.mb7.act_func = "swish"
 _C.supernet_config.mb7.se = True
 
 _C.supernet_config.last_conv = CN()
 _C.supernet_config.last_conv.c = [1792, 1984]
-_C.supernet_config.last_conv.act_func = 'swish'
+_C.supernet_config.last_conv.act_func = "swish"
 
-_C.sync_bn = False # True
+_C.sync_bn = False  # True
+
 
 def _update_config_from_file(config, cfg_file):
     config.defrost()
-    with open(cfg_file, 'r') as f:
+    with open(cfg_file, "r") as f:
         yaml_cfg = yaml.load(f, Loader=yaml.SafeLoader)
 
-    for cfg in yaml_cfg.setdefault('BASE', ['']):
+    for cfg in yaml_cfg.setdefault("BASE", [""]):
         if cfg:
             _update_config_from_file(
                 config, os.path.join(os.path.dirname(cfg_file), cfg)
             )
-    print('=> merge config from {}'.format(cfg_file))
+    print("=> merge config from {}".format(cfg_file))
     if cfg_file.startswith("manifold://"):
         config.merge_from_file(pathmgr.get_local_path(cfg_file))
     else:
@@ -290,7 +291,7 @@ def update_config(config, args):
 
     ## set local rank for distributed training
     # will be set later
-    #config.LOCAL_RANK = args.local_rank
+    # config.LOCAL_RANK = args.local_rank
 
     # output folder
     config.OUTPUT = os.path.join(config.OUTPUT, config.MODEL.NAME, config.TAG)

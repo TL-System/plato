@@ -14,9 +14,10 @@ Advances in neural information processing systems.
 https://proceedings.neurips.cc/paper/2017/file/6c340f25839e6acdc73414517203f5f0-Paper.pdf
 """
 
-from typing import Any
 import random
 from struct import pack, unpack
+from typing import Any
+
 import torch
 
 from plato.processors import model

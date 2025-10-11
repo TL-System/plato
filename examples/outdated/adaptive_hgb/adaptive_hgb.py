@@ -7,13 +7,14 @@ This is source code of the work "Towards Optimal Multi-modal Federated Learning 
     Non-IID Data with Hierarchical Gradient Blending"
 
 """
+
 import os
 
 import adaptive_hgb_client
 import adaptive_hgb_server
 import adaptive_hgb_trainer
 
-os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.yml'
+os.environ["config_file"] = "configs/Kinetics/kinetics_mm.yml"
 
 from plato.config import Config
 from plato.models.multimodal import multimodal_module
@@ -21,9 +22,9 @@ from plato.datasources import kinetics
 
 
 def main():
-    """ A Plato federated learning training session using the HGB algorithm. """
+    """A Plato federated learning training session using the HGB algorithm."""
     __ = Config()
-    support_modalities = ['rgb', "flow", "audio"]
+    support_modalities = ["rgb", "flow", "audio"]
 
     kinetics_data_source = kinetics.DataSource()
 
@@ -32,21 +33,22 @@ def main():
         modality_model_nm = modality_nm + "_model"
         if modality_model_nm in Config.multimodal_nets_configs.keys():
             modality_net = Config.multimodal_nets_configs[modality_model_nm]
-            modality_net['backbone']['pretrained'] = None
-            if "pretrained2d" in list(modality_net['backbone'].keys()):
-                modality_net['backbone']['pretrained2d'] = False
+            modality_net["backbone"]["pretrained"] = None
+            if "pretrained2d" in list(modality_net["backbone"].keys()):
+                modality_net["backbone"]["pretrained2d"] = False
 
     # define the model
     multi_model = multimodal_module.DynamicMultimodalModule(
         support_modality_names=support_modalities,
         multimodal_nets_configs=Config.multimodal_nets_configs,
-        is_fused_head=True)
+        is_fused_head=True,
+    )
 
     trainer = adaptive_hgb_trainer.Trainer
 
-    client = adaptive_hgb_client.Client(model=multi_model,
-                                        datasource=kinetics_data_source,
-                                        trainer=trainer)
+    client = adaptive_hgb_client.Client(
+        model=multi_model, datasource=kinetics_data_source, trainer=trainer
+    )
 
     server = adaptive_hgb_server.Server(model=multi_model, trainer=trainer)
 

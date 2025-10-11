@@ -1,4 +1,5 @@
 """The YOLOV8 model for PyTorch."""
+
 import logging
 
 from plato.config import Config

@@ -1,6 +1,7 @@
 """
 The training and testing loops for PyTorch.
 """
+
 import logging
 import time
 
@@ -8,7 +9,6 @@ from opacus import GradSampleModule
 from opacus.privacy_engine import PrivacyEngine
 from opacus.utils.batch_memory_manager import BatchMemoryManager
 from opacus.validators import ModuleValidator
-
 from torch.utils.data import Subset
 
 from plato.config import Config
@@ -69,7 +69,8 @@ class Trainer(basic.Trainer):
         total_epochs = config["epochs"]
 
         logging.info(
-            "[Client #%s] Using differential privacy during training.", self.client_id
+            "[Client #%s] Using differential privacy during training.",
+            self.client_id,
         )
 
         privacy_engine = PrivacyEngine(accountant="rdp", secure_mode=False)
@@ -99,7 +100,10 @@ class Trainer(basic.Trainer):
                 self.callback_handler.call_event("on_train_epoch_start", self, config)
 
                 for batch_id, (examples, labels) in enumerate(memory_safe_train_loader):
-                    examples, labels = examples.to(self.device), labels.to(self.device)
+                    examples, labels = (
+                        examples.to(self.device),
+                        labels.to(self.device),
+                    )
                     optimizer.zero_grad(set_to_none=True)
 
                     outputs = self.model(examples)
@@ -116,7 +120,11 @@ class Trainer(basic.Trainer):
 
                     self.train_step_end(config, batch=batch_id, loss=loss)
                     self.callback_handler.call_event(
-                        "on_train_step_end", self, config, batch=batch_id, loss=loss
+                        "on_train_step_end",
+                        self,
+                        config,
+                        batch=batch_id,
+                        loss=loss,
                     )
 
             self.lr_scheduler_step()

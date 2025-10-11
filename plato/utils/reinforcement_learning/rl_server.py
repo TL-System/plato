@@ -1,6 +1,7 @@
 """
 A federated learning server with RL Agent.
 """
+
 import asyncio
 import logging
 from abc import abstractmethod

@@ -4,8 +4,10 @@ be customized in Plato and executed in a standalone fashion.
 
 To run this example:
 
-python examples/customized/custom_server.py -c examples/customized/server.yml
+cd examples/customized
+uv run custom_server.py -c server.yml
 """
+
 import logging
 from functools import partial
 
@@ -14,8 +16,8 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
-from plato.servers import fedavg
 from plato.datasources import base
+from plato.servers import fedavg
 from plato.trainers import basic
 
 
@@ -23,7 +25,12 @@ class CustomServer(fedavg.Server):
     """A custom federated learning server."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
@@ -74,9 +81,7 @@ class Trainer(basic.Trainer):
                 optimizer.step()
                 optimizer.zero_grad()
 
-    def test_model(
-        self, config, testset, sampler=None, **kwargs
-    ):  # pylint: disable=unused-argument
+    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
         """A custom testing loop."""
         test_loader = torch.utils.data.DataLoader(
             testset,
@@ -90,7 +95,10 @@ class Trainer(basic.Trainer):
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 examples = examples.view(len(examples), -1)
                 outputs = self.model(examples)

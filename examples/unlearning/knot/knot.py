@@ -2,9 +2,9 @@
 Knot: a clustered aggregation mechanism designed for federated unlearning.
 """
 
-import knot_server
 import knot_algorithm
 import knot_client
+import knot_server
 import knot_trainer
 
 

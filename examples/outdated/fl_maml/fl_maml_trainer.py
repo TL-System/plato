@@ -1,6 +1,7 @@
 """
 The training and testing loops for PyTorch.
 """
+
 import copy
 import logging
 import os
@@ -226,8 +227,9 @@ class Trainer(basic.Trainer):
                     for batch_id, (examples, labels) in enumerate(test_loader):
                         # Aviod using the batch used to generate the personalized model when testing
                         if batch_id != random_batch_id:
-                            examples, labels = examples.to(self.device), labels.to(
-                                self.device
+                            examples, labels = (
+                                examples.to(self.device),
+                                labels.to(self.device),
                             )
 
                             outputs = personalized_model(examples)
@@ -240,8 +242,9 @@ class Trainer(basic.Trainer):
             else:
                 with torch.no_grad():
                     for examples, labels in test_loader:
-                        examples, labels = examples.to(self.device), labels.to(
-                            self.device
+                        examples, labels = (
+                            examples.to(self.device),
+                            labels.to(self.device),
                         )
 
                         outputs = self.model(examples)

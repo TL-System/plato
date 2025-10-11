@@ -32,7 +32,6 @@ class CallbackHandler:
         _callback_class = callback if isinstance(callback, type) else callback.__class__
 
         if _callback_class in {c.__class__ for c in self.callbacks}:
-
             existing_callbacks = "\n".join(cb for cb in self.callback_list)
 
             raise ValueError(

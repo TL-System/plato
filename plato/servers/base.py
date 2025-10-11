@@ -22,7 +22,7 @@ from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.server import LogProgressCallback
 from plato.client import run
 from plato.config import Config
-from plato.utils import s3, fonts
+from plato.utils import fonts, s3
 
 
 # pylint: disable=unused-argument, protected-access
@@ -37,7 +37,7 @@ class ServerEvents(socketio.AsyncNamespace):
         """Upon a new connection from a client."""
         logging.info("[Server #%d] A new client just connected.", os.getpid())
 
-    async def on_disconnect(self, sid):
+    async def on_disconnect(self, sid, reason=None):
         """Upon a disconnection event."""
         logging.info("[Server #%d] An existing client just disconnected.", os.getpid())
         await self.plato_server._client_disconnected(sid)
@@ -323,7 +323,10 @@ class Server:
         app = web.Application()
         self.sio.attach(app)
         web.run_app(
-            app, host=Config().server.address, port=port, loop=asyncio.get_event_loop()
+            app,
+            host=Config().server.address,
+            port=port,
+            loop=asyncio.get_event_loop(),
         )
 
     async def register_client(self, sid, client_process_id, client_id):
@@ -358,7 +361,11 @@ class Server:
 
     @staticmethod
     def _start_clients(
-        client=None, as_server=False, edge_server=None, edge_client=None, trainer=None
+        client=None,
+        as_server=False,
+        edge_server=None,
+        edge_client=None,
+        trainer=None,
     ):
         """Starts all the clients as separate processes."""
         starting_id = 1
@@ -397,11 +404,20 @@ class Server:
             if as_server:
                 port = int(Config().server.port) + client_id
                 logging.info(
-                    "Starting client #%d as an edge server on port %s.", client_id, port
+                    "Starting client #%d as an edge server on port %s.",
+                    client_id,
+                    port,
                 )
                 proc = mp.Process(
                     target=run,
-                    args=(client_id, port, client, edge_server, edge_client, trainer),
+                    args=(
+                        client_id,
+                        port,
+                        client,
+                        edge_server,
+                        edge_client,
+                        trainer,
+                    ),
                 )
                 proc.start()
             else:
@@ -1119,7 +1135,9 @@ class Server:
             self.wall_time = max(client_finish_time, self.wall_time)
 
             logging.info(
-                "[%s] Advancing the wall clock time to %.2f.", self, self.wall_time
+                "[%s] Advancing the wall clock time to %.2f.",
+                self,
+                self.wall_time,
             )
 
         # If all updates have been received from selected clients, the aggregation process
@@ -1194,9 +1212,9 @@ class Server:
                         untrained_client_index = len(self.trained_clients)
 
                         # Swap current client to the begining of untrained clients
-                        self.selected_clients[
-                            fail_client_index
-                        ] = self.selected_clients[untrained_client_index]
+                        self.selected_clients[fail_client_index] = (
+                            self.selected_clients[untrained_client_index]
+                        )
                         self.selected_clients[untrained_client_index] = client_id
 
                         # Start next batch of client selection if current batch is done
@@ -1226,7 +1244,10 @@ class Server:
             model_name = model_name.replace("/", "_")
         filename = f"checkpoint_{model_name}_{self.current_round}.pth"
         logging.info(
-            "[%s] Saving the checkpoint to %s/%s.", self, checkpoint_path, filename
+            "[%s] Saving the checkpoint to %s/%s.",
+            self,
+            checkpoint_path,
+            filename,
         )
         self.trainer.save_model(filename, checkpoint_path)
         self._save_random_states(self.current_round, checkpoint_path)
@@ -1238,7 +1259,8 @@ class Server:
     def _resume_from_checkpoint(self):
         """Resumes a training session from a previously saved checkpoint."""
         logging.info(
-            "[%s] Resume a training session from a previously saved checkpoint.", self
+            "[%s] Resume a training session from a previously saved checkpoint.",
+            self,
         )
 
         # Loading important data in the server for resuming its session

@@ -8,6 +8,7 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 
 https://arxiv.org/pdf/1910.06378.pdf
 """
+
 from collections import OrderedDict
 
 import copy
@@ -21,6 +22,7 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
+
     def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)

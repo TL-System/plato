@@ -7,14 +7,14 @@ If runtime exceptions occur that prevent a federated learning session from runni
 * Out of CUDA memory.
 
   *Potential solutions:* Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
- 
+
 * The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
-  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds). 
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
 
   For example, to run a training session on [Google Colaboratory or Compute Canada](https://github.com/TL-System/plato/blob/main/docs/Running.md) with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
 
-* Running processes have not been terminated from previous runs. 
+* Running processes have not been terminated from previous runs.
 
   *Potential solutions:* Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
 
@@ -34,7 +34,7 @@ The selected performance metrics, such as accuracy, will be saved in a `.csv` fi
 
 As `.csv` files, these results can be used however one wishes; an example Python program, called `plot.py`, plots the necessary figures and saves them as PDF files. To run this program:
 
-```shell
+```bash
 python plot.py -c config.yml
 ```
 
@@ -53,7 +53,7 @@ Continuous Integration (CI) tests have been set up for the PyTorch frameworks in
 ### conda
 If you still use conda, remove the `conda` environment used to run *Plato* first, and then remove the directory containing *Plato*'s git repository.
 
-```shell
+```bash
 conda env remove -n plato
 rm -rf plato/
 ```
@@ -65,13 +65,13 @@ If you installed Plato using `uv`, you can uninstall it by:
 
 1. Remove the local uv environment
 By default, uv puts the environment under .venv/ (if you’re using "uv sync" in a project). To “uninstall” it:
-```shell
+```bash
 rm -rf .venv
 ```
 
 2. Clean uv’s cache
 This will remove cached isolated tool environments, etc.
-```shell
+```bash
 uv cache clean
 ```
 

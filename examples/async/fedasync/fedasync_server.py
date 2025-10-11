@@ -8,8 +8,8 @@ in Proc. 12th Annual Workshop on Optimization for Machine Learning (OPT 2020).
 
 https://opt-ml.org/papers/2020/paper_28.pdf
 """
+
 import logging
-from collections import OrderedDict
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -19,7 +19,12 @@ class Server(fedavg.Server):
     """A federated learning server using the FedAsync algorithm."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,
@@ -31,6 +36,7 @@ class Server(fedavg.Server):
 
         # The hyperparameter of FedAsync with a range of (0, 1)
         self.mixing_hyperparam = 1
+
         # Whether adjust mixing hyperparameter after each round
         self.adaptive_mixing = False
 

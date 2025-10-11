@@ -1,9 +1,9 @@
 """
 A customized server with asynchronous client selection
 """
+
 import logging
 
-from turtle import up, update
 from plato.config import Config
 from plato.servers import fedavg
 from cvxopt import matrix, log, solvers, sparse
@@ -40,9 +40,7 @@ class Server(fedavg.Server):
         """Initializes necessary variables."""
         super().configure()
 
-        self.local_gradient_bounds = 0.5 * np.ones(
-            self.number_of_client
-        )  
+        self.local_gradient_bounds = 0.5 * np.ones(self.number_of_client)
         self.local_stalenesses = 0.01 * np.ones(self.number_of_client)
         self.aggregation_weights = np.ones(self.number_of_client) * (
             1.0 / self.number_of_client
@@ -57,7 +55,7 @@ class Server(fedavg.Server):
 
         # Select clients based on calculated probability (within clients_pool)
         p = self.calculate_selection_probability(clients_pool)
-        #logging.info(f"The calculated probability is: ", p)
+        # logging.info(f"The calculated probability is: ", p)
         selected_clients = np.random.choice(
             clients_pool, clients_count, replace=False, p=p
         )
@@ -71,7 +69,7 @@ class Server(fedavg.Server):
         self.squared_deltas_current_round = np.zeros(self.number_of_client)
         sum_deltas_current_round = 0
         deltas_counter = 0
-        
+
         # Find delta bound for each client
         for update, delta in zip(updates, deltas_received):
             squared_delta = 0
@@ -96,7 +94,7 @@ class Server(fedavg.Server):
         for client_counter in range(200):
             if client_counter in self.unexplored_clients:
                 self.squared_deltas_current_round[client_counter] = expect_deltas
-       
+
         return avg_update
 
     def weights_aggregated(self, updates):
@@ -104,9 +102,7 @@ class Server(fedavg.Server):
 
         # Extract the local staleness and update the record of client staleness.
         for update in updates:
-            self.local_stalenesses[update.client_id - 1] = (
-                update.staleness + 0.1
-            )  
+            self.local_stalenesses[update.client_id - 1] = update.staleness + 0.1
 
         # Update local gradient bounds
         for client_id, bound in enumerate(self.squared_deltas_current_round):
@@ -159,8 +155,7 @@ class Server(fedavg.Server):
         f2_temp = np.multiply(local_staleness_inpool, local_gradient_bounds_inpool)
         f2_params = matrix(
             BigA * np.multiply(aggre_weight_square, f2_temp)
-        )  # p_i^2 * \tau_i * G_i 
-
+        )  # p_i^2 * \tau_i * G_i
 
         f1 = matrix(-1 * np.eye(num_of_clients_inpool))
         f2 = matrix(np.eye(num_of_clients_inpool))
@@ -169,8 +164,8 @@ class Server(fedavg.Server):
         g = log(matrix(sparse([[f1_params, f2_params]])))
 
         K = [2 * num_of_clients_inpool]
-        G = matrix(-1 * np.eye(num_of_clients_inpool))  
-        h = matrix(np.zeros((num_of_clients_inpool, 1)))  
+        G = matrix(-1 * np.eye(num_of_clients_inpool))
+        h = matrix(np.zeros((num_of_clients_inpool, 1)))
 
         A1 = matrix([[1.0]])
         A = matrix([[1.0]])
@@ -184,4 +179,3 @@ class Server(fedavg.Server):
         ]  # solve out the optimal sampling probabitliy
 
         return np.array(sol).reshape(-1)
-

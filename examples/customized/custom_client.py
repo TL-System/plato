@@ -1,9 +1,10 @@
-""" 
-An example for running Plato with custom clients. 
+"""
+An example for running Plato with custom clients.
 
 To run this example:
 
-python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
+cd examples/customized
+uv run custom_client.py -c client.yml -i <client_id>
 """
 
 import asyncio
@@ -73,7 +74,10 @@ class Trainer(basic.Trainer):
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(self.device),
+                    labels.to(self.device),
+                )
 
                 examples = examples.view(len(examples), -1)
                 outputs = self.model(examples)

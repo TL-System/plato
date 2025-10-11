@@ -6,6 +6,7 @@ Samples data from a dataset, biased across modalities in an
      one subset of modalities in each sample.
 
 """
+
 import numpy as np
 
 from plato.config import Config
@@ -15,6 +16,7 @@ from plato.samplers import base
 class Sampler(base.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
     dataset."""
+
     def __init__(self, datasource, client_id):
         super().__init__()
         self.client_id = client_id
@@ -27,9 +29,11 @@ class Sampler(base.Sampler):
         np.random.seed(self.random_seed * int(client_id))
 
         # default, one sample holds only one modality
-        per_client_modalties_size = Config(
-        ).data.per_client_modalties_size if hasattr(
-            Config().data, 'per_client_modalties_size') else 1
+        per_client_modalties_size = (
+            Config().data.per_client_modalties_size
+            if hasattr(Config().data, "per_client_modalties_size")
+            else 1
+        )
 
         assert per_client_modalties_size < len(modalities_name)
 
@@ -42,11 +46,11 @@ class Sampler(base.Sampler):
 
     def get(self):
         """Obtains the modality sampler.
-            Note: the sampler here is utilized as the mask to
-             remove modalities.
+        Note: the sampler here is utilized as the mask to
+         remove modalities.
         """
         return self.subset_modalities
 
     def modality_size(self):
-        """ Obtain the utilized modality size """
+        """Obtain the utilized modality size"""
         return len(self.subset_modalities)

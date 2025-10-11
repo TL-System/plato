@@ -5,7 +5,7 @@ Y. Deng, et al., "Adaptive Personalized Federated Learning"
 
 URL: https://arxiv.org/pdf/2003.13461.pdf
 
-Third-party code: 
+Third-party code:
 https://github.com/MLOPTPSU/FedTorch/blob/main/main.py
 https://github.com/MLOPTPSU/FedTorch/blob/main/fedtorch/comms/trainings/federated/apfl.py
 """

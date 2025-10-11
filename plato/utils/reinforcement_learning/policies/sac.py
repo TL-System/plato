@@ -3,6 +3,7 @@ Reference:
 
 https://github.com/pranz24/pytorch-soft-actor-critic
 """
+
 import math
 
 import numpy as np
@@ -39,8 +40,7 @@ def logsumexp(inputs, dim=None, keepdim=False):
 
 def soft_update(target, source, tau):
     for target_param, param in zip(target.parameters(), source.parameters()):
-        target_param.data.copy_(target_param.data * (1.0 - tau) +
-                                param.data * tau)
+        target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
 
 
 def hard_update(target, source):
@@ -116,13 +116,15 @@ class GaussianPolicy(nn.Module):
 
         # action rescaling
         if action_space is None:
-            self.action_scale = torch.tensor(1.)
-            self.action_bias = torch.tensor(0.)
+            self.action_scale = torch.tensor(1.0)
+            self.action_bias = torch.tensor(0.0)
         else:
             self.action_scale = torch.FloatTensor(
-                (action_space.high - action_space.low) / 2.)
+                (action_space.high - action_space.low) / 2.0
+            )
             self.action_bias = torch.FloatTensor(
-                (action_space.high + action_space.low) / 2.)
+                (action_space.high + action_space.low) / 2.0
+            )
 
     def forward(self, state):
         x = F.relu(self.linear1(state))
@@ -136,14 +138,14 @@ class GaussianPolicy(nn.Module):
         mean, log_std = self.forward(state)
         std = log_std.exp()
         normal = Normal(mean, std)
-        x_t = normal.rsample(
-        )  # for reparameterization trick (mean + std * N(0,1))
+        x_t = normal.rsample()  # for reparameterization trick (mean + std * N(0,1))
         y_t = torch.tanh(x_t)
         action = y_t * self.action_scale + self.action_bias
         log_prob = normal.log_prob(x_t)
         # Enforcing Action Bound
-        log_prob -= torch.log(self.action_scale * (1 - y_t.pow(2)) +
-                              Config().algorithm.epsilon)
+        log_prob -= torch.log(
+            self.action_scale * (1 - y_t.pow(2)) + Config().algorithm.epsilon
+        )
         log_prob = log_prob.sum(1, keepdim=True)
         mean = torch.tanh(mean) * self.action_scale + self.action_bias
         return action, log_prob, mean
@@ -167,13 +169,15 @@ class DeterministicPolicy(nn.Module):
 
         # action rescaling
         if action_space is None:
-            self.action_scale = 1.
-            self.action_bias = 0.
+            self.action_scale = 1.0
+            self.action_bias = 0.0
         else:
             self.action_scale = torch.FloatTensor(
-                (action_space.high - action_space.low) / 2.)
+                (action_space.high - action_space.low) / 2.0
+            )
             self.action_bias = torch.FloatTensor(
-                (action_space.high + action_space.low) / 2.)
+                (action_space.high + action_space.low) / 2.0
+            )
 
     def forward(self, state):
         x = F.relu(self.linear1(state))
@@ -183,10 +187,10 @@ class DeterministicPolicy(nn.Module):
 
     def sample(self, state):
         mean = self.forward(state)
-        noise = self.noise.normal_(0., std=0.1)
+        noise = self.noise.normal_(0.0, std=0.1)
         noise = noise.clamp(-0.25, 0.25)
         action = mean + noise
-        return action, torch.tensor(0.), mean
+        return action, torch.tensor(0.0), mean
 
     def to(self, device):
         self.action_scale = self.action_scale.to(device)
@@ -200,48 +204,59 @@ class Policy(base.Policy):
         super().__init__(state_dim, action_space)
 
         # Initialize NNs
-        self.critic = QNetwork(state_dim, action_space.shape[0],
-                               Config().algorithm.hidden_size).to(self.device)
+        self.critic = QNetwork(
+            state_dim, action_space.shape[0], Config().algorithm.hidden_size
+        ).to(self.device)
         self.critic_optimizer = torch.optim.Adam(
-            self.critic.parameters(), lr=Config().algorithm.learning_rate)
+            self.critic.parameters(), lr=Config().algorithm.learning_rate
+        )
 
-        self.critic_target = QNetwork(state_dim, action_space.shape[0],
-                                      Config().algorithm.hidden_size).to(
-                                          self.device)
+        self.critic_target = QNetwork(
+            state_dim, action_space.shape[0], Config().algorithm.hidden_size
+        ).to(self.device)
         hard_update(self.critic_target, self.critic)
 
         if Config().algorithm.deterministic:
             self.alpha = 0
             self.automatic_entropy_tuning = False
-            self.actor = DeterministicPolicy(state_dim, action_space.shape[0],
-                                             Config().algorithm.hidden_size,
-                                             action_space).to(self.device)
+            self.actor = DeterministicPolicy(
+                state_dim,
+                action_space.shape[0],
+                Config().algorithm.hidden_size,
+                action_space,
+            ).to(self.device)
             self.actor_optimizer = torch.optim.Adam(
-                self.actor.parameters(), lr=Config().algorithm.learning_rate)
+                self.actor.parameters(), lr=Config().algorithm.learning_rate
+            )
         else:
             if self.automatic_entropy_tuning is True:
                 self.target_entropy = -torch.prod(
-                    torch.Tensor(action_space.shape).to(self.device)).item()
-                self.log_alpha = torch.zeros(1,
-                                             requires_grad=True,
-                                             device=self.device)
+                    torch.Tensor(action_space.shape).to(self.device)
+                ).item()
+                self.log_alpha = torch.zeros(1, requires_grad=True, device=self.device)
                 self.alpha_optimizer = torch.optim.Adam(
-                    [self.log_alpha], lr=Config().algorithm.learning_rate)
+                    [self.log_alpha], lr=Config().algorithm.learning_rate
+                )
 
-            self.actor = GaussianPolicy(state_dim, action_space.shape[0],
-                                        Config().algorithm.hidden_size,
-                                        action_space).to(self.device)
+            self.actor = GaussianPolicy(
+                state_dim,
+                action_space.shape[0],
+                Config().algorithm.hidden_size,
+                action_space,
+            ).to(self.device)
             self.actor_optimizer = torch.optim.Adam(
-                self.actor.parameters(), lr=Config().algorithm.learning_rate)
+                self.actor.parameters(), lr=Config().algorithm.learning_rate
+            )
 
         # Initialize replay memory
-        self.replay_buffer = base.ReplayMemory(state_dim,
-                                               action_space.shape[0],
-                                               Config().algorithm.replay_size,
-                                               Config().algorithm.replay_seed)
+        self.replay_buffer = base.ReplayMemory(
+            state_dim,
+            action_space.shape[0],
+            Config().algorithm.replay_size,
+            Config().algorithm.replay_seed,
+        )
         self.alpha = Config().algorithm.alpha
-        self.automatic_entropy_tuning = Config(
-        ).algorithm.automatic_entropy_tuning
+        self.automatic_entropy_tuning = Config().algorithm.automatic_entropy_tuning
 
     def select_action(self, state, test=False):
         state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
@@ -254,28 +269,30 @@ class Policy(base.Policy):
     def update(self):
         for _ in range(Config().algorithm.update_iteration):
             # Sample a batch from memory
-            state_batch, action_batch, reward_batch, next_state_batch, mask_batch = self.replay_buffer.sample(
+            state_batch, action_batch, reward_batch, next_state_batch, mask_batch = (
+                self.replay_buffer.sample()
             )
 
             state_batch = torch.FloatTensor(state_batch).to(self.device)
-            next_state_batch = torch.FloatTensor(next_state_batch).to(
-                self.device)
+            next_state_batch = torch.FloatTensor(next_state_batch).to(self.device)
             action_batch = torch.FloatTensor(action_batch).to(self.device)
-            reward_batch = torch.FloatTensor(reward_batch).to(
-                self.device).unsqueeze(1)
-            mask_batch = torch.FloatTensor(mask_batch).to(
-                self.device).unsqueeze(1)
+            reward_batch = torch.FloatTensor(reward_batch).to(self.device).unsqueeze(1)
+            mask_batch = torch.FloatTensor(mask_batch).to(self.device).unsqueeze(1)
 
             with torch.no_grad():
                 next_state_action, next_state_log_pi, _ = self.actor.sample(
-                    next_state_batch)
+                    next_state_batch
+                )
                 qf1_next_target, qf2_next_target = self.critic_target(
-                    next_state_batch, next_state_action)
-                min_qf_next_target = torch.min(
-                    qf1_next_target,
-                    qf2_next_target) - self.alpha * next_state_log_pi
-                next_q_value = reward_batch + (1 - mask_batch) * Config(
-                ).algorithm.gamma * (min_qf_next_target)
+                    next_state_batch, next_state_action
+                )
+                min_qf_next_target = (
+                    torch.min(qf1_next_target, qf2_next_target)
+                    - self.alpha * next_state_log_pi
+                )
+                next_q_value = reward_batch + (
+                    1 - mask_batch
+                ) * Config().algorithm.gamma * (min_qf_next_target)
             qf1, qf2 = self.critic(
                 state_batch, action_batch
             )  # Two Q-functions to mitigate positive bias in the policy improvement step
@@ -299,8 +316,9 @@ class Policy(base.Policy):
             self.actor_optimizer.step()
 
             if self.automatic_entropy_tuning:
-                alpha_loss = -(self.log_alpha *
-                               (log_pi + self.target_entropy).detach()).mean()
+                alpha_loss = -(
+                    self.log_alpha * (log_pi + self.target_entropy).detach()
+                ).mean()
 
                 self.alpha_optimizer.zero_grad()
                 alpha_loss.backward()
@@ -309,13 +327,17 @@ class Policy(base.Policy):
                 self.alpha = self.log_alpha.exp()
                 alpha_tlogs = self.alpha.clone()  # For TensorboardX logs
             else:
-                alpha_loss = torch.tensor(0.).to(self.device)
+                alpha_loss = torch.tensor(0.0).to(self.device)
                 alpha_tlogs = torch.tensor(self.alpha)  # For TensorboardX logs
 
-            soft_update(self.critic_target, self.critic,
-                        Config().algorithm.tau)
+            soft_update(self.critic_target, self.critic, Config().algorithm.tau)
 
             self.total_it += 1
 
-        return qf1_loss.item(), qf2_loss.item(), policy_loss.item(
-        ), alpha_loss.item(), alpha_tlogs.item()
+        return (
+            qf1_loss.item(),
+            qf2_loss.item(),
+            policy_loss.item(),
+            alpha_loss.item(),
+            alpha_tlogs.item(),
+        )

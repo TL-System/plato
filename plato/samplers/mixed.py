@@ -3,6 +3,7 @@ Samples data from a dataset as clients' local datasets.
 Some are biased across labels according to the Dirichlet distribution,
 while some are in an independent and identically distributed fashion.
 """
+
 import numpy as np
 from plato.config import Config
 from plato.samplers import dirichlet

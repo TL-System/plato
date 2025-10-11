@@ -16,35 +16,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Install CUDA
         env:
           cuda: "11.3"
         run: bash ./scripts/actions/install_cuda_ubuntu.sh
         shell: bash
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt install -y python3-pip
-          pip3 install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
-          pip3 install -r requirements.txt --upgrade
-          cd configs
-          pip3 install -r requirements.txt --upgrade
-          pip install .
-          cd ../..
-
-      - name: Unit tests
-        shell: bash -l {0}
-        run: |
-          cd tests
-          find . -name '*.py' -exec python {} \;
-
       - name: Training workloads
         run: |
           mkdir ./models/pretrained
           wget https://kubeedge.obs.cn-north-1.myhuaweicloud.com/model/yolov5.pth
           mv yolov5.pth ./models/pretrained
-          ./run --config=configs/MNIST/fedavg_lenet5.yml
-          ./run --config=configs/MNIST/mistnet_lenet5.yml
-          ./run --config=.github/workflows/configs/fedavg_yolov5.yml
-          ./run --config=.github/workflows/configs/mistnet_yolov5.yml
+          uv run plato.py --config=configs/MNIST/fedavg_lenet5.yml
+          uv run plato.py --config=configs/MNIST/mistnet_lenet5.yml
+          uv run plato.py --config=.github/workflows/configs/fedavg_yolov5.yml
+          uv run plato.py --config=.github/workflows/configs/mistnet_yolov5.yml

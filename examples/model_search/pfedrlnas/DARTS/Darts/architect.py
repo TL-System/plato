@@ -2,6 +2,7 @@
 Modify based on cnn/architect.py in https://github.com/quark0/darts,
 to support the algorithms in FedRLNAS.
 """
+
 import pickle
 import os
 import logging
@@ -52,7 +53,12 @@ class Architect(nn.Module):
 
         self.baseline = {}
         if Config().args.resume:
-            save_config = f"{Config().server.model_path}/baselines.pickle"
+            # Use model_path if available, otherwise use default models/pretrained directory
+            if hasattr(Config().server, "model_path"):
+                model_dir = Config().server.model_path
+            else:
+                model_dir = "./models/pretrained"
+            save_config = f"{model_dir}/baselines.pickle"
             if os.path.exists(save_config):
                 with open(save_config, "rb") as file:
                     self.baseline = pickle.load(file)
@@ -71,6 +77,15 @@ class Architect(nn.Module):
         normal_grads = self._compute_grad(rewards, epoch_index_normal, client_id_list)
         reduce_grads = self._compute_grad(rewards, epoch_index_reduce, client_id_list)
         for index, client_id in enumerate(client_id_list):
+            # Ensure gradient tensors exist before copying
+            if self.alphas_normal[client_id - 1].grad is None:
+                self.alphas_normal[client_id - 1].grad = torch.zeros_like(
+                    self.alphas_normal[client_id - 1]
+                )
+            if self.alphas_reduce[client_id - 1].grad is None:
+                self.alphas_reduce[client_id - 1].grad = torch.zeros_like(
+                    self.alphas_reduce[client_id - 1]
+                )
             self.alphas_normal[client_id - 1].grad.copy_(normal_grads[index])
             self.alphas_reduce[client_id - 1].grad.copy_(reduce_grads[index])
             self.optimizers[client_id - 1].step()
@@ -108,7 +123,7 @@ class Architect(nn.Module):
         return reward
 
     def _compute_grad(self, rewards, index_list, client_id_list, normal=True):
-        #pylint: disable=too-many-locals
+        # pylint: disable=too-many-locals
         grads = []
         for list_index, client_id in enumerate(client_id_list):
             if normal:

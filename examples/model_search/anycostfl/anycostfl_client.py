@@ -1,6 +1,7 @@
 """
 Customized Client for AntCostFL.
 """
+
 from plato.config import Config
 from plato.clients import simple
 

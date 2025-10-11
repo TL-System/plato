@@ -17,6 +17,7 @@ handwritten letters," in the 2017 International Joint Conference on Neural
 Networks (IJCNN).
 
 """
+
 import json
 import logging
 import os

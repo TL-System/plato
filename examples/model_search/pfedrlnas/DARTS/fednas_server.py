@@ -1,6 +1,7 @@
 """
 Implement new algorithm: personalized federarted NAS.
 """
+
 import logging
 import pickle
 
@@ -18,9 +19,7 @@ class Server(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
@@ -70,15 +69,35 @@ class Server(fedavg.Server):
             if cfg:
                 logging.info("the config of client %s is %s", str(i), str(cfg))
                 cfgs.append(cfg)
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+        # Use model_path if available, otherwise use default models/pretrained directory
+        if hasattr(Config().server, "model_path"):
+            model_dir = Config().server.model_path
+        else:
+            model_dir = "./models/pretrained"
+        save_config = f"{model_dir}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump((cfgs), file)
 
     def save_to_checkpoint(self) -> None:
-        save_config = f"{Config().server.model_path}/subnet_configs.pickle"
+        # Similar way used in server_will_close
+        cfgs = []
+        for i in range(1, Config().clients.total_clients + 1):
+            cfg = self.algorithm.model.genotype(
+                self.algorithm.model.alphas_normal[i - 1],
+                self.algorithm.model.alphas_reduce[i - 1],
+            )
+            if cfg:
+                cfgs.append(cfg)
+
+        # Use model_path if available, otherwise use default models/pretrained directory
+        if hasattr(Config().server, "model_path"):
+            model_dir = Config().server.model_path
+        else:
+            model_dir = "./models/pretrained"
+        save_config = f"{model_dir}/subnet_configs.pickle"
         with open(save_config, "wb") as file:
-            pickle.dump(self.subnets_config, file)
-        save_config = f"{Config().server.model_path}/baselines.pickle"
+            pickle.dump(cfgs, file)
+        save_config = f"{model_dir}/baselines.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.algorithm.model.baseline, file)
         return super().save_to_checkpoint()

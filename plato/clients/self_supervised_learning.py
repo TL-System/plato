@@ -1,12 +1,12 @@
 """
 A self-supervised learning (SSL) client prepares a personalized datasource for
 the personalization process, which will be performed after finishing the FL
-training process with SSL. 
+training process with SSL.
 
 Specifically, the conventional FL training process with SSL will train the model
 with the datasource and objective function of SSL. Yet, the datasource used in
 personalization should be one of supervised learning. Therefore, a client needs
-to prepare the personalized datasource. 
+to prepare the personalized datasource.
 """
 
 from plato.datasources import registry as datasources_registry

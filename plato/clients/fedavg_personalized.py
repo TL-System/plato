@@ -2,6 +2,7 @@
 A personalized federated learning client that saves its local layers before
 sending the shared global model to the server after local training.
 """
+
 from collections import OrderedDict
 
 from plato.clients import simple

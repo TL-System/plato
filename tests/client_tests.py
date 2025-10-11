@@ -1,10 +1,11 @@
 """
 Testing a federated learning client.
 """
+
 import os
 import asyncio
 
-os.environ["config_file"] = "tests/config.yml"
+os.environ["config_file"] = "config.yml"
 
 from plato.clients import simple
 

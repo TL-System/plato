@@ -1,6 +1,7 @@
 """
 A customized trainer for image segmentation on PASCAL VOC dataset (2012).
 """
+
 import torch.nn as nn
 import torch
 import numpy as np

@@ -7,9 +7,7 @@ import os
 from typing import List
 
 
-def initialize_csv(
-    result_csv_file: str, logged_items: List, result_path: str
-) -> None:
+def initialize_csv(result_csv_file: str, logged_items: List, result_path: str) -> None:
     """Create a CSV file and writer the first row."""
     # Create a new directory if it does not exist
     if not os.path.exists(result_path):

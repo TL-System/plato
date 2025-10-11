@@ -4,6 +4,7 @@ The registry for samplers designed to partition the dataset across the clients.
 Having a registry of all available classes is convenient for retrieving an instance based
 on a configuration at run-time.
 """
+
 import logging
 from collections import OrderedDict
 
@@ -54,7 +55,7 @@ def get(datasource, client_id, testing=False, **kwargs):
         logging.info("[Client #%d] Test set sampler: %s", client_id, sampler_type)
     else:
         logging.info("[Client #%d] Sampler: %s", client_id, sampler_type)
-        
+
     if sampler_type in registered_samplers:
         registered_sampler = registered_samplers[sampler_type](
             datasource, client_id, testing=testing

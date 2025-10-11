@@ -1,11 +1,12 @@
 """Unit tests for data loaders."""
+
 import os
 import unittest
 import math
 import torch
 from typing import Type, List
 
-os.environ["config_file"] = "tests/config.yml"
+os.environ["config_file"] = "config.yml"
 
 import numpy as np
 

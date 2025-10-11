@@ -12,6 +12,7 @@ Learning and Systems, 2, 429-450.
 
 https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf
 """
+
 import fedprox_trainer
 
 from plato.servers import fedavg

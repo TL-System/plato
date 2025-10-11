@@ -3,6 +3,7 @@ import torch
 
 class FeatureDataset(torch.utils.data.Dataset):
     """Used to prepare a feature dataset for a DataLoader in PyTorch."""
+
     def __init__(self, dataset):
         self.dataset = dataset
 

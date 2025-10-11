@@ -168,9 +168,9 @@ class Algorithm(fedavg.Algorithm):
                             not update_track
                             and not ("running" in key or "tracked" in key)
                         ):
-                            global_parameters[key][
-                                : local_weights[key].shape[0]
-                            ] += copy.deepcopy(local_weights[key])
+                            global_parameters[key][: local_weights[key].shape[0]] += (
+                                copy.deepcopy(local_weights[key])
+                            )
                             count[: local_weights[key].shape[0]] += torch.ones(
                                 local_weights[key].shape
                             )
@@ -257,7 +257,7 @@ class Algorithm(fedavg.Algorithm):
             ).to(Config.device())
             optimizer = torch.optim.Adam(
                 subnet.parameters(),
-                **Config().parameters.distillation.optimizer._asdict()
+                **Config().parameters.distillation.optimizer._asdict(),
             )
             for _ in range(
                 int(

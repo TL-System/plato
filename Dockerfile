@@ -1,26 +1,20 @@
 # Download base image from NVIDIA's Docker Hub
-FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:13.0.1-cudnn-devel-ubuntu24.04
 LABEL maintainer="Baochun Li"
 
-ADD ./.bashrc /root/
-COPY ./requirements.txt /root/
 WORKDIR /root/plato
+COPY . /root/plato/
 
 RUN apt-get update \
-    && apt-get install -y wget \
-    && apt-get install -y vim \
-    && apt-get install -y net-tools \
-    && apt-get install -y git \
-    && apt-get install -y libgmp-dev \
-    && mkdir -p ~/miniconda3 \
-    && wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -O ~/miniconda3/miniconda.sh \
-    && bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3 \
-    && rm -rf ~/miniconda3/miniconda.sh \
-    && ~/miniconda3/bin/conda update -n base -c defaults conda \
-    && ~/miniconda3/bin/conda init bash \
-    && ~/miniconda3/bin/conda create -n plato python=3.9 \
-    && ~/miniconda3/envs/plato/bin/pip install torch torchvision \
-    && ~/miniconda3/envs/plato/bin/pip install -r ~/requirements.txt \
-    && ~/miniconda3/envs/plato/bin/pip install plato-learn
+    && apt-get install -y libgomp1 \
+    && apt-get install -y curl \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh
 
-RUN rm /root/requirements.txt
+# Set environment variables for uv before using it
+ENV PATH="/root/.local/bin:$PATH"
+
+# Set additional environment variables for uv
+ENV UV_SYSTEM_PYTHON=1
+
+# Set default command to use uv run
+CMD ["/bin/bash"]

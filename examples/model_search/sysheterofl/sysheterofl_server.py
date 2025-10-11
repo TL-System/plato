@@ -1,6 +1,7 @@
 """
 The server for paper system-heterogenous federated learning through architecture search.
 """
+
 import numpy as np
 
 from plato.config import Config
@@ -46,9 +47,7 @@ class Server(fedavg.Server):
         self.trainer.biggest_net_config = self.algorithm.biggest_net
         return super().customize_server_response(server_response, client_id)
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         return self.algorithm.aggregation(weights_received)
 

@@ -12,7 +12,7 @@ Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb`
 
 SSH into a cluster on Digital Research Alliance of Canada. Here we take [Graham](https://docs.alliancecan.ca/wiki/Graham) as an example, while [Cedar](https://docs.alliancecan.ca/wiki/Cedar) and [Narval](https://docs.alliancecan.ca/wiki/Narval/en) are also available. Then clone the *Plato* repository to your own directory:
 
-```shell
+```bash
 ssh <CCDB username>@graham.computecanada.ca
 cd projects/def-baochun/<CCDB username>
 git clone https://github.com/TL-System/plato
@@ -24,44 +24,44 @@ Your CCDB username can be located after signing into the [CCDB portal](https://c
 
 First, load version 3.9 of the Python programming language:
 
-```shell
+```bash
 module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack
 ```
 
 Then create the directory that contains your own Python virtual environment using `virtualenv`:
 
-```shell
+```bash
 virtualenv --no-download ~/.federated
 ```
 
-where `~/.federated` is assumed to be the directory containing the new virtual environment just created. 
+where `~/.federated` is assumed to be the directory containing the new virtual environment just created.
 
 You can now activate your environment:
 
-```shell
+```bash
 source ~/.federated/bin/activate
 ```
 
 Due to the versioning difference for some Python packages on Digital Research Alliance of Canada, some source files may need to be patched. Use the following command to patch these files:
 
-```shell
+```bash
 bash ./docs/patches/patch_cc.sh
 ```
 
 The next step is to install the required Python packages. PyTorch should be installed following the advice of its [getting started website](https://pytorch.org/get-started/locally/). As for January 2022, Digital Research Alliance of Canada provides GPU with CUDA version 11.2, so the command would be:
 
-```shell
+```bash
 pip3 install torch==1.10.1+cu113 torchvision==0.11.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 ```
 If it prompts `MemoryError`, use the alternative command:
 
-```shell
-pip3 install --no-cache-dir torch==1.10.1+cu113 torchvision==0.11.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html 
+```bash
+pip3 install --no-cache-dir torch==1.10.1+cu113 torchvision==0.11.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 ```
 
 Finally, install Plato as a pip package:
 
-```shell
+```bash
 pip install .
 ```
 
@@ -71,7 +71,7 @@ pip install .
 vim ~/.bashrc
 ```
 
-Then add 
+Then add
 
 ```
 alias plato='cd ~/projects/def-baochun/<CCDB username>/plato/; module load gcc/9.3.0 arrow cuda/11 python/3.9 scipy-stack; source ~/.federated/bin/activate'
@@ -89,13 +89,13 @@ Next time, after you SSH into this cluster, just type `plato`:)
 
 To start a federated learning training workload with *Plato*, create a job script:
 
-```shell
+```bash
 vi <job script file name>.sh
 ```
 
 For exmaple:
 
-```shell
+```bash
 cd ~/projects/def-baochun/<CCDB username>/plato
 vi cifar_wideresnet.sh
 ```
@@ -121,13 +121,13 @@ source ~/.federated/bin/activate
 
 Submit the job:
 
-```shell
+```bash
 sbatch <job script file name>.sh
 ```
 
 For example:
 
-```shell
+```bash
 sbatch cifar_wideresnet.sh
 ```
 
@@ -135,7 +135,7 @@ To check the status of a submitted job, use the `sq` command. Refer to the [offi
 
 To monitor the output as it is generated live, use the command:
 
-```shell
+```bash
 watch -n 1 tail -n 50 ./cifar_wideresnet.out
 ```
 
@@ -146,7 +146,7 @@ where `./cifar_wideresnet.out` is the output file that needs to be monitored, an
 
 If there is a need to start an interactive session (for debugging purposes, for example), it is also supported by Digital Research Alliance of Canada using the `salloc` command:
 
-```shell
+```bash
 salloc --time=2:00:00 --gres=gpu:1 --mem=64G --account=def-baochun
 ```
 
@@ -166,7 +166,7 @@ salloc: Granted job allocation 53923456
 
 Then you can run *Plato*:
 
-```shell
+```bash
 ./run -c configs/CIFAR10/fedavg_wideresnet.yml
 ```
 
@@ -179,14 +179,14 @@ If runtime exceptions occur that prevent a federated learning session from runni
 * Out of CUDA memory.
 
   *Potential solutions:* Decrease the `max_concurrency` value in the `trainer` section in your configuration file.
- 
-* Running processes have not been terminated from previous runs. 
+
+* Running processes have not been terminated from previous runs.
 
   *Potential solutions:* Use the command `pkill python` to terminate them so that there will not be CUDA errors in the upcoming run.
- 
+
 * The time that a client waits for the server to respond before disconnecting is too short. This could happen when training with large neural network models. If you get an `AssertionError` saying that there are not enough launched clients for the server to select, this could be the reason. But make sure you first check if it is due to the *out of CUDA memory* error.
 
-  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds). 
+  *Potential solutions:* Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
 
 
 ### Running jobs of HuggingFace
@@ -217,6 +217,6 @@ TRANSFORMERS_OFFLINE=1 ./run -c <your configuration file>
 
 To remove the environment after experiments are completed, just delete the directory:
 
-```shell
+```bash
 rm -rf ~/.federated
 ```

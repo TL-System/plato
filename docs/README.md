@@ -1,10 +1,10 @@
-# Compiling the documentation 
+# Compiling the documentation
 
-```shell
+```bash
 pip install -r requirements.txt --upgrade
 make html
 open _build/html/index.html
-``` 
+```
 
 The following reference has been useful for building the Sphinx continuous integration using Netlify:
 

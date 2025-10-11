@@ -1,6 +1,7 @@
 """
 A federated learning client for FEI.
 """
+
 import logging
 import math
 from types import SimpleNamespace

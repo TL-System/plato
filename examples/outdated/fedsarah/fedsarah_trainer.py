@@ -5,6 +5,7 @@ Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
 Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 
 """
+
 import torch
 
 from plato.config import Config
@@ -14,10 +15,10 @@ import fedsarah_optimizer
 
 
 class Trainer(basic.Trainer):
-    """ The federated learning trainer for the FedSarah client. """
+    """The federated learning trainer for the FedSarah client."""
 
     def __init__(self, model=None):
-        """ Initializing the trainer with the provided model.
+        """Initializing the trainer with the provided model.
 
         Arguments:
             client_id: The ID of the client using this trainer (optional).

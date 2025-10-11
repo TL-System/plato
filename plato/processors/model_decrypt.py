@@ -1,9 +1,11 @@
 """
 A processor that decrypts model weights of MaskCrypt.
 """
+
 from typing import Any
 
 import torch
+
 from plato.processors import model
 from plato.utils import homo_enc
 

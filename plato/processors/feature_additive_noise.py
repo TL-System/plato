@@ -1,8 +1,10 @@
 """
 Implements a Processor for applying local differential privacy using additive noise mechanism.
 """
+
 import logging
 from typing import Any
+
 import numpy
 
 from plato.processors import feature
@@ -19,10 +21,14 @@ class Processor(feature.Processor):
     }
 
     def __init__(self, method="", scale=None, **kwargs) -> None:
-
         self._method = method
-        func = lambda logits, targets: (Processor.methods[method]
-                                        (logits, scale), targets)
+
+        def func(logits, targets):
+            return (
+                Processor.methods[method](logits, scale),
+                targets,
+            )
+
         super().__init__(method=func, **kwargs)
 
     def process(self, data: Any) -> Any:
@@ -35,6 +41,8 @@ class Processor(feature.Processor):
 
         logging.info(
             "[Client #%d] Local differential privacy (using the %s mechanism) applied.",
-            self.client_id, self._method)
+            self.client_id,
+            self._method,
+        )
 
         return output

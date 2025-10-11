@@ -1,9 +1,11 @@
 """The customized trainer designed for MaskCrpyt."""
+
 import logging
 import os
+from typing import OrderedDict
+
 import torch
 
-from typing import OrderedDict
 from plato.config import Config
 from plato.trainers import basic
 
@@ -18,11 +20,14 @@ class Trainer(basic.Trainer):
     def train_run_end(self, config):
         """Compute gradients on local data when training is finished."""
         logging.info(
-            "[Client #%d] Training completed, computing gradient.", self.client_id
+            "[Client #%d] Training completed, computing gradient.",
+            self.client_id,
         )
+
         # Set the existing gradients to zeros
         [x.grad.zero_() for x in list(self.model.parameters())]
         self.model.to(self.device)
+
         for idx, (examples, labels) in enumerate(self.train_loader):
             examples, labels = examples.to(self.device), labels.to(self.device)
             outputs = self.model(examples)
@@ -33,6 +38,7 @@ class Trainer(basic.Trainer):
 
         param_dict = dict(list(self.model.named_parameters()))
         state_dict = self.model.state_dict()
+
         for name in state_dict.keys():
             if name in param_dict:
                 self.gradient[name] = param_dict[name].grad
@@ -41,6 +47,7 @@ class Trainer(basic.Trainer):
 
         model_type = config["model_name"]
         filename = f"{model_type}_gradient_{self.client_id}_{config['run_id']}.pth"
+
         self._save_gradient(filename)
 
     def get_gradient(self):
@@ -48,6 +55,7 @@ class Trainer(basic.Trainer):
         model_type = Config().trainer.model_name
         run_id = Config().params["run_id"]
         filename = f"{model_type}_gradient_{self.client_id}_{run_id}.pth"
+
         return self._load_gradient(filename)
 
     def _save_gradient(self, filename=None, location=None):
@@ -78,4 +86,4 @@ class Trainer(basic.Trainer):
         else:
             model_path = f"{model_path}/{model_name}.pth"
 
-        return torch.load(model_path)
+        return torch.load(model_path, weights_only=False)

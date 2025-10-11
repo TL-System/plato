@@ -7,6 +7,7 @@ Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedi
 
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
+
 import logging
 
 from plato.config import Config
@@ -37,9 +38,7 @@ class Server(fedavg.Server):
 
         logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.genotype())
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received
-    ):  # pylint: disable=unused-argument
+    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]

@@ -1,34 +1,33 @@
 """
 The implementation of the losses for the Calibre approach.
 
-The objective function of Calibre is the combination of the main loss 
-and the auxiliary loss containing two regularizers. And, Calibre assigns 
-different weights to these two parts. We build the loss function to be 
-general enough so that which loss will be included in the objective function 
-and the corresponding weight can be set under the `algorithm` block of the config file. 
+The objective function of Calibre is the combination of the main loss
+and the auxiliary loss containing two regularizers. And, Calibre assigns
+different weights to these two parts. We build the loss function to be
+general enough so that which loss will be included in the objective function
+and the corresponding weight can be set under the `algorithm` block of the config file.
 
 The main loss will be a NTXentLoss while the two regularizers are:
     - prototype-oriented contrastive regularizer
     - prototype-based meta regularizer
 
-The objective function related to ours is proposed by Supervised Contrastive Learning 
-(SupCon) with the paper address https://arxiv.org/pdf/2004.11362.pdf. 
-However, this supervised objective function lags behind our unsupervised objective 
-function. Besides, it does not have theoretically obtained regularizers and overall 
-structure but only computes clustering loss with ground truth labels. 
+The objective function related to ours is proposed by Supervised Contrastive Learning
+(SupCon) with the paper address https://arxiv.org/pdf/2004.11362.pdf.
+However, this supervised objective function lags behind our unsupervised objective
+function. Besides, it does not have theoretically obtained regularizers and overall
+structure but only computes clustering loss with ground truth labels.
 """
 
-from typing import List
 from collections import OrderedDict
+from typing import List
 
 import torch
-from torch import nn
 from lightly import loss as lightly_loss
+from plato.trainers import loss_criterion
+from torch import nn
 
 from clustering import kmeans_clustering
 from prototype_loss import get_prototype_loss
-
-from plato.trainers import loss_criterion
 
 
 class CalibreLoss(nn.Module):
@@ -127,42 +126,56 @@ class CalibreLoss(nn.Module):
 
         ## prototype-oriented contrastive regularizer
         # Compute the prototype features based on projection
-        # with shape, [n_clusters, projection_dim]
-        prototypes_a = torch.stack(
-            [
-                projections_a[pseudo_labels_a == class_id].mean(0)
-                for class_id in pseudo_classes
-            ],
-            dim=0,
-        )
-        # With shape, [n_clusters, projection_dim]
-        prototypes_b = torch.stack(
-            [
-                projections_b[pseudo_labels_b == class_id].mean(0)
-                for class_id in pseudo_classes
-            ],
-            dim=0,
-        )
+        # Filter out clusters that don't have samples in both views to avoid NaN
+        valid_classes = []
+        prototypes_a_list = []
+        prototypes_b_list = []
+        support_prototypes_list = []
+
+        for class_id in pseudo_classes:
+            mask_a = pseudo_labels_a == class_id
+            mask_b = pseudo_labels_b == class_id
+
+            # Only include clusters that have samples in both views
+            if mask_a.sum() > 0 and mask_b.sum() > 0:
+                valid_classes.append(class_id)
+                prototypes_a_list.append(projections_a[mask_a].mean(0))
+                prototypes_b_list.append(projections_b[mask_b].mean(0))
+                support_prototypes_list.append(encodings_a[mask_a].mean(0))
+
+        # Stack the prototypes
+        # with shape, [n_valid_clusters, projection_dim]
+        prototypes_a = torch.stack(prototypes_a_list, dim=0)
+        # With shape, [n_valid_clusters, projection_dim]
+        prototypes_b = torch.stack(prototypes_b_list, dim=0)
 
         # Compute the L_p loss
         loss_fn = lightly_loss.NTXentLoss(memory_bank_size=0)
         l_p = loss_fn(prototypes_a, prototypes_b)
+
         # Compute prototype-based meta regularizer
-        # Support set with shape, [n_clusters, encoding_dim]
-        support_prototypes = torch.stack(
-            [
-                encodings_a[pseudo_labels_a == class_id].mean(0)
-                for class_id in pseudo_classes
-            ],
-            dim=0,
+        # Support set with shape, [n_valid_clusters, encoding_dim]
+        support_prototypes = torch.stack(support_prototypes_list, dim=0)
+
+        # Remap pseudo_labels_b to new indices (0 to n_valid_clusters-1)
+        valid_classes_tensor = torch.tensor(
+            valid_classes, device=pseudo_labels_b.device
         )
+        # Create a mapping from old class IDs to new indices
+        remapped_labels = torch.zeros_like(pseudo_labels_b)
+        for new_idx, class_id in enumerate(valid_classes):
+            remapped_labels[pseudo_labels_b == class_id] = new_idx
+
+        # Filter queries to only include samples from valid clusters
+        valid_query_mask = torch.isin(pseudo_labels_b, valid_classes_tensor)
+        queries_filtered = encodings_b[valid_query_mask]
+        labels_filtered = remapped_labels[valid_query_mask]
 
         # Calculate distances between query set embeddings and class prototypes
-        # with shape, [n_clusters, encoding_dim]
         l_n = get_prototype_loss(
             support_prototypes,
-            queries=encodings_b,
-            query_labels=pseudo_labels_b,
+            queries=queries_filtered,
+            query_labels=labels_filtered,
             distance_type=distance_type,
         )
 

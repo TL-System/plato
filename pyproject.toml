@@ -22,6 +22,7 @@ dependencies = [
     "python-socketio",
     "pyyaml",
     "requests",
+    "tenseal",
     "timm",
     "torch",
     "torch-optimizer",
@@ -32,9 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "black",
-    "pylint"
+    "pytest"
 ]
 
 [project.urls]
@@ -43,8 +42,34 @@ Repository = "https://github.com/TL-System/plato"
 Documentation = "https://platodocs.netlify.app/"
 
 # Basic tool configuration
-[tool.black]
-line-length = 88
+[tool.ruff]
+exclude = [
+    ".venv",
+    "plato/models/dvit",
+    "plato/models/t2tvit",
+]
+include = [
+    "pyproject.toml",
+    "plato/**/*.py",
+    "tests/**/*.py",
+    "examples/**/*.py",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]
+
+[tool.uv.workspace]
+members = [
+    "examples/unlearning/fedunlearning",
+    "examples/unlearning/knot",
+    "examples/client_selection/pisces",
+    "examples/client_selection/polaris",
+    "examples/split_learning/llm_split_learning",
+    "examples/ssl/calibre",
+    "examples/model_search/pfedrlnas/VIT",
+    "examples/model_search/pfedrlnas/MobileNetV3",
+    "examples/model_search/heterofl",
+    "examples/model_search/fedrolex",
+    "examples/detector",
+    "examples/gradient_leakage_attacks",
+]

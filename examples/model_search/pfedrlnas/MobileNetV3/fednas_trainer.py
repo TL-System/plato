@@ -1,20 +1,20 @@
 """
 Customized Trainer for PerFedRLNAS.
 """
+
 import logging
-import random
 import os
 import pickle
+import random
 import re
+
 import torch
+from plato.config import Config
+from plato.trainers import basic
 
 import fednas_specific
 import fedtools
 from model.mobilenetv3_supernet import NasDynamicModel
-
-from plato.trainers import basic
-from plato.config import Config
-
 
 if Config().trainer.lr_scheduler == "timm":
     BasicTrainer = basic.TrainerWithTimmScheduler
@@ -72,12 +72,30 @@ class TrainerAsync(BasicTrainer):
         self.batch_size = config["batch_size"]
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        torch.cuda.synchronize(self.device)
-        torch.cuda.reset_peak_memory_stats(self.device)
+        # Get the device type
+        device_type = (
+            self.device.type if hasattr(self.device, "type") else str(self.device)
+        )
+
+        # Synchronize or reset memory tracking
+        if device_type == "cuda":
+            torch.cuda.synchronize(self.device)
+            torch.cuda.reset_peak_memory_stats(self.device)
+        elif device_type == "mps":
+            torch.mps.synchronize()
+            # MPS currently doesn't expose memory stats APIs, skip reset_peak_memory_stats for MPS
+
+        # Perform forward + backward passes
         loss = super().perform_forward_and_backward_passes(config, examples, labels)
-        torch.cuda.synchronize(self.device)
-        max_mem = torch.cuda.max_memory_allocated(self.device) / 1024**3
-        self.max_mem_allocated = max(max_mem, self.max_mem_allocated)
+
+        # Post-training synchronization and memory tracking
+        if device_type == "cuda":
+            torch.cuda.synchronize(self.device)
+            max_mem = torch.cuda.max_memory_allocated(self.device) / 1024**3
+            self.max_mem_allocated = max(max_mem, self.max_mem_allocated)
+        elif device_type == "mps":
+            torch.mps.synchronize()
+
         return loss
 
     def train_step_end(self, config, batch=None, loss=None):
@@ -113,7 +131,8 @@ class TrainerAsync(BasicTrainer):
             model_name = config["model_name"]
             filename = f"{model_name}_{self.client_id}_{config['run_id']}.mem"
             self.save_memory(
-                (self.max_mem_allocated, self.exceed_memory, self.sim_mem), filename
+                (self.max_mem_allocated, self.exceed_memory, self.sim_mem),
+                filename,
             )
 
     # pylint: disable=unused-argument

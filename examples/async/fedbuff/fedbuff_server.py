@@ -8,6 +8,7 @@ Nguyen, J., Malik, K., Zhan, H., et al., "Federated Learning with Buffered Async
 
 https://proceedings.mlr.press/v151/nguyen22b/nguyen22b.pdf
 """
+
 import asyncio
 
 from plato.config import Config

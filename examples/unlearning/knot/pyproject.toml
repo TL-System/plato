@@ -1,0 +1,10 @@
+[project]
+name = "Knot"
+version = "0.1.0"
+description = "Knot: a clustered aggregation mechanism designed for federated unlearning"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "cvxopt",
+    "mosek",
+]

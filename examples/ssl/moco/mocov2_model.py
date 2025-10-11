@@ -1,6 +1,7 @@
 """
 A model for the MoCoV2 method.
 """
+
 import copy
 from torch import nn
 from lightly.models.modules import MoCoProjectionHead

@@ -73,9 +73,9 @@ class Server(fedavg.Server):
                 + self.delta2 * self.avg_update[client_id]
                 + self.delta3 * self.mean_variance
             )
-            self.update_thresholds[str(client_id)] = (
-                1 / (1 + (np.exp(-sigmoid)))
-            ) * self.orig_threshold
+            self.update_thresholds[str(client_id)] = float(
+                (1 / (1 + (np.exp(-sigmoid)))) * self.orig_threshold
+            )
 
     # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):

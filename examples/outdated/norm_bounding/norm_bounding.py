@@ -7,6 +7,7 @@ federated learning?. arXiv preprint arXiv:1911.07963.
 
 https://arxiv.org/pdf/1911.07963.pdf
 """
+
 import norm_bounding_server
 
 
@@ -15,5 +16,5 @@ def main():
     server.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

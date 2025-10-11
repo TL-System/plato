@@ -3,8 +3,8 @@ A federated learning training session using the FedAdp algorithm.
 
 Reference:
 
-Wu et al., "Fast-Convergent Federated Learning with Adaptive Weighting,"
-in IEEE Transactions on Cognitive Communications and Networking (TCCN'21).
+H. Wu, P. Wang. "Fast-Convergent Federated Learning with Adaptive Weighting," in IEEE Trans.
+on Cognitive Communications and Networking (TCCN), 2021.
 
 https://ieeexplore.ieee.org/abstract/document/9442814
 """
@@ -12,6 +12,7 @@ https://ieeexplore.ieee.org/abstract/document/9442814
 import math
 
 import numpy as np
+
 from plato.config import Config
 from plato.servers import fedavg
 
@@ -20,7 +21,12 @@ class Server(fedavg.Server):
     """A federated learning server using the FedAdp algorithm."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
     ):
         super().__init__(
             model=model,

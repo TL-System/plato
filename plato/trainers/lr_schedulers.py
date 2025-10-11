@@ -1,6 +1,7 @@
 """
 Returns a learning rate scheduler according to the configuration.
 """
+
 import bisect
 import sys
 from types import SimpleNamespace
@@ -111,7 +112,7 @@ def get(
             returned_schedulers.append(
                 retrieved_scheduler(
                     optimizer,
-                    lambda it, lambdas=lambdas: np.product([l(it) for l in lambdas]),
+                    lambda it, lambdas=lambdas: np.prod([l(it) for l in lambdas]),
                 )
             )
         elif _scheduler == "MultiStepLR":

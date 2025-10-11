@@ -1,6 +1,7 @@
 """
 FedRolexFL algorithm trainer.
 """
+
 from plato.config import Config
 from plato.trainers.basic import Trainer
 

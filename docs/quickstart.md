@@ -4,7 +4,7 @@
 
 To start a federated learning training workload, run `./run` from the repository's root directory. For example:
 
-```shell
+```bash
 ./run -c configs/MNIST/fedavg_lenet5.yml
 ```
 
@@ -20,7 +20,7 @@ _Plato_ uses the YAML format for its configuration files to manage the runtime c
 
 In `examples/`, a number of research projects that were developed using Plato as the federated learning framework have been included. To run them, just run the main Python program in each of the directories with a suitable configuration file. For example, to run the FedRep project which implements the FedRep algorithm, run the command:
 
-```shell
+```bash
 python examples/FedRep/fedrep.py -c examples/FedRep/fedrep_MNIST_lenet5.yml
 ```
 
@@ -28,31 +28,31 @@ python examples/FedRep/fedrep.py -c examples/FedRep/fedrep_MNIST_lenet5.yml
 
 To build a new Docker image, use the provided `Dockerfile` for PyTorch:
 
-```shell
+```bash
 docker build -t plato -f Dockerfile .
 ```
 
 To run the docker image that was just built, use the command:
 
-```shell
+```bash
 ./dockerrun.sh
 ```
 
 Or if GPUs are available, use the command:
 
-```shell
+```bash
 ./dockerrun_gpu.sh
 ```
 
 To remove all the containers after they are run, use the command:
 
-```shell
+```bash
 docker rm $(docker ps -a -q)
 ```
 
 To remove the `plato` Docker image, use the command:
 
-```shell
+```bash
 docker rmi plato
 ```
 

@@ -1,44 +1,32 @@
 name: PyTorch CI Tests
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+        branches: [main]
 
 jobs:
-  PyTorch-Tests:
-    runs-on: ubuntu-20.04
+    PyTorch-Tests:
+        runs-on: ubuntu-20.04
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+              with:
+                  submodules: recursive
 
-      # Runs a set of commands using the runners shell
-      - name: Install dependencies
-        shell: bash -l {0}
-        run: |
-          sudo apt-get update
-          sudo apt install -y python3-pip python3-dev
-          pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
-          pip3 install -r requirements.txt --upgrade
-          pip3 install .
+            - name: Install uv
+              uses: astral-sh/setup-uv@v4
 
-      - name: Unit tests
-        shell: bash -l {0}
-        run: |
-          find tests -name '*.py' -exec python {} \;
-
-      - name: Training workloads
-        shell: bash -l {0}
-        run: |
-          ./run --config=configs/MNIST/fedavg_lenet5.yml
-          ./run --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
-          ./run --config=configs/MNIST/fedavg_async_lenet5.yml
-          ./run --config=configs/MNIST/fedavg_lenet5_noniid.yml
-          ./run --config=configs/MNIST/mistnet_lenet5.yml
+            - name: Training workloads
+              shell: bash -l {0}
+              run: |
+                  uv run plato.py --config=configs/MNIST/fedavg_lenet5.yml
+                  uv run plato.py --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
+                  uv run plato.py --config=configs/MNIST/fedavg_async_lenet5.yml
+                  uv run plato.py --config=configs/MNIST/fedavg_lenet5_noniid.yml
+                  uv run plato.py --config=configs/MNIST/mistnet_lenet5.yml

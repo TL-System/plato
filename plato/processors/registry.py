@@ -10,28 +10,27 @@ import logging
 from typing import Tuple
 
 from plato.config import Config
-from plato.processors import pipeline
-
 from plato.processors import (
     base,
     compress,
     decompress,
-    feature_randomized_response,
+    feature_dequantize,
     feature_gaussian,
     feature_laplace,
     feature_quantize,
-    feature_dequantize,
+    feature_randomized_response,
     feature_unbatch,
     inbound_feature_tensors,
-    outbound_feature_ndarrays,
-    model_deepcopy,
-    model_quantize,
-    model_quantize_qsgd,
-    model_dequantize,
-    model_dequantize_qsgd,
     model_compress,
     model_decompress,
+    model_deepcopy,
+    model_dequantize,
+    model_dequantize_qsgd,
+    model_quantize,
+    model_quantize_qsgd,
     model_randomized_response,
+    outbound_feature_ndarrays,
+    pipeline,
     structured_pruning,
     unstructured_pruning,
 )
@@ -61,17 +60,8 @@ registered_processors = {
 }
 
 
-if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
-    # FedAvg server with homomorphic encryption needs to import tenseal, which is not available on
-    # all platforms such as macOS
-    from plato.processors import model_encrypt, model_decrypt
-
-    registered_processors.update(
-        {
-            "model_encrypt": model_encrypt.Processor,
-            "model_decrypt": model_decrypt.Processor,
-        }
-    )
+def register_he_processors():
+    """Register homomorphic encryption processors if needed."""
 
 
 def get(
@@ -102,6 +92,21 @@ def get(
         logging.info("%s: Using Processor for sending payload: %s", user, processor)
     for processor in inbound_processors:
         logging.info("%s: Using Processor for receiving payload: %s", user, processor)
+
+    # Check if HE processors are needed based on server configuration
+    if hasattr(config, "type") and config.type == "fedavg_he":
+        # FedAvg server with homomorphic encryption needs to import tenseal,
+        # which is not available on all platforms such as macOS
+        from plato.processors import model_decrypt, model_encrypt
+
+        registered_processors.update(
+            {
+                "model_encrypt": model_encrypt.Processor,
+                "model_decrypt": model_decrypt.Processor,
+            }
+        )
+
+        logging.info("%s: Using homomorphic encryption processors.", user)
 
     def map_f(name):
         if processor_kwargs is not None and name in processor_kwargs:

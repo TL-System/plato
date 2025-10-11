@@ -1,6 +1,7 @@
 """
 In HeteroFL, the model needs to specifically designed to fit in the algorithm.
 """
+
 import numpy as np
 from torch import nn
 import torch.nn.functional as F
@@ -35,6 +36,7 @@ class Block(nn.Module):
     """
 
     expansion = 1
+
     # pylint:disable=too-many-arguments
     def __init__(self, in_planes, planes, stride, rate, track):
         super().__init__()
@@ -76,6 +78,7 @@ class Bottleneck(nn.Module):
     """
 
     expansion = 4
+
     # pylint:disable=too-many-arguments
     def __init__(self, in_planes, planes, stride, rate, track):
         super().__init__()

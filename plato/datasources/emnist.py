@@ -1,6 +1,7 @@
 """
 The Extended MNIST (EMNIST) dataset from the torchvision package.
 """
+
 from torchvision import datasets, transforms
 
 from plato.config import Config

@@ -23,8 +23,8 @@ data:
     data_path: data/CINIC-10
 
     #
-    download_url: http://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz
-    
+    download_url: https://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz
+
     # Number of samples in each partition
     partition_size: 20000
 

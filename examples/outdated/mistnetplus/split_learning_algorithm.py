@@ -63,8 +63,9 @@ class Algorithm(fedavg.Algorithm):
 
         for inputs, targets, *__ in data_loader:
             with torch.no_grad():
-                inputs, targets = inputs.to(self.trainer.device), targets.to(
-                    self.trainer.device
+                inputs, targets = (
+                    inputs.to(self.trainer.device),
+                    targets.to(self.trainer.device),
                 )
                 logits = self.model.forward_to(inputs)
 
@@ -101,8 +102,9 @@ class Algorithm(fedavg.Algorithm):
         grad_index = 0
 
         for batch_id, (examples, labels) in enumerate(data_loader):
-            examples, labels = examples.to(self.trainer.device), labels.to(
-                self.trainer.device
+            examples, labels = (
+                examples.to(self.trainer.device),
+                labels.to(self.trainer.device),
             )
 
             optimizer.zero_grad()

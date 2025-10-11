@@ -10,6 +10,7 @@ Comparison to FedAtt, instead of using norm distance, this algorithm uses cosine
 similarity between the client and server parameters. It also applies softmax with
 temperatures.
 """
+
 from collections import OrderedDict
 
 import torch

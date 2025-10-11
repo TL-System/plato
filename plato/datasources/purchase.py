@@ -1,6 +1,7 @@
 """
 The Purchase100 dataset.
 """
+
 import os
 import logging
 import urllib

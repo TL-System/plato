@@ -4,6 +4,7 @@ when creating new trainer callbacks.
 
 Defines a default callback to print training progress.
 """
+
 import logging
 import os
 from abc import ABC

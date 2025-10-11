@@ -1,6 +1,7 @@
 """
 A trainer with FedRep.
 """
+
 from plato.trainers import basic
 from plato.config import Config
 

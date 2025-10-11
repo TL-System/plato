@@ -4,14 +4,33 @@ import math
 import torch
 import torch.nn as nn
 import torch.utils.checkpoint as checkpoint
-from timm.models.layers import DropPath, to_2tuple, trunc_normal_
+from timm.layers import DropPath, to_2tuple, trunc_normal_
 import torch.nn.functional as F
 
 
-from .static_layers import MBInvertedConvLayer, ConvBnActLayer, LinearLayer, SELayer, ShortcutLayer
-from .dynamic_ops import DynamicSeparableConv2d, DynamicPointConv2d, DynamicBatchNorm2d, DynamicLinear, DynamicSE
-from .nn_utils import int2list, get_net_device, copy_bn, build_activation, make_divisible
+from .static_layers import (
+    MBInvertedConvLayer,
+    ConvBnActLayer,
+    LinearLayer,
+    SELayer,
+    ShortcutLayer,
+)
+from .dynamic_ops import (
+    DynamicSeparableConv2d,
+    DynamicPointConv2d,
+    DynamicBatchNorm2d,
+    DynamicLinear,
+    DynamicSE,
+)
+from .nn_utils import (
+    int2list,
+    get_net_device,
+    copy_bn,
+    build_activation,
+    make_divisible,
+)
 from .nn_base import MyModule, MyNetwork
+
 
 class DynamicMlp(MyModule):
     def __init__(self, hidden_features_list, out_features, bias=True, act_layer=None):
@@ -23,16 +42,23 @@ class DynamicMlp(MyModule):
 
         # self.bn1 = DynamicBatchNorm2d(self.in_features)
         # self.bn2 =  DynamicBatchNorm2d(max(self.hidden_features_list))
-        self.linear1 = DynamicLinear(max_in_features=self.in_features, max_out_features=max(self.hidden_features_list), bias=self.bias)
-        self.linear2 = DynamicLinear(max_in_features=max(self.hidden_features_list), max_out_features=self.out_features, bias=self.bias)
+        self.linear1 = DynamicLinear(
+            max_in_features=self.in_features,
+            max_out_features=max(self.hidden_features_list),
+            bias=self.bias,
+        )
+        self.linear2 = DynamicLinear(
+            max_in_features=max(self.hidden_features_list),
+            max_out_features=self.out_features,
+            bias=self.bias,
+        )
         self.act = build_activation(act_layer, inplace=True)
         self.active_hidden_features = max(self.hidden_features_list)
-
 
     def forward(self, x):
         B, N, C = x.shape
         C_ = C
-        x = self.linear1(x, int(x.shape[-1] * 1.))
+        x = self.linear1(x, int(x.shape[-1] * 1.0))
         x = self.act(x)
 
         x = self.linear2(x, C_)
@@ -40,33 +66,46 @@ class DynamicMlp(MyModule):
 
     @property
     def module_str(self):
-        return 'DyMLP(%d)' % self.out_features
+        return "DyMLP(%d)" % self.out_features
 
     @property
     def config(self):
         return {
-                'name': DynamicMLP.__name__,
-                'hidden_features_list': self.hidden_features_list,
-                'in_features': self.in_features,
-                'out_features': self.out_features,
-                'bias': self.bias
-                }
+            "name": DynamicMLP.__name__,
+            "hidden_features_list": self.hidden_features_list,
+            "in_features": self.in_features,
+            "out_features": self.out_features,
+            "bias": self.bias,
+        }
 
     @staticmethod
     def build_from_config(config):
         return DynamicMLP(**config)
 
     def get_active_subnet(self, hidden_features, preserve_weight=True):
-        sub_layer = nn.Sequential(LinearLayer(self.in_features, hidden_features, self.bias), self.act, LinearLayer(hidden_features, self.out_features, self.bias))
+        sub_layer = nn.Sequential(
+            LinearLayer(self.in_features, hidden_features, self.bias),
+            self.act,
+            LinearLayer(hidden_features, self.out_features, self.bias),
+        )
         sub_layer = sub_layer.to(get_net_device(self))
         if not preserve_weight:
             return sub_layer
-        sub_layer[0].linear.weight.data.copy_(self.linear1.linear.weight.data[:self.in_features, :hidden_features])
-        sub_layer[-1].linear.weight.data.copy_(self.linear2.linear.weight.data[:hidden_features, :self.out_features])
+        sub_layer[0].linear.weight.data.copy_(
+            self.linear1.linear.weight.data[: self.in_features, :hidden_features]
+        )
+        sub_layer[-1].linear.weight.data.copy_(
+            self.linear2.linear.weight.data[:hidden_features, : self.out_features]
+        )
         if self.bias:
-            sub_layer[0].linear.bias.data.copy_(self.linear1.linear.bias.data[:hidden_features])
-            sub_layer[-1].linear.bias.data.copy_(self.linear2.linear.bias.data[:self.out_features])
+            sub_layer[0].linear.bias.data.copy_(
+                self.linear1.linear.bias.data[:hidden_features]
+            )
+            sub_layer[-1].linear.bias.data.copy_(
+                self.linear2.linear.bias.data[: self.out_features]
+            )
         return sub_layer
+
 
 def window_partition(x, window_size):
     """
@@ -79,7 +118,9 @@ def window_partition(x, window_size):
     """
     B, H, W, C = x.shape
     x = x.view(B, H // window_size, window_size, W // window_size, window_size, C)
-    windows = x.permute(0, 1, 3, 2, 4, 5).contiguous().view(-1, window_size, window_size, C)
+    windows = (
+        x.permute(0, 1, 3, 2, 4, 5).contiguous().view(-1, window_size, window_size, C)
+    )
     return windows
 
 
@@ -95,13 +136,28 @@ def window_reverse(windows, window_size, H, W):
         x: (B, H, W, C)
     """
     B = int(windows.shape[0] / (H * W / window_size / window_size))
-    x = windows.view(B, H // window_size, W // window_size, window_size, window_size, -1)
+    x = windows.view(
+        B, H // window_size, W // window_size, window_size, window_size, -1
+    )
     x = x.permute(0, 1, 3, 2, 4, 5).contiguous().view(B, H, W, -1)
     return x
 
+
 class OutlookAttention(MyModule):
-    def __init__(self, dim_list, num_heads, kernel_size=3, padding=1, stride=1,
-            qkv_bias=False, qk_scale=None, attn_drop=0., proj_drop=0., act_layer='relu6', downsample=1):
+    def __init__(
+        self,
+        dim_list,
+        num_heads,
+        kernel_size=3,
+        padding=1,
+        stride=1,
+        qkv_bias=False,
+        qk_scale=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        act_layer="relu6",
+        downsample=1,
+    ):
         super(OutlookAttention, self).__init__()
         self.dim_list = dim_list
         self.head_dim = 8
@@ -109,16 +165,26 @@ class OutlookAttention(MyModule):
         self.dim = max(dim_list)
         dim = self.dim
         self.num_heads = self.dim // head_dim
-        self.scale = qk_scale or head_dim ** -0.5
+        self.scale = qk_scale or head_dim**-0.5
 
         self.kernel_size = kernel_size
         self.padding = padding
         self.stride = stride
 
         self.expan_ratio = 1
-        self.v = DynamicLinear(max_in_features=max(self.dim_list), max_out_features=max(self.dim_list) * self.expan_ratio, bias=qkv_bias)
-        self.attn = DynamicLinear(max_in_features=max(self.dim_list), max_out_features=kernel_size**4 * self.num_heads) # * self.expan_ratio)
-        self.proj = DynamicLinear(max_in_features=max(self.dim_list) * self.expan_ratio, max_out_features=max(self.dim_list))
+        self.v = DynamicLinear(
+            max_in_features=max(self.dim_list),
+            max_out_features=max(self.dim_list) * self.expan_ratio,
+            bias=qkv_bias,
+        )
+        self.attn = DynamicLinear(
+            max_in_features=max(self.dim_list),
+            max_out_features=kernel_size**4 * self.num_heads,
+        )  # * self.expan_ratio)
+        self.proj = DynamicLinear(
+            max_in_features=max(self.dim_list) * self.expan_ratio,
+            max_out_features=max(self.dim_list),
+        )
 
         self.unfold = nn.Unfold(kernel_size=kernel_size, padding=padding, stride=stride)
         self.pool = nn.AvgPool2d(kernel_size=stride, stride=stride, ceil_mode=True)
@@ -128,33 +194,79 @@ class OutlookAttention(MyModule):
 
     def forward(self, x):
         B_, N, C = x.shape
-        H = int(N**.5)
+        H = int(N**0.5)
         x = x.reshape(B_, H, H, C)
         B, H, W, C = x.shape
-        v = self.v(x, out_features=x.shape[-1] * self.expan_ratio).permute(0, 3, 1, 2)  # B, C, H, W
+        v = self.v(x, out_features=x.shape[-1] * self.expan_ratio).permute(
+            0, 3, 1, 2
+        )  # B, C, H, W
 
         h, w = math.ceil(H / self.stride), math.ceil(W / self.stride)
-        v = self.unfold(v).reshape(B, C // self.head_dim, self.expan_ratio * self.head_dim,
+        v = (
+            self.unfold(v)
+            .reshape(
+                B,
+                C // self.head_dim,
+                self.expan_ratio * self.head_dim,
                 self.kernel_size * self.kernel_size,
-                h * w).permute(0, 1, 4, 3, 2) # b, exc, hxw, 3x3, num_head
+                h * w,
+            )
+            .permute(0, 1, 4, 3, 2)
+        )  # b, exc, hxw, 3x3, num_head
 
         attn = self.pool(x.permute(0, 3, 1, 2)).permute(0, 2, 3, 1)
-        attn = self.attn(attn, out_features=C // self.head_dim * self.kernel_size**4 * self.expan_ratio).reshape(
-                B, h * w, C // self.head_dim, self.kernel_size * self.kernel_size,
-                self.kernel_size * self.kernel_size).permute(0, 2, 1, 3, 4) # b, c, hxw, 9, 9
+        attn = (
+            self.attn(
+                attn,
+                out_features=C
+                // self.head_dim
+                * self.kernel_size**4
+                * self.expan_ratio,
+            )
+            .reshape(
+                B,
+                h * w,
+                C // self.head_dim,
+                self.kernel_size * self.kernel_size,
+                self.kernel_size * self.kernel_size,
+            )
+            .permute(0, 2, 1, 3, 4)
+        )  # b, c, hxw, 9, 9
         attn = attn * self.scale
         attn = attn.softmax(dim=-1)
 
-        x = (attn @ v).permute(0, 1, 4, 3, 2).reshape(
-                B, C * self.kernel_size * self.kernel_size * self.expan_ratio, h * w)
-        x = F.fold(x, output_size=(H, W), kernel_size=self.kernel_size,
-                padding=self.padding, stride=self.stride)
+        x = (
+            (attn @ v)
+            .permute(0, 1, 4, 3, 2)
+            .reshape(
+                B, C * self.kernel_size * self.kernel_size * self.expan_ratio, h * w
+            )
+        )
+        x = F.fold(
+            x,
+            output_size=(H, W),
+            kernel_size=self.kernel_size,
+            padding=self.padding,
+            stride=self.stride,
+        )
         x = self.act(x).permute(0, 2, 3, 1).reshape(B, N, -1)
         x = self.proj(x, out_features=x.shape[-1] // self.expan_ratio)
         return x
 
+
 class DynamicWindowAttention(MyModule):
-    def __init__(self, dim_list, window_size, num_heads, qkv_bias=True, qk_scale=None, attn_drop=0., proj_drop=0., act_layer='relu6', downsample=1):
+    def __init__(
+        self,
+        dim_list,
+        window_size,
+        num_heads,
+        qkv_bias=True,
+        qk_scale=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        act_layer="relu6",
+        downsample=1,
+    ):
         super(DynamicWindowAttention, self).__init__()
 
         self.dim_list = dim_list
@@ -169,39 +281,75 @@ class DynamicWindowAttention(MyModule):
         # self.num_heads = num_heads
         self.num_heads = self.dim // head_dim
         self.window_size = window_size  # Wh, Ww
-        self.scale = qk_scale or head_dim ** -0.5
+        self.scale = qk_scale or head_dim**-0.5
 
         # define a parameter table of relative position bias
         self.relative_position_bias_table = nn.Parameter(
-            torch.zeros((2 * window_size[0] - 1) * (2 * window_size[1] - 1), self.num_heads * 1))  # 2*Wh-1 * 2*Ww-1, nH
+            torch.zeros(
+                (2 * window_size[0] - 1) * (2 * window_size[1] - 1), self.num_heads * 1
+            )
+        )  # 2*Wh-1 * 2*Ww-1, nH
 
         # get pair-wise relative position index for each token inside the window
         coords_h = torch.arange(self.window_size[0])
         coords_w = torch.arange(self.window_size[1])
         coords = torch.stack(torch.meshgrid([coords_h, coords_w]))  # 2, Wh, Ww
         coords_flatten = torch.flatten(coords, 1)  # 2, Wh*Ww
-        relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]  # 2, Wh*Ww, Wh*Ww
-        relative_coords = relative_coords.permute(1, 2, 0).contiguous()  # Wh*Ww, Wh*Ww, 2
+        relative_coords = (
+            coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        )  # 2, Wh*Ww, Wh*Ww
+        relative_coords = relative_coords.permute(
+            1, 2, 0
+        ).contiguous()  # Wh*Ww, Wh*Ww, 2
         relative_coords[:, :, 0] += self.window_size[0] - 1  # shift to start from 0
         relative_coords[:, :, 1] += self.window_size[1] - 1
         relative_coords[:, :, 0] *= 2 * self.window_size[1] - 1
         relative_position_index = relative_coords.sum(-1)  # Wh*Ww, Wh*Ww
         self.register_buffer("relative_position_index", relative_position_index)
 
-        self.expan_ratio = 4 # 2
-        self.q = DynamicLinear(max_in_features=max(self.dim_list), max_out_features=max(self.dim_list), bias=qkv_bias)
-        self.k = DynamicLinear(max_in_features=max(self.dim_list), max_out_features=max(self.dim_list), bias=qkv_bias)
-        self.v = DynamicLinear(max_in_features=max(self.dim_list), max_out_features=max(self.dim_list) * self.expan_ratio, bias=qkv_bias)
+        self.expan_ratio = 4  # 2
+        self.q = DynamicLinear(
+            max_in_features=max(self.dim_list),
+            max_out_features=max(self.dim_list),
+            bias=qkv_bias,
+        )
+        self.k = DynamicLinear(
+            max_in_features=max(self.dim_list),
+            max_out_features=max(self.dim_list),
+            bias=qkv_bias,
+        )
+        self.v = DynamicLinear(
+            max_in_features=max(self.dim_list),
+            max_out_features=max(self.dim_list) * self.expan_ratio,
+            bias=qkv_bias,
+        )
 
-        self.vconv = nn.Conv2d(dim * self.expan_ratio, dim * self.expan_ratio, kernel_size=3, stride=1, padding=1, groups=dim*self.expan_ratio, bias=False)
+        self.vconv = nn.Conv2d(
+            dim * self.expan_ratio,
+            dim * self.expan_ratio,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            groups=dim * self.expan_ratio,
+            bias=False,
+        )
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj = DynamicLinear(max_in_features=max(self.dim_list) * self.expan_ratio, max_out_features=max(self.dim_list))
+        self.proj = DynamicLinear(
+            max_in_features=max(self.dim_list) * self.expan_ratio,
+            max_out_features=max(self.dim_list),
+        )
         self.proj_drop = nn.Dropout(proj_drop)
 
-        self.proj_l = DynamicLinear(max_in_features=max(self.dim_list) // self.head_dim, max_out_features=max(self.dim_list) // self.head_dim)
-        self.proj_w = DynamicLinear(max_in_features=max(self.dim_list) // self.head_dim, max_out_features=max(self.dim_list) // self.head_dim)
+        self.proj_l = DynamicLinear(
+            max_in_features=max(self.dim_list) // self.head_dim,
+            max_out_features=max(self.dim_list) // self.head_dim,
+        )
+        self.proj_w = DynamicLinear(
+            max_in_features=max(self.dim_list) // self.head_dim,
+            max_out_features=max(self.dim_list) // self.head_dim,
+        )
 
-        trunc_normal_(self.relative_position_bias_table, std=.02)
+        trunc_normal_(self.relative_position_bias_table, std=0.02)
         self.softmax = nn.Softmax(dim=-1)
         self.act = build_activation(act_layer, inplace=True)
 
@@ -212,37 +360,78 @@ class DynamicWindowAttention(MyModule):
             mask: (0/-inf) mask with shape of (num_windows, Wh*Ww, Wh*Ww) or None
         """
         B_, N, C = x.shape
-        q = self.q(x, out_features=x.shape[-1]).reshape(B_, N, C // self.head_dim, self.head_dim).permute(0, 2, 1, 3)
-        k = self.k(x, out_features=x.shape[-1]).reshape(B_, N, C // self.head_dim, self.head_dim).permute(0, 2, 1, 3)
+        q = (
+            self.q(x, out_features=x.shape[-1])
+            .reshape(B_, N, C // self.head_dim, self.head_dim)
+            .permute(0, 2, 1, 3)
+        )
+        k = (
+            self.k(x, out_features=x.shape[-1])
+            .reshape(B_, N, C // self.head_dim, self.head_dim)
+            .permute(0, 2, 1, 3)
+        )
 
         v = self.v(x, out_features=x.shape[-1] * self.expan_ratio)
-        v = F.conv2d(v.permute(0, 2, 1).reshape(B_, -1, int(N**.5), int(N**.5)), self.vconv.weight[:C * self.expan_ratio, :, :, :], None, 1, 1, 1, C * self.expan_ratio)
-        v = v.reshape(B_, -1, N).permute(0, 2, 1).reshape(B_, N, C // self.head_dim, -1).permute(0, 2, 1, 3)
+        v = F.conv2d(
+            v.permute(0, 2, 1).reshape(B_, -1, int(N**0.5), int(N**0.5)),
+            self.vconv.weight[: C * self.expan_ratio, :, :, :],
+            None,
+            1,
+            1,
+            1,
+            C * self.expan_ratio,
+        )
+        v = (
+            v.reshape(B_, -1, N)
+            .permute(0, 2, 1)
+            .reshape(B_, N, C // self.head_dim, -1)
+            .permute(0, 2, 1, 3)
+        )
         q = q * self.scale
 
-        attn = (q @ k.transpose(-2, -1))
+        attn = q @ k.transpose(-2, -1)
 
+        relative_position_bias = self.relative_position_bias_table[
+            self.relative_position_index.view(-1)
+        ].view(
+            self.window_size[0],
+            self.window_size[1],
+            self.window_size[0],
+            self.window_size[1],
+            -1,
+        )  # Wh*Ww,Wh*Ww,nH
+        H, W = int(attn.shape[3] ** 0.5), int(attn.shape[3] ** 0.5)
 
-        relative_position_bias = self.relative_position_bias_table[self.relative_position_index.view(-1)].view(
-           self.window_size[0], self.window_size[1], self.window_size[0], self.window_size[1], -1)  # Wh*Ww,Wh*Ww,nH
-        H, W = int(attn.shape[3]**.5), int(attn.shape[3]**.5)
+        relative_position_bias = (
+            relative_position_bias[:H, :W, :H, :W, :]
+            .contiguous()
+            .reshape(H * W, H * W, -1)
+        )
+        relative_position_bias = relative_position_bias.permute(
+            2, 0, 1
+        ).contiguous()  # nH, Wh*Ww, Wh*Ww
 
-        relative_position_bias = relative_position_bias[:H, :W, :H, :W, :].contiguous().reshape(H*W, H*W, -1)
-        relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()  # nH, Wh*Ww, Wh*Ww
+        attn = (
+            attn + relative_position_bias.unsqueeze(0)[:, : attn.shape[1]]
+        )  # , :attn.shape[2], :attn.shape[3]]
 
-        attn = attn + relative_position_bias.unsqueeze(0)[:, :attn.shape[1]] # , :attn.shape[2], :attn.shape[3]]
-
-        attn = self.proj_l(attn.permute(0,2,3,1), out_features=C // self.head_dim).permute(0,3,1,2)
+        attn = self.proj_l(
+            attn.permute(0, 2, 3, 1), out_features=C // self.head_dim
+        ).permute(0, 3, 1, 2)
 
         if mask is not None:
             nW = mask.shape[0]
-            attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(0)
+            attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(
+                1
+            ).unsqueeze(0)
             attn = attn.view(-1, self.num_heads, N, N)
             attn = self.softmax(attn)
         else:
             attn = self.softmax(attn)
 
-        attn = self.proj_w(attn.permute(0,2,3,1), out_features=C // self.head_dim).permute(0,3,1,2)
+        attn = self.proj_w(
+            attn.permute(0, 2, 3, 1), out_features=C // self.head_dim
+        ).permute(0, 3, 1, 2)
         attn = self.attn_drop(attn)
 
         x = (attn @ v).transpose(1, 2).reshape(B_, N, -1)
@@ -251,7 +440,7 @@ class DynamicWindowAttention(MyModule):
         return x
 
     def extra_repr(self) -> str:
-        return f'dim={self.dim}, window_size={self.window_size}' # , num_heads={self.num_heads}'
+        return f"dim={self.dim}, window_size={self.window_size}"  # , num_heads={self.num_heads}'
 
     def flops(self, N):
         # calculate flops for 1 window with token length of N
@@ -265,16 +454,17 @@ class DynamicWindowAttention(MyModule):
         # x = self.proj(x)
         flops += N * self.dim * self.dim
         return flops
+
     @property
     def module_str(self):
-        return 'DyMLP(%d)' % self.out_features
+        return "DyMLP(%d)" % self.out_features
 
     @property
     def config(self):
         return {
-                'name': DynamicWindowAttention.__name__,
-                'dim_list': self.dim_list,
-                'window_size': self.window_size,
+            "name": DynamicWindowAttention.__name__,
+            "dim_list": self.dim_list,
+            "window_size": self.window_size,
         }
 
     @staticmethod
@@ -284,14 +474,31 @@ class DynamicWindowAttention(MyModule):
     def get_active_subnet(self, dim, preserve_weight=True):
         sub_layer = WindowAttention(dim, self.window_size, dim // 16)
         sub_layer = sub_layer.to(get_net_device(self))
-        sub_layer.qkv.weight.data.copy_(self.qkv.weight.data[:dim, :dim*6])
-        sub_layer.proj.weight.data.copy_(self.proj.weight.data[:dim*4, :dim])
+        sub_layer.qkv.weight.data.copy_(self.qkv.weight.data[:dim, : dim * 6])
+        sub_layer.proj.weight.data.copy_(self.proj.weight.data[: dim * 4, :dim])
         return sub_layer
 
+
 class DynamicSwinTransformerBlock(MyModule):
-    def __init__(self, dim_list, input_resolution, num_heads, window_size=14, shift_size=0,
-                 mlp_ratio=4., qkv_bias=True, qk_scale=None, drop=0., attn_drop=0., drop_path=0.,
-                 act_layer=nn.GELU, norm_layer=nn.LayerNorm, downsample=1, rescale=1., shift=False):
+    def __init__(
+        self,
+        dim_list,
+        input_resolution,
+        num_heads,
+        window_size=14,
+        shift_size=0,
+        mlp_ratio=4.0,
+        qkv_bias=True,
+        qk_scale=None,
+        drop=0.0,
+        attn_drop=0.0,
+        drop_path=0.0,
+        act_layer=nn.GELU,
+        norm_layer=nn.LayerNorm,
+        downsample=1,
+        rescale=1.0,
+        shift=False,
+    ):
         super(DynamicSwinTransformerBlock, self).__init__()
         self.dim_list = dim_list
         self.dim = max(dim_list)
@@ -308,26 +515,47 @@ class DynamicSwinTransformerBlock(MyModule):
             # if window size is larger than input resolution, we don't partition windows
             self.shift_size = 0
             self.window_size = min(self.input_resolution)
-        assert 0 <= self.shift_size < self.window_size, "shift_size must in 0-window_size"
+        assert 0 <= self.shift_size < self.window_size, (
+            "shift_size must in 0-window_size"
+        )
 
         self.norm1 = norm_layer(self.dim)
         self.attn = DynamicWindowAttention(
-            dim_list, window_size=to_2tuple(window_size), num_heads=num_heads,
-            qkv_bias=qkv_bias, qk_scale=qk_scale, attn_drop=attn_drop, proj_drop=drop, act_layer=act_layer, downsample=downsample)
+            dim_list,
+            window_size=to_2tuple(window_size),
+            num_heads=num_heads,
+            qkv_bias=qkv_bias,
+            qk_scale=qk_scale,
+            attn_drop=attn_drop,
+            proj_drop=drop,
+            act_layer=act_layer,
+            downsample=downsample,
+        )
 
-        self.drop_path = DropPath(drop_path) # if drop_path > 0. else nn.Identity()
+        self.drop_path = DropPath(drop_path)  # if drop_path > 0. else nn.Identity()
         self.norm2 = norm_layer(self.dim)
 
         self.norm3 = norm_layer(self.dim)
         # mlp_hidden_dim = int(dim * mlp_ratio)
 
-        self.mlp1 = DynamicMlp(out_features=self.dim, hidden_features_list=[int(1. * self.dim)], act_layer=act_layer)#, drop=drop)
-        self.mlp2 = DynamicMlp(out_features=self.dim, hidden_features_list=[int(1. * self.dim)], act_layer=act_layer)#, drop=drop)
+        self.mlp1 = DynamicMlp(
+            out_features=self.dim,
+            hidden_features_list=[int(1.0 * self.dim)],
+            act_layer=act_layer,
+        )  # , drop=drop)
+        self.mlp2 = DynamicMlp(
+            out_features=self.dim,
+            hidden_features_list=[int(1.0 * self.dim)],
+            act_layer=act_layer,
+        )  # , drop=drop)
         self.mobile_inverted_conv = None
 
-
-        self.rescale_mlp = nn.Parameter(1e-4 * torch.ones((10, 8, self.dim)), requires_grad=True)
-        self.rescale_attn = nn.Parameter(1e-4 * torch.ones((10, 8, self.dim)), requires_grad=True)
+        self.rescale_mlp = nn.Parameter(
+            1e-4 * torch.ones((10, 8, self.dim)), requires_grad=True
+        )
+        self.rescale_attn = nn.Parameter(
+            1e-4 * torch.ones((10, 8, self.dim)), requires_grad=True
+        )
 
         self.rescale_idx = 0
 
@@ -340,10 +568,13 @@ class DynamicSwinTransformerBlock(MyModule):
         B, L, C = x.shape
         assert L == H * W, "input feature has wrong size"
 
-
         shortcut = x
-        x = F.layer_norm(x, x.shape[1:], self.norm1.weight[:x.shape[-1]].expand(x.shape[1:]), self.norm1.bias[:x.shape[-1]].expand(x.shape[1:]))
-
+        x = F.layer_norm(
+            x,
+            x.shape[1:],
+            self.norm1.weight[: x.shape[-1]].expand(x.shape[1:]),
+            self.norm1.bias[: x.shape[-1]].expand(x.shape[1:]),
+        )
 
         if H > 18 and self.shift:
             if H > 18:
@@ -353,37 +584,70 @@ class DynamicSwinTransformerBlock(MyModule):
             x = x.view(B, H, W, C)
             if self.shift:
                 self.shift_size = H // num_window // 2
-                shifted_x = torch.roll(x, shifts=(-self.shift_size, -self.shift_size), dims=(1, 2))
+                shifted_x = torch.roll(
+                    x, shifts=(-self.shift_size, -self.shift_size), dims=(1, 2)
+                )
             else:
                 shifted_x = x
 
             x_windows = window_partition(shifted_x, H // num_window)
             x_windows = x_windows.view(-1, H // num_window * H // num_window, C)
-            attn_windows = self.attn(x_windows) # , mask=self.attn_mask)
+            attn_windows = self.attn(x_windows)  # , mask=self.attn_mask)
             attn_windows = attn_windows.view(-1, H // num_window * H // num_window, C)
             shifted_x = window_reverse(attn_windows, H // num_window, H, W)
             if self.shift:
-                x = torch.roll(shifted_x, shifts=(self.shift_size, self.shift_size), dims=(1, 2))
+                x = torch.roll(
+                    shifted_x, shifts=(self.shift_size, self.shift_size), dims=(1, 2)
+                )
             else:
                 x = shifted_x
             x = x.view(B, H * W, C)
         else:
             x = self.attn(x)
 
-
         self.rescale_idx = self.rescale_idx
         self.rescale_idx_width = x.shape[1] % 8
 
         # FFN
-        x = shortcut + self.drop_path(x * self.rescale_attn[self.rescale_idx, self.rescale_idx_width, :C] * self.rescale_mlp.shape[1] / C)
-        x  = x + self.drop_path(self.mlp2( F.layer_norm(x, x.shape[1:], self.norm3.weight[:x.shape[-1]].expand(x.shape[1:]), self.norm3.bias[:x.shape[-1]].expand(x.shape[1:])) ) * self.rescale_mlp[self.rescale_idx, self.rescale_idx_width, :C] * self.rescale_mlp.shape[1] / C)
-        x = x + self.drop_path(self.mlp1( F.layer_norm(x, x.shape[1:], self.norm2.weight[:x.shape[-1]].expand(x.shape[1:]), self.norm2.bias[:x.shape[-1]].expand(x.shape[1:])) )  * self.rescale_mlp[self.rescale_idx, self.rescale_idx_width, :C] * self.rescale_mlp.shape[1] / C)
+        x = shortcut + self.drop_path(
+            x
+            * self.rescale_attn[self.rescale_idx, self.rescale_idx_width, :C]
+            * self.rescale_mlp.shape[1]
+            / C
+        )
+        x = x + self.drop_path(
+            self.mlp2(
+                F.layer_norm(
+                    x,
+                    x.shape[1:],
+                    self.norm3.weight[: x.shape[-1]].expand(x.shape[1:]),
+                    self.norm3.bias[: x.shape[-1]].expand(x.shape[1:]),
+                )
+            )
+            * self.rescale_mlp[self.rescale_idx, self.rescale_idx_width, :C]
+            * self.rescale_mlp.shape[1]
+            / C
+        )
+        x = x + self.drop_path(
+            self.mlp1(
+                F.layer_norm(
+                    x,
+                    x.shape[1:],
+                    self.norm2.weight[: x.shape[-1]].expand(x.shape[1:]),
+                    self.norm2.bias[: x.shape[-1]].expand(x.shape[1:]),
+                )
+            )
+            * self.rescale_mlp[self.rescale_idx, self.rescale_idx_width, :C]
+            * self.rescale_mlp.shape[1]
+            / C
+        )
         return x.reshape(B, H, W, C).permute(0, 3, 1, 2)
 
-
     def extra_repr(self) -> str:
-        return f"dim={self.dim}, input_resolution={self.input_resolution}, num_heads={self.num_heads}, " \
-               f"window_size={self.window_size}, shift_size={self.shift_size}, mlp_ratio={self.mlp_ratio}"
+        return (
+            f"dim={self.dim}, input_resolution={self.input_resolution}, num_heads={self.num_heads}, "
+            f"window_size={self.window_size}, shift_size={self.shift_size}, mlp_ratio={self.mlp_ratio}"
+        )
 
     def flops(self):
         flops = 0
@@ -401,7 +665,7 @@ class DynamicSwinTransformerBlock(MyModule):
 
 
 class DynamicPatchMerging(nn.Module):
-    r""" Patch Merging Layer.
+    r"""Patch Merging Layer.
 
     Args:
         input_resolution (tuple[int]): Resolution of input feature.
@@ -423,13 +687,27 @@ class DynamicPatchMerging(nn.Module):
         if pad_input:
             x = F.pad(x, (0, W % 2, 0, H % 2))
         B, C, pH, pW = x.shape
-        x = x.reshape(B, C, pH // 2, 2, pW // 2, 2).permute(0, 2, 4, 1, 3, 5).reshape(B, 4*C, -1).permute(0, 2, 1)
+        x = (
+            x.reshape(B, C, pH // 2, 2, pW // 2, 2)
+            .permute(0, 2, 4, 1, 3, 5)
+            .reshape(B, 4 * C, -1)
+            .permute(0, 2, 1)
+        )
 
-        x = F.layer_norm(x, x.shape[1:], self.norm.weight[:x.shape[-1]].expand(x.shape[1:]), self.norm.bias[:x.shape[-1]].expand(x.shape[1:]))
+        x = F.layer_norm(
+            x,
+            x.shape[1:],
+            self.norm.weight[: x.shape[-1]].expand(x.shape[1:]),
+            self.norm.bias[: x.shape[-1]].expand(x.shape[1:]),
+        )
         # x = self.norm(x)
         x = self.reduction(x, self.out_dim)
         N = x.shape[1]
-        return x.reshape(B, -1, self.out_dim).permute(0, 2, 1).reshape(B, self.out_dim, int(N**.5), int(N**.5))
+        return (
+            x.reshape(B, -1, self.out_dim)
+            .permute(0, 2, 1)
+            .reshape(B, self.out_dim, int(N**0.5), int(N**0.5))
+        )
 
     def extra_repr(self) -> str:
         return f"dim={self.dim}"
@@ -667,7 +945,6 @@ class DynamicPatchMerging(nn.Module):
 #             if count == 1 or count == 2:
 #                 layers.append(x)
 #             count += 1
-
 
 
 #         x = self.norm(x)  # B L C

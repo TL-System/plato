@@ -7,6 +7,7 @@ https://arxiv.org/abs/2006.09882
 
 Source code: https://github.com/facebookresearch/swav
 """
+
 from plato.servers import fedavg_personalized as personalized_server
 from plato.clients import self_supervised_learning as ssl_client
 from plato.datasources import self_supervised_learning as ssl_datasource

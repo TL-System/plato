@@ -15,7 +15,7 @@ import cs_maml_edge
 
 
 def main():
-    """ A Plato federated learning training session using the MAML algorithm. """
+    """A Plato federated learning training session using the MAML algorithm."""
     trainer = cs_maml_trainer.Trainer
     client = cs_maml_client.Client(trainer=trainer())
     server = cs_maml_server.Server(trainer=trainer())

@@ -1,6 +1,7 @@
 """
 Model used in BYOL algorithm.
 """
+
 import copy
 
 from torch import nn

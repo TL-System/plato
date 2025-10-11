@@ -6,7 +6,7 @@ import torch
 import os
 
 
-os.environ["config_file"] = "tests/TestsConfig/fedavg_tests.yml"
+os.environ["config_file"] = "TestsConfig/fedavg_tests.yml"
 
 
 from plato.clients import simple

@@ -1,12 +1,14 @@
 """
 Base processor for processing PyTorch models.
 """
+
 import logging
 import pickle
 import sys
 from typing import OrderedDict
 
 import torch
+
 from plato.processors import base
 
 

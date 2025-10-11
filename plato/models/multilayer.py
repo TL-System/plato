@@ -3,6 +3,7 @@ The Multi-Layer Perception model for PyTorch.
 The model follows the previous work to use tanh as activation
 Reference: https://www.comp.nus.edu.sg/~reza/files/Shokri-SP2019.pdf
 """
+
 import collections
 
 import torch.nn as nn

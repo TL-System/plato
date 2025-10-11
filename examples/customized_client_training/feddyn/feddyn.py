@@ -8,6 +8,7 @@ https://openreview.net/forum?id=B7v4QMR6Z9w
 
 Source code: https://github.com/alpemreacar/FedDyn
 """
+
 from plato.servers import fedavg
 from plato.clients import simple
 

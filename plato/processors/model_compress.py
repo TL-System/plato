@@ -1,9 +1,11 @@
 """
 Implements a Processor for compressing model weights.
 """
+
 import logging
 import pickle
 from typing import Any
+
 import zstd
 
 from plato.processors import model

@@ -1,6 +1,7 @@
 """
 Utility functions for homomorphric encryption with TenSEAL.
 """
+
 import os
 import pickle
 import zlib
@@ -18,7 +19,7 @@ def get_ckks_context():
     try:
         with open(os.path.join(context_dir, context_name), "rb") as f:
             return ts.context_from(f.read())
-    except:
+    except FileNotFoundError:
         # Create a new context if it does not exist
         if not os.path.exists(context_dir):
             os.mkdir(context_dir)
@@ -44,7 +45,7 @@ def encrypt_weights(
     indices=None,
 ):
     """Flatten the model weights and encrypt the selected ones."""
-    assert not context is None
+    assert context is not None
 
     # Step 1: flatten all weight tensors to a vector
     weights_vector = np.array([])
@@ -125,11 +126,12 @@ def decrypt_weights(data, weight_shapes=None, para_nums=None):
         plaintext_weights_vector, np.cumsum(vector_length)
     )[:-1]
     weight_index = 0
+
     for name, shape in weight_shapes.items():
         decrypted_weights[name] = plaintext_weights_vector[weight_index].reshape(shape)
         try:
             decrypted_weights[name] = torch.from_numpy(decrypted_weights[name])
-        except:
+        except Exception:
             # PyTorch does not exist, just return numpy array and handle it somewhere else.
             decrypted_weights[name] = decrypted_weights[name]
         weight_index = weight_index + 1
@@ -153,6 +155,7 @@ def extract_encrypted_model(data):
     unencrypted_weights = data["unencrypted_weights"]
     encrypted_weights = data["encrypted_weights"]
     indices = data["indices"]
+
     return unencrypted_weights, encrypted_weights, indices
 
 
@@ -167,6 +170,7 @@ def indices_to_bitmap(indices):
 
     # Compress the bitmap before sending it out
     compressed_bitmap = zlib.compress(pickle.dumps(bitmap))
+
     return compressed_bitmap
 
 
@@ -179,4 +183,5 @@ def bitmap_to_indices(bitmap):
     decompressed_bitmap = pickle.loads(zlib.decompress(bitmap))
     bit_array = np.unpackbits(decompressed_bitmap)
     indices = np.where(bit_array == 1)[0].tolist()
+
     return indices

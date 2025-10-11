@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 # A memory-efficient implementation of Swish function
 class SwishImplementation(torch.autograd.Function):
     @staticmethod
@@ -19,21 +20,22 @@ class SwishImplementation(torch.autograd.Function):
         sigmoid_i = torch.sigmoid(i)
         return grad_output * (sigmoid_i * (1 + i * (1 - sigmoid_i)))
 
+
 class MemoryEfficientSwish(nn.Module):
     def forward(self, x):
         return SwishImplementation.apply(x)
 
 
 class Hswish(nn.Module):
-
     def __init__(self, inplace=True):
         super(Hswish, self).__init__()
         self.inplace = inplace
 
     def forward(self, x):
-        return x * F.relu6(x + 3., inplace=self.inplace) / 6.
+        return x * F.relu6(x + 3.0, inplace=self.inplace) / 6.0
 
-#class Swish(nn.Module):
+
+# class Swish(nn.Module):
 #    def __init__(self, inplace=True):
 #        super(Swish, self).__init__()
 #        self.inplace = inplace
@@ -48,8 +50,4 @@ class Hsigmoid(nn.Module):
         self.inplace = inplace
 
     def forward(self, x):
-        return F.relu6(x + 3., inplace=self.inplace) / 6.
-
-
-
-
+        return F.relu6(x + 3.0, inplace=self.inplace) / 6.0

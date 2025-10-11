@@ -1,6 +1,7 @@
 """
 The MNIST dataset from the torchvision package.
 """
+
 from torchvision import datasets, transforms
 
 from plato.config import Config

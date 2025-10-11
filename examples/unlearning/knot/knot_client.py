@@ -2,12 +2,13 @@
 A customized client for Knot, a clustered aggregation mechanism designed for
 federated unlearning.
 """
+
 import logging
 
-from plato.config import Config
-from plato.clients import simple
-
 import unlearning_iid
+
+from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):

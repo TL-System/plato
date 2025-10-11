@@ -4,6 +4,7 @@ A customized optimizer for FedSarah.
 Reference: Ngunyen et al., "SARAH: A Novel Method for Machine Learning Problems
 Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 """
+
 import os
 
 import torch
@@ -21,7 +22,6 @@ class FedSarahOptimizer(optim.Adam):
         self.max_counter = None
 
     def params_state_update(self):
-
         self.epoch_counter += 1
         new_client_control_variates = []
         new_last_model_weights = []
@@ -32,23 +32,30 @@ class FedSarahOptimizer(optim.Adam):
                 self.last_model_weights = torch.load(filename)
 
         for group in self.param_groups:
-
             # Initialize server control variates and client control variates
             if self.server_control_variates is None:
-                self.client_control_variates = [0] * len(group['params'])
-                self.server_control_variates = [0] * len(group['params'])
-                self.last_model_weights = [0] * len(group['params'])
+                self.client_control_variates = [0] * len(group["params"])
+                self.server_control_variates = [0] * len(group["params"])
+                self.last_model_weights = [0] * len(group["params"])
 
-            for p, client_control_variate, server_control_variate, last_model_weight in zip(
-                    group['params'], self.client_control_variates,
-                    self.server_control_variates, self.last_model_weights):
-
+            for (
+                p,
+                client_control_variate,
+                server_control_variate,
+                last_model_weight,
+            ) in zip(
+                group["params"],
+                self.client_control_variates,
+                self.server_control_variates,
+                self.last_model_weights,
+            ):
                 if p.grad is None:
                     continue
 
                 # Compute control variates update
-                control_variate_update = torch.sub(server_control_variate,
-                                                   client_control_variate)
+                control_variate_update = torch.sub(
+                    server_control_variate, client_control_variate
+                )
                 # Reduce variance
                 p.data.add_(control_variate_update, alpha=0.0001)
 

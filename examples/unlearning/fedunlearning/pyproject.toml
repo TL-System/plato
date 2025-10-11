@@ -1,0 +1,10 @@
+[project]
+name = "fedunlearning"
+version = "0.1.0"
+description = "Federated Unlearning"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "catboost",
+    "scikit-learn",
+]

@@ -1,7 +1,7 @@
 """
 The STL-10 dataset from the torchvision package.
 The details of this data can be found on the websites:
-https://cs.stanford.edu/~acoates/stl10/ 
+https://cs.stanford.edu/~acoates/stl10/
 and
 https://www.kaggle.com/datasets/jessicali9530/stl10
 .
@@ -32,7 +32,6 @@ class STL10Dataset(Dataset):
         self.classes = self.dataset.classes
 
     def __getitem__(self, index):
-
         return self.dataset[index]
 
     def __len__(self):

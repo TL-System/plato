@@ -1,6 +1,7 @@
 """
 Customized Client for PerFedRLNAS.
 """
+
 from types import SimpleNamespace
 
 from plato.clients import simple

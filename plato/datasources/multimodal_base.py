@@ -91,7 +91,9 @@ class MultiModalDataSource(base.DataSource):
                         pass
 
     def _data_path_process(
-        self, data_path, base_data_name=None  # the base directory for the data
+        self,
+        data_path,
+        base_data_name=None,  # the base directory for the data
     ):  # the directory name of the working data
         """Generate the data structure based on the defined data path"""
 

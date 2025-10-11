@@ -5,20 +5,19 @@ Having a registry of all available classes is convenient for retrieving an insta
 based on a configuration at run-time.
 """
 
-from typing import Union
+from typing import Any, Dict, TypedDict, cast
 
 from plato.config import Config
-
 from plato.models import (
-    lenet5,
+    cnn_encoder,
     dcgan,
+    general_multilayer,
+    huggingface,
+    lenet5,
     multilayer,
     resnet,
-    vgg,
-    cnn_encoder,
-    general_multilayer,
     torch_hub,
-    huggingface,
+    vgg,
     vit,
 )
 
@@ -39,31 +38,48 @@ registered_factories = {
 }
 
 
-def get(**kwargs: Union[str, dict]):
+class ModelKwargs(TypedDict, total=False):
+    model_name: str
+    model_type: str
+    model_params: Dict[str, Any]
+
+
+def get(**kwargs: Any) -> Any:
     """Get the model with the provided name."""
-    model_name = (
-        kwargs["model_name"] if "model_name" in kwargs else Config().trainer.model_name
-    )
+    config = Config()
 
-    model_type = (
-        kwargs["model_type"]
-        if "model_type" in kwargs
-        else (
-            Config().trainer.model_type
-            if hasattr(Config().trainer, "model_type")
-            else model_name.split("_")[0]
-        )
-    )
+    # Get model name
+    model_name: str = ""
+    if "model_name" in kwargs:
+        model_name = cast(str, kwargs["model_name"])
+    elif hasattr(config, "trainer"):
+        trainer = getattr(config, "trainer")
+        if hasattr(trainer, "model_name"):
+            model_name = getattr(trainer, "model_name")
 
-    model_params = (
-        kwargs["model_params"]
-        if "model_params" in kwargs
-        else (
-            Config().parameters.model._asdict()
-            if hasattr(Config().parameters, "model")
-            else {}
-        )
-    )
+    # Get model type
+    model_type: str = ""
+    if "model_type" in kwargs:
+        model_type = cast(str, kwargs["model_type"])
+    elif hasattr(config, "trainer"):
+        trainer = getattr(config, "trainer")
+        if hasattr(trainer, "model_type"):
+            model_type = getattr(trainer, "model_type")
+
+    # If model_type is still empty, derive it from model_name
+    if not model_type and model_name:
+        model_type = model_name.split("_")[0]
+
+    # Get model parameters
+    model_params: Dict[str, Any] = {}
+    if "model_params" in kwargs:
+        model_params = cast(Dict[str, Any], kwargs["model_params"])
+    elif hasattr(config, "parameters"):
+        parameters = getattr(config, "parameters")
+        if hasattr(parameters, "model"):
+            model = getattr(parameters, "model")
+            if hasattr(model, "_asdict"):
+                model_params = model._asdict()
 
     if model_type in registered_models:
         registered_model = registered_models[model_type]

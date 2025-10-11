@@ -9,7 +9,9 @@ import os
 import random
 from collections import deque
 
+import fedunlearning_server
 import numpy
+import solver
 import torch
 import torch.nn.functional as F
 from cvxopt import matrix
@@ -17,9 +19,6 @@ from numpy.linalg import norm
 
 from plato.config import Config
 from plato.utils import fonts
-
-import fedunlearning_server
-import solver
 
 
 class Server(fedunlearning_server.Server):
@@ -38,7 +37,10 @@ class Server(fedunlearning_server.Server):
 
     def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
         super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
         )
 
         # A dictionary that maps client IDs to the cluster IDs
@@ -133,7 +135,7 @@ class Server(fedunlearning_server.Server):
             and not self.initialize_optimization
         ):
             for client_id in selected_clients:
-                if not client_id in self.round_first_selected:
+                if client_id not in self.round_first_selected:
                     self.round_first_selected[client_id] = self.current_round
 
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
@@ -206,7 +208,9 @@ class Server(fedunlearning_server.Server):
                     weights_received = [_update.payload for _update in update]
 
                     deltas_received = self.algorithm.compute_weight_deltas(
-                        baseline_weights, weights_received, cluster_id=cluster_id
+                        baseline_weights,
+                        weights_received,
+                        cluster_id=cluster_id,
                     )
                     deltas = await self.aggregate_deltas(update, deltas_received)
                     updated_weights = self.algorithm.update_weights(
@@ -440,7 +444,8 @@ class Server(fedunlearning_server.Server):
 
             if target_perplexity and self.accuracy <= target_perplexity:
                 logging.info(
-                    "[%s] Target perplexity and standard deviation reached.", self
+                    "[%s] Target perplexity and standard deviation reached.",
+                    self,
                 )
                 await self._close()
 
@@ -821,6 +826,7 @@ class Server(fedunlearning_server.Server):
 
         logging.info(
             fonts.colourize(
-                f"\n[{self}] Cluster assignments: {self.clusters}", colour="green"
+                f"\n[{self}] Cluster assignments: {self.clusters}",
+                colour="green",
             )
         )

@@ -125,9 +125,9 @@ class Algorithm(fedavg.Algorithm):
                             : local_weights[key].shape[1],
                         ] += torch.ones(local_weights[key].shape)
                     elif value.dim() == 1:
-                        global_parameters[key][
-                            : local_weights[key].shape[0]
-                        ] += copy.deepcopy(local_weights[key])
+                        global_parameters[key][: local_weights[key].shape[0]] += (
+                            copy.deepcopy(local_weights[key])
+                        )
                         count[: local_weights[key].shape[0]] += torch.ones(
                             local_weights[key].shape
                         )
@@ -142,7 +142,7 @@ class Algorithm(fedavg.Algorithm):
         The implementation of sBN.
         """
         with torch.no_grad():
-            model_param=Config().parameters.model._asdict()
+            model_param = Config().parameters.model._asdict()
             if "track" in model_param:
                 model_param.pop("track")
             test_model = model_class(track=True, **model_param)

@@ -76,7 +76,13 @@ class Client(edge.Client):
         """Additional client-specific processing on the server response."""
         super().process_server_response(server_response)
 
+        # Get the logical client ID from our configuration
+        # In cross-silo training, Config().args.id represents the logical edge server ID
+        logical_client_id = Config().args.id
+
         pruning_amount_list = server_response["pruning_amount"]
-        pruning_amount = pruning_amount_list[str(self.client_id)]
+
+        # Convert to string since pruning_amount_list has string keys
+        pruning_amount = pruning_amount_list[str(logical_client_id)]
         # Update pruning amount
         self.server.edge_pruning_amount = pruning_amount
