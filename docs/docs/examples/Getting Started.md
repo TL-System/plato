@@ -24,7 +24,7 @@ And then run the command again without the `-d` flag:
 uv run calibre.py -c ../configs/calibre_CIFAR10_resnet18.yml
 ```
 
-Plato uses **uv** for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the top-level directory.
+Plato uses [uv](https://docs.astral.sh/uv/) for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the top-level directory.
 
 To run an example with its dependencies, you need to run `uv sync` first in the top-level directory, navigate to the directory containing the example, and then use `uv run` to run the example.
 

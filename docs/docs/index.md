@@ -1,6 +1,6 @@
-# Plato: A New Framework for Scalable Federated Learning Research
+# Plato: A Research Framework for Federated Learning
 
-Welcome to Plato, a new software framework to facilitate scalable federated learning research.
+Welcome to *Plato*, a software framework to facilitate scalable, reproducible, and extensible federated learning research.
 
 ## Getting Started
 
@@ -38,8 +38,8 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
 !!! tip "Configuration Settings"
     Comprehensive guides for configuring all aspects of Plato.
 
-    - **[Configuration Settings](configurations/overview.md)** - Overview of configuration options
-    - **[General](configurations/general.md)** - General configuration settings
+    - **[Overview](configurations/overview.md)** - An overview of configuration settings
+    - **[General](configurations/general.md)** - General configuration
     - **[Clients](configurations/clients.md)** - Client configuration
     - **[Server](configurations/server.md)** - Server configuration
     - **[Data](configurations/data.md)** - Data handling configuration
