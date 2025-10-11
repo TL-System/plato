@@ -49,17 +49,20 @@ class Sampler(base.Sampler):
 
         per_client_classes_size = Config().data.per_client_classes_size
         anchor_classes = Config().data.anchor_classes
-        consistent_clients_size = Config().data.consistent_clients_size
         keep_anchor_classes_size = Config().data.keep_anchor_classes_size
         total_clients = Config().clients.total_clients
 
         assert per_client_classes_size == len(anchor_classes)
 
-        self.consistent_clients = np.random.choice(
-            list(range(total_clients)),
-            size=consistent_clients_size,
-            replace=False,
-        )
+        if hasattr(Config().data, "consistent_clients"):
+            self.consistent_clients = Config().data.consistent_clients
+        else:
+            consistent_clients_size = Config().data.consistent_clients_size
+            self.consistent_clients = np.random.choice(
+                list(range(total_clients)),
+                size=consistent_clients_size,
+                replace=False,
+            )
         self.anchor_classes = anchor_classes
         self.keep_anchor_classes_size = keep_anchor_classes_size
 
@@ -128,5 +131,7 @@ class Sampler(base.Sampler):
         """Obtain the detailed information in the trainser"""
         targets_array = np.array(self.targets_list)
         client_sampled_subset_labels = targets_array[self.subset_indices]
-        unique, counts = np.unique(client_sampled_subset_labels, return_counts=True)
+        unique, counts = np.unique(
+            client_sampled_subset_labels, return_counts=True
+        )
         return np.asarray((unique, counts)).T
