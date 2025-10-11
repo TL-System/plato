@@ -11,8 +11,8 @@ import logging
 import time
 from types import SimpleNamespace
 
-from plato.config import Config
 from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):

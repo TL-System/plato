@@ -2,8 +2,8 @@
 The trainer for paper system-heterogenous federated learning through architecture search.
 """
 
-from plato.trainers import basic
 from plato.config import Config
+from plato.trainers import basic
 
 
 class ServerTrainer(basic.Trainer):

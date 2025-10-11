@@ -2,12 +2,11 @@
 A model for the SwAV algorithm.
 """
 
+from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
 from torch import nn
 
-from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
-
-from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
+from plato.models.cnn_encoder import Model as encoder_registry
 
 
 class SwaV(nn.Module):

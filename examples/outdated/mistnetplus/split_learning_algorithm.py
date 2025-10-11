@@ -11,10 +11,11 @@ https://arxiv.org/pdf/1812.00564.pdf
 
 import logging
 import time
-from copy import deepcopy
 from collections import OrderedDict
+from copy import deepcopy
 
 import torch
+
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.datasources import feature_dataset

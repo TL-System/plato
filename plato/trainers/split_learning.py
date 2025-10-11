@@ -18,11 +18,11 @@ import logging
 import os
 
 import torch
-from plato.config import Config
 
-from plato.trainers import basic
+from plato.config import Config
 from plato.datasources import feature
 from plato.samplers import all_inclusive
+from plato.trainers import basic
 
 
 # pylint:disable=too-many-instance-attributes

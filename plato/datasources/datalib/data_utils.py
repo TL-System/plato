@@ -3,9 +3,10 @@ Useful tools for processing the data
 
 """
 
-import shutil
-import os
 import json
+import os
+import shutil
+
 import numpy as np
 
 

@@ -9,11 +9,11 @@ Association for Computing Machinery, New York, NY, USA,
 115–124. https://doi.org/10.1145/3559613.3563201.
 """
 
-from split_learning_trainer_attack import CuriousTrainer, HonestTrainer
 from split_learning_llm_model import ClientModel
 from split_learning_llm_model_attack import ServerModelCurious
 from split_learning_lora_algorithm import Algorithm as LoRAAlgorithm
 from split_learning_server_attack import CuriousServer
+from split_learning_trainer_attack import CuriousTrainer, HonestTrainer
 
 from plato.clients.split_learning import Client
 from plato.config import Config

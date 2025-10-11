@@ -3,11 +3,11 @@ Test the dynamic multimodal model definition
 
 """
 
-import os
 import logging
+import os
 
-from mmaction.tests import test_models
 from mmaction.models import build_model
+from mmaction.tests import test_models
 
 from plato.config import Config
 from plato.models.multimodal import multimodal_module

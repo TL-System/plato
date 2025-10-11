@@ -5,15 +5,17 @@ Having a registry of all available classes is convenient for retrieving an insta
 on a configuration at run-time.
 """
 
-import torch
 import logging
-from plato.config import Config
-from scipy.stats import norm
-from collections import OrderedDict
-import numpy as np
 import os
-import torch.nn.functional as F
 import pickle
+from collections import OrderedDict
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+from scipy.stats import norm
+
+from plato.config import Config
 
 
 def get():

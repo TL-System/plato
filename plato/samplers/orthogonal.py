@@ -5,9 +5,9 @@ Each insitution's clients have data of different classes.
 
 import numpy as np
 import torch
-from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler
-from plato.config import Config
+from torch.utils.data import SubsetRandomSampler, WeightedRandomSampler
 
+from plato.config import Config
 from plato.samplers import base
 
 

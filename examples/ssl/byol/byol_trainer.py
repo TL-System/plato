@@ -2,13 +2,12 @@
 A self-supervised federated learning trainer with BYOL.
 """
 
-from lightly.utils.scheduler import cosine_schedule
 from lightly.models.utils import update_momentum
+from lightly.utils.scheduler import cosine_schedule
 
-
-from plato.trainers import self_supervised_learning as ssl_trainer
-from plato.trainers import loss_criterion
 from plato.config import Config
+from plato.trainers import loss_criterion
+from plato.trainers import self_supervised_learning as ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):

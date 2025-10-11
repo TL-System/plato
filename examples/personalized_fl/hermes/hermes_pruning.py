@@ -2,11 +2,13 @@
 Utility functions for pruning.
 """
 
-from math import floor
 import os
+from math import floor
+
 import numpy as np
 import torch
 from torch.nn.utils import prune
+
 from plato.config import Config
 
 

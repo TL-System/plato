@@ -7,12 +7,12 @@ https://arxiv.org/pdf/2006.07733.pdf.
 Source code: https://github.com/lucidrains/byol-pytorch or https://github.com/sthalles/PyTorch-BYOL.
 """
 
-from plato.servers import fedavg_personalized as personalized_server
+import byol_trainer
+from byol_model import BYOLModel
+
 from plato.clients import self_supervised_learning as ssl_client
 from plato.datasources import self_supervised_learning as ssl_datasource
-
-from byol_model import BYOLModel
-import byol_trainer
+from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():

@@ -22,12 +22,12 @@ from collections import OrderedDict
 from typing import List
 
 import torch
+from clustering import kmeans_clustering
 from lightly import loss as lightly_loss
-from plato.trainers import loss_criterion
+from prototype_loss import get_prototype_loss
 from torch import nn
 
-from clustering import kmeans_clustering
-from prototype_loss import get_prototype_loss
+from plato.trainers import loss_criterion
 
 
 class CalibreLoss(nn.Module):

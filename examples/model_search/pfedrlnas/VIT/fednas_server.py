@@ -2,11 +2,11 @@
 Customized Server for PerFedRLNAS.
 """
 
-import sys
 import pickle
+import sys
 import time
-import numpy as np
 
+import numpy as np
 
 from plato.config import Config
 from plato.servers import fedavg

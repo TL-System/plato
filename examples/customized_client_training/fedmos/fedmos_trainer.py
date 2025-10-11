@@ -10,10 +10,10 @@ Source code: https://github.com/Distributed-Learning-Networking-Group/FedMoS
 
 import copy
 
+from optimizers import FedMosOptimizer
+
 from plato.config import Config
 from plato.trainers import basic
-
-from optimizers import FedMosOptimizer
 
 
 # pylint:disable=no-member

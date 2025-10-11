@@ -2,13 +2,13 @@
 An implementation of the Calibre algorithm.
 """
 
+import calibre_callback
+import calibre_model
+import calibre_server
+import calibre_trainer
+
 from plato.clients import self_supervised_learning as ssl_client
 from plato.datasources import self_supervised_learning as ssl_datasource
-
-import calibre_model
-import calibre_trainer
-import calibre_callback
-import calibre_server
 
 
 def main():

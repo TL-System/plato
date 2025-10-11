@@ -5,9 +5,8 @@ Helped functions used by trainer and algorithm in PerFedRLNAS.
 import copy
 import logging
 
-import torch
 import numpy as np
-
+import torch
 from nasvit_wrapper.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )

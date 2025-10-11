@@ -13,15 +13,14 @@ features with fixed dimensions.
 
 """
 
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from torch import nn
 import torchvision
-
-from plato.models.lenet5 import Model as lenet5_model
-from plato.models.vgg import Model as vgg_model
+from torch import nn
 
 from plato.config import Config
+from plato.models.lenet5 import Model as lenet5_model
+from plato.models.vgg import Model as vgg_model
 
 
 class TruncatedLeNetModel(nn.Module):

@@ -2,9 +2,9 @@
 A federated learning client at the edge server in a cross-silo training workload.
 """
 
-from dataclasses import dataclass
 import logging
 import pickle
+from dataclasses import dataclass
 
 from plato.clients import edge
 

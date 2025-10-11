@@ -1,5 +1,5 @@
 """
-Samples data from a dataset, 1). biased across labels, and 2). the number of labels
+Samples data from a dataset. 1). biased across labels, and 2). the number of labels
  (corresponding classes) in different clients is the same, and 3). part of clients
  share same classes 4) the classes shared by these clients are partly used by other
  clients.
@@ -30,9 +30,7 @@ import torch
 from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
-from plato.samplers import base
-
-from plato.samplers import sampler_utils
+from plato.samplers import base, sampler_utils
 
 
 class Sampler(base.Sampler):
@@ -58,7 +56,9 @@ class Sampler(base.Sampler):
         assert per_client_classes_size == len(anchor_classes)
 
         self.consistent_clients = np.random.choice(
-            list(range(total_clients)), size=consistent_clients_size, replace=False
+            list(range(total_clients)),
+            size=consistent_clients_size,
+            replace=False,
         )
         self.anchor_classes = anchor_classes
         self.keep_anchor_classes_size = keep_anchor_classes_size
@@ -89,7 +89,11 @@ class Sampler(base.Sampler):
         self.subset_indices = self.clients_dataidx_map[client_id - 1]
 
     def quantity_label_skew(
-        self, dataset_labels, dataset_classes, num_clients, per_client_classes_size
+        self,
+        dataset_labels,
+        dataset_classes,
+        num_clients,
+        per_client_classes_size,
     ):
         """Achieve the quantity-based lable skewness"""
         client_id = self.client_id

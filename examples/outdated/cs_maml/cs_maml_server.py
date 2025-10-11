@@ -8,8 +8,8 @@ import logging
 import os
 
 from plato.config import Config
-from plato.utils import csv_processor
 from plato.servers import fedavg_cs
+from plato.utils import csv_processor
 
 
 class Server(fedavg_cs.Server):

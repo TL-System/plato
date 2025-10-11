@@ -2,9 +2,9 @@
 A federated learning training session with LoRA fine-tuning.
 """
 
-import lora_server
 import lora_client
-from lora_utils import LoraModel, DataSource, Trainer, Algorithm
+import lora_server
+from lora_utils import Algorithm, DataSource, LoraModel, Trainer
 
 
 def main():

@@ -2,13 +2,15 @@
 The Purchase100 dataset.
 """
 
-import os
 import logging
-import urllib
+import os
 import tarfile
-import torch
+import urllib
+
 import numpy as np
+import torch
 from torch.utils import data
+
 from plato.config import Config
 from plato.datasources import base
 

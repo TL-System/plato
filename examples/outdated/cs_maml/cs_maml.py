@@ -8,10 +8,10 @@ sys.path.append("../fl_maml/")
 
 # pylint: disable=import-error
 # pylint: disable=wrong-import-position
-import fl_maml_trainer as cs_maml_trainer
-import fl_maml_client as cs_maml_client
-import cs_maml_server
 import cs_maml_edge
+import cs_maml_server
+import fl_maml_client as cs_maml_client
+import fl_maml_trainer as cs_maml_trainer
 
 
 def main():

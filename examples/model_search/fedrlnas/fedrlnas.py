@@ -12,10 +12,9 @@ The Search Space of NAS is based on: Darts https://github.com/quark0/darts .
 
 import fedrlnas_client
 import fedrlnas_server
-from fedrlnas_algorithm import ClientAlgorithm, ServerAlgorithm
-
 from Darts.architect import Architect
 from Darts.model_search import Network
+from fedrlnas_algorithm import ClientAlgorithm, ServerAlgorithm
 
 from plato.trainers.basic import Trainer
 

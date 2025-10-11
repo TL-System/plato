@@ -4,8 +4,8 @@ Customize the inbound and outbound processors through client callbacks.
 
 from customize_callback import CustomizeProcessorCallback
 
-from plato.servers import fedavg
 from plato.clients import simple
+from plato.servers import fedavg
 
 
 def main():

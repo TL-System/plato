@@ -2,9 +2,8 @@
 A federated learning client of Tempo.
 """
 
-from plato.config import Config
-
 from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):

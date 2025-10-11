@@ -1,9 +1,10 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import os
-import torch
-import torch.nn as nn
-import torch.distributed as dist
 from copy import deepcopy
+
+import torch
+import torch.distributed as dist
+import torch.nn as nn
 from timm.utils import get_state_dict
 
 try:

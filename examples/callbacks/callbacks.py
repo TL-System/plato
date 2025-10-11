@@ -2,9 +2,10 @@
 This example shows how to use callbacks to customize server, client, and trainer.
 """
 
+from callback_examples import *
+
 from plato.clients import simple
 from plato.servers import fedavg
-from callback_examples import *
 
 
 def main():

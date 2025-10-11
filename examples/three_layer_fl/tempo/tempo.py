@@ -2,9 +2,9 @@
 A federated learning training session using Tempo.
 """
 
-import tempo_server
 import tempo_client
 import tempo_edge
+import tempo_server
 
 
 def main():

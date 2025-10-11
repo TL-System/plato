@@ -1,13 +1,13 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 # modified from OFA: https://github.com/mit-han-lab/once-for-all
 
-from torch.autograd.function import Function
-import torch.nn.functional as F
-from torch.nn.parameter import Parameter
-import torch.nn as nn
 import torch
-from torch.nn.modules._functions import SyncBatchNorm as sync_batch_norm
 import torch.distributed as dist
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd.function import Function
+from torch.nn.modules._functions import SyncBatchNorm as sync_batch_norm
+from torch.nn.parameter import Parameter
 
 from .nn_utils import get_same_padding, make_divisible, sub_filter_start_end
 from .static_layers import SELayer

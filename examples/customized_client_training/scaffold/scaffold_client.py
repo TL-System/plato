@@ -11,7 +11,6 @@ https://arxiv.org/pdf/1910.06378.pdf
 
 import logging
 import os
-
 import pickle
 
 from plato.clients import simple

@@ -9,11 +9,11 @@ in Proceedings of the 37th International Conference on Machine Learning (ICML), 
 https://arxiv.org/pdf/1910.06378.pdf
 """
 
-from collections import OrderedDict
-
 import copy
 import logging
 import pickle
+from collections import OrderedDict
+
 import torch
 
 from plato.config import Config

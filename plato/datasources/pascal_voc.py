@@ -3,8 +3,8 @@ The PASCAL VOC dataset for image segmentation.
 """
 
 from torchvision import datasets, transforms
-from plato.config import Config
 
+from plato.config import Config
 from plato.datasources import base
 
 

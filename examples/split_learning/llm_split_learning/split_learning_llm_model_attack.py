@@ -4,13 +4,17 @@ An LLM model on the server which has certain hack functions helping recover the
 """
 
 import logging
+
 import torch
-from transformers import AutoModelForCausalLM
 from split_learning_llm_model import (
     ServerModel as ServerModelHonest,
-    get_module,
-    get_lora_model,
 )
+from split_learning_llm_model import (
+    get_lora_model,
+    get_module,
+)
+from transformers import AutoModelForCausalLM
+
 from plato.config import Config
 
 

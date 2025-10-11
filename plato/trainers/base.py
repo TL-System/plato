@@ -2,8 +2,8 @@
 Base class for trainers.
 """
 
-from abc import ABC, abstractmethod
 import os
+from abc import ABC, abstractmethod
 
 from plato.config import Config
 

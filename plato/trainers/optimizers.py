@@ -5,8 +5,8 @@ Optimizers for training workloads.
 from typing import Union
 
 import torch_optimizer as torch_optim
-from torch import optim
 from timm import optim as timm_optim
+from torch import optim
 
 from plato.config import Config
 

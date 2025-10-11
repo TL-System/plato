@@ -15,6 +15,7 @@ import math
 import random
 
 import numpy as np
+
 from plato.config import Config
 from plato.servers import fedavg
 

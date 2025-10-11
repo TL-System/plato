@@ -7,11 +7,10 @@ in NeurIPS, 2021.
 
 import resnet
 import vit
-
+from fjord_algorithm import Algorithm
 from fjord_client import Client
 from fjord_server import Server
-from fjord_algorithm import Algorithm
-from fjord_trainer import ServerTrainer, ClientTrainer
+from fjord_trainer import ClientTrainer, ServerTrainer
 
 from plato.config import Config
 

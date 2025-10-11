@@ -2,10 +2,11 @@
 A personalized federate learning algorithm that loads and saves local layers of a model.
 """
 
-import os
 import logging
+import os
 
 import torch
+
 from plato.algorithms import fedavg
 from plato.config import Config
 

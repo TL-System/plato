@@ -13,10 +13,10 @@ https://ieeexplore.ieee.org/document/9546506
 
 """
 
-from plato.servers import fedavg
-
-import adaptive_freezing_client
 import adaptive_freezing_algorithm
+import adaptive_freezing_client
+
+from plato.servers import fedavg
 
 
 def main():

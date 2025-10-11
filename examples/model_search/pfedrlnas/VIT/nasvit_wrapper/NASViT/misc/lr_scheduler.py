@@ -1,9 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import torch
-
 from timm.scheduler.cosine_lr import CosineLRScheduler
-from timm.scheduler.step_lr import StepLRScheduler
 from timm.scheduler.scheduler import Scheduler
+from timm.scheduler.step_lr import StepLRScheduler
 
 
 def build_scheduler(config, optimizer, n_iter_per_epoch):

@@ -9,19 +9,18 @@ import logging
 from collections import OrderedDict
 
 from plato.config import Config
-
 from plato.samplers import (
-    iid,
-    dirichlet,
-    mixed,
-    orthogonal,
     all_inclusive,
+    dirichlet,
     distribution_noniid,
+    iid,
     label_quantity_noniid,
+    mixed,
     mixed_label_quantity_noniid,
-    sample_quantity_noniid,
     modality_iid,
     modality_quantity_noniid,
+    orthogonal,
+    sample_quantity_noniid,
 )
 
 registered_samplers = OrderedDict(

@@ -4,9 +4,9 @@ The class in this file is supported by the mmaction/tools/data/build_file_list
 
 """
 
-import os
 import glob
 import json
+import os
 
 from mmaction.tools.data.anno_txt2json import lines2dictlist
 from mmaction.tools.data.parse_file_list import parse_directory

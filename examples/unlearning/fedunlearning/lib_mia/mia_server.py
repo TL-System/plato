@@ -13,9 +13,10 @@ https://arxiv.org/pdf/1610.05820.pdf
 import copy
 
 import torch
+from torch.utils.data import SubsetRandomSampler
+
 from plato.config import Config
 from plato.servers import fedavg
-from torch.utils.data import SubsetRandomSampler
 
 from .mia import launch_attack, train_attack_model
 

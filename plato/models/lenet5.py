@@ -8,8 +8,8 @@ document recognition." Proceedings of the IEEE, November 1998.
 
 import collections
 
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 
 class Model(nn.Module):

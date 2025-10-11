@@ -3,10 +3,10 @@ Necessary functions for the Flickr30K Entities dataset
 
 """
 
-import os
 import json
-import xml.etree.ElementTree as ET
 import logging
+import os
+import xml.etree.ElementTree as ET
 
 from plato.datasources.datalib import data_utils
 

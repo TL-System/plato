@@ -9,8 +9,8 @@ Proceedings of the 41st IEEE International Conference on Distributed Computing
 Systems (ICDCS 2021), Online, July 7-10, 2021 (found in papers/).
 """
 
-from plato.config import Config
 from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):

@@ -9,13 +9,12 @@ instance based on a configuration at run-time.
 import logging
 
 from plato.config import Config
-
 from plato.servers import (
     fedavg,
     fedavg_cs,
-    mistnet,
     fedavg_gan,
     fedavg_personalized,
+    mistnet,
     split_learning,
 )
 

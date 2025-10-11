@@ -17,7 +17,6 @@ three different networks:
 
 import torch
 import torch.nn as nn
-
 from mmaction.models import build_loss
 
 from plato.models.multimodal import fc_net

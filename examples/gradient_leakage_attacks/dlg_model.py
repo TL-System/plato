@@ -5,10 +5,12 @@ which will be used in the defense Soteria.
 """
 
 from typing import Union
+
 from nn import (
     lenet,
     resnet,
 )
+
 from plato.config import Config
 
 

@@ -1,5 +1,5 @@
-from prettytable import PrettyTable
 import torch
+from prettytable import PrettyTable
 
 
 def count_parameters(model):

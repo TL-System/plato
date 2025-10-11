@@ -5,7 +5,6 @@ The base class used for all following classes
 
 import torch
 import torch.nn as nn
-
 from mmaction.models import build_model
 
 

@@ -3,15 +3,16 @@ NAS architect in PerFedRLNAS, a wrapper over the supernet.
 """
 
 import copy
+import os
 import pickle
 import sys
-import os
 
 import torch
+
 from plato.config import Config
 
-from .mobilenetv3_supernet import NasDynamicModel
 from .config import get_config
+from .mobilenetv3_supernet import NasDynamicModel
 
 sys.path.append("./examples/pfedrlnas/")
 from VIT.nasvit_wrapper import architect

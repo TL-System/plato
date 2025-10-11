@@ -3,18 +3,18 @@ Modify based on cnn/architect.py in https://github.com/quark0/darts,
 to support the algorithms in FedRLNAS.
 """
 
-import pickle
-import os
 import logging
-import numpy as np
+import os
+import pickle
 
+import numpy as np
 import torch
+import torch.nn.functional as F
 from torch import nn
 from torch.autograd import Variable
-import torch.nn.functional as F
 
-from Darts.model_search import Network
 from Darts.genotypes import PRIMITIVES, Genotype
+from Darts.model_search import Network
 from plato.config import Config
 
 

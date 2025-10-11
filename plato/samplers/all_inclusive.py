@@ -5,8 +5,8 @@ local sources only. Used by the Federated EMNIST dataset and the MistNet server.
 
 import random
 
-from plato.samplers import base
 from plato.config import Config
+from plato.samplers import base
 
 
 class Sampler(base.Sampler):

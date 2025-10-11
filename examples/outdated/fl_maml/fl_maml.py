@@ -8,8 +8,8 @@ International Conference on Machine Learning. PMLR, 2017.
 http://proceedings.mlr.press/v70/finn17a/finn17a.pdf
 """
 
-import fl_maml_server
 import fl_maml_client
+import fl_maml_server
 import fl_maml_trainer
 
 

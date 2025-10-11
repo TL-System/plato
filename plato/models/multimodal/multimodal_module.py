@@ -18,8 +18,7 @@ import logging
 
 import torch.nn as nn
 
-from plato.models.multimodal import base_net
-from plato.models.multimodal import fusion_net
+from plato.models.multimodal import base_net, fusion_net
 
 
 class DynamicMultimodalModule(nn.Module):

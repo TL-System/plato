@@ -5,8 +5,8 @@ A self-supervised federated learning trainer with MoCoV2.
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
-from plato.trainers import self_supervised_learning as ssl_trainer
 from plato.config import Config
+from plato.trainers import self_supervised_learning as ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):

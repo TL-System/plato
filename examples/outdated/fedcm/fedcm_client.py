@@ -3,9 +3,8 @@ Reference:
 J. Xu, et al. "FedCM: Federated Learning with Client-level Momentum," found in papers/.
 """
 
-from plato.config import Config
-
 from plato.clients import simple
+from plato.config import Config
 from plato.models import registry as models_registry
 
 

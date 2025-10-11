@@ -5,18 +5,17 @@ The model for the SMoG algorithm.
 import copy
 
 import torch
-from torch import nn
-from sklearn.cluster import KMeans
-
-from lightly.models.utils import deactivate_requires_grad
 from lightly.models.modules.heads import (
     SMoGPredictionHead,
     SMoGProjectionHead,
     SMoGPrototypes,
 )
+from lightly.models.utils import deactivate_requires_grad
+from sklearn.cluster import KMeans
+from torch import nn
 
-from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
+from plato.models.cnn_encoder import Model as encoder_registry
 
 
 class SMoG(nn.Module):

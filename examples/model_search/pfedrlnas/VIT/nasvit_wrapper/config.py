@@ -4,7 +4,6 @@ NASViT configuration
 
 from yacs.config import CfgNode as CN
 
-
 _C = CN()
 
 # Base config files

@@ -4,9 +4,9 @@ Model used in BYOL algorithm.
 
 import copy
 
-from torch import nn
 from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
 from lightly.models.utils import deactivate_requires_grad
+from torch import nn
 
 from plato.config import Config
 from plato.models.cnn_encoder import Model as encoder_registry

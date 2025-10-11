@@ -3,8 +3,9 @@ A federated learning client using pruning.
 """
 
 import copy
-from collections import OrderedDict
 import logging
+from collections import OrderedDict
+
 import torch
 from torch.nn.utils import prune
 

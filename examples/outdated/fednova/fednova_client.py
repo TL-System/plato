@@ -10,13 +10,13 @@ Optimization", in the Proceedings of NeurIPS 2020.
 https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-Abstract.html
 """
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
+
 import numpy as np
 
+from plato.clients import base, simple
 from plato.config import Config
-from plato.clients import simple
-from plato.clients import base
 
 
 @dataclass

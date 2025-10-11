@@ -1,14 +1,15 @@
-import os
 import asyncio
 import logging
+import os
 import pickle
 
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 os.environ["config_file"] = "examples/configs/client.yml"
 from fedreId import DataSource, Trainer
+
 from plato.clients import simple
 from plato.config import Config
 

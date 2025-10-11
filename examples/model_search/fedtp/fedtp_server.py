@@ -12,11 +12,11 @@ https://arxiv.org/pdf/2211.01572v1.pdf.
 
 from collections import OrderedDict
 
-import hypernetworks
 import fedtp_algorithm
+import hypernetworks
 
-from plato.servers import fedavg
 from plato.config import Config
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):

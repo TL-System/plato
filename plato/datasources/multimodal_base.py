@@ -2,15 +2,18 @@
 Base class for multimodal datasets.
 """
 
-from abc import abstractmethod
 import logging
 import os
 import subprocess
+from abc import abstractmethod
 from collections import namedtuple
 
 import torch
-from torchvision.datasets.utils import download_url, extract_archive
-from torchvision.datasets.utils import download_file_from_google_drive
+from torchvision.datasets.utils import (
+    download_file_from_google_drive,
+    download_url,
+    extract_archive,
+)
 
 from plato.datasources import base
 

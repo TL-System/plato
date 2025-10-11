@@ -3,9 +3,9 @@ A federated learning training session using FedSaw.
 
 """
 
-import fedsaw_server
 import fedsaw_client
 import fedsaw_edge
+import fedsaw_server
 
 
 def main():

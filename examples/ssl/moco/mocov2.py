@@ -11,12 +11,12 @@ Source code: https://github.com/facebookresearch/moco
 
 """
 
-from plato.servers import fedavg_personalized as personalized_server
-from plato.clients import self_supervised_learning as ssl_client
-from plato.datasources import self_supervised_learning as ssl_datasource
-
 import mocov2_model
 import mocov2_trainer
+
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
+from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():

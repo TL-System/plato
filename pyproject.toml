@@ -54,6 +54,7 @@ include = [
     "tests/**/*.py",
     "examples/**/*.py",
 ]
+lint.select = ["I"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]

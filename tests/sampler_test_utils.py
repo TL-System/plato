@@ -3,8 +3,8 @@ Useful functions to test the correctness of samplers
 
 """
 
-from collections import Counter, OrderedDict
 import logging
+from collections import Counter, OrderedDict
 
 import numpy as np
 import torch

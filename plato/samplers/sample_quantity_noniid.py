@@ -26,8 +26,7 @@ import torch
 from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
-from plato.samplers import base
-from plato.samplers import sampler_utils
+from plato.samplers import base, sampler_utils
 
 
 class Sampler(base.Sampler):

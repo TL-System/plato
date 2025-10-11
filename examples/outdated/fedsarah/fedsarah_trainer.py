@@ -6,12 +6,11 @@ Using Stochastic Recursive Gradient." (https://arxiv.org/pdf/1703.00102.pdf)
 
 """
 
+import fedsarah_optimizer
 import torch
 
 from plato.config import Config
 from plato.trainers import basic
-
-import fedsarah_optimizer
 
 
 class Trainer(basic.Trainer):

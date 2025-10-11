@@ -3,12 +3,12 @@ Finetune HuggingFace large language models using split learning.
 """
 
 import split_learning_trainer
-from split_learning_llm_model import ServerModel, ClientModel
+from split_learning_llm_model import ClientModel, ServerModel
 from split_learning_lora_algorithm import Algorithm as LoRAAlgorithm
 
-from plato.servers.split_learning import Server
 from plato.clients.split_learning import Client
 from plato.config import Config
+from plato.servers.split_learning import Server
 
 
 def main():

@@ -15,9 +15,9 @@ Reference: https://arxiv.org/abs/2203.07320
 import logging
 import os
 
-from plato.config import Config
-
 from lib_mia import mia_server
+
+from plato.config import Config
 
 
 class Server(mia_server.Server):

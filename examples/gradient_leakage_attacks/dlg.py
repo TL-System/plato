@@ -5,9 +5,9 @@ perform the gradient leakage attacks and reconstruct the training data of the vi
 """
 
 import dlg_client
+import dlg_model
 import dlg_server
 import dlg_trainer
-import dlg_model
 
 
 def main():

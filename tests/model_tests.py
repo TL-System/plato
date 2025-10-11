@@ -5,8 +5,8 @@ import unittest
 
 os.environ["config_file"] = "TestsConfig/models_config.yml"
 
-from plato.models import registry as models_registry
 from plato.config import Config
+from plato.models import registry as models_registry
 from plato.trainers import optimizers
 
 

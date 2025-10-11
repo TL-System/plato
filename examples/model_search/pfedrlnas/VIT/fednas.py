@@ -6,15 +6,14 @@ Reference Search Space: NASVIT: https://openreview.net/pdf?id=Qaw16njk6L.
 The code: https://github.com/facebookresearch/NASViT.
 """
 
-import fednas_server
-import fednas_client
 import fednas_algorithm
+import fednas_client
+import fednas_server
 import fednas_trainer
-
+from nasvit_wrapper.architect import Architect
 from nasvit_wrapper.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )
-from nasvit_wrapper.architect import Architect
 
 
 def main():

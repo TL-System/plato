@@ -3,9 +3,10 @@ Customize the list of inbound and outbound processors through callbacks.
 """
 
 import logging
-from plato.callbacks.client import ClientCallback
 
 from dummy_processor import DummyProcessor
+
+from plato.callbacks.client import ClientCallback
 
 
 class CustomizeProcessorCallback(ClientCallback):

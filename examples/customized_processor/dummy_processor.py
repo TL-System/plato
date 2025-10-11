@@ -4,6 +4,7 @@ Dummy processor which can be used to test customize processor feature.
 
 import logging
 from typing import Any
+
 from plato.processors import base
 
 

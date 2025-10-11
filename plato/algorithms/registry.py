@@ -7,16 +7,14 @@ based on a configuration at run-time.
 
 import logging
 
-from plato.config import Config
-
-
 from plato.algorithms import (
     fedavg,
-    mistnet,
     fedavg_gan,
     fedavg_personalized,
+    mistnet,
     split_learning,
 )
+from plato.config import Config
 
 registered_algorithms = {
     "fedavg": fedavg.Algorithm,

@@ -4,8 +4,8 @@ A federated learning server using federated averaging to train GAN models.
 
 import asyncio
 
-from plato.servers import fedavg
 from plato.config import Config
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):

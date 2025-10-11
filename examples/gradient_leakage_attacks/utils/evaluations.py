@@ -2,9 +2,11 @@
 
 import math
 from statistics import mean
+
 import lpips
 import torch
 from torchmetrics import StructuralSimilarityIndexMeasure
+
 from plato.config import Config
 
 LOSS_FN = lpips.LPIPS(net="vgg").to(Config().device())

@@ -1,6 +1,7 @@
 """Callback examples  for test purpose"""
 
 import logging
+
 from plato.callbacks.client import ClientCallback
 from plato.callbacks.server import ServerCallback
 from plato.callbacks.trainer import TrainerCallback

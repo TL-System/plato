@@ -1,47 +1,43 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-import random
-import os
-import time
 import argparse
 import datetime
-import numpy as np
-import warnings
-import sys
-import math
-from copy import deepcopy
-from collections import defaultdict
 import gc
+import math
+import os
+import random
+import sys
+import time
+import warnings
+from collections import defaultdict
+from copy import deepcopy
 
+import misc.attentive_nas_eval as attentive_nas_eval
+import misc.logger as logging
+import models
+import numpy as np
+import timm as timm
 import torch
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
 import torch.multiprocessing as mp
-import torch.nn.functional as F
 import torch.nn as nn
-
-from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
-from timm.utils import accuracy, AverageMeter
-import timm as timm
-from timm.utils import ModelEma
-
-from misc.config import get_config
-import misc.attentive_nas_eval as attentive_nas_eval
-import models
+import torch.nn.functional as F
 
 # from models import build_model
 from data import build_loader
+from misc.config import get_config
+from misc.loss_ops import AdaptiveLossSoft
 from misc.lr_scheduler import build_scheduler
 from misc.optimizer import build_optimizer
 from misc.utils import (
-    load_checkpoint,
-    save_checkpoint,
-    get_grad_norm,
     auto_resume_helper,
+    get_grad_norm,
+    load_checkpoint,
     reduce_tensor,
+    save_checkpoint,
 )
-import misc.logger as logging
-
-from misc.loss_ops import AdaptiveLossSoft
+from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
+from timm.utils import AverageMeter, ModelEma, accuracy
 
 # from misc.resnet import resnext50_32x4d, resnext101_32x4d
 try:

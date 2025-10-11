@@ -2,10 +2,9 @@
 Helped functions in PerFedRLNAS only applicable for search space: NASVIT
 """
 
+from nasvit_wrapper.config import _C as config
 from timm.loss import LabelSmoothingCrossEntropy
 from torch import optim
-
-from nasvit_wrapper.config import _C as config
 
 
 def get_nasvit_loss_criterion():

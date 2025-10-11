@@ -8,13 +8,12 @@ in ICLR, 2021.
 Reference "https://github.com/dem123456789/HeteroFL-Computation-and-Communication-Efficient-Federated-Learning-for-Heterogeneous-Clients".
 """
 
-from mobilenetv3 import MobileNetV3
 import resnet
-
+from heterofl_algorithm import Algorithm
 from heterofl_client import Client
 from heterofl_server import Server
-from heterofl_algorithm import Algorithm
 from heterofl_trainer import ServerTrainer
+from mobilenetv3 import MobileNetV3
 
 from plato.config import Config
 

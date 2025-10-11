@@ -10,8 +10,8 @@ Modified specific for algorithm HeteroFL. sBN and scaler modules are implemented
 
 from collections import OrderedDict
 
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
 
 
 def _ensure_divisible(number, divisor, min_value=None):

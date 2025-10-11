@@ -3,10 +3,9 @@ Modified ViT.
 """
 
 import torch
-from torch import nn
-
 from einops import rearrange, repeat
 from einops.layers.torch import Rearrange
+from torch import nn
 
 
 class Scaler(nn.Module):

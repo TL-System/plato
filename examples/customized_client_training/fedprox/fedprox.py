@@ -15,8 +15,8 @@ https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-P
 
 import fedprox_trainer
 
-from plato.servers import fedavg
 from plato.clients import simple
+from plato.servers import fedavg
 
 
 def main():

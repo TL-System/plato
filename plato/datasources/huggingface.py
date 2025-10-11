@@ -10,8 +10,14 @@ import logging
 import os
 
 from datasets import load_dataset, load_from_disk
-from transformers import AutoConfig, AutoTokenizer, HfArgumentParser
-from transformers import TrainingArguments, testing_utils, utils
+from transformers import (
+    AutoConfig,
+    AutoTokenizer,
+    HfArgumentParser,
+    TrainingArguments,
+    testing_utils,
+    utils,
+)
 
 from plato.config import Config
 from plato.datasources import base

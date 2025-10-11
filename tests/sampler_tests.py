@@ -29,12 +29,11 @@ import unittest
 os.environ["config_file"] = "TestsConfig/sample_quantity_noniid_sampler.yml"
 
 import numpy as np
+import sampler_test_utils
 
 from plato.config import Config
 from plato.datasources.cifar10 import DataSource
 from plato.samplers import registry as samplers_registry
-
-import sampler_test_utils
 
 
 class SamplersTest(unittest.TestCase):

@@ -3,6 +3,7 @@ HeteroFL algorithm trainer.
 """
 
 import logging
+
 from plato.config import Config
 from plato.trainers.basic import Trainer
 

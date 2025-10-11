@@ -17,18 +17,18 @@ from plato.config import Config
 from .config import get_config
 
 sys.path.append("../")  # Add parent directory to path to access VIT module
-from VIT.nasvit_wrapper.dynamic_layers import (
-    DynamicMBConvLayer,
-    DynamicConvBnActLayer,
-    DynamicLinearLayer,
-    DynamicShortcutLayer,
-)
-from VIT.nasvit_wrapper.NASViT.models.modules.static_layers import (
-    MobileInvertedResidualBlock,
-)
-from VIT.nasvit_wrapper.NASViT.models.modules.nn_utils import int2list
 from VIT.nasvit_wrapper.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
+)
+from VIT.nasvit_wrapper.dynamic_layers import (
+    DynamicConvBnActLayer,
+    DynamicLinearLayer,
+    DynamicMBConvLayer,
+    DynamicShortcutLayer,
+)
+from VIT.nasvit_wrapper.NASViT.models.modules.nn_utils import int2list
+from VIT.nasvit_wrapper.NASViT.models.modules.static_layers import (
+    MobileInvertedResidualBlock,
 )
 
 

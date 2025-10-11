@@ -3,7 +3,9 @@ Callback for attaching a pruning mask to the payload if pruning had been conduct
 """
 
 import logging
+
 from hermes_processor import SendMaskProcessor
+
 from plato.callbacks.client import ClientCallback
 
 

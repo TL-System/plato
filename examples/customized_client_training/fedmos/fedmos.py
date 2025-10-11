@@ -8,10 +8,10 @@ Paper: https://ieeexplore.ieee.org/document/10228957
 Source code: https://github.com/Distributed-Learning-Networking-Group/FedMoS
 """
 
-from plato.servers import fedavg
-from plato.clients import simple
-
 import fedmos_trainer
+
+from plato.clients import simple
+from plato.servers import fedavg
 
 
 def main():

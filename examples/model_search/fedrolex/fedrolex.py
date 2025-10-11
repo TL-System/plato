@@ -7,13 +7,13 @@ in FedRolex NIPS2022.
 
 """
 
+from fedrolex_algorithm import Algorithm
+from fedrolex_client import Client
+from fedrolex_server import Server
+from fedrolex_trainer import ServerTrainer
 from resnet import resnet18
 from vit import ViT
 
-from fedrolex_client import Client
-from fedrolex_server import Server
-from fedrolex_algorithm import Algorithm
-from fedrolex_trainer import ServerTrainer
 from plato.config import Config
 
 

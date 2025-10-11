@@ -14,10 +14,10 @@ Reference: https://arxiv.org/abs/2203.07320
 
 import logging
 
-from plato.config import Config
-
 import unlearning_iid
 from lib_mia import mia_client
+
+from plato.config import Config
 
 
 class Client(mia_client.Client):

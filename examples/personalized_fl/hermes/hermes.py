@@ -7,10 +7,9 @@ Clients,” in Proc. 27th Annual International Conference on Mobile Computing an
 Networking (MobiCom), 2021.
 """
 
-from hermes_callback import HermesCallback
-import hermes_trainer
 import hermes_server
-
+import hermes_trainer
+from hermes_callback import HermesCallback
 
 from plato.clients import fedavg_personalized as personalized_client
 

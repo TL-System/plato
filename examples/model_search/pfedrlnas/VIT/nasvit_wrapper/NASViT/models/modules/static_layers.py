@@ -1,12 +1,13 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 # modified from OFA: https://github.com/mit-han-lab/once-for-all
+from collections import OrderedDict
+
+import torch.nn as nn
 import torch.nn.functional as F
 
-from collections import OrderedDict
-import torch.nn as nn
-from .nn_utils import get_same_padding, build_activation, make_divisible, drop_connect
-from .nn_base import MyModule
 from .activations import *
+from .nn_base import MyModule
+from .nn_utils import build_activation, drop_connect, get_same_padding, make_divisible
 
 
 def set_layer_from_config(layer_config):

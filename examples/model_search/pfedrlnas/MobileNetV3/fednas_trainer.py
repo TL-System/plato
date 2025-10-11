@@ -8,13 +8,13 @@ import pickle
 import random
 import re
 
-import torch
-from plato.config import Config
-from plato.trainers import basic
-
 import fednas_specific
 import fedtools
+import torch
 from model.mobilenetv3_supernet import NasDynamicModel
+
+from plato.config import Config
+from plato.trainers import basic
 
 if Config().trainer.lr_scheduler == "timm":
     BasicTrainer = basic.TrainerWithTimmScheduler

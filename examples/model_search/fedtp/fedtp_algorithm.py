@@ -13,8 +13,8 @@ https://arxiv.org/pdf/2211.01572v1.pdf.
 import torch
 
 from plato.algorithms import fedavg
-from plato.trainers.basic import Trainer
 from plato.config import Config
+from plato.trainers.basic import Trainer
 
 
 class ServerAlgorithm(fedavg.Algorithm):

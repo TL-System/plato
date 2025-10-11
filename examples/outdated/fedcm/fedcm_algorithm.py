@@ -1,5 +1,6 @@
-from plato.algorithms import fedavg
 from collections import OrderedDict
+
+from plato.algorithms import fedavg
 
 
 class Algorithm(fedavg.Algorithm):

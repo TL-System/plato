@@ -2,23 +2,24 @@
 # modified from OFA: https://github.com/mit-han-lab/once-for-all
 
 
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-import torch.nn.functional as F
 import math
 
-from .modules.static_layers import (
-    set_layer_from_config,
-    MBInvertedConvLayer,
-    ConvBnActLayer,
-    ShortcutLayer,
-    LinearLayer,
-    MobileInvertedResidualBlock,
-    IdentityLayer,
-)
-from .modules.nn_utils import make_divisible
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.autograd import Variable
+
 from .modules.nn_base import MyNetwork
+from .modules.nn_utils import make_divisible
+from .modules.static_layers import (
+    ConvBnActLayer,
+    IdentityLayer,
+    LinearLayer,
+    MBInvertedConvLayer,
+    MobileInvertedResidualBlock,
+    ShortcutLayer,
+    set_layer_from_config,
+)
 
 
 class AttentiveNasStaticModel(MyNetwork):

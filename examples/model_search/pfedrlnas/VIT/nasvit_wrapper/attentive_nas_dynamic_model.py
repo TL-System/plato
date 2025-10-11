@@ -9,22 +9,23 @@ import torch
 from torch import nn
 
 from plato.config import Config
+
+from .config import _C as config
+from .dynamic_layers import (
+    DynamicConvBnActLayer,
+    DynamicLinearLayer,
+    DynamicMBConvLayer,
+    DynamicShortcutLayer,
+)
+from .NASViT.models import attentive_nas_dynamic_model
+from .NASViT.models.attentive_nas_static_model import (
+    AttentiveNasStaticModel,
+)
+from .NASViT.models.modules.nn_utils import int2list
 from .NASViT.models.modules.static_layers import MobileInvertedResidualBlock
 from .NASViT.models.modules.transformer import (
     DynamicSwinTransformerBlock as StandardDynamicSwinTransformerBlock,
 )
-from .NASViT.models import attentive_nas_dynamic_model
-from .NASViT.models.modules.nn_utils import int2list
-from .NASViT.models.attentive_nas_static_model import (
-    AttentiveNasStaticModel,
-)
-from .dynamic_layers import (
-    DynamicMBConvLayer,
-    DynamicConvBnActLayer,
-    DynamicLinearLayer,
-    DynamicShortcutLayer,
-)
-from .config import _C as config
 
 
 # pylint:disable=abstract-method

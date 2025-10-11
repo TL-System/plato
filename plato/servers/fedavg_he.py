@@ -3,6 +3,7 @@ A federated learning server using federated averaging to aggregate updates after
 """
 
 from functools import reduce
+
 from plato.servers import fedavg
 from plato.utils import homo_enc
 

@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from collections import OrderedDict
 
 from plato.algorithms import fedavg

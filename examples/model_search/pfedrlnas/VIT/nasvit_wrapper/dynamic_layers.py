@@ -3,8 +3,8 @@ Inherit modules fron NASViT and add get weights from subnet methods.
 """
 
 from .NASViT.models.modules import dynamic_layers
-from .NASViT.models.modules.static_layers import SELayer
 from .NASViT.models.modules.nn_utils import make_divisible
+from .NASViT.models.modules.static_layers import SELayer
 
 
 def copy_bn(target_bn, src_bn):

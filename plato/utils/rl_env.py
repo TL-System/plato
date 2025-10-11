@@ -13,8 +13,9 @@ import logging
 
 import gym
 import numpy as np
-from plato.config import Config
 from gym import spaces
+
+from plato.config import Config
 
 
 class RLEnv(gym.Env):

@@ -1,9 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 import os
+
 import yaml
 from yacs.config import CfgNode as CN
-
 
 _C = CN()
 

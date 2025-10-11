@@ -8,6 +8,7 @@ Defines a default callback to print training progress.
 import logging
 import os
 from abc import ABC
+
 from plato.config import Config
 from plato.utils import csv_processor, fonts
 

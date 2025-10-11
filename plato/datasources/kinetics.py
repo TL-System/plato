@@ -44,24 +44,25 @@ for modality, we support "video", "audio", "audio_feature", "rgb", "flow"
 
 """
 
-import re
 import logging
 import os
+import re
 import shutil
 from collections import defaultdict
 
 import torch
-
-from mmaction.tools.data.kinetics import download as kinetics_downloader
 from mmaction.datasets import build_dataset
+from mmaction.tools.data.kinetics import download as kinetics_downloader
 
 from plato.config import Config
 from plato.datasources import multimodal_base
-from plato.datasources.datalib import frames_extraction_tools
-from plato.datasources.datalib import audio_extraction_tools
-from plato.datasources.datalib import modality_data_anntation_tools
-from plato.datasources.datalib import data_utils
-from plato.datasources.datalib import tiny_data_tools
+from plato.datasources.datalib import (
+    audio_extraction_tools,
+    data_utils,
+    frames_extraction_tools,
+    modality_data_anntation_tools,
+    tiny_data_tools,
+)
 
 
 def obtain_required_anno_files(splits_info):

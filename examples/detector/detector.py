@@ -4,6 +4,7 @@ An implementation of the attack-defence scenario.
 """
 
 from detector_server import Server
+
 from plato.clients.simple import Client
 from plato.trainers.basic import Trainer
 

@@ -18,10 +18,10 @@ import logging
 
 from plato.config import Config
 from plato.datasources import feature
+from plato.datasources import registry as datasources_registry
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.utils import fonts
-from plato.datasources import registry as datasources_registry
 
 
 # pylint:disable=too-many-instance-attributes

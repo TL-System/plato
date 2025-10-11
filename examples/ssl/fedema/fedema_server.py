@@ -2,8 +2,8 @@
 Implementation of the server for the FedEMA.
 """
 
-import os
 import logging
+import os
 
 import utils
 

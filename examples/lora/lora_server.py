@@ -8,9 +8,9 @@ python examples/lora/lora_server.py -c examples/lora/server.yml
 
 import logging
 
-from plato.servers import fedavg
+from lora_utils import Algorithm, DataSource, LoraModel, Trainer
 
-from lora_utils import LoraModel, DataSource, Trainer, Algorithm
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):

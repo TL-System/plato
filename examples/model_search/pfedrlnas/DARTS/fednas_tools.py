@@ -7,7 +7,6 @@ import copy
 import numpy as np
 import torch
 import torch.nn.functional as F
-
 from Darts.genotypes import PRIMITIVES
 
 # Exactly the same as search space in DARTS in search phase: 14 edges each with 8 candidates

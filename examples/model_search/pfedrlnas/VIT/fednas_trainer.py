@@ -4,9 +4,8 @@ Customized Trainer for PerFedRLNAS.
 
 import fednasvit_specific
 
-from plato.trainers import basic
 from plato.config import Config
-
+from plato.trainers import basic
 
 if Config().trainer.lr_scheduler == "timm":
     BasicTrainer = basic.TrainerWithTimmScheduler

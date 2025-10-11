@@ -2,16 +2,17 @@
 HeteroFL algorithm.
 """
 
-import sys
+import copy
 import pickle
 import random
-import copy
+import sys
 
-import torch
-import ptflops
 import numpy as np
-from plato.config import Config
+import ptflops
+import torch
+
 from plato.algorithms import fedavg
+from plato.config import Config
 
 
 class Algorithm(fedavg.Algorithm):

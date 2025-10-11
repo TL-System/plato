@@ -9,12 +9,11 @@ https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
 
 from Darts.model_search_local import MaskedNetwork
-
 from fedrlnas_tools import (
     client_weight_param,
-    sample_mask,
-    fuse_weight_gradient,
     extract_index,
+    fuse_weight_gradient,
+    sample_mask,
 )
 
 from plato.algorithms import fedavg

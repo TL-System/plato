@@ -7,9 +7,8 @@ C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
 Learning withGradient-Instructed Frequency Tuning," found in papers/.
 """
 
-from plato.config import Config
-
 from plato.clients import simple
+from plato.config import Config
 
 
 class Client(simple.Client):

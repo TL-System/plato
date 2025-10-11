@@ -5,13 +5,14 @@ A cross-silo federated learning server using federated averaging, as either edge
 import asyncio
 import logging
 import os
+
 import numpy as np
 
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
-from plato.samplers import registry as samplers_registry
 from plato.samplers import all_inclusive
+from plato.samplers import registry as samplers_registry
 from plato.servers import fedavg
 from plato.utils import fonts
 

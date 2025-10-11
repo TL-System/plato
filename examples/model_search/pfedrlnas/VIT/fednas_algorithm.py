@@ -2,9 +2,8 @@
 Customized NAS algorithms for PerFedRLNAS.
 """
 
-import numpy as np
-
 import fedtools
+import numpy as np
 from nasvit_wrapper.attentive_nas_dynamic_model import (
     AttentiveNasDynamicModel,
 )

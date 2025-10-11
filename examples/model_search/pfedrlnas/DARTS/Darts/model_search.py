@@ -4,10 +4,11 @@ to support the algorithms in FedRLNAS.
 """
 
 import torch
-from torch import nn
 import torch.nn.functional as F
-from Darts.operations import FactorizedReduce, ReLUConvBN, OPS
+from torch import nn
+
 from Darts.genotypes import PRIMITIVES
+from Darts.operations import OPS, FactorizedReduce, ReLUConvBN
 from plato.config import Config
 
 

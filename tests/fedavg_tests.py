@@ -1,19 +1,19 @@
 import asyncio
 import copy
+import os
 import unittest
+
 import numpy as np
 import torch
-import os
-
 
 os.environ["config_file"] = "TestsConfig/fedavg_tests.yml"
 
 
-from plato.clients import simple
 from plato.algorithms import registry as algorithms_registry
+from plato.clients import simple
+from plato.config import Config
 from plato.servers import fedavg as fedavg_server
 from plato.trainers import basic
-from plato.config import Config
 
 
 class InnerProductModel(torch.nn.Module):

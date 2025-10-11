@@ -7,9 +7,10 @@ COCO 2017 dataset, refer to https://www.kaggle.com/ultralytics/coco128.
 For more information about the COCO 2017 dataset, refer to http://cocodataset.org.
 """
 
-from ultralytics.data.dataset import YOLODataset
 from ultralytics.cfg import DEFAULT_CFG
+from ultralytics.data.dataset import YOLODataset
 from ultralytics.data.utils import check_det_dataset
+
 from plato.config import Config
 from plato.datasources import base
 

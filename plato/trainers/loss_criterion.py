@@ -4,8 +4,8 @@ Obtaining the loss criterion for training workloads according to the configurati
 
 from typing import Union
 
-from torch import nn
 from lightly import loss
+from torch import nn
 
 from plato.config import Config
 

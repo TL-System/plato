@@ -2,10 +2,9 @@
 A federated learning server using Hermes.
 """
 
+import hermes_pruning as pruning
 import numpy as np
 import torch
-
-import hermes_pruning as pruning
 
 from plato.servers import fedavg_personalized as personalized_server
 

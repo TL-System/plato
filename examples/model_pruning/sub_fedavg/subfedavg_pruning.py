@@ -4,9 +4,8 @@ https://github.com/MMorafah/Sub-FedAvg/blob/main/src/pruning/unstructured.py
 """
 
 import numpy as np
-from scipy.spatial import distance
-
 import torch
+from scipy.spatial import distance
 
 
 def make_init_mask(model, is_print=False):

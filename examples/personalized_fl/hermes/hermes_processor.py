@@ -3,13 +3,13 @@ An outbound processor for Hermes to load a mask from the local file system on th
 and attach it to the payload.
 """
 
+import logging
 import os
 import pickle
-import logging
 from typing import OrderedDict
 
-from plato.processors import base
 from plato.config import Config
+from plato.processors import base
 
 
 class SendMaskProcessor(base.Processor):

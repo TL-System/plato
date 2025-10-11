@@ -4,13 +4,12 @@ The trainer used by clients using Hermes.
 
 import logging
 import os
-
 import pickle
 
+import hermes_pruning as pruning
 import torch
 from torch.nn.utils import prune
 
-import hermes_pruning as pruning
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.trainers import basic

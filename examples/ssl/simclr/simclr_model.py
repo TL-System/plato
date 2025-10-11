@@ -2,10 +2,11 @@
 Model for the SimCLR algorithm.
 """
 
-from torch import nn
 from lightly.models.modules.heads import SimCLRProjectionHead
-from plato.models.cnn_encoder import Model as encoder_registry
+from torch import nn
+
 from plato.config import Config
+from plato.models.cnn_encoder import Model as encoder_registry
 
 
 class SimCLRModel(nn.Module):

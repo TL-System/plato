@@ -12,6 +12,7 @@ import zipfile
 from urllib.parse import urlparse
 
 import requests
+
 from plato.config import Config
 
 

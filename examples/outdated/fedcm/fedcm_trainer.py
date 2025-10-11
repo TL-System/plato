@@ -1,8 +1,9 @@
-import torch
-import torch.nn as nn
-import numpy as np
 import logging
 import os
+
+import numpy as np
+import torch
+import torch.nn as nn
 
 from plato.config import Config
 from plato.trainers import basic

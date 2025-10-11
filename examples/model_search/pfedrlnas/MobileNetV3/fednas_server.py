@@ -2,22 +2,22 @@
 Customized Server for PerFedRLNAS.
 """
 
-import os
-import sys
 import logging
+import os
 import pickle
+import sys
 import time
-import numpy as np
 
 import fedtools
+import numpy as np
 
+from plato.callbacks.server import ServerCallback
+from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
-from plato.utils import csv_processor
-from plato.config import Config
-from plato.callbacks.server import ServerCallback
 from plato.servers import fedavg
+from plato.utils import csv_processor
 
 
 class FendasServerCallback(ServerCallback):

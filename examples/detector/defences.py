@@ -1,8 +1,10 @@
-import torch
 import logging
-from plato.config import Config
 from collections import OrderedDict
+
 import numpy as np
+import torch
+
+from plato.config import Config
 
 registered_defences = {}
 

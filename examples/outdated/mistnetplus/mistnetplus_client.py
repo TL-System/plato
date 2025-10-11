@@ -1,15 +1,15 @@
 import asyncio
-import os
 import logging
+import os
 from dataclasses import dataclass
 
 os.environ["config_file"] = "examples/mistnetplus/mistnet_lenet5_client.yml"
 
-from plato.clients import simple
-from plato.config import Config
-
 import split_learning_algorithm
 import split_learning_trainer
+
+from plato.clients import simple
+from plato.config import Config
 
 
 @dataclass

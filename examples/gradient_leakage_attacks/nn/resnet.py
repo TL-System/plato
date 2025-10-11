@@ -8,10 +8,12 @@ https://github.com/JonasGeiping/invertinggradients
 """
 
 import random
-import torch
-from torch import nn
-import torchvision
+
 import numpy as np
+import torch
+import torchvision
+from torch import nn
+
 from plato.config import Config
 
 

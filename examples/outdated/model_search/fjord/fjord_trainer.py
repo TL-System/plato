@@ -4,8 +4,10 @@ FjORD algorithm trainer.
 
 import copy
 import random
-import torch
+
 import numpy as np
+import torch
+
 from plato.config import Config
 from plato.trainers.basic import Trainer
 

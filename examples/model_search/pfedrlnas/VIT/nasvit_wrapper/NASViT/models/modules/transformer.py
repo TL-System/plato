@@ -1,35 +1,35 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 import math
+
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 from timm.layers import DropPath, to_2tuple, trunc_normal_
-import torch.nn.functional as F
 
-
+from .dynamic_ops import (
+    DynamicBatchNorm2d,
+    DynamicLinear,
+    DynamicPointConv2d,
+    DynamicSE,
+    DynamicSeparableConv2d,
+)
+from .nn_base import MyModule, MyNetwork
+from .nn_utils import (
+    build_activation,
+    copy_bn,
+    get_net_device,
+    int2list,
+    make_divisible,
+)
 from .static_layers import (
-    MBInvertedConvLayer,
     ConvBnActLayer,
     LinearLayer,
+    MBInvertedConvLayer,
     SELayer,
     ShortcutLayer,
 )
-from .dynamic_ops import (
-    DynamicSeparableConv2d,
-    DynamicPointConv2d,
-    DynamicBatchNorm2d,
-    DynamicLinear,
-    DynamicSE,
-)
-from .nn_utils import (
-    int2list,
-    get_net_device,
-    copy_bn,
-    build_activation,
-    make_divisible,
-)
-from .nn_base import MyModule, MyNetwork
 
 
 class DynamicMlp(MyModule):

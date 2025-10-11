@@ -17,8 +17,8 @@ import adaptive_hgb_trainer
 os.environ["config_file"] = "configs/Kinetics/kinetics_mm.yml"
 
 from plato.config import Config
-from plato.models.multimodal import multimodal_module
 from plato.datasources import kinetics
+from plato.models.multimodal import multimodal_module
 
 
 def main():

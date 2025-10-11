@@ -2,9 +2,10 @@
 
 # Modified from OFA - https://github.com/mit-han-lab/once-for-all
 
+import copy
+
 import torch
 import torch.nn as nn
-import copy
 
 multiply_adds = 1
 

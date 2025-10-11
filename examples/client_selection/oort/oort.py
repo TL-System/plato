@@ -8,9 +8,9 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 (OSDI 2021), July 2021.
 """
 
+import oort_client
 import oort_server
 import oort_trainer
-import oort_client
 
 
 def main():

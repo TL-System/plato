@@ -7,8 +7,8 @@ final round of personalization, where a selected subset of clients perform local
 training using their local dataset.
 """
 
-from plato.servers import fedavg
 from plato.config import Config
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):

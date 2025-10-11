@@ -4,9 +4,9 @@ Samples data from a dataset, biased across labels according to the Dirichlet dis
 
 import numpy as np
 import torch
-from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler
-from plato.config import Config
+from torch.utils.data import SubsetRandomSampler, WeightedRandomSampler
 
+from plato.config import Config
 from plato.samplers import base
 
 

@@ -37,12 +37,10 @@ This sampler can introduce the hardest non-IID data scenarios because it contain
 
 import numpy as np
 import torch
-
-from torch.utils.data import WeightedRandomSampler, SubsetRandomSampler
+from torch.utils.data import SubsetRandomSampler, WeightedRandomSampler
 
 from plato.config import Config
-from plato.samplers import base
-from plato.samplers import sampler_utils
+from plato.samplers import base, sampler_utils
 
 
 class Sampler(base.Sampler):

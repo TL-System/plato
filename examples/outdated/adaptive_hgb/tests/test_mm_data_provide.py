@@ -5,15 +5,11 @@ Test all datasources
 
 import os
 
-from plato.config import Config
-
 # from plato.mmconfig import mmConfig
-from plato.datasources.multimodal import kinetics
+from plato.datasources.multimodal import flickr30k_entities, kinetics
 
-from plato.datasources import gym
-from plato.datasources.multimodal import flickr30k_entities
-from plato.datasources import coco
-from plato.datasources import referitgame
+from plato.config import Config
+from plato.datasources import coco, gym, referitgame
 
 # put the configuration file here:
 # os.environ['config_file'] = 'configs/Kinetics/kinetics_mm.py'

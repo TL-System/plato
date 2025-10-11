@@ -2,12 +2,11 @@
 The model of the SimSiam method.
 """
 
+from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 from torch import nn
 
-from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
-
-from plato.models.cnn_encoder import Model as encoder_registry
 from plato.config import Config
+from plato.models.cnn_encoder import Model as encoder_registry
 
 
 class SimSiam(nn.Module):

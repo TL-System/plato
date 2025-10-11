@@ -3,8 +3,9 @@ A FedAvg training session with customized models.
 """
 
 import dlg_model
-from plato.servers import fedavg
+
 from plato.clients import simple
+from plato.servers import fedavg
 
 
 def main():

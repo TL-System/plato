@@ -4,10 +4,11 @@ aggregates them and adds them to the global model from the previous round.
 """
 
 import os
+
 import numpy as np
 
-from plato.servers import fedavg
 from plato.config import Config
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):

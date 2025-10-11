@@ -3,14 +3,14 @@ A curious split learning trainer which will try to reconstruct private data
     during split learning.
 """
 
-import os
 import logging
+import os
 
 import torch
+from split_learning_llm_model import get_module
+from split_learning_trainer import Trainer as HonestTrainer
 from torchmetrics.text.rouge import ROUGEScore
 
-from split_learning_trainer import Trainer as HonestTrainer
-from split_learning_llm_model import get_module
 from plato.config import Config
 from plato.trainers import tracking
 

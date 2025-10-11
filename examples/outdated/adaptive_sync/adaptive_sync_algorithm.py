@@ -12,10 +12,10 @@ import logging
 from collections import OrderedDict
 
 import torch
-from plato.config import Config
-from plato.trainers.base import Trainer
 
 from plato.algorithms import fedavg
+from plato.config import Config
+from plato.trainers.base import Trainer
 
 
 class Algorithm(fedavg.Algorithm):

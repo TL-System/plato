@@ -3,15 +3,15 @@ A customized server with asynchronous client selection
 """
 
 import logging
-
-from plato.config import Config
-from plato.servers import fedavg
-from cvxopt import matrix, log, solvers, sparse
 from collections import OrderedDict
-from plato.config import Config
+
 import mosek
 import numpy as np
 import torch
+from cvxopt import log, matrix, solvers, sparse
+
+from plato.config import Config
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):

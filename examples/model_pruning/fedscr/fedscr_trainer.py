@@ -2,14 +2,14 @@
 The training loop that takes place on clients of FedSCR.
 """
 
+import copy
+import logging
+import os
+import pickle
 from collections import OrderedDict
 
-import copy
-import pickle
-import os
-import logging
-import torch
 import numpy as np
+import torch
 
 from plato.config import Config
 from plato.trainers import basic

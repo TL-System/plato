@@ -10,10 +10,11 @@ import random
 import numpy as np
 import torch
 import torch.nn.functional as F
-from plato.config import Config
-from plato.utils.reinforcement_learning.policies import base
 from torch import nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, pad_sequence
+
+from plato.config import Config
+from plato.utils.reinforcement_learning.policies import base
 
 
 class RNNReplayMemory:

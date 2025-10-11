@@ -4,6 +4,7 @@ A federated learning server for personalized FL.
 
 import logging
 import os
+
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import csv_processor

@@ -4,12 +4,12 @@ to support the algorithms in FedRLNAS.
 """
 
 import torch
+import torch.nn.functional as F
 from torch import nn
 from torch.autograd import Variable
-import torch.nn.functional as F
 
-from Darts.model_search import Network
 from Darts.genotypes import PRIMITIVES, Genotype
+from Darts.model_search import Network
 from plato.config import Config
 
 

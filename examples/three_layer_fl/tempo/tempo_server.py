@@ -6,8 +6,8 @@ clients' local epoch numbers of each edge server (institution).
 import math
 
 import torch
-from plato.config import Config
 
+from plato.config import Config
 from plato.servers import fedavg_cs
 
 

@@ -6,10 +6,11 @@
 # Written by Ze Liu
 # --------------------------------------------------------
 
+import functools
+import logging
 import os
 import sys
-import logging
-import functools
+
 from termcolor import colored
 
 

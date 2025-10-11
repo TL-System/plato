@@ -6,12 +6,12 @@ B. Pang, et al., "Unsupervised Visual Representation Learning by Synchronous Mom
 https://arxiv.org/pdf/2006.07733.pdf
 """
 
-from plato.servers import fedavg_personalized as personalized_server
+import smog_model
+import smog_trainer
+
 from plato.clients import self_supervised_learning as ssl_client
 from plato.datasources import self_supervised_learning as ssl_datasource
-
-import smog_trainer
-import smog_model
+from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():

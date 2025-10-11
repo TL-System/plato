@@ -9,16 +9,15 @@ import logging
 import math
 import os
 
+import numpy as np
+import scipy
 import torch
 import torch.nn as nn
 import torchvision
-import numpy as np
-import scipy
 
 from plato.config import Config
 from plato.models import registry as models_registry
-from plato.trainers import basic
-from plato.trainers import optimizers
+from plato.trainers import basic, optimizers
 
 
 class Trainer(basic.Trainer):

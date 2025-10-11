@@ -2,16 +2,15 @@
 A self-supervised federated learning trainer with Calibre.
 """
 
-import os
 import logging
+import os
 
 import torch
-
-from plato.trainers import self_supervised_learning as ssl_trainer
-from plato.config import Config
-
 from calibre_loss import CalibreLoss
 from clustering import kmeans_clustering
+
+from plato.config import Config
+from plato.trainers import self_supervised_learning as ssl_trainer
 
 
 class Trainer(ssl_trainer.Trainer):

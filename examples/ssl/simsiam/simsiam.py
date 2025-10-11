@@ -7,12 +7,12 @@ https://arxiv.org/pdf/2011.10566.pdf
 Source code: https://github.com/facebookresearch/simsiam or https://github.com/PatrickHua/SimSiam
 """
 
-from plato.servers import fedavg_personalized as personalized_server
+import simsiam_model
+import simsiam_trainer
+
 from plato.clients import self_supervised_learning as ssl_client
 from plato.datasources import self_supervised_learning as ssl_datasource
-
-import simsiam_trainer
-import simsiam_model
+from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():

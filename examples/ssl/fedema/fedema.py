@@ -6,13 +6,13 @@ https://arxiv.org/pdf/2204.04385.pdf.
 
 """
 
-from plato.clients import self_supervised_learning as ssl_client
-from plato.datasources import self_supervised_learning as ssl_datasource
-
-import fedema_server
-import fedema_trainer
 import fedema_callback
 import fedema_model
+import fedema_server
+import fedema_trainer
+
+from plato.clients import self_supervised_learning as ssl_client
+from plato.datasources import self_supervised_learning as ssl_datasource
 
 
 def main():

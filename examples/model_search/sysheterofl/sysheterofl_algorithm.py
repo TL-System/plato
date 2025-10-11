@@ -2,15 +2,16 @@
 The algorithm for paper system-heterogenous federated learning through architecture search.
 """
 
-import sys
+import copy
 import pickle
 import random
-import copy
+import sys
 
-import torch
 import ptflops
-from plato.config import Config
+import torch
+
 from plato.algorithms import fedavg
+from plato.config import Config
 
 
 # pylint:disable=too-many-instance-attributes

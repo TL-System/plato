@@ -4,10 +4,10 @@ J. Xu, et al. "FedCM: Federated Learning with Client-level Momentum," found in p
 """
 
 # configure dataset and model via the configutation files
-import fedcm_client
-import fedcm_trainer
-import fedcm_server
 import fedcm_algorithm
+import fedcm_client
+import fedcm_server
+import fedcm_trainer
 
 
 def main():

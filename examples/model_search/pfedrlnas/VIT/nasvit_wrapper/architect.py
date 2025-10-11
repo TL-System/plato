@@ -2,16 +2,16 @@
 NAS architect in PerFedRLNAS, a wrapper over the supernet.
 """
 
-import os
-import pickle
 import copy
 import logging
-import numpy as np
+import os
+import pickle
 
+import numpy as np
 import torch
+import torch.nn.functional as F
 from torch import nn
 from torch.autograd import Variable
-import torch.nn.functional as F
 
 from plato.config import Config
 

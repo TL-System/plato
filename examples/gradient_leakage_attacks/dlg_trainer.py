@@ -7,13 +7,13 @@ and potential defense mechanisms can be applied.
 import math
 import pickle
 import random
+
 import numpy as np
 import torch
-from torchvision import transforms
-
 from defense.GradDefense.dataloader import get_root_set_loader
 from defense.GradDefense.sensitivity import compute_sens
 from defense.Outpost.perturb import compute_risk
+from torchvision import transforms
 from utils.helpers import cross_entropy_for_onehot, label_to_onehot
 
 from plato.config import Config

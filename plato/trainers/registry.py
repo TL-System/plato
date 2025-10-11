@@ -6,9 +6,7 @@ based on a configuration at run-time.
 import logging
 
 from plato.config import Config
-
-
-from plato.trainers import basic, diff_privacy, pascal_voc, gan, split_learning
+from plato.trainers import basic, diff_privacy, gan, pascal_voc, split_learning
 
 registered_trainers = {
     "basic": basic.Trainer,

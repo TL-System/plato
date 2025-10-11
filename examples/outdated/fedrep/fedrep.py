@@ -11,10 +11,10 @@ https://arxiv.org/abs/2102.07078
 Source code: https://github.com/lgcollins/FedRep
 """
 
-import fedrep_trainer
+import fedrep_algorithm
 import fedrep_client
 import fedrep_server
-import fedrep_algorithm
+import fedrep_trainer
 
 
 def main():

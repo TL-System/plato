@@ -4,6 +4,7 @@ noise to model weights or features before transmitting to the federated learning
 """
 
 import unittest
+
 import numpy as np
 
 from plato.utils import unary_encoding

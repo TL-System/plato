@@ -8,10 +8,9 @@ To allow SSL transform to use the desired parameters, one should place the
 
 from lightly import transforms
 
+from plato.config import Config
 from plato.datasources import base
 from plato.datasources import registry as datasources_registry
-from plato.config import Config
-
 
 # The normalizations for different datasets
 MNIST_NORMALIZE = {"mean": [0.1307], "std": [0.3081]}

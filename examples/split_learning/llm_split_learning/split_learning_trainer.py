@@ -1,10 +1,11 @@
 """A split learning trainer for large language model fine-tuning"""
 
-from typing import Optional
 from collections import OrderedDict
+from typing import Optional
 
-from torch.utils.data import RandomSampler, Sampler
+import evaluate
 from torch import Tensor, reshape
+from torch.utils.data import RandomSampler, Sampler
 from transformers import (
     AutoTokenizer,
     HfArgumentParser,
@@ -12,11 +13,9 @@ from transformers import (
     default_data_collator,
 )
 from transformers import Trainer as HuggingFaceTrainer
-import evaluate
-
-from plato.trainers import split_learning
 
 from plato.config import Config
+from plato.trainers import split_learning
 
 
 # pylint:disable=unused-argument

@@ -9,8 +9,8 @@ personalization should be one of supervised learning. Therefore, a client needs
 to prepare the personalized datasource.
 """
 
-from plato.datasources import registry as datasources_registry
 from plato.clients import simple
+from plato.datasources import registry as datasources_registry
 
 
 class Client(simple.Client):

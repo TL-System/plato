@@ -1,19 +1,20 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
-import torch
-import torch.nn as nn
-import torch.nn.parallel
-import torch.backends.cudnn as cudnn
-import torch.distributed as dist
-import torch.optim
-import torch.multiprocessing as mp
-import torch.utils.data
-import torch.utils.data.distributed
 import time
 
-from .progress import AverageMeter, ProgressMeter, accuracy
-from .flops_counter import count_net_flops_and_params
 import models
+import torch
+import torch.backends.cudnn as cudnn
+import torch.distributed as dist
+import torch.multiprocessing as mp
+import torch.nn as nn
+import torch.nn.parallel
+import torch.optim
+import torch.utils.data
+import torch.utils.data.distributed
+
+from .flops_counter import count_net_flops_and_params
+from .progress import AverageMeter, ProgressMeter, accuracy
 
 
 def log_helper(summary, logger=None):

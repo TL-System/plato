@@ -2,9 +2,8 @@
 A federated learning client at edge server of Tempo.
 """
 
-from plato.config import Config
-
 from plato.clients import edge
+from plato.config import Config
 
 
 class Client(edge.Client):

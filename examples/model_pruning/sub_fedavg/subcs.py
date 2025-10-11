@@ -4,10 +4,11 @@ in three-layer cross-silo federated learning.
 
 """
 
-import subfedavg_trainer as subcs_trainer
 import subfedavg_client as subcs_client
-from plato.servers import fedavg_cs
+import subfedavg_trainer as subcs_trainer
+
 from plato.clients import edge
+from plato.servers import fedavg_cs
 
 
 def main():

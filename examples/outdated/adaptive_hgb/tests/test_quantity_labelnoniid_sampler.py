@@ -8,15 +8,15 @@ import os
 
 os.environ["config_file"] = "examples/adaptive_hgb/tests/sampler_config.yml"
 
+from plato.samplers.multimodal.quantity_label_noniid import Sampler
 from utils import (
-    verify_working_correctness,
     verify_client_local_data_correctness,
     verify_difference_between_clients,
+    verify_working_correctness,
 )
 
 from plato.config import Config
 from plato.datasources.cifar10 import DataSource
-from plato.samplers.multimodal.quantity_label_noniid import Sampler
 
 if __name__ == "__main__":
     _ = Config()

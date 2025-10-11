@@ -2,8 +2,8 @@
 A personalized federated learning trainer with LG-FedAvg.
 """
 
-from plato.trainers import basic
 from plato.config import Config
+from plato.trainers import basic
 from plato.utils import trainer_utils
 
 

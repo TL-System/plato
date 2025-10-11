@@ -20,17 +20,16 @@ The output sample structure of this data is consistent with that
 
 """
 
+import collections
 import logging
 
-import collections
-
-import torch
 import cv2
+import torch
 
 from plato.config import Config
 from plato.datasources import multimodal_base
-from plato.datasources.multimodal_base import TextData, BoxData, TargetData
 from plato.datasources.datalib.refer_utils import referitgame_utils
+from plato.datasources.multimodal_base import BoxData, TargetData, TextData
 
 SplitedDatasets = collections.namedtuple(
     "SplitedDatasets",

@@ -2,8 +2,8 @@
 Testing a federated learning client.
 """
 
-import os
 import asyncio
+import os
 
 os.environ["config_file"] = "config.yml"
 

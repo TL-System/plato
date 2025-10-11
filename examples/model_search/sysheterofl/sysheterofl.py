@@ -3,10 +3,9 @@ The implementation paper system-heterogenous federated learning through architec
 """
 
 import resnet
-
+from sysheterofl_algorithm import Algorithm
 from sysheterofl_client import Client
 from sysheterofl_server import Server
-from sysheterofl_algorithm import Algorithm
 from sysheterofl_trainer import ServerTrainer
 
 

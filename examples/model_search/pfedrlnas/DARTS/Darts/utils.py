@@ -3,9 +3,10 @@ Replicated from cnn/utils.py in https://github.com/quark0/darts.
 """
 
 import os
+import shutil
+
 import numpy as np
 import torch
-import shutil
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 

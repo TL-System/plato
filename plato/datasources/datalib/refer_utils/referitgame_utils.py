@@ -1,14 +1,14 @@
-import sys
-import os.path as osp
+import itertools
 import json
 import logging
+import os.path as osp
 import pickle
+import sys
 import time
-import itertools
-import skimage.io as io
-
 from pprint import pprint
+
 import numpy as np
+import skimage.io as io
 
 
 class REFER:

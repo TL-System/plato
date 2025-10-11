@@ -2,13 +2,13 @@ import os
 
 os.environ["config_file"] = "configs/Kinetics/kinetics_mm.py"
 
-from plato.config import Config
-from plato.models.multimodal import multimodal_module
 from plato.datasources.multimodal import kinetics
 
-from plato.trainers import basic
 from plato.clients import simple
+from plato.config import Config
+from plato.models.multimodal import multimodal_module
 from plato.servers import fedavg
+from plato.trainers import basic
 
 
 def main():

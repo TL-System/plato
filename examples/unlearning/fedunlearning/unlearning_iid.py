@@ -14,9 +14,10 @@ Reference: https://arxiv.org/abs/2203.07320
 
 import numpy as np
 import torch
+from torch.utils.data import SubsetRandomSampler
+
 from plato.config import Config
 from plato.samplers import iid
-from torch.utils.data import SubsetRandomSampler
 
 
 class Sampler(iid.Sampler):

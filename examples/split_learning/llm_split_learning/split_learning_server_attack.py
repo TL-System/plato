@@ -4,8 +4,9 @@ A curious server which will try to attack and reconstruct user private data
 """
 
 import multiprocessing as mp
-from plato.servers import split_learning as split_learning_server
+
 from plato.config import Config
+from plato.servers import split_learning as split_learning_server
 
 
 class CuriousServer(split_learning_server.Server):

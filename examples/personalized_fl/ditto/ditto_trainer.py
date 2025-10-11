@@ -2,16 +2,16 @@
 A personalized federated learning trainer with Ditto.
 """
 
-import os
 import copy
 import logging
+import os
 
 import torch
 
-from plato.trainers import tracking, basic
-from plato.utils import fonts
 from plato.config import Config
 from plato.models import registry as models_registry
+from plato.trainers import basic, tracking
+from plato.utils import fonts
 
 
 class Trainer(basic.Trainer):

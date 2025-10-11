@@ -6,13 +6,12 @@ https://openaccess.thecvf.com/content_ICCV_2019/papers/Howard_Searching_for_Mobi
 https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv3.html.
 """
 
-from fednas_server import Server
+from fednas_algorithm import ClientAlgorithm, ServerAlgorithm
 from fednas_client import Client
-from fednas_algorithm import ServerAlgorithm, ClientAlgorithm
+from fednas_server import Server
 from fednas_trainer import Trainer
-
-from model.mobilenetv3_supernet import NasDynamicModel
 from model.architect import Architect
+from model.mobilenetv3_supernet import NasDynamicModel
 
 
 def main():

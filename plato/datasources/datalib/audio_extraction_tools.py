@@ -5,7 +5,6 @@ Tools for extracting information from the audio
 
 import glob
 import os
-
 from multiprocessing import Pool
 
 from mmaction.tools.data import build_audio_features

@@ -1,20 +1,20 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
+import time
+
 import torch
-import torch.nn as nn
-import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
-import torch.optim
 import torch.multiprocessing as mp
+import torch.nn as nn
+import torch.nn.parallel
+import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
 
-import time
-from .progress import AverageMeter, ProgressMeter, accuracy
 from .comm import reduce_eval_results
-
-from .imagenet_eval import validate_one_subnet, log_helper
+from .imagenet_eval import log_helper, validate_one_subnet
+from .progress import AverageMeter, ProgressMeter, accuracy
 
 
 def validate(

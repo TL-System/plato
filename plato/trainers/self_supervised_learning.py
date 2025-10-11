@@ -21,9 +21,8 @@ import torch
 from lightly.data.multi_view_collate import MultiViewCollate
 
 from plato.config import Config
-from plato.trainers import basic
 from plato.models import registry as models_registry
-from plato.trainers import optimizers, lr_schedulers, loss_criterion
+from plato.trainers import basic, loss_criterion, lr_schedulers, optimizers
 
 
 class SSLSamples(UserList):

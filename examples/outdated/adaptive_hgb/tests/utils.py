@@ -4,8 +4,9 @@ Useful functions to test the correctness of samplers
 
 """
 
-import torch
 import collections
+
+import torch
 
 
 def dicts_equal(dict1, dict2):

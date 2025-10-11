@@ -6,9 +6,9 @@ import copy
 import logging
 import time
 
+import subfedavg_pruning as pruning_processor
 import torch
 
-import subfedavg_pruning as pruning_processor
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.samplers import registry as samplers_registry

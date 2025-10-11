@@ -7,10 +7,10 @@ C. Chen, et al. "GIFT: Towards Accurate and Efficient Federated
 Learning withGradient-Instructed Frequency Tuning," found in papers/.
 """
 
-from plato.servers import fedavg
-
 import adaptive_sync_algorithm
 import adaptive_sync_client
+
+from plato.servers import fedavg
 
 
 def main():

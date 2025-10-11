@@ -13,8 +13,8 @@ import logging
 import os
 
 import torch
-from plato.config import Config
 
+from plato.config import Config
 from plato.trainers import basic
 
 

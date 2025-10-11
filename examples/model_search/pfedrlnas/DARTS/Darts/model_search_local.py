@@ -4,10 +4,12 @@ to support the algorithms in FedRLNAS.
 """
 
 import copy
+
 import torch
 from torch import nn
-from Darts.operations import OPS, ReLUConvBN, FactorizedReduce
+
 from Darts.genotypes import PRIMITIVES
+from Darts.operations import OPS, FactorizedReduce, ReLUConvBN
 
 
 class MixedOp(nn.Module):

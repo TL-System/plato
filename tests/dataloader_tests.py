@@ -1,10 +1,11 @@
 """Unit tests for data loaders."""
 
+import math
 import os
 import unittest
-import math
+from typing import List, Type
+
 import torch
-from typing import Type, List
 
 os.environ["config_file"] = "config.yml"
 
@@ -12,8 +13,8 @@ import numpy as np
 
 from plato.config import Config
 from plato.datasources import registry as datasource_registry
-from plato.utils import data_loaders
 from plato.samplers import registry as samplers_registry
+from plato.utils import data_loaders
 
 
 class DataLoadersTest(unittest.TestCase):

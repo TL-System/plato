@@ -1,29 +1,29 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 # Implementation modified from OFA: https://github.com/mit-han-lab/once-for-all
 
-import copy
-import random
 import collections
+import copy
 import math
-import numpy as np
+import random
 
+import numpy as np
 import torch
 import torch.nn as nn
 
+from .attentive_nas_static_model import AttentiveNasStaticModel
 from .modules.dynamic_layers import (
-    DynamicMBConvLayer,
     DynamicConvBnActLayer,
     DynamicLinearLayer,
+    DynamicMBConvLayer,
     DynamicShortcutLayer,
 )
-from .modules.static_layers import MobileInvertedResidualBlock
-from .modules.nn_utils import make_divisible, int2list
 from .modules.nn_base import MyNetwork
+from .modules.nn_utils import int2list, make_divisible
+from .modules.static_layers import MobileInvertedResidualBlock
+from .modules.transformer import DynamicPatchMerging
 from .modules.transformer import (
     DynamicSwinTransformerBlock as StandardDynamicSwinTransformerBlock,
 )
-from .modules.transformer import DynamicPatchMerging
-from .attentive_nas_static_model import AttentiveNasStaticModel
 
 
 class AttentiveNasDynamicModel(MyNetwork):

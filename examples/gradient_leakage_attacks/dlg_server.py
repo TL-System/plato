@@ -25,29 +25,29 @@ import os
 import shutil
 from collections import OrderedDict
 from copy import deepcopy
-import numpy as np
+
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn.functional as F
-from torchvision import transforms
-
 from defense.GradDefense.compensate import denoise
-from utils.evaluations import get_evaluation_dict
-from utils.modules import PatchedModule
-from utils.helpers import cross_entropy_for_onehot
-from utils.helpers import total_variation as TV
-from utils import consts
 from malicious_attacks.fishing import (
+    check_with_tolerance,
     reconfigure_for_class_attack,
     reconfigure_for_feature_attack,
     reconstruct_feature,
-    check_with_tolerance,
 )
+from torchvision import transforms
+from utils import consts
+from utils.evaluations import get_evaluation_dict
+from utils.helpers import cross_entropy_for_onehot
+from utils.helpers import total_variation as TV
+from utils.modules import PatchedModule
 
+from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import csv_processor
-from plato.config import Config
 
 cross_entropy = torch.nn.CrossEntropyLoss(reduce="mean")
 tt = transforms.ToPILImage()

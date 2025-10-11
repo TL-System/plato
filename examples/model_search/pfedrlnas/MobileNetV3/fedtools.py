@@ -2,14 +2,13 @@
 Helped functions used by trainer and algorithm in PerFedRLNAS.
 """
 
-import os
 import copy
 import logging
+import os
 
+import numpy as np
 import torch
 import torch.nn.functional as F
-import numpy as np
-
 from model.mobilenetv3_supernet import NasDynamicModel
 
 

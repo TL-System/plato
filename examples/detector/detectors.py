@@ -1,13 +1,14 @@
-import torch
-import os
 import logging
-from plato.config import Config
-import numpy as np
-from sklearn.cluster import KMeans, AgglomerativeClustering
-import pickle
 import os
-import torch.nn.functional as F
+import pickle
 from collections import OrderedDict
+
+import numpy as np
+import torch
+import torch.nn.functional as F
+from sklearn.cluster import AgglomerativeClustering, KMeans
+
+from plato.config import Config
 
 # Configure logging
 logging.basicConfig(filename="app.log", filemode="w", level=logging.INFO)

@@ -10,9 +10,9 @@ python examples/lora/lora_client.py -c examples/lora/client.yml -i <client_id>
 import asyncio
 import logging
 
-from plato.clients import simple
+from lora_utils import Algorithm, DataSource, LoraModel, Trainer
 
-from lora_utils import LoraModel, DataSource, Trainer, Algorithm
+from plato.clients import simple
 
 
 class Client(simple.Client):

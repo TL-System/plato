@@ -2,9 +2,8 @@
 Customized NAS algorithms for PerFedRLNAS.
 """
 
-import numpy as np
-
 import fedtools
+import numpy as np
 from model.mobilenetv3_supernet import NasDynamicModel
 
 from plato.algorithms import fedavg

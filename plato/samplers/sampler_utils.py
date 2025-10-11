@@ -43,12 +43,15 @@ def generate_left_classes_pool(anchor_classes, all_classes, keep_anchor_size=1):
     return left_classes_id_list
 
 
-def assign_fully_classes(dataset_labels, dataset_classes, num_clients, client_id):
+def assign_fully_classes(
+    dataset_labels, dataset_classes, num_clients, client_id
+):
     """Assign full classes to each client"""
 
     # define the client_id to sample index mapper
     clients_dataidx_map = {
-        client_id: np.ndarray(0, dtype=np.int64) for client_id in range(num_clients)
+        client_id: np.ndarray(0, dtype=np.int64)
+        for client_id in range(num_clients)
     }
 
     dataset_labels = np.array(dataset_labels)
@@ -88,7 +91,8 @@ def assign_sub_classes(
     """
     # define the client_id to sample index mapper
     clients_dataidx_map = {
-        client_id: np.ndarray(0, dtype=np.int64) for client_id in range(num_clients)
+        client_id: np.ndarray(0, dtype=np.int64)
+        for client_id in range(num_clients)
     }
     dataset_labels = np.array(dataset_labels)
 
@@ -185,6 +189,8 @@ def create_dirichlet_skew(
             proportions = list(map(set_min_bound, proportions))
 
     else:
-        proportions = np.random.dirichlet(np.repeat(concentration, number_partitions))
+        proportions = np.random.dirichlet(
+            np.repeat(concentration, number_partitions)
+        )
 
     return proportions

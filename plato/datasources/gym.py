@@ -38,16 +38,17 @@ import os
 import shutil
 
 import torch
-
-from mmaction.tools.data.gym import download as gym_downloader
 from mmaction.datasets import build_dataset
+from mmaction.tools.data.gym import download as gym_downloader
 
 from plato.config import Config
-from plato.datasources.datalib.gym_utils import gym_trim
 from plato.datasources import multimodal_base
-from plato.datasources.datalib import frames_extraction_tools
-from plato.datasources.datalib import audio_extraction_tools
-from plato.datasources.datalib import data_utils
+from plato.datasources.datalib import (
+    audio_extraction_tools,
+    data_utils,
+    frames_extraction_tools,
+)
+from plato.datasources.datalib.gym_utils import gym_trim
 
 
 class GymDataset(multimodal_base.MultiModalDataset):

@@ -4,10 +4,9 @@ Implement new algorithm: personalized federarted NAS.
 
 import fednas_client
 import fednas_server
-from fednas_algorithm import ClientAlgorithm, ServerAlgorithm
-
 from Darts.architect import Architect
 from Darts.model_search import Network
+from fednas_algorithm import ClientAlgorithm, ServerAlgorithm
 
 from plato.trainers.basic import Trainer
 

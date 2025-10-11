@@ -2,14 +2,14 @@
 An outbound prossor for Calibre algorithm to save the divergence on the client locally.
 """
 
-import os
 import logging
+import os
 from typing import OrderedDict
 
 import torch
 
-from plato.processors import base
 from plato.config import Config
+from plato.processors import base
 
 
 class AddDivergenceRateProcessor(base.Processor):

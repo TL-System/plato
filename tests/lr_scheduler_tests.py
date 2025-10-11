@@ -9,10 +9,9 @@ os.environ["config_file"] = "TestsConfig/fedavg_tests.yml"
 
 import numpy as np
 
-from plato.config import Config
 import plato.models.registry as models_registry
-from plato.trainers import optimizers
-from plato.trainers import lr_schedulers
+from plato.config import Config
+from plato.trainers import lr_schedulers, optimizers
 
 
 class LrSchedulerTest(unittest.TestCase):

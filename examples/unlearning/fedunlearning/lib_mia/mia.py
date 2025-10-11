@@ -15,10 +15,11 @@ import logging
 import numpy as np
 import torch
 from catboost import CatBoostClassifier
-from plato.config import Config
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from torch.nn.functional import softmax
+
+from plato.config import Config
 
 
 def train_attack_model(shadow_model, in_dataloader, out_dataloader):

@@ -6,24 +6,23 @@ based on a configuration at run-time.
 import logging
 
 from plato.config import Config
-
 from plato.datasources import (
-    mnist,
-    fashion_mnist,
-    emnist,
+    celeba,
     cifar10,
     cifar100,
     cinic10,
-    purchase,
-    texas,
-    huggingface,
-    pascal_voc,
-    tiny_imagenet,
-    femnist,
+    emnist,
+    fashion_mnist,
     feature,
+    femnist,
+    huggingface,
+    mnist,
+    pascal_voc,
+    purchase,
     qoenflx,
-    celeba,
     stl10,
+    texas,
+    tiny_imagenet,
 )
 
 registered_datasources = {

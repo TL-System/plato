@@ -63,15 +63,14 @@ import json
 import logging
 import os
 
-import torch
-import skimage.io as io
 import cv2
+import skimage.io as io
+import torch
 
 from plato.config import Config
 from plato.datasources import multimodal_base
-from plato.datasources.multimodal_base import TextData, BoxData, TargetData
-from plato.datasources.datalib import data_utils
-from plato.datasources.datalib import flickr30kE_utils
+from plato.datasources.datalib import data_utils, flickr30kE_utils
+from plato.datasources.multimodal_base import BoxData, TargetData, TextData
 
 
 def collate_fn(batch):

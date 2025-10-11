@@ -1,4 +1,5 @@
 import logging
+
 from torch import nn
 
 from plato.servers import fedavg

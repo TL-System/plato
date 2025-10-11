@@ -8,8 +8,8 @@ vol. 32, no. 7, pp. 1565-1577, 1 July 2021, doi: 10.1109/TPDS.2020.3046250.
 """
 
 import fedscr_client
-import fedscr_trainer
 import fedscr_server
+import fedscr_trainer
 
 
 def main():

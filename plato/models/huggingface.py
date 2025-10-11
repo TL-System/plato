@@ -2,7 +2,8 @@
 Obtaining a model from the PyTorch Hub.
 """
 
-from transformers import AutoModelForCausalLM, AutoConfig
+from transformers import AutoConfig, AutoModelForCausalLM
+
 from plato.config import Config
 
 

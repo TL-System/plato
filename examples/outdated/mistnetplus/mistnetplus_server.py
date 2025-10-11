@@ -1,20 +1,20 @@
 import logging
 import os
-import sys
 import pickle
+import sys
 from dataclasses import dataclass
 
 import torch
 
 os.environ["config_file"] = "examples/mistnetplus/mistnet_lenet5_server.yml"
 
+import mistnetplus_algorithm
+import split_learning_trainer
+
 from plato.config import Config
 from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
-
-import mistnetplus_algorithm
-import split_learning_trainer
 
 
 @dataclass

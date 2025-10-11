@@ -10,8 +10,8 @@ Third-party code: https://github.com/jhoon-oh/FedBABU
 
 import fedper_trainer
 
-from plato.servers import fedavg_personalized as personalized_server
 from plato.clients import fedavg_personalized as personalized_client
+from plato.servers import fedavg_personalized as personalized_server
 
 
 def main():

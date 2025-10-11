@@ -5,8 +5,8 @@ when creating new client callbacks.
 Defines a default callback to print local training progress.
 """
 
-from abc import ABC
 import logging
+from abc import ABC
 
 
 class ClientCallback(ABC):

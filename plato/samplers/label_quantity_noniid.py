@@ -32,9 +32,7 @@ import torch
 from torch.utils.data import SubsetRandomSampler
 
 from plato.config import Config
-from plato.samplers import base
-
-from plato.samplers import sampler_utils
+from plato.samplers import base, sampler_utils
 
 
 class Sampler(base.Sampler):
@@ -80,7 +78,11 @@ class Sampler(base.Sampler):
         self.subset_indices = self.clients_dataidx_map[client_id - 1]
 
     def quantity_label_skew(
-        self, dataset_labels, dataset_classes, num_clients, per_client_classes_size
+        self,
+        dataset_labels,
+        dataset_classes,
+        num_clients,
+        per_client_classes_size,
     ):
         """Achieve the quantity-based lable skewness"""
         client_id = self.client_id

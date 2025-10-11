@@ -20,8 +20,8 @@ some cases, since intuitively BN provides similar regularization benefits as Dro
 
 """
 
-from typing import Union, Dict, List
 from collections import OrderedDict
+from typing import Dict, List, Union
 
 from torch import nn
 

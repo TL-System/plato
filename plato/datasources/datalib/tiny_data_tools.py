@@ -5,12 +5,12 @@ The tiny dataset is sampled from the whole dataset.
 
 """
 
-import os
 import collections
 import logging
+import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def create_tiny_kinetics_anno(kinetics_annotation_files_info, num_samples, random_seed):

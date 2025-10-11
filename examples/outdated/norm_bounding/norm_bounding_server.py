@@ -9,6 +9,7 @@ https://arxiv.org/pdf/1911.07963.pdf
 """
 
 import asyncio
+
 import numpy as np
 
 from plato.config import Config

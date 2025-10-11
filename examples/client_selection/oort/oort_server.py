@@ -11,10 +11,11 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 import logging
 import math
 import random
+
 import numpy as np
 
-from plato.servers import fedavg
 from plato.config import Config
+from plato.servers import fedavg
 
 
 class Server(fedavg.Server):
