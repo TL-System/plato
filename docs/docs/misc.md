@@ -41,22 +41,6 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 Continuous Integration (CI) tests have been set up for PyTorch in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
 
-## Uninstalling Plato
-
-If you installed Plato using `uv`, you can uninstall it by simply removing the local environment:
-
-```bash
-rm -rf .venv
-```
-
-Optionally, you may also clean `uv`’s cache:
-
-```bash
-uv cache clean
-```
-
-Finally, you can uninstall `uv` itself by following the [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/#uninstallation).
-
 ## Setting up Zed for formatting and linting
 
 If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. In order to properly set up its YAML validation, add the following to your local configuration:

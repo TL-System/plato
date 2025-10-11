@@ -2,6 +2,39 @@
 
 In `examples/`, we included a wide variety of examples that showed how federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer` classes.
 
+### Downloading the dataset
+
+When you first run some of the examples, you'll may need to first download the dataset they use using the `-d` flag. For example, before running the [Calibre](algorithms/9.%20Personalized%20Federated%20Learning%20Algorithms%20based%20on%20Self-Supervised%20Learning.md) example, you should first run:
+
+```bash
+cd examples/ssl/calibre
+uv run calibre.py -c ../configs/calibre_CIFAR10_resnet18.yml -d
+```
+
+Wait for the confirmation message:
+
+```
+The dataset has been successfully downloaded. Re-run the experiment without '-d'
+or '--download'.
+```
+
+And then run the command again without the `-d` flag:
+
+```bash
+uv run calibre.py -c ../configs/calibre_CIFAR10_resnet18.yml
+```
+
+Plato uses **uv** for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the top-level directory.
+
+To run an example with its dependencies, you need to run `uv sync` first in the top-level directory, navigate to the directory containing the example, and then use `uv run` to run the example.
+
+!!! tip "Note"
+    To make sure that all dependencies are properly loaded, always run `uv run` from within the directory containing the example.
+
+Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It will automatically detect and use these GPUs when they are present.
+
+---
+
 ## Available Examples
 
 - [Server Aggregation Algorithms](algorithms/1.%20Server%20Aggregation%20Algorithms.md)
@@ -29,55 +62,3 @@ In `examples/`, we included a wide variety of examples that showed how federated
 - [Poisoning Detection Algorithms](algorithms/12.%20Poisoning%20Detection%20Algorithms.md)
 
 - [Model Pruning Algorithms](algorithms/13.%20Model%20Pruning%20Algorithms.md)
-
----
-
-
-## Getting Started
-
-### Prerequisites
-
-Before running any examples, you'll need to complete two important steps:
-
-#### 1. Download the Dataset
-
-On your first run, you must download the required dataset using the `-d` flag:
-
-```bash
-uv run examples/personalized_fl/fedbabu/fedbabu.py \
-  -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml -d
-```
-
-Wait for the confirmation message:
-
-```bash
-The dataset has been successfully downloaded. Re-run the experiment without '-d' or '--download'.
-```
-
-Then run the command again **without** the `-d` flag:
-
-```bash
-uv run examples/personalized_fl/fedbabu/fedbabu.py \
-  -c examples/personalized_fl/configs/fedbabu_CIFAR10_resnet18.yml
-```
-
-#### 2. Install Dependencies
-
-Plato uses **uv** for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the root directory.
-
-To run an example with its dependencies:
-
-1. Navigate to the example directory
-2. Execute using `uv run`
-
-**Example:**
-
-```bash
-cd examples/ssl/smog
-uv run smog.py -c ../../../examples/ssl/configs/smog_CIFAR10_resnet18.yml
-```
-
-**Important:**
-    *Always run `uv run` from within the specific example directory to ensure all dependencies are properly loaded.*
-
----

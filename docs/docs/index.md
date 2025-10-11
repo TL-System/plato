@@ -4,33 +4,18 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
 
 ## Getting Started
 
-!!! tip "Installation and Setup"
+!!! tip "Installing and Running Plato"
     Get Plato up and running in your environment.
 
-    - **[Installation](install.md)** - Install Plato and set up your development environment
-    - **[Quick Start](quickstart.md)** - Get started with Plato quickly
-
-## Configuration
-
-!!! tip "Configuration Settings"
-    Comprehensive guides for configuring all aspects of Plato.
-
-    - **[Configuration Settings](configurations/overview.md)** - Overview of configuration options
-    - **[General](configurations/general.md)** - General configuration settings
-    - **[Clients](configurations/clients.md)** - Client configuration
-    - **[Server](configurations/server.md)** - Server configuration
-    - **[Data](configurations/data.md)** - Data handling configuration
-    - **[Trainer](configurations/trainer.md)** - Training configuration
-    - **[Algorithm](configurations/algorithm.md)** - Algorithm configuration
-    - **[Results](configurations/results.md)** - Results and logging configuration
-    - **[Parameters](configurations/parameters.md)** - Parameter configuration
+    - **[Installation](install.md)** - Installing Plato and setting up your development environment
+    - **[Quick Start](quickstart.md)** - Getting started with Plato
 
 ## Examples
 
-!!! tip "Available Example"
-    Explore practical examples and algorithm implementations.
+!!! tip "Examples"
+    Explore some examples on how to get started implementing federated learning algorithms.
 
-    - **[Getting Started Examples](examples/Getting%20Started.md)** - Basic examples to get you started
+    - **[Getting Started](examples/Getting%20Started.md)** - Basic examples to get you started
 
     ### Algorithm Examples
     - **[Server Aggregation Algorithms](examples/algorithms/1.%20Server%20Aggregation%20Algorithms.md)**
@@ -48,13 +33,20 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
     - **[Model Pruning](examples/algorithms/13.%20Model%20Pruning%20Algorithms.md)**
     - **[Gradient Leakage Attacks and Defences](examples/algorithms/14.%20Gradient%20Leakage%20Attacks%20and%20Defences.md)**
 
-## Development and Deployment
+## Configuration Settings
 
-!!! tip "Development and Deployment"
-    For developers and production deployments.
+!!! tip "Configuration Settings"
+    Comprehensive guides for configuring all aspects of Plato.
 
-    - **[Developer's Guide](development.md)** - Contribute to Plato development
-    - **[Deployment Guide](deployment.md)** - Deploy Plato in production environments
+    - **[Configuration Settings](configurations/overview.md)** - Overview of configuration options
+    - **[General](configurations/general.md)** - General configuration settings
+    - **[Clients](configurations/clients.md)** - Client configuration
+    - **[Server](configurations/server.md)** - Server configuration
+    - **[Data](configurations/data.md)** - Data handling configuration
+    - **[Trainer](configurations/trainer.md)** - Training configuration
+    - **[Algorithm](configurations/algorithm.md)** - Algorithm configuration
+    - **[Results](configurations/results.md)** - Results and logging configuration
+    - **[Parameters](configurations/parameters.md)** - Parameter configuration
 
 ## API Reference
 
@@ -64,6 +56,14 @@ Welcome to Plato, a new software framework to facilitate scalable federated lear
     - **[Trainers](references/trainers.md)** - Customizing training loops and callbacks
     - **[Servers](references/servers.md)** - Customizing server behavior and aggregation
     - **[Clients](references/clients.md)** - Customizing client behavior and processing
+
+## Development and Deployment
+
+!!! tip "Development and Deployment"
+    For developers and production deployments.
+
+    - **[Developer's Guide](development.md)** - Contribute to Plato development
+    - **[Deployment Guide](deployment.md)** - Deploy Plato in production environments
 
 ## Additional Resources
 

@@ -31,8 +31,8 @@ nav:
           - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
           - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
           - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
-  - Configuration:
-      - Configuration Settings: configurations/overview.md
+  - Configuration Settings:
+      - Overview: configurations/overview.md
       - General: configurations/general.md
       - Clients: configurations/clients.md
       - Server: configurations/server.md

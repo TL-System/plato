@@ -41,27 +41,44 @@ uv run fedatt.py -c fedatt_FashionMNIST_lenet5.yml
 
 This will make sure that any additional Python packages, specified in the local `pyproject.yaml` configuration, will be installed first.
 
-!!! tip "Building the `plato-learn` PyPi package"
-    The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
+### Building the `plato-learn` PyPi package
 
-    1. Clean previous builds (optional):
+The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
+
+1. Clean previous builds (optional):
+```bash
+rm -rf dist/ build/ *.egg-info
+```
+
+2. Build the package:
+```bash
+uv build
+```
+
+3. Publish to PyPI:
     ```bash
-    rm -rf dist/ build/ *.egg-info
+    uv publish
     ```
 
-    2. Build the package:
+    Or if you need to specify the PyPi token explicitly:
     ```bash
-    uv build
+    uv publish --token <your-pypi-token>
     ```
 
-    3. Publish to PyPI:
-        ```bash
-        uv publish
-        ```
+The `uv` tool will handle all the build process using the modern, PEP 517-compliant `hatchling` backend specified in `pyproject.toml`, making it much simpler than the old `python setup.py sdist bdist_wheel` approach.
 
-        Or if you need to specify the PyPi token explicitly:
-        ```bash
-        uv publish --token <your-pypi-token>
-        ```
+### Uninstalling Plato
 
-    The `uv` tool will handle all the build process using the modern, PEP 517-compliant `hatchling` backend specified in `pyproject.toml`, making it much simpler than the old `python setup.py sdist bdist_wheel` approach.
+Plato can be uninstalled by simply removing the local environment, residing within the top-level directory:
+
+```bash
+rm -rf .venv
+```
+
+Optionally, you may also clean `uv`’s cache:
+
+```bash
+uv cache clean
+```
+
+Optionally, you can also uninstall `uv` itself by following the [official uv documentation](https://docs.astral.sh/uv/getting-started/installation/#uninstallation).
