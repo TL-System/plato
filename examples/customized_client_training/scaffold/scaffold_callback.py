@@ -37,6 +37,7 @@ class ExtractControlVariatesProcessor(base.Processor):
 class SendControlVariateProcessor(base.Processor):
     """
     A processor for clients to attach additional items to the client payload.
+    Sends Δc_i (client control variate delta) as required by SCAFFOLD Eq. (5).
     """
 
     def __init__(self, client_id, trainer, **kwargs) -> None:
@@ -46,18 +47,19 @@ class SendControlVariateProcessor(base.Processor):
         self.trainer = trainer
 
     def process(self, data: Any) -> List:
-        client_control_variate_filename = self.trainer.client_control_variate_path
-        if os.path.exists(client_control_variate_filename):
-            with open(client_control_variate_filename, "rb") as payload_file:
-                client_control_variate = pickle.load(payload_file)
-                data = [data, client_control_variate]
+        delta = getattr(self.trainer, "client_control_variate_delta", None)
+        data = [data, delta]
 
+        if delta is not None:
             logging.info(
-                "[Client #%d] Control variates were attached to the payload.",
+                "[Client #%d] Control variate deltas were attached to the payload.",
                 self.client_id,
             )
         else:
-            data = [data, None]
+            logging.info(
+                "[Client #%d] No control variate deltas available; sending None.",
+                self.client_id,
+            )
 
         return data
 

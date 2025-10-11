@@ -39,16 +39,22 @@ class Trainer(basic.Trainer):
 
         self.additional_data = None
         self.param_groups = None
+        self.local_steps = 0
+        self.local_lr = None
+        self.client_control_variate_delta = None
 
     def get_optimizer(self, model):
         """Gets the parameter groups from the optimizer"""
         optimizer = super().get_optimizer(model)
         self.param_groups = optimizer.param_groups
+        # SCAFFOLD requires η (local learning rate)
+        if len(self.param_groups) > 0 and "lr" in self.param_groups[0]:
+            self.local_lr = self.param_groups[0]["lr"]
         return optimizer
 
     def train_run_start(self, config):
         """Initializes the client control variate to 0 if the client
-        is participating for the first time.
+        is participating for the first time, and reset local counters.
         """
         self.server_control_variate = self.additional_data
         if self.client_control_variate is None:
@@ -58,11 +64,17 @@ class Trainer(basic.Trainer):
                     self.server_control_variate[variate].shape
                 )
         self.global_model_weights = copy.deepcopy(self.model.state_dict())
+        self.local_steps = 0
+        self.client_control_variate_delta = OrderedDict(
+            (k, torch.zeros_like(v)) for k, v in self.server_control_variate.items()
+        )
 
     def train_step_end(self, config, batch=None, loss=None):
-        """Modifies the weights based on the server and client control variates."""
+        """Modifies the weights based on the server and client control variates,
+        and count local steps for SCAFFOLD scaling.
+        """
         for group in self.param_groups:
-            learning_rate = -group["lr"]
+            learning_rate = group["lr"]
             counter = 0
             for name in self.server_control_variate:
                 if "weight" in name or "bias" in name:
@@ -81,43 +93,36 @@ class Trainer(basic.Trainer):
                     else:
                         param.data.add_(server_control_variate, alpha=learning_rate)
                     counter += 1
+        self.local_steps += 1
 
     def train_run_end(self, config):
-        """Compute deltas of this client's control variate and deltas of the model"""
+        """Compute Δc_i per SCAFFOLD (Eq. 4/5) and update c_i.
 
-        # Compute deltas of control variate to be used for the next time that
-        # the client is selected
+        c_i' = c - (1/(η·τ)) (x_local - x_global)
+        Δc_i = c_i' - c_i
+        c_i ← c_i'
+        """
+        eta = self.local_lr if self.local_lr is not None else Config().trainer.lr
+        tau = max(1, int(self.local_steps))
+
+        delta_ci = OrderedDict()
         new_client_control_variate = OrderedDict()
-        control_variate_deltas = OrderedDict()
-        if self.client_control_variate is not None:
-            for name, previous_weight in self.global_model_weights.items():
-                new_client_control_variate[name] = torch.sub(
-                    self.client_control_variate[name].to(device=self.device),
-                    self.server_control_variate[name].to(device=self.device),
-                ).to(device=self.device)
-                new_client_control_variate[name].add_(
-                    torch.sub(
-                        previous_weight.to(device=self.device),
-                        self.model.state_dict()[name],
-                    ),
-                    alpha=1 / Config().trainer.epochs,
-                )
 
-                control_variate_deltas[name] = torch.sub(
-                    new_client_control_variate[name],
-                    self.client_control_variate[name].to(self.device),
-                )
-        else:
-            for name, previous_weight in self.global_model_weights.items():
-                new_client_control_variate[name] = -self.server_control_variate[name]
-                new_client_control_variate[name].add_(
-                    torch.sub(previous_weight, self.model.state_dict()[name]),
-                    alpha=1 / Config().trainer.epochs,
-                )
+        for name, x_global in self.global_model_weights.items():
+            x_local = self.model.state_dict()[name]
+            ci_old = self.client_control_variate[name]
 
-                control_variate_deltas[name] = new_client_control_variate[name]
+            ci_new = (
+                self.server_control_variate[name].to(self.device)
+                - (x_local.to(self.device) - x_global.to(self.device)) / (eta * tau)
+            )
 
-        # Update client control variate
+            delta = ci_new - ci_old.to(self.device)
+            delta_ci[name] = delta.detach().cpu()
+            new_client_control_variate[name] = ci_new.detach().cpu()
+
+        # Expose Δc_i for the outbound processor and update stored c_i
+        self.client_control_variate_delta = delta_ci
         self.client_control_variate = new_client_control_variate
 
         # Save client control variate
