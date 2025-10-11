@@ -54,6 +54,7 @@ include = [
     "tests/**/*.py",
     "examples/**/*.py",
 ]
+line-length = 88
 lint.select = ["I"]
 
 [tool.hatch.build.targets.wheel]
