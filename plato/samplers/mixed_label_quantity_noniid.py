@@ -131,7 +131,5 @@ class Sampler(base.Sampler):
         """Obtain the detailed information in the trainser"""
         targets_array = np.array(self.targets_list)
         client_sampled_subset_labels = targets_array[self.subset_indices]
-        unique, counts = np.unique(
-            client_sampled_subset_labels, return_counts=True
-        )
+        unique, counts = np.unique(client_sampled_subset_labels, return_counts=True)
         return np.asarray((unique, counts)).T
