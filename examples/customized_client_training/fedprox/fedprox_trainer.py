@@ -13,9 +13,8 @@ Learning and Systems (MLSys), vol. 2, 429-450.
 https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf
 """
 
-from plato.trainers.strategies.algorithms import FedProxLossStrategyFromConfig
-
 from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.algorithms import FedProxLossStrategyFromConfig
 
 
 class Trainer(ComposableTrainer):

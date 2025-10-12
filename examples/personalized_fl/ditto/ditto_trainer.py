@@ -9,9 +9,8 @@ In Proceedings of ICML 2021.
 Paper: https://arxiv.org/abs/2012.04221
 """
 
-from plato.trainers.strategies.algorithms import DittoUpdateStrategyFromConfig
-
 from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.algorithms import DittoUpdateStrategyFromConfig
 
 
 class Trainer(ComposableTrainer):

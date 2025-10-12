@@ -9,12 +9,11 @@ arXiv preprint arXiv:2003.13461.
 Paper: https://arxiv.org/abs/2003.13461
 """
 
+from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.algorithms import (
     APFLStepStrategy,
     APFLUpdateStrategyFromConfig,
 )
-
-from plato.trainers.composable import ComposableTrainer
 
 
 class Trainer(ComposableTrainer):
