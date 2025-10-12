@@ -1,6 +1,6 @@
 # Servers
 
-## Customizing servers using inheritance
+## Customizing Servers using Inheritance
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
@@ -206,7 +206,7 @@ The common practice is to customize the server using inheritance for important f
 
     Override this method to complete additional tasks before closing the server.
 
-## Customizing servers using callbacks
+## Customizing Servers using Callbacks
 
 For infrastructure changes, such as logging and recording metrics, we tend to customize the global training process using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the server when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
 

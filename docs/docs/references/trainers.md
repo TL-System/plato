@@ -1,6 +1,6 @@
 # Trainers
 
-## Customizing trainers using inheritance
+## Customizing Trainers using Inheritance
 
 The common practice is to customize the training loop using inheritance for important features that change the state of the training process. To customize the training loop using inheritance, subclass the `basic.Trainer` class in `plato.trainers`, and override the following methods:
 
