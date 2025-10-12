@@ -11,6 +11,7 @@ Source code: https://github.com/Distributed-Learning-Networking-Group/FedMoS
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.implementations import (
     FedMosOptimizerStrategyFromConfig,
+    FedMosStepStrategy,
     FedMosUpdateStrategy,
 )
 
@@ -42,4 +43,5 @@ class Trainer(ComposableTrainer):
             callbacks=callbacks,
             optimizer_strategy=FedMosOptimizerStrategyFromConfig(),
             model_update_strategy=FedMosUpdateStrategy(),
+            training_step_strategy=FedMosStepStrategy(),
         )

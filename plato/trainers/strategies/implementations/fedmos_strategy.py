@@ -31,6 +31,7 @@ from plato.trainers.strategies.base import (
     ModelUpdateStrategy,
     OptimizerStrategy,
     TrainingContext,
+    TrainingStepStrategy,
 )
 
 
@@ -437,3 +438,103 @@ class FedMosOptimizerStrategyFromConfig(FedMosOptimizerStrategy):
             lr = config.trainer.lr
 
         super().__init__(lr=lr, a=a, mu=mu, weight_decay=weight_decay)
+
+
+class FedMosStepStrategy(TrainingStepStrategy):
+    """
+    FedMos training step strategy that calls update_momentum() before step().
+
+    This strategy implements the FedMos training step which requires calling
+    update_momentum() on the optimizer after backward() but before step().
+
+    The training flow is:
+    1. Zero gradients
+    2. Forward pass
+    3. Compute loss
+    4. Backward pass
+    5. **Call optimizer.update_momentum()** (FedMos-specific)
+    6. Optimizer step with global model
+
+    Args:
+        create_graph: Whether to create computation graph for higher-order derivatives
+        retain_graph: Whether to retain the computation graph
+
+    Example:
+        >>> from plato.trainers.composable import ComposableTrainer
+        >>> from plato.trainers.strategies.implementations import (
+        ...     FedMosOptimizerStrategyFromConfig,
+        ...     FedMosUpdateStrategy,
+        ...     FedMosStepStrategy
+        ... )
+        >>>
+        >>> trainer = ComposableTrainer(
+        ...     optimizer_strategy=FedMosOptimizerStrategyFromConfig(),
+        ...     model_update_strategy=FedMosUpdateStrategy(),
+        ...     training_step_strategy=FedMosStepStrategy()
+        ... )
+
+    Note:
+        This strategy should be used together with FedMosOptimizerStrategy and
+        FedMosUpdateStrategy to ensure proper FedMos training behavior.
+    """
+
+    def __init__(self, create_graph: bool = False, retain_graph: bool = False):
+        """Initialize FedMos training step parameters."""
+        self.create_graph = create_graph
+        self.retain_graph = retain_graph
+
+    def training_step(
+        self,
+        model: nn.Module,
+        optimizer: Optimizer,
+        examples: torch.Tensor,
+        labels: torch.Tensor,
+        loss_criterion: callable,
+        context: TrainingContext,
+    ) -> torch.Tensor:
+        """
+        Perform FedMos training step with momentum update.
+
+        Args:
+            model: The neural network model
+            optimizer: The FedMos optimizer
+            examples: Input batch
+            labels: Target labels
+            loss_criterion: Loss computation function
+            context: Training context with state
+
+        Returns:
+            The computed loss
+        """
+        # Zero gradients
+        optimizer.zero_grad()
+
+        # Forward pass
+        outputs = model(examples)
+
+        # Compute loss
+        loss = loss_criterion(outputs, labels)
+
+        # Backward pass
+        loss.backward(create_graph=self.create_graph, retain_graph=self.retain_graph)
+
+        # FedMos-specific: Update momentum before step
+        if hasattr(optimizer, "update_momentum"):
+            optimizer.update_momentum()
+
+        # Optimizer step - pass global model if available
+        global_model = context.state.get("fedmos_global_model")
+        if global_model is not None and hasattr(optimizer, "step"):
+            # Check if step accepts global_model_params argument
+            import inspect
+
+            sig = inspect.signature(optimizer.step)
+            if "global_model_params" in sig.parameters:
+                optimizer.step(global_model_params=global_model)
+            else:
+                # Fallback for older optimizer signature
+                optimizer.step(global_model)
+        else:
+            optimizer.step()
+
+        return loss

@@ -29,6 +29,7 @@ Available Strategies:
         - FedMosOptimizerStrategy: Optimizer strategy
         - FedMosUpdateStrategy: State management
         - FedMosOptimizerStrategyFromConfig: Config-based variant
+        - FedMosStepStrategy: Training step with momentum update
 
     Personalized FL:
         - FedPerUpdateStrategy: FedPer personalization
@@ -98,6 +99,7 @@ from plato.trainers.strategies.implementations.fedmos_strategy import (
     FedMosOptimizer,
     FedMosOptimizerStrategy,
     FedMosOptimizerStrategyFromConfig,
+    FedMosStepStrategy,
     FedMosUpdateStrategy,
 )
 from plato.trainers.strategies.implementations.fedprox_strategy import (
@@ -145,6 +147,7 @@ __all__ = [
     "FedMosOptimizer",
     "FedMosOptimizerStrategy",
     "FedMosOptimizerStrategyFromConfig",
+    "FedMosStepStrategy",
     "FedMosUpdateStrategy",
     # Personalized FL
     "FedPerUpdateStrategy",
