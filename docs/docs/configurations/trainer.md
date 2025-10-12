@@ -1,4 +1,4 @@
-!!! example "**type**"
+!!! example "type"
     The type of the trainer. The following types are available:
 
     - `basic` a basic trainer with a standard training loop.
@@ -28,7 +28,7 @@
     - `self_supervised_learning` a trainer that supports personalized federated learning based on self supervised learning.
     - `gan` a trainer for Generative Adversarial Networks (GANs).
 
-!!! example "**rounds**"
+!!! example "rounds"
     The maximum number of training rounds.
 
     `round` could be any positive integer.
@@ -45,13 +45,13 @@
 !!! example "target_perplexity"
     The target perplexity of the global Natural Language Processing (NLP) model.
 
-!!! example "**epochs**"
+!!! example "epochs"
     The total number of epochs in local training in each communication round.
 
-!!! example "**batch_size**"
+!!! example "batch_size"
     The size of the mini-batch of data in each step (iteration) of the training loop.
 
-!!! example "**optimizer**"
+!!! example "optimizer"
     The type of the optimizer. The following options are supported:
 
     - `Adam`
@@ -120,7 +120,7 @@
     Whether the learning rate should be scheduled globally (`true`) or not (`false`).
     If `true`, the learning rate of the first epoch in the next communication round is scheduled based on that of the last epoch in the previous communication round.
 
-!!! example "**model_type**"
+!!! example "model_type"
     The repository where the machine learning model should be retrieved from. The following options are available:
 
     - `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
@@ -140,7 +140,7 @@
                 pretrained: false
         ```
 
-!!! example "**model_name**"
+!!! example "model_name"
     The name of the machine learning model. The following options are available:
 
     - `lenet5`

@@ -184,76 +184,83 @@ class ComposableTrainer(base.Trainer):
 
 #### Key Methods
 
-##### `train(trainset, sampler, **kwargs) -> float`
+!!! note "`train(trainset, sampler, **kwargs) -> float`"
 
-Train the model on the given dataset.
+    Train the model on the given dataset and sampler.
 
-**Parameters:**
-- `trainset`: Training dataset
-- `sampler`: Data sampler for this client
-- `**kwargs`: Additional arguments
+    **Parameters:**
 
-**Returns:**
-- Training time in seconds
+    - `trainset`: Training dataset
+    - `sampler`: Data sampler for this client
+    - `**kwargs`: Additional arguments
 
-**Example:**
-```python
-training_time = trainer.train(trainset, sampler)
-```
+    **Returns:**
 
-##### `test(testset, sampler=None, **kwargs) -> float`
+    - Training time in seconds
 
-Test the model on the given dataset.
+    **Example:**
 
-**Parameters:**
-- `testset`: Test dataset
-- `sampler`: Optional data sampler
-- `**kwargs`: Additional arguments
+    ```python
+    training_time = trainer.train(trainset, sampler)
+    ```
 
-**Returns:**
-- Test accuracy (0.0 to 1.0)
+!!! note "`test(testset, sampler=None, **kwargs) -> float`"
+    Test the model on the given dataset.
 
-**Example:**
-```python
-accuracy = trainer.test(testset)
-print(f"Accuracy: {accuracy * 100:.2f}%")
-```
+    **Parameters:**
 
-##### `train_model(config, trainset, sampler, **kwargs)`
+    - `testset`: Test dataset
+    - `sampler`: Optional data sampler
+    - `**kwargs`: Additional arguments
 
-Main training loop implementation. Called internally by `train()`.
+    **Returns:**
 
-**Parameters:**
-- `config`: Configuration dictionary
-- `trainset`: Training dataset
-- `sampler`: Data sampler
-- `**kwargs`: Additional arguments
+    - Test accuracy (0.0 to 1.0)
 
-##### `save_model(filename=None, location=None)`
+    **Example:**
 
-Save model weights and training history.
+    ```python
+    accuracy = trainer.test(testset)
+    print(f"Accuracy: {accuracy * 100:.2f}%")
+    ```
 
-**Parameters:**
-- `filename`: Optional custom filename
-- `location`: Optional custom directory
+!!! note "`train_model(config, trainset, sampler, **kwargs)`"
+    Main training loop implementation. Called internally by `train()`.
 
-**Example:**
-```python
-trainer.save_model("my_model.pth")
-```
+    **Parameters:**
 
-##### `load_model(filename=None, location=None)`
+    - `config`: Configuration dictionary
+    - `trainset`: Training dataset
+    - `sampler`: Data sampler
+    - `**kwargs`: Additional arguments
 
-Load model weights and training history.
+!!! note "`save_model(filename=None, location=None)`"
+    Save model weights and training history.
 
-**Parameters:**
-- `filename`: Optional custom filename
-- `location`: Optional custom directory
+    **Parameters:**
 
-**Example:**
-```python
-trainer.load_model("my_model.pth")
-```
+    - `filename`: Optional custom filename
+    - `location`: Optional custom directory
+
+    **Example:**
+
+    ```python
+    trainer.save_model("my_model.pth")
+    ```
+
+!!! note "`load_model(filename=None, location=None)`"
+    Load model weights and training history.
+
+    **Parameters:**
+
+    - `filename`: Optional custom filename
+    - `location`: Optional custom directory
+
+    **Example:**
+
+    ```python
+    trainer.load_model("my_model.pth")
+    ```
 
 #### Attributes
 
@@ -1831,19 +1838,3 @@ trainer = ComposableTrainer(loss_strategy=composite)
 | **FedRep** | `FedRepUpdateStrategy` | `...implementations.personalized_fl_strategy` |
 | **APFL** | `APFLUpdateStrategy`, `APFLStepStrategy` | `...implementations.apfl_strategy` |
 | **Ditto** | `DittoUpdateStrategy` | `...implementations.ditto_strategy` |
-
----
-
-## Additional Resources
-
-- **Design Document**: `docs/trainer-redesign/TRAINER_REFACTORING_DESIGN.md`
-- **Quick Reference**: `docs/trainer-redesign/QUICK_REFERENCE.md`
-- **Algorithm Guide**: `docs/trainer-redesign/ALGORITHM_STRATEGIES_QUICK_REFERENCE.md`
-- **Examples**: `examples/` directory with migrated trainers
-- **Source Code**: `plato/trainers/strategies/` for strategy implementations
-
----
-
-**Last Updated**: Phase 5 Completion
-**Version**: 1.0
-**Status**: Production Ready

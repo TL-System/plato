@@ -1,4 +1,4 @@
-!!! example "**type**"
+!!! example "type"
     The type of the server.
 
     - `simple` a basic client who sends weight updates to the server.
@@ -7,10 +7,10 @@
     - `fedavg_personalized` a client saves its local layers before sending the shared global model to the server after local training.
     - `self_supervised_learning` a client to prepare the datasource for personalized learning based on self-supervised learning.
 
-!!! example "**total_clients**"
+!!! example "total_clients"
     The total number of clients in a training session.
 
-!!! example "**per_round**"
+!!! example "per_round"
     The number of clients selected in each round. It should be lower than `total_clients`.
 
 !!! example "do_test"
@@ -65,7 +65,7 @@
 
     Simulating the sleep times — rather than letting clients go to sleep and measure the actual local training times including the sleep times — will be helpful to increase the speed of running the experiments, and to improve reproducibility, since every time the experiments run, the average training time will remain the same, and specified using the `avg_training_time` setting below.
 
-    !!! example "**avg_training_time**"
+    !!! example "avg_training_time"
         If we are simulating client training times, what is the average training time? When we are simulating the sleep times rather than letting clients go to sleep, we will not be able to use the measured wall-clock time for local training. As a result, we need to specify this value in lieu of the measured training time.
 
 !!! example "outbound_processors"

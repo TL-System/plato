@@ -4,7 +4,7 @@
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
-!!! example "**configure()**"
+!!! example "configure()"
     **`def configure(self) -> None`**
 
     Override this method to implement additional tasks for initializing and configuring the server. Make sure that `super().configure()` is called first.
@@ -19,7 +19,7 @@ The common practice is to customize the server using inheritance for important f
         self.total_rounds = Config().trainer.rounds
     ```
 
-!!! example "**init_trainer()**"
+!!! example "init_trainer()"
     **`def init_trainer(self) -> None`**
 
     Override this method to implement additional tasks for initializing and configuring the trainer. Make sure that `super().init_trainer()` is called first.
@@ -34,7 +34,7 @@ The common practice is to customize the server using inheritance for important f
         self.algorithm.init_clusters(self.clusters)
     ```
 
-!!! example "**choose_clients()**"
+!!! example "choose_clients()"
     **`def choose_clients(self, clients_pool, clients_count)`**
 
     Override this method to implement a customized client selection algorithm, choosing a subset of clients from the client pool.
@@ -45,7 +45,7 @@ The common practice is to customize the server using inheritance for important f
 
     **Returns:** a list of selected client IDs.
 
-!!! example "**weights_received()**"
+!!! example "weights_received()"
     **`def weights_received(self, weights_received)`**
 
     Override this method to complete additional tasks after the updated weights have been received.
@@ -63,7 +63,7 @@ The common practice is to customize the server using inheritance for important f
         return [weight[0] for weight in weights_received]
     ```
 
-!!! example "**aggregate_deltas()**"
+!!! example "aggregate_deltas()"
     **`async def aggregate_deltas(self, updates, deltas_received)`**
 
     In most cases, it is more convenient to aggregate the model deltas from the clients, because this can be performed in a framework-agnostic fashion. Override this method to aggregate the deltas received. This method is needed if `aggregate_weights()` (below) is not defined.
@@ -72,7 +72,7 @@ The common practice is to customize the server using inheritance for important f
 
     `deltas_received` the weight deltas received from the clients.
 
-!!! example "**aggregate_weights()**"
+!!! example "aggregate_weights()"
     **`async def aggregate_weights(self, updates, baseline_weights, weights_received)`**
 
     Sometimes it is more convenient to aggregate the received model weights directly to the global model. In this case, override this method to aggregate the weights received directly to baseline weights. This method is optional, and the server will call this method rather than `aggregate_deltas` when it is defined. Refer to `examples/fedasync/fedasync_server.py` for an example.
@@ -83,14 +83,14 @@ The common practice is to customize the server using inheritance for important f
 
     `weights_received` the weights received from the clients.
 
-!!! example "**weights_aggregated()**"
+!!! example "weights_aggregated()"
     **`def weights_aggregated(self, updates)`**
 
     Override this method to complete additional tasks after aggregating weights.
 
     `updates` the client updates received at the server.
 
-!!! example "**customize_server_response()**"
+!!! example "customize_server_response()"
     **`def customize_server_response(self, server_response: dict, client_id) -> dict`**
 
     Override this method to return a customize server response with any additional information.
@@ -110,26 +110,26 @@ The common practice is to customize the server using inheritance for important f
         return server_response
     ```
 
-!!! example "**customize_server_payload()**"
+!!! example "customize_server_payload()"
     **`def customize_server_payload(self, payload)`**
 
     Override this method to customize the server payload before sending it to the clients.
 
     **Returns:** Customized server payload to be sent to the clients.
 
-!!! example "**clients_selected()**"
+!!! example "clients_selected()"
     **`def clients_selected(self, selected_clients) -> None`**
 
     Override this method to complete additional tasks after clients have been selected in each round.
 
     `selected_clients` a list of client IDs that have just been selected by the server.
 
-!!! example "**clients_processed()**"
+!!! example "clients_processed()"
     **`def clients_processed(self) -> None`**
 
     Override this method to complete additional tasks after all client reports have been processed.
 
-!!! example "**get_logged_items()**"
+!!! example "get_logged_items()"
     **`def get_logged_items(self) -> dict`**
 
     Override this method to return items to be logged by the `LogProgressCallback` class in a .csv file.
@@ -155,7 +155,7 @@ The common practice is to customize the server using inheritance for important f
         return logged_items
     ```
 
-!!! example "**should_request_update()**"
+!!! example "should_request_update()"
     **`def should_request_update(self, client_id, start_time, finish_time, client_staleness, report):`**
 
     Override this method to save additional information when the server saves checkpoints at the end of each around.
@@ -181,27 +181,27 @@ The common practice is to customize the server using inheritance for important f
             return client_staleness > self.staleness_bound and finish_time > self.wall_time
     ```
 
-!!! example "**save_to_checkpoint()**"
+!!! example "save_to_checkpoint()"
     **`def save_to_checkpoint(self) -> None`**
 
     Override this method to save additional information when the server saves checkpoints at the end of each around.
 
-!!! example "**training_will_start()**"
+!!! example "training_will_start()"
     **`def training_will_start(self) -> None`**
 
     Override this method to complete additional tasks before selecting clients for the first round of training.
 
-!!! example "**periodic_task()**"
+!!! example "periodic_task()"
     **`periodic_task(self) -> None`**
 
     Override this async method to perform periodic tasks in asynchronous mode, where this method will be called periodically.
 
-!!! example "**wrap_up()**"
+!!! example "wrap_up()"
     **`async def wrap_up(self) -> None`**
 
     Override this method to complete additional tasks at the end of each round.
 
-!!! example "**server_will_close()**"
+!!! example "server_will_close()"
     **`def server_will_close(self) -> None:`**
 
     Override this method to complete additional tasks before closing the server.
@@ -214,14 +214,14 @@ Within the implementation of these callback methods, one can access additional i
 
 To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server`, and override the following methods, then pass it to the server when it is initialized, or call `server.add_callbacks` after initialization. Examples can be found in `examples/callbacks`.
 
-!!! example "**on_weights_received()**"
+!!! example "on_weights_received()"
     **`def on_weights_received(self, server, weights_received)`**
 
     Override this method to complete additional tasks after the updated weights have been received.
 
     `weights_received` the updated weights that have been received from the clients.
 
-!!! example "**on_weights_aggregated()**"
+!!! example "on_weights_aggregated()"
     **`def on_weights_aggregated(self, server, updates)`**
 
     Override this method to complete additional tasks after aggregating weights.
@@ -235,24 +235,24 @@ To use callbacks, subclass the `ServerCallback` class in `plato.callbacks.server
         logging.info("[Server #%s] Finished aggregating weights.", os.getpid())
     ```
 
-!!! example "**on_clients_selected()**"
+!!! example "on_clients_selected()"
     **`def on_clients_selected(self, server, selected_clients)`**
 
     Override this method to complete additional tasks after clients have been selected in each round.
 
     `selected_clients` a list of client IDs that have just been selected by the server.
 
-!!! example "**on_clients_processed()**"
+!!! example "on_clients_processed()"
     **`def on_clients_processed(self, server)`**
 
     Override this method to complete additional tasks after all client reports have been processed.
 
-!!! example "**on_training_will_start()**"
+!!! example "on_training_will_start()"
     **`def on_training_will_start(self, server)`**
 
     Override this method to complete additional tasks before selecting clients for the first round of training.
 
-!!! example "**on_server_will_close()**"
+!!! example "on_server_will_close()"
     **`def on_server_will_close(self, server)`**
 
     Override this method to complete additional tasks before closing the server.

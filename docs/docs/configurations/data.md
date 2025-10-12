@@ -38,7 +38,7 @@
     !!! note "Note"
         `test_path` need to be specified for datasets using `YOLO`.
 
-!!! example "**sampler**"
+!!! example "sampler"
     How to divide the entire dataset to the clients. The following options are available:
 
     - `iid`
@@ -73,7 +73,7 @@
 !!! example "random_seed"
     The random seed used to sample each client's dataset so that experiments are reproducible.
 
-!!! example "**partition_size**"
+!!! example "partition_size"
     The number of samples in each client's dataset.
 
 !!! example "testset_size"
