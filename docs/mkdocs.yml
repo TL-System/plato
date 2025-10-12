@@ -1,5 +1,5 @@
 site_name: Plato
-site_url: https://mydomain.org/plato
+site_url: https://platodocs.netlify.app/
 theme:
   name: material
   font:
