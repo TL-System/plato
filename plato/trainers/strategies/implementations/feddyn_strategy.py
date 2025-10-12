@@ -374,11 +374,13 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
 
         for name in self.cumulative_grad_vector:
             if name in trained_weights and name in self.global_model_weights:
-                # Compute the difference: w_trained - w_global
-                diff = trained_weights[name] - self.global_model_weights[name]
+                # Compute the difference: w_trained - w_global (both on CPU)
+                trained_param_cpu = trained_weights[name].cpu()
+                global_param_cpu = self.global_model_weights[name].cpu()
+                diff = trained_param_cpu - global_param_cpu
                 # Add to cumulative gradient vector
                 self.cumulative_grad_vector[name] = (
-                    self.cumulative_grad_vector[name] + diff.cpu()
+                    self.cumulative_grad_vector[name] + diff
                 )
 
         # Save updated cumulative gradient vector for next round
