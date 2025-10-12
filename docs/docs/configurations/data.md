@@ -1,4 +1,4 @@
-!!! example "**dataset**"
+!!! example "dataset"
     The training and test datasets. The following options are available:
 
     - `MNIST`

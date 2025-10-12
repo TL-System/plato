@@ -34,7 +34,9 @@ class Server(fedavg.Server):
     def weights_received(self, weights_received):
         """Compute control variates from clients' updated weights."""
         # Each weight is [model_weights, Δc_i]. Save Δc_i for Eq. (5) update.
-        self.received_client_control_variates = [weight[1] for weight in weights_received]
+        self.received_client_control_variates = [
+            weight[1] for weight in weights_received
+        ]
         return [weight[0] for weight in weights_received]
 
     def weights_aggregated(self, updates):

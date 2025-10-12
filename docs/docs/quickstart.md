@@ -28,7 +28,7 @@ In `examples/`, a number of federated learning algorithms have been included. To
 uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.yml
 ```
 
-## Running Plato in a Docker container
+## Running Plato in a Docker Container
 
 To build such a Docker image, use the provided `Dockerfile`:
 

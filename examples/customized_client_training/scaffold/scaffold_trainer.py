@@ -112,10 +112,9 @@ class Trainer(basic.Trainer):
             x_local = self.model.state_dict()[name]
             ci_old = self.client_control_variate[name]
 
-            ci_new = (
-                self.server_control_variate[name].to(self.device)
-                - (x_local.to(self.device) - x_global.to(self.device)) / (eta * tau)
-            )
+            ci_new = self.server_control_variate[name].to(self.device) - (
+                x_local.to(self.device) - x_global.to(self.device)
+            ) / (eta * tau)
 
             delta = ci_new - ci_old.to(self.device)
             delta_ci[name] = delta.detach().cpu()

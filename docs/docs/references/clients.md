@@ -1,6 +1,6 @@
 # Clients
 
-## Customizing clients using inheritance
+## Customizing Clients using Inheritance
 
 The common practice is to customize the client using inheritance for important features that change internal states within a client. To customize the client using inheritance, subclass the `simple.Client` class (or `edge.Client` for cross-silo federated learning) in `plato.clients`, and override the following methods:
 
@@ -81,7 +81,7 @@ The common practice is to customize the client using inheritance for important f
         outbound_processor.processors.pop()
     ```
 
-## Customizing clients using callbacks
+## Customizing Clients using Callbacks
 
 For infrastructure changes, such as logging and recording metrics, we tend to customize the client using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the client when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
 

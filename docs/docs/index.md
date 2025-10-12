@@ -17,7 +17,7 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
 
     - **[Getting Started](examples/Getting%20Started.md)** - Basic examples to get you started
 
-    ### Algorithm Examples
+    ### Algorithms
     - **[Server Aggregation Algorithms](examples/algorithms/1.%20Server%20Aggregation%20Algorithms.md)**
     - **[Secure Aggregation with Homomorphic Encryption](examples/algorithms/2.%20Secure%20Aggregation%20with%20Homomorphic%20Encryption.md)**
     - **[Asynchronous Federated Learning](examples/algorithms/3.%20Asynchronous%20Federated%20Learning%20Algorithms.md)**

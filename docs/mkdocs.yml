@@ -1,5 +1,5 @@
 site_name: Plato
-site_url: https://mydomain.org/plato
+site_url: https://platodocs.netlify.app/
 theme:
   name: material
   font:
@@ -13,7 +13,6 @@ nav:
   - Home: index.md
   - Installation: install.md
   - Quick Start: quickstart.md
-  - Digital Research Alliance of Canada: ccdb.md
   - Examples:
       - Getting Started: examples/Getting Started.md
       - Algorithms:
@@ -47,4 +46,5 @@ nav:
       - Clients: references/clients.md
   - Developer's Guide: development.md
   - Deployment Guide: deployment.md
+  - Digital Research Alliance of Canada: ccdb.md
   - Miscellaneous Notes: misc.md
