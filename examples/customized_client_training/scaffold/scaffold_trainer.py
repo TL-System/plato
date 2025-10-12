@@ -58,7 +58,7 @@ class Trainer(ComposableTrainer):
         # Pass additional_data (server control variate) to context
         if self.additional_data is not None:
             # This will be picked up by the SCAFFOLD strategy in on_train_start
-            self.training_context.state["server_control_variate"] = self.additional_data
+            self.context.state["server_control_variate"] = self.additional_data
 
     @property
     def client_control_variate_delta(self):
