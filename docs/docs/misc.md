@@ -41,7 +41,7 @@ All unit tests are in the `tests/` directory. These tests are designed to be sta
 
 Continuous Integration (CI) tests have been set up for PyTorch in `.github/workflows/`, and will be activated on every push and Pull Request. To run these tests manually, visit the `Actions` tab at GitHub, select the job, and then click `Run workflow`.
 
-## Setting up Zed for formatting and linting
+## Setting up Zed for Formatting and Linting
 
 If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. In order to properly set up its YAML validation, add the following to your local configuration:
 
