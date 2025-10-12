@@ -6,7 +6,7 @@ clients:
     total_clients: 1000
 
     # The number of clients selected in each round
-    per_round: 100
+    per_round: 10
 
     # Should the clients compute test accuracy locally?
     do_test: false

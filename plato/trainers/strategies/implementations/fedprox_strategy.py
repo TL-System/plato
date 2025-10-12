@@ -14,12 +14,15 @@ term to the local objective function. This helps prevent client drift and improv
 convergence in heterogeneous settings.
 
 The local objective becomes:
-    h_k(w; w^t) = F_k(w) + (mu/2)||w - w^t||^2
+    h_k(w; w^t) = F_k(w) + (mu/2)||w - w^t||
 
 where:
 - F_k(w) is the standard loss function on client k's data
 - w^t is the global model at round t
 - mu is the proximal term coefficient
+
+Note: This implementation uses the L2 norm (not squared) for backward compatibility
+with the original Plato implementation, although the paper formula shows ||w - w^t||^2.
 """
 
 from typing import Optional
@@ -40,7 +43,10 @@ class FedProxLossStrategy(LossCriterionStrategy):
     particularly useful in heterogeneous federated learning settings.
 
     Mathematical formulation:
-        loss = base_loss(outputs, labels) + (mu/2) * ||w - w_global||^2
+        loss = base_loss(outputs, labels) + (mu/2) * ||w - w_global||
+
+    Note: This implementation uses the L2 norm (not squared) for backward
+    compatibility with the original Plato FedProx implementation.
 
     Args:
         mu: Proximal term penalty coefficient (default: 0.01).
@@ -136,7 +142,7 @@ class FedProxLossStrategy(LossCriterionStrategy):
         Compute FedProx loss: base loss + proximal term.
 
         The total loss is:
-            loss = base_loss + (mu/2) * ||w - w_global||^2
+            loss = base_loss + (mu/2) * ||w - w_global||
 
         Args:
             outputs: Model predictions (logits)
@@ -149,33 +155,37 @@ class FedProxLossStrategy(LossCriterionStrategy):
         Note:
             The proximal term is computed only for parameters that have
             gradients enabled and exist in the global_weights dictionary.
+            This implementation uses the L2 norm (not squared) to match
+            the behavior of the original Plato implementation.
         """
         # Compute base loss (e.g., cross-entropy)
         base_loss = self._criterion(outputs, labels)
 
-        # Compute proximal term: (mu/2) * ||w - w_global||^norm
-        proximal_term = torch.tensor(0.0, device=outputs.device)
+        # Compute proximal term: (mu/2) * ||w - w_global||
+        # Note: We use L2 norm (not squared) for backward compatibility
+        squared_diff_sum = torch.tensor(0.0, device=outputs.device)
 
         for name, param in context.model.named_parameters():
             if param.requires_grad and name in self.global_weights:
                 global_param = self.global_weights[name].to(param.device)
 
                 if self.norm_type == "l2":
-                    # L2 norm: ||w - w_global||^2
-                    proximal_term = proximal_term + torch.sum(
+                    # Sum of squared differences for L2 norm computation
+                    squared_diff_sum = squared_diff_sum + torch.sum(
                         (param - global_param) ** 2
                     )
                 else:  # l1
                     # L1 norm: ||w - w_global||
-                    proximal_term = proximal_term + torch.sum(
+                    squared_diff_sum = squared_diff_sum + torch.sum(
                         torch.abs(param - global_param)
                     )
 
-        # Scale by mu/2 (for L2) or mu (for L1)
+        # Compute the actual norm and scale by mu/2
         if self.norm_type == "l2":
-            proximal_term = (self.mu / 2.0) * proximal_term
+            # Take square root to get L2 norm (not squared L2 norm)
+            proximal_term = (self.mu / 2.0) * torch.sqrt(squared_diff_sum)
         else:
-            proximal_term = self.mu * proximal_term
+            proximal_term = self.mu * squared_diff_sum
 
         # Total loss
         total_loss = base_loss + proximal_term
