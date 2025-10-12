@@ -39,13 +39,21 @@ class FedMosOptimizer(Optimizer):
     FedMos optimizer with double momentum.
 
     This optimizer implements the FedMos update rule with both local momentum
-    and global momentum towards the initial model.
+    (tracking gradient differences) and global momentum towards the initial model.
+
+    The local momentum uses the formula:
+        d_t = g_t + (1 - a) * (d_{t-1} - g_{t-1})
+
+    This tracks gradient changes rather than standard momentum, which helps
+    mitigate client drift in federated learning.
 
     Args:
         params: Model parameters to optimize
         lr: Learning rate
-        a: Local momentum coefficient (default: 0.9)
-        mu: Global momentum coefficient (default: 0.9)
+        a: Local momentum coefficient (default: 0.9). Higher values give more
+           weight to recent gradient changes.
+        mu: Global momentum coefficient (default: 0.9). Controls pull towards
+            the global model.
         weight_decay: Weight decay coefficient (default: 0)
 
     Attributes:
@@ -90,13 +98,15 @@ class FedMosOptimizer(Optimizer):
             for p in group["params"]:
                 state = self.state[p]
                 state["momentum_buffer"] = torch.zeros_like(p.data)
+                state["grad_prev"] = torch.zeros_like(p.data)
 
     def update_momentum(self):
         """
-        Update local momentum buffers.
+        Update local momentum buffers using FedMos formula.
 
         This should be called after backward() but before step().
-        It updates the momentum buffer with the current gradient.
+        It updates the momentum buffer using the gradient difference formula:
+        d_t = g_t + (1 - a) * (d_{t-1} - g_{t-1})
         """
         for group in self.param_groups:
             a = group["a"]
@@ -106,15 +116,32 @@ class FedMosOptimizer(Optimizer):
                     continue
 
                 state = self.state[p]
-                momentum_buffer = state["momentum_buffer"]
+                grad_current = p.grad.data
 
-                # Ensure momentum buffer is on the same device as the parameter
+                # Get state variables
+                momentum_buffer = state["momentum_buffer"]
+                grad_prev = state["grad_prev"]
+
+                # Ensure buffers are on the same device as the parameter
                 if momentum_buffer.device != p.device:
                     momentum_buffer = momentum_buffer.to(p.device)
                     state["momentum_buffer"] = momentum_buffer
+                if grad_prev.device != p.device:
+                    grad_prev = grad_prev.to(p.device)
+                    state["grad_prev"] = grad_prev
 
-                # Update momentum: m = a * m + g
-                momentum_buffer.mul_(a).add_(p.grad.data)
+                # FedMos momentum update: d_t = g_t + (1 - a) * (d_{t-1} - g_{t-1})
+                # Rewritten as: d_t = g_t + (1-a)*d_{t-1} - (1-a)*g_{t-1}
+                #
+                # To compute this in-place:
+                # 1. temp = d_{t-1} - g_{t-1}  (gradient momentum difference)
+                # 2. d_t = g_t + (1-a) * temp
+
+                grad_momentum_diff = momentum_buffer - grad_prev
+                momentum_buffer.copy_(grad_current).add_(grad_momentum_diff, alpha=(1 - a))
+
+                # Store current gradient for next iteration
+                grad_prev.copy_(grad_current)
 
     @torch.no_grad()
     def step(self, global_model_params=None, closure=None):
