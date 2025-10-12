@@ -5,9 +5,6 @@ theme:
   font:
     text: Inter
     code: IBM Plex Mono
-plugins:
-  - search
-  - mermaid2
 markdown_extensions:
   - admonition
   - pymdownx.details
