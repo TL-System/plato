@@ -108,6 +108,11 @@ class FedMosOptimizer(Optimizer):
                 state = self.state[p]
                 momentum_buffer = state["momentum_buffer"]
 
+                # Ensure momentum buffer is on the same device as the parameter
+                if momentum_buffer.device != p.device:
+                    momentum_buffer = momentum_buffer.to(p.device)
+                    state["momentum_buffer"] = momentum_buffer
+
                 # Update momentum: m = a * m + g
                 momentum_buffer.mul_(a).add_(p.grad.data)
 
@@ -139,8 +144,11 @@ class FedMosOptimizer(Optimizer):
 
                 state = self.state[p]
 
-                # Get momentum buffer
+                # Get momentum buffer and ensure it's on the same device as the parameter
                 momentum_buffer = state["momentum_buffer"]
+                if momentum_buffer.device != p.device:
+                    momentum_buffer = momentum_buffer.to(p.device)
+                    state["momentum_buffer"] = momentum_buffer
 
                 # Get corresponding global parameter
                 if global_model_params is not None:
