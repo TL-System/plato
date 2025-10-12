@@ -59,3 +59,17 @@ class Trainer(ComposableTrainer):
         if self.additional_data is not None:
             # This will be picked up by the SCAFFOLD strategy in on_train_start
             self.training_context.state["server_control_variate"] = self.additional_data
+
+    @property
+    def client_control_variate_delta(self):
+        """
+        Property to expose the client control variate delta.
+
+        This provides backward compatibility with the SendControlVariateProcessor
+        which expects trainer.client_control_variate_delta to be accessible.
+
+        Returns:
+            The client control variate delta from the training context,
+            or None if not available.
+        """
+        return self.context.state.get("client_control_variate_delta")

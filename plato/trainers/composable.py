@@ -224,7 +224,7 @@ class ComposableTrainer(base.Trainer):
             model_path = f"{model_path}/{model_name}.pth"
 
         if os.path.exists(model_path):
-            self.model.load_state_dict(torch.load(model_path))
+            self.model.load_state_dict(torch.load(model_path, weights_only=False))
 
             logging.info(
                 "[Client #%d] Model loaded from %s.", self.client_id, model_path
@@ -258,7 +258,7 @@ class ComposableTrainer(base.Trainer):
         self.train_model(config, trainset, sampler, **kwargs)
 
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
     def train_model(self, config, trainset, sampler, **kwargs):
@@ -437,6 +437,21 @@ class ComposableTrainer(base.Trainer):
             try:
                 self.load_model(filename)
             except OSError as error:
+                logging.error(
+                    "[Client #%d] Failed to load model from %s: %s",
+                    self.client_id,
+                    filename,
+                    error,
+                )
+                raise ValueError(
+                    f"Training on client {self.client_id} failed."
+                ) from error
+            except Exception as error:
+                logging.error(
+                    "[Client #%d] Unexpected error loading model: %s",
+                    self.client_id,
+                    error,
+                )
                 raise ValueError(
                     f"Training on client {self.client_id} failed."
                 ) from error
@@ -456,7 +471,7 @@ class ComposableTrainer(base.Trainer):
         self.test_model(config, testset, sampler, **kwargs)
 
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
         self.save_accuracy(self.accuracy, filename)
 
     def test(self, testset, sampler=None, **kwargs) -> float:
@@ -472,6 +487,7 @@ class ComposableTrainer(base.Trainer):
             Accuracy on test set
         """
         config = Config().trainer._asdict()
+        config["run_id"] = Config().params["run_id"]
 
         if "max_concurrency" in config:
             self.model.cpu()

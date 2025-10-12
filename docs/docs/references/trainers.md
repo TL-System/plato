@@ -1,8 +1,4 @@
-# Plato Trainer API Reference
-
-**Comprehensive guide to the composition-based trainer architecture**
-
----
+# Trainers
 
 ## Table of Contents
 
@@ -16,7 +12,6 @@
 8. [TrainingContext](#trainingcontext)
 9. [Creating Custom Strategies](#creating-custom-strategies)
 10. [Advanced Usage](#advanced-usage)
-11. [Migration Guide](#migration-guide)
 
 ---
 
@@ -1803,170 +1798,6 @@ trainer = ComposableTrainer(loss_strategy=composite)
 
 ---
 
-## Migration Guide
-
-### From Inheritance to Composition
-
-#### Before: Inheritance-Based
-
-```python
-from plato.trainers import basic
-
-class MyTrainer(basic.Trainer):
-    def get_loss_criterion(self):
-        """Override to customize loss."""
-        criterion = torch.nn.CrossEntropyLoss()
-
-        def custom_loss(outputs, labels):
-            base_loss = criterion(outputs, labels)
-            # Add custom regularization
-            reg = 0.01 * torch.norm(self.model.fc.weight)
-            return base_loss + reg
-
-        return custom_loss
-```
-
-#### After: Composition-Based
-
-```python
-from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.base import LossCriterionStrategy, TrainingContext
-import torch.nn as nn
-
-class MyLossStrategy(LossCriterionStrategy):
-    def __init__(self, reg_weight=0.01):
-        self.reg_weight = reg_weight
-        self._criterion = None
-
-    def setup(self, context: TrainingContext):
-        self._criterion = nn.CrossEntropyLoss()
-
-    def compute_loss(self, outputs, labels, context):
-        base_loss = self._criterion(outputs, labels)
-        # Add custom regularization
-        reg = self.reg_weight * torch.norm(context.model.fc.weight)
-        return base_loss + reg
-
-# Use strategy
-trainer = ComposableTrainer(
-    loss_strategy=MyLossStrategy(reg_weight=0.01)
-)
-```
-
-### Migration Patterns
-
-#### Pattern 1: Override `get_loss_criterion()` → `LossCriterionStrategy`
-
-**Before:**
-```python
-class MyTrainer(basic.Trainer):
-    def get_loss_criterion(self):
-        return my_loss_function
-```
-
-**After:**
-```python
-class MyLossStrategy(LossCriterionStrategy):
-    def compute_loss(self, outputs, labels, context):
-        return my_loss_function(outputs, labels)
-
-trainer = ComposableTrainer(loss_strategy=MyLossStrategy())
-```
-
-#### Pattern 2: Override `get_optimizer()` → `OptimizerStrategy`
-
-**Before:**
-```python
-class MyTrainer(basic.Trainer):
-    def get_optimizer(self, model):
-        return torch.optim.Adam(model.parameters(), lr=0.001)
-```
-
-**After:**
-```python
-class MyOptimizerStrategy(OptimizerStrategy):
-    def create_optimizer(self, model, context):
-        return torch.optim.Adam(model.parameters(), lr=0.001)
-
-trainer = ComposableTrainer(optimizer_strategy=MyOptimizerStrategy())
-```
-
-#### Pattern 3: Override `perform_forward_and_backward_passes()` → `TrainingStepStrategy`
-
-**Before:**
-```python
-class MyTrainer(basic.Trainer):
-    def perform_forward_and_backward_passes(self, config, examples, labels):
-        self.optimizer.zero_grad()
-        outputs = self.model(examples)
-        loss = self.loss_criterion(outputs, labels)
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-        self.optimizer.step()
-        return loss
-```
-
-**After:**
-```python
-class MyStepStrategy(TrainingStepStrategy):
-    def training_step(self, model, optimizer, examples, labels,
-                     loss_criterion, context):
-        optimizer.zero_grad()
-        outputs = model(examples)
-        loss = loss_criterion(outputs, labels)
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        optimizer.step()
-        return loss
-
-trainer = ComposableTrainer(training_step_strategy=MyStepStrategy())
-```
-
-#### Pattern 4: Override lifecycle hooks → `ModelUpdateStrategy`
-
-**Before:**
-```python
-class MyTrainer(basic.Trainer):
-    def train_run_start(self, config):
-        super().train_run_start(config)
-        # Initialize custom state
-        self.custom_state = ...
-
-    def train_step_end(self, config, batch, loss):
-        super().train_step_end(config, batch, loss)
-        # Update custom state
-        self.custom_state += ...
-```
-
-**After:**
-```python
-class MyUpdateStrategy(ModelUpdateStrategy):
-    def __init__(self):
-        self.custom_state = None
-
-    def on_train_start(self, context):
-        # Initialize custom state
-        self.custom_state = ...
-
-    def after_step(self, context):
-        # Update custom state
-        self.custom_state += ...
-
-trainer = ComposableTrainer(model_update_strategy=MyUpdateStrategy())
-```
-
-### Benefits of Migration
-
-| Aspect | Before (Inheritance) | After (Composition) |
-|--------|---------------------|---------------------|
-| **Code Reuse** | Limited, must copy-paste | High, strategies are reusable |
-| **Testing** | Difficult, need full trainer | Easy, test strategies independently |
-| **Combining** | Complex multiple inheritance | Simple, inject multiple strategies |
-| **Clarity** | Unclear what's customized | Clear, explicit strategy injection |
-| **Maintenance** | Changes affect all subclasses | Changes localized to strategy |
-
----
-
 ## API Summary
 
 ### Core Classes
@@ -2016,4 +1847,3 @@ trainer = ComposableTrainer(model_update_strategy=MyUpdateStrategy())
 **Last Updated**: Phase 5 Completion
 **Version**: 1.0
 **Status**: Production Ready
-

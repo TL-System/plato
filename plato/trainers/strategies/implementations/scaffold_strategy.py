@@ -213,10 +213,12 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
             lr = Config().trainer.lr if hasattr(Config().trainer, "lr") else 0.01
 
         # Apply control variate correction: w += lr * (c - c_i)
+        # Only apply to weight and bias parameters (matching original implementation)
         with torch.no_grad():
             for name, param in context.model.named_parameters():
                 if (
-                    name in self.server_control_variate
+                    ("weight" in name or "bias" in name)
+                    and name in self.server_control_variate
                     and name in self.client_control_variate
                 ):
                     server_cv = self.server_control_variate[name].to(param.device)
@@ -225,8 +227,36 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                     # Correction term
                     correction = server_cv - client_cv
 
+                    # Debug: Check for NaN or Inf
+                    if torch.isnan(correction).any() or torch.isinf(correction).any():
+                        logging.error(
+                            "[Client #%d] Step %d: NaN/Inf in correction for %s! "
+                            "server_cv: min=%.6f max=%.6f, client_cv: min=%.6f max=%.6f",
+                            context.client_id,
+                            self.local_steps,
+                            name,
+                            server_cv.min().item(),
+                            server_cv.max().item(),
+                            client_cv.min().item(),
+                            client_cv.max().item(),
+                        )
+
                     # Apply correction
                     param.data.add_(correction, alpha=lr)
+
+                    # Debug: Check param after correction
+                    if self.local_steps < 3:  # Only log first few steps
+                        logging.debug(
+                            "[Client #%d] Step %d: Applied correction to %s: "
+                            "correction range=[%.6f, %.6f], param range=[%.6f, %.6f]",
+                            context.client_id,
+                            self.local_steps,
+                            name,
+                            correction.min().item(),
+                            correction.max().item(),
+                            param.data.min().item(),
+                            param.data.max().item(),
+                        )
 
         # Increment local step counter
         self.local_steps += 1

@@ -53,12 +53,16 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
         # Handle different sampler types
         if sampler is not None:
             if isinstance(sampler, torch.utils.data.Sampler):
-                # It's already a Sampler object
+                # It's already a PyTorch Sampler object
                 sampler_obj = sampler
                 shuffle = False
             elif isinstance(sampler, (list, range)):
                 # It's a list of indices, create SubsetRandomSampler
                 sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+                shuffle = False
+            elif hasattr(sampler, "get"):
+                # It's a Plato Sampler, call get() to obtain PyTorch sampler
+                sampler_obj = sampler.get()
                 shuffle = False
             else:
                 # Unknown type, try to use it directly
@@ -123,6 +127,8 @@ class CustomCollateFnDataLoaderStrategy(DataLoaderStrategy):
                 sampler_obj = sampler
             elif isinstance(sampler, (list, range)):
                 sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
             else:
                 sampler_obj = sampler
             shuffle = False
@@ -186,6 +192,8 @@ class PrefetchDataLoaderStrategy(DataLoaderStrategy):
                 sampler_obj = sampler
             elif isinstance(sampler, (list, range)):
                 sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
             else:
                 sampler_obj = sampler
             shuffle = False
@@ -263,6 +271,8 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
                 sampler_obj = sampler
             elif isinstance(sampler, (list, range)):
                 sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
             else:
                 sampler_obj = sampler
             shuffle = False
@@ -314,19 +324,20 @@ class ShuffleDataLoaderStrategy(DataLoaderStrategy):
         """Create data loader with shuffling."""
         # If sampler is provided, convert to list and shuffle
         if sampler is not None:
-            if isinstance(sampler, (list, range)):
+            if isinstance(sampler, torch.utils.data.Sampler):
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
                 indices = list(sampler)
+                sampler_obj = torch.utils.data.SubsetRandomSampler(indices)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
             else:
                 # Try to get indices from sampler
                 try:
                     indices = list(sampler)
+                    sampler_obj = torch.utils.data.SubsetRandomSampler(indices)
                 except:
-                    indices = None
-
-            if indices is not None:
-                sampler_obj = torch.utils.data.SubsetRandomSampler(indices)
-            else:
-                sampler_obj = sampler
+                    sampler_obj = sampler
             shuffle = False
         else:
             sampler_obj = None

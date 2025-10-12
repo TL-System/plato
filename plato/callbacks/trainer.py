@@ -66,13 +66,13 @@ class LogProgressCallback(TrainerCallback):
             logging.info(
                 "[Server #%s] Loading the dataset with size %d.",
                 os.getpid(),
-                len(list(trainer.sampler)),
+                trainer.sampler.num_samples(),
             )
         else:
             logging.info(
                 "[Client #%d] Loading the dataset with size %d.",
                 trainer.client_id,
-                len(list(trainer.sampler)),
+                trainer.sampler.num_samples(),
             )
 
     def on_train_epoch_start(self, trainer, config, **kwargs):
