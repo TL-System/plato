@@ -13,7 +13,6 @@ from copy import deepcopy
 
 import misc.attentive_nas_eval as attentive_nas_eval
 import misc.logger as logging
-import models
 import numpy as np
 import timm as timm
 import torch
@@ -22,9 +21,6 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 import torch.nn as nn
 import torch.nn.functional as F
-
-# from models import build_model
-from data import build_loader
 from misc.config import get_config
 from misc.loss_ops import AdaptiveLossSoft
 from misc.lr_scheduler import build_scheduler
@@ -38,6 +34,11 @@ from misc.utils import (
 )
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.utils import AverageMeter, ModelEma, accuracy
+
+import models
+
+# from models import build_model
+from data import build_loader
 
 # from misc.resnet import resnext50_32x4d, resnext101_32x4d
 try:

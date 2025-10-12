@@ -138,7 +138,9 @@ class FedMosOptimizer(Optimizer):
                 # 2. d_t = g_t + (1-a) * temp
 
                 grad_momentum_diff = momentum_buffer - grad_prev
-                momentum_buffer.copy_(grad_current).add_(grad_momentum_diff, alpha=(1 - a))
+                momentum_buffer.copy_(grad_current).add_(
+                    grad_momentum_diff, alpha=(1 - a)
+                )
 
                 # Store current gradient for next iteration
                 grad_prev.copy_(grad_current)

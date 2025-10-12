@@ -174,7 +174,10 @@ class FedDynLossStrategy(LossCriterionStrategy):
         linear_penalty = torch.tensor(0.0, device=outputs.device)
 
         for name, param in context.model.named_parameters():
-            if name in self.cumulative_grad_vector and name in self.global_model_weights:
+            if (
+                name in self.cumulative_grad_vector
+                and name in self.global_model_weights
+            ):
                 grad_vec = self.cumulative_grad_vector[name].to(param.device)
                 w_global = self.global_model_weights[name].to(param.device)
 
@@ -387,7 +390,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         try:
             torch.save(self.cumulative_grad_vector, self.grad_vector_path)
             logging.info(
-                "[Client #%d] Updated and saved FedDyn cumulative gradient vector to %s",
+                "[Client #%d] Updated and saved FedDyn cumulative gradient vector to %s.",
                 context.client_id,
                 self.grad_vector_path,
             )
