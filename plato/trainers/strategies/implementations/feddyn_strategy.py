@@ -11,18 +11,21 @@ Source code: https://github.com/alpemreacar/FedDyn
 
 Description:
 FedDyn addresses client drift by dynamically adjusting a regularization term that
-accounts for the previous local model update. The local objective becomes:
+accounts for cumulative local model updates. The local objective becomes:
 
-    F_k(w) - <w, h_k> + (α/2)||w - w^t||^2
+    min_θ [L_k(θ) - <∇L_k(θ_k^{t-1}), θ> + (α/2)||θ - θ^{t-1}||^2]
 
 where:
-- F_k(w) is the standard loss on client k's data
-- h_k is a dynamic regularizer tracking previous local updates
-- w^t is the global model at round t
+- L_k(θ) is the local loss on client k's data
+- ∇L_k(θ_k^{t-1}) is a cumulative dynamic regularizer (gradient vector)
+- θ^{t-1} is the global model at round t-1
 - α is the regularization coefficient
 
-The key difference from FedProx is that h_k changes based on local training history,
-making the regularization adaptive.
+The dynamic regularizer is updated after training:
+    ∇L_k(θ_k^t) = ∇L_k(θ_k^{t-1}) - α(θ_k^t - θ^{t-1})
+
+This cumulative tracking of historical updates is the key innovation that makes
+FedDyn different from FedProx and other methods.
 """
 
 import copy
@@ -43,17 +46,18 @@ from plato.trainers.strategies.base import (
 
 class FedDynLossStrategy(LossCriterionStrategy):
     """
-    FedDyn loss strategy with dynamic regularization.
+    FedDyn loss strategy with cumulative dynamic regularization.
 
     This strategy implements the FedDyn local objective which includes:
     1. Standard task loss (e.g., cross-entropy)
-    2. Linear penalty term: -<w, h_k>
-    3. L2 regularization: (α/2)||w - w^t||^2
+    2. Linear penalty term: <w, -w_global + grad_vector>
+    3. L2 regularization: (α/2)||w - w_global||^2
 
-    The dynamic regularizer h_k is updated by the FedDynUpdateStrategy.
+    The cumulative gradient vector grad_vector is maintained across rounds:
+        grad_vector += (w_trained - w_global) after each training round
 
-    Mathematical formulation:
-        loss = task_loss - <w, h_k> + (α/2)||w - w^t||^2
+    Mathematical formulation (from paper):
+        loss = task_loss + α * <w, -w_global + grad_vector> + (α/2)||w - w_global||^2
 
     Args:
         alpha: Regularization coefficient (default: 0.01).
@@ -67,7 +71,7 @@ class FedDynLossStrategy(LossCriterionStrategy):
         base_loss_fn: The underlying loss criterion
         adaptive_alpha: Whether to use adaptive alpha scaling
         global_model_weights: Snapshot of global model weights
-        local_model_last_round: Previous round's local model weights
+        cumulative_grad_vector: Cumulative gradient vector tracking historical updates
 
     Example:
         >>> from plato.trainers.composable import ComposableTrainer
@@ -84,7 +88,7 @@ class FedDynLossStrategy(LossCriterionStrategy):
 
     Note:
         FedDynLossStrategy should be used together with FedDynUpdateStrategy
-        which manages the h_k dynamic regularizer state.
+        which manages the cumulative gradient vector state across rounds.
     """
 
     def __init__(
@@ -108,7 +112,7 @@ class FedDynLossStrategy(LossCriterionStrategy):
         self.base_loss_fn = base_loss_fn
         self.adaptive_alpha = adaptive_alpha
         self.global_model_weights = None
-        self.local_model_last_round = None
+        self.cumulative_grad_vector = None
         self._criterion = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -126,27 +130,31 @@ class FedDynLossStrategy(LossCriterionStrategy):
 
         # Try to retrieve state from context
         self.global_model_weights = context.state.get("feddyn_global_weights")
-        self.local_model_last_round = context.state.get("feddyn_local_last_round")
+        self.cumulative_grad_vector = context.state.get("feddyn_cumulative_grad")
 
-        # If not in context, initialize with current model
+        # If not in context, initialize
         if self.global_model_weights is None:
             self.global_model_weights = copy.deepcopy(context.model.state_dict())
             context.state["feddyn_global_weights"] = self.global_model_weights
 
-        if self.local_model_last_round is None:
-            self.local_model_last_round = copy.deepcopy(context.model.state_dict())
-            context.state["feddyn_local_last_round"] = self.local_model_last_round
+        if self.cumulative_grad_vector is None:
+            # Initialize cumulative gradient vector to zero
+            self.cumulative_grad_vector = {
+                name: torch.zeros_like(param)
+                for name, param in context.model.named_parameters()
+            }
+            context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
 
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """
-        Compute FedDyn loss: task loss + linear penalty + L2 regularization.
+        Compute FedDyn loss with cumulative dynamic regularization.
 
-        The total loss is:
-            loss = task_loss - <w, h_k> + (α/2)||w - w^t||^2
+        The total loss is (following the original paper and GitHub implementation):
+            loss = task_loss + α * <w, -w_global + grad_vector> + (α/2)||w - w_global||^2
 
-        where h_k = w_prev - w_global (maintained by FedDynUpdateStrategy)
+        where grad_vector is the cumulative sum of (w_trained - w_global) across rounds.
 
         Args:
             outputs: Model predictions (logits)
@@ -162,22 +170,22 @@ class FedDynLossStrategy(LossCriterionStrategy):
         # Get alpha coefficient (potentially adaptive)
         alpha_coef = self._get_alpha_coefficient(labels, context)
 
-        # Compute linear penalty: -<w, h_k> where h_k = w_prev - w_global
+        # Compute linear penalty: α * <w, -w_global + grad_vector>
         linear_penalty = torch.tensor(0.0, device=outputs.device)
 
         for name, param in context.model.named_parameters():
-            if (
-                name in self.local_model_last_round
-                and name in self.global_model_weights
-            ):
-                w_prev = self.local_model_last_round[name].to(param.device)
+            if name in self.cumulative_grad_vector and name in self.global_model_weights:
+                grad_vec = self.cumulative_grad_vector[name].to(param.device)
                 w_global = self.global_model_weights[name].to(param.device)
-                h_k = w_prev - w_global
 
-                # Compute dot product: <w, h_k>
-                linear_penalty = linear_penalty + alpha_coef * torch.sum(param * h_k)
+                # Compute: <w, -w_global + grad_vector>
+                linear_penalty = linear_penalty + torch.sum(
+                    param * (-w_global + grad_vec)
+                )
 
-        # Compute L2 regularization: (α/2)||w - w^t||^2
+        linear_penalty = alpha_coef * linear_penalty
+
+        # Compute L2 regularization: (α/2)||w - w_global||^2
         l2_reg = torch.tensor(0.0, device=outputs.device)
 
         for name, param in context.model.named_parameters():
@@ -187,9 +195,9 @@ class FedDynLossStrategy(LossCriterionStrategy):
 
         l2_reg = (alpha_coef / 2.0) * l2_reg
 
-        # Total loss: task_loss - linear_penalty + l2_reg
-        # Note: We subtract because in the formulation it's -<w, h_k>
-        total_loss = task_loss - linear_penalty + l2_reg
+        # Total loss: task_loss + linear_penalty + l2_reg
+        # Note: We add linear_penalty because it already includes the sign
+        total_loss = task_loss + linear_penalty + l2_reg
 
         return total_loss
 
@@ -234,20 +242,24 @@ class FedDynLossStrategy(LossCriterionStrategy):
             context: Training context
         """
         self.global_model_weights = None
-        self.local_model_last_round = None
+        self.cumulative_grad_vector = None
 
 
 class FedDynUpdateStrategy(ModelUpdateStrategy):
     """
-    FedDyn model update strategy for state management.
+    FedDyn model update strategy for cumulative gradient state management.
 
-    This strategy manages the FedDyn-specific state:
+    This strategy manages the FedDyn-specific cumulative state:
     - Saves global model weights at start of training
-    - Loads/saves local model from previous round
+    - Loads/saves cumulative gradient vector across rounds
+    - Updates gradient vector after training: grad_vec += (w_trained - w_global)
     - Provides state to FedDynLossStrategy
 
+    The cumulative gradient vector is the key to FedDyn's dynamic regularization,
+    tracking the sum of all historical local model deviations from global models.
+
     Args:
-        save_path: Optional custom path for saving local models.
+        save_path: Optional custom path for saving gradient vectors.
                    If None, uses Config().params["model_path"]
 
     Example:
@@ -264,7 +276,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
 
     Note:
         This strategy should be used together with FedDynLossStrategy.
-        The loss strategy accesses the state managed by this strategy.
+        The loss strategy accesses the cumulative gradient vector managed by this strategy.
     """
 
     def __init__(self, save_path: Optional[str] = None):
@@ -272,12 +284,12 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         Initialize FedDyn update strategy.
 
         Args:
-            save_path: Optional custom path for saving local models
+            save_path: Optional custom path for saving gradient vectors
         """
         self.save_path = save_path
         self.global_model_weights = None
-        self.local_model_last_round = None
-        self.local_model_path = None
+        self.cumulative_grad_vector = None
+        self.grad_vector_path = None
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -291,13 +303,8 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         else:
             base_path = Config().params["model_path"]
 
-        model_name = (
-            Config().trainer.model_name
-            if hasattr(Config(), "trainer") and hasattr(Config().trainer, "model_name")
-            else "model"
-        )
-
-        self.local_model_path = f"{base_path}_{model_name}_{context.client_id}.pth"
+        # Path for saving cumulative gradient vector
+        self.grad_vector_path = f"{base_path}_feddyn_grad_{context.client_id}.pth"
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -305,67 +312,92 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
 
         This method:
         1. Saves current global model weights
-        2. Loads previous round's local model if it exists
+        2. Loads cumulative gradient vector from previous rounds if it exists
         3. Stores state in context for FedDynLossStrategy
 
         Args:
             context: Training context
         """
-        # Save global model weights
+        # Save global model weights at start of this round
         self.global_model_weights = copy.deepcopy(context.model.state_dict())
 
-        # Try to load previous round's local model
-        if os.path.exists(self.local_model_path):
+        # Try to load cumulative gradient vector from previous rounds
+        if os.path.exists(self.grad_vector_path):
             try:
-                self.local_model_last_round = torch.load(
-                    self.local_model_path, map_location=torch.device("cpu")
+                self.cumulative_grad_vector = torch.load(
+                    self.grad_vector_path, map_location=torch.device("cpu")
                 )
                 logging.info(
-                    "[Client #%d] Loaded FedDyn local model from previous round: %s",
+                    "[Client #%d] Loaded FedDyn cumulative gradient vector from: %s",
                     context.client_id,
-                    self.local_model_path,
+                    self.grad_vector_path,
                 )
             except Exception as e:
                 logging.warning(
-                    "[Client #%d] Failed to load previous local model: %s",
+                    "[Client #%d] Failed to load cumulative gradient vector: %s",
                     context.client_id,
                     str(e),
                 )
-                self.local_model_last_round = copy.deepcopy(self.global_model_weights)
+                # Initialize to zero if loading fails
+                self.cumulative_grad_vector = {
+                    name: torch.zeros_like(param)
+                    for name, param in context.model.named_parameters()
+                }
         else:
-            # First round: use global model as previous local model
+            # First round: initialize cumulative gradient vector to zero
             logging.info(
-                "[Client #%d] No previous local model found. "
-                "Using global model for first round.",
+                "[Client #%d] No previous gradient vector found. "
+                "Initializing to zero for first round.",
                 context.client_id,
             )
-            self.local_model_last_round = copy.deepcopy(self.global_model_weights)
+            self.cumulative_grad_vector = {
+                name: torch.zeros_like(param)
+                for name, param in context.model.named_parameters()
+            }
 
         # Store in context for loss strategy
         context.state["feddyn_global_weights"] = self.global_model_weights
-        context.state["feddyn_local_last_round"] = self.local_model_last_round
+        context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
 
     def on_train_end(self, context: TrainingContext) -> None:
         """
-        Save local model at end of training round.
+        Update and save cumulative gradient vector at end of training round.
+
+        This implements the key FedDyn update:
+            grad_vector += (w_trained - w_global)
 
         Args:
             context: Training context
         """
-        # Save current local model for next round
+        # Update cumulative gradient vector: grad_vec += (w_trained - w_global)
+        trained_weights = context.model.state_dict()
+
+        for name in self.cumulative_grad_vector:
+            if name in trained_weights and name in self.global_model_weights:
+                # Compute the difference: w_trained - w_global
+                diff = trained_weights[name] - self.global_model_weights[name]
+                # Add to cumulative gradient vector
+                self.cumulative_grad_vector[name] = (
+                    self.cumulative_grad_vector[name] + diff.cpu()
+                )
+
+        # Save updated cumulative gradient vector for next round
         try:
-            torch.save(context.model.state_dict(), self.local_model_path)
+            torch.save(self.cumulative_grad_vector, self.grad_vector_path)
             logging.info(
-                "[Client #%d] Saved FedDyn local model to %s",
+                "[Client #%d] Updated and saved FedDyn cumulative gradient vector to %s",
                 context.client_id,
-                self.local_model_path,
+                self.grad_vector_path,
             )
         except Exception as e:
             logging.error(
-                "[Client #%d] Failed to save local model: %s",
+                "[Client #%d] Failed to save cumulative gradient vector: %s",
                 context.client_id,
                 str(e),
             )
+
+        # Update state in context for next potential use
+        context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
 
     def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
         """
@@ -387,7 +419,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             context: Training context
         """
         self.global_model_weights = None
-        self.local_model_last_round = None
+        self.cumulative_grad_vector = None
 
 
 class FedDynLossStrategyFromConfig(FedDynLossStrategy):
