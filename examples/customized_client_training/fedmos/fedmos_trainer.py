@@ -8,12 +8,13 @@ Paper: https://ieeexplore.ieee.org/document/10228957
 Source code: https://github.com/Distributed-Learning-Networking-Group/FedMoS
 """
 
-from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedMosOptimizerStrategyFromConfig,
     FedMosStepStrategy,
     FedMosUpdateStrategy,
 )
+
+from plato.trainers.composable import ComposableTrainer
 
 
 class Trainer(ComposableTrainer):

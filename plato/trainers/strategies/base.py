@@ -7,7 +7,7 @@ trainer functionality, strategies are injected as dependencies.
 
 Example:
     >>> from plato.trainers.composable import ComposableTrainer
-    >>> from plato.trainers.strategies.implementations import FedProxLossStrategy
+    >>> from plato.trainers.strategies.algorithms import FedProxLossStrategy
     >>>
     >>> trainer = ComposableTrainer(
     ...     loss_strategy=FedProxLossStrategy(mu=0.01)

@@ -33,7 +33,7 @@ This document provides a detailed, actionable roadmap for refactoring the Plato 
 class MyTrainer(basic.Trainer):
     def get_loss_criterion(self):
         return custom_loss()
-    
+
     def train_step_end(self, config, batch=None, loss=None):
         # Custom logic
         super().train_step_end(config, batch, loss)
@@ -125,18 +125,18 @@ class TrainingContext:
 
 class Strategy(ABC):
     """Base class for all strategies."""
-    
+
     def setup(self, context: TrainingContext) -> None:
         """Called once during trainer initialization."""
         pass
-    
+
     def teardown(self, context: TrainingContext) -> None:
         """Called when training is complete."""
         pass
 
 class LossCriterionStrategy(Strategy):
     """Strategy for computing loss."""
-    
+
     @abstractmethod
     def compute_loss(
         self,
@@ -218,30 +218,30 @@ class ComposableTrainer(base.Trainer):
         data_loader_strategy: Optional[DataLoaderStrategy] = None,
     ):
         super().__init__()
-        
+
         # Initialize context
         self.context = TrainingContext()
-        
+
         # Initialize strategies with defaults
         self.loss_strategy = loss_strategy or DefaultLossCriterionStrategy()
         self.optimizer_strategy = optimizer_strategy or DefaultOptimizerStrategy()
         # ... etc.
-        
+
         # Setup all strategies
         for strategy in self._get_all_strategies():
             strategy.setup(self.context)
-    
+
     def train_model(self, config, trainset, sampler, **kwargs):
         """Training loop using strategies."""
         # Strategy hook: on_train_start
         if self.model_update_strategy:
             self.model_update_strategy.on_train_start(self.context)
-        
+
         # Create data loader using strategy
         self.train_loader = self.data_loader_strategy.create_train_loader(
             trainset, sampler, batch_size, self.context
         )
-        
+
         # Training epochs
         for self.current_epoch in range(1, total_epochs + 1):
             for batch_id, (examples, labels) in enumerate(self.train_loader):
@@ -256,7 +256,7 @@ class ComposableTrainer(base.Trainer):
                     ),
                     context=self.context,
                 )
-        
+
         # Strategy hook: on_train_end
         if self.model_update_strategy:
             self.model_update_strategy.on_train_end(self.context)
@@ -291,12 +291,12 @@ class Trainer(base.Trainer):
         else:
             # Old approach: support method overrides
             self._init_legacy_mode()
-    
+
     def _init_with_strategies(self, **strategy_kwargs):
         """Initialize with strategy injection."""
         self.composable_trainer = ComposableTrainer(**strategy_kwargs)
         # Delegate to composable trainer
-    
+
     def _init_legacy_mode(self):
         """Initialize in legacy mode with method overrides."""
         # Detect which methods are overridden
@@ -367,17 +367,17 @@ class [Algorithm]Strategy([Strategy]):
     - Usage example
     - Configuration parameters]
     """
-    
+
     def __init__(self, **params):
         """Initialize with algorithm-specific parameters."""
         pass
-    
+
     def setup(self, context: TrainingContext):
         """Setup called once at initialization."""
         pass
-    
+
     # Implement abstract methods...
-    
+
     def teardown(self, context: TrainingContext):
         """Cleanup at end of training."""
         pass
@@ -457,20 +457,20 @@ For the legacy version, see [algorithm].py
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import [Strategy]
+from plato.trainers.strategies.algorithms import [Strategy]
 from plato.clients import simple
 from plato.servers import fedavg
 
 
 def main():
     """Run [Algorithm] with strategy-based trainer."""
-    
+
     # Create trainer with strategies
     trainer = ComposableTrainer(
         loss_strategy=[Strategy](...),
         # ... other strategies
     )
-    
+
     # Rest remains the same
     client = simple.Client(trainer=trainer)
     server = fedavg.Server(trainer=trainer)
@@ -524,12 +524,12 @@ def analyze_trainer(file_path):
     """Analyze trainer to identify overridden methods."""
     with open(file_path) as f:
         tree = ast.parse(f.read())
-    
+
     # Find Trainer class
     # Identify overridden methods
     # Suggest corresponding strategies
     # Generate migration template
-    
+
 def suggest_strategies(overridden_methods):
     """Suggest strategies based on overridden methods."""
     suggestions = {
@@ -776,74 +776,74 @@ plato/
 
 import torch
 import torch.nn as nn
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 from plato.trainers.strategies.base import TrainingContext
 
 class TestFedProxLossStrategy:
-    
+
     def test_initialization(self):
         """Test strategy initializes correctly."""
         strategy = FedProxLossStrategy(mu=0.01)
         assert strategy.mu == 0.01
-    
+
     def test_compute_loss_without_proximal(self):
         """Test loss equals base loss when mu=0."""
         strategy = FedProxLossStrategy(mu=0.0)
         context = TrainingContext()
-        
+
         model = nn.Linear(10, 2)
         context.model = model
-        
+
         strategy.setup(context)
-        
+
         outputs = torch.randn(32, 2)
         labels = torch.randint(0, 2, (32,))
-        
+
         loss = strategy.compute_loss(outputs, labels, context)
-        
+
         # Should equal CrossEntropyLoss when mu=0
         expected = nn.CrossEntropyLoss()(outputs, labels)
         assert torch.allclose(loss, expected)
-    
+
     def test_proximal_term_increases_loss(self):
         """Test proximal term adds to base loss."""
         strategy = FedProxLossStrategy(mu=0.1)
         context = TrainingContext()
-        
+
         model = nn.Linear(10, 2)
         context.model = model
-        
+
         strategy.setup(context)
-        
+
         outputs = torch.randn(32, 2)
         labels = torch.randint(0, 2, (32,))
-        
+
         # First call: saves global weights
         loss1 = strategy.compute_loss(outputs, labels, context)
-        
+
         # Modify model weights
         with torch.no_grad():
             for param in model.parameters():
                 param.add_(torch.randn_like(param) * 0.1)
-        
+
         # Second call: should have proximal term
         outputs2 = model(torch.randn(32, 10))
         loss2 = strategy.compute_loss(outputs2, labels, context)
-        
+
         # Loss2 should be different due to proximal term
         assert not torch.allclose(loss1, loss2)
-    
+
     def test_setup_teardown(self):
         """Test setup and teardown lifecycle."""
         strategy = FedProxLossStrategy(mu=0.01)
         context = TrainingContext()
         context.model = nn.Linear(10, 2)
-        
+
         assert strategy.global_weights is None
-        
+
         strategy.setup(context)
         # setup should be idempotent
-        
+
         strategy.teardown(context)
         assert strategy.global_weights is None
 ```
@@ -861,55 +861,55 @@ class TestFedProxLossStrategy:
 import torch
 from torch.utils.data import TensorDataset
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 class TestComposableTrainer:
-    
+
     def test_training_with_fedprox(self):
         """Test end-to-end training with FedProx strategy."""
-        
+
         # Create simple dataset
         X = torch.randn(100, 10)
         y = torch.randint(0, 2, (100,))
         dataset = TensorDataset(X, y)
-        
+
         # Create trainer with FedProx
         trainer = ComposableTrainer(
             model=lambda: torch.nn.Linear(10, 2),
             loss_strategy=FedProxLossStrategy(mu=0.01)
         )
-        
+
         # Configure
         config = {
             'batch_size': 32,
             'epochs': 2,
             'lr': 0.01,
         }
-        
+
         # Train
         sampler = list(range(len(dataset)))
         trainer.train_model(config, dataset, sampler)
-        
+
         # Verify training occurred
         assert trainer.current_epoch == 2
         assert len(trainer.run_history.get_metric('train_loss')) > 0
-    
+
     def test_strategy_receives_context(self):
         """Test that strategies receive correct context."""
-        
+
         class MockStrategy(LossCriterionStrategy):
             def __init__(self):
                 self.context_received = None
-            
+
             def compute_loss(self, outputs, labels, context):
                 self.context_received = context
                 return torch.tensor(0.0)
-        
+
         mock_strategy = MockStrategy()
         trainer = ComposableTrainer(loss_strategy=mock_strategy)
-        
+
         # ... train ...
-        
+
         assert mock_strategy.context_received is not None
         assert mock_strategy.context_received.model is trainer.model
 ```
@@ -926,36 +926,36 @@ class TestComposableTrainer:
 
 import pytest
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 from plato.datasources import registry as datasource_registry
 from plato.config import Config
 
 @pytest.mark.slow
 class TestFedProxFullTraining:
-    
+
     def test_fedprox_mnist(self):
         """Test FedProx on MNIST achieves expected accuracy."""
-        
+
         # Configure
         Config().trainer.epochs = 5
         Config().trainer.batch_size = 32
-        
+
         # Create datasource
         datasource = datasource_registry.get(client_id=1)
         trainset = datasource.get_train_set()
-        
+
         # Create trainer
         trainer = ComposableTrainer(
             loss_strategy=FedProxLossStrategy(mu=0.01)
         )
-        
+
         # Train
         trainer.train(trainset, sampler=None)
-        
+
         # Test
         testset = datasource.get_test_set()
         accuracy = trainer.test(testset)
-        
+
         # Verify reasonable accuracy
         assert accuracy > 0.85  # Should achieve >85% on MNIST
 ```
@@ -981,7 +981,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run unit tests
         run: pytest tests/trainers/strategies/ -v --cov
-  
+
   integration-tests:
     runs-on: ubuntu-latest
     steps:
@@ -990,7 +990,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run integration tests
         run: pytest tests/trainers/ -v --cov
-  
+
   backward-compat-tests:
     runs-on: ubuntu-latest
     steps:
@@ -1001,7 +1001,7 @@ jobs:
         run: |
           pytest tests/examples/ -v
           python examples/customized_client_training/fedprox/fedprox.py
-  
+
   performance-tests:
     runs-on: ubuntu-latest
     steps:

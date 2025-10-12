@@ -105,7 +105,7 @@ trainer = ComposableTrainer(model=my_model)
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 # FedProx with proximal term regularization
 trainer = ComposableTrainer(
@@ -128,7 +128,7 @@ trainer = ComposableTrainer(
 ### Example 4: Combining Strategies
 
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     LGFedAvgStepStrategy,
 )
@@ -853,7 +853,7 @@ trainer = ComposableTrainer(
 
 ### FedProx
 
-**Location**: `plato.trainers.strategies.implementations.fedprox_strategy`
+**Location**: `plato.trainers.strategies.algorithms.fedprox_strategy`
 
 **Reference**: Li et al., "Federated Optimization in Heterogeneous Networks", MLSys 2020.
 
@@ -882,7 +882,7 @@ Reads `mu` from config: `clients.proximal_term_penalty_constant`
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 # Explicit parameters
 trainer = ComposableTrainer(
@@ -890,7 +890,7 @@ trainer = ComposableTrainer(
 )
 
 # From config
-from plato.trainers.strategies.implementations import FedProxLossStrategyFromConfig
+from plato.trainers.strategies.algorithms import FedProxLossStrategyFromConfig
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategyFromConfig()
 )
@@ -907,7 +907,7 @@ clients:
 
 ### SCAFFOLD
 
-**Location**: `plato.trainers.strategies.implementations.scaffold_strategy`
+**Location**: `plato.trainers.strategies.algorithms.scaffold_strategy`
 
 **Reference**: Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging for Federated Learning", ICML 2020.
 
@@ -934,7 +934,7 @@ Alternative implementation (Option 1 from paper).
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=SCAFFOLDUpdateStrategy()
@@ -967,7 +967,7 @@ trainer.context.state['server_control_variate'] = server_control_variate
 
 ### FedDyn
 
-**Location**: `plato.trainers.strategies.implementations.feddyn_strategy`
+**Location**: `plato.trainers.strategies.algorithms.feddyn_strategy`
 
 **Reference**: Acar et al., "Federated Learning Based on Dynamic Regularization", ICLR 2021.
 
@@ -1005,7 +1005,7 @@ Reads `alpha` from config: `algorithm.alpha_coef`
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategy,
     FedDynUpdateStrategy
 )
@@ -1028,7 +1028,7 @@ algorithm:
 
 ### LG-FedAvg
 
-**Location**: `plato.trainers.strategies.implementations.lgfedavg_strategy`
+**Location**: `plato.trainers.strategies.algorithms.lgfedavg_strategy`
 
 **Reference**: Liang et al., "Think Locally, Act Globally: Federated Learning with Local and Global Representations", 2020.
 
@@ -1072,7 +1072,7 @@ class LGFedAvgStepStrategyAuto(TrainingStepStrategy):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategy
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategy
 
 # Explicit layer names
 trainer = ComposableTrainer(
@@ -1083,7 +1083,7 @@ trainer = ComposableTrainer(
 )
 
 # Auto detection
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategyAuto
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategyAuto
 trainer = ComposableTrainer(
     training_step_strategy=LGFedAvgStepStrategyAuto(num_local_layers=1)
 )
@@ -1106,7 +1106,7 @@ algorithm:
 
 ### FedMos
 
-**Location**: `plato.trainers.strategies.implementations.fedmos_strategy`
+**Location**: `plato.trainers.strategies.algorithms.fedmos_strategy`
 
 **Reference**: Wang et al., "FedMos: Taming Client Drift in Federated Learning with Double Momentum", IEEE INFOCOM 2023.
 
@@ -1140,7 +1140,7 @@ Reads parameters from config: `algorithm.a`, `algorithm.mu`, `parameters.optimiz
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedMosOptimizerStrategy,
     FedMosUpdateStrategy
 )
@@ -1167,7 +1167,7 @@ parameters:
 
 ### FedPer
 
-**Location**: `plato.trainers.strategies.implementations.personalized_fl_strategy`
+**Location**: `plato.trainers.strategies.algorithms.personalized_fl_strategy`
 
 **Reference**: Arivazhagan et al., "Federated Learning with Personalization Layers", 2019.
 
@@ -1195,7 +1195,7 @@ Reads from config: `algorithm.global_layer_names`, `trainer.rounds`
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedPerUpdateStrategy
+from plato.trainers.strategies.algorithms import FedPerUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=FedPerUpdateStrategy(
@@ -1221,7 +1221,7 @@ trainer:
 
 ### FedRep
 
-**Location**: `plato.trainers.strategies.implementations.personalized_fl_strategy`
+**Location**: `plato.trainers.strategies.algorithms.personalized_fl_strategy`
 
 **Reference**: Collins et al., "Exploiting Shared Representations for Personalized Federated Learning", ICML 2021.
 
@@ -1250,7 +1250,7 @@ Reads from config: `algorithm.global_layer_names`, `algorithm.local_layer_names`
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedRepUpdateStrategy
+from plato.trainers.strategies.algorithms import FedRepUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=FedRepUpdateStrategy(
@@ -1284,7 +1284,7 @@ algorithm:
 
 ### APFL
 
-**Location**: `plato.trainers.strategies.implementations.apfl_strategy`
+**Location**: `plato.trainers.strategies.algorithms.apfl_strategy`
 
 **Reference**: Deng et al., "Adaptive Personalized Federated Learning", 2020.
 
@@ -1319,7 +1319,7 @@ Reads from config: `algorithm.alpha`, `algorithm.adaptive_alpha`, `algorithm.alp
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLUpdateStrategy,
     APFLStepStrategy
 )
@@ -1350,7 +1350,7 @@ algorithm:
 
 ### Ditto
 
-**Location**: `plato.trainers.strategies.implementations.ditto_strategy`
+**Location**: `plato.trainers.strategies.algorithms.ditto_strategy`
 
 **Reference**: Li et al., "Ditto: Fair and Robust Federated Learning Through Personalization", ICML 2021.
 
@@ -1380,7 +1380,7 @@ Reads from config: `algorithm.ditto_lambda`, `algorithm.personalization_epochs`
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import DittoUpdateStrategy
+from plato.trainers.strategies.algorithms import DittoUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=DittoUpdateStrategy(
@@ -1650,7 +1650,7 @@ test_my_custom_loss_strategy()
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     LGFedAvgStepStrategy,
 )
@@ -1684,7 +1684,7 @@ trainer = ComposableTrainer(
 trainer.train(trainset, sampler)
 
 # Swap to different strategy
-from plato.trainers.strategies.implementations import FedDynLossStrategy
+from plato.trainers.strategies.algorithms import FedDynLossStrategy
 trainer.loss_strategy = FedDynLossStrategy(alpha=0.01)
 
 # Continue training with new strategy
@@ -1701,12 +1701,12 @@ def create_trainer_from_config():
 
     # Select strategy based on config
     if config.algorithm.name == "FedProx":
-        from plato.trainers.strategies.implementations import (
+        from plato.trainers.strategies.algorithms import (
             FedProxLossStrategyFromConfig
         )
         loss_strategy = FedProxLossStrategyFromConfig()
     elif config.algorithm.name == "FedDyn":
-        from plato.trainers.strategies.implementations import (
+        from plato.trainers.strategies.algorithms import (
             FedDynLossStrategyFromConfig,
             FedDynUpdateStrategy
         )
@@ -1727,7 +1727,7 @@ trainer = create_trainer_from_config()
 ### Strategy Factories
 
 ```python
-from plato.trainers.strategies.implementations import *
+from plato.trainers.strategies.algorithms import *
 
 class StrategyFactory:
     """Factory for creating common strategy combinations."""
@@ -1793,7 +1793,7 @@ class CompositeLossStrategy(LossCriterionStrategy):
 
 # Use composite loss
 from plato.trainers.strategies import CrossEntropyLossStrategy
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 composite = CompositeLossStrategy([
     (CrossEntropyLossStrategy(), 1.0),
@@ -1829,12 +1829,12 @@ trainer = ComposableTrainer(loss_strategy=composite)
 
 | Algorithm | Strategies | Location |
 |-----------|-----------|----------|
-| **FedProx** | `FedProxLossStrategy` | `...implementations.fedprox_strategy` |
-| **SCAFFOLD** | `SCAFFOLDUpdateStrategy` | `...implementations.scaffold_strategy` |
-| **FedDyn** | `FedDynLossStrategy`, `FedDynUpdateStrategy` | `...implementations.feddyn_strategy` |
-| **LG-FedAvg** | `LGFedAvgStepStrategy` | `...implementations.lgfedavg_strategy` |
-| **FedMos** | `FedMosOptimizerStrategy`, `FedMosUpdateStrategy` | `...implementations.fedmos_strategy` |
-| **FedPer** | `FedPerUpdateStrategy` | `...implementations.personalized_fl_strategy` |
-| **FedRep** | `FedRepUpdateStrategy` | `...implementations.personalized_fl_strategy` |
-| **APFL** | `APFLUpdateStrategy`, `APFLStepStrategy` | `...implementations.apfl_strategy` |
-| **Ditto** | `DittoUpdateStrategy` | `...implementations.ditto_strategy` |
+| **FedProx** | `FedProxLossStrategy` | `...algorithms.fedprox_strategy` |
+| **SCAFFOLD** | `SCAFFOLDUpdateStrategy` | `...algorithms.scaffold_strategy` |
+| **FedDyn** | `FedDynLossStrategy`, `FedDynUpdateStrategy` | `...algorithms.feddyn_strategy` |
+| **LG-FedAvg** | `LGFedAvgStepStrategy` | `...algorithms.lgfedavg_strategy` |
+| **FedMos** | `FedMosOptimizerStrategy`, `FedMosUpdateStrategy` | `...algorithms.fedmos_strategy` |
+| **FedPer** | `FedPerUpdateStrategy` | `...algorithms.personalized_fl_strategy` |
+| **FedRep** | `FedRepUpdateStrategy` | `...algorithms.personalized_fl_strategy` |
+| **APFL** | `APFLUpdateStrategy`, `APFLStepStrategy` | `...algorithms.apfl_strategy` |
+| **Ditto** | `DittoUpdateStrategy` | `...algorithms.ditto_strategy` |

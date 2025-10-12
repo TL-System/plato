@@ -31,7 +31,7 @@
 class MyTrainer(basic.Trainer):
     def get_loss_criterion(self):
         return custom_loss
-    
+
     def train_step_end(self, config, batch, loss):
         # Custom logic
         pass
@@ -69,7 +69,7 @@ Determine which strategies your algorithm needs:
 Look in `plato/trainers/strategies/implementations/`:
 
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     SCAFFOLDUpdateStrategy,
     FedDynLossStrategy,
@@ -88,7 +88,7 @@ from plato.trainers.strategies.implementations import (
 **If strategy exists**:
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 class MyTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
@@ -129,19 +129,19 @@ Identify which methods you've overridden:
 class MyTrainer(basic.Trainer):
     def get_loss_criterion(self):           # → LossCriterionStrategy
         pass
-    
+
     def get_optimizer(self, model):          # → OptimizerStrategy
         pass
-    
+
     def perform_forward_and_backward_passes(...):  # → TrainingStepStrategy
         pass
-    
+
     def train_run_start(self, config):       # → ModelUpdateStrategy.on_train_start
         pass
-    
+
     def train_step_end(self, config, ...):   # → ModelUpdateStrategy.after_step
         pass
-    
+
     def train_run_end(self, config):         # → ModelUpdateStrategy.on_train_end
         pass
 ```
@@ -169,7 +169,7 @@ class MyLossStrategy(LossCriterionStrategy):
     def __init__(self, param1, param2):
         self.param1 = param1
         self.param2 = param2
-    
+
     def compute_loss(self, outputs, labels, context):
         # Extract logic from get_loss_criterion()
         base_loss = torch.nn.CrossEntropyLoss()(outputs, labels)
@@ -179,15 +179,15 @@ class MyLossStrategy(LossCriterionStrategy):
 class MyUpdateStrategy(ModelUpdateStrategy):
     def __init__(self):
         self.state = None
-    
+
     def on_train_start(self, context):
         # Extract logic from train_run_start()
         self.state = initialize_state(context.model)
-    
+
     def after_step(self, context):
         # Extract logic from train_step_end()
         update_state(self.state, context.model)
-    
+
     def on_train_end(self, context):
         # Extract logic from train_run_end()
         save_state(self.state)
@@ -254,14 +254,14 @@ class MyTrainer(basic.Trainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
         self.my_state = None
-    
+
     def train_run_start(self, config):
         super().train_run_start(config)
         self.my_state = initialize()
-    
+
     def train_step_end(self, config, batch, loss):
         update_state(self.my_state)
-    
+
     def train_run_end(self, config):
         save_state(self.my_state)
         super().train_run_end(config)
@@ -272,13 +272,13 @@ class MyTrainer(basic.Trainer):
 class MyUpdateStrategy(ModelUpdateStrategy):
     def __init__(self):
         self.my_state = None
-    
+
     def on_train_start(self, context):
         self.my_state = initialize()
-    
+
     def after_step(self, context):
         update_state(self.my_state)
-    
+
     def on_train_end(self, context):
         save_state(self.my_state)
 
@@ -300,10 +300,10 @@ class MyTrainer(basic.Trainer):
         self.optimizer.zero_grad()
         outputs = self.model(examples)
         loss = self._loss_criterion(outputs, labels)
-        
+
         # Custom logic here
         custom_step(self.model, loss)
-        
+
         self.optimizer.step()
         return loss
 ```
@@ -311,15 +311,15 @@ class MyTrainer(basic.Trainer):
 **After**:
 ```python
 class MyStepStrategy(TrainingStepStrategy):
-    def training_step(self, model, optimizer, examples, labels, 
+    def training_step(self, model, optimizer, examples, labels,
                       loss_criterion, context):
         optimizer.zero_grad()
         outputs = model(examples)
         loss = loss_criterion(outputs, labels)
-        
+
         # Custom logic here
         custom_step(model, loss)
-        
+
         optimizer.step()
         return loss
 
@@ -340,11 +340,11 @@ class MyComplexTrainer(basic.Trainer):
     def get_loss_criterion(self):
         # FedProx-like logic
         pass
-    
+
     def train_run_start(self, config):
         # SCAFFOLD-like logic
         pass
-    
+
     def train_step_end(self, config, batch, loss):
         # SCAFFOLD-like logic
         pass
@@ -370,7 +370,7 @@ class MyTrainer(ComposableTrainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 class FedProxTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
@@ -385,7 +385,7 @@ class FedProxTrainer(ComposableTrainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 class SCAFFOLDTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
@@ -395,7 +395,7 @@ class SCAFFOLDTrainer(ComposableTrainer):
             model_update_strategy=SCAFFOLDUpdateStrategy()
         )
         self.additional_data = None
-    
+
     def set_client_id(self, client_id):
         super().set_client_id(client_id)
         if self.additional_data is not None:
@@ -406,7 +406,7 @@ class SCAFFOLDTrainer(ComposableTrainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategy,
     FedDynUpdateStrategy
 )
@@ -425,7 +425,7 @@ class FedDynTrainer(ComposableTrainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategy
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategy
 
 class LGFedAvgTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
@@ -443,7 +443,7 @@ class LGFedAvgTrainer(ComposableTrainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLUpdateStrategy,
     APFLStepStrategy
 )
@@ -462,7 +462,7 @@ class APFLTrainer(ComposableTrainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import DittoUpdateStrategy
+from plato.trainers.strategies.algorithms import DittoUpdateStrategy
 
 class DittoTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
@@ -541,7 +541,7 @@ class MyUpdateStrategy(ModelUpdateStrategy):
     def on_train_end(self, context):
         # Save state
         torch.save(self.state, f"state_{context.client_id}.pth")
-    
+
     def on_train_start(self, context):
         # Load state
         if os.path.exists(f"state_{context.client_id}.pth"):
@@ -552,7 +552,7 @@ class MyUpdateStrategy(ModelUpdateStrategy):
 
 **Problem**: Extra overhead from strategy indirection.
 
-**Solution**: 
+**Solution**:
 1. Profile to find bottleneck
 2. Move performance-critical code to compiled functions
 3. Use `@torch.jit.script` for hot paths
@@ -582,17 +582,17 @@ trainer = ComposableTrainer(
 class MyStrategy(LossCriterionStrategy):
     """
     My custom loss strategy.
-    
+
     Reference:
     Author et al., "Paper Title", Conference Year.
-    
+
     Description:
     This strategy does X by computing Y...
-    
+
     Args:
         param1: Description of param1
         param2: Description of param2
-    
+
     Example:
         >>> strategy = MyStrategy(param1=0.01)
         >>> trainer = ComposableTrainer(loss_strategy=strategy)
@@ -606,10 +606,10 @@ def test_my_strategy():
     strategy = MyStrategy(param=0.01)
     context = TrainingContext()
     context.model = create_test_model()
-    
+
     strategy.setup(context)
     result = strategy.compute_loss(outputs, labels, context)
-    
+
     assert result > 0
 ```
 
@@ -644,7 +644,7 @@ class MyTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
         super().__init__(...)
         self.extra_state = ...  # Move to strategy!
-    
+
     def custom_method(self):  # Move to strategy!
         pass
 ```

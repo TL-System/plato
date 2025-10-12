@@ -12,8 +12,9 @@ Note: This is the outdated version. Please use the version in
 examples/personalized_fl/fedrep/ for the latest implementation.
 """
 
+from plato.trainers.strategies.algorithms import FedRepUpdateStrategyFromConfig
+
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedRepUpdateStrategyFromConfig
 
 
 class Trainer(ComposableTrainer):

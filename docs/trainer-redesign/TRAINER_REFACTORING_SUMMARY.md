@@ -57,7 +57,7 @@ Replace method overriding with **strategy injection**:
 ```python
 # New approach: Composition with strategies
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     SCAFFOLDUpdateStrategy,
 )
@@ -537,7 +537,7 @@ The proposed refactoring from inheritance to composition using the Strategy patt
 ```python
 # 1. Import
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     SCAFFOLDUpdateStrategy,
 )

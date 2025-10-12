@@ -130,7 +130,7 @@ Proper lifecycle hooks for stateful algorithms:
 ### FedProx
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(mu=0.01)
@@ -139,7 +139,7 @@ trainer = ComposableTrainer(
 
 ### SCAFFOLD
 ```python
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=SCAFFOLDUpdateStrategy()
@@ -151,7 +151,7 @@ trainer = ComposableTrainer(
 
 ### LG-FedAvg
 ```python
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategy
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategy
 
 trainer = ComposableTrainer(
     training_step_strategy=LGFedAvgStepStrategy(
@@ -163,7 +163,7 @@ trainer = ComposableTrainer(
 
 ### APFL
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLUpdateStrategy,
     APFLStepStrategy
 )
@@ -277,7 +277,7 @@ class FedProxTrainer(basic.Trainer):
 ### After (Composition)
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(mu=0.01)

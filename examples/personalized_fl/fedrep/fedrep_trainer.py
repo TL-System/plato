@@ -10,7 +10,7 @@ Paper: https://arxiv.org/abs/2102.07078
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedRepUpdateStrategyFromConfig
+from plato.trainers.strategies.algorithms import FedRepUpdateStrategyFromConfig
 
 
 class Trainer(ComposableTrainer):

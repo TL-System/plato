@@ -423,7 +423,7 @@ Basic trainer usage with single strategy.
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 from plato.clients import simple
 from plato.servers import fedavg
 
@@ -456,7 +456,7 @@ Trainer usage with multiple strategies composed together.
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     SCAFFOLDUpdateStrategy,
     AdamOptimizerStrategy,
@@ -518,7 +518,7 @@ def main():
     
     # Option 2: Use builder pattern
     from plato.trainers.strategies.builders import TrainerBuilder
-    from plato.trainers.strategies.implementations import (
+    from plato.trainers.strategies.algorithms import (
         FedProxLossStrategy,
         SCAFFOLDUpdateStrategy,
     )
@@ -816,7 +816,7 @@ import pytest
 import torch
 import torch.nn as nn
 from plato.trainers.strategies.base import TrainingContext
-from plato.trainers.strategies.implementations import MyStrategy
+from plato.trainers.strategies.algorithms import MyStrategy
 
 
 class TestMyStrategy:
@@ -893,7 +893,7 @@ import pytest
 import torch
 from torch.utils.data import TensorDataset
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import MyStrategy
+from plato.trainers.strategies.algorithms import MyStrategy
 
 
 class TestTrainerWithStrategy:
@@ -968,7 +968,7 @@ Apply strategy conditionally based on configuration.
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     DefaultLossCriterionStrategy,
 )

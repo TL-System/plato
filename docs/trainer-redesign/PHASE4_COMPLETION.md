@@ -1,7 +1,7 @@
 # Phase 4 Completion: Example Migration to Composition-Based Design
 
-**Status**: ✅ **COMPLETE**  
-**Date**: 2024  
+**Status**: ✅ **COMPLETE**
+**Date**: 2024
 **Phase**: 4 of 5 in Trainer Refactoring Roadmap
 
 ---
@@ -36,8 +36,8 @@ examples/outdated/
 └── fedrep/fedrep_trainer.py           ✅ Migrated (84% code reduction)
 ```
 
-**Total**: 10 trainer files migrated  
-**Average Code Reduction**: 79%  
+**Total**: 10 trainer files migrated
+**Average Code Reduction**: 79%
 **Syntax Validation**: 100% pass rate
 
 ---
@@ -89,12 +89,12 @@ def _flatten_weights_from_model(model, device):
 
 class FedProxLocalObjective:
     """Representing the local objective of FedProx clients."""
-    
+
     def __init__(self, model, device):
         self.model = model
         self.device = device
         self.init_global_weights = _flatten_weights_from_model(model, device)
-    
+
     def compute_objective(self, outputs, labels):
         """Compute the objective the FedProx client wishes to minimize."""
         current_weights = _flatten_weights_from_model(self.model, self.device)
@@ -113,7 +113,7 @@ class FedProxLocalObjective:
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the FedProx client."""
-    
+
     def get_loss_criterion(self):
         """Return the loss criterion for FedProx clients."""
         local_obj = FedProxLocalObjective(self.model, self.device)
@@ -123,20 +123,20 @@ class Trainer(basic.Trainer):
 #### After (Composition-Based)
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategyFromConfig
+from plato.trainers.strategies.algorithms import FedProxLossStrategyFromConfig
 
 class Trainer(ComposableTrainer):
     """
     The federated learning trainer for the FedProx client.
-    
+
     This trainer uses the composition-based design with FedProx loss strategy.
     The proximal term coefficient (mu) is read from the configuration file.
     """
-    
+
     def __init__(self, model=None, callbacks=None):
         """
         Initialize the FedProx trainer with composition-based strategies.
-        
+
         Args:
             model: The neural network model to train
             callbacks: Optional list of callback handlers
@@ -171,7 +171,7 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """The federated learning trainer for the SCAFFOLD client."""
-    
+
     def __init__(self, model=None, callbacks=None):
         """Initializing the trainer with the provided model."""
         super().__init__(model=model, callbacks=callbacks)
@@ -184,7 +184,7 @@ class Trainer(basic.Trainer):
         self.local_steps = 0
         self.local_lr = None
         self.client_control_variate_delta = None
-    
+
     def get_optimizer(self, model):
         """Gets the parameter groups from the optimizer"""
         optimizer = super().get_optimizer(model)
@@ -192,17 +192,17 @@ class Trainer(basic.Trainer):
         if len(self.param_groups) > 0 and "lr" in self.param_groups[0]:
             self.local_lr = self.param_groups[0]["lr"]
         return optimizer
-    
+
     def train_run_start(self, config):
         """Initialize control variates..."""
         # 20+ lines of initialization logic
         ...
-    
+
     def train_step_end(self, config, batch=None, loss=None):
         """Apply control variate corrections..."""
         # 15+ lines of correction logic
         ...
-    
+
     def train_run_end(self, config):
         """Compute and save control variate deltas..."""
         # 30+ lines of computation and saving
@@ -212,20 +212,20 @@ class Trainer(basic.Trainer):
 #### After (Composition-Based)
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 class Trainer(ComposableTrainer):
     """
     The federated learning trainer for the SCAFFOLD client.
-    
+
     This trainer uses the composition-based design with SCAFFOLD update strategy.
     The SCAFFOLD algorithm uses control variates to correct for client drift.
     """
-    
+
     def __init__(self, model=None, callbacks=None):
         """
         Initialize the SCAFFOLD trainer with composition-based strategies.
-        
+
         Args:
             model: The neural network model to train
             callbacks: Optional list of callback handlers
@@ -235,14 +235,14 @@ class Trainer(ComposableTrainer):
             callbacks=callbacks,
             model_update_strategy=SCAFFOLDUpdateStrategy(),
         )
-        
+
         # Store additional_data for server control variate
         self.additional_data = None
-    
+
     def set_client_id(self, client_id):
         """Set the client ID for this trainer."""
         super().set_client_id(client_id)
-        
+
         # Pass additional_data (server control variate) to context
         if self.additional_data is not None:
             self.training_context.state["server_control_variate"] = self.additional_data
@@ -271,7 +271,7 @@ from plato.trainers import basic
 
 class Trainer(basic.Trainer):
     """A trainer using the APFL algorithm to train both global and personalized models."""
-    
+
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
         self.alpha = Config().algorithm.alpha
@@ -280,37 +280,37 @@ class Trainer(basic.Trainer):
         else:
             self.personalized_model = model()
         self.personalized_optimizer = None
-    
+
     def perform_forward_and_backward_passes(self, config, examples, labels):
         """Performing forward and backward passes in the training loop."""
         super().perform_forward_and_backward_passes(config, examples, labels)
-        
+
         # 15+ lines of dual model training logic
         ...
-        
+
         return personalized_loss
-    
+
     def train_run_start(self, config):
         """Load the alpha before starting the training."""
         super().train_run_start(config)
-        
+
         # 20+ lines of loading alpha and personalized model
         ...
-    
+
     def train_run_end(self, config):
         """Saves alpha and personalized model."""
         super().train_run_end(config)
-        
+
         # 10+ lines of saving
         ...
-    
+
     def train_step_end(self, config, batch=None, loss=None):
         """Updates alpha in APFL before each iteration."""
         super().train_step_end(config, batch, loss)
-        
+
         # Alpha update logic
         ...
-    
+
     def _update_alpha(self, eta):
         """Updates alpha based on Eq. 10 in the paper."""
         # 15+ lines of gradient computation
@@ -320,7 +320,7 @@ class Trainer(basic.Trainer):
 #### After (Composition-Based)
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLStepStrategy,
     APFLUpdateStrategyFromConfig,
 )
@@ -328,14 +328,14 @@ from plato.trainers.strategies.implementations import (
 class Trainer(ComposableTrainer):
     """
     A trainer using the APFL algorithm with composition-based design.
-    
+
     APFL maintains two models with adaptive mixing parameter α.
     """
-    
+
     def __init__(self, model=None, callbacks=None):
         """
         Initialize the APFL trainer with composition-based strategies.
-        
+
         Args:
             model: The neural network model to train
             callbacks: Optional list of callback handlers
@@ -391,11 +391,11 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         # Initialize state
         ...
-    
+
     def train_step_end(self, config, batch, loss):
         # Update state
         ...
-    
+
     def train_run_end(self, config):
         # Save state
         ...
@@ -447,7 +447,7 @@ class Trainer(basic.Trainer):
     def train_run_start(self, config):
         if condition:
             freeze_layers(...)
-    
+
     def train_epoch_start(self, config):
         if other_condition:
             freeze_layers(...)
@@ -477,11 +477,11 @@ class Trainer(basic.Trainer):
         super().__init__(model, callbacks)
         self.personalized_model = create_model()
         self.personalized_optimizer = ...
-    
+
     def perform_forward_and_backward_passes(...):
         # Train both models
         ...
-    
+
     def train_run_start/end(self, config):
         # Load/save personalized model
         ...
@@ -568,10 +568,10 @@ def test_fedprox_loss():
     strategy = FedProxLossStrategy(mu=0.01)
     context = TrainingContext()
     context.model = simple_model
-    
+
     strategy.setup(context)
     loss = strategy.compute_loss(outputs, labels, context)
-    
+
     assert loss > base_loss  # Proximal term increases loss
 ```
 
@@ -735,11 +735,11 @@ Instead of backward compatibility, we provide:
 
 Phase 4 successfully migrated all major federated learning algorithm examples from inheritance-based to composition-based design. The migration demonstrates:
 
-✅ **Dramatic code reduction** (48% overall, up to 90% in some cases)  
-✅ **Improved code quality** (SOLID principles, clear intent)  
-✅ **Better maintainability** (fix once, benefit everywhere)  
-✅ **Enhanced flexibility** (mix and match strategies)  
-✅ **Easier testing** (test strategies in isolation)  
+✅ **Dramatic code reduction** (48% overall, up to 90% in some cases)
+✅ **Improved code quality** (SOLID principles, clear intent)
+✅ **Better maintainability** (fix once, benefit everywhere)
+✅ **Enhanced flexibility** (mix and match strategies)
+✅ **Easier testing** (test strategies in isolation)
 
 The composition-based design is proven production-ready and provides a superior development experience compared to the inheritance-based approach.
 
@@ -775,6 +775,6 @@ The composition-based design is proven production-ready and provides a superior 
 
 ---
 
-**Last Updated**: Phase 4 Completion  
-**Version**: 1.0  
+**Last Updated**: Phase 4 Completion
+**Version**: 1.0
 **Status**: Production Ready ✅

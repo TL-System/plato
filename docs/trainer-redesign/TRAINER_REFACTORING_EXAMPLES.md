@@ -36,7 +36,7 @@ trainer = ComposableTrainer(
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     SCAFFOLDUpdateStrategy,
     AdamOptimizerStrategy,
@@ -59,15 +59,15 @@ class MyCustomLossStrategy(LossCriterionStrategy):
     def __init__(self, alpha=0.5):
         self.alpha = alpha
         self.base_criterion = torch.nn.CrossEntropyLoss()
-    
+
     def compute_loss(self, outputs, labels, context):
         ce_loss = self.base_criterion(outputs, labels)
-        
+
         # Add custom regularization
         reg_term = self.alpha * torch.norm(
             torch.stack([p for p in context.model.parameters()])
         )
-        
+
         return ce_loss + reg_term
 
 # Use it
@@ -123,7 +123,7 @@ class Trainer(basic.Trainer):
 
 ```python
 # examples/customized_client_training/fedprox/fedprox_trainer_v2.py
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 # Option 1: Use in main script
 from plato.trainers.composable import ComposableTrainer
@@ -199,7 +199,7 @@ class Trainer(basic.Trainer):
 ```python
 # examples/customized_client_training/scaffold/scaffold_trainer_v2.py
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 def main():
     trainer = ComposableTrainer(
@@ -239,7 +239,7 @@ class Trainer(basic.Trainer):
 ```python
 # examples/personalized_fl/lgfedavg/lgfedavg_trainer_v2.py
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategy
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategy
 from plato.config import Config
 
 
@@ -284,7 +284,7 @@ class Trainer(basic.Trainer):
         # Linear penalty
         local_params = self.model.state_dict()
         loss_penalty = torch.zeros(adaptive_alpha_coef.shape).to(self.device)
-        
+
         for parameter_name in local_params:
             loss_penalty += adaptive_alpha_coef * torch.sum(
                 local_params[parameter_name] * (
@@ -296,7 +296,7 @@ class Trainer(basic.Trainer):
         loss = loss_task + torch.sum(loss_penalty)
         loss.backward()
         self.optimizer.step()
-        
+
         return loss
 ```
 
@@ -305,7 +305,7 @@ class Trainer(basic.Trainer):
 ```python
 # examples/customized_client_training/feddyn/feddyn_trainer_v2.py
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategy,
     FedDynUpdateStrategy,
 )
@@ -329,12 +329,12 @@ def main():
 # plato/trainers/strategies/factories.py
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import *
+from plato.trainers.strategies.algorithms import *
 
 
 class TrainerFactory:
     """Factory for creating trainers with common strategy combinations."""
-    
+
     @staticmethod
     def create_fedprox_trainer(mu=0.01, **kwargs):
         """Create a FedProx trainer."""
@@ -342,7 +342,7 @@ class TrainerFactory:
             loss_strategy=FedProxLossStrategy(mu=mu),
             **kwargs
         )
-    
+
     @staticmethod
     def create_scaffold_trainer(**kwargs):
         """Create a SCAFFOLD trainer."""
@@ -350,7 +350,7 @@ class TrainerFactory:
             model_update_strategy=SCAFFOLDUpdateStrategy(),
             **kwargs
         )
-    
+
     @staticmethod
     def create_feddyn_trainer(alpha_coef=0.01, **kwargs):
         """Create a FedDyn trainer."""
@@ -359,7 +359,7 @@ class TrainerFactory:
             model_update_strategy=FedDynUpdateStrategy(),
             **kwargs
         )
-    
+
     @staticmethod
     def create_lgfedavg_trainer(global_layers, local_layers, **kwargs):
         """Create a LG-FedAvg trainer."""
@@ -370,7 +370,7 @@ class TrainerFactory:
             ),
             **kwargs
         )
-    
+
     @staticmethod
     def create_personalized_fl_trainer(
         personalization_layers,
@@ -385,7 +385,7 @@ class TrainerFactory:
             ),
             **kwargs
         )
-    
+
     @staticmethod
     def create_hybrid_trainer(
         loss_strategy=None,
@@ -408,13 +408,13 @@ class TrainerFactory:
 def example_usage():
     # FedProx
     trainer1 = TrainerFactory.create_fedprox_trainer(mu=0.01)
-    
+
     # SCAFFOLD
     trainer2 = TrainerFactory.create_scaffold_trainer()
-    
+
     # FedDyn
     trainer3 = TrainerFactory.create_feddyn_trainer(alpha_coef=0.02)
-    
+
     # Hybrid: FedProx + SCAFFOLD
     trainer4 = TrainerFactory.create_hybrid_trainer(
         loss_strategy=FedProxLossStrategy(mu=0.01),
@@ -433,7 +433,7 @@ from plato.trainers.composable import ComposableTrainer
 
 class TrainerBuilder:
     """Builder pattern for creating trainers with fluent API."""
-    
+
     def __init__(self):
         self._model = None
         self._callbacks = None
@@ -443,47 +443,47 @@ class TrainerBuilder:
         self._lr_scheduler_strategy = None
         self._model_update_strategy = None
         self._data_loader_strategy = None
-    
+
     def with_model(self, model):
         """Set the model."""
         self._model = model
         return self
-    
+
     def with_callbacks(self, callbacks):
         """Set callbacks."""
         self._callbacks = callbacks
         return self
-    
+
     def with_loss_strategy(self, strategy):
         """Set loss computation strategy."""
         self._loss_strategy = strategy
         return self
-    
+
     def with_optimizer_strategy(self, strategy):
         """Set optimizer strategy."""
         self._optimizer_strategy = strategy
         return self
-    
+
     def with_training_step_strategy(self, strategy):
         """Set training step strategy."""
         self._training_step_strategy = strategy
         return self
-    
+
     def with_lr_scheduler_strategy(self, strategy):
         """Set LR scheduler strategy."""
         self._lr_scheduler_strategy = strategy
         return self
-    
+
     def with_model_update_strategy(self, strategy):
         """Set model update strategy."""
         self._model_update_strategy = strategy
         return self
-    
+
     def with_data_loader_strategy(self, strategy):
         """Set data loader strategy."""
         self._data_loader_strategy = strategy
         return self
-    
+
     def build(self) -> ComposableTrainer:
         """Build the trainer."""
         return ComposableTrainer(
@@ -499,7 +499,7 @@ class TrainerBuilder:
 
 
 # Usage
-from plato.trainers.strategies.implementations import *
+from plato.trainers.strategies.algorithms import *
 
 trainer = (
     TrainerBuilder()
@@ -530,20 +530,20 @@ from plato.config import Config
 class FedProxLossStrategy(LossCriterionStrategy):
     """
     FedProx loss with proximal term to handle system heterogeneity.
-    
+
     Reference:
     Li et al., "Federated Optimization in Heterogeneous Networks", MLSys 2020.
     https://proceedings.mlsys.org/paper/2020/hash/38af86134b65d0f10fe33d30dd76442e-Abstract.html
-    
+
     Loss = L(w) + (mu/2) * ||w - w_global||^2
-    
+
     where:
     - L(w) is the base loss (e.g., cross-entropy)
     - w is the current model parameters
     - w_global is the global model parameters at start of training
     - mu is the proximal term penalty constant
     """
-    
+
     def __init__(
         self,
         mu: float = 0.01,
@@ -551,7 +551,7 @@ class FedProxLossStrategy(LossCriterionStrategy):
     ):
         """
         Initialize FedProx loss strategy.
-        
+
         Args:
             mu: Proximal term penalty constant (default: 0.01)
             base_loss_fn: Base loss function (default: CrossEntropyLoss)
@@ -560,7 +560,7 @@ class FedProxLossStrategy(LossCriterionStrategy):
         self.base_loss_fn = base_loss_fn
         self._criterion = None
         self.global_weights = None
-    
+
     def setup(self, context: TrainingContext):
         """Initialize base loss function."""
         if self.base_loss_fn is None:
@@ -568,7 +568,7 @@ class FedProxLossStrategy(LossCriterionStrategy):
             self._criterion = nn.CrossEntropyLoss()
         else:
             self._criterion = self.base_loss_fn
-    
+
     def compute_loss(
         self,
         outputs: torch.Tensor,
@@ -577,25 +577,25 @@ class FedProxLossStrategy(LossCriterionStrategy):
     ) -> torch.Tensor:
         """
         Compute FedProx loss with proximal term.
-        
+
         Args:
             outputs: Model outputs
             labels: Ground truth labels
             context: Training context with model and device
-        
+
         Returns:
             Total loss (base loss + proximal term)
         """
         # Compute base loss
         base_loss = self._criterion(outputs, labels)
-        
+
         # On first call, save global weights
         if self.global_weights is None:
             self.global_weights = {
                 name: param.clone().detach()
                 for name, param in context.model.named_parameters()
             }
-        
+
         # Compute proximal term: (mu/2) * ||w - w_global||^2
         proximal_term = 0.0
         for name, param in context.model.named_parameters():
@@ -603,11 +603,11 @@ class FedProxLossStrategy(LossCriterionStrategy):
                 proximal_term += torch.sum(
                     (param - self.global_weights[name].to(param.device)) ** 2
                 )
-        
+
         proximal_term = (self.mu / 2.0) * proximal_term
-        
+
         return base_loss + proximal_term
-    
+
     def teardown(self, context: TrainingContext):
         """Clean up at end of training."""
         self.global_weights = None
@@ -632,31 +632,31 @@ from plato.config import Config
 class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
     """
     SCAFFOLD control variate strategy for variance reduction.
-    
+
     Reference:
-    Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging 
+    Karimireddy et al., "SCAFFOLD: Stochastic Controlled Averaging
     for Federated Learning", ICML 2020.
     https://arxiv.org/abs/1910.06378
-    
+
     SCAFFOLD maintains control variates (c_i for client, c for server) to
     correct for client drift. The client update rule becomes:
-    
+
     x_i ← x_i - η∇F_i(x_i) - η(c - c_i)
-    
+
     After local training:
     c_i^new = c - (1/(ητ))(x_local - x_global)
-    
+
     where:
     - η is the learning rate
     - τ is the number of local steps
     - x_global is the global model at start
     - x_local is the local model at end
     """
-    
+
     def __init__(self, load_saved_cv: bool = True):
         """
         Initialize SCAFFOLD strategy.
-        
+
         Args:
             load_saved_cv: Whether to load saved client control variate
         """
@@ -667,18 +667,18 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         self.local_steps = 0
         self.learning_rate = None
         self.client_cv_path = None
-    
+
     def setup(self, context: TrainingContext):
         """Setup file paths for saving/loading control variates."""
         model_path = Config().params["model_path"]
         if not os.path.exists(model_path):
             os.makedirs(model_path)
-        
+
         self.client_cv_path = os.path.join(
             model_path,
             f"scaffold_cv_client_{context.client_id}.pkl"
         )
-        
+
         # Try to load existing client control variate
         if self.load_saved_cv and os.path.exists(self.client_cv_path):
             try:
@@ -695,16 +695,16 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                     context.client_id,
                     str(e)
                 )
-    
+
     def on_train_start(self, context: TrainingContext):
         """
         Initialize control variates and save global model weights.
-        
+
         Called at the start of each training round.
         """
         # Get server control variate from context (sent by server)
         self.server_control_variate = context.state.get('server_control_variate')
-        
+
         if self.server_control_variate is None:
             logging.warning(
                 "[Client #%d] No server control variate received, "
@@ -715,7 +715,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                 name: torch.zeros_like(param)
                 for name, param in context.model.named_parameters()
             }
-        
+
         # Initialize client control variate to zero if first participation
         if self.client_control_variate is None:
             self.client_control_variate = {
@@ -726,26 +726,26 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                 "[Client #%d] Initialized client control variate to zero",
                 context.client_id
             )
-        
+
         # Save global model weights for computing control variate update
         self.global_model_weights = copy.deepcopy(context.model.state_dict())
-        
+
         # Reset local step counter
         self.local_steps = 0
-        
+
         # Get learning rate from config
         self.learning_rate = context.config.get('lr', Config().trainer.lr)
-    
+
     def after_step(self, context: TrainingContext):
         """
         Apply control variate correction after each optimizer step.
-        
+
         This is the key SCAFFOLD correction:
         x ← x - η(c - c_i)
         """
         if self.server_control_variate is None:
             return
-        
+
         with torch.no_grad():
             for name, param in context.model.named_parameters():
                 if name in self.server_control_variate:
@@ -754,48 +754,48 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                         self.server_control_variate[name].to(param.device)
                         - self.client_control_variate[name].to(param.device)
                     )
-                    
+
                     # Apply correction: x ← x - η(c - c_i)
                     param.data.sub_(correction, alpha=self.learning_rate)
-        
+
         self.local_steps += 1
-    
+
     def on_train_end(self, context: TrainingContext):
         """
         Compute new client control variate and delta to send to server.
-        
+
         Formula: c_i^new = c - (1/(ητ))(x_local - x_global)
         Delta: Δc_i = c_i^new - c_i^old
         """
         eta = self.learning_rate
         tau = max(1, self.local_steps)
-        
+
         new_client_cv = OrderedDict()
         delta_cv = OrderedDict()
-        
+
         for name, param in context.model.named_parameters():
             # Get weights
             x_global = self.global_model_weights[name]
             x_local = param.data
             c_old = self.client_control_variate[name]
             c_server = self.server_control_variate[name]
-            
+
             # Compute new client control variate
             # c_i^new = c - (x_local - x_global) / (η * τ)
             c_new = c_server.to(param.device) - (
                 (x_local - x_global.to(param.device)) / (eta * tau)
             )
-            
+
             # Compute delta for server
             delta = c_new - c_old.to(param.device)
-            
+
             # Store (move to CPU to save memory)
             new_client_cv[name] = c_new.detach().cpu()
             delta_cv[name] = delta.detach().cpu()
-        
+
         # Update stored client control variate
         self.client_control_variate = new_client_cv
-        
+
         # Save to disk for next round
         try:
             with open(self.client_cv_path, 'wb') as f:
@@ -811,21 +811,21 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                 context.client_id,
                 str(e)
             )
-        
+
         # Store delta in context for sending to server
         context.state['scaffold_delta_cv'] = delta_cv
-        
+
         logging.info(
             "[Client #%d] SCAFFOLD: local_steps=%d, lr=%.6f",
             context.client_id,
             self.local_steps,
             eta
         )
-    
+
     def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
         """
         Return control variate delta to send to server.
-        
+
         The server will aggregate these deltas to update global control variate:
         c^{t+1} = c^t + (1/K) Σ Δc_i
         """
@@ -833,7 +833,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
             'scaffold_delta_cv': context.state.get('scaffold_delta_cv'),
             'local_steps': self.local_steps,
         }
-    
+
     def teardown(self, context: TrainingContext):
         """Clean up at end of training."""
         # Control variates are preserved across rounds,
@@ -854,21 +854,21 @@ from plato.trainers.strategies.base import TrainingStepStrategy, TrainingContext
 class LGFedAvgStepStrategy(TrainingStepStrategy):
     """
     LG-FedAvg training step with dual forward/backward passes.
-    
+
     Reference:
-    Liang et al., "Think Locally, Act Globally: Federated Learning with 
+    Liang et al., "Think Locally, Act Globally: Federated Learning with
     Local and Global Representations", NeurIPS 2020.
     https://arxiv.org/abs/2001.01523
-    
+
     LG-FedAvg splits the model into:
     - Global layers: Shared across all clients (e.g., feature extractor)
     - Local layers: Personalized per client (e.g., classifier head)
-    
+
     Training performs two forward/backward passes per batch:
     1. Freeze global layers, train local layers
     2. Freeze local layers, train global layers
     """
-    
+
     def __init__(
         self,
         global_layer_names: List[str],
@@ -876,14 +876,14 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
     ):
         """
         Initialize LG-FedAvg strategy.
-        
+
         Args:
             global_layer_names: List of layer name patterns for global layers
             local_layer_names: List of layer name patterns for local layers
         """
         self.global_layer_names = global_layer_names
         self.local_layer_names = local_layer_names
-    
+
     def _set_requires_grad(
         self,
         model: torch.nn.Module,
@@ -892,7 +892,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
     ):
         """
         Enable/disable gradients for specific layers.
-        
+
         Args:
             model: The model
             layer_names: List of layer name patterns
@@ -902,7 +902,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
             # Check if parameter name matches any pattern
             if any(layer_name in name for layer_name in layer_names):
                 param.requires_grad = requires_grad
-    
+
     def training_step(
         self,
         model: torch.nn.Module,
@@ -914,7 +914,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
     ) -> torch.Tensor:
         """
         Perform LG-FedAvg training step with two passes.
-        
+
         Args:
             model: The model to train
             optimizer: The optimizer
@@ -922,14 +922,14 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
             labels: Target labels
             loss_criterion: Loss function
             context: Training context
-        
+
         Returns:
             Loss from the second pass (global layers)
         """
         # First pass: Train local layers only
         self._set_requires_grad(model, self.global_layer_names, False)
         self._set_requires_grad(model, self.local_layer_names, True)
-        
+
         optimizer.zero_grad()
         outputs = model(examples)
         loss_local = loss_criterion(outputs, labels)

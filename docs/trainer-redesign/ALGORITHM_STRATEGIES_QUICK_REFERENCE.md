@@ -27,7 +27,7 @@
 ### Basic Usage
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(mu=0.01)
@@ -42,7 +42,7 @@ clients:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import FedProxLossStrategyFromConfig
+from plato.trainers.strategies.algorithms import FedProxLossStrategyFromConfig
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategyFromConfig()
@@ -69,7 +69,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=SCAFFOLDUpdateStrategy()
@@ -111,7 +111,7 @@ server_control_variate += (1/K) * sum(deltas)
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategy,
     FedDynUpdateStrategy
 )
@@ -130,7 +130,7 @@ algorithm:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategyFromConfig,
     FedDynUpdateStrategy
 )
@@ -160,7 +160,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategy
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategy
 
 trainer = ComposableTrainer(
     training_step_strategy=LGFedAvgStepStrategy(
@@ -184,7 +184,7 @@ algorithm:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategyFromConfig
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategyFromConfig
 
 trainer = ComposableTrainer(
     training_step_strategy=LGFedAvgStepStrategyFromConfig()
@@ -193,7 +193,7 @@ trainer = ComposableTrainer(
 
 ### Auto Layer Detection
 ```python
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategyAuto
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategyAuto
 
 # Automatically treat last N layers as local
 trainer = ComposableTrainer(
@@ -221,7 +221,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedMosOptimizerStrategy,
     FedMosUpdateStrategy
 )
@@ -244,7 +244,7 @@ parameters:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedMosOptimizerStrategyFromConfig,
     FedMosUpdateStrategy
 )
@@ -276,7 +276,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import FedPerUpdateStrategy
+from plato.trainers.strategies.algorithms import FedPerUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=FedPerUpdateStrategy(
@@ -298,7 +298,7 @@ trainer:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import FedPerUpdateStrategyFromConfig
+from plato.trainers.strategies.algorithms import FedPerUpdateStrategyFromConfig
 
 trainer = ComposableTrainer(
     model_update_strategy=FedPerUpdateStrategyFromConfig()
@@ -324,7 +324,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import FedRepUpdateStrategy
+from plato.trainers.strategies.algorithms import FedRepUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=FedRepUpdateStrategy(
@@ -349,7 +349,7 @@ algorithm:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import FedRepUpdateStrategyFromConfig
+from plato.trainers.strategies.algorithms import FedRepUpdateStrategyFromConfig
 
 trainer = ComposableTrainer(
     model_update_strategy=FedRepUpdateStrategyFromConfig()
@@ -381,7 +381,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLUpdateStrategy,
     APFLStepStrategy
 )
@@ -402,7 +402,7 @@ algorithm:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLUpdateStrategyFromConfig,
     APFLStepStrategy
 )
@@ -438,7 +438,7 @@ trainer = ComposableTrainer(
 
 ### Basic Usage
 ```python
-from plato.trainers.strategies.implementations import DittoUpdateStrategy
+from plato.trainers.strategies.algorithms import DittoUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=DittoUpdateStrategy(
@@ -457,7 +457,7 @@ algorithm:
 ```
 
 ```python
-from plato.trainers.strategies.implementations import DittoUpdateStrategyFromConfig
+from plato.trainers.strategies.algorithms import DittoUpdateStrategyFromConfig
 
 trainer = ComposableTrainer(
     model_update_strategy=DittoUpdateStrategyFromConfig()
@@ -486,7 +486,7 @@ trainer = ComposableTrainer(
 
 ### Example 1: FedProx + FedMos
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     FedMosOptimizerStrategy,
     FedMosUpdateStrategy
@@ -501,7 +501,7 @@ trainer = ComposableTrainer(
 
 ### Example 2: FedDyn + Custom Optimizer
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategy,
     FedDynUpdateStrategy
 )
@@ -516,7 +516,7 @@ trainer = ComposableTrainer(
 
 ### Example 3: LG-FedAvg + FedProx
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     LGFedAvgStepStrategy
 )

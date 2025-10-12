@@ -8,7 +8,7 @@ with Local and Global Representations." arXiv preprint arXiv:2001.01523.
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategyFromConfig
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategyFromConfig
 
 
 class Trainer(ComposableTrainer):

@@ -10,7 +10,7 @@ Source code: https://github.com/alpemreacar/FedDyn
 """
 
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedDynLossStrategyFromConfig,
     FedDynUpdateStrategy,
 )

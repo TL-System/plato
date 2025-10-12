@@ -9,8 +9,9 @@ arXiv preprint arXiv:1912.00818.
 Paper: https://arxiv.org/abs/1912.00818
 """
 
+from plato.trainers.strategies.algorithms import FedPerUpdateStrategyFromConfig
+
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedPerUpdateStrategyFromConfig
 
 
 class Trainer(ComposableTrainer):

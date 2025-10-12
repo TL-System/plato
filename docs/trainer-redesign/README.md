@@ -38,7 +38,7 @@ This project transforms Plato's federated learning trainer architecture from inh
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 # Simple: Use FedProx
 trainer = ComposableTrainer(
@@ -46,7 +46,7 @@ trainer = ComposableTrainer(
 )
 
 # Advanced: Combine multiple strategies
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     SCAFFOLDUpdateStrategy
 )
@@ -111,7 +111,7 @@ class FedProxTrainer(basic.Trainer):
     def get_loss_criterion(self):
         # 30+ lines of custom logic
         ...
-    
+
     def train_step_end(self, config, batch, loss):
         # 20+ lines of custom logic
         ...
@@ -128,7 +128,7 @@ class FedProxTrainer(basic.Trainer):
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 class FedProxTrainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
@@ -267,7 +267,7 @@ plato/
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(mu=0.01)
@@ -278,7 +278,7 @@ trainer = ComposableTrainer(
 
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=SCAFFOLDUpdateStrategy()
@@ -291,7 +291,7 @@ trainer = ComposableTrainer(
 ### Combining Strategies Example
 
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     FedMosOptimizerStrategy,
     FedMosUpdateStrategy
@@ -315,10 +315,10 @@ def test_fedprox_loss():
     strategy = FedProxLossStrategy(mu=0.01)
     context = TrainingContext()
     context.model = create_test_model()
-    
+
     strategy.setup(context)
     loss = strategy.compute_loss(outputs, labels, context)
-    
+
     assert loss > base_loss  # Proximal term increases loss
 ```
 
@@ -329,11 +329,11 @@ def test_trainer():
     trainer = ComposableTrainer(
         loss_strategy=FedProxLossStrategy(mu=0.01)
     )
-    
+
     # Train and validate
     trainer.train_model(trainset, sampler)
     accuracy = evaluate(trainer.model)
-    
+
     assert accuracy > threshold
 ```
 
@@ -362,19 +362,19 @@ class TrainingContext:
 class Strategy:
     def setup(self, context):          # Once at initialization
         pass
-    
+
     def on_train_start(self, context):  # Start of each round
         pass
-    
+
     def before_step(self, context):     # Before each step
         pass
-    
+
     def after_step(self, context):      # After each step
         pass
-    
+
     def on_train_end(self, context):    # End of each round
         pass
-    
+
     def teardown(self, context):        # Once at completion
         pass
 ```
@@ -454,20 +454,20 @@ from plato.trainers.strategies.base import LossCriterionStrategy
 class MyAlgorithmLossStrategy(LossCriterionStrategy):
     """
     Detailed description...
-    
+
     Args:
         param1: Description
         param2: Description
-    
+
     Example:
         >>> strategy = MyAlgorithmLossStrategy(param1=0.01)
         >>> trainer = ComposableTrainer(loss_strategy=strategy)
     """
-    
+
     def __init__(self, param1=0.01, param2=0.5):
         self.param1 = param1
         self.param2 = param2
-    
+
     def compute_loss(self, outputs, labels, context):
         # Your implementation
         ...
@@ -534,6 +534,6 @@ This refactoring project builds upon the excellent work of the Plato team and th
 
 ---
 
-**Last Updated**: Phase 4 Completion  
-**Version**: 1.0  
+**Last Updated**: Phase 4 Completion
+**Version**: 1.0
 **Status**: Production Ready ✅

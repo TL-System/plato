@@ -40,7 +40,7 @@ All implementations:
 **Usage**:
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(mu=0.01)
@@ -391,7 +391,7 @@ All files pass Python syntax validation:
 ### Import Validation
 All strategies are properly exported and importable:
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     # FedProx
     FedProxLossStrategy,
     FedProxLossStrategyFromConfig,
@@ -468,7 +468,7 @@ self.personalized_model.to(context.device)
 ### Example 1: FedProx with Custom Configuration
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(
@@ -480,7 +480,7 @@ trainer = ComposableTrainer(
 
 ### Example 2: SCAFFOLD with Default Settings
 ```python
-from plato.trainers.strategies.implementations import SCAFFOLDUpdateStrategy
+from plato.trainers.strategies.algorithms import SCAFFOLDUpdateStrategy
 
 trainer = ComposableTrainer(
     model_update_strategy=SCAFFOLDUpdateStrategy()
@@ -498,7 +498,7 @@ trainer = ComposableTrainer(
 #   global_layer_names: [conv1, conv2, fc1]
 #   local_layer_names: [fc2]
 
-from plato.trainers.strategies.implementations import LGFedAvgStepStrategyFromConfig
+from plato.trainers.strategies.algorithms import LGFedAvgStepStrategyFromConfig
 
 trainer = ComposableTrainer(
     training_step_strategy=LGFedAvgStepStrategyFromConfig()
@@ -507,7 +507,7 @@ trainer = ComposableTrainer(
 
 ### Example 4: Combined Strategies
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     FedProxLossStrategy,
     FedMosOptimizerStrategy,
     FedMosUpdateStrategy
@@ -523,7 +523,7 @@ trainer = ComposableTrainer(
 
 ### Example 5: APFL with Dual Models
 ```python
-from plato.trainers.strategies.implementations import (
+from plato.trainers.strategies.algorithms import (
     APFLUpdateStrategy,
     APFLStepStrategy
 )
@@ -555,7 +555,7 @@ class FedProxTrainer(basic.Trainer):
 ### After (Composition-Based)
 ```python
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.implementations import FedProxLossStrategy
+from plato.trainers.strategies.algorithms import FedProxLossStrategy
 
 trainer = ComposableTrainer(
     loss_strategy=FedProxLossStrategy(mu=0.01)
