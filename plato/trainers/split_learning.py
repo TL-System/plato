@@ -42,10 +42,7 @@ class SplitLearningCallback(TrainerCallback):
         if trainer.client_id == 0:
             # Server needs to save gradients, clients not
             trainer.save_gradients(config)
-            logging.info(
-                "[Server #%d] Gradients saved after training.",
-                os.getpid()
-            )
+            logging.info("[Server #%d] Gradients saved after training.", os.getpid())
 
 
 class SplitLearningTrainingStepStrategy(TrainingStepStrategy):
@@ -105,7 +102,9 @@ class SplitLearningTrainingStepStrategy(TrainingStepStrategy):
         """Complete the client side training with gradients from server."""
         optimizer.zero_grad()
 
-        examples, batch_size = trainer.process_samples_before_client_forwarding(examples)
+        examples, batch_size = trainer.process_samples_before_client_forwarding(
+            examples
+        )
         outputs = model.forward_to(examples)
 
         # Backpropagate with gradients from the server
