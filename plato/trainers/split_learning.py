@@ -25,6 +25,7 @@ from plato.datasources import feature
 from plato.samplers import all_inclusive
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
+    TestingStrategy,
     TrainingContext,
     TrainingStepStrategy,
 )
@@ -34,8 +35,14 @@ class SplitLearningCallback(TrainerCallback):
     """
     Callback to handle split learning-specific tasks.
 
-    This callback saves gradients at the end of training (server only).
+    This callback:
+    - Injects trainer reference into context at training start
+    - Saves gradients at the end of training (server only)
     """
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """Inject trainer reference into context for strategy access."""
+        trainer.context.state["trainer"] = trainer
 
     def on_train_run_end(self, trainer, config, **kwargs):
         """Save gradients after training (server only)."""
@@ -147,6 +154,61 @@ class SplitLearningTrainingStepStrategy(TrainingStepStrategy):
         return loss
 
 
+class SplitLearningTestingStrategy(TestingStrategy):
+    """
+    Testing strategy for split learning models.
+
+    This strategy implements the split learning test protocol where
+    the model is tested as a whole (not split across client/server).
+    """
+
+    def test_model(self, model, config, testset, sampler, context):
+        """
+        Test the split learning model.
+
+        Args:
+            model: The model to test
+            config: Testing configuration dictionary
+            testset: Test dataset
+            sampler: Optional data sampler for test set
+            context: Training context
+
+        Returns:
+            Test accuracy as float
+        """
+        # Get trainer reference from context
+        trainer = context.state.get("trainer")
+        if trainer is None:
+            raise ValueError("Trainer must be stored in context.state['trainer']")
+
+        batch_size = config["batch_size"]
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+
+        model.to(context.device)
+        model.eval()
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(context.device), labels.to(context.device)
+                outputs = model(examples)
+
+                # Use trainer's process_outputs if available
+                if hasattr(trainer, "process_outputs"):
+                    outputs = trainer.process_outputs(outputs)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+        return accuracy
+
+
 # pylint:disable=too-many-instance-attributes
 class Trainer(ComposableTrainer):
     """
@@ -164,8 +226,9 @@ class Trainer(ComposableTrainer):
             model: The model to train (class or instance)
             callbacks: Additional callback classes or instances
         """
-        # Create split learning-specific strategy
-        split_learning_strategy = SplitLearningTrainingStepStrategy()
+        # Create split learning-specific strategies
+        split_learning_training_strategy = SplitLearningTrainingStepStrategy()
+        split_learning_testing_strategy = SplitLearningTestingStrategy()
         split_learning_callback = SplitLearningCallback()
 
         # Combine with user callbacks
@@ -173,22 +236,20 @@ class Trainer(ComposableTrainer):
         if callbacks is not None:
             callbacks_with_split.extend(callbacks)
 
-        # Initialize with split learning strategy
+        # Initialize with split learning strategies
         super().__init__(
             model=model,
             callbacks=callbacks_with_split,
             loss_strategy=None,  # Uses DefaultLossCriterionStrategy
             optimizer_strategy=None,  # Uses DefaultOptimizerStrategy
-            training_step_strategy=split_learning_strategy,
+            training_step_strategy=split_learning_training_strategy,
             lr_scheduler_strategy=None,  # Uses DefaultLRSchedulerStrategy
             model_update_strategy=None,  # Uses NoOpUpdateStrategy
             data_loader_strategy=None,  # Uses DefaultDataLoaderStrategy
+            testing_strategy=split_learning_testing_strategy,
         )
 
         # Split learning-specific attributes
-        self.last_client_id = None
-        self.last_optimizer = None
-
         # Client side variables
         self.training_samples = None
         self.gradients = None
@@ -196,44 +257,6 @@ class Trainer(ComposableTrainer):
 
         # Server side variables
         self.cut_layer_grad = []
-
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """
-        Override train_model to inject trainer reference into context.
-
-        This is needed so the training step strategy can access split learning
-        specific methods like process_samples_before_client_forwarding().
-        """
-        # Store trainer in context so strategy can access it
-        self.context.state["trainer"] = self
-
-        # Call parent train_model
-        return super().train_model(config, trainset, sampler, **kwargs)
-
-    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        """
-        Creates an instance of the trainloader.
-
-        For split learning, this returns the trainset directly instead of
-        creating a DataLoader.
-
-        Arguments:
-            batch_size: the batch size
-            trainset: the training dataset
-            sampler: the sampler for the trainloader to use
-
-        Returns:
-            The trainset directly (not wrapped in DataLoader)
-        """
-        return trainset
-
-    def get_optimizer(self, model):
-        """Return the optimizer used in the last round to avoid reconfiguration."""
-        if self.last_optimizer is None or self.last_client_id != self.client_id:
-            self.last_optimizer = super().get_optimizer(model)
-            self.last_client_id = self.client_id
-
-        return self.last_optimizer
 
     def get_train_samples(self, batch_size, trainset, sampler):
         """
@@ -324,23 +347,6 @@ class Trainer(ComposableTrainer):
         )
 
         return torch.load(model_gradients_path)
-
-    def test_model(self, config, testset, sampler=None, **kwargs):
-        """
-        Evaluates the model with the provided test dataset and test sampler.
-
-        Arguments:
-            config: Configuration
-            testset: the test dataset
-            sampler: the test sampler (default None)
-            kwargs: Additional keyword arguments
-
-        Returns:
-            Accuracy metric
-        """
-        batch_size = config["batch_size"]
-        accuracy = self.test_model_split_learning(batch_size, testset, sampler)
-        return accuracy
 
     # API functions for split learning - can be overridden by subclasses
 
@@ -448,35 +454,12 @@ class Trainer(ComposableTrainer):
         targets = targets.detach().cpu()
         return outputs, targets
 
-    def test_model_split_learning(self, batch_size, testset, sampler=None):
+    @staticmethod
+    def process_outputs(outputs):
         """
-        The test model process for split learning.
+        Method called after model outputs are generated.
 
-        Arguments:
-            batch_size: Batch size for testing
-            testset: Test dataset
-            sampler: Optional sampler
-
-        Returns:
-            Accuracy metric for evaluating the model
+        This is a legacy method for backward compatibility.
+        Override this in subclasses if output processing is needed.
         """
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
-        correct = 0
-        total = 0
-
-        self.model.to(self.device)
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-
-                outputs = self.process_outputs(outputs)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        return correct / total
+        return outputs
