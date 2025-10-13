@@ -2,6 +2,7 @@
     The type of the trainer. The following types are available:
 
     - `basic` a basic trainer with a standard training loop.
+    - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
 
         !!! example "max_physical_batch_size"
