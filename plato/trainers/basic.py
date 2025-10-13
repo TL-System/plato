@@ -207,12 +207,34 @@ class Trainer(ComposableTrainer):
         return outputs
 
 
+class TimmSchedulerCallback(TrainerCallback):
+    """
+    Callback that handles timm scheduler-specific hooks.
+
+    This callback calls the on_epoch_start() and on_step() methods
+    on TimmLRSchedulerStrategy to handle timm's step_update() functionality.
+    """
+
+    def on_train_epoch_start(self, trainer, config, **kwargs):
+        """Call timm scheduler's epoch start hook."""
+        if isinstance(trainer.lr_scheduler_strategy, TimmLRSchedulerStrategy):
+            trainer.lr_scheduler_strategy.on_epoch_start(
+                trainer.lr_scheduler, trainer.context
+            )
+
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+        """Call timm scheduler's step hook after each training step."""
+        if isinstance(trainer.lr_scheduler_strategy, TimmLRSchedulerStrategy):
+            trainer.lr_scheduler_strategy.on_step(trainer.lr_scheduler, trainer.context)
+
+
 class TrainerWithTimmScheduler(Trainer):
     """
     Trainer that works with timm schedulers using the composable architecture.
 
     This trainer uses a custom TimmLRSchedulerStrategy to handle timm's
     step_update() method that needs to be called after each training step.
+    The timm-specific hooks are handled via TimmSchedulerCallback.
     """
 
     def __init__(self, model=None, callbacks=None):
@@ -226,12 +248,18 @@ class TrainerWithTimmScheduler(Trainer):
         # Create timm scheduler strategy
         timm_scheduler_strategy = TimmLRSchedulerStrategy()
 
+        # Add both TimmSchedulerCallback and LegacyHookBridgeCallback
+        # to support timm-specific hooks and legacy hook methods
+        callbacks_with_timm = [LegacyHookBridgeCallback, TimmSchedulerCallback]
+        if callbacks is not None:
+            callbacks_with_timm.extend(callbacks)
+
         # Initialize parent with timm strategy
         # We need to bypass Trainer.__init__ and call ComposableTrainer directly
         ComposableTrainer.__init__(
             self,
             model=model,
-            callbacks=callbacks,
+            callbacks=callbacks_with_timm,
             loss_strategy=None,
             optimizer_strategy=None,
             training_step_strategy=None,
@@ -242,154 +270,3 @@ class TrainerWithTimmScheduler(Trainer):
 
         # Legacy attributes for backward compatibility
         self._loss_criterion = None
-
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """Override to inject epoch start and step hooks for timm scheduler."""
-        # Store reference to strategy for hook calls
-        timm_strategy = self.lr_scheduler_strategy
-
-        # Call epoch start hook
-        original_train_model = super().train_model
-
-        # We need to override the training loop to call timm-specific hooks
-        batch_size = config["batch_size"]
-        self.sampler = sampler
-        self.context.config = config
-        self.context.current_round = self.current_round
-
-        # Reset tracking
-        self.run_history.reset()
-        self._loss_tracker.reset()
-
-        # Callbacks: train run start
-        self.callback_handler.call_event("on_train_run_start", self, config)
-
-        # Strategy hook: on_train_start
-        self.model_update_strategy.on_train_start(self.context)
-
-        # Create data loader using strategy
-        self.train_loader = self.data_loader_strategy.create_train_loader(
-            trainset, sampler, batch_size, self.context
-        )
-
-        # Store train_loader in context for potential use by strategies
-        self.context.state["train_loader"] = self.train_loader
-
-        # Create optimizer using strategy
-        self.optimizer = self.optimizer_strategy.create_optimizer(
-            self.model, self.context
-        )
-
-        # Create LR scheduler using strategy (timm-aware)
-        self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
-            self.optimizer, self.context
-        )
-
-        # Move model to device
-        self.model.to(self.device)
-        self.model.train()
-
-        # Training epochs
-        total_epochs = config["epochs"]
-        tic = time.perf_counter()
-
-        for self.current_epoch in range(1, total_epochs + 1):
-            self.context.current_epoch = self.current_epoch
-            self._loss_tracker.reset()
-
-            # Timm-specific: epoch start hook
-            timm_strategy.on_epoch_start(self.lr_scheduler, self.context)
-
-            # Callbacks: epoch start
-            self.callback_handler.call_event("on_train_epoch_start", self, config)
-
-            # Training steps
-            for batch_id, (examples, labels) in enumerate(self.train_loader):
-                # Store current batch in context
-                self.context.state["current_batch"] = batch_id
-
-                # Callbacks: step start
-                self.callback_handler.call_event(
-                    "on_train_step_start", self, config, batch=batch_id
-                )
-
-                # Strategy hook: before_step
-                self.model_update_strategy.before_step(self.context)
-
-                # Move data to device
-                examples = examples.to(self.device)
-                labels = labels.to(self.device)
-
-                # Create loss criterion callable
-                def compute_loss(outputs, labels_inner):
-                    return self.loss_strategy.compute_loss(
-                        outputs, labels_inner, self.context
-                    )
-
-                # Perform training step using strategy
-                loss = self.training_step_strategy.training_step(
-                    model=self.model,
-                    optimizer=self.optimizer,
-                    examples=examples,
-                    labels=labels,
-                    loss_criterion=compute_loss,
-                    context=self.context,
-                )
-
-                # Track loss
-                self._loss_tracker.update(loss, labels.size(0))
-
-                # Store last loss in context
-                self.context.state["last_loss"] = loss.item()
-
-                # Strategy hook: after optimizer step
-                self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
-
-                # Timm-specific: step hook
-                timm_strategy.on_step(self.lr_scheduler, self.context)
-
-                # Strategy hook: after_step
-                self.model_update_strategy.after_step(self.context)
-
-                # Callbacks: step end
-                self.callback_handler.call_event(
-                    "on_train_step_end", self, config, batch=batch_id, loss=loss
-                )
-
-            # LR scheduler epoch step (timm-aware)
-            self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
-
-            # Handle optimizer params state update if needed
-            if hasattr(self.optimizer, "params_state_update"):
-                self.optimizer.params_state_update()
-
-            # Simulate client's speed
-            if (
-                self.client_id != 0
-                and hasattr(Config().clients, "speed_simulation")
-                and Config().clients.speed_simulation
-            ):
-                self.simulate_sleep_time()
-
-            # Save model for asynchronous mode
-            if (
-                hasattr(Config().server, "request_update")
-                and Config().server.request_update
-            ):
-                self.model.cpu()
-                training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
-                self.save_model(filename)
-                self.model.to(self.device)
-
-            # Update metrics
-            self.run_history.update_metric("train_loss", self._loss_tracker.average)
-
-            # Callbacks: epoch end
-            self.callback_handler.call_event("on_train_epoch_end", self, config)
-
-        # Strategy hook: on_train_end
-        self.model_update_strategy.on_train_end(self.context)
-
-        # Callbacks: train run end
-        self.callback_handler.call_event("on_train_run_end", self, config)
