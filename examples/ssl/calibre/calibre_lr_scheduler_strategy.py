@@ -61,7 +61,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
         """
         # Get train_loader length safely
         train_loader_len = self._get_train_loader_length(context)
-        
+
         if train_loader_len == 0:
             # Can't create scheduler without knowing loader length
             # Return None for no scheduling
@@ -96,7 +96,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
 
         # Get scheduler config
         lr_scheduler_name = Config().algorithm.personalization.lr_scheduler
-        
+
         if hasattr(Config().parameters.personalization, "learning_rate"):
             lr_params = Config().parameters.personalization.learning_rate._asdict()
         else:
@@ -104,7 +104,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
 
         # Get train_loader length safely
         train_loader_len = self._get_train_loader_length(context)
-        
+
         if train_loader_len == 0:
             # Can't create scheduler without knowing loader length
             return None
@@ -131,7 +131,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
             Length of train loader, or 0 if not available
         """
         train_loader = context.state.get("train_loader")
-        
+
         if train_loader is None:
             return 0
 

@@ -6,10 +6,11 @@ is algorithmically identical to the old inheritance-based implementation and
 consistent with the FedRep paper (Collins et al., ICML 2021).
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 import torch
 import torch.nn as nn
-from unittest.mock import MagicMock, patch
 
 from plato.config import Config
 from plato.trainers.strategies.algorithms.personalized_fl_strategy import (
@@ -46,7 +47,7 @@ class TestFedRepLayerFreezing:
         """Test that during local phase, global layers are frozen and local layers are active."""
         # Setup mock config
         mock_config.return_value.trainer.rounds = 10
-        
+
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -76,7 +77,7 @@ class TestFedRepLayerFreezing:
         """Test that during global phase, local layers are frozen and global layers are active."""
         # Setup mock config
         mock_config.return_value.trainer.rounds = 10
-        
+
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -142,7 +143,7 @@ class TestFedRepEpochTransitions:
         """Test transition from local phase to global phase."""
         # Setup mock config
         mock_config.return_value.trainer.rounds = 10
-        
+
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -179,7 +180,7 @@ class TestFedRepEpochTransitions:
         """Test that calling before_step multiple times in same epoch is safe."""
         # Setup mock config
         mock_config.return_value.trainer.rounds = 10
-        
+
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -236,7 +237,9 @@ class TestFedRepPersonalizationEpochs:
         assert context.config["epochs"] == 5
 
     @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
-    def test_personalization_epochs_not_applied_during_regular_rounds(self, mock_config):
+    def test_personalization_epochs_not_applied_during_regular_rounds(
+        self, mock_config
+    ):
         """Test that personalization epochs are not applied during regular rounds."""
         mock_trainer = MagicMock()
         mock_trainer.rounds = 10
@@ -272,7 +275,7 @@ class TestFedRepCleanup:
         """Test that all layers are reactivated after training ends."""
         # Setup mock config
         mock_config.return_value.trainer.rounds = 10
-        
+
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -360,7 +363,7 @@ class TestFedRepFromConfig:
 class TestFedRepAlgorithmicEquivalence:
     """
     Tests to verify algorithmic equivalence with the original implementation.
-    
+
     These tests simulate the training flow and verify that layer states match
     what the old inheritance-based implementation would produce.
     """
@@ -370,7 +373,7 @@ class TestFedRepAlgorithmicEquivalence:
         """Simulate a complete training round with 5 epochs."""
         # Setup mock config
         mock_config.return_value.trainer.rounds = 10
-        
+
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -390,18 +393,20 @@ class TestFedRepAlgorithmicEquivalence:
 
         for epoch in range(1, 6):
             context.current_epoch = epoch
-            
+
             # Simulate multiple batches per epoch (10 batches)
             for batch in range(10):
                 strategy.before_step(context)
-                
+
                 # Record state only on first batch of each epoch
                 if batch == 0:
-                    layer_states.append({
-                        "epoch": epoch,
-                        "global_frozen": not model.conv1.weight.requires_grad,
-                        "local_frozen": not model.fc1.weight.requires_grad,
-                    })
+                    layer_states.append(
+                        {
+                            "epoch": epoch,
+                            "global_frozen": not model.conv1.weight.requires_grad,
+                            "local_frozen": not model.fc1.weight.requires_grad,
+                        }
+                    )
 
         # End training
         strategy.on_train_end(context)
@@ -452,7 +457,7 @@ class TestFedRepAlgorithmicEquivalence:
             context.current_epoch = epoch
             for _ in range(10):  # Multiple batches
                 strategy.before_step(context)
-                
+
                 # Global should remain frozen
                 assert not model.conv1.weight.requires_grad
 

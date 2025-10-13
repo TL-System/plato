@@ -63,11 +63,11 @@ class LogProgressCallback(TrainerCallback):
         Event called at the start of training run.
         """
         # Handle both Sampler objects and list/indices
-        if hasattr(trainer.sampler, 'num_samples'):
+        if hasattr(trainer.sampler, "num_samples"):
             num_samples = trainer.sampler.num_samples()
         else:
             num_samples = len(trainer.sampler)
-        
+
         if trainer.client_id == 0:
             logging.info(
                 "[Server #%s] Loading the dataset with size %d.",

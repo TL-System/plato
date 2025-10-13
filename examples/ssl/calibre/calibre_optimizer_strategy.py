@@ -82,9 +82,11 @@ class CalibreOptimizerStrategy(OptimizerStrategy):
         """
         # Use the default optimizer from config
         optimizer_name = (
-            Config().trainer.optimizer if hasattr(Config().trainer, "optimizer") else "SGD"
+            Config().trainer.optimizer
+            if hasattr(Config().trainer, "optimizer")
+            else "SGD"
         )
-        
+
         if hasattr(Config().parameters, "optimizer"):
             optimizer_params = Config().parameters.optimizer._asdict()
         else:

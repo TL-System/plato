@@ -85,7 +85,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
     Note:
         This strategy should be used together with APFLStepStrategy which
         implements the dual model training logic.
-        
+
         The learning rate for alpha updates is taken from the model's optimizer,
         matching the behavior of the original implementation.
     """

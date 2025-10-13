@@ -5,10 +5,11 @@ During SSL training, the data loader uses a multi-view collate function that ret
 SSLSamples (a list of views). During personalization, it uses standard data loading.
 """
 
+from collections import UserList
+
 import torch
 import torch.utils.data as data
 from lightly.data.multi_view_collate import MultiViewCollate
-from collections import UserList
 
 from plato.config import Config
 from plato.trainers.strategies.base import DataLoaderStrategy, TrainingContext
@@ -101,7 +102,7 @@ class CalibreDataLoaderStrategy(DataLoaderStrategy):
         collate_fn = MultiViewCollateWrapper()
 
         # Handle Plato Sampler objects that have a get() method
-        if hasattr(sampler, 'get') and callable(sampler.get):
+        if hasattr(sampler, "get") and callable(sampler.get):
             sampler = sampler.get()
 
         return data.DataLoader(
@@ -136,7 +137,7 @@ class CalibreDataLoaderStrategy(DataLoaderStrategy):
             trainset = personalized_trainset
 
         # Handle Plato Sampler objects that have a get() method
-        if hasattr(sampler, 'get') and callable(sampler.get):
+        if hasattr(sampler, "get") and callable(sampler.get):
             sampler = sampler.get()
 
         return data.DataLoader(

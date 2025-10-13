@@ -120,7 +120,7 @@ class CalibreDivergenceStrategy(ModelUpdateStrategy):
             return
 
         # Handle Plato Sampler objects that have a get() method
-        if sampler is not None and hasattr(sampler, 'get') and callable(sampler.get):
+        if sampler is not None and hasattr(sampler, "get") and callable(sampler.get):
             sampler = sampler.get()
 
         personalized_train_loader = torch.utils.data.DataLoader(
@@ -130,9 +130,7 @@ class CalibreDivergenceStrategy(ModelUpdateStrategy):
             sampler=sampler,
         )
 
-        logging.info(
-            "[Client #%d] Computing the divergence rate.", context.client_id
-        )
+        logging.info("[Client #%d] Computing the divergence rate.", context.client_id)
 
         sample_encodings = None
 
@@ -147,9 +145,7 @@ class CalibreDivergenceStrategy(ModelUpdateStrategy):
                     else torch.cat((sample_encodings, features), dim=0)
                 )
 
-        divergence_rate = self.compute_divergence_rate(
-            sample_encodings, context.device
-        )
+        divergence_rate = self.compute_divergence_rate(sample_encodings, context.device)
 
         # Save the divergence
         model_path = Config().params["model_path"]
