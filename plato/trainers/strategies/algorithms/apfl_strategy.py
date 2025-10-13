@@ -37,6 +37,7 @@ import torch.nn as nn
 
 from plato.config import Config
 from plato.models import registry as models_registry
+from plato.trainers import optimizers as optimizer_registry
 from plato.trainers.strategies.base import (
     ModelUpdateStrategy,
     TrainingContext,
@@ -57,7 +58,6 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         alpha: Initial mixing parameter (default: 0.5).
                0 = fully personalized, 1 = fully global
         adaptive_alpha: If True, learns α adaptively (default: True)
-        alpha_lr: Learning rate for α updates (default: 0.01)
         model_fn: Optional callable to create personalized model.
                   If None, uses models_registry.get()
         save_path: Optional custom path for saving models and alpha.
@@ -66,7 +66,6 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
     Attributes:
         alpha: Current mixing parameter
         adaptive_alpha: Whether to adapt α
-        alpha_lr: Learning rate for α
         personalized_model: The local personalized model
         personalized_optimizer: Optimizer for personalized model
         save_path: Path for saving state
@@ -86,13 +85,15 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
     Note:
         This strategy should be used together with APFLStepStrategy which
         implements the dual model training logic.
+        
+        The learning rate for alpha updates is taken from the model's optimizer,
+        matching the behavior of the original implementation.
     """
 
     def __init__(
         self,
         alpha: float = 0.5,
         adaptive_alpha: bool = True,
-        alpha_lr: float = 0.01,
         model_fn: Optional[callable] = None,
         save_path: Optional[str] = None,
     ):
@@ -102,19 +103,14 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         Args:
             alpha: Initial mixing parameter (0 to 1)
             adaptive_alpha: Whether to learn α adaptively
-            alpha_lr: Learning rate for α updates
             model_fn: Callable to create personalized model
             save_path: Custom path for saving state
         """
         if not 0 <= alpha <= 1:
             raise ValueError(f"alpha must be in [0, 1], got {alpha}")
 
-        if alpha_lr <= 0:
-            raise ValueError(f"alpha_lr must be positive, got {alpha_lr}")
-
         self.alpha = alpha
         self.adaptive_alpha = adaptive_alpha
-        self.alpha_lr = alpha_lr
         self.model_fn = model_fn
         self.save_path = save_path
         self.personalized_model = None
@@ -204,7 +200,6 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         context.state["apfl_personalized_model"] = self.personalized_model
         context.state["apfl_alpha"] = self.alpha
         context.state["apfl_adaptive_alpha"] = self.adaptive_alpha
-        context.state["apfl_alpha_lr"] = self.alpha_lr
 
     def on_train_end(self, context: TrainingContext) -> None:
         """
@@ -341,7 +336,6 @@ class APFLStepStrategy(TrainingStepStrategy):
         personalized_model = context.state.get("apfl_personalized_model")
         alpha = context.state.get("apfl_alpha", 0.5)
         adaptive_alpha = context.state.get("apfl_adaptive_alpha", True)
-        alpha_lr = context.state.get("apfl_alpha_lr", 0.01)
 
         if personalized_model is None:
             # Fallback: just return global loss if no personalized model
@@ -349,11 +343,9 @@ class APFLStepStrategy(TrainingStepStrategy):
 
         # Get or create optimizer for personalized model
         if "apfl_personalized_optimizer" not in context.state:
-            # Create optimizer for personalized model
-            lr = optimizer.param_groups[0]["lr"]
-            personalized_optimizer = torch.optim.SGD(
-                personalized_model.parameters(), lr=lr
-            )
+            # Create optimizer for personalized model using the same configuration
+            # as the global model optimizer (respects optimizer type and parameters)
+            personalized_optimizer = optimizer_registry.get(personalized_model)
             context.state["apfl_personalized_optimizer"] = personalized_optimizer
         else:
             personalized_optimizer = context.state["apfl_personalized_optimizer"]
@@ -379,14 +371,19 @@ class APFLStepStrategy(TrainingStepStrategy):
         personalized_optimizer.step()
 
         # Third: Update alpha if adaptive
-        if adaptive_alpha and context.current_epoch == 1:
+        # Update alpha only once at the beginning of training (epoch 1, batch 0)
+        # This matches the main branch behavior and the paper's algorithm
+        current_batch = context.state.get("current_batch", 0)
+        if adaptive_alpha and context.current_epoch == 1 and current_batch == 0:
             # Update alpha based on Eq. 10 in the paper
-            # This is a simplified version
+            # Get the current learning rate from the optimizer
+            # (matches main branch behavior which uses lr_scheduler.get_lr()[0])
+            current_lr = optimizer.param_groups[0]["lr"]
             alpha = self._update_alpha(
                 model,
                 personalized_model,
                 alpha,
-                alpha_lr,
+                current_lr,
                 examples,
                 labels,
                 loss_criterion,
@@ -415,7 +412,7 @@ class APFLStepStrategy(TrainingStepStrategy):
             global_model: Global model
             personalized_model: Personalized model
             alpha: Current α value
-            alpha_lr: Learning rate for α
+            alpha_lr: Learning rate for α (typically the model's learning rate)
             examples: Input batch
             labels: Target labels
             loss_criterion: Loss function
@@ -461,14 +458,12 @@ class APFLUpdateStrategyFromConfig(APFLUpdateStrategy):
     Configuration:
         - Config().algorithm.alpha (optional, default: 0.5)
         - Config().algorithm.adaptive_alpha (optional, default: True)
-        - Config().algorithm.alpha_lr (optional, default: 0.01)
 
     Example:
         >>> # In config file:
         >>> # algorithm:
         >>> #   alpha: 0.5
         >>> #   adaptive_alpha: true
-        >>> #   alpha_lr: 0.01
         >>>
         >>> from plato.trainers.composable import ComposableTrainer
         >>> from plato.trainers.strategies.algorithms import (
@@ -494,19 +489,15 @@ class APFLUpdateStrategyFromConfig(APFLUpdateStrategy):
         # Read hyperparameters from config with defaults
         alpha = 0.5
         adaptive_alpha = True
-        alpha_lr = 0.01
 
         if hasattr(config, "algorithm"):
             if hasattr(config.algorithm, "alpha"):
                 alpha = config.algorithm.alpha
             if hasattr(config.algorithm, "adaptive_alpha"):
                 adaptive_alpha = config.algorithm.adaptive_alpha
-            if hasattr(config.algorithm, "alpha_lr"):
-                alpha_lr = config.algorithm.alpha_lr
 
         super().__init__(
             alpha=alpha,
             adaptive_alpha=adaptive_alpha,
-            alpha_lr=alpha_lr,
             model_fn=model_fn,
         )
