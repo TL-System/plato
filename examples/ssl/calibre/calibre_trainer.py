@@ -202,6 +202,66 @@ class Trainer(ComposableTrainer):
         self.personalized_trainset = trainset
         self.personalized_testset = testset
 
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """
+        Test the model - uses encoder + local_layers for SSL personalization testing.
+
+        Args:
+            config: Configuration dictionary
+            testset: Test dataset
+            sampler: Optional sampler
+            **kwargs: Additional arguments
+
+        Returns:
+            Test accuracy
+        """
+        # Only test during personalization phase (after SSL training rounds)
+        if self.current_round <= Config().trainer.rounds:
+            # During SSL training, we don't have a standard test
+            # The SSL framework uses KNN or other methods separately
+            return 0.0
+
+        # Test the personalized model (encoder + local_layers)
+        if self.local_layers is None:
+            logging.warning(
+                "[Client #%d] No local_layers for testing.", self.client_id
+            )
+            return 0.0
+
+        batch_size = config["batch_size"]
+
+        self.local_layers.eval()
+        self.local_layers.to(self.device)
+
+        self.model.eval()
+        self.model.to(self.device)
+
+        # Handle Plato Sampler objects
+        if sampler is not None and hasattr(sampler, 'get') and callable(sampler.get):
+            sampler = sampler.get()
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = examples.to(self.device), labels.to(self.device)
+
+                # Use encoder to extract features, then classify with local_layers
+                features = self.model.encoder(examples)
+                outputs = self.local_layers(features)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total if total > 0 else 0.0
+        return accuracy
+
     def train(self, trainset, sampler, **kwargs):
         """
         Train the model and store necessary data in context for divergence computation.
