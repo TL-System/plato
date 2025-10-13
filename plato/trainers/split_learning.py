@@ -194,7 +194,10 @@ class SplitLearningTestingStrategy(TestingStrategy):
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(context.device), labels.to(context.device)
+                examples, labels = (
+                    examples.to(context.device),
+                    labels.to(context.device),
+                )
                 outputs = model(examples)
 
                 # Use trainer's process_outputs if available
