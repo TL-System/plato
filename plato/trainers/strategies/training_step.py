@@ -155,7 +155,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
             self.enabled = torch.cuda.is_available()
 
         if self.enabled:
-            self.scaler = torch.amp.GradScaler('cuda')
+            self.scaler = torch.amp.GradScaler("cuda")
 
     def training_step(
         self,
@@ -171,7 +171,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
 
         if self.enabled and self.scaler is not None:
             # Mixed precision training
-            with torch.cuda.amp.autocast():
+            with torch.amp.autocast("cuda"):
                 outputs = model(examples)
                 loss = loss_criterion(outputs, labels)
 
