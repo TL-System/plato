@@ -9,7 +9,6 @@
     - `CINIC10`
     - `YOLO`
     - `HuggingFace`
-    - `PASCAL_VOC`
     - `TinyImageNet`
     - `CelebA`
     - `Purchase`

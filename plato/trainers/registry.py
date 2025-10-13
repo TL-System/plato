@@ -11,16 +11,14 @@ from plato.trainers import (
     composable,
     diff_privacy,
     gan,
-    pascal_voc,
     split_learning,
 )
 
 registered_trainers = {
-    "basic": basic.Trainer,
     "composable": composable.ComposableTrainer,
+    "basic": basic.Trainer,
     "timm_basic": basic.TrainerWithTimmScheduler,
     "diff_privacy": diff_privacy.Trainer,
-    "pascal_voc": pascal_voc.Trainer,
     "gan": gan.Trainer,
     "split_learning": split_learning.Trainer,
 }
