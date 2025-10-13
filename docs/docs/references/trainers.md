@@ -29,22 +29,6 @@ Plato's trainer system uses a **composition-based architecture** built on the **
 
 ### Why Strategies?
 
-Traditional inheritance-based trainer extension has limitations:
-
-- ❌ Tight coupling between subclasses and base class
-- ❌ Cannot combine multiple behaviors (e.g., FedProx + SCAFFOLD)
-- ❌ Difficult to test individual components
-- ❌ Fragile base class problem
-
-Strategies solve these problems:
-
-- ✅ Composition over inheritance
-- ✅ Easy to combine multiple strategies
-- ✅ Each strategy is independently testable
-- ✅ Clear separation of concerns
-
-### Key Benefits
-
 - **Composability**: Mix and match strategies to create new algorithms
 - **Testability**: Test strategies in isolation without full trainer setup
 - **Flexibility**: Swap strategies at runtime or configuration time
@@ -759,21 +743,21 @@ class DefaultTestingStrategy(TestingStrategy):
     def test_model(self, model, config, testset, sampler, context):
         model.eval()
         test_loader = DataLoader(testset, batch_size=32, sampler=sampler)
-        
+
         correct = 0
         total = 0
-        
+
         with torch.no_grad():
             for examples, labels in test_loader:
                 examples = examples.to(context.device)
                 labels = labels.to(context.device)
-                
+
                 outputs = model(examples)
                 _, predicted = torch.max(outputs.data, 1)
-                
+
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-        
+
         return correct / total
 ```
 
