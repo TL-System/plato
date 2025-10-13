@@ -24,9 +24,10 @@ import multiprocessing as mp
 import os
 import pickle
 import time
-from typing import Optional
+from typing import Any, Callable, List, Optional, Union
 
 import torch
+import torch.nn as nn
 
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
