@@ -371,6 +371,12 @@ class GANTestingStrategy(TestingStrategy):
         # calculate mean and covariance statistics
         mu1, sigma1 = real_features.mean(axis=0), np.cov(real_features, rowvar=False)
         mu2, sigma2 = fake_features.mean(axis=0), np.cov(fake_features, rowvar=False)
+
+        # Add small epsilon to diagonal for numerical stability
+        eps = 1e-6
+        sigma1 = sigma1 + np.eye(sigma1.shape[0]) * eps
+        sigma2 = sigma2 + np.eye(sigma2.shape[0]) * eps
+
         # calculate sum squared difference between means
         ssdiff = np.sum((mu1 - mu2) ** 2.0)
         # calculate sqrt of product between cov
