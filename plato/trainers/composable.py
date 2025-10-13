@@ -107,7 +107,11 @@ class ComposableTrainer(base.Trainer):
         # Initialize model
         if model is None:
             self.model = models_registry.get()
+        elif isinstance(model, nn.Module):
+            # Model instance passed directly
+            self.model = model
         elif callable(model):
+            # Model factory/constructor passed
             self.model = model()
         else:
             self.model = model
