@@ -327,10 +327,7 @@ def main():
     print("3. Multiple strategies can be combined easily")
     print("4. Custom strategies are straightforward to implement")
     print("5. Advanced features like mixed precision are simple to enable")
-    print("\nFor more information, see:")
-    print("  - plato/trainers/strategies/README.md")
-    print("  - TRAINER_REFACTORING_DESIGN.md")
-    print("  - TRAINER_REFACTORING_EXAMPLES.md")
+    print("\nFor more information, see the Plato documentation.")
     print()
 
 

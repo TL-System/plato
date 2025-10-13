@@ -35,7 +35,7 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 
 ---
 
-## Available Examples
+## Algorithms Using Plato
 
 - [Server Aggregation Algorithms](algorithms/1.%20Server%20Aggregation%20Algorithms.md)
 
@@ -62,3 +62,9 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 - [Poisoning Detection Algorithms](algorithms/12.%20Poisoning%20Detection%20Algorithms.md)
 
 - [Model Pruning Algorithms](algorithms/13.%20Model%20Pruning%20Algorithms.md)
+
+## Examples of using Plato's API
+
+- Composable Trainer API
+
+  A simple example located at `examples/composable_trainer` has been provided to demonstrate the composable trainer API design with strategy composition.
