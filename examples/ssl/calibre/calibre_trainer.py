@@ -202,9 +202,31 @@ class Trainer(ComposableTrainer):
         self.personalized_trainset = trainset
         self.personalized_testset = testset
 
+    def collect_encodings(self, data_loader):
+        """Collect encodings of the data by using self.model encoder."""
+        samples_encoding = None
+        samples_label = None
+        self.model.eval()
+        self.model.to(self.device)
+        
+        for examples, labels in data_loader:
+            examples, labels = examples.to(self.device), labels.to(self.device)
+            with torch.no_grad():
+                features = self.model.encoder(examples)
+                if samples_encoding is None:
+                    samples_encoding = features
+                else:
+                    samples_encoding = torch.cat([samples_encoding, features], dim=0)
+                if samples_label is None:
+                    samples_label = labels
+                else:
+                    samples_label = torch.cat([samples_label, labels], dim=0)
+
+        return samples_encoding, samples_label
+
     def test_model(self, config, testset, sampler=None, **kwargs):
         """
-        Test the model - uses encoder + local_layers for SSL personalization testing.
+        Test the model using KNN during SSL phase, encoder+local_layers during personalization.
 
         Args:
             config: Configuration dictionary
@@ -215,55 +237,85 @@ class Trainer(ComposableTrainer):
         Returns:
             Test accuracy
         """
-        # Only test during personalization phase (after SSL training rounds)
-        if self.current_round <= Config().trainer.rounds:
-            # During SSL training, we don't have a standard test
-            # The SSL framework uses KNN or other methods separately
-            self.accuracy = 0.0
-            return 0.0
-
-        # Test the personalized model (encoder + local_layers)
-        if self.local_layers is None:
-            logging.warning(
-                "[Client #%d] No local_layers for testing.", self.client_id
-            )
-            self.accuracy = 0.0
-            return 0.0
-
         batch_size = config["batch_size"]
-
-        self.local_layers.eval()
-        self.local_layers.to(self.device)
-
-        self.model.eval()
-        self.model.to(self.device)
 
         # Handle Plato Sampler objects
         if sampler is not None and hasattr(sampler, 'get') and callable(sampler.get):
             sampler = sampler.get()
 
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
+        if self.current_round > Config().trainer.rounds:
+            # Personalization phase: Test with encoder + local_layers
+            if self.local_layers is None:
+                logging.warning(
+                    "[Client #%d] No local_layers for testing.", self.client_id
+                )
+                self.accuracy = 0.0
+                return 0.0
 
-        correct = 0
-        total = 0
+            self.local_layers.eval()
+            self.local_layers.to(self.device)
 
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+            self.model.eval()
+            self.model.to(self.device)
 
-                # Use encoder to extract features, then classify with local_layers
-                features = self.model.encoder(examples)
-                outputs = self.local_layers(features)
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            )
 
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
+            correct = 0
+            total = 0
 
-        accuracy = correct / total if total > 0 else 0.0
-        self.accuracy = accuracy  # Set self.accuracy for the framework
-        return accuracy
+            with torch.no_grad():
+                for examples, labels in test_loader:
+                    examples, labels = examples.to(self.device), labels.to(self.device)
+
+                    # Use encoder to extract features, then classify with local_layers
+                    features = self.model.encoder(examples)
+                    outputs = self.local_layers(features)
+
+                    _, predicted = torch.max(outputs.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+
+            accuracy = correct / total if total > 0 else 0.0
+            self.accuracy = accuracy
+            return accuracy
+        else:
+            # SSL phase: Test with KNN classifier
+            # For SSL, the way to test the trained model before personalization is
+            # to use KNN as a classifier to evaluate the extracted features.
+
+            logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
+
+            # Get the training loader and test loader
+            train_loader = torch.utils.data.DataLoader(
+                dataset=self.personalized_trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=sampler,
+            )
+            test_loader = torch.utils.data.DataLoader(
+                testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            )
+
+            # For evaluating self-supervised performance, we need to calculate
+            # distance between training samples and testing samples.
+            train_encodings, train_labels = self.collect_encodings(train_loader)
+            test_encodings, test_labels = self.collect_encodings(test_loader)
+
+            # Build KNN and perform the prediction
+            distances = torch.cdist(test_encodings, train_encodings, p=2)
+            knn = distances.topk(1, largest=False)
+            nearest_idx = knn.indices
+            predicted_labels = train_labels[nearest_idx].view(-1)
+            test_labels = test_labels.view(-1)
+
+            # Compute the accuracy
+            num_correct = torch.sum(predicted_labels == test_labels).item()
+            accuracy = num_correct / len(test_labels)
+
+            self.accuracy = accuracy
+            return accuracy
 
     def train(self, trainset, sampler, **kwargs):
         """
