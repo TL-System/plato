@@ -41,8 +41,12 @@ class SimpleModel(nn.Module):
 class TestFedRepLayerFreezing:
     """Test that layers are frozen/activated correctly during training."""
 
-    def test_regular_round_local_phase(self):
+    @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
+    def test_regular_round_local_phase(self, mock_config):
         """Test that during local phase, global layers are frozen and local layers are active."""
+        # Setup mock config
+        mock_config.return_value.trainer.rounds = 10
+        
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -67,8 +71,12 @@ class TestFedRepLayerFreezing:
         assert model.fc1.weight.requires_grad
         assert model.fc2.weight.requires_grad
 
-    def test_regular_round_global_phase(self):
+    @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
+    def test_regular_round_global_phase(self, mock_config):
         """Test that during global phase, local layers are frozen and global layers are active."""
+        # Setup mock config
+        mock_config.return_value.trainer.rounds = 10
+        
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -129,8 +137,12 @@ class TestFedRepLayerFreezing:
 class TestFedRepEpochTransitions:
     """Test that layer freezing changes correctly across epochs."""
 
-    def test_epoch_transition_from_local_to_global(self):
+    @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
+    def test_epoch_transition_from_local_to_global(self, mock_config):
         """Test transition from local phase to global phase."""
+        # Setup mock config
+        mock_config.return_value.trainer.rounds = 10
+        
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -162,8 +174,12 @@ class TestFedRepEpochTransitions:
         assert model.conv1.weight.requires_grad  # Global active
         assert not model.fc1.weight.requires_grad  # Local frozen
 
-    def test_multiple_calls_same_epoch_are_idempotent(self):
+    @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
+    def test_multiple_calls_same_epoch_are_idempotent(self, mock_config):
         """Test that calling before_step multiple times in same epoch is safe."""
+        # Setup mock config
+        mock_config.return_value.trainer.rounds = 10
+        
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -251,8 +267,12 @@ class TestFedRepPersonalizationEpochs:
 class TestFedRepCleanup:
     """Test that model state is properly cleaned up after training."""
 
-    def test_all_layers_reactivated_after_training(self):
+    @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
+    def test_all_layers_reactivated_after_training(self, mock_config):
         """Test that all layers are reactivated after training ends."""
+        # Setup mock config
+        mock_config.return_value.trainer.rounds = 10
+        
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],
@@ -345,8 +365,12 @@ class TestFedRepAlgorithmicEquivalence:
     what the old inheritance-based implementation would produce.
     """
 
-    def test_complete_training_round_simulation(self):
+    @patch("plato.trainers.strategies.algorithms.personalized_fl_strategy.Config")
+    def test_complete_training_round_simulation(self, mock_config):
         """Simulate a complete training round with 5 epochs."""
+        # Setup mock config
+        mock_config.return_value.trainer.rounds = 10
+        
         model = SimpleModel()
         strategy = FedRepUpdateStrategy(
             global_layer_names=["conv1", "conv2"],

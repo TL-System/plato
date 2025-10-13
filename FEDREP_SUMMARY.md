@@ -37,6 +37,11 @@ if self._last_processed_epoch != current_epoch:
 
 **Impact**: Improves efficiency without changing algorithmic behavior.
 
+### 3. Test Fixes
+**Issue**: Tests were failing because `Config()` singleton was trying to parse pytest command-line arguments.
+
+**Fix**: Added `@patch` decorators to mock `Config()` in all test methods that call `on_train_start()`.
+
 ## Key Findings
 
 ### Algorithmic Equivalence
