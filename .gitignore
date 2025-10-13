@@ -157,7 +157,6 @@ docs/_build/
 
 # Homomorphic encryption
 .ckks_context/
-yolov8n.pt
 
 # uv
 uv.lock
