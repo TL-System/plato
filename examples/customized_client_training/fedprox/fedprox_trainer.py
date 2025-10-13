@@ -13,52 +13,28 @@ Learning and Systems (MLSys), vol. 2, 429-450.
 https://proceedings.mlsys.org/paper/2020/file/38af86134b65d0f10fe33d30dd76442e-Paper.pdf
 """
 
-import torch
-
-from plato.config import Config
-from plato.trainers import basic
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.algorithms import FedProxLossStrategyFromConfig
 
 
-def _flatten_weights_from_model(model, device):
-    """Return the weights of the given model as a 1-D tensor"""
-    weights = torch.tensor([], requires_grad=False).to(device)
-    model.to(device)
-    for param in model.parameters():
-        weights = torch.cat((weights, torch.flatten(param)))
-    return weights
+class Trainer(ComposableTrainer):
+    """
+    The federated learning trainer for the FedProx client.
 
+    This trainer uses the composition-based design with FedProx loss strategy.
+    The proximal term coefficient (mu) is read from the configuration file.
+    """
 
-class FedProxLocalObjective:
-    """Representing the local objective of FedProx clients."""
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize the FedProx trainer with composition-based strategies.
 
-    def __init__(self, model, device):
-        self.model = model
-        self.device = device
-        self.init_global_weights = _flatten_weights_from_model(model, device)
-
-    def compute_objective(self, outputs, labels):
-        """Compute the objective the FedProx client wishes to minimize."""
-        current_weights = _flatten_weights_from_model(self.model, self.device)
-        parameter_mu = (
-            Config().clients.proximal_term_penalty_constant
-            if hasattr(Config().clients, "proximal_term_penalty_constant")
-            else 1
+        Args:
+            model: The neural network model to train
+            callbacks: Optional list of callback handlers
+        """
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            loss_strategy=FedProxLossStrategyFromConfig(),
         )
-        proximal_term = (
-            parameter_mu
-            / 2
-            * torch.linalg.norm(current_weights - self.init_global_weights, ord=2)
-        )
-
-        local_function = torch.nn.CrossEntropyLoss()
-        function_h = local_function(outputs, labels) + proximal_term
-        return function_h
-
-
-class Trainer(basic.Trainer):
-    """The federated learning trainer for the FedProx client."""
-
-    def get_loss_criterion(self):
-        """Return the loss criterion for FedProx clients."""
-        local_obj = FedProxLocalObjective(self.model, self.device)
-        return local_obj.compute_objective

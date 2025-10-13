@@ -1,420 +1,150 @@
 """
 The training and testing loops for PyTorch.
+
+This module provides basic trainers using the composable trainer architecture.
+The Trainer class uses the ComposableTrainer with default strategies, leveraging
+the strategy design pattern.
 """
 
 import copy
 import logging
-import multiprocessing as mp
 import os
-import pickle
 import re
 import time
+from typing import Optional
 
 import torch
 
-from plato.callbacks.handler import CallbackHandler
-from plato.callbacks.trainer import LogProgressCallback
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.models import registry as models_registry
-from plato.trainers import (
-    base,
-    loss_criterion,
-    lr_schedulers,
-    optimizers,
-    tracking,
-)
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import TrainingContext
+from plato.trainers.strategies.lr_scheduler import TimmLRSchedulerStrategy
 
 
-class Trainer(base.Trainer):
-    """A basic federated learning trainer, used by both the client and the server."""
+class LegacyHookBridgeCallback(TrainerCallback):
+    """
+    Bridge callback that calls legacy hook methods for backward compatibility.
+
+    This callback ensures that trainers overriding the old hook methods
+    (train_run_start, train_epoch_start, etc.) continue to work with the
+    new ComposableTrainer architecture.
+    """
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """Call legacy train_run_start hook."""
+        if hasattr(trainer, "train_run_start"):
+            trainer.train_run_start(config)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        """Call legacy train_run_end hook."""
+        if hasattr(trainer, "train_run_end"):
+            trainer.train_run_end(config, **kwargs)
+
+    def on_train_epoch_start(self, trainer, config, **kwargs):
+        """Call legacy train_epoch_start hook."""
+        if hasattr(trainer, "train_epoch_start"):
+            trainer.train_epoch_start(config)
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        """Call legacy train_epoch_end hook."""
+        if hasattr(trainer, "train_epoch_end"):
+            trainer.train_epoch_end(config)
+
+    def on_train_step_start(self, trainer, config, batch, **kwargs):
+        """Call legacy train_step_start hook."""
+        if hasattr(trainer, "train_step_start"):
+            trainer.train_step_start(config, batch=batch)
+
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+        """Call legacy train_step_end hook."""
+        if hasattr(trainer, "train_step_end"):
+            trainer.train_step_end(config, batch=batch, loss=loss)
+
+
+class Trainer(ComposableTrainer):
+    """
+    A basic federated learning trainer using the composable architecture.
+
+    This trainer extends ComposableTrainer with default strategies.
+
+    For advanced customization, use ComposableTrainer directly with custom strategies.
+    """
 
     def __init__(self, model=None, callbacks=None):
-        """Initializing the trainer with the provided model.
+        """
+        Initialize the basic trainer with default strategies.
 
         Arguments:
-        model: The model to train.
-        callbacks: The callbacks that this trainer uses.
+            model: The model to train (class or instance)
+            callbacks: List of callback classes or instances
         """
-        super().__init__()
-
-        self.training_start_time = time.time()
-        self.model_state_dict = None
-        self.current_round = 0
-
-        # Starting from the default trainer callback class, add all supplied trainer callbacks
-        self.callbacks = [LogProgressCallback]
+        # Add bridge callback to support legacy hook methods
+        callbacks_with_bridge = [LegacyHookBridgeCallback]
         if callbacks is not None:
-            self.callbacks.extend(callbacks)
-        self.callback_handler = CallbackHandler(self.callbacks)
+            callbacks_with_bridge.extend(callbacks)
 
-        # The run history of performance metrics
-        self.run_history = tracking.RunHistory()
-        self._loss_tracker = tracking.LossTracker()
+        # Initialize with default strategies
+        super().__init__(
+            model=model,
+            callbacks=callbacks_with_bridge,
+            loss_strategy=None,  # Uses DefaultLossCriterionStrategy
+            optimizer_strategy=None,  # Uses DefaultOptimizerStrategy
+            training_step_strategy=None,  # Uses DefaultTrainingStepStrategy
+            lr_scheduler_strategy=None,  # Uses DefaultLRSchedulerStrategy
+            model_update_strategy=None,  # Uses NoOpUpdateStrategy
+            data_loader_strategy=None,  # Uses DefaultDataLoaderStrategy
+            testing_strategy=None,  # Uses DefaultTestingStrategy
+        )
 
-        if model is None:
-            self.model = models_registry.get()
-        else:
-            self.model = model()
-
-        self.train_loader = None
-        self.sampler = None
+        # Legacy attributes for backward compatibility
         self._loss_criterion = None
-        self.optimizer = None
-        self.lr_scheduler = None
-        self.current_epoch = 0
 
-    def zeros(self, shape):
-        """Returns a PyTorch zero tensor with the given shape."""
-        # This should only be called from a server
-        assert self.client_id == 0
-        return torch.zeros(shape)
-
-    def save_model(self, filename=None, location=None):
-        """Saving the model to a file."""
-        model_path = Config().params["model_path"] if location is None else location
-        model_name = Config().trainer.model_name
-
-        try:
-            if not os.path.exists(model_path):
-                os.makedirs(model_path)
-        except FileExistsError:
-            pass
-
-        if filename is not None:
-            model_path = f"{model_path}/{filename}"
-        else:
-            model_path = f"{model_path}/{model_name}.pth"
-
-        if self.model_state_dict is None:
-            torch.save(self.model.state_dict(), model_path)
-        else:
-            torch.save(self.model_state_dict, model_path)
-
-        with open(model_path + ".pkl", "wb") as history_file:
-            pickle.dump(self.run_history, history_file)
-
-        if self.client_id == 0:
-            logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
-        else:
-            logging.info("[Client #%d] Model saved to %s.", self.client_id, model_path)
-
-    def load_model(self, filename=None, location=None):
-        """Loading pre-trained model weights from a file."""
-        model_path = Config().params["model_path"] if location is None else location
-        model_name = Config().trainer.model_name
-
-        if filename is not None:
-            model_path = f"{model_path}/{filename}"
-        else:
-            model_path = f"{model_path}/{model_name}.pth"
-
-        if self.client_id == 0:
-            logging.info(
-                "[Server #%d] Loading a model from %s.", os.getpid(), model_path
-            )
-        else:
-            logging.info(
-                "[Client #%d] Loading a model from %s.",
-                self.client_id,
-                model_path,
-            )
-
-        pretrained = None
-        if torch.cuda.is_available():
-            pretrained = torch.load(model_path)
-        else:
-            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
-        self.model.load_state_dict(pretrained, strict=True)
-
-        with open(model_path + ".pkl", "rb") as history_file:
-            self.run_history = pickle.load(history_file)
-
-    def simulate_sleep_time(self):
-        """Simulate client's speed by putting it to sleep."""
-        if not (
-            hasattr(Config().clients, "sleep_simulation")
-            and Config().clients.sleep_simulation
-        ):
-            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
-
-            # Put this client to sleep
-            logging.info(
-                "[Client #%d] Going to sleep for %.2f seconds.",
-                self.client_id,
-                sleep_seconds,
-            )
-            time.sleep(sleep_seconds)
-            logging.info("[Client #%d] Woke up.", self.client_id)
-
-    def train_process(self, config, trainset, sampler, **kwargs):
-        """
-        The main training loop in a federated learning workload, run in a
-        separate process with a new CUDA context, so that CUDA memory can be
-        released after the training completes.
-
-        Arguments:
-        self: the trainer itself.
-        config: a dictionary of configuration parameters.
-        trainset: The training dataset.
-        sampler: The sampler that extracts a partition for this client.
-        kwargs (optional): Additional keyword arguments.
-        """
-        try:
-            self.train_model(config, trainset, sampler.get(), **kwargs)
-        except Exception as training_exception:
-            logging.info("Training on client #%d failed.", self.client_id)
-            raise training_exception
-
-        if "max_concurrency" in config:
-            self.model.cpu()
-            model_name = config["model_name"]
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
-            self.save_model(filename)
-
-    def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
-        """
-        self.optimizer.zero_grad()
-
-        outputs = self.model(examples)
-
-        loss = self._loss_criterion(outputs, labels)
-        self._loss_tracker.update(loss, labels.size(0))
-
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
-
-        self.optimizer.step()
-
-        return loss
-
-    # pylint: disable=unused-argument
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """The default training loop when a custom training loop is not supplied."""
-        batch_size = config["batch_size"]
-        self.sampler = sampler
-        tic = time.perf_counter()
-
-        self.run_history.reset()
-
-        self.train_run_start(config)
-        self.callback_handler.call_event("on_train_run_start", self, config)
-
-        self.train_loader = self.get_train_loader(batch_size, trainset, sampler)
-
-        # Initializing the loss criterion
-        self._loss_criterion = self.get_loss_criterion()
-
-        # Initializing the optimizer
-        self.optimizer = self.get_optimizer(self.model)
-        self.lr_scheduler = self.get_lr_scheduler(config, self.optimizer)
-        self.optimizer = self._adjust_lr(config, self.lr_scheduler, self.optimizer)
-
-        self.model.to(self.device)
-        self.model.train()
-
-        total_epochs = config["epochs"]
-
-        for self.current_epoch in range(1, total_epochs + 1):
-            self._loss_tracker.reset()
-            self.train_epoch_start(config)
-            self.callback_handler.call_event("on_train_epoch_start", self, config)
-
-            for batch_id, (examples, labels) in enumerate(self.train_loader):
-                self.train_step_start(config, batch=batch_id)
-                self.callback_handler.call_event(
-                    "on_train_step_start", self, config, batch=batch_id
-                )
-
-                examples, labels = (
-                    examples.to(self.device),
-                    labels.to(self.device),
-                )
-
-                loss = self.perform_forward_and_backward_passes(
-                    config, examples, labels
-                )
-
-                self.train_step_end(config, batch=batch_id, loss=loss)
-                self.callback_handler.call_event(
-                    "on_train_step_end", self, config, batch=batch_id, loss=loss
-                )
-
-            self.lr_scheduler_step()
-
-            if hasattr(self.optimizer, "params_state_update"):
-                self.optimizer.params_state_update()
-
-            # Simulate client's speed
-            if (
-                self.client_id != 0
-                and hasattr(Config().clients, "speed_simulation")
-                and Config().clients.speed_simulation
-            ):
-                self.simulate_sleep_time()
-
-            # Saving the model at the end of this epoch to a file so that
-            # it can later be retrieved to respond to server requests
-            # in asynchronous mode when the wall clock time is simulated
-            if (
-                hasattr(Config().server, "request_update")
-                and Config().server.request_update
-            ):
-                self.model.cpu()
-                training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
-                self.save_model(filename)
-                self.model.to(self.device)
-
-            self.run_history.update_metric("train_loss", self._loss_tracker.average)
-            self.train_epoch_end(config)
-            self.callback_handler.call_event("on_train_epoch_end", self, config)
-
-        self.train_run_end(config)
-        self.callback_handler.call_event("on_train_run_end", self, config)
-
-    def train(self, trainset, sampler, **kwargs) -> float:
-        """The main training loop in a federated learning workload.
-
-        Arguments:
-        trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
-        kwargs (optional): Additional keyword arguments.
-
-        Returns:
-        float: Elapsed time during training.
-        """
-        config = Config().trainer._asdict()
-        config["run_id"] = Config().params["run_id"]
-
-        # Set the start time of training in absolute time
-        self.training_start_time = time.time()
-
-        if "max_concurrency" in config:
-            tic = time.perf_counter()
-
-            if mp.get_start_method(allow_none=True) != "spawn":
-                mp.set_start_method("spawn", force=True)
-
-            train_proc = mp.Process(
-                target=self.train_process,
-                args=(config, trainset, sampler),
-                kwargs=kwargs,
-            )
-            train_proc.start()
-            train_proc.join()
-
-            model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
-
-            try:
-                self.load_model(filename)
-            except OSError as error:  # the model file is not found, training failed
-                raise ValueError(
-                    f"Training on client {self.client_id} failed."
-                ) from error
-
-            toc = time.perf_counter()
-            self.pause_training()
-        else:
-            tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, **kwargs)
-            toc = time.perf_counter()
-
-        training_time = toc - tic
-
-        return training_time
-
-    def test_process(self, config, testset, sampler=None, **kwargs):
-        """The testing loop, run in a separate process with a new CUDA context,
-        so that CUDA memory can be released after the training completes.
-
-        Arguments:
-        config: a dictionary of configuration parameters.
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        kwargs (optional): Additional keyword arguments.
-        """
-        self.model.to(self.device)
-        self.model.eval()
-
-        # Initialize accuracy to be returned to -1, so that the client can disconnect
-        # from the server when testing fails
-        accuracy = -1
-
-        try:
-            if sampler is None:
-                accuracy = self.test_model(config, testset, **kwargs)
-            else:
-                accuracy = self.test_model(config, testset, sampler.get(), **kwargs)
-
-        except Exception as testing_exception:
-            logging.info("Testing on client #%d failed.", self.client_id)
-            raise testing_exception
-
-        self.model.cpu()
-
-        if "max_concurrency" in config:
-            model_name = config["model_name"]
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-            self.save_accuracy(accuracy, filename)
-        else:
-            return accuracy
-
-    def test(self, testset, sampler=None, **kwargs) -> float:
-        """Testing the model using the provided test dataset.
-
-        Arguments:
-        testset: The test dataset.
-        sampler: The sampler that extracts a partition of the test dataset.
-        kwargs (optional): Additional keyword arguments.
-        """
-        config = Config().trainer._asdict()
-        config["run_id"] = Config().params["run_id"]
-
-        if hasattr(Config().trainer, "max_concurrency"):
-            if mp.get_start_method(allow_none=True) != "spawn":
-                mp.set_start_method("spawn", force=True)
-
-            proc = mp.Process(
-                target=self.test_process,
-                args=(config, testset, sampler),
-                kwargs=kwargs,
-            )
-            proc.start()
-            proc.join()
-
-            accuracy = -1
-            try:
-                model_name = Config().trainer.model_name
-                filename = (
-                    f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-                )
-                accuracy = self.load_accuracy(filename)
-            except OSError as error:  # the model file is not found, training failed
-                raise ValueError(
-                    f"Testing on client #{self.client_id} failed."
-                ) from error
-
-            self.pause_training()
-        else:
-            accuracy = self.test_process(config, testset, **kwargs)
-
-        return accuracy
-
-    def obtain_model_update(self, client_id, requested_time):
+    @property
+    def loss_criterion(self):
+        """Legacy property for accessing loss criterion."""
+        if self._loss_criterion is None:
+            # Create loss criterion using the strategy
+            def compute_loss_fn(outputs, labels):
+                return self.loss_strategy.compute_loss(outputs, labels, self.context)
+
+            self._loss_criterion = compute_loss_fn
+        return self._loss_criterion
+
+    # Legacy hook methods for backward compatibility
+    # These are no-ops since ComposableTrainer handles them via strategies
+    def train_run_start(self, config):
+        """Method called at the start of training run (legacy hook)."""
+        pass
+
+    def train_run_end(self, config):
+        """Method called at the end of a training run (legacy hook)."""
+        pass
+
+    def train_epoch_start(self, config):
+        """Method called at the beginning of a training epoch (legacy hook)."""
+        pass
+
+    def train_epoch_end(self, config):
+        """Method called at the end of a training epoch (legacy hook)."""
+        pass
+
+    def train_step_start(self, config, batch=None):
+        """Method called at the beginning of a training step (legacy hook)."""
+        pass
+
+    def train_step_end(self, config, batch=None, loss=None):
+        """Method called at the end of a training step (legacy hook)."""
+        pass
+
+    # Legacy methods for old obtain_model_update behavior
+    def obtain_model_update_legacy(self, client_id, requested_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
         wall clock time is reached.
+
+        This is a legacy method for asynchronous training with wall-clock simulation.
         """
         # Constructing a list of epochs and training times
         models_per_epoch = {}
@@ -433,6 +163,7 @@ class Trainer(base.Trainer):
                         "training_time": float(training_time),
                         "model_checkpoint": filename,
                     }
+
         # Locate the model at a specific wall clock time
         for epoch in sorted(models_per_epoch, reverse=True):
             model_training_time = models_per_epoch[epoch]["training_time"]
@@ -466,184 +197,78 @@ class Trainer(base.Trainer):
             f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
         )
 
-    # pylint: disable=unused-argument
-    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        """
-        Creates an instance of the trainloader.
-
-        Arguments:
-        batch_size: the batch size.
-        trainset: the training dataset.
-        sampler: the sampler for the trainloader to use.
-        """
-        return torch.utils.data.DataLoader(
-            dataset=trainset,
-            shuffle=False,
-            batch_size=batch_size,
-            sampler=sampler,
-        )
-
-    # pylint: disable=unused-argument
-    def test_model(self, config, testset, sampler=None, **kwargs):
-        """
-        Evaluates the model with the provided test dataset and test sampler.
-
-        Auguments:
-        testset: the test dataset.
-        sampler: the test sampler. The default is None.
-        kwargs (optional): Additional keyword arguments.
-        """
-        batch_size = config["batch_size"]
-
-        test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
-        )
-
-        correct = 0
-        total = 0
-
-        self.model.to(self.device)
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = (
-                    examples.to(self.device),
-                    labels.to(self.device),
-                )
-
-                outputs = self.model(examples)
-
-                outputs = self.process_outputs(outputs)
-
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        return correct / total
-
-    def add_callbacks(self, callbacks):
-        """Adds a list of callbacks to the trainer callback handler."""
-        self.callback_handler.add_callbacks(callbacks)
-
-    def get_optimizer(self, model):
-        """Returns the optimizer."""
-        return optimizers.get(model)
-
-    def get_lr_scheduler(self, config, optimizer):
-        """Returns the learning rate scheduler, if needed."""
-        if "lr_scheduler" not in config:
-            return None
-
-        return lr_schedulers.get(optimizer, len(self.train_loader))
-
-    def lr_scheduler_step(self):
-        """
-        Performs a single scheduler step if ``self.lr_scheduler`` has been assigned.
-        """
-        if self.lr_scheduler is not None:
-            self.lr_scheduler.step()
-
-    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
-        """Returns an optimizer with an initial learning rate that has been
-        adjusted according to the current round, so that learning rate
-        schedulers can be effective throughout the communication rounds."""
-
-        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
-            global_lr_scheduler = copy.deepcopy(lr_scheduler)
-
-            for __ in range(self.current_round - 1):
-                for __ in range(Config().trainer.epochs):
-                    global_lr_scheduler.step()
-
-            initial_lr = global_lr_scheduler.get_last_lr()
-            optimizer.param_groups[0]["lr"] = initial_lr[0]
-
-        return optimizer
-
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
-        return loss_criterion.get()
-
-    def backward(self, config, loss):
-        """Perform the backpropagation pass."""
-
-    def train_run_start(self, config):
-        """Method called at the start of training run."""
-
-    def train_run_end(self, config):
-        """Method called at the end of a training run."""
-
-    def train_epoch_start(self, config):
-        """Method called at the beginning of a training epoch."""
-
-    def train_epoch_end(self, config):
-        """Method called at the end of a training epoch."""
-
-    def train_step_start(self, config, batch=None):
-        """Method called at the beginning of a training step."""
-
-    def train_step_end(self, config, batch=None, loss=None):
-        """
-        Method called at the end of a training step.
-
-        :param batch: the current batch of training data.
-        :param loss: the loss computed in the current batch.
-        """
-
     @staticmethod
     def process_outputs(outputs):
         """
-        Method called after the model updates have been generated.
+        Method called after model outputs are generated.
+
+        This is a legacy method for backward compatibility.
+        Override this in subclasses if output processing is needed.
         """
         return outputs
 
 
+class TimmSchedulerCallback(TrainerCallback):
+    """
+    Callback that handles timm scheduler-specific hooks.
+
+    This callback calls the on_epoch_start() and on_step() methods
+    on TimmLRSchedulerStrategy to handle timm's step_update() functionality.
+    """
+
+    def on_train_epoch_start(self, trainer, config, **kwargs):
+        """Call timm scheduler's epoch start hook."""
+        if isinstance(trainer.lr_scheduler_strategy, TimmLRSchedulerStrategy):
+            trainer.lr_scheduler_strategy.on_epoch_start(
+                trainer.lr_scheduler, trainer.context
+            )
+
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+        """Call timm scheduler's step hook after each training step."""
+        if isinstance(trainer.lr_scheduler_strategy, TimmLRSchedulerStrategy):
+            trainer.lr_scheduler_strategy.on_step(trainer.lr_scheduler, trainer.context)
+
+
 class TrainerWithTimmScheduler(Trainer):
     """
-    Subclass of the :class:`Trainer` that works with `timm schedulers
-    <https://fastai.github.io/timmdocs/schedulers>` instead of standard PyTorch
-    learning rate schedulers.
+    Trainer that works with timm schedulers using the composable architecture.
+
+    This trainer uses a custom TimmLRSchedulerStrategy to handle timm's
+    step_update() method that needs to be called after each training step.
+    The timm-specific hooks are handled via TimmSchedulerCallback.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.num_updates = None
-        self.past_epochs = None
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize trainer with timm scheduler strategy.
 
-    def train_epoch_start(self, config):
-        """Method called at the beginning of a training epoch."""
-        super().train_epoch_start(config)
+        Arguments:
+            model: The model to train (class or instance)
+            callbacks: List of callback classes or instances
+        """
+        # Create timm scheduler strategy
+        timm_scheduler_strategy = TimmLRSchedulerStrategy()
 
-        self.num_updates = self.current_epoch * len(self.train_loader)
+        # Add both TimmSchedulerCallback and LegacyHookBridgeCallback
+        # to support timm-specific hooks and legacy hook methods
+        callbacks_with_timm = [LegacyHookBridgeCallback, TimmSchedulerCallback]
+        if callbacks is not None:
+            callbacks_with_timm.extend(callbacks)
 
-        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
-            self.num_updates += self.past_epochs * len(self.train_loader)
+        # Initialize parent with timm strategy
+        # We need to bypass Trainer.__init__ and call ComposableTrainer directly
+        ComposableTrainer.__init__(
+            self,
+            model=model,
+            callbacks=callbacks_with_timm,
+            loss_strategy=None,
+            optimizer_strategy=None,
+            training_step_strategy=None,
+            lr_scheduler_strategy=timm_scheduler_strategy,
+            model_update_strategy=None,
+            data_loader_strategy=None,
+            testing_strategy=None,
+        )
 
-    def lr_scheduler_step(self):
-        self.num_updates += 1
-
-        if self.lr_scheduler is not None:
-            self.lr_scheduler.step_update(num_updates=self.num_updates)
-
-    def train_epoch_end(self, config):
-        """Method called at the end of a training epoch."""
-        super().train_epoch_end(config)
-
-        if self.lr_scheduler is not None:
-            if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
-                self.lr_scheduler.step(self.past_epochs + self.current_epoch + 1)
-            else:
-                self.lr_scheduler.step(self.current_epoch + 1)
-
-    def _adjust_lr(self, config, lr_scheduler, optimizer) -> torch.optim.Optimizer:
-        """Returns an optimizer with an initial learning rate that has been
-        adjusted according to the current round, so that learning rate
-        schedulers can be effective throughout the communication rounds."""
-
-        if "global_lr_scheduler" in config and config["global_lr_scheduler"]:
-            past_epochs = (self.current_round - 1) * Config().trainer.epochs
-            self.past_epochs = past_epochs
-
-            lr_scheduler.step(past_epochs)
-            lr_scheduler.step_update(past_epochs * len(self.train_loader))
-
-        return optimizer
+        # Legacy attributes for backward compatibility
+        self._loss_criterion = None

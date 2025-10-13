@@ -31,11 +31,6 @@ dependencies = [
     "zstd",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest"
-]
-
 [project.urls]
 Homepage = "https://github.com/TL-System/plato"
 Repository = "https://github.com/TL-System/plato"
@@ -74,4 +69,9 @@ members = [
     "examples/model_search/fedrolex",
     "examples/detector",
     "examples/gradient_leakage_attacks",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
 ]

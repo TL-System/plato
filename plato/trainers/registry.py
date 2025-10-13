@@ -6,13 +6,19 @@ based on a configuration at run-time.
 import logging
 
 from plato.config import Config
-from plato.trainers import basic, diff_privacy, gan, pascal_voc, split_learning
+from plato.trainers import (
+    basic,
+    composable,
+    diff_privacy,
+    gan,
+    split_learning,
+)
 
 registered_trainers = {
+    "composable": composable.ComposableTrainer,
     "basic": basic.Trainer,
     "timm_basic": basic.TrainerWithTimmScheduler,
     "diff_privacy": diff_privacy.Trainer,
-    "pascal_voc": pascal_voc.Trainer,
     "gan": gan.Trainer,
     "split_learning": split_learning.Trainer,
 }
@@ -23,11 +29,7 @@ def get(model=None, callbacks=None):
     trainer_name = Config().trainer.type
     logging.info("Trainer: %s", trainer_name)
 
-    if Config().trainer.model_name == "yolov8":
-        from plato.trainers import yolov8
-
-        return yolov8.Trainer()
-    elif Config().trainer.type == "HuggingFace":
+    if Config().trainer.type == "HuggingFace":
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)

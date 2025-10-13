@@ -1,31 +1,41 @@
 """
 A personalized federated learning trainer with FedPer.
+
+Reference:
+Arivazhagan, M. G., Aggarwal, V., Singh, A. K., & Choudhary, S. (2019).
+"Federated Learning with Personalization Layers."
+arXiv preprint arXiv:1912.00818.
+
+Paper: https://arxiv.org/abs/1912.00818
 """
 
-from plato.config import Config
-from plato.trainers import basic
-from plato.utils import trainer_utils
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.algorithms import FedPerUpdateStrategyFromConfig
 
 
-class Trainer(basic.Trainer):
+class Trainer(ComposableTrainer):
     """
     A trainer with FedPer, which freezes the global model layers in the final
     personalization round.
+
+    FedPer maintains global (shared) and local (personalized) layers. During
+    regular federated learning rounds, all layers are trained. During final
+    personalization rounds (after Config().trainer.rounds), global layers are
+    frozen and only local layers are trained.
+
+    The layer names are read from the configuration file.
     """
 
-    def train_run_start(self, config):
-        super().train_run_start(config)
-        if self.current_round > Config().trainer.rounds:
-            trainer_utils.freeze_model(
-                self.model,
-                Config().algorithm.global_layer_names,
-            )
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize the FedPer trainer with composition-based strategies.
 
-    def train_run_end(self, config):
-        """Activate the model."""
-        super().train_run_end(config)
-
-        if self.current_round > Config().trainer.rounds:
-            trainer_utils.activate_model(
-                self.model, Config().algorithm.global_layer_names
-            )
+        Args:
+            model: The neural network model to train
+            callbacks: Optional list of callback handlers
+        """
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            model_update_strategy=FedPerUpdateStrategyFromConfig(),
+        )

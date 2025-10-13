@@ -20,9 +20,20 @@ from collections import UserList
 import torch
 from lightly.data.multi_view_collate import MultiViewCollate
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.models import registry as models_registry
-from plato.trainers import basic, loss_criterion, lr_schedulers, optimizers
+from plato.trainers import loss_criterion, lr_schedulers, optimizers
+from plato.trainers.basic import Trainer as BasicTrainer
+from plato.trainers.strategies.base import (
+    DataLoaderStrategy,
+    LossCriterionStrategy,
+    LRSchedulerStrategy,
+    OptimizerStrategy,
+    TestingStrategy,
+    TrainingContext,
+    TrainingStepStrategy,
+)
 
 
 class SSLSamples(UserList):
@@ -57,42 +68,41 @@ class MultiViewCollateWrapper(MultiViewCollate):
         return samples, labels
 
 
-class Trainer(basic.Trainer):
-    """A federated SSL trainer."""
+# ============================================================================
+# Custom Strategies for SSL Training
+# ============================================================================
 
-    def __init__(self, model=None, callbacks=None):
-        """Initialize the trainer."""
-        super().__init__(model=model, callbacks=callbacks)
 
-        # Datasets for personalization.
-        self.personalized_trainset = None
-        self.personalized_testset = None
+class SSLDataLoaderStrategy(DataLoaderStrategy):
+    """
+    Data loader strategy for SSL training with dual-phase support.
 
-        # Define the personalized model
-        model_params = Config().parameters.personalization.model._asdict()
-        model_params["input_dim"] = self.model.encoder.encoding_dim
-        model_params["output_dim"] = model_params["num_classes"]
-        self.local_layers = models_registry.get(
-            model_name=Config().algorithm.personalization.model_name,
-            model_type=Config().algorithm.personalization.model_type,
-            model_params=model_params,
-        )
+    Uses MultiViewCollate during SSL training phase and standard loader
+    during personalization phase.
+    """
 
-    def set_personalized_datasets(self, trainset, testset):
-        """Set the personalized trainset."""
-        self.personalized_trainset = trainset
-        self.personalized_testset = testset
+    def __init__(self, personalized_trainset=None):
+        """Initialize the SSL data loader strategy."""
+        self.personalized_trainset = personalized_trainset
 
-    def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
-        """Obtain the training loader based on the learning mode."""
-        # Get the trainloader for personalization
-        if self.current_round > Config().trainer.rounds:
+    def create_train_loader(
+        self, trainset, sampler, batch_size: int, context: TrainingContext
+    ) -> torch.utils.data.DataLoader:
+        """Create data loader based on training phase (SSL or personalization)."""
+        current_round = context.current_round
+
+        # Personalization phase: use simple data loader
+        if current_round > Config().trainer.rounds:
+            dataset = (
+                self.personalized_trainset if self.personalized_trainset else trainset
+            )
             return torch.utils.data.DataLoader(
-                dataset=self.personalized_trainset,
+                dataset=dataset,
                 shuffle=False,
                 batch_size=batch_size,
                 sampler=sampler,
             )
+        # SSL training phase: use multi-view collate
         else:
             collate_fn = MultiViewCollateWrapper()
             return torch.utils.data.DataLoader(
@@ -103,124 +113,306 @@ class Trainer(basic.Trainer):
                 collate_fn=collate_fn,
             )
 
-    def get_optimizer(self, model):
-        """Return the optimizer for SSL and personalization."""
-        if self.current_round <= Config().trainer.rounds:
-            return super().get_optimizer(model)
-        # Define the optimizer for the personalized model
-        optimizer_name = Config().algorithm.personalization.optimizer
-        optimizer_params = Config().parameters.personalization.optimizer._asdict()
-        return optimizers.get(
-            self.local_layers,
-            optimizer_name=optimizer_name,
-            optimizer_params=optimizer_params,
-        )
 
-    def get_ssl_criterion(self):
-        """
-        Get the loss criterion for SSL. Some SSL algorithms, for example,
-        BYOL, will overwrite this function for specific loss functions.
-        """
+class SSLLossCriterionStrategy(LossCriterionStrategy):
+    """
+    Loss criterion strategy for SSL with dual-phase support.
 
-        # Get loss criterion for the SSL
+    Uses SSL-specific loss during training phase and classification loss
+    during personalization phase.
+    """
+
+    def __init__(self):
+        """Initialize the SSL loss strategy."""
+        self._ssl_criterion = None
+        self._personalization_criterion = None
+
+    def setup(self, context: TrainingContext) -> None:
+        """Initialize loss criteria for both phases."""
+        # SSL loss criterion
         ssl_loss_function = loss_criterion.get()
 
-        # We need to wrap the loss function to make it compatible
-        # with different types of outputs
-        # The types of the outputs can vary from Tensor to a list of Tensors
-        def compute_loss(outputs, __):
+        # Wrap to handle different output types
+        def compute_ssl_loss(outputs, __):
             if isinstance(outputs, (list, tuple)):
                 return ssl_loss_function(*outputs)
-
             return ssl_loss_function(outputs)
 
-        return compute_loss
+        self._ssl_criterion = compute_ssl_loss
 
-    def get_loss_criterion(self):
-        """Return the loss criterion for SSL."""
-        # Get loss criterion for the subsequent training process
-        if self.current_round > Config().trainer.rounds:
-            loss_criterion_type = Config().algorithm.personalization.loss_criterion
-            loss_criterion_params = {}
-            if hasattr(Config().parameters.personalization, "loss_criterion"):
-                loss_criterion_params = (
-                    Config().parameters.personalization.loss_criterion._asdict()
+    def compute_loss(
+        self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
+    ) -> torch.Tensor:
+        """Compute loss based on current training phase."""
+        current_round = context.current_round
+
+        # Personalization phase
+        if current_round > Config().trainer.rounds:
+            if self._personalization_criterion is None:
+                loss_criterion_type = Config().algorithm.personalization.loss_criterion
+                loss_criterion_params = {}
+                if hasattr(Config().parameters.personalization, "loss_criterion"):
+                    loss_criterion_params = (
+                        Config().parameters.personalization.loss_criterion._asdict()
+                    )
+                self._personalization_criterion = loss_criterion.get(
+                    loss_criterion=loss_criterion_type,
+                    loss_criterion_params=loss_criterion_params,
                 )
-            return loss_criterion.get(
-                loss_criterion=loss_criterion_type,
-                loss_criterion_params=loss_criterion_params,
+            return self._personalization_criterion(outputs, labels)
+        # SSL training phase
+        else:
+            return self._ssl_criterion(outputs, labels)
+
+
+class SSLOptimizerStrategy(OptimizerStrategy):
+    """
+    Optimizer strategy for SSL with dual-phase support.
+
+    Uses different optimizers for SSL training and personalization phases.
+    """
+
+    def __init__(self, local_layers=None):
+        """Initialize the SSL optimizer strategy."""
+        self.local_layers = local_layers
+
+    def create_optimizer(
+        self, model, context: TrainingContext
+    ) -> torch.optim.Optimizer:
+        """Create optimizer based on current training phase."""
+        current_round = context.current_round
+
+        # Personalization phase: optimize local layers only
+        if current_round > Config().trainer.rounds:
+            optimizer_name = Config().algorithm.personalization.optimizer
+            optimizer_params = Config().parameters.personalization.optimizer._asdict()
+            return optimizers.get(
+                self.local_layers,
+                optimizer_name=optimizer_name,
+                optimizer_params=optimizer_params,
             )
+        # SSL training phase: optimize full model
+        else:
+            return optimizers.get(model)
 
-        return self.get_ssl_criterion()
 
-    def get_lr_scheduler(self, config, optimizer):
-        # Get the lr scheduler for personalization
-        if self.current_round > Config().trainer.rounds:
-            lr_scheduler = Config().algorithm.personalization.lr_scheduler
+class SSLLRSchedulerStrategy(LRSchedulerStrategy):
+    """
+    LR scheduler strategy for SSL with dual-phase support.
+    """
+
+    def __init__(self):
+        """Initialize the SSL LR scheduler strategy."""
+        pass
+
+    def create_scheduler(self, optimizer, context: TrainingContext):
+        """Create LR scheduler based on current training phase."""
+        current_round = context.current_round
+
+        # Personalization phase
+        if current_round > Config().trainer.rounds:
+            lr_scheduler_name = Config().algorithm.personalization.lr_scheduler
             lr_params = Config().parameters.personalization.learning_rate._asdict()
+            train_loader = context.state.get("train_loader")
 
             return lr_schedulers.get(
                 optimizer,
-                len(self.train_loader),
-                lr_scheduler=lr_scheduler,
+                len(train_loader) if train_loader else 0,
+                lr_scheduler=lr_scheduler_name,
                 lr_params=lr_params,
             )
-        # Get the lr scheduler for SSL
-        return super().get_lr_scheduler(config, optimizer)
-
-    def train_run_start(self, config):
-        """Set the config before training."""
-        if self.current_round > Config().trainer.rounds:
-            # Set the config for the personalization
-            config["batch_size"] = Config().algorithm.personalization.batch_size
-            config["epochs"] = Config().algorithm.personalization.epochs
-
-            # Move the local layers to the device and set it to train mode
-            self.local_layers.to(self.device)
-            self.local_layers.train()
-
-    def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-        This function needs to reuse the optimization code of Plato as
-        during personalization, the encoder of the self.model will be used to
-        extract features into the local layers.
-        """
-
-        # Perform SSL training in the first `Config().trainer.rounds`` rounds
-        if not self.current_round > Config().trainer.rounds:
-            return super().perform_forward_and_backward_passes(config, examples, labels)
-
-        # Perform personalization after the final round
-        # Perform the local update on self.local_layers
-        self.optimizer.zero_grad()
-
-        # Use the trained encoder to output features.
-        # No optimizer for this basic encoder
-        features = self.model.encoder(examples)
-        outputs = self.local_layers(features)
-
-        loss = self._loss_criterion(outputs, labels)
-        self._loss_tracker.update(loss, labels.size(0))
-
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
+        # SSL training phase
         else:
+            config = Config().trainer._asdict()
+            train_loader = context.state.get("train_loader")
+            return lr_schedulers.get(
+                optimizer, len(train_loader) if train_loader else 0, **config
+            )
+
+
+class SSLTrainingStepStrategy(TrainingStepStrategy):
+    """
+    Training step strategy for SSL with dual-phase support.
+
+    During SSL training: trains full model
+    During personalization: freezes encoder and trains only local layers
+    """
+
+    def __init__(self, local_layers=None):
+        """Initialize the SSL training step strategy."""
+        self.local_layers = local_layers
+
+    def training_step(
+        self,
+        model,
+        optimizer,
+        examples,
+        labels,
+        loss_criterion: callable,
+        context: TrainingContext,
+    ) -> torch.Tensor:
+        """Perform training step based on current phase."""
+        current_round = context.current_round
+
+        # Personalization phase: use frozen encoder + local layers
+        if current_round > Config().trainer.rounds:
+            optimizer.zero_grad()
+
+            # Extract features using frozen encoder
+            features = model.encoder(examples)
+            # Train local layers
+            outputs = self.local_layers(features)
+
+            loss = loss_criterion(outputs, labels)
             loss.backward()
+            optimizer.step()
 
-        self.optimizer.step()
+            return loss
+        # SSL training phase: standard training
+        else:
+            optimizer.zero_grad()
+            outputs = model(examples)
+            loss = loss_criterion(outputs, labels)
 
-        return loss
+            # Support for create_graph in config
+            if "create_graph" in context.config and context.config["create_graph"]:
+                loss.backward(create_graph=True)
+            else:
+                loss.backward()
 
-    def collect_encodings(self, data_loader):
-        """Collect encodings of the data by using self.model."""
+            optimizer.step()
+            return loss
+
+
+# ============================================================================
+# Custom Testing Strategy for SSL
+# ============================================================================
+
+
+class SSLTestingStrategy(TestingStrategy):
+    """
+    Testing strategy for SSL with dual-phase support.
+
+    During SSL training phase: Uses KNN classifier for evaluation
+    During personalization phase: Uses trained local layers for evaluation
+    """
+
+    def __init__(self, local_layers=None, personalized_trainset=None):
+        """
+        Initialize SSL testing strategy.
+
+        Args:
+            local_layers: The personalized local layers (for personalization phase)
+            personalized_trainset: Training set for personalization (used for KNN)
+        """
+        self.local_layers = local_layers
+        self.personalized_trainset = personalized_trainset
+
+    def test_model(self, model, config, testset, sampler, context):
+        """
+        Test the model using KNN for SSL or local layers for personalization.
+
+        Args:
+            model: The model to test
+            config: Testing configuration
+            testset: Test dataset
+            sampler: Optional data sampler
+            context: Training context
+
+        Returns:
+            Test accuracy as float
+        """
+        batch_size = config["batch_size"]
+        current_round = context.current_round
+
+        # Personalization phase: test with local layers
+        if current_round > Config().trainer.rounds:
+            return self._test_with_local_layers(
+                model, testset, sampler, batch_size, context
+            )
+        # SSL training phase: test with KNN
+        else:
+            return self._test_with_knn(model, testset, sampler, batch_size, context)
+
+    def _test_with_local_layers(self, model, testset, sampler, batch_size, context):
+        """Test using trained local layers."""
+        self.local_layers.eval()
+        self.local_layers.to(context.device)
+
+        model.eval()
+        model.to(context.device)
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = (
+                    examples.to(context.device),
+                    labels.to(context.device),
+                )
+
+                features = model.encoder(examples)
+                outputs = self.local_layers(features)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+        return accuracy
+
+    def _test_with_knn(self, model, testset, sampler, batch_size, context):
+        """Test using KNN classifier on extracted features."""
+        logging.info("[Client #%d] Testing the model with KNN.", context.client_id)
+
+        # Get the training loader and test loader
+        train_loader = torch.utils.data.DataLoader(
+            dataset=self.personalized_trainset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
+        )
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        # Collect encodings
+        train_encodings, train_labels = self._collect_encodings(
+            model, train_loader, context
+        )
+        test_encodings, test_labels = self._collect_encodings(
+            model, test_loader, context
+        )
+
+        # Build KNN and perform prediction
+        distances = torch.cdist(test_encodings, train_encodings, p=2)
+        knn = distances.topk(1, largest=False)
+        nearest_idx = knn.indices
+        predicted_labels = train_labels[nearest_idx].view(-1)
+        test_labels = test_labels.view(-1)
+
+        # Compute accuracy
+        num_correct = torch.sum(predicted_labels == test_labels).item()
+        accuracy = num_correct / len(test_labels)
+
+        return accuracy
+
+    def _collect_encodings(self, model, data_loader, context):
+        """Collect encodings of the data by using the model encoder."""
         samples_encoding = None
         samples_label = None
-        self.model.eval()
-        self.model.to(self.device)
+        model.eval()
+        model.to(context.device)
+
         for examples, labels in data_loader:
-            examples, labels = examples.to(self.device), labels.to(self.device)
+            examples, labels = examples.to(context.device), labels.to(context.device)
             with torch.no_grad():
-                features = self.model.encoder(examples)
+                features = model.encoder(examples)
                 if samples_encoding is None:
                     samples_encoding = features
                 else:
@@ -232,70 +424,136 @@ class Trainer(basic.Trainer):
 
         return samples_encoding, samples_label
 
-    def test_model(self, config, testset, sampler=None, **kwargs):
-        """Test the model to report the accuracy in each round."""
-        batch_size = config["batch_size"]
-        if self.current_round > Config().trainer.rounds:
-            # Test the personalized model after the final round.
-            self.local_layers.eval()
-            self.local_layers.to(self.device)
 
-            self.model.eval()
-            self.model.to(self.device)
+# ============================================================================
+# Custom Callbacks for SSL Training
+# ============================================================================
 
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler
-            )
 
-            correct = 0
-            total = 0
-            accuracy = 0
-            with torch.no_grad():
-                for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(self.device)
+class SSLTrainRunStartCallback(TrainerCallback):
+    """
+    Callback to handle train run start for SSL trainer.
 
-                    features = self.model.encoder(examples)
-                    outputs = self.local_layers(features)
+    Configures batch size and epochs for personalization phase,
+    and moves local layers to device.
+    """
 
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
+    def __init__(self, local_layers=None):
+        """Initialize with reference to local layers."""
+        self.local_layers = local_layers
 
-            accuracy = correct / total
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """Configure training parameters based on phase."""
+        if trainer.current_round > Config().trainer.rounds:
+            # Set config for personalization
+            config["batch_size"] = Config().algorithm.personalization.batch_size
+            config["epochs"] = Config().algorithm.personalization.epochs
 
-            return accuracy
+            # Move local layers to device and set to train mode
+            if self.local_layers is not None:
+                self.local_layers.to(trainer.device)
+                self.local_layers.train()
+
+
+# ============================================================================
+# SSL Trainer
+# ============================================================================
+
+
+class Trainer(BasicTrainer):
+    """A federated SSL trainer using composable architecture."""
+
+    def __init__(self, model=None, callbacks=None):
+        """Initialize the SSL trainer with custom strategies."""
+        # Datasets for personalization
+        self.personalized_trainset = None
+        self.personalized_testset = None
+
+        # Initialize model first if needed to access encoder
+        if model is None:
+            temp_model = models_registry.get()
+        elif callable(model):
+            temp_model = model()
         else:
-            # Test the personalized model in each round.
+            temp_model = model
 
-            # For SSL, the way to test the trained model before personalization is
-            # to use the KNN as a classifier to evaluate the extracted features.
+        # Define the personalized local layers
+        model_params = Config().parameters.personalization.model._asdict()
+        model_params["input_dim"] = temp_model.encoder.encoding_dim
+        model_params["output_dim"] = model_params["num_classes"]
+        self.local_layers = models_registry.get(
+            model_name=Config().algorithm.personalization.model_name,
+            model_type=Config().algorithm.personalization.model_type,
+            model_params=model_params,
+        )
 
-            logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
+        # Create custom strategies for SSL
+        ssl_data_loader_strategy = SSLDataLoaderStrategy(
+            personalized_trainset=self.personalized_trainset
+        )
+        ssl_loss_strategy = SSLLossCriterionStrategy()
+        ssl_optimizer_strategy = SSLOptimizerStrategy(local_layers=self.local_layers)
+        ssl_lr_scheduler_strategy = SSLLRSchedulerStrategy()
+        ssl_training_step_strategy = SSLTrainingStepStrategy(
+            local_layers=self.local_layers
+        )
+        ssl_testing_strategy = SSLTestingStrategy(
+            local_layers=self.local_layers,
+            personalized_trainset=self.personalized_trainset,
+        )
 
-            # Get the training loader and test loader
-            train_loader = torch.utils.data.DataLoader(
-                dataset=self.personalized_trainset,
-                shuffle=False,
-                batch_size=batch_size,
-                sampler=sampler,
-            )
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler
-            )
-            # For evaluating self-supervised performance, we need to calculate
-            # distance between training samples and testing samples.
-            train_encodings, train_labels = self.collect_encodings(train_loader)
-            test_encodings, test_labels = self.collect_encodings(test_loader)
+        # Create custom callback for train run start
+        ssl_callback = SSLTrainRunStartCallback(local_layers=self.local_layers)
 
-            # Build KNN and perform the prediction
-            distances = torch.cdist(test_encodings, train_encodings, p=2)
-            knn = distances.topk(1, largest=False)
-            nearest_idx = knn.indices
-            predicted_labels = train_labels[nearest_idx].view(-1)
-            test_labels = test_labels.view(-1)
+        # Combine with provided callbacks
+        all_callbacks = [ssl_callback]
+        if callbacks is not None:
+            all_callbacks.extend(callbacks)
 
-            # Compute the accuracy
-            num_correct = torch.sum(predicted_labels == test_labels).item()
-            accuracy = num_correct / len(test_labels)
+        # Initialize parent with model and custom strategies
+        # Note: We bypass BasicTrainer.__init__ to directly use ComposableTrainer
+        from plato.callbacks.handler import CallbackHandler
+        from plato.callbacks.trainer import LogProgressCallback
+        from plato.trainers import tracking
+        from plato.trainers.basic import LegacyHookBridgeCallback
+        from plato.trainers.composable import ComposableTrainer
 
-            return accuracy
+        # Initialize ComposableTrainer
+        ComposableTrainer.__init__(
+            self,
+            model=temp_model,
+            callbacks=None,  # We'll set up callbacks manually
+            loss_strategy=ssl_loss_strategy,
+            optimizer_strategy=ssl_optimizer_strategy,
+            training_step_strategy=ssl_training_step_strategy,
+            lr_scheduler_strategy=ssl_lr_scheduler_strategy,
+            model_update_strategy=None,
+            data_loader_strategy=ssl_data_loader_strategy,
+            testing_strategy=ssl_testing_strategy,
+        )
+
+        # Setup callbacks with both legacy bridge and SSL callbacks
+        self.callbacks = (
+            [LegacyHookBridgeCallback] + all_callbacks + [LogProgressCallback]
+        )
+        self.callback_handler = CallbackHandler(self.callbacks)
+
+        # Reinitialize tracking (parent might have set these up already)
+        self.run_history = tracking.RunHistory()
+        self._loss_tracker = tracking.LossTracker()
+
+        # Legacy attributes for backward compatibility
+        self._loss_criterion = None
+
+    def set_personalized_datasets(self, trainset, testset):
+        """Set the personalized datasets for both training and testing."""
+        self.personalized_trainset = trainset
+        self.personalized_testset = testset
+
+        # Update the data loader strategy with new personalized trainset
+        if hasattr(self, "data_loader_strategy"):
+            self.data_loader_strategy.personalized_trainset = trainset
+
+        # Update the testing strategy with new personalized trainset
+        if hasattr(self, "testing_strategy"):
+            self.testing_strategy.personalized_trainset = trainset

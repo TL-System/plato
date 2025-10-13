@@ -17,7 +17,6 @@ from plato.datasources import (
     femnist,
     huggingface,
     mnist,
-    pascal_voc,
     purchase,
     qoenflx,
     stl10,
@@ -35,7 +34,6 @@ registered_datasources = {
     "Purchase": purchase,
     "Texas": texas,
     "HuggingFace": huggingface,
-    "PASCAL_VOC": pascal_voc,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
     "QoENFLX": qoenflx,
@@ -81,10 +79,6 @@ def get(client_id: int = 0, **kwargs):
 
         return coco.DataSource(**kwargs)
 
-    if datasource_name == "YOLOv8":
-        from plato.datasources import yolov8
-
-        return yolov8.DataSource(**kwargs)
     elif datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:

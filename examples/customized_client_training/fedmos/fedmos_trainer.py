@@ -8,56 +8,40 @@ Paper: https://ieeexplore.ieee.org/document/10228957
 Source code: https://github.com/Distributed-Learning-Networking-Group/FedMoS
 """
 
-import copy
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.algorithms import (
+    FedMosOptimizerStrategyFromConfig,
+    FedMosStepStrategy,
+    FedMosUpdateStrategy,
+)
 
-from optimizers import FedMosOptimizer
 
-from plato.config import Config
-from plato.trainers import basic
-
-
-# pylint:disable=no-member
-class Trainer(basic.Trainer):
+class Trainer(ComposableTrainer):
     """
-    FedMos's Trainer.
+    FedMos's Trainer with composition-based design.
+
+    FedMos uses double momentum to address client drift:
+    1. Local momentum: Standard momentum in the optimizer
+    2. Global momentum: Momentum towards the global model
+
+    The optimizer implements: w = (1-mu)*w - lr*m + mu*w_global
+
+    The momentum coefficients (a for local, mu for global) are read from
+    the configuration file.
     """
 
     def __init__(self, model=None, callbacks=None):
-        super().__init__(model, callbacks)
-        self.local_param_tmpl = None
+        """
+        Initialize the FedMos trainer with composition-based strategies.
 
-    def get_optimizer(self, model):
-        """Get the optimizer of the Fedmos."""
-        a = Config().algorithm.a if hasattr(Config().algorithm, "a") else 0.9
-        mu = Config().algorithm.mu if hasattr(Config().algorithm, "mu") else 0.9
-        lr = (
-            Config().parameters.optimizer.lr
-            if hasattr(Config().parameters.optimizer, "lr")
-            else 0.01
+        Args:
+            model: The neural network model to train
+            callbacks: Optional list of callback handlers
+        """
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            optimizer_strategy=FedMosOptimizerStrategyFromConfig(),
+            model_update_strategy=FedMosUpdateStrategy(),
+            training_step_strategy=FedMosStepStrategy(),
         )
-
-        return FedMosOptimizer(model.parameters(), lr=lr, a=a, mu=mu)
-
-    def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop."""
-        self.optimizer.zero_grad()
-
-        outputs = self.model(examples)
-
-        loss = self._loss_criterion(outputs, labels)
-        self._loss_tracker.update(loss, labels.size(0))
-
-        if "create_graph" in config:
-            loss.backward(create_graph=config["create_graph"])
-        else:
-            loss.backward()
-
-        self.optimizer.update_momentum()
-        self.optimizer.step(copy.deepcopy(self.local_param_tmpl))
-
-        return loss
-
-    def train_run_start(self, config):
-        super().train_run_start(config)
-        # At the beginning of each round, the client records the local model
-        self.local_param_tmpl = copy.deepcopy(self.model)

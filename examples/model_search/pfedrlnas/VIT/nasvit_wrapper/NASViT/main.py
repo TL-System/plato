@@ -22,8 +22,6 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 import torch.nn as nn
 import torch.nn.functional as F
-
-# from models import build_model
 from data import build_loader
 from misc.config import get_config
 from misc.loss_ops import AdaptiveLossSoft
@@ -39,7 +37,6 @@ from misc.utils import (
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.utils import AverageMeter, ModelEma, accuracy
 
-# from misc.resnet import resnext50_32x4d, resnext101_32x4d
 try:
     from apex import amp
 except ImportError:
