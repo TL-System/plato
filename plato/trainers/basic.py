@@ -95,6 +95,7 @@ class Trainer(ComposableTrainer):
             lr_scheduler_strategy=None,  # Uses DefaultLRSchedulerStrategy
             model_update_strategy=None,  # Uses NoOpUpdateStrategy
             data_loader_strategy=None,  # Uses DefaultDataLoaderStrategy
+            testing_strategy=None,  # Uses DefaultTestingStrategy
         )
 
         # Legacy attributes for backward compatibility
@@ -266,6 +267,7 @@ class TrainerWithTimmScheduler(Trainer):
             lr_scheduler_strategy=timm_scheduler_strategy,
             model_update_strategy=None,
             data_loader_strategy=None,
+            testing_strategy=None,
         )
 
         # Legacy attributes for backward compatibility

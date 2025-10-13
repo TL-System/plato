@@ -30,6 +30,7 @@ from plato.trainers.strategies.base import (
     LossCriterionStrategy,
     LRSchedulerStrategy,
     OptimizerStrategy,
+    TestingStrategy,
     TrainingContext,
     TrainingStepStrategy,
 )
@@ -284,6 +285,147 @@ class SSLTrainingStepStrategy(TrainingStepStrategy):
 
 
 # ============================================================================
+# Custom Testing Strategy for SSL
+# ============================================================================
+
+
+class SSLTestingStrategy(TestingStrategy):
+    """
+    Testing strategy for SSL with dual-phase support.
+
+    During SSL training phase: Uses KNN classifier for evaluation
+    During personalization phase: Uses trained local layers for evaluation
+    """
+
+    def __init__(self, local_layers=None, personalized_trainset=None):
+        """
+        Initialize SSL testing strategy.
+
+        Args:
+            local_layers: The personalized local layers (for personalization phase)
+            personalized_trainset: Training set for personalization (used for KNN)
+        """
+        self.local_layers = local_layers
+        self.personalized_trainset = personalized_trainset
+
+    def test_model(self, model, config, testset, sampler, context):
+        """
+        Test the model using KNN for SSL or local layers for personalization.
+
+        Args:
+            model: The model to test
+            config: Testing configuration
+            testset: Test dataset
+            sampler: Optional data sampler
+            context: Training context
+
+        Returns:
+            Test accuracy as float
+        """
+        batch_size = config["batch_size"]
+        current_round = context.current_round
+
+        # Personalization phase: test with local layers
+        if current_round > Config().trainer.rounds:
+            return self._test_with_local_layers(
+                model, testset, sampler, batch_size, context
+            )
+        # SSL training phase: test with KNN
+        else:
+            return self._test_with_knn(model, testset, sampler, batch_size, context)
+
+    def _test_with_local_layers(self, model, testset, sampler, batch_size, context):
+        """Test using trained local layers."""
+        self.local_layers.eval()
+        self.local_layers.to(context.device)
+
+        model.eval()
+        model.to(context.device)
+
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        correct = 0
+        total = 0
+
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples, labels = (
+                    examples.to(context.device),
+                    labels.to(context.device),
+                )
+
+                features = model.encoder(examples)
+                outputs = self.local_layers(features)
+
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        accuracy = correct / total
+        return accuracy
+
+    def _test_with_knn(self, model, testset, sampler, batch_size, context):
+        """Test using KNN classifier on extracted features."""
+        logging.info("[Client #%d] Testing the model with KNN.", context.client_id)
+
+        # Get the training loader and test loader
+        train_loader = torch.utils.data.DataLoader(
+            dataset=self.personalized_trainset,
+            shuffle=False,
+            batch_size=batch_size,
+            sampler=sampler,
+        )
+        test_loader = torch.utils.data.DataLoader(
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+        )
+
+        # Collect encodings
+        train_encodings, train_labels = self._collect_encodings(
+            model, train_loader, context
+        )
+        test_encodings, test_labels = self._collect_encodings(
+            model, test_loader, context
+        )
+
+        # Build KNN and perform prediction
+        distances = torch.cdist(test_encodings, train_encodings, p=2)
+        knn = distances.topk(1, largest=False)
+        nearest_idx = knn.indices
+        predicted_labels = train_labels[nearest_idx].view(-1)
+        test_labels = test_labels.view(-1)
+
+        # Compute accuracy
+        num_correct = torch.sum(predicted_labels == test_labels).item()
+        accuracy = num_correct / len(test_labels)
+
+        return accuracy
+
+    def _collect_encodings(self, model, data_loader, context):
+        """Collect encodings of the data by using the model encoder."""
+        samples_encoding = None
+        samples_label = None
+        model.eval()
+        model.to(context.device)
+
+        for examples, labels in data_loader:
+            examples, labels = examples.to(context.device), labels.to(context.device)
+            with torch.no_grad():
+                features = model.encoder(examples)
+                if samples_encoding is None:
+                    samples_encoding = features
+                else:
+                    samples_encoding = torch.cat([samples_encoding, features], dim=0)
+                if samples_label is None:
+                    samples_label = labels
+                else:
+                    samples_label = torch.cat([samples_label, labels], dim=0)
+
+        return samples_encoding, samples_label
+
+
+# ============================================================================
 # Custom Callbacks for SSL Training
 # ============================================================================
 
@@ -355,6 +497,10 @@ class Trainer(BasicTrainer):
         ssl_training_step_strategy = SSLTrainingStepStrategy(
             local_layers=self.local_layers
         )
+        ssl_testing_strategy = SSLTestingStrategy(
+            local_layers=self.local_layers,
+            personalized_trainset=self.personalized_trainset,
+        )
 
         # Create custom callback for train run start
         ssl_callback = SSLTrainRunStartCallback(local_layers=self.local_layers)
@@ -383,6 +529,7 @@ class Trainer(BasicTrainer):
             lr_scheduler_strategy=ssl_lr_scheduler_strategy,
             model_update_strategy=None,
             data_loader_strategy=ssl_data_loader_strategy,
+            testing_strategy=ssl_testing_strategy,
         )
 
         # Setup callbacks with both legacy bridge and SSL callbacks
@@ -407,89 +554,6 @@ class Trainer(BasicTrainer):
         if hasattr(self, "data_loader_strategy"):
             self.data_loader_strategy.personalized_trainset = trainset
 
-    def collect_encodings(self, data_loader):
-        """Collect encodings of the data by using self.model."""
-        samples_encoding = None
-        samples_label = None
-        self.model.eval()
-        self.model.to(self.device)
-
-        for examples, labels in data_loader:
-            examples, labels = examples.to(self.device), labels.to(self.device)
-            with torch.no_grad():
-                features = self.model.encoder(examples)
-                if samples_encoding is None:
-                    samples_encoding = features
-                else:
-                    samples_encoding = torch.cat([samples_encoding, features], dim=0)
-                if samples_label is None:
-                    samples_label = labels
-                else:
-                    samples_label = torch.cat([samples_label, labels], dim=0)
-
-        return samples_encoding, samples_label
-
-    def test_model(self, config, testset, sampler=None, **kwargs):
-        """Test the model using KNN for SSL or local layers for personalization."""
-        batch_size = config["batch_size"]
-
-        # Personalization phase: test with local layers
-        if self.current_round > Config().trainer.rounds:
-            self.local_layers.eval()
-            self.local_layers.to(self.device)
-
-            self.model.eval()
-            self.model.to(self.device)
-
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler
-            )
-
-            correct = 0
-            total = 0
-
-            with torch.no_grad():
-                for examples, labels in test_loader:
-                    examples, labels = examples.to(self.device), labels.to(self.device)
-
-                    features = self.model.encoder(examples)
-                    outputs = self.local_layers(features)
-
-                    _, predicted = torch.max(outputs.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
-
-            accuracy = correct / total
-            return accuracy
-
-        # SSL training phase: test with KNN
-        else:
-            logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
-
-            # Get the training loader and test loader
-            train_loader = torch.utils.data.DataLoader(
-                dataset=self.personalized_trainset,
-                shuffle=False,
-                batch_size=batch_size,
-                sampler=sampler,
-            )
-            test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=batch_size, shuffle=False, sampler=sampler
-            )
-
-            # Collect encodings
-            train_encodings, train_labels = self.collect_encodings(train_loader)
-            test_encodings, test_labels = self.collect_encodings(test_loader)
-
-            # Build KNN and perform prediction
-            distances = torch.cdist(test_encodings, train_encodings, p=2)
-            knn = distances.topk(1, largest=False)
-            nearest_idx = knn.indices
-            predicted_labels = train_labels[nearest_idx].view(-1)
-            test_labels = test_labels.view(-1)
-
-            # Compute accuracy
-            num_correct = torch.sum(predicted_labels == test_labels).item()
-            accuracy = num_correct / len(test_labels)
-
-            return accuracy
+        # Update the testing strategy with new personalized trainset
+        if hasattr(self, "testing_strategy"):
+            self.testing_strategy.personalized_trainset = trainset

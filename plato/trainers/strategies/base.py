@@ -495,3 +495,60 @@ class DataLoaderStrategy(Strategy):
             Configured DataLoader instance
         """
         pass
+
+
+class TestingStrategy(Strategy):
+    """
+    Strategy interface for model testing/evaluation.
+
+    Implement this interface to customize testing behavior:
+    - Custom evaluation metrics (MIoU, FID, KNN accuracy, etc.)
+    - Multi-phase testing (SSL KNN vs personalization)
+    - External framework evaluation (HuggingFace, YOLO)
+    - Specialized test loops
+
+    Example:
+        >>> class MyTestingStrategy(TestingStrategy):
+        ...     def test_model(self, model, config, testset, sampler, context):
+        ...         model.eval()
+        ...         test_loader = torch.utils.data.DataLoader(
+        ...             testset, batch_size=config["batch_size"]
+        ...         )
+        ...         correct = 0
+        ...         total = 0
+        ...         with torch.no_grad():
+        ...             for examples, labels in test_loader:
+        ...                 outputs = model(examples)
+        ...                 _, predicted = torch.max(outputs, 1)
+        ...                 total += labels.size(0)
+        ...                 correct += (predicted == labels).sum().item()
+        ...         return correct / total
+    """
+
+    @abstractmethod
+    def test_model(
+        self,
+        model: nn.Module,
+        config: Dict[str, Any],
+        testset,
+        sampler,
+        context: TrainingContext,
+    ) -> float:
+        """
+        Test the model and return accuracy/metric.
+
+        Args:
+            model: The model to test
+            config: Testing configuration dictionary
+            testset: Test dataset
+            sampler: Optional data sampler for test set
+            context: Training context with device, client_id, etc.
+
+        Returns:
+            Accuracy or other evaluation metric (float)
+
+        Note:
+            This method should handle moving model to device,
+            setting eval mode, and computing the metric.
+        """
+        pass

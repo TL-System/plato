@@ -39,6 +39,7 @@ from plato.trainers.strategies.base import (
     LRSchedulerStrategy,
     ModelUpdateStrategy,
     OptimizerStrategy,
+    TestingStrategy,
     TrainingContext,
     TrainingStepStrategy,
 )
@@ -47,6 +48,7 @@ from plato.trainers.strategies.loss_criterion import DefaultLossCriterionStrateg
 from plato.trainers.strategies.lr_scheduler import DefaultLRSchedulerStrategy
 from plato.trainers.strategies.model_update import NoOpUpdateStrategy
 from plato.trainers.strategies.optimizer import DefaultOptimizerStrategy
+from plato.trainers.strategies.testing import DefaultTestingStrategy
 from plato.trainers.strategies.training_step import DefaultTrainingStepStrategy
 
 
@@ -67,6 +69,7 @@ class ComposableTrainer(base.Trainer):
         lr_scheduler_strategy: Strategy for LR scheduling
         model_update_strategy: Strategy for model updates and state management
         data_loader_strategy: Strategy for creating data loaders
+        testing_strategy: Strategy for model testing/evaluation
 
     Example:
         >>> from plato.trainers.strategies import (
@@ -90,6 +93,7 @@ class ComposableTrainer(base.Trainer):
         lr_scheduler_strategy: Optional[LRSchedulerStrategy] = None,
         model_update_strategy: Optional[ModelUpdateStrategy] = None,
         data_loader_strategy: Optional[DataLoaderStrategy] = None,
+        testing_strategy: Optional[TestingStrategy] = None,
     ):
         """Initialize composable trainer with strategies."""
         super().__init__()
@@ -120,6 +124,7 @@ class ComposableTrainer(base.Trainer):
         )
         self.model_update_strategy = model_update_strategy or NoOpUpdateStrategy()
         self.data_loader_strategy = data_loader_strategy or DefaultDataLoaderStrategy()
+        self.testing_strategy = testing_strategy or DefaultTestingStrategy()
 
         # Setup all strategies
         self._setup_strategies()
@@ -153,6 +158,7 @@ class ComposableTrainer(base.Trainer):
             self.lr_scheduler_strategy,
             self.model_update_strategy,
             self.data_loader_strategy,
+            self.testing_strategy,
         ]
 
         for strategy in strategies:
@@ -168,6 +174,7 @@ class ComposableTrainer(base.Trainer):
             self.lr_scheduler_strategy,
             self.model_update_strategy,
             self.data_loader_strategy,
+            self.testing_strategy,
         ]
 
         for strategy in strategies:
@@ -519,45 +526,25 @@ class ComposableTrainer(base.Trainer):
             return self.test_model(config, testset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):
-        """The testing loop."""
-        self.model.to(self.device)
-        self.model.eval()
+        """
+        Test the model using the configured testing strategy.
 
-        # Use data loader strategy for test data
-        batch_size = config.get("batch_size", 32)
-        test_loader = self.data_loader_strategy.create_train_loader(
-            testset, sampler, batch_size, self.context
+        Args:
+            config: Testing configuration dictionary
+            testset: Test dataset
+            sampler: Optional data sampler for test set
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            Test accuracy or other metric as float
+        """
+        # Use testing strategy to perform evaluation
+        accuracy = self.testing_strategy.test_model(
+            self.model, config, testset, sampler, self.context
         )
 
-        correct = 0
-        total = 0
-
-        with torch.no_grad():
-            for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
-
-                outputs = self.model(examples)
-                _, predicted = torch.max(outputs.data, 1)
-
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        accuracy = correct / total if total > 0 else 0
-
+        # Store accuracy for compatibility with existing code
         self.accuracy = accuracy
-
-        if self.client_id == 0:
-            logging.info(
-                "[Server #%d] Test accuracy: %.2f%%",
-                os.getpid(),
-                100 * accuracy,
-            )
-        else:
-            logging.info(
-                "[Client #%d] Test accuracy: %.2f%%",
-                self.client_id,
-                100 * accuracy,
-            )
 
         return accuracy
 
