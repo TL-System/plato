@@ -91,7 +91,7 @@ class CalibreDataLoaderStrategy(DataLoaderStrategy):
 
         Args:
             trainset: Training dataset
-            sampler: Data sampler
+            sampler: Data sampler (may be Plato Sampler object)
             batch_size: Batch size
             context: Training context
 
@@ -99,6 +99,10 @@ class CalibreDataLoaderStrategy(DataLoaderStrategy):
             DataLoader with MultiViewCollateWrapper
         """
         collate_fn = MultiViewCollateWrapper()
+
+        # Handle Plato Sampler objects that have a get() method
+        if hasattr(sampler, 'get') and callable(sampler.get):
+            sampler = sampler.get()
 
         return data.DataLoader(
             dataset=trainset,
@@ -119,7 +123,7 @@ class CalibreDataLoaderStrategy(DataLoaderStrategy):
 
         Args:
             trainset: Training dataset (may be overridden)
-            sampler: Data sampler
+            sampler: Data sampler (may be Plato Sampler object)
             batch_size: Batch size
             context: Training context
 
@@ -130,6 +134,10 @@ class CalibreDataLoaderStrategy(DataLoaderStrategy):
         personalized_trainset = context.state.get("personalized_trainset")
         if personalized_trainset is not None:
             trainset = personalized_trainset
+
+        # Handle Plato Sampler objects that have a get() method
+        if hasattr(sampler, 'get') and callable(sampler.get):
+            sampler = sampler.get()
 
         return data.DataLoader(
             dataset=trainset,
