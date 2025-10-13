@@ -26,6 +26,18 @@ from plato.trainers.strategies.base import (
 )
 
 
+@pytest.fixture(autouse=True)
+def setup_environment(monkeypatch):
+    """Set up environment variables for testing."""
+    import os
+    import sys
+
+    test_args = ["pytest"]
+    monkeypatch.setattr(sys, "argv", test_args)
+    monkeypatch.setenv("config_file", "tests/config.yml")
+    return None
+
+
 @pytest.fixture
 def simple_model():
     """Create a simple model for testing."""
