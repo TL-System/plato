@@ -65,7 +65,9 @@ class MemoryTrackingTrainingStepStrategy(TrainingStepStrategy):
         """Initialize the strategy."""
         self.max_mem_allocated = 0
 
-    def training_step(self, model, optimizer, examples, labels, loss_criterion, context):
+    def training_step(
+        self, model, optimizer, examples, labels, loss_criterion, context
+    ):
         """Perform training step with memory tracking."""
         device = context.device
         device_type = device.type if hasattr(device, "type") else str(device)

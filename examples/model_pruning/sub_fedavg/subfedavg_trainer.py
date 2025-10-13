@@ -23,7 +23,9 @@ class SubFedAvgTrainingStepStrategy(TrainingStepStrategy):
         """Initialize with reference to trainer for accessing mask."""
         self.trainer = trainer
 
-    def training_step(self, model, optimizer, examples, labels, loss_criterion, context):
+    def training_step(
+        self, model, optimizer, examples, labels, loss_criterion, context
+    ):
         """Perform training step with gradient masking."""
         optimizer.zero_grad()
         outputs = model(examples)
@@ -173,8 +175,9 @@ class PruningCallback(TrainerCallback):
 
             with torch.no_grad():
                 for examples, labels in test_loader:
-                    examples, labels = examples.to(trainer.device), labels.to(
-                        trainer.device
+                    examples, labels = (
+                        examples.to(trainer.device),
+                        labels.to(trainer.device),
                     )
 
                     outputs = trainer.model(examples)

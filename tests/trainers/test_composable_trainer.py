@@ -457,7 +457,9 @@ class TestComposableTrainerComparison:
         trainer = ComposableTrainer(model=simple_model)
 
         # Save initial parameters (move to same device as they'll be after training)
-        initial_params = [p.clone().to(trainer.context.device) for p in trainer.model.parameters()]
+        initial_params = [
+            p.clone().to(trainer.context.device) for p in trainer.model.parameters()
+        ]
 
         sampler = list(range(len(simple_dataset)))
         trainer.train_model(simple_config, simple_dataset, sampler)

@@ -71,8 +71,7 @@ class GradientComputationCallback(TrainerCallback):
                 self.gradient[name] = param_dict[name].grad.clone()
             else:
                 self.gradient[name] = torch.zeros(
-                    state_dict[name].shape,
-                    device=trainer.device
+                    state_dict[name].shape, device=trainer.device
                 )
 
         # Save gradient to file
