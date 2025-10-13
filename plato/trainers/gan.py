@@ -259,10 +259,11 @@ class GANTestingStrategy(TestingStrategy):
         """Initialize GAN testing strategy with InceptionV3 feature extractor."""
         # Use the pre-trained InceptionV3 model as a feature extractor for testing
         self.inception_model = torchvision.models.inception_v3(
-            pretrained=True, aux_logits=False
+            weights=torchvision.models.Inception_V3_Weights.DEFAULT
         )
-        # Remove the last output layer of inception
+        # Remove the last output layer of inception and auxiliary classifier
         self.inception_model.fc = nn.Identity()
+        self.inception_model.AuxLogits = None
         self.inception_model.eval()
 
     def test_model(self, model, config, testset, sampler, context):

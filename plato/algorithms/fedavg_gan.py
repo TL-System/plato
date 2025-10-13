@@ -16,9 +16,9 @@ class Algorithm(fedavg.Algorithm):
         self.generator = self.model.generator
         self.discriminator = self.model.discriminator
 
-    def compute_weight_deltas(self, weights_received):
+    def compute_weight_deltas(self, baseline_weights, weights_received):
         """Extract the weights received from a client and compute the updates."""
-        baseline_weights_gen, baseline_weights_disc = self.extract_weights()
+        baseline_weights_gen, baseline_weights_disc = baseline_weights
 
         deltas = []
         for weight_gen, weight_disc in weights_received:
