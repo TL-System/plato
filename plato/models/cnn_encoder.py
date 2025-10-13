@@ -74,7 +74,7 @@ class Model:
                 "resnet_50": torchvision.models.resnet50,
             }
 
-            encoder = resnets[model_name](num_classes=num_classes)
+            encoder = resnets[model_name](weights=None, num_classes=num_classes)
 
             datasource = (
                 kwargs["datasource"]
