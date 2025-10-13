@@ -7,22 +7,29 @@ import os
 
 import torch
 from calibre_loss import CalibreLoss
+from calibre_optimizer_strategy import CalibreOptimizerStrategy
 from clustering import kmeans_clustering
 
 from plato.config import Config
-from plato.trainers import self_supervised_learning as ssl_trainer
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import (
+    LossCriterionStrategy,
+    ModelUpdateStrategy,
+    TrainingContext,
+)
 
 
-class Trainer(ssl_trainer.Trainer):
+class CalibreLossStrategy(LossCriterionStrategy):
     """
-    A trainer with Calibre, which computes Calibre's loss and computes the
-    divergence of clusters, showing the normalized distance between the points
-    and the centroid.
+    Loss strategy for Calibre that computes the Calibre loss with auxiliary losses.
     """
 
-    def get_ssl_criterion(self):
-        """Get the loss of Calibre."""
+    def __init__(self):
+        """Initialize the Calibre loss strategy."""
+        self._calibre_loss = None
 
+    def setup(self, context: TrainingContext):
+        """Initialize the Calibre loss criterion."""
         # Get the main loss criterion
         loss_criterion_name = (
             Config().trainer.loss_criterion
@@ -35,8 +42,7 @@ class Trainer(ssl_trainer.Trainer):
             else {}
         )
 
-        # Get the auxiliary losses which are regularizers in the
-        # objective funct
+        # Get the auxiliary losses which are regularizers in the objective function
         auxiliary_losses = (
             Config().algorithm.auxiliary_loss_criterions
             if hasattr(Config.algorithm, "auxiliary_loss_criterions")
@@ -55,31 +61,36 @@ class Trainer(ssl_trainer.Trainer):
             else {}
         )
 
-        defined_ssl_loss = CalibreLoss(
+        self._calibre_loss = CalibreLoss(
             main_loss=loss_criterion_name,
             main_loss_params=loss_criterion_params,
             auxiliary_losses=auxiliary_losses,
             auxiliary_loss_params=auxiliary_loss_params,
             losses_weight=losses_weight,
-            device=self.device,
+            device=context.device,
         )
 
-        def compute_loss(outputs, labels):
-            if isinstance(outputs, (list, tuple)):
-                return defined_ssl_loss(*outputs, labels=labels)
-            else:
-                return defined_ssl_loss(outputs, labels=labels)
+    def compute_loss(self, outputs, labels, context: TrainingContext):
+        """Compute Calibre loss."""
+        if isinstance(outputs, (list, tuple)):
+            return self._calibre_loss(*outputs, labels=labels)
+        else:
+            return self._calibre_loss(outputs, labels=labels)
 
-        return compute_loss
 
-    def compute_divergence_rate(self, encodings):
+class CalibreDivergenceStrategy(ModelUpdateStrategy):
+    """
+    Model update strategy that computes and saves divergence rate after training.
+    """
+
+    def compute_divergence_rate(self, encodings, device):
         """
         Compute the divergence rate, which is the normalized distance between the points
         and the corresponding centroid.
         """
         cluster_ids_x, cluster_centers = kmeans_clustering(encodings, n_clusters=10)
         cluster_ids = torch.unique(cluster_ids_x, return_counts=False)
-        cluster_divergence = torch.zeros(size=(len(cluster_ids),), device=self.device)
+        cluster_divergence = torch.zeros(size=(len(cluster_ids),), device=device)
         for cluster_id in cluster_ids:
             cluster_center = cluster_centers[cluster_id]
             cluster_elems = encodings[cluster_ids_x == cluster_id]
@@ -89,39 +100,40 @@ class Trainer(ssl_trainer.Trainer):
 
         return torch.mean(cluster_divergence)
 
-    def get_optimizer(self, model):
-        """Get the optimizer"""
-        optimizer = super().get_optimizer(model)
-        if self.current_round > Config().trainer.rounds:
-            # Add another self.model's parameters to the existing optimizer
-            # This will not be trained but only used to build an entire model
-            # encoder - linear classifier
-            optimizer.add_param_group({"params": self.model.encoder.parameters()})
-        return optimizer
-
-    def train_run_end(self, config):
+    def on_train_end(self, context: TrainingContext):
         """
         Compute divergence rate based on the learned features of local samples
-        after training. The, the computed value will be saved to disk to be loaded
+        after training. The computed value will be saved to disk to be loaded
         when the client sends it to the server.
         """
-        super().train_run_end(config)
+        # Get personalized trainset from context state
+        personalized_trainset = context.state.get("personalized_trainset")
+        sampler = context.state.get("sampler")
+
+        if personalized_trainset is None:
+            logging.warning(
+                "[Client #%d] No personalized trainset found in context.",
+                context.client_id,
+            )
+            return
 
         personalized_train_loader = torch.utils.data.DataLoader(
-            dataset=self.personalized_trainset,
+            dataset=personalized_trainset,
             shuffle=False,
             batch_size=10,
-            sampler=self.sampler,
+            sampler=sampler,
         )
 
-        logging.info("[Client #%d] Computing the divergence rate.", self.client_id)
+        logging.info(
+            "[Client #%d] Computing the divergence rate.", context.client_id
+        )
 
         sample_encodings = None
 
         with torch.no_grad():
             for examples, _ in personalized_train_loader:
-                examples = examples.to(self.device)
-                features = self.model.encoder(examples)
+                examples = examples.to(context.device)
+                features = context.model.encoder(examples)
 
                 sample_encodings = (
                     features
@@ -129,11 +141,58 @@ class Trainer(ssl_trainer.Trainer):
                     else torch.cat((sample_encodings, features), dim=0)
                 )
 
-        divergence_rate = self.compute_divergence_rate(sample_encodings)
+        divergence_rate = self.compute_divergence_rate(
+            sample_encodings, context.device
+        )
 
         # Save the divergence
         model_path = Config().params["model_path"]
-        filename = f"client_{self.client_id}_divergence_rate.pth"
+        filename = f"client_{context.client_id}_divergence_rate.pth"
         save_path = os.path.join(model_path, filename)
 
         torch.save(divergence_rate.detach().cpu(), save_path)
+
+
+class Trainer(ComposableTrainer):
+    """
+    A trainer with Calibre, which computes Calibre's loss and computes the
+    divergence of clusters, showing the normalized distance between the points
+    and the centroid.
+    """
+
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize the Calibre trainer with composition-based strategies.
+
+        Args:
+            model: The neural network model to train
+            callbacks: Optional list of callback handlers
+        """
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            loss_strategy=CalibreLossStrategy(),
+            optimizer_strategy=CalibreOptimizerStrategy(),
+            model_update_strategy=CalibreDivergenceStrategy(),
+        )
+
+    def train(self, trainset, sampler, **kwargs):
+        """
+        Train the model and store necessary data in context for divergence computation.
+
+        Args:
+            trainset: Training dataset
+            sampler: Data sampler for this client
+            **kwargs: Additional arguments including personalized_trainset
+
+        Returns:
+            Training time in seconds
+        """
+        # Store personalized trainset and sampler in context for divergence computation
+        personalized_trainset = kwargs.get("personalized_trainset")
+        if personalized_trainset is not None:
+            self.context.state["personalized_trainset"] = personalized_trainset
+            self.context.state["sampler"] = sampler
+
+        # Call parent train method
+        return super().train(trainset, sampler, **kwargs)
