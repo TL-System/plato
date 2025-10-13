@@ -437,7 +437,8 @@ class APFLStepStrategy(TrainingStepStrategy):
                 )
 
                 # Gradient w.r.t. α: <diff, combined_grad>
-                grad_alpha += diff.view(-1).T.dot(combined_grad.view(-1)).item()
+                # Use torch.dot for 1D tensors to avoid deprecation warning
+                grad_alpha += torch.dot(diff.view(-1), combined_grad.view(-1)).item()
 
         # Add L2 regularization on α (optional, coefficient 0.02 from paper)
         grad_alpha += 0.02 * alpha
