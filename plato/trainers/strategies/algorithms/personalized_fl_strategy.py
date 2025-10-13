@@ -251,6 +251,7 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         self.local_epochs = local_epochs
         self.is_personalizing = False
         self.original_epochs = None
+        self._last_processed_epoch = None
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -259,6 +260,9 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         Args:
             context: Training context
         """
+        # Reset epoch tracking
+        self._last_processed_epoch = None
+
         # Determine total rounds
         total_rounds = (
             Config().trainer.rounds
@@ -278,11 +282,8 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
                 Config().algorithm, "personalization"
             ):
                 if hasattr(Config().algorithm.personalization, "epochs"):
-                    # This would require modifying the training config
-                    # Store for potential use
-                    context.state["personalization_epochs"] = (
-                        Config().algorithm.personalization.epochs
-                    )
+                    # Modify the training config to use personalization epochs
+                    context.config["epochs"] = Config().algorithm.personalization.epochs
 
     def before_step(self, context: TrainingContext) -> None:
         """
@@ -298,14 +299,18 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         if not self.is_personalizing:
             current_epoch = context.current_epoch
 
-            if current_epoch <= self.local_epochs:
-                # Train local layers, freeze global layers
-                self._freeze_global_layers(context)
-                self._activate_local_layers(context)
-            else:
-                # Train global layers, freeze local layers
-                self._freeze_local_layers(context)
-                self._activate_global_layers(context)
+            # Optimize: only update layer freezing when epoch changes
+            if self._last_processed_epoch != current_epoch:
+                self._last_processed_epoch = current_epoch
+
+                if current_epoch <= self.local_epochs:
+                    # Train local layers, freeze global layers
+                    self._freeze_global_layers(context)
+                    self._activate_local_layers(context)
+                else:
+                    # Train global layers, freeze local layers
+                    self._freeze_local_layers(context)
+                    self._activate_global_layers(context)
 
     def on_train_end(self, context: TrainingContext) -> None:
         """
