@@ -43,6 +43,15 @@ class GradientComputationCallback(TrainerCallback):
         trainer.model.to(trainer.device)
         trainer.model.train()
 
+        # Get total number of samples
+        if hasattr(trainer.sampler, "num_samples"):
+            total_samples = trainer.sampler.num_samples()
+        elif hasattr(trainer.sampler, "__len__"):
+            total_samples = len(trainer.sampler)
+        else:
+            # If we can't get the sampler length, compute from dataset
+            total_samples = len(trainer.train_loader.dataset)
+
         # Compute gradients over the entire training set
         for idx, (examples, labels) in enumerate(trainer.train_loader):
             examples, labels = examples.to(trainer.device), labels.to(trainer.device)
@@ -50,7 +59,7 @@ class GradientComputationCallback(TrainerCallback):
             loss_criterion = torch.nn.CrossEntropyLoss()
             loss = loss_criterion(outputs, labels)
             # Weight the loss by batch proportion
-            loss = loss * (len(labels) / len(trainer.sampler))
+            loss = loss * (len(labels) / total_samples)
             loss.backward()
 
         # Extract gradients from model parameters
