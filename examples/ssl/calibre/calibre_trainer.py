@@ -176,6 +176,28 @@ class Trainer(ComposableTrainer):
             model_update_strategy=CalibreDivergenceStrategy(),
         )
 
+        # Datasets for personalization (required by SSL client)
+        self.personalized_trainset = None
+        self.personalized_testset = None
+
+        # Define the personalized model (local layers)
+        # This is initialized after the model is available in setup
+        self.local_layers = None
+
+    def set_personalized_datasets(self, trainset, testset):
+        """
+        Set the personalized trainset and testset.
+
+        This method is called by the SSL client to provide datasets
+        for the personalization phase.
+
+        Args:
+            trainset: Training dataset for personalization
+            testset: Test dataset for personalization
+        """
+        self.personalized_trainset = trainset
+        self.personalized_testset = testset
+
     def train(self, trainset, sampler, **kwargs):
         """
         Train the model and store necessary data in context for divergence computation.
@@ -188,10 +210,26 @@ class Trainer(ComposableTrainer):
         Returns:
             Training time in seconds
         """
+        # Initialize local_layers if not done yet and model has encoder
+        if self.local_layers is None and hasattr(self.model, "encoder"):
+            from plato.models import registry as models_registry
+
+            model_params = Config().parameters.personalization.model._asdict()
+            model_params["input_dim"] = self.model.encoder.encoding_dim
+            model_params["output_dim"] = model_params["num_classes"]
+            self.local_layers = models_registry.get(
+                model_name=Config().algorithm.personalization.model_name,
+                model_type=Config().algorithm.personalization.model_type,
+                model_params=model_params,
+            )
+
+        # Store local_layers in context for optimizer strategy
+        if self.local_layers is not None:
+            self.context.state["local_layers"] = self.local_layers
+
         # Store personalized trainset and sampler in context for divergence computation
-        personalized_trainset = kwargs.get("personalized_trainset")
-        if personalized_trainset is not None:
-            self.context.state["personalized_trainset"] = personalized_trainset
+        if self.personalized_trainset is not None:
+            self.context.state["personalized_trainset"] = self.personalized_trainset
             self.context.state["sampler"] = sampler
 
         # Call parent train method
