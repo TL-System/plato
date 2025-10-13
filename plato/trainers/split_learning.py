@@ -1,5 +1,5 @@
 """
-A federated learning trainer using split learning.
+A federated learning trainer using split learning with composable architecture.
 
 Reference:
 
@@ -19,24 +19,174 @@ import os
 
 import torch
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.datasources import feature
 from plato.samplers import all_inclusive
-from plato.trainers import basic
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import (
+    TrainingContext,
+    TrainingStepStrategy,
+)
+
+
+class SplitLearningCallback(TrainerCallback):
+    """
+    Callback to handle split learning-specific tasks.
+
+    This callback saves gradients at the end of training (server only).
+    """
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        """Save gradients after training (server only)."""
+        if trainer.client_id == 0:
+            # Server needs to save gradients, clients not
+            trainer.save_gradients(config)
+            logging.info(
+                "[Server #%d] Gradients saved after training.",
+                os.getpid()
+            )
+
+
+class SplitLearningTrainingStepStrategy(TrainingStepStrategy):
+    """
+    Training step strategy for split learning.
+
+    This strategy implements the split learning protocol:
+    - Client: Forward to cut layer, backprop with gradients from server
+    - Server: Forward from cut layer, compute loss and gradients
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.cut_layer_grad = []
+
+    def training_step(
+        self,
+        model,
+        optimizer,
+        examples,
+        labels,
+        loss_criterion,
+        context: TrainingContext,
+    ):
+        """
+        Perform one split learning training step.
+
+        Args:
+            model: The model to train
+            optimizer: The optimizer
+            examples: Input batch (already moved to device)
+            labels: Target labels (already moved to device)
+            loss_criterion: Loss computation function
+            context: Training context
+
+        Returns:
+            Loss value for this step
+        """
+        # Get trainer reference from context
+        trainer = context.state.get("trainer")
+        if trainer is None:
+            raise ValueError("Trainer must be stored in context.state['trainer']")
+
+        # Different behavior for server (client_id=0) vs clients
+        if context.client_id == 0:
+            return self._server_train_step(
+                model, optimizer, examples, labels, loss_criterion, context, trainer
+            )
+        else:
+            return self._client_train_step(
+                model, optimizer, examples, labels, loss_criterion, context, trainer
+            )
+
+    def _client_train_step(
+        self, model, optimizer, examples, labels, loss_criterion, context, trainer
+    ):
+        """Complete the client side training with gradients from server."""
+        optimizer.zero_grad()
+
+        examples, batch_size = trainer.process_samples_before_client_forwarding(examples)
+        outputs = model.forward_to(examples)
+
+        # Backpropagate with gradients from the server
+        gradients = trainer.gradients[0] if trainer.gradients else None
+        if gradients is None:
+            logging.warning("[Client #%d] Gradients from server is None.", os.getpid())
+        else:
+            gradients = gradients.to(context.device)
+            outputs.backward(gradients)
+            optimizer.step()
+
+        # No loss value on the client side
+        loss = torch.zeros(1)
+        return loss
+
+    def _server_train_step(
+        self, model, optimizer, examples, labels, loss_criterion, context, trainer
+    ):
+        """The training loop on the server."""
+        optimizer.zero_grad()
+
+        config = context.config
+        loss, grad, batch_size = trainer.server_forward_from((examples, labels), config)
+        loss = loss.cpu().detach()
+
+        # Record gradients within the cut layer
+        if grad is not None:
+            grad = grad.cpu().clone().detach()
+        self.cut_layer_grad = [grad]
+        trainer.cut_layer_grad = self.cut_layer_grad
+
+        optimizer.step()
+
+        logging.warning(
+            "[Server #%d] Gradients computed with training loss: %.4f",
+            os.getpid(),
+            loss,
+        )
+
+        return loss
 
 
 # pylint:disable=too-many-instance-attributes
-class Trainer(basic.Trainer):
-    """The split learning trainer."""
+class Trainer(ComposableTrainer):
+    """
+    The split learning trainer using composable architecture.
+
+    This trainer uses ComposableTrainer with custom strategies and callbacks
+    to implement split learning without inheritance.
+    """
 
     def __init__(self, model=None, callbacks=None):
-        """Initializing the trainer with the provided model.
+        """
+        Initialize split learning trainer with custom strategies.
 
         Arguments:
-        model: The model to train.
-        callbacks: The callbacks that this trainer uses.
+            model: The model to train (class or instance)
+            callbacks: Additional callback classes or instances
         """
-        super().__init__(model=model, callbacks=callbacks)
+        # Create split learning-specific strategy
+        split_learning_strategy = SplitLearningTrainingStepStrategy()
+        split_learning_callback = SplitLearningCallback()
+
+        # Combine with user callbacks
+        callbacks_with_split = [split_learning_callback]
+        if callbacks is not None:
+            callbacks_with_split.extend(callbacks)
+
+        # Initialize with split learning strategy
+        super().__init__(
+            model=model,
+            callbacks=callbacks_with_split,
+            loss_strategy=None,  # Uses DefaultLossCriterionStrategy
+            optimizer_strategy=None,  # Uses DefaultOptimizerStrategy
+            training_step_strategy=split_learning_strategy,
+            lr_scheduler_strategy=None,  # Uses DefaultLRSchedulerStrategy
+            model_update_strategy=None,  # Uses NoOpUpdateStrategy
+            data_loader_strategy=None,  # Uses DefaultDataLoaderStrategy
+        )
+
+        # Split learning-specific attributes
         self.last_client_id = None
         self.last_optimizer = None
 
@@ -48,37 +198,35 @@ class Trainer(basic.Trainer):
         # Server side variables
         self.cut_layer_grad = []
 
+    def train_model(self, config, trainset, sampler, **kwargs):
+        """
+        Override train_model to inject trainer reference into context.
+
+        This is needed so the training step strategy can access split learning
+        specific methods like process_samples_before_client_forwarding().
+        """
+        # Store trainer in context so strategy can access it
+        self.context.state["trainer"] = self
+
+        # Call parent train_model
+        return super().train_model(config, trainset, sampler, **kwargs)
+
     def get_train_loader(self, batch_size, trainset, sampler, **kwargs):
         """
         Creates an instance of the trainloader.
 
+        For split learning, this returns the trainset directly instead of
+        creating a DataLoader.
+
         Arguments:
-        batch_size: the batch size.
-        trainset: the training dataset.
-        sampler: the sampler for the trainloader to use.
+            batch_size: the batch size
+            trainset: the training dataset
+            sampler: the sampler for the trainloader to use
+
+        Returns:
+            The trainset directly (not wrapped in DataLoader)
         """
         return trainset
-
-    def perform_forward_and_backward_passes(self, config, examples, labels):
-        """Perform forward and backward passes in the training loop.
-
-        Arguments:
-        config: the configuration.
-        examples: data samples in the current batch.
-        labels: labels in the current batch.
-
-        Returns: loss values after the current batch has been processed.
-        """
-        if self.client_id == 0:
-            return self._server_train_loop(config, examples, labels)
-
-        return self._client_train_loop(examples)
-
-    def train_run_end(self, config):
-        """Additional tasks after training."""
-        if self.client_id == 0:
-            # Server needs to save gradients, clients not
-            self.save_gradients(config)
 
     def get_optimizer(self, model):
         """Return the optimizer used in the last round to avoid reconfiguration."""
@@ -90,14 +238,24 @@ class Trainer(basic.Trainer):
 
     def get_train_samples(self, batch_size, trainset, sampler):
         """
-        Get a batch of training samples to extract feature, the trainer has to save these
-        samples to complete training later.
+        Get a batch of training samples to extract feature.
+
+        The trainer has to save these samples to complete training later.
+
+        Arguments:
+            batch_size: Batch size
+            trainset: Training dataset
+            sampler: Data sampler
+
+        Returns:
+            Training samples
         """
         data_loader = torch.utils.data.DataLoader(
             dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
         )
         data_loader = iter(data_loader)
         self.training_samples = next(data_loader)
+
         # Wrap the training samples with datasource and sampler to be fed into Plato trainer
         self.training_samples = self.process_training_samples_before_retrieving(
             self.training_samples
@@ -105,59 +263,33 @@ class Trainer(basic.Trainer):
         return self.training_samples
 
     def retrieve_train_samples(self):
-        """Retrieve the training samples to complete client training."""
+        """
+        Retrieve the training samples to complete client training.
+
+        Returns:
+            Tuple of (datasource, sampler)
+        """
         samples = feature.DataSource([[self.training_samples]])
         sampler = all_inclusive.Sampler(samples)
 
         return samples, sampler
 
     def load_gradients(self, gradients):
-        """Load the gradients which will be used to complete client training."""
+        """
+        Load the gradients which will be used to complete client training.
+
+        Arguments:
+            gradients: Gradients from server
+        """
         self.gradients = gradients
 
-    def _client_train_loop(self, examples):
-        """Complete the client side training with gradients from server."""
-        self.optimizer.zero_grad()
-        examples, batch_size = self.process_samples_before_client_forwarding(examples)
-        outputs = self.model.forward_to(examples)
-
-        # Backpropagate with gradients from the server
-        gradients = self.gradients[0]
-        if gradients is None:
-            logging.warning("[Client #%d] Gradients from server is None.", os.getpid())
-        else:
-            gradients = gradients.to(self.device)
-            outputs.backward(gradients)
-            self.optimizer.step()
-
-        # No loss value on the client side
-        loss = torch.zeros(1)
-        self._loss_tracker.update(loss, batch_size)
-        return loss
-
-    def _server_train_loop(self, config, examples, labels):
-        """The training loop on the server."""
-        self.optimizer.zero_grad()
-        loss, grad, batch_size = self.server_forward_from((examples, labels), config)
-        loss = loss.cpu().detach()
-        self._loss_tracker.update(loss, batch_size)
-
-        # Record gradients within the cut layer
-        if grad is not None:
-            grad = grad.cpu().clone().detach()
-        self.cut_layer_grad = [grad]
-        self.optimizer.step()
-
-        logging.warning(
-            "[Server #%d] Gradients computed with training loss: %.4f",
-            os.getpid(),
-            loss,
-        )
-
-        return loss
-
     def save_gradients(self, config):
-        """Server saves recorded gradients to a file."""
+        """
+        Server saves recorded gradients to a file.
+
+        Arguments:
+            config: Training configuration
+        """
         model_name = config["model_name"]
         model_path = Config().params["model_path"]
 
@@ -175,7 +307,12 @@ class Trainer(basic.Trainer):
         )
 
     def get_gradients(self):
-        """Read gradients from a file."""
+        """
+        Read gradients from a file.
+
+        Returns:
+            Loaded gradients
+        """
         model_path = Config().params["model_path"]
         model_name = Config().trainer.model_name
 
@@ -194,55 +331,89 @@ class Trainer(basic.Trainer):
         Evaluates the model with the provided test dataset and test sampler.
 
         Arguments:
-        testset: the test dataset.
-        sampler: the test sampler. The default is None.
-        kwargs (optional): Additional keyword arguments.
+            config: Configuration
+            testset: the test dataset
+            sampler: the test sampler (default None)
+            kwargs: Additional keyword arguments
+
+        Returns:
+            Accuracy metric
         """
         batch_size = config["batch_size"]
         accuracy = self.test_model_split_learning(batch_size, testset, sampler)
         return accuracy
 
-    # API functions for split learning
-    def process_training_samples_before_retrieving(self, training_samples) -> ...:
-        """Process training samples before completing retrieving samples."""
+    # API functions for split learning - can be overridden by subclasses
+
+    def process_training_samples_before_retrieving(self, training_samples):
+        """
+        Process training samples before completing retrieving samples.
+
+        Override this in subclasses for custom preprocessing.
+
+        Arguments:
+            training_samples: Raw training samples
+
+        Returns:
+            Processed training samples
+        """
         return training_samples
 
-    def process_samples_before_client_forwarding(self, examples) -> ...:
-        """Process the examples before client conducting forwarding."""
+    def process_samples_before_client_forwarding(self, examples):
+        """
+        Process the examples before client conducting forwarding.
+
+        Override this in subclasses for custom preprocessing.
+
+        Arguments:
+            examples: Input examples
+
+        Returns:
+            Tuple of (processed_examples, batch_size)
+        """
         return examples, examples.size(0)
 
     # pylint:disable=unused-argument
-    def server_forward_from(self, batch, config) -> (..., ..., int):
+    def server_forward_from(self, batch, config):
         """
         The event for server completing training by forwarding from intermediate features.
+
         Users may override this function for training different models with split learning.
 
-        Inputs:
-            batch: the batch of inputs for forwarding.
-            config: training configuration.
-        Returns:
-            loss: the calculated loss.
-            grad: the gradients over the intermediate feature.
-            batch_size: the batch size of the current sample.
-        """
+        Arguments:
+            batch: the batch of inputs for forwarding
+            config: training configuration
 
+        Returns:
+            Tuple of (loss, grad, batch_size):
+                - loss: the calculated loss
+                - grad: the gradients over the intermediate feature
+                - batch_size: the batch size of the current sample
+        """
         inputs, target = batch
         batch_size = inputs.size(0)
         inputs = inputs.detach().requires_grad_(True)
         outputs = self.model.forward_from(inputs)
-        loss = self._loss_criterion(outputs, target)
+
+        # Get loss criterion from strategy
+        loss = self.loss_strategy.compute_loss(outputs, target, self.context)
         loss.backward()
         grad = inputs.grad
+
         return loss, grad, batch_size
 
-    def update_weights_before_cut(self, current_weights, weights) -> ...:
+    def update_weights_before_cut(self, current_weights, weights):
         """
-        Update the weights before cut layer, called when testing accuracy in trainer.
-        Inputs:
-        current_weights: the current weights extracted by the algorithm.
-        weights: the weights to load.
-        Output:
-        current_weights: the updated current weights of the model.
+        Update the weights before cut layer.
+
+        Called when testing accuracy in trainer.
+
+        Arguments:
+            current_weights: the current weights extracted by the algorithm
+            weights: the weights to load
+
+        Returns:
+            Updated current weights of the model
         """
         cut_layer_idx = self.model.layers.index(self.model.cut_layer)
 
@@ -258,16 +429,18 @@ class Trainer(basic.Trainer):
 
         return current_weights
 
-    def forward_to_intermediate_feature(self, inputs, targets) -> (..., ...):
+    def forward_to_intermediate_feature(self, inputs, targets):
         """
         The process to forward to get intermediate feature on the client.
-        Arguments:
-        inputs: the inputs for the model on the clients.
-        targets: the targets to get of the whole model.
 
-        Return:
-        outputs: the intermediate feature.
-        targets: the targets to get of the whole model.
+        Arguments:
+            inputs: the inputs for the model on the clients
+            targets: the targets to get of the whole model
+
+        Returns:
+            Tuple of (outputs, targets):
+                - outputs: the intermediate feature
+                - targets: the targets to get of the whole model
         """
         with torch.no_grad():
             logits = self.model.forward_to(inputs)
@@ -276,12 +449,17 @@ class Trainer(basic.Trainer):
         targets = targets.detach().cpu()
         return outputs, targets
 
-    def test_model_split_learning(self, batch_size, testset, sampler=None) -> ...:
+    def test_model_split_learning(self, batch_size, testset, sampler=None):
         """
         The test model process for split learning.
 
+        Arguments:
+            batch_size: Batch size for testing
+            testset: Test dataset
+            sampler: Optional sampler
+
         Returns:
-        accuracy: the metrics for evaluating the model.
+            Accuracy metric for evaluating the model
         """
         test_loader = torch.utils.data.DataLoader(
             testset, batch_size=batch_size, shuffle=False, sampler=sampler
