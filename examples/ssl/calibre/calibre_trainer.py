@@ -219,6 +219,7 @@ class Trainer(ComposableTrainer):
         if self.current_round <= Config().trainer.rounds:
             # During SSL training, we don't have a standard test
             # The SSL framework uses KNN or other methods separately
+            self.accuracy = 0.0
             return 0.0
 
         # Test the personalized model (encoder + local_layers)
@@ -226,6 +227,7 @@ class Trainer(ComposableTrainer):
             logging.warning(
                 "[Client #%d] No local_layers for testing.", self.client_id
             )
+            self.accuracy = 0.0
             return 0.0
 
         batch_size = config["batch_size"]
@@ -260,6 +262,7 @@ class Trainer(ComposableTrainer):
                 correct += (predicted == labels).sum().item()
 
         accuracy = correct / total if total > 0 else 0.0
+        self.accuracy = accuracy  # Set self.accuracy for the framework
         return accuracy
 
     def train(self, trainset, sampler, **kwargs):
