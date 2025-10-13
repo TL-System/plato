@@ -119,6 +119,10 @@ class CalibreDivergenceStrategy(ModelUpdateStrategy):
             )
             return
 
+        # Handle Plato Sampler objects that have a get() method
+        if sampler is not None and hasattr(sampler, 'get') and callable(sampler.get):
+            sampler = sampler.get()
+
         personalized_train_loader = torch.utils.data.DataLoader(
             dataset=personalized_trainset,
             shuffle=False,
