@@ -255,7 +255,7 @@ class ComposableTrainer(base.Trainer):
             hasattr(Config().clients, "sleep_simulation")
             and Config().clients.sleep_simulation
         ):
-            sleep_seconds = Config().clients.simulation_distribution(self.client_id)
+            sleep_seconds = Config.client_sleep_times[self.client_id - 1]
             sleep_seconds = max(0, sleep_seconds)
 
             if sleep_seconds > 0:

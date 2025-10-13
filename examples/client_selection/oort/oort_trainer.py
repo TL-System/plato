@@ -12,26 +12,63 @@ import numpy as np
 import torch
 from torch import nn
 
-from plato.trainers import basic
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import LossCriterionStrategy
 
 
-class Trainer(basic.Trainer):
-    """A federated learning trainer used by the Oort that keeps track of losses."""
+class OortLossStrategy(LossCriterionStrategy):
+    """Loss strategy for Oort that tracks sum of squared per-sample losses."""
 
-    def process_loss(self, outputs, labels) -> torch.Tensor:
-        """Returns the loss from CrossEntropyLoss, and records the sum of
-        squaures over per_sample loss values."""
-        loss_func = nn.CrossEntropyLoss(reduction="none")
-        per_sample_loss = loss_func(outputs, labels)
+    def setup(self, context):
+        """Initialize the loss criterion."""
+        self._criterion = nn.CrossEntropyLoss(reduction="none")
 
-        # Stores the sum of squares over per_sample loss values
-        self.run_history.update_metric(
-            "train_squared_loss_step",
-            sum(np.power(per_sample_loss.cpu().detach().numpy(), 2)),
-        )
+    def compute_loss(self, outputs, labels, context):
+        """
+        Compute loss and track squared per-sample losses.
+
+        This computes per-sample losses, tracks the sum of squares
+        (used by Oort for client selection), and returns the mean loss.
+        """
+        per_sample_loss = self._criterion(outputs, labels)
+
+        # Get the trainer from context to access run_history
+        trainer = context.state.get("trainer")
+        if trainer is not None:
+            # Store the sum of squares over per_sample loss values
+            trainer.run_history.update_metric(
+                "train_squared_loss_step",
+                sum(np.power(per_sample_loss.cpu().detach().numpy(), 2)),
+            )
 
         return torch.mean(per_sample_loss)
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
-        return self.process_loss
+
+class Trainer(ComposableTrainer):
+    """A federated learning trainer for Oort that tracks squared losses."""
+
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize the Oort trainer.
+
+        Args:
+            model: The model to train (class or instance)
+            callbacks: List of callback classes or instances
+        """
+        # Create Oort-specific loss strategy
+        loss_strategy = OortLossStrategy()
+
+        # Initialize with Oort strategies
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            loss_strategy=loss_strategy,
+        )
+
+    def train_model(self, config, trainset, sampler, **kwargs):
+        """Training loop that provides trainer reference to context."""
+        # Store trainer reference in context so loss strategy can access run_history
+        self.context.state["trainer"] = self
+
+        # Call parent training loop
+        super().train_model(config, trainset, sampler, **kwargs)
