@@ -12,7 +12,7 @@ The example demonstrates:
 4. Creating custom strategies
 
 Run this example:
-    python composable_trainer_example.py
+    uv run composable_trainer_example.py
 """
 
 import torch
