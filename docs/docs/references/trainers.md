@@ -94,6 +94,11 @@ Strategies solve these problems:
 │  │  DataLoaderStrategy                           │  │
 │  │  • create_train_loader(dataset, context)      │  │
 │  └───────────────────────────────────────────────┘  │
+│                                                     │
+│  ┌───────────────────────────────────────────────┐  │
+│  │  TestingStrategy                              │  │
+│  │  • test_model(model, testset, context)        │  │
+│  └───────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -178,14 +183,15 @@ class ComposableTrainer(base.Trainer):
 
     def __init__(
         self,
-        model=None,
-        callbacks=None,
+        model: Optional[Union[nn.Module, Callable[[], nn.Module]]] = None,
+        callbacks: Optional[List[Any]] = None,
         loss_strategy: Optional[LossCriterionStrategy] = None,
         optimizer_strategy: Optional[OptimizerStrategy] = None,
         training_step_strategy: Optional[TrainingStepStrategy] = None,
         lr_scheduler_strategy: Optional[LRSchedulerStrategy] = None,
         model_update_strategy: Optional[ModelUpdateStrategy] = None,
         data_loader_strategy: Optional[DataLoaderStrategy] = None,
+        testing_strategy: Optional[TestingStrategy] = None,
     )
 ```
 
@@ -201,6 +207,7 @@ class ComposableTrainer(base.Trainer):
 | `lr_scheduler_strategy` | `LRSchedulerStrategy` | `DefaultLRSchedulerStrategy()` | Strategy for LR scheduling |
 | `model_update_strategy` | `ModelUpdateStrategy` | `NoOpUpdateStrategy()` | Strategy for state management |
 | `data_loader_strategy` | `DataLoaderStrategy` | `DefaultDataLoaderStrategy()` | Strategy for data loading |
+| `testing_strategy` | `TestingStrategy` | `DefaultTestingStrategy()` | Strategy for model evaluation |
 
 #### Key Methods
 
@@ -700,6 +707,75 @@ class MyUpdateStrategy(ModelUpdateStrategy):
 ```
 
 ---
+
+### TestingStrategy
+
+**Location**: `plato.trainers.strategies.base`
+
+Strategy for testing/evaluating model performance.
+
+```python
+class TestingStrategy(Strategy):
+    """Strategy interface for model testing and evaluation."""
+
+    @abstractmethod
+    def test_model(
+        self,
+        model: torch.nn.Module,
+        config: dict,
+        testset: Dataset,
+        sampler: Optional[Sampler],
+        context: TrainingContext
+    ) -> float:
+        """
+        Test the model using evaluation metrics.
+
+        Args:
+            model: The model to test
+            config: Testing configuration dictionary
+            testset: Test dataset
+            sampler: Optional data sampler for test set
+            context: Training context
+
+        Returns:
+            Evaluation metric (e.g., accuracy) as a float
+        """
+        pass
+```
+
+#### When to Implement
+
+- Custom evaluation metrics
+- Multi-metric evaluation
+- Task-specific testing procedures
+- Specialized model evaluation flows
+
+#### Example Implementation
+
+```python
+class DefaultTestingStrategy(TestingStrategy):
+    """Default testing strategy for classification tasks."""
+
+    def test_model(self, model, config, testset, sampler, context):
+        model.eval()
+        test_loader = DataLoader(testset, batch_size=32, sampler=sampler)
+        
+        correct = 0
+        total = 0
+        
+        with torch.no_grad():
+            for examples, labels in test_loader:
+                examples = examples.to(context.device)
+                labels = labels.to(context.device)
+                
+                outputs = model(examples)
+                _, predicted = torch.max(outputs.data, 1)
+                
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+        
+        return correct / total
+```
 
 ### DataLoaderStrategy
 

@@ -85,8 +85,8 @@ class ComposableTrainer(base.Trainer):
 
     def __init__(
         self,
-        model=None,
-        callbacks=None,
+        model: Optional[Union[nn.Module, Callable[[], nn.Module]]] = None,
+        callbacks: Optional[List[Any]] = None,
         loss_strategy: Optional[LossCriterionStrategy] = None,
         optimizer_strategy: Optional[OptimizerStrategy] = None,
         training_step_strategy: Optional[TrainingStepStrategy] = None,
