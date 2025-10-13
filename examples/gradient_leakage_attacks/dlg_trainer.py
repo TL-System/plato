@@ -16,11 +16,20 @@ from defense.Outpost.perturb import compute_risk
 from torchvision import transforms
 from utils.helpers import cross_entropy_for_onehot, label_to_onehot
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.trainers import basic
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
+
+
+class DLGOutputProcessingCallback(TrainerCallback):
+    """Callback to process outputs for DLG trainer (extract first element from tuple)."""
+
+    def on_test_outputs(self, trainer, outputs, **kwargs):
+        """Extract first element from output tuple."""
+        return outputs[0]
 
 
 class Trainer(basic.Trainer):
@@ -41,7 +50,12 @@ class Trainer(basic.Trainer):
             if hasattr(m, "bias") and m.bias is not None:
                 m.bias.data.uniform_(-0.5, 0.5)
 
-        super().__init__(model=model, callbacks=callbacks)
+        # Add DLG output processing callback
+        callbacks_with_dlg = [DLGOutputProcessingCallback]
+        if callbacks is not None:
+            callbacks_with_dlg.extend(callbacks)
+
+        super().__init__(model=model, callbacks=callbacks_with_dlg)
 
         # DLG explicit weights initialziation
         if (
@@ -272,10 +286,3 @@ class Trainer(basic.Trainer):
             pickle.dump(
                 [self.full_examples, self.full_onehot_labels, self.target_grad], handle
             )
-
-    @staticmethod
-    def process_outputs(outputs):
-        """
-        Method called after the model updates have been generated.
-        """
-        return outputs[0]

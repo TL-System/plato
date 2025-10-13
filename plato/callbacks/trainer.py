@@ -52,6 +52,15 @@ class TrainerCallback(ABC):
         Event called at the end of a training epoch.
         """
 
+    def on_test_outputs(self, trainer, outputs, **kwargs):
+        """
+        Event called to process model outputs during testing.
+
+        :param outputs: the raw model outputs
+        :return: processed outputs (default: unchanged)
+        """
+        return outputs
+
 
 class LogProgressCallback(TrainerCallback):
     """

@@ -200,9 +200,9 @@ class SplitLearningTestingStrategy(TestingStrategy):
                 )
                 outputs = model(examples)
 
-                # Use trainer's process_outputs if available
-                if hasattr(trainer, "process_outputs"):
-                    outputs = trainer.process_outputs(outputs)
+                # Process outputs through callbacks
+                for callback in trainer.callbacks:
+                    outputs = callback.on_test_outputs(trainer, outputs)
 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -456,13 +456,3 @@ class Trainer(ComposableTrainer):
         outputs = logits.detach().cpu()
         targets = targets.detach().cpu()
         return outputs, targets
-
-    @staticmethod
-    def process_outputs(outputs):
-        """
-        Method called after model outputs are generated.
-
-        This is a legacy method for backward compatibility.
-        Override this in subclasses if output processing is needed.
-        """
-        return outputs

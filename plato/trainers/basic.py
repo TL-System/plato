@@ -197,16 +197,6 @@ class Trainer(ComposableTrainer):
             f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
         )
 
-    @staticmethod
-    def process_outputs(outputs):
-        """
-        Method called after model outputs are generated.
-
-        This is a legacy method for backward compatibility.
-        Override this in subclasses if output processing is needed.
-        """
-        return outputs
-
 
 class TimmSchedulerCallback(TrainerCallback):
     """
