@@ -8,6 +8,7 @@ import os
 import torch
 from calibre_dataloader_strategy import CalibreDataLoaderStrategy
 from calibre_loss import CalibreLoss
+from calibre_lr_scheduler_strategy import CalibreLRSchedulerStrategy
 from calibre_optimizer_strategy import CalibreOptimizerStrategy
 from clustering import kmeans_clustering
 
@@ -174,6 +175,7 @@ class Trainer(ComposableTrainer):
             callbacks=callbacks,
             loss_strategy=CalibreLossStrategy(),
             optimizer_strategy=CalibreOptimizerStrategy(),
+            lr_scheduler_strategy=CalibreLRSchedulerStrategy(),
             model_update_strategy=CalibreDivergenceStrategy(),
             data_loader_strategy=CalibreDataLoaderStrategy(),
         )
