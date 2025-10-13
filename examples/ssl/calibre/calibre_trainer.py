@@ -6,6 +6,7 @@ import logging
 import os
 
 import torch
+from calibre_dataloader_strategy import CalibreDataLoaderStrategy
 from calibre_loss import CalibreLoss
 from calibre_optimizer_strategy import CalibreOptimizerStrategy
 from clustering import kmeans_clustering
@@ -174,6 +175,7 @@ class Trainer(ComposableTrainer):
             loss_strategy=CalibreLossStrategy(),
             optimizer_strategy=CalibreOptimizerStrategy(),
             model_update_strategy=CalibreDivergenceStrategy(),
+            data_loader_strategy=CalibreDataLoaderStrategy(),
         )
 
         # Datasets for personalization (required by SSL client)
