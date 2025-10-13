@@ -489,3 +489,129 @@ class WarmupSchedulerStrategy(LRSchedulerStrategy):
         """Teardown base scheduler if provided."""
         if self.base_scheduler is not None:
             self.base_scheduler.teardown(context)
+
+
+class TimmLRSchedulerStrategy(LRSchedulerStrategy):
+    """
+    LR Scheduler strategy for timm (PyTorch Image Models) schedulers.
+
+    This strategy handles timm schedulers that require step_update() calls
+    during training steps, in addition to epoch-level step() calls. This is
+    necessary for schedulers like CosineLRScheduler that update learning rate
+    per iteration rather than per epoch.
+
+    The strategy tracks the number of updates (training steps) and calls
+    step_update() after each batch, while also calling step() at the end
+    of each epoch.
+
+    Args:
+        None
+
+    Example:
+        >>> strategy = TimmLRSchedulerStrategy()
+        >>> trainer = TrainerWithTimmScheduler(
+        ...     lr_scheduler_strategy=strategy
+        ... )
+
+    Note:
+        This strategy requires the LR scheduler to be configured in the
+        config file. It uses the plato.trainers.lr_schedulers registry
+        to create the scheduler.
+    """
+
+    def __init__(self):
+        """Initialize timm scheduler strategy."""
+        super().__init__()
+        self.num_updates = 0
+        self.past_epochs = 0
+
+    def create_scheduler(
+        self, optimizer: torch.optim.Optimizer, context: TrainingContext
+    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+        """
+        Create timm scheduler using configuration.
+
+        Args:
+            optimizer: The optimizer to schedule
+            context: Training context
+
+        Returns:
+            LR scheduler instance from timm, or None if not configured
+        """
+        # Import locally to avoid dependency if not used
+        from plato.trainers import lr_schedulers
+
+        train_loader = context.state.get("train_loader")
+        if train_loader is None:
+            return None
+
+        config = context.config
+        if "lr_scheduler" not in config:
+            return None
+
+        scheduler = lr_schedulers.get(optimizer, len(train_loader))
+
+        # Initialize for global lr scheduler if needed
+        if config.get("global_lr_scheduler", False):
+            past_epochs = (context.current_round - 1) * config.get("epochs", 1)
+            self.past_epochs = past_epochs
+            if scheduler is not None:
+                scheduler.step(past_epochs)
+                scheduler.step_update(past_epochs * len(train_loader))
+
+        return scheduler
+
+    def step(
+        self,
+        scheduler: Optional[torch.optim.lr_scheduler._LRScheduler],
+        context: TrainingContext,
+    ) -> None:
+        """
+        Perform epoch-level scheduler step for timm.
+
+        Args:
+            scheduler: The timm scheduler
+            context: Training context
+        """
+        if scheduler is not None:
+            config = context.config
+            if config.get("global_lr_scheduler", False):
+                scheduler.step(self.past_epochs + context.current_epoch + 1)
+            else:
+                scheduler.step(context.current_epoch + 1)
+
+    def on_epoch_start(self, scheduler, context: TrainingContext) -> None:
+        """
+        Called at epoch start to initialize num_updates.
+
+        This method should be called at the beginning of each epoch
+        to properly track the number of training steps.
+
+        Args:
+            scheduler: The scheduler (unused in this method)
+            context: Training context
+        """
+        train_loader = context.state.get("train_loader")
+        if train_loader is None:
+            return
+
+        self.num_updates = context.current_epoch * len(train_loader)
+
+        config = context.config
+        if config.get("global_lr_scheduler", False):
+            self.num_updates += self.past_epochs * len(train_loader)
+
+    def on_step(self, scheduler, context: TrainingContext) -> None:
+        """
+        Called after each training step to update timm scheduler.
+
+        This method should be called after each optimizer.step() to
+        update the learning rate on a per-iteration basis.
+
+        Args:
+            scheduler: The timm scheduler
+            context: Training context
+        """
+        self.num_updates += 1
+        if scheduler is not None:
+            scheduler.step_update(num_updates=self.num_updates)

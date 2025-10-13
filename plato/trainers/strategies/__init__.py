@@ -70,6 +70,7 @@ from plato.trainers.strategies.lr_scheduler import (
     PolynomialLRSchedulerStrategy,
     ReduceLROnPlateauSchedulerStrategy,
     StepLRSchedulerStrategy,
+    TimmLRSchedulerStrategy,
     WarmupSchedulerStrategy,
 )
 
@@ -147,6 +148,7 @@ __all__ = [
     "ReduceLROnPlateauSchedulerStrategy",
     "LinearLRSchedulerStrategy",
     "PolynomialLRSchedulerStrategy",
+    "TimmLRSchedulerStrategy",
     "WarmupSchedulerStrategy",
     # Model update
     "NoOpUpdateStrategy",

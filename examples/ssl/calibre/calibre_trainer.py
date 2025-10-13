@@ -208,7 +208,7 @@ class Trainer(ComposableTrainer):
         samples_label = None
         self.model.eval()
         self.model.to(self.device)
-        
+
         for examples, labels in data_loader:
             examples, labels = examples.to(self.device), labels.to(self.device)
             with torch.no_grad():
@@ -240,7 +240,7 @@ class Trainer(ComposableTrainer):
         batch_size = config["batch_size"]
 
         # Handle Plato Sampler objects
-        if sampler is not None and hasattr(sampler, 'get') and callable(sampler.get):
+        if sampler is not None and hasattr(sampler, "get") and callable(sampler.get):
             sampler = sampler.get()
 
         if self.current_round > Config().trainer.rounds:
