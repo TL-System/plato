@@ -19,6 +19,22 @@
 
 Plato's trainer system uses a **composition-based architecture** built on the **Strategy Pattern** and **Dependency Injection**. Instead of creating subclasses that override methods, you inject strategy objects that define specific behaviors.
 
+### Why Strategies?
+
+Traditional inheritance-based trainer extension has limitations:
+
+- ❌ Tight coupling between subclasses and base class
+- ❌ Cannot combine multiple behaviors (e.g., FedProx + SCAFFOLD)
+- ❌ Difficult to test individual components
+- ❌ Fragile base class problem
+
+Strategies solve these problems:
+
+- ✅ Composition over inheritance
+- ✅ Easy to combine multiple strategies
+- ✅ Each strategy is independently testable
+- ✅ Clear separation of concerns
+
 ### Key Benefits
 
 - **Composability**: Mix and match strategies to create new algorithms
@@ -26,10 +42,6 @@ Plato's trainer system uses a **composition-based architecture** built on the **
 - **Flexibility**: Swap strategies at runtime or configuration time
 - **Maintainability**: Fix bugs once in strategies, benefit everywhere
 - **Clarity**: Each strategy has a single, clear responsibility
-
-### Design Principle
-
-> **Composition over Inheritance**: Extend functionality by combining strategy objects rather than creating subclass hierarchies.
 
 ---
 
@@ -146,7 +158,7 @@ trainer = ComposableTrainer(
 
 ---
 
-## ComposableTrainer API
+## ComposableTrainer
 
 ### Class: `ComposableTrainer`
 
@@ -277,6 +289,34 @@ class ComposableTrainer(base.Trainer):
 | `current_round` | `int` | Current FL round (1-indexed) |
 | `run_history` | `RunHistory` | Training metrics history |
 | `accuracy` | `float` | Latest test accuracy |
+
+---
+
+## Basic Usage
+
+```python
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies import (
+    CrossEntropyLossStrategy,
+    AdamOptimizerStrategy,
+    CosineAnnealingLRSchedulerStrategy,
+)
+
+# Create trainer with custom strategies
+trainer = ComposableTrainer(
+    loss_strategy=CrossEntropyLossStrategy(label_smoothing=0.1),
+    optimizer_strategy=AdamOptimizerStrategy(lr=0.001),
+    lr_scheduler_strategy=CosineAnnealingLRSchedulerStrategy(T_max=50),
+)
+
+# Use in federated learning
+from plato.clients import simple
+from plato.servers import fedavg
+
+client = simple.Client(trainer=trainer)
+server = fedavg.Server(trainer=trainer)
+server.run(client)
+```
 
 ---
 
@@ -1805,7 +1845,97 @@ trainer = ComposableTrainer(loss_strategy=composite)
 
 ---
 
-## API Summary
+## Usage Examples
+
+### Example 1: Simple Customization
+
+```python
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies import CrossEntropyLossStrategy
+
+# Just customize loss, use defaults for everything else
+trainer = ComposableTrainer(
+    loss_strategy=CrossEntropyLossStrategy(label_smoothing=0.1)
+)
+```
+
+### Example 2: Multiple Customizations
+
+```python
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies import (
+    CrossEntropyLossStrategy,
+    AdamWOptimizerStrategy,
+    CosineAnnealingLRSchedulerStrategy,
+    MixedPrecisionStepStrategy,
+)
+
+trainer = ComposableTrainer(
+    loss_strategy=CrossEntropyLossStrategy(),
+    optimizer_strategy=AdamWOptimizerStrategy(lr=0.001, weight_decay=0.01),
+    training_step_strategy=MixedPrecisionStepStrategy(),
+    lr_scheduler_strategy=CosineAnnealingLRSchedulerStrategy(T_max=50),
+)
+```
+
+### Example 3: Composing Multiple Losses
+
+```python
+from plato.trainers.strategies import (
+    CompositeLossStrategy,
+    CrossEntropyLossStrategy,
+    L2RegularizationStrategy,
+)
+
+# Combine classification loss with L2 regularization
+composite_loss = CompositeLossStrategy([
+    (CrossEntropyLossStrategy(), 1.0),           # weight = 1.0
+    (L2RegularizationStrategy(weight=0.01), 1.0) # weight = 1.0
+])
+
+trainer = ComposableTrainer(loss_strategy=composite_loss)
+```
+
+### Example 4: Gradient Accumulation
+
+```python
+from plato.trainers.strategies import GradientAccumulationStepStrategy
+
+# Effectively 4x batch size through gradient accumulation
+training_step_strategy = GradientAccumulationStepStrategy(
+    accumulation_steps=4
+)
+
+trainer = ComposableTrainer(training_step_strategy=training_step_strategy)
+```
+
+---
+
+## API Reference
+
+### TrainingContext
+
+Shared context passed between strategies:
+
+```python
+class TrainingContext:
+    model: nn.Module              # The model being trained
+    device: torch.device          # CPU or GPU device
+    client_id: int                # Client ID (0 for server)
+    current_epoch: int            # Current epoch number
+    current_round: int            # Current FL round number
+    config: Dict[str, Any]        # Training configuration
+    state: Dict[str, Any]         # Shared state between strategies
+```
+
+### Strategy Lifecycle
+
+All strategies follow this lifecycle:
+
+1. **Construction**: `strategy = MyStrategy(param=value)`
+2. **Setup**: `strategy.setup(context)` - Called once at initialization
+3. **Execution**: Strategy methods called during training
+4. **Teardown**: `strategy.teardown(context)` - Called at end
 
 ### Core Classes
 
@@ -1838,3 +1968,137 @@ trainer = ComposableTrainer(loss_strategy=composite)
 | **FedRep** | `FedRepUpdateStrategy` | `...algorithms.personalized_fl_strategy` |
 | **APFL** | `APFLUpdateStrategy`, `APFLStepStrategy` | `...algorithms.apfl_strategy` |
 | **Ditto** | `DittoUpdateStrategy` | `...algorithms.ditto_strategy` |
+
+---
+
+## Common Patterns
+
+### Access Model in Strategy
+
+```python
+def compute_loss(self, outputs, labels, context):
+    model = context.model  # Access model
+    device = context.device  # Access device
+    # Use model and device...
+```
+
+### Share Data Between Strategies
+
+```python
+# Strategy 1: Store data
+def on_train_start(self, context):
+    context.state['my_data'] = some_value
+
+# Strategy 2: Read data
+def on_train_end(self, context):
+    data = context.state.get('my_data')
+```
+
+### Combine Multiple Strategies
+
+```python
+composite = CompositeLossStrategy([
+    (strategy1, weight1),
+    (strategy2, weight2),
+])
+```
+
+---
+
+## Import Guide
+
+### Import Base Interfaces
+
+```python
+from plato.trainers.strategies.base import (
+    TrainingContext,
+    LossCriterionStrategy,
+    OptimizerStrategy,
+    TrainingStepStrategy,
+    LRSchedulerStrategy,
+    ModelUpdateStrategy,
+    DataLoaderStrategy,
+)
+```
+
+### Import Default Implementations
+
+```python
+from plato.trainers.strategies import (
+    CrossEntropyLossStrategy,
+    AdamOptimizerStrategy,
+    DefaultTrainingStepStrategy,
+    CosineAnnealingLRSchedulerStrategy,
+    NoOpUpdateStrategy,
+    DefaultDataLoaderStrategy,
+)
+```
+
+### Import Everything
+
+```python
+from plato.trainers.strategies import *
+```
+
+---
+
+## Testing
+
+### Unit Testing a Strategy
+
+```python
+import pytest
+import torch
+import torch.nn as nn
+from plato.trainers.strategies.base import TrainingContext
+from my_module import MyCustomLossStrategy
+
+def test_my_custom_loss():
+    # Create strategy
+    strategy = MyCustomLossStrategy(alpha=0.5)
+
+    # Create context
+    context = TrainingContext()
+    context.model = nn.Linear(10, 2)
+    context.device = torch.device('cpu')
+
+    # Setup strategy
+    strategy.setup(context)
+
+    # Test loss computation
+    outputs = torch.randn(10, 2)
+    labels = torch.randint(0, 2, (10,))
+
+    loss = strategy.compute_loss(outputs, labels, context)
+
+    assert isinstance(loss, torch.Tensor)
+    assert loss.dim() == 0  # Scalar
+    assert loss.item() > 0
+```
+
+---
+
+## Frequently Asked Questions
+
+**Q: When should I use strategies vs. callbacks?**
+A: Use strategies for algorithmic variations (loss, optimizer, training step). Use callbacks for event-driven behavior (logging, checkpointing).
+
+**Q: Can I use multiple strategies of the same type?**
+A: Use `CompositeLossStrategy` or `CompositeUpdateStrategy` to combine multiple strategies.
+
+**Q: Can strategies access the training loop?**
+A: Strategies receive a `TrainingContext` with model, device, config, and shared state.
+
+---
+
+## Contributing
+
+To add a new strategy:
+
+1. Choose the appropriate strategy type
+2. Inherit from the base strategy class
+3. Implement required abstract methods
+4. Add comprehensive docstrings with examples
+5. Add type hints to all methods
+6. Write unit tests
+7. Submit pull request
