@@ -84,7 +84,7 @@ def example_1_default_strategies():
     trainer.train_model(config, dataset, sampler)
 
     # Show results
-    loss_history = trainer.run_history.get_metric("train_loss")
+    loss_history = trainer.run_history.get_metric_values("train_loss")
     print(f"\nTraining complete!")
     print(f"Initial loss: {loss_history[0]:.4f}")
     print(f"Final loss: {loss_history[-1]:.4f}")
@@ -126,7 +126,7 @@ def example_2_custom_loss_and_optimizer():
     trainer.train_model(config, dataset, sampler)
 
     # Show results
-    loss_history = trainer.run_history.get_metric("train_loss")
+    loss_history = trainer.run_history.get_metric_values("train_loss")
     print(f"\nTraining complete!")
     print(f"Initial loss: {loss_history[0]:.4f}")
     print(f"Final loss: {loss_history[-1]:.4f}")
@@ -175,7 +175,7 @@ def example_3_multiple_strategies():
     trainer.train_model(config, dataset, sampler)
 
     # Show results
-    loss_history = trainer.run_history.get_metric("train_loss")
+    loss_history = trainer.run_history.get_metric_values("train_loss")
     print(f"\nTraining complete!")
     print(f"Initial loss: {loss_history[0]:.4f}")
     print(f"Final loss: {loss_history[-1]:.4f}")
@@ -250,7 +250,7 @@ def example_4_custom_strategy():
     trainer.train_model(config, dataset, sampler)
 
     # Show results
-    loss_history = trainer.run_history.get_metric("train_loss")
+    loss_history = trainer.run_history.get_metric_values("train_loss")
     print(f"\nTraining complete!")
     print(f"Initial loss: {loss_history[0]:.4f}")
     print(f"Final loss: {loss_history[-1]:.4f}")
@@ -297,7 +297,7 @@ def example_5_mixed_precision():
     trainer.train_model(config, dataset, sampler)
 
     # Show results
-    loss_history = trainer.run_history.get_metric("train_loss")
+    loss_history = trainer.run_history.get_metric_values("train_loss")
     print(f"\nTraining complete!")
     print(f"Initial loss: {loss_history[0]:.4f}")
     print(f"Final loss: {loss_history[-1]:.4f}")
