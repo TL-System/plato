@@ -172,10 +172,12 @@ class TrainerAsync(BasicTrainer):
 
         return memory
 
-    def obtain_model_update(self, client_id, requested_time):
+    def obtain_model_at_time(self, client_id, requested_time):
         """
         Obtain a saved model for a particular epoch that finishes just after the provided
         wall clock time is reached.
+
+        This method is used for asynchronous training with wall-clock simulation.
         """
         # Constructing a list of epochs and training times
         models_per_epoch = {}

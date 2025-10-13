@@ -6,20 +6,9 @@ The Trainer class uses the ComposableTrainer with default strategies, leveraging
 the strategy design pattern.
 """
 
-import copy
-import logging
-import os
-import re
-import time
-from typing import Optional
-
-import torch
-
 from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
-from plato.models import registry as models_registry
 from plato.trainers.composable import ComposableTrainer
-from plato.trainers.strategies.base import TrainingContext
 from plato.trainers.strategies.lr_scheduler import TimmLRSchedulerStrategy
 
 
@@ -137,65 +126,6 @@ class Trainer(ComposableTrainer):
     def train_step_end(self, config, batch=None, loss=None):
         """Method called at the end of a training step (legacy hook)."""
         pass
-
-    # Legacy methods for old obtain_model_update behavior
-    def obtain_model_update_legacy(self, client_id, requested_time):
-        """
-        Obtain a saved model for a particular epoch that finishes just after the provided
-        wall clock time is reached.
-
-        This is a legacy method for asynchronous training with wall-clock simulation.
-        """
-        # Constructing a list of epochs and training times
-        models_per_epoch = {}
-
-        for filename in os.listdir(Config().params["model_path"]):
-            split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
-                filename,
-            )
-
-            if split is not None:
-                epoch = split.group("epoch")
-                training_time = split.group("training_time")
-                if client_id == int(split.group("client_id")):
-                    models_per_epoch[epoch] = {
-                        "training_time": float(training_time),
-                        "model_checkpoint": filename,
-                    }
-
-        # Locate the model at a specific wall clock time
-        for epoch in sorted(models_per_epoch, reverse=True):
-            model_training_time = models_per_epoch[epoch]["training_time"]
-            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
-
-            if model_training_time < requested_time:
-                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
-
-                pretrained = None
-                if torch.cuda.is_available():
-                    pretrained = torch.load(model_path)
-                else:
-                    pretrained = torch.load(
-                        model_path, map_location=torch.device("cpu")
-                    )
-
-                model = models_registry.get()
-                model.load_state_dict(pretrained, strict=True)
-
-                logging.info(
-                    "[Client #%s] Responding to the server with the model after "
-                    "epoch %s finished, at time %s.",
-                    client_id,
-                    epoch,
-                    model_training_time,
-                )
-
-                return model
-
-        raise ValueError(
-            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
-        )
 
     @staticmethod
     def process_outputs(outputs):
