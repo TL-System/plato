@@ -39,8 +39,26 @@ class DefaultTestingStrategy(TestingStrategy):
 
         # Create test data loader
         batch_size = config.get("batch_size", 32)
+
+        # Handle different sampler types properly
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                # It's already a PyTorch Sampler object
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
+                # It's a list of indices, create SubsetRandomSampler
+                sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                # It's a Plato Sampler, call get() to obtain PyTorch sampler
+                sampler_obj = sampler.get()
+            else:
+                # Unknown type, try to use it directly
+                sampler_obj = sampler
+        else:
+            sampler_obj = None
+
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler_obj
         )
 
         correct = 0
