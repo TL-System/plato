@@ -75,7 +75,9 @@ class HermesPruningCallback(TrainerCallback):
             accuracy >= self.accuracy_threshold
             and self.pruned_amount < self.pruning_target
         ):
-            logging.info("[Client #%d] Conducting structured pruning.", trainer.client_id)
+            logging.info(
+                "[Client #%d] Conducting structured pruning.", trainer.client_id
+            )
 
             if self.pruning_target - self.pruned_amount < self.pruning_rate:
                 self.pruning_rate = (self.pruning_target - self.pruned_amount) / 100
