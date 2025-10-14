@@ -1,5 +1,5 @@
 """
-Server aggregation using FedAtt.
+Server aggregation using FedAtt with strategy pattern.
 
 Reference:
 
@@ -11,30 +11,56 @@ https://arxiv.org/abs/1812.07108
 """
 
 from collections import OrderedDict
+from types import SimpleNamespace
+from typing import Dict, List, Optional
 
 import torch
 import torch.nn.functional as F
 
-from plato.algorithms import fedavg
 from plato.config import Config
+from plato.servers import fedavg
+from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
 
-class Algorithm(fedavg.Algorithm):
-    """The federated learning algorithm for FedAtt, used by the server."""
+class FedAttAggregationStrategy(AggregationStrategy):
+    """FedAtt aggregation strategy using attentive aggregation with norm-based attention."""
 
-    async def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
+    async def aggregate_deltas(
+        self,
+        updates: List[SimpleNamespace],
+        deltas_received: List[Dict],
+        context: ServerContext,
+    ) -> Dict:
+        """This method is not used; FedAtt aggregates weights directly."""
+        raise NotImplementedError(
+            "FedAtt uses aggregate_weights instead of aggregate_deltas"
+        )
+
+    async def aggregate_weights(
+        self,
+        updates: List[SimpleNamespace],
+        baseline_weights: Dict,
+        weights_received: List[Dict],
+        context: ServerContext,
+    ) -> Optional[Dict]:
         """Perform attentive aggregation with the attention mechanism."""
-        deltas_received = self.compute_weight_deltas(baseline_weights, weights_received)
+        # Compute weight deltas
+        deltas_received = []
+        for weight in weights_received:
+            delta = OrderedDict()
+            for name, current_weight in baseline_weights.items():
+                delta[name] = weight[name] - current_weight
+            deltas_received.append(delta)
 
         att_update = {
-            name: self.trainer.zeros(weights.shape)
+            name: context.trainer.zeros(weights.shape)
             for name, weights in deltas_received[0].items()
         }
 
         atts = OrderedDict()
 
         for name in baseline_weights.keys():
-            atts[name] = self.trainer.zeros(len(deltas_received))
+            atts[name] = context.trainer.zeros(len(deltas_received))
             for i, update in enumerate(deltas_received):
                 # convert potential LongTensor to FloatTensor for linalg.norm
                 delta = update[name].type(torch.FloatTensor)
@@ -44,7 +70,7 @@ class Algorithm(fedavg.Algorithm):
             atts[name] = F.softmax(atts[name], dim=0)
 
         for name, weight in baseline_weights.items():
-            att_weight = self.trainer.zeros(weight.shape)
+            att_weight = context.trainer.zeros(weight.shape)
             for i, update in enumerate(deltas_received):
                 delta = update[name]
                 delta = delta.float()
@@ -68,4 +94,9 @@ class Algorithm(fedavg.Algorithm):
                 torch.randn(weight.shape), magnitude
             )
 
-        return self.update_weights(att_update)
+        # Apply the aggregated update to the baseline weights
+        updated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            updated_weights[name] = weight + att_update[name]
+
+        return updated_weights

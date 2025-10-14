@@ -1,5 +1,7 @@
 """
-A federated learning training session using Oort.
+A federated learning training session using Oort with strategy pattern.
+
+This is the updated version using the strategy-based API instead of inheritance.
 
 Reference:
 
@@ -14,7 +16,7 @@ import oort_trainer
 
 
 def main():
-    """A Plato federated learning training session using Oort for client selection."""
+    """A Plato federated learning training session using Oort strategy."""
     trainer = oort_trainer.Trainer
     client = oort_client.Client(trainer=trainer)
     server = oort_server.Server(trainer=trainer)

@@ -10,15 +10,47 @@ with Attentive Aggregation," in Proc. International Joint Conference on Neural N
 https://arxiv.org/abs/1812.07108
 """
 
+from collections import OrderedDict
+from types import SimpleNamespace
+from typing import Dict, List, Optional
+
+import torch
+import torch.nn.functional as F
+from fedatt_server_strategy import FedAttAggregationStrategy
+
+from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
 
 class Server(fedavg.Server):
-    """The federated learning server using the FedAtt algorithm."""
+    """
+    A federated learning server using FedAtt aggregation strategy.
 
-    # pylint: disable=unused-argument
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Aggregate weight updates from the clients using FedAtt."""
-        return await self.algorithm.aggregate_weights(
-            baseline_weights, weights_received
+    The FedAtt aggregation logic is implemented in the aggregation strategy,
+    following the composition-over-inheritance pattern.
+    """
+
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        aggregation_strategy=None,
+        client_selection_strategy=None,
+    ):
+        # Use FedAtt aggregation strategy by default
+        if aggregation_strategy is None:
+            aggregation_strategy = FedAttAggregationStrategy()
+
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            aggregation_strategy=aggregation_strategy,
+            client_selection_strategy=client_selection_strategy,
         )

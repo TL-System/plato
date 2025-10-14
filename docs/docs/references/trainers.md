@@ -2,24 +2,22 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Architecture](#architecture)
-3. [Quick Start](#quick-start)
-4. [ComposableTrainer API](#composabletrainer-api)
-5. [Strategy Interfaces](#strategy-interfaces)
-6. [Default Strategies](#default-strategies)
-7. [Algorithm-Specific Strategies](#algorithm-specific-strategies)
-8. [TrainingContext](#trainingcontext)
-9. [Creating Custom Strategies](#creating-custom-strategies)
-10. [Advanced Usage of Strategies](#advanced-usage-of-strategies)
-11. [Usage Examples](#usage-examples)
-12. [API Reference](#api-reference)
-13. [Common Patterns](#common-patterns)
-14. [Customizing Trainers using Callbacks](#customizing-trainers-using-callbacks)
-15. [Accessing and Customizing the Run History During Training](#accessing-and-customizing-the-run-history-during-training)
-16. [Customizing Trainers using Subclassing and Hooks](#customizing-trainers-using-subclassing-and-hooks)
-17. [Import Guide](#import-guide)
-18. [Frequently Asked Questions](#frequently-asked-questions)
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Strategy Interfaces](#strategy-interfaces)
+- [Default Strategies](#default-strategies)
+- [Algorithm-Specific Strategies](#algorithm-specific-strategies)
+- [TrainingContext](#trainingcontext)
+- [Creating Custom Strategies](#creating-custom-strategies)
+- [Advanced Usage of Strategies](#advanced-usage-of-strategies)
+- [Usage Examples](#usage-examples)
+- [API Reference](#api-reference)
+- [Common Patterns](#common-patterns)
+- [Customizing Trainers using Callbacks](#customizing-trainers-using-callbacks)
+- [Accessing and Customizing the Run History During Training](#accessing-and-customizing-the-run-history-during-training)
+- [Customizing Trainers using Subclassing and Hooks](#customizing-trainers-using-subclassing-and-hooks)
+- [Frequently Asked Questions](#frequently-asked-questions)
 
 ---
 
@@ -1694,7 +1692,7 @@ test_my_custom_loss_strategy()
 
 ---
 
-## Advanced Usage of Strategy Patterns
+## Advanced Usage of Strategies
 
 ### Combining Multiple Strategies
 
@@ -2231,43 +2229,6 @@ When using the strategy pattern is no longer feasible, it is also possible to cu
     ```python
     trainer.load_model("my_model.pth")
     ```
-
----
-
-## Import Guide
-
-### Import Base Interfaces
-
-```python
-from plato.trainers.strategies.base import (
-    TrainingContext,
-    LossCriterionStrategy,
-    OptimizerStrategy,
-    TrainingStepStrategy,
-    LRSchedulerStrategy,
-    ModelUpdateStrategy,
-    DataLoaderStrategy,
-)
-```
-
-### Import Default Implementations
-
-```python
-from plato.trainers.strategies import (
-    CrossEntropyLossStrategy,
-    AdamOptimizerStrategy,
-    DefaultTrainingStepStrategy,
-    CosineAnnealingLRSchedulerStrategy,
-    NoOpUpdateStrategy,
-    DefaultDataLoaderStrategy,
-)
-```
-
-### Import Everything
-
-```python
-from plato.trainers.strategies import *
-```
 
 ---
 

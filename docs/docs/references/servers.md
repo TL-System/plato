@@ -1,5 +1,147 @@
 # Servers
 
+## Strategy-Based Customization
+
+Plato servers now support strategy-based composition for the two most common customization points:
+client selection and update aggregation. Instead of subclassing the server and overriding hooks, you
+can pass strategy objects that implement lightweight interfaces.
+
+### Overview
+
+- `AggregationStrategy`: orchestrates how client model updates are merged into the global model.
+- `ClientSelectionStrategy`: decides which clients participate in each round.
+- `ServerStrategy`: shared base class that exposes lifecycle hooks for setup/teardown.
+- `ServerContext`: shared state passed to every strategy so they can coordinate without tight
+  coupling to the concrete server implementation.
+
+Strategy instances can be combined at runtime, making it easy to mix built-in functionality with your
+own components.
+
+### Quick Start
+
+```py
+from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedNovaAggregationStrategy
+from plato.servers.strategies.client_selection import OortSelectionStrategy
+
+server = fedavg.Server(
+    aggregation_strategy=FedNovaAggregationStrategy(),
+    client_selection_strategy=OortSelectionStrategy(exploration_factor=0.3),
+)
+
+server.run()
+```
+
+If you only need to customize one side, pass the other strategy as `None` and the server falls back
+to its default implementation.
+
+### Built-in Strategies
+
+| Strategy type | Class | Highlights |
+| --- | --- | --- |
+| Aggregation | `FedAvgAggregationStrategy` | Sample-weighted FedAvg implementation. |
+| Aggregation | `FedAsyncAggregationStrategy` | Staleness-aware mixing for asynchronous training. |
+| Aggregation | `FedBuffAggregationStrategy` | Simple asynchronous aggregation strategy without using weights. |
+| Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
+| Aggregation | `PiscesAggregationStrategy` | More complex asynchronous aggregation strategy. |
+| Aggregation | `PolarisAggregationStrategy` | More complex asynchronous aggregation strategy. |
+| Client selection | `RandomSelectionStrategy` | Uniform random selection (default). |
+| Client selection | `OortSelectionStrategy` | Utility-based exploration/exploitation selection. |
+| Client selection | `AFLSelectionStrategy` | Active federated learning prioritization. |
+| Client selection | `PiscesAggregationStrategy` | Client selection based on the Pisces algorithm. |
+| Client selection | `PolarisAggregationStrategy` | Client selection based on the Polaris algorithm. |
+
+### Implementing Custom Strategies
+
+```py
+from typing import Dict, List
+from types import SimpleNamespace
+
+from plato.servers.strategies.base import (
+    AggregationStrategy,
+    ClientSelectionStrategy,
+    ServerContext,
+)
+
+
+class ClippedAggregationStrategy(AggregationStrategy):
+    """Clip client deltas before averaging to improve robustness."""
+
+    def __init__(self, max_norm: float = 5.0):
+        self.max_norm = max_norm
+
+    async def aggregate_deltas(
+        self,
+        updates: List[SimpleNamespace],
+        deltas_received: List[Dict],
+        context: ServerContext,
+    ) -> Dict:
+        total_samples = sum(update.report.num_samples for update in updates)
+        averaged = {
+            name: context.trainer.zeros(delta.shape)
+            for name, delta in deltas_received[0].items()
+        }
+
+        for i, delta in enumerate(deltas_received):
+            weight = updates[i].report.num_samples / total_samples
+            for name, value in delta.items():
+                clipped = value.clamp(-self.max_norm, self.max_norm)
+                averaged[name] += clipped * weight
+
+        return averaged
+
+
+class StragglerAwareSelection(ClientSelectionStrategy):
+    """Avoid repeatedly selecting clients that recently participated."""
+
+    def select_clients(
+        self,
+        clients_pool: List[int],
+        clients_count: int,
+        context: ServerContext,
+    ) -> List[int]:
+        history = context.state.setdefault(
+            "recent_clients", []
+        )  # maintain simple FIFO history
+        eligible = [cid for cid in clients_pool if cid not in history]
+
+        if len(eligible) < clients_count:
+            eligible = clients_pool  # fallback if pool is too small
+
+        selected = eligible[:clients_count]
+        history.extend(selected)
+        history[:] = history[-2 * clients_count :]  # keep last few entries
+        return selected
+```
+
+Key tips:
+
+- Strategies receive a `ServerContext` instance on every call; use it to read or share runtime state.
+- Aggregation strategies may override `aggregate_weights()` when working with weight dictionaries
+  instead of deltas.
+- Client selection strategies can optionally implement `on_clients_selected()` and
+  `on_reports_received()` hooks when additional bookkeeping is required.
+
+### Strategy Interfaces
+
+`plato/servers/strategies/base.py` defines the shared contracts. The most important attributes on
+`ServerContext` are:
+
+- `server`, `trainer`, and `algorithm` references for interacting with the broader system.
+- `current_round`, `total_clients`, and `clients_per_round` counters.
+- `updates`: list of `SimpleNamespace` instances containing the latest batch of client reports.
+- `state`: dictionary for persisting cross-call state without mutating the server directly.
+
+Refer to the source docstrings for the complete interface.
+
+### Migrating from Hook Overrides
+
+The hook-based approach, as documented in the next section, continues to work for advanced scenarios. We recommend the strategy pattern for new projects because it keeps responsibilities modular and testable. When migrating:
+
+1. Identify the overridden hook (for example, `choose_clients`) and map it to the corresponding strategy (`ClientSelectionStrategy.select_clients`).
+2. Move helper attributes into the strategy's internal state or the shared `context.state`.
+3. Register the strategy in your server factory or experiment script.
+
 ## Customizing Servers using Inheritance
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
