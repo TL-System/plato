@@ -1,5 +1,5 @@
 """
-Obtaining a model from the PyTorch Hub.
+Obtaining a model from HuggingFace.
 """
 
 from transformers import AutoConfig, AutoModelForCausalLM
