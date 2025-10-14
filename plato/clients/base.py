@@ -279,7 +279,7 @@ class Client:
             data["time"],
         )
 
-        report, payload = await self._obtain_model_update(
+        report, payload = await self._obtain_model_at_time(
             client_id=data["client_id"],
             requested_time=data["time"],
         )
@@ -463,5 +463,9 @@ class Client:
         """Additional client-specific processing on the server response."""
 
     @abstractmethod
-    async def _obtain_model_update(self, client_id, requested_time):
-        """Retrieving a model update corrsponding to a particular wall clock time."""
+    async def _obtain_model_at_time(self, client_id, requested_time):
+        """Retrieving a model update corresponding to a particular wall clock time.
+
+        This method is called during asynchronous training when the server requests
+        a model update at a specific wall-clock time.
+        """

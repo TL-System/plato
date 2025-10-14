@@ -200,10 +200,6 @@ class SplitLearningTestingStrategy(TestingStrategy):
                 )
                 outputs = model(examples)
 
-                # Process outputs through callbacks
-                for callback in trainer.callbacks:
-                    outputs = callback.on_test_outputs(trainer, outputs)
-
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()

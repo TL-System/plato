@@ -96,6 +96,7 @@ Plato's trainer system uses a **composition-based architecture** built on the **
 | **LRSchedulerStrategy** | LR scheduling | Custom schedules, warmup |
 | **ModelUpdateStrategy** | State management | Control variates, personalization (SCAFFOLD, Ditto) |
 | **DataLoaderStrategy** | Data loading | Custom sampling, augmentation |
+| **TestingStrategy** | Model evaluation | Custom model evaluation and testing |
 
 ---
 
@@ -193,85 +194,10 @@ class ComposableTrainer(base.Trainer):
 | `data_loader_strategy` | `DataLoaderStrategy` | `DefaultDataLoaderStrategy()` | Strategy for data loading |
 | `testing_strategy` | `TestingStrategy` | `DefaultTestingStrategy()` | Strategy for model evaluation |
 
-#### Key Methods
+#### Methods
 
-!!! note "`train(trainset, sampler, **kwargs) -> float`"
+Here is a list of methods in `ComposableTrainer` that can be called.
 
-    Train the model on the given dataset and sampler.
-
-    **Parameters:**
-
-    - `trainset`: Training dataset
-    - `sampler`: Data sampler for this client
-    - `**kwargs`: Additional arguments
-
-    **Returns:**
-
-    - Training time in seconds
-
-    **Example:**
-
-    ```python
-    training_time = trainer.train(trainset, sampler)
-    ```
-
-!!! note "`test(testset, sampler=None, **kwargs) -> float`"
-    Test the model on the given dataset.
-
-    **Parameters:**
-
-    - `testset`: Test dataset
-    - `sampler`: Optional data sampler
-    - `**kwargs`: Additional arguments
-
-    **Returns:**
-
-    - Test accuracy (0.0 to 1.0)
-
-    **Example:**
-
-    ```python
-    accuracy = trainer.test(testset)
-    print(f"Accuracy: {accuracy * 100:.2f}%")
-    ```
-
-!!! note "`train_model(config, trainset, sampler, **kwargs)`"
-    Main training loop implementation. Called internally by `train()`.
-
-    **Parameters:**
-
-    - `config`: Configuration dictionary
-    - `trainset`: Training dataset
-    - `sampler`: Data sampler
-    - `**kwargs`: Additional arguments
-
-!!! note "`save_model(filename=None, location=None)`"
-    Save model weights and training history.
-
-    **Parameters:**
-
-    - `filename`: Optional custom filename
-    - `location`: Optional custom directory
-
-    **Example:**
-
-    ```python
-    trainer.save_model("my_model.pth")
-    ```
-
-!!! note "`load_model(filename=None, location=None)`"
-    Load model weights and training history.
-
-    **Parameters:**
-
-    - `filename`: Optional custom filename
-    - `location`: Optional custom directory
-
-    **Example:**
-
-    ```python
-    trainer.load_model("my_model.pth")
-    ```
 
 #### Attributes
 
@@ -662,9 +588,9 @@ class ModelUpdateStrategy(Strategy):
 
 #### When to Implement
 
-- Control variates (SCAFFOLD)
-- Dynamic regularization state (FedDyn)
-- Personalization (FedPer, FedRep, Ditto)
+- Control variates (e.g., SCAFFOLD)
+- Dynamic regularization state (e.g., FedDyn)
+- Personalization (e.g., FedPer, FedRep, Ditto)
 - Layer freezing/unfreezing
 - Custom state management
 
@@ -955,6 +881,22 @@ trainer = ComposableTrainer(
 )
 ```
 
+### Testing Strategies
+
+**Location**: `plato.trainers.strategies.testing`
+
+| Strategy | Description | Parameters |
+|----------|-------------|------------|
+| `DefaultTestingStrategy` | Standard Testing | Uses config settings |
+
+**Example:**
+```python
+from plato.trainers.strategies import TestingStrategy
+
+trainer = ComposableTrainer(
+    testing_strategy=DefaultTestingStrategy()
+)
+```
 ---
 
 ## Algorithm-Specific Strategies
@@ -1212,7 +1154,7 @@ algorithm:
 
 ---
 
-### FedMos
+### FedMoS
 
 **Location**: `plato.trainers.strategies.algorithms.fedmos_strategy`
 
@@ -2241,7 +2183,7 @@ Here is a list of all the methods available in the `RunHistory` class:
 
 When using the strategy pattern is no longer feasible, it is also possible to customize the training or testing procedure using subclassing, and overriding hook methods. To customize the training loop using subclassing, subclass the `basic.Trainer` class in `plato.trainers`, and override the following hook methods:
 
-!!! example "train_model()"
+!!! note "`train_model()`"
     **`def train_model(self, config, trainset, sampler, **kwargs):`**
 
     Override this method to provide a custom training loop.
@@ -2252,8 +2194,8 @@ When using the strategy pattern is no longer feasible, it is also possible to cu
 
     **Example:** A complete example can be found in the Hugging Face trainer, located at `plato/trainers/huggingface.py`.
 
-!!! example "test_model()"
-    **`test_model(self, config, testset, sampler=None, **kwargs):`**
+!!! note "`test_model()`"
+    **`def test_model(self, config, testset, sampler=None, **kwargs):`**
 
     Override this method to provide a custom testing loop.
 
@@ -2261,6 +2203,34 @@ When using the strategy pattern is no longer feasible, it is also possible to cu
     `testset` The test dataset.
 
     **Example:** A complete example can be found in `plato/trainers/huggingface.py`.
+
+!!! note "`save_model(filename=None, location=None)`"
+    Save model weights and training history.
+
+    **Parameters:**
+
+    - `filename`: Optional custom filename
+    - `location`: Optional custom directory
+
+    **Example:**
+
+    ```python
+    trainer.save_model("my_model.pth")
+    ```
+
+!!! note "`load_model(filename=None, location=None)`"
+    Load model weights and training history.
+
+    **Parameters:**
+
+    - `filename`: Optional custom filename
+    - `location`: Optional custom directory
+
+    **Example:**
+
+    ```python
+    trainer.load_model("my_model.pth")
+    ```
 
 ---
 

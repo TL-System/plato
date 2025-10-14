@@ -9,24 +9,63 @@ Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 URL: https://arxiv.org/abs/2206.09264
 """
 
-from plato.trainers import basic, loss_criterion
+from plato.trainers import loss_criterion
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import LossCriterionStrategy
 
 
-class Trainer(basic.Trainer):
-    """The federated learning trainer for the Pisces client."""
+class PiscesLossStrategy(LossCriterionStrategy):
+    """Loss strategy for Pisces that tracks per-batch loss values."""
 
-    def process_loss(self, outputs, labels):
-        """Returns the loss and records per_batch loss values."""
-        loss_func = loss_criterion.get()
-        per_batch_loss = loss_func(outputs, labels)
+    def setup(self, context):
+        """Initialize the loss criterion."""
+        self._criterion = loss_criterion.get()
 
-        # Stores the per_batch loss value
-        self.run_history.update_metric(
-            "train_batch_loss", per_batch_loss.cpu().detach().numpy()
-        )
+    def compute_loss(self, outputs, labels, context):
+        """
+        Compute loss and track per-batch loss values.
+
+        This computes the batch loss and stores it in run_history
+        for Pisces client selection algorithm.
+        """
+        per_batch_loss = self._criterion(outputs, labels)
+
+        # Get the trainer from context to access run_history
+        trainer = context.state.get("trainer")
+        if trainer is not None:
+            # Store the per_batch loss value
+            trainer.run_history.update_metric(
+                "train_batch_loss", per_batch_loss.cpu().detach().numpy()
+            )
 
         return per_batch_loss
 
-    def get_loss_criterion(self):
-        """Returns the loss criterion."""
-        return self.process_loss
+
+class Trainer(ComposableTrainer):
+    """The federated learning trainer for the Pisces client."""
+
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize the Pisces trainer.
+
+        Args:
+            model: The model to train (class or instance)
+            callbacks: List of callback classes or instances
+        """
+        # Create Pisces-specific loss strategy
+        loss_strategy = PiscesLossStrategy()
+
+        # Initialize with Pisces strategies
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            loss_strategy=loss_strategy,
+        )
+
+    def train_model(self, config, trainset, sampler, **kwargs):
+        """Training loop that provides trainer reference to context."""
+        # Store trainer reference in context so loss strategy can access run_history
+        self.context.state["trainer"] = self
+
+        # Call parent training loop
+        super().train_model(config, trainset, sampler, **kwargs)

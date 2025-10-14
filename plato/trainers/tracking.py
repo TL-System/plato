@@ -92,5 +92,6 @@ class LossTracker:
     @property
     def average(self):
         """Returns the computed average of loss values tracked."""
-
+        if isinstance(self._average, (int, float)):
+            return self._average
         return self._average.cpu().detach().mean().item()

@@ -11,17 +11,71 @@ from collections import OrderedDict
 import numpy as np
 import torch
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
-from plato.trainers import basic
+from plato.trainers.composable import ComposableTrainer
 
 
-class Trainer(basic.Trainer):
+class FedSCRCallback(TrainerCallback):
+    """Callback for FedSCR pruning and gradient accumulation operations."""
+
+    def __init__(self):
+        """Initialize the callback."""
+        # The accumulated gradients for a client throughout the FL session
+        self.acc_grads = []
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """Initialize at the start of training."""
+        trainer.total_grad = OrderedDict()
+        trainer.orig_weights = copy.deepcopy(trainer.model)
+        trainer.orig_weights.to(trainer.device)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        """Process weight update pruning at the end of training."""
+        # Get the overall weight updates
+        logging.info("[Client #%d] Pruning weight updates.", trainer.client_id)
+        trainer.prune_update(self.acc_grads)
+        logging.info(
+            "[Client #%d] SCR ratio (pruned amount): %.2f%%",
+            trainer.client_id,
+            trainer.compute_pruned_amount(),
+        )
+
+        # Add weight divergence and average update to client report
+        if trainer.use_adaptive:
+            # Calculate weight divergence between local and global model
+            trainer.div_from_global = trainer.compute_weight_divergence()
+
+            # Calculate average local weight updates
+            trainer.avg_update = trainer.compute_local_update_significance()
+
+            logging.info(
+                "[Client #%d] Average local weight updates: %.2f",
+                trainer.client_id,
+                trainer.avg_update,
+            )
+            logging.info(
+                "[Client #%d] Weight divergence: %.2f",
+                trainer.client_id,
+                trainer.div_from_global,
+            )
+
+            trainer.run_history.update_metric(
+                "div_from_global", trainer.div_from_global
+            )
+            trainer.run_history.update_metric("avg_update", trainer.avg_update)
+
+        trainer.model.load_state_dict(trainer.total_grad, strict=True)
+
+        # Update accumulated gradients for next round
+        self.acc_grads = trainer._acc_grads
+
+
+class Trainer(ComposableTrainer):
     """A federated learning trainer used by the client."""
 
     def __init__(self, model=None, callbacks=None):
         """Initializes the trainer with the provided model."""
-        super().__init__(model=model, callbacks=callbacks)
-
         # The threshold for determining whether an update is significant or not
         self.update_threshold = (
             Config().clients.update_threshold
@@ -33,7 +87,7 @@ class Trainer(basic.Trainer):
         self.total_grad = OrderedDict()
 
         # The accumulated gradients for a client throughout the FL session
-        self.acc_grads = []
+        self._acc_grads = []
 
         # Should the clients use the adaptive algorithm?
         self.use_adaptive = bool(
@@ -43,9 +97,20 @@ class Trainer(basic.Trainer):
         self.div_from_global = None
         self.orig_weights = None
 
-    def prune_update(self):
+        # Create callbacks for FedSCR
+        fedscr_callbacks = [FedSCRCallback]
+        if callbacks is not None:
+            fedscr_callbacks.extend(callbacks)
+
+        # Initialize with FedSCR callbacks
+        super().__init__(
+            model=model,
+            callbacks=fedscr_callbacks,
+        )
+
+    def prune_update(self, acc_grads):
         """Prunes the weight update by setting some parameters in update to 0."""
-        self.load_acc_grads()
+        self._acc_grads = self.load_acc_grads()
 
         conv_updates = OrderedDict()
         i = 0
@@ -57,7 +122,7 @@ class Trainer(basic.Trainer):
             ):
                 orig_tensor = orig_module.weight.data.cpu().numpy()
                 trained_tensor = trained_module.weight.data.cpu().numpy()
-                delta = trained_tensor - orig_tensor + self.acc_grads[i]
+                delta = trained_tensor - orig_tensor + self._acc_grads[i]
                 orig_delta = copy.deepcopy(delta)
 
                 aggregated_channels = self.aggregate_channels(delta)
@@ -67,14 +132,14 @@ class Trainer(basic.Trainer):
                 delta = self.prune_filters(aggregated_filters, delta)
 
                 delta_name = f"{orig_name}.weight"
-                self.acc_grads[i] = orig_delta - delta
+                self._acc_grads[i] = orig_delta - delta
                 conv_updates[delta_name] = delta
                 i += 1
 
         for orig_key, trained_key in zip(
             self.orig_weights.state_dict(), self.model.state_dict()
         ):
-            if not orig_key in conv_updates:
+            if orig_key not in conv_updates:
                 orig_tensor = self.orig_weights.state_dict()[orig_key]
                 trained_tensor = self.model.state_dict()[trained_key]
                 delta = trained_tensor - orig_tensor
@@ -143,7 +208,7 @@ class Trainer(basic.Trainer):
             f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         )
         with open(acc_grad_path, "wb") as payload_file:
-            pickle.dump(self.acc_grads, payload_file)
+            pickle.dump(self._acc_grads, payload_file)
 
     def load_acc_grads(self):
         """Loads the accumulated gradients from a previous communication round."""
@@ -156,7 +221,7 @@ class Trainer(basic.Trainer):
         grad_path = f"{checkpoint_path}/{model_name}_client{self.client_id}_grad.pth"
         if os.path.exists(grad_path):
             with open(grad_path, "rb") as payload_file:
-                self.acc_grads = pickle.load(payload_file)
+                return pickle.load(payload_file)
         else:
             count = 0
             for module in self.model.modules():
@@ -164,7 +229,7 @@ class Trainer(basic.Trainer):
                     module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
                 ):
                     count += 1
-            self.acc_grads = [0] * count
+            return [0] * count
 
     def compute_pruned_amount(self):
         """Computes the pruned percentage of the entire model."""
@@ -178,47 +243,6 @@ class Trainer(basic.Trainer):
             total += total_params
 
         return 100 * (total - nonzero) / total
-
-    def train_run_start(self, config):
-        """Method called at the start of training run."""
-        self.total_grad = OrderedDict()
-        self.orig_weights = copy.deepcopy(self.model)
-        self.orig_weights.to(self.device)
-
-    def train_run_end(self, config):
-        """Method called at the end of training run."""
-        # Get the overall weight updates
-        logging.info("[Client #%d] Pruning weight updates.", self.client_id)
-        self.prune_update()
-        logging.info(
-            "[Client #%d] SCR ratio (pruned amount): %.2f%%",
-            self.client_id,
-            self.compute_pruned_amount(),
-        )
-
-        # Add weight divergence and average update to client report
-        if self.use_adaptive is True:
-            # Calculate weight divergence between local and global model
-            self.div_from_global = self.compute_weight_divergence()
-
-            # Calculate average local weight updates
-            self.avg_update = self.compute_local_update_significance()
-
-            logging.info(
-                "[Client #%d] Average local weight updates: %.2f",
-                self.client_id,
-                self.avg_update,
-            )
-            logging.info(
-                "[Client #%d] Weight divergence: %.2f",
-                self.client_id,
-                self.div_from_global,
-            )
-
-            self.run_history.update_metric("div_from_global", self.div_from_global)
-            self.run_history.update_metric("avg_update", self.avg_update)
-
-        self.model.load_state_dict(self.total_grad, strict=True)
 
     def compute_weight_divergence(self):
         """Calculates the divergence of the locally trained model from the global model."""

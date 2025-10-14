@@ -23,6 +23,7 @@ import logging
 import multiprocessing as mp
 import os
 import pickle
+import re
 import time
 from typing import Any, Callable, List, Optional, Union
 
@@ -107,7 +108,11 @@ class ComposableTrainer(base.Trainer):
         # Initialize model
         if model is None:
             self.model = models_registry.get()
+        elif isinstance(model, nn.Module):
+            # Model instance passed directly
+            self.model = model
         elif callable(model):
+            # Model factory/constructor passed
             self.model = model()
         else:
             self.model = model
@@ -250,7 +255,7 @@ class ComposableTrainer(base.Trainer):
             hasattr(Config().clients, "sleep_simulation")
             and Config().clients.sleep_simulation
         ):
-            sleep_seconds = Config().clients.simulation_distribution(self.client_id)
+            sleep_seconds = Config.client_sleep_times[self.client_id - 1]
             sleep_seconds = max(0, sleep_seconds)
 
             if sleep_seconds > 0:
@@ -572,6 +577,79 @@ class ComposableTrainer(base.Trainer):
             }
         else:
             return model_update
+
+    def obtain_model_at_time(self, client_id, requested_time):
+        """
+        Obtain a saved model for a particular epoch that finishes just after
+        the provided wall clock time is reached.
+
+        This method is used for asynchronous training with wall-clock simulation.
+        It searches through saved model checkpoints and returns the model from
+        the latest epoch that finished before the requested time.
+
+        Subclasses can override this method to provide custom model retrieval logic
+        (e.g., loading models with specific architectures or configurations).
+
+        Args:
+            client_id: The client ID whose model to retrieve
+            requested_time: The wall clock time threshold
+
+        Returns:
+            The model corresponding to the requested time
+
+        Raises:
+            ValueError: If no model checkpoint matches the wall-clock time provided
+        """
+        # Constructing a list of epochs and training times
+        models_per_epoch = {}
+
+        for filename in os.listdir(Config().params["model_path"]):
+            split = re.match(
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
+                filename,
+            )
+
+            if split is not None:
+                epoch = split.group("epoch")
+                training_time = split.group("training_time")
+                if client_id == int(split.group("client_id")):
+                    models_per_epoch[epoch] = {
+                        "training_time": float(training_time),
+                        "model_checkpoint": filename,
+                    }
+
+        # Locate the model at a specific wall clock time
+        for epoch in sorted(models_per_epoch, reverse=True):
+            model_training_time = models_per_epoch[epoch]["training_time"]
+            model_checkpoint = models_per_epoch[epoch]["model_checkpoint"]
+
+            if model_training_time < requested_time:
+                model_path = f"{Config().params['model_path']}/{model_checkpoint}"
+
+                pretrained = None
+                if torch.cuda.is_available():
+                    pretrained = torch.load(model_path)
+                else:
+                    pretrained = torch.load(
+                        model_path, map_location=torch.device("cpu")
+                    )
+
+                model = models_registry.get()
+                model.load_state_dict(pretrained, strict=True)
+
+                logging.info(
+                    "[Client #%s] Responding to the server with the model after "
+                    "epoch %s finished, at time %s.",
+                    client_id,
+                    epoch,
+                    model_training_time,
+                )
+
+                return model
+
+        raise ValueError(
+            f"[Client #{client_id}] Cannot find an epoch that matches the wall-clock time provided."
+        )
 
     def __del__(self):
         """Teardown strategies when trainer is destroyed."""

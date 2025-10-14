@@ -91,6 +91,23 @@ class SSLDataLoaderStrategy(DataLoaderStrategy):
         """Create data loader based on training phase (SSL or personalization)."""
         current_round = context.current_round
 
+        # Handle different sampler types
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                # It's already a PyTorch Sampler object
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
+                # It's a list of indices, create SubsetRandomSampler
+                sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                # It's a Plato Sampler, call get() to obtain PyTorch sampler
+                sampler_obj = sampler.get()
+            else:
+                # Unknown type, try to use it directly
+                sampler_obj = sampler
+        else:
+            sampler_obj = None
+
         # Personalization phase: use simple data loader
         if current_round > Config().trainer.rounds:
             dataset = (
@@ -100,7 +117,7 @@ class SSLDataLoaderStrategy(DataLoaderStrategy):
                 dataset=dataset,
                 shuffle=False,
                 batch_size=batch_size,
-                sampler=sampler,
+                sampler=sampler_obj,
             )
         # SSL training phase: use multi-view collate
         else:
@@ -109,7 +126,7 @@ class SSLDataLoaderStrategy(DataLoaderStrategy):
                 dataset=trainset,
                 shuffle=False,
                 batch_size=batch_size,
-                sampler=sampler,
+                sampler=sampler_obj,
                 collate_fn=collate_fn,
             )
 
@@ -129,16 +146,8 @@ class SSLLossCriterionStrategy(LossCriterionStrategy):
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize loss criteria for both phases."""
-        # SSL loss criterion
-        ssl_loss_function = loss_criterion.get()
-
-        # Wrap to handle different output types
-        def compute_ssl_loss(outputs, __):
-            if isinstance(outputs, (list, tuple)):
-                return ssl_loss_function(*outputs)
-            return ssl_loss_function(outputs)
-
-        self._ssl_criterion = compute_ssl_loss
+        # SSL loss criterion - store directly without wrapper
+        self._ssl_criterion = loss_criterion.get()
 
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
@@ -162,7 +171,10 @@ class SSLLossCriterionStrategy(LossCriterionStrategy):
             return self._personalization_criterion(outputs, labels)
         # SSL training phase
         else:
-            return self._ssl_criterion(outputs, labels)
+            # Handle different output types
+            if isinstance(outputs, (list, tuple)):
+                return self._ssl_criterion(*outputs)
+            return self._ssl_criterion(outputs)
 
 
 class SSLOptimizerStrategy(OptimizerStrategy):
@@ -205,6 +217,37 @@ class SSLLRSchedulerStrategy(LRSchedulerStrategy):
         """Initialize the SSL LR scheduler strategy."""
         pass
 
+    def _get_train_loader_length(self, train_loader):
+        """
+        Safely calculate the length of the train loader.
+
+        Args:
+            train_loader: PyTorch DataLoader instance
+
+        Returns:
+            int: Number of batches in the loader, or 0 if cannot be determined
+        """
+        if train_loader is None:
+            return 0
+
+        try:
+            # Try direct length calculation
+            return len(train_loader)
+        except TypeError:
+            # If sampler doesn't implement __len__, calculate from dataset
+            try:
+                dataset = train_loader.dataset
+                batch_size = train_loader.batch_size
+                if hasattr(dataset, "__len__") and batch_size:
+                    dataset_size = len(dataset)
+                    # Calculate number of batches (ceiling division)
+                    return (dataset_size + batch_size - 1) // batch_size
+            except (AttributeError, TypeError):
+                pass
+
+        # If all else fails, return 0
+        return 0
+
     def create_scheduler(self, optimizer, context: TrainingContext):
         """Create LR scheduler based on current training phase."""
         current_round = context.current_round
@@ -214,20 +257,22 @@ class SSLLRSchedulerStrategy(LRSchedulerStrategy):
             lr_scheduler_name = Config().algorithm.personalization.lr_scheduler
             lr_params = Config().parameters.personalization.learning_rate._asdict()
             train_loader = context.state.get("train_loader")
+            num_batches = self._get_train_loader_length(train_loader)
 
             return lr_schedulers.get(
                 optimizer,
-                len(train_loader) if train_loader else 0,
+                num_batches,
                 lr_scheduler=lr_scheduler_name,
                 lr_params=lr_params,
             )
         # SSL training phase
         else:
             config = Config().trainer._asdict()
+            # Remove 'optimizer' from config to avoid conflict with positional argument
+            config.pop("optimizer", None)
             train_loader = context.state.get("train_loader")
-            return lr_schedulers.get(
-                optimizer, len(train_loader) if train_loader else 0, **config
-            )
+            num_batches = self._get_train_loader_length(train_loader)
+            return lr_schedulers.get(optimizer, num_batches, **config)
 
 
 class SSLTrainingStepStrategy(TrainingStepStrategy):
@@ -308,6 +353,31 @@ class SSLTestingStrategy(TestingStrategy):
         self.local_layers = local_layers
         self.personalized_trainset = personalized_trainset
 
+    def _convert_sampler(self, sampler):
+        """
+        Convert Plato sampler to PyTorch sampler.
+
+        Args:
+            sampler: Plato Sampler, PyTorch Sampler, list of indices, or None
+
+        Returns:
+            PyTorch Sampler object or None
+        """
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                # It's already a PyTorch Sampler object
+                return sampler
+            elif isinstance(sampler, (list, range)):
+                # It's a list of indices, create SubsetRandomSampler
+                return torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                # It's a Plato Sampler, call get() to obtain PyTorch sampler
+                return sampler.get()
+            else:
+                # Unknown type, try to use it directly
+                return sampler
+        return None
+
     def test_model(self, model, config, testset, sampler, context):
         """
         Test the model using KNN for SSL or local layers for personalization.
@@ -342,8 +412,11 @@ class SSLTestingStrategy(TestingStrategy):
         model.eval()
         model.to(context.device)
 
+        # Convert sampler to PyTorch sampler
+        sampler_obj = self._convert_sampler(sampler)
+
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler_obj
         )
 
         correct = 0
@@ -370,15 +443,18 @@ class SSLTestingStrategy(TestingStrategy):
         """Test using KNN classifier on extracted features."""
         logging.info("[Client #%d] Testing the model with KNN.", context.client_id)
 
+        # Convert sampler to PyTorch sampler
+        sampler_obj = self._convert_sampler(sampler)
+
         # Get the training loader and test loader
         train_loader = torch.utils.data.DataLoader(
             dataset=self.personalized_trainset,
             shuffle=False,
             batch_size=batch_size,
-            sampler=sampler,
+            sampler=sampler_obj,
         )
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler_obj
         )
 
         # Collect encodings
@@ -542,7 +618,7 @@ class Trainer(BasicTrainer):
         self.run_history = tracking.RunHistory()
         self._loss_tracker = tracking.LossTracker()
 
-        # Legacy attributes for backward compatibility
+        # Convenience attributes
         self._loss_criterion = None
 
     def set_personalized_datasets(self, trainset, testset):

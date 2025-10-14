@@ -1,9 +1,9 @@
 [project]
 name = "smog"
 version = "0.1.0"
-description = "Add your description here"
+description = "SMoG - Unsupervised Visual Representation Learning by Synchronous Momentum Grouping"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "scikit-learn>=1.7.2",
+    "scikit-learn",
 ]

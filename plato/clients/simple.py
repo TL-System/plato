@@ -203,9 +203,13 @@ class Client(base.Client):
 
         return self._report, weights
 
-    async def _obtain_model_update(self, client_id, requested_time):
-        """Retrieves a model update corresponding to a particular wall clock time."""
-        model = self.trainer.obtain_model_update(client_id, requested_time)
+    async def _obtain_model_at_time(self, client_id, requested_time):
+        """Retrieves a model update corresponding to a particular wall clock time.
+
+        This method is called during asynchronous training when the server requests
+        a model update at a specific wall-clock time.
+        """
+        model = self.trainer.obtain_model_at_time(client_id, requested_time)
         weights = self.algorithm.extract_weights(model)
         self._report.comm_time = time.time()
         self._report.client_id = client_id

@@ -26,6 +26,18 @@ from plato.trainers.strategies.base import (
 )
 
 
+@pytest.fixture(autouse=True)
+def setup_environment(monkeypatch):
+    """Set up environment variables for testing."""
+    import os
+    import sys
+
+    test_args = ["pytest"]
+    monkeypatch.setattr(sys, "argv", test_args)
+    monkeypatch.setenv("config_file", "tests/config.yml")
+    return None
+
+
 @pytest.fixture
 def simple_model():
     """Create a simple model for testing."""
@@ -124,7 +136,7 @@ class TestComposableTrainerTraining:
 
         # Verify training occurred
         assert trainer.current_epoch == 2
-        assert len(trainer.run_history.get_metric("train_loss")) > 0
+        assert len(trainer.run_history.get_metric_values("train_loss")) > 0
 
     def test_loss_decreases_during_training(
         self, simple_model, simple_dataset, simple_config
@@ -140,7 +152,7 @@ class TestComposableTrainerTraining:
         trainer.train_model(simple_config, simple_dataset, sampler)
 
         # Get loss history
-        loss_history = trainer.run_history.get_metric("train_loss")
+        loss_history = trainer.run_history.get_metric_values("train_loss")
 
         assert len(loss_history) > 0
         # Loss should decrease (first loss > last loss)
@@ -161,7 +173,7 @@ class TestComposableTrainerTraining:
         trainer.train_model(config, simple_dataset, sampler)
 
         assert trainer.current_epoch == 5
-        assert len(trainer.run_history.get_metric("train_loss")) == 5
+        assert len(trainer.run_history.get_metric_values("train_loss")) == 5
 
 
 class TestComposableTrainerStrategies:
@@ -433,7 +445,7 @@ class TestComposableTrainerComparison:
 
         trainer.train_model(simple_config, simple_dataset, sampler)
 
-        loss_history = trainer.run_history.get_metric("train_loss")
+        loss_history = trainer.run_history.get_metric_values("train_loss")
 
         # All losses should be finite
         for loss in loss_history:
@@ -444,8 +456,10 @@ class TestComposableTrainerComparison:
         """Test that model parameters actually change during training."""
         trainer = ComposableTrainer(model=simple_model)
 
-        # Save initial parameters
-        initial_params = [p.clone() for p in trainer.model.parameters()]
+        # Save initial parameters (move to same device as they'll be after training)
+        initial_params = [
+            p.clone().to(trainer.context.device) for p in trainer.model.parameters()
+        ]
 
         sampler = list(range(len(simple_dataset)))
         trainer.train_model(simple_config, simple_dataset, sampler)

@@ -1,70 +1,143 @@
 """
 A self-supervised federated learning trainer with BYOL.
+
+This trainer uses the composable trainer architecture with custom callbacks
+and loss strategy to implement BYOL-specific functionality (dual loss computation
+and momentum updates).
 """
 
+import torch
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.trainers import loss_criterion
 from plato.trainers import self_supervised_learning as ssl_trainer
+from plato.trainers.strategies.base import LossCriterionStrategy, TrainingContext
+
+
+class BYOLLossCriterionStrategy(LossCriterionStrategy):
+    """
+    Loss criterion strategy for BYOL with dual loss computation.
+
+    BYOL computes the loss as the average of two SSL losses when
+    the model outputs are tuples/lists (dual views).
+    """
+
+    def __init__(self):
+        """Initialize the BYOL loss strategy."""
+        self._ssl_criterion = None
+        self._personalization_criterion = None
+
+    def setup(self, context: TrainingContext) -> None:
+        """Initialize loss criterion."""
+        self._ssl_criterion = loss_criterion.get()
+
+    def compute_loss(
+        self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
+    ) -> torch.Tensor:
+        """Compute BYOL loss based on current training phase."""
+        current_round = context.current_round
+
+        # Personalization phase - use standard SSL loss
+        if current_round > Config().trainer.rounds:
+            if self._personalization_criterion is None:
+                loss_criterion_type = Config().algorithm.personalization.loss_criterion
+                loss_criterion_params = {}
+                if hasattr(Config().parameters.personalization, "loss_criterion"):
+                    loss_criterion_params = (
+                        Config().parameters.personalization.loss_criterion._asdict()
+                    )
+                self._personalization_criterion = loss_criterion.get(
+                    loss_criterion=loss_criterion_type,
+                    loss_criterion_params=loss_criterion_params,
+                )
+            return self._personalization_criterion(outputs, labels)
+
+        # SSL training phase - use BYOL dual loss
+        else:
+            if isinstance(outputs, (list, tuple)):
+                # BYOL: average of two losses
+                loss = 0.5 * (
+                    self._ssl_criterion(*outputs[0]) + self._ssl_criterion(*outputs[1])
+                )
+                return loss
+            else:
+                return self._ssl_criterion(outputs)
+
+
+class BYOLCallback(TrainerCallback):
+    """
+    Callback implementing BYOL algorithm functionality.
+
+    Handles:
+    - Momentum value computation using cosine scheduling
+    - Model updates with Exponential Moving Average
+    """
+
+    def __init__(self):
+        """Initialize BYOL-specific state."""
+        # The momentum value used to update the model with Exponential Moving Average
+        self.momentum_val = 0
+
+    def on_train_epoch_start(self, trainer, config, **kwargs):
+        """Compute the momentum value at the start of each epoch."""
+        epoch = trainer.current_epoch
+        total_epochs = config["epochs"] * config["rounds"]
+        global_epoch = (trainer.current_round - 1) * config["epochs"] + epoch
+
+        # Update the momentum value for the current epoch in regular federated training
+        if not trainer.current_round > Config().trainer.rounds:
+            self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
+
+    def on_train_step_start(self, trainer, config, batch, **kwargs):
+        """Update the model based on the momentum value at each training step."""
+        if not trainer.current_round > Config().trainer.rounds:
+            # Update the model based on the momentum value
+            # Specifically, it updates parameters of `encoder` with
+            # Exponential Moving Average of `momentum_encoder`
+            update_momentum(
+                trainer.model.encoder,
+                trainer.model.momentum_encoder,
+                m=self.momentum_val,
+            )
+            update_momentum(
+                trainer.model.projector,
+                trainer.model.momentum_projector,
+                m=self.momentum_val,
+            )
 
 
 class Trainer(ssl_trainer.Trainer):
     """
-    A trainer with BYOL, which generates the BYOL's loss and computes the
-    momentum value at the start of each epoch; thus the model will be updated
-    step-wise based on this value in a momentum manner.
+    A federated learning trainer using BYOL algorithm.
+
+    This trainer extends the SSL trainer with BYOL-specific functionality
+    via a custom callback and loss strategy. It uses the composable trainer
+    architecture with callbacks for momentum updates and a custom loss strategy
+    for dual loss computation.
     """
 
     def __init__(self, model=None, callbacks=None):
-        super().__init__(model, callbacks)
-
-        # The momentum value used to update the model
-        # with Exponential Moving Average
-        self.momentum_val = 0
-
-    def get_ssl_criterion(self):
-        """Compute the loss proposed by BYOL."""
-        defined_ssl_loss = loss_criterion.get()
-
-        def compute_loss(outputs, labels):
-            if isinstance(outputs, (list, tuple)):
-                loss = 0.5 * (
-                    defined_ssl_loss(*outputs[0]) + defined_ssl_loss(*outputs[1])
-                )
-                return loss
-            else:
-                return defined_ssl_loss(outputs)
-
-        return compute_loss
-
-    def train_epoch_start(self, config):
         """
-        At the start of one epoch, the momentum value should be computed.
-        """
-        super().train_epoch_start(config)
-        epoch = self.current_epoch
-        total_epochs = config["epochs"] * config["rounds"]
-        global_epoch = (self.current_round - 1) * config["epochs"] + epoch
-        if not self.current_round > Config().trainer.rounds:
-            self.momentum_val = cosine_schedule(global_epoch, total_epochs, 0.996, 1)
+        Initialize the BYOL trainer with BYOL callback and loss strategy.
 
-    def train_step_start(self, config, batch=None):
+        Arguments:
+            model: The model to train (SSL model with momentum encoders)
+            callbacks: List of callback classes or instances
         """
-        At the start of every iteration, the model should be updated based on the
-        momentum value in a momentum manner.
-        """
-        super().train_step_start(config)
-        if not self.current_round > Config().trainer.rounds:
-            # Update the model based on the momentum value
-            # Specifically, it updates parameters of `encoder` with
-            # Exponential Moving Average of `encoder_momentum`
-            update_momentum(
-                self.model.encoder, self.model.momentum_encoder, m=self.momentum_val
-            )
-            update_momentum(
-                self.model.projector,
-                self.model.momentum_projector,
-                m=self.momentum_val,
-            )
+        # Create BYOL callback
+        byol_callback = BYOLCallback()
+
+        # Combine with provided callbacks
+        all_callbacks = [byol_callback]
+        if callbacks is not None:
+            all_callbacks.extend(callbacks)
+
+        # Initialize parent SSL trainer - we'll override the loss strategy
+        super().__init__(model=model, callbacks=all_callbacks)
+
+        # Replace the SSL loss strategy with BYOL loss strategy
+        self.loss_strategy = BYOLLossCriterionStrategy()
+        self.loss_strategy.setup(self.context)
