@@ -543,7 +543,9 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
             if hasattr(server_cfg, "exploration_factor"):
                 self.exploration_factor = server_cfg.exploration_factor
             if hasattr(server_cfg, "exploration_decaying_factor"):
-                self.exploration_decaying_factor = server_cfg.exploration_decaying_factor
+                self.exploration_decaying_factor = (
+                    server_cfg.exploration_decaying_factor
+                )
             if hasattr(server_cfg, "min_explore_factor"):
                 self.min_explore_factor = server_cfg.min_explore_factor
             if hasattr(server_cfg, "staleness_factor"):
@@ -635,9 +637,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                 self.min_explore_factor,
             )
 
-            exploited_clients_target = max(
-                0, effective_count - explored_clients_count
-            )
+            exploited_clients_target = max(0, effective_count - explored_clients_count)
             exploited_clients_count = min(
                 len(explored_available), exploited_clients_target
             )
@@ -701,9 +701,9 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                 if self.robustness:
                     start_round = getattr(update.report, "start_round", None)
                     if start_round is not None:
-                        self.model_versions_clients_dict.setdefault(start_round, []).append(
-                            (client_id, base_utility)
-                        )
+                        self.model_versions_clients_dict.setdefault(
+                            start_round, []
+                        ).append((client_id, base_utility))
                         self._maybe_detect_outliers(start_round)
 
     def _maybe_detect_outliers(self, start_version: int) -> None:
@@ -910,7 +910,13 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
 
     def _ensure_solver_available(self) -> None:
         """Ensure optional optimization dependencies are available."""
-        if mosek is None or solvers is None or matrix is None or sparse is None or log is None:
+        if (
+            mosek is None
+            or solvers is None
+            or matrix is None
+            or sparse is None
+            or log is None
+        ):
             raise ImportError(
                 "PolarisSelectionStrategy requires 'mosek' and 'cvxopt' to be installed."
             )

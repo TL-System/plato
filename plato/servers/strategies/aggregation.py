@@ -310,7 +310,11 @@ class PiscesAggregationStrategy(AggregationStrategy):
 
             self.client_staleness.setdefault(client_id, []).append(staleness)
             staleness_factor = self._calculate_staleness_factor(client_id)
-            weight = (num_samples / total_samples) * staleness_factor if total_samples > 0 else 0.0
+            weight = (
+                (num_samples / total_samples) * staleness_factor
+                if total_samples > 0
+                else 0.0
+            )
 
             for name, value in delta.items():
                 avg_update[name] += value * weight
@@ -411,7 +415,10 @@ class PolarisAggregationStrategy(FedAvgAggregationStrategy):
             norm_delta = float(np.sqrt(max(squared_delta, 0.0)))
             self.squared_deltas_current_round[client_index] = norm_delta
 
-            if self.unexplored_clients is not None and client_index in self.unexplored_clients:
+            if (
+                self.unexplored_clients is not None
+                and client_index in self.unexplored_clients
+            ):
                 self.unexplored_clients.remove(client_index)
 
             sum_deltas_current_round += norm_delta
@@ -429,6 +436,8 @@ class PolarisAggregationStrategy(FedAvgAggregationStrategy):
             if bound != 0:
                 local_gradient_bounds[idx] = bound
 
-        polaris_state["squared_deltas_current_round"] = self.squared_deltas_current_round.copy()
+        polaris_state["squared_deltas_current_round"] = (
+            self.squared_deltas_current_round.copy()
+        )
 
         return avg_update
