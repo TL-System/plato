@@ -234,11 +234,14 @@ class Server(fedunlearning_server.Server):
                 self.clusters[update.client_id] for update in self.updates
             }
 
-            test_accuracy_per_cluster = self.trainer.server_clustered_test(
-                self.testset,
-                self.testset_sampler,
-                clustered_models=self.algorithm.models,
-                updated_cluster_ids=updated_cluster_ids,
+            test_accuracy_per_cluster = (
+                self.trainer.testing_strategy.test_clustered_models(
+                    self.testset,
+                    self.testset_sampler,
+                    self.trainer.context,
+                    self.algorithm.models,
+                    updated_cluster_ids,
+                )
             )
 
             # Second, update the test accuracy for clusters that have just been tested

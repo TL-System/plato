@@ -96,7 +96,7 @@ Plato's trainer system uses a **composition-based architecture** built on the **
 | **LRSchedulerStrategy** | LR scheduling | Custom schedules, warmup |
 | **ModelUpdateStrategy** | State management | Control variates, personalization (SCAFFOLD, Ditto) |
 | **DataLoaderStrategy** | Data loading | Custom sampling, augmentation |
-| **TestingStrategy** | Model evaluation |
+| **TestingStrategy** | Model evaluation | Custom model evaluation and testing |
 
 ---
 
@@ -588,9 +588,9 @@ class ModelUpdateStrategy(Strategy):
 
 #### When to Implement
 
-- Control variates (SCAFFOLD)
-- Dynamic regularization state (FedDyn)
-- Personalization (FedPer, FedRep, Ditto)
+- Control variates (e.g., SCAFFOLD)
+- Dynamic regularization state (e.g., FedDyn)
+- Personalization (e.g., FedPer, FedRep, Ditto)
 - Layer freezing/unfreezing
 - Custom state management
 
@@ -881,6 +881,22 @@ trainer = ComposableTrainer(
 )
 ```
 
+### Testing Strategies
+
+**Location**: `plato.trainers.strategies.testing`
+
+| Strategy | Description | Parameters |
+|----------|-------------|------------|
+| `DefaultTestingStrategy` | Standard Testing | Uses config settings |
+
+**Example:**
+```python
+from plato.trainers.strategies import TestingStrategy
+
+trainer = ComposableTrainer(
+    testing_strategy=DefaultTestingStrategy()
+)
+```
 ---
 
 ## Algorithm-Specific Strategies
@@ -1138,7 +1154,7 @@ algorithm:
 
 ---
 
-### FedMos
+### FedMoS
 
 **Location**: `plato.trainers.strategies.algorithms.fedmos_strategy`
 

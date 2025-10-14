@@ -1,43 +1,57 @@
 """
 A customized trainer for the federated unlearning baseline clustering algorithm.
 
+This trainer uses the composable trainer architecture with the strategy pattern,
+implementing custom testing strategy for clustered model evaluation.
 """
 
 import torch
 
 from plato.config import Config
-from plato.trainers import basic
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.testing import DefaultTestingStrategy
 
 
-class Trainer(basic.Trainer):
-    """A federated learning trainer using the Knot algorithm."""
+class ClusteredTestingStrategy(DefaultTestingStrategy):
+    """
+    Testing strategy for evaluating multiple cluster models.
 
-    def server_clustered_test(self, testset, sampler=None, **kwargs):
-        """Separately perform the model test for all clusters."""
-        # The models within each cluster should be provided in the argument,
-        # and it should be a dictionary in which the keys are cluster IDs,
-        # and the values are the corresponding models
-        assert "clustered_models" in kwargs
+    This strategy extends the default testing strategy to support testing
+    multiple cluster models on the same test dataset, which is required
+    for the KNOT federated unlearning algorithm.
+    """
 
-        # Which clusters have been updated in this aggregation should be provided
-        # as either a list or a set
-        assert "updated_cluster_ids" in kwargs
+    def test_clustered_models(
+        self, testset, sampler, context, clustered_models, updated_cluster_ids
+    ):
+        """
+        Separately perform model testing for all updated clusters.
 
-        clustered_models = kwargs["clustered_models"]
-        updated_cluster_ids = kwargs["updated_cluster_ids"]
+        Args:
+            testset: The test dataset
+            sampler: Optional data sampler for the test set
+            context: Training context with device, config, etc.
+            clustered_models: dict mapping cluster IDs to model instances
+            updated_cluster_ids: list/set of cluster IDs that were updated
 
+        Returns:
+            Dictionary mapping cluster IDs to test accuracy values
+        """
         clustered_test_accuracy = {}
-        config = Config().trainer._asdict()
+        config = (
+            context.config if hasattr(context, "config") else Config().trainer._asdict()
+        )
+        batch_size = config.get("batch_size", 32)
 
         # Preparing the test data loader
         if sampler is None:
             test_loader = torch.utils.data.DataLoader(
-                testset, batch_size=config["batch_size"], shuffle=False
+                testset, batch_size=batch_size, shuffle=False
             )
         else:
             test_loader = torch.utils.data.DataLoader(
                 testset,
-                batch_size=config["batch_size"],
+                batch_size=batch_size,
                 shuffle=False,
                 sampler=sampler,
             )
@@ -45,7 +59,7 @@ class Trainer(basic.Trainer):
         for cluster_id in updated_cluster_ids:
             cluster_model = clustered_models[cluster_id]
 
-            cluster_model.to(self.device)
+            cluster_model.to(context.device)
             cluster_model.eval()
 
             correct = 0
@@ -53,8 +67,8 @@ class Trainer(basic.Trainer):
             with torch.no_grad():
                 for examples, labels in test_loader:
                     examples, labels = (
-                        examples.to(self.device),
-                        labels.to(self.device),
+                        examples.to(context.device),
+                        labels.to(context.device),
                     )
 
                     outputs = cluster_model(examples)
@@ -67,3 +81,31 @@ class Trainer(basic.Trainer):
             clustered_test_accuracy[cluster_id] = cluster_acc
 
         return clustered_test_accuracy
+
+
+class Trainer(ComposableTrainer):
+    """
+    A federated learning trainer using the Knot algorithm.
+
+    This trainer extends ComposableTrainer with a custom ClusteredTestingStrategy
+    to support testing multiple cluster models. It uses the strategy pattern for
+    all aspects of training and testing.
+
+    The server can directly access the testing strategy via:
+        trainer.testing_strategy.test_clustered_models(...)
+    """
+
+    def __init__(self, model=None, callbacks=None):
+        """
+        Initialize the Knot trainer with clustered testing strategy.
+
+        Arguments:
+            model: The model to train (class or instance)
+            callbacks: List of callback classes or instances
+        """
+        # Initialize with custom clustered testing strategy
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            testing_strategy=ClusteredTestingStrategy(),
+        )
