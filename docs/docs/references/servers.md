@@ -40,11 +40,16 @@ to its default implementation.
 | Strategy type | Class | Highlights |
 | --- | --- | --- |
 | Aggregation | `FedAvgAggregationStrategy` | Sample-weighted FedAvg implementation. |
-| Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
 | Aggregation | `FedAsyncAggregationStrategy` | Staleness-aware mixing for asynchronous training. |
+| Aggregation | `FedBuffAggregationStrategy` | Simple asynchronous aggregation strategy without using weights. |
+| Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
+| Aggregation | `PiscesAggregationStrategy` | More complex asynchronous aggregation strategy. |
+| Aggregation | `PolarisAggregationStrategy` | More complex asynchronous aggregation strategy. |
 | Client selection | `RandomSelectionStrategy` | Uniform random selection (default). |
-| Client selection | `OortSelectionStrategy` | Utility-based exploration/exploitation scheduler. |
+| Client selection | `OortSelectionStrategy` | Utility-based exploration/exploitation selection. |
 | Client selection | `AFLSelectionStrategy` | Active federated learning prioritization. |
+| Client selection | `PiscesAggregationStrategy` | Client selection based on the Pisces algorithm. |
+| Client selection | `PolarisAggregationStrategy` | Client selection based on the Polaris algorithm. |
 
 ### Implementing Custom Strategies
 
@@ -131,17 +136,13 @@ Refer to the source docstrings for the complete interface.
 
 ### Migrating from Hook Overrides
 
-The legacy hook-based approach continues to work for advanced scenarios. We recommend the strategy
-pattern for new projects because it keeps responsibilities modular and testable. When migrating:
+The hook-based approach, as documented in the next section, continues to work for advanced scenarios. We recommend the strategy pattern for new projects because it keeps responsibilities modular and testable. When migrating:
 
-1. Identify the overridden hook (for example, `choose_clients`) and map it to the corresponding
-   strategy (`ClientSelectionStrategy.select_clients`).
+1. Identify the overridden hook (for example, `choose_clients`) and map it to the corresponding strategy (`ClientSelectionStrategy.select_clients`).
 2. Move helper attributes into the strategy's internal state or the shared `context.state`.
 3. Register the strategy in your server factory or experiment script.
 
-Detailed hook documentation remains available in the next section.
-
-## Legacy: Customizing Servers using Inheritance
+## Customizing Servers using Inheritance
 
 The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
