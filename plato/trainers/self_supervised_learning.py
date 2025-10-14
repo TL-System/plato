@@ -618,7 +618,7 @@ class Trainer(BasicTrainer):
         self.run_history = tracking.RunHistory()
         self._loss_tracker = tracking.LossTracker()
 
-        # Legacy attributes for backward compatibility
+        # Convenience attributes
         self._loss_criterion = None
 
     def set_personalized_datasets(self, trainset, testset):

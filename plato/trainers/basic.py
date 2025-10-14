@@ -12,46 +12,6 @@ from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.lr_scheduler import TimmLRSchedulerStrategy
 
 
-class LegacyHookBridgeCallback(TrainerCallback):
-    """
-    Bridge callback that calls legacy hook methods for backward compatibility.
-
-    This callback ensures that trainers overriding the old hook methods
-    (train_run_start, train_epoch_start, etc.) continue to work with the
-    new ComposableTrainer architecture.
-    """
-
-    def on_train_run_start(self, trainer, config, **kwargs):
-        """Call legacy train_run_start hook."""
-        if hasattr(trainer, "train_run_start"):
-            trainer.train_run_start(config)
-
-    def on_train_run_end(self, trainer, config, **kwargs):
-        """Call legacy train_run_end hook."""
-        if hasattr(trainer, "train_run_end"):
-            trainer.train_run_end(config, **kwargs)
-
-    def on_train_epoch_start(self, trainer, config, **kwargs):
-        """Call legacy train_epoch_start hook."""
-        if hasattr(trainer, "train_epoch_start"):
-            trainer.train_epoch_start(config)
-
-    def on_train_epoch_end(self, trainer, config, **kwargs):
-        """Call legacy train_epoch_end hook."""
-        if hasattr(trainer, "train_epoch_end"):
-            trainer.train_epoch_end(config)
-
-    def on_train_step_start(self, trainer, config, batch, **kwargs):
-        """Call legacy train_step_start hook."""
-        if hasattr(trainer, "train_step_start"):
-            trainer.train_step_start(config, batch=batch)
-
-    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
-        """Call legacy train_step_end hook."""
-        if hasattr(trainer, "train_step_end"):
-            trainer.train_step_end(config, batch=batch, loss=loss)
-
-
 class Trainer(ComposableTrainer):
     """
     A basic federated learning trainer using the composable architecture.
@@ -69,15 +29,11 @@ class Trainer(ComposableTrainer):
             model: The model to train (class or instance)
             callbacks: List of callback classes or instances
         """
-        # Add bridge callback to support legacy hook methods
-        callbacks_with_bridge = [LegacyHookBridgeCallback]
-        if callbacks is not None:
-            callbacks_with_bridge.extend(callbacks)
 
         # Initialize with default strategies
         super().__init__(
             model=model,
-            callbacks=callbacks_with_bridge,
+            callbacks=None,
             loss_strategy=None,  # Uses DefaultLossCriterionStrategy
             optimizer_strategy=None,  # Uses DefaultOptimizerStrategy
             training_step_strategy=None,  # Uses DefaultTrainingStepStrategy
@@ -87,12 +43,12 @@ class Trainer(ComposableTrainer):
             testing_strategy=None,  # Uses DefaultTestingStrategy
         )
 
-        # Legacy attributes for backward compatibility
+        # Convenience attributes
         self._loss_criterion = None
 
     @property
     def loss_criterion(self):
-        """Legacy property for accessing loss criterion."""
+        """Convenience property for accessing loss criterion."""
         if self._loss_criterion is None:
             # Create loss criterion using the strategy
             def compute_loss_fn(outputs, labels):
@@ -143,9 +99,8 @@ class TrainerWithTimmScheduler(Trainer):
         # Create timm scheduler strategy
         timm_scheduler_strategy = TimmLRSchedulerStrategy()
 
-        # Add both TimmSchedulerCallback and LegacyHookBridgeCallback
-        # to support timm-specific hooks and legacy hook methods
-        callbacks_with_timm = [LegacyHookBridgeCallback, TimmSchedulerCallback]
+        # Add TimmSchedulerCallback to support timm-specific callbacks
+        callbacks_with_timm = [TimmSchedulerCallback]
         if callbacks is not None:
             callbacks_with_timm.extend(callbacks)
 
@@ -164,5 +119,5 @@ class TrainerWithTimmScheduler(Trainer):
             testing_strategy=None,
         )
 
-        # Legacy attributes for backward compatibility
+        # Convenience attributes
         self._loss_criterion = None
