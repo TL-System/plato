@@ -22,6 +22,7 @@ Example:
 from plato.servers.strategies.aggregation import (
     FedAsyncAggregationStrategy,
     FedAvgAggregationStrategy,
+    FedBuffAggregationStrategy,
     FedNovaAggregationStrategy,
     PiscesAggregationStrategy,
     PolarisAggregationStrategy,
@@ -52,6 +53,7 @@ __all__ = [
     "FedAvgAggregationStrategy",
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
+    "FedBuffAggregationStrategy",
     "PiscesAggregationStrategy",
     "PolarisAggregationStrategy",
     # Client selection strategies

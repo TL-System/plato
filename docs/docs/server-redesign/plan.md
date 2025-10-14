@@ -955,103 +955,22 @@ Strategy Pattern Migration Plan for Plato Server API
 
   4.1 Documentation Updates
 
-  Create: docs/docs/references/server_strategies.md
-
-  # Server Strategies
-
-  ## Overview
-
-  Plato supports composable server strategies for aggregation and client selection.
-  Strategies can be mixed and matched or customized independently.
-
-  ## Quick Start
-
-  ### Using Built-in Strategies
-
-  ```python
-  from plato.servers import fedavg
-  from plato.servers.strategies.aggregation import FedNovaAggregationStrategy
-  from plato.servers.strategies.client_selection import OortSelectionStrategy
-
-  server = fedavg.Server(
-      aggregation_strategy=FedNovaAggregationStrategy(),
-      client_selection_strategy=OortSelectionStrategy(
-          exploration_factor=0.3
-      )
-  )
-  server.run()
-
-  Creating Custom Strategies
-
-  from plato.servers.strategies.base import AggregationStrategy
-
-  class MyAggregationStrategy(AggregationStrategy):
-      async def aggregate_deltas(self, updates, deltas_received, context):
-          # Your custom aggregation logic
-          return aggregated_deltas
-
-  Available Strategies
-
-  Aggregation Strategies
-
-  - FedAvgAggregationStrategy - Standard weighted averaging
-  - FedNovaAggregationStrategy - Normalized momentum aggregation
-  - FedAsyncAggregationStrategy - Staleness-aware mixing
-
-  Client Selection Strategies
-
-  - RandomSelectionStrategy - Uniform random selection (default)
-  - OortSelectionStrategy - Utility-based exploration/exploitation
-  - AFLSelectionStrategy - Valuation-based active learning
-
-  Migration Guide
-
-  Old inheritance-based approach still works:
-
-  class Server(fedavg.Server):
-      def choose_clients(self, clients_pool, clients_count):
-          # Custom logic
-          return selected_clients
-
-  New strategy-based approach (recommended):
-
-  class MySelectionStrategy(ClientSelectionStrategy):
-      def select_clients(self, clients_pool, clients_count, context):
-          # Custom logic
-          return selected_clients
-
-  server = fedavg.Server(
-      client_selection_strategy=MySelectionStrategy()
-  )
-
-  API Reference
-
-  [Detailed API documentation follows...]
-
-  **Update:** `docs/docs/references/servers.md`
-
-  Add section at the top:
-
-  ```markdown
-  # Servers
-
-  ## Customizing Servers using Strategies (New in v1.3)
-
-  For aggregation and client selection, you can now use **strategy pattern** instead of inheritance:
-
-  ```python
-  from plato.servers import fedavg
-  from plato.servers.strategies.aggregation import FedNovaAggregationStrategy
-
-  server = fedavg.Server(
-      aggregation_strategy=FedNovaAggregationStrategy()
-  )
-
-  See server_strategies.md for full documentation.
-
-  Customizing Servers using Inheritance
-
-  [Existing documentation continues...]
+  - Update `docs/docs/references/servers.md` with a leading section that explains the strategy-based
+    server API, covering:
+      - Conceptual overview of the Server Strategy pattern, including the shared `ServerContext`.
+      - Instructions for configuring built-in aggregation and client-selection strategies from code
+        and configuration files.
+      - Usage tables for default aggregation and client selection strategies with key parameters.
+      - Step-by-step guidance for implementing custom `AggregationStrategy` and
+        `ClientSelectionStrategy` subclasses, including async considerations.
+      - Migration notes that contrast strategy composition with the legacy inheritance hooks and
+        link to the hook reference that follows in the document.
+      - Inline API reference for relevant strategy interfaces (`AggregationStrategy`,
+        `ClientSelectionStrategy`, `ServerStrategy`, and `ServerContext` attributes).
+  - Ensure screenshots/examples in the documentation reference the new API names and imports
+    (`plato.servers.strategies.*`).
+  - Retain the existing inheritance-based customization guidance as a "Legacy / Advanced Hooks"
+    section that follows the new strategy-focused introduction.
 
   ### 4.2 Testing Plan
 
