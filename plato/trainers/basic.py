@@ -101,42 +101,6 @@ class Trainer(ComposableTrainer):
             self._loss_criterion = compute_loss_fn
         return self._loss_criterion
 
-    # Legacy hook methods for backward compatibility
-    # These are no-ops since ComposableTrainer handles them via strategies
-    def train_run_start(self, config):
-        """Method called at the start of training run (legacy hook)."""
-        pass
-
-    def train_run_end(self, config):
-        """Method called at the end of a training run (legacy hook)."""
-        pass
-
-    def train_epoch_start(self, config):
-        """Method called at the beginning of a training epoch (legacy hook)."""
-        pass
-
-    def train_epoch_end(self, config):
-        """Method called at the end of a training epoch (legacy hook)."""
-        pass
-
-    def train_step_start(self, config, batch=None):
-        """Method called at the beginning of a training step (legacy hook)."""
-        pass
-
-    def train_step_end(self, config, batch=None, loss=None):
-        """Method called at the end of a training step (legacy hook)."""
-        pass
-
-    @staticmethod
-    def process_outputs(outputs):
-        """
-        Method called after model outputs are generated.
-
-        This is a legacy method for backward compatibility.
-        Override this in subclasses if output processing is needed.
-        """
-        return outputs
-
 
 class TimmSchedulerCallback(TrainerCallback):
     """

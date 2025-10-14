@@ -54,15 +54,32 @@ class DLGDataLoaderStrategy(DataLoaderStrategy):
                 # Store in context for use by other components
                 context.state["sensitivity"] = self.sensitivity
 
+        # Handle different sampler types properly
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                # It's already a PyTorch Sampler object
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
+                # It's a list of indices, create SubsetRandomSampler
+                sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                # It's a Plato Sampler, call get() to obtain PyTorch sampler
+                sampler_obj = sampler.get()
+            else:
+                # Unknown type, try to use it directly
+                sampler_obj = sampler
+        else:
+            sampler_obj = None
+
         return torch.utils.data.DataLoader(
-            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+            dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler_obj
         )
 
 
 class DLGTrainingStepStrategy(TrainingStepStrategy):
     """
     Custom training step strategy for DLG gradient leakage attacks.
-    
+
     This strategy implements custom forward/backward passes with gradient
     computation and storage for gradient leakage analysis.
     """
@@ -73,7 +90,9 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
         self.list_grad = None
         self.feature_fc1_graph = None
 
-    def training_step(self, model, optimizer, examples, labels, loss_criterion, context):
+    def training_step(
+        self, model, optimizer, examples, labels, loss_criterion, context
+    ):
         """Perform forward and backward passes for DLG attacks."""
         examples.requires_grad = True
         self.examples = examples
@@ -138,7 +157,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
 class DLGTrainingCallbacks(TrainerCallback):
     """
     Callbacks for DLG trainer handling training lifecycle events.
-    
+
     Implements the logic from train_run_start, train_step_end, and train_run_end.
     """
 
@@ -163,13 +182,13 @@ class DLGTrainingCallbacks(TrainerCallback):
     def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         """Apply defense mechanisms and update model weights manually."""
         context = trainer.context
-        
+
         # Retrieve stored data from context
         examples = context.state.get("examples")
         labels = context.state.get("labels")
         list_grad = context.state.get("list_grad")
         feature_fc1_graph = context.state.get("feature_fc1_graph")
-        
+
         # Store data in the first epoch
         if trainer.current_epoch == 1 and examples is not None and labels is not None:
             try:
@@ -270,15 +289,18 @@ class DLGTrainingCallbacks(TrainerCallback):
         # Update model weights with gradients and learning rate
         if grad is not None:
             for param, grad_part in zip(trainer.model.parameters(), grad):
-                param.data = param.data - Config().parameters.optimizer.lr * grad_part.to(
-                    trainer.device
+                param.data = (
+                    param.data
+                    - Config().parameters.optimizer.lr * grad_part.to(trainer.device)
                 )
 
             # Sum up the gradients for each local update
             try:
                 self.target_grad = [
                     sum(x)
-                    for x in zip(list((_.detach().clone() for _ in grad)), self.target_grad)
+                    for x in zip(
+                        list((_.detach().clone() for _ in grad)), self.target_grad
+                    )
                 ]
             except:
                 self.target_grad = list((_.detach().clone() for _ in grad))
@@ -302,7 +324,8 @@ class DLGTrainingCallbacks(TrainerCallback):
             file_path = f"{Config().params['model_path']}/{trainer.client_id}.pickle"
             with open(file_path, "wb") as handle:
                 pickle.dump(
-                    [self.full_examples, self.full_onehot_labels, self.target_grad], handle
+                    [self.full_examples, self.full_onehot_labels, self.target_grad],
+                    handle,
                 )
 
 
@@ -345,11 +368,11 @@ class DLGTestingStrategy(TestingStrategy):
                 )
 
                 outputs = model(examples)
-                
+
                 # Process outputs - extract first element if tuple/list
                 if isinstance(outputs, (tuple, list)):
                     outputs = outputs[0]
-                
+
                 _, predicted = torch.max(outputs.data, 1)
 
                 total += labels.size(0)
@@ -362,7 +385,7 @@ class DLGTestingStrategy(TestingStrategy):
 class Trainer(ComposableTrainer):
     """
     The federated learning trainer for gradient leakage attacks.
-    
+
     Migrated to use the new composable trainer architecture with strategies
     and callbacks instead of inheritance and hooks.
     """
@@ -431,11 +454,3 @@ class Trainer(ComposableTrainer):
         if self._dlg_callback is not None:
             return self._dlg_callback.full_onehot_labels
         return None
-
-    @staticmethod
-    def process_outputs(outputs):
-        """
-        Method called after the model updates have been generated.
-        Kept for backward compatibility.
-        """
-        return outputs[0]
