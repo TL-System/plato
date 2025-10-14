@@ -10,6 +10,8 @@ import logging
 from types import SimpleNamespace
 from typing import Dict, List, Optional
 
+import numpy as np
+
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
@@ -212,6 +214,85 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
             await asyncio.sleep(0)
 
         return avg_update
+
+
+class PiscesAggregationStrategy(AggregationStrategy):
+    """
+    Pisces aggregation with staleness-aware weighting.
+
+    Applies a polynomial decay to client updates based on their staleness:
+    factor = 1.0 / (staleness + 1) ** staleness_factor
+    """
+
+    def __init__(self, staleness_factor: float = 1.0, history_window: int = 5):
+        super().__init__()
+        self.staleness_factor = staleness_factor
+        self.history_window = history_window
+        self.client_staleness: Dict[int, List[float]] = {}
+
+    def setup(self, context: ServerContext) -> None:
+        """Initialize staleness tracking and load config overrides."""
+        try:
+            if hasattr(Config().server, "staleness_factor"):
+                self.staleness_factor = Config().server.staleness_factor
+        except ValueError:
+            # Config not initialized, keep constructor values
+            pass
+
+        total_clients = context.total_clients
+        if total_clients:
+            self.client_staleness = {
+                client_id: [] for client_id in range(1, total_clients + 1)
+            }
+
+    async def aggregate_deltas(
+        self,
+        updates: List[SimpleNamespace],
+        deltas_received: List[Dict],
+        context: ServerContext,
+    ) -> Dict:
+        """Aggregate weight updates with staleness-based weighting."""
+        if not updates or not deltas_received:
+            return {}
+
+        total_samples = sum(update.report.num_samples for update in updates)
+        if total_samples == 0:
+            logging.warning("PiscesAggregation: total_samples is 0, returning zeros.")
+
+        avg_update = {
+            name: context.trainer.zeros(delta.shape)
+            for name, delta in deltas_received[0].items()
+        }
+
+        for i, update in enumerate(deltas_received):
+            client_id = updates[i].client_id
+            report = updates[i].report
+            num_samples = report.num_samples
+
+            staleness = getattr(updates[i], "staleness", 0.0)
+            self.client_staleness.setdefault(client_id, []).append(staleness)
+
+            staleness_factor = self._calculate_staleness_factor(client_id)
+
+            for name, delta in update.items():
+                weight = 0.0
+                if total_samples > 0:
+                    weight = (num_samples / total_samples) * staleness_factor
+                avg_update[name] += delta * weight
+
+            await asyncio.sleep(0)
+
+        return avg_update
+
+    def _calculate_staleness_factor(self, client_id: int) -> float:
+        """Compute the staleness decay factor for a client."""
+        history = self.client_staleness.get(client_id, [])
+        if not history:
+            return 1.0
+
+        recent_history = history[-self.history_window :]
+        staleness = float(np.mean(recent_history))
+        return 1.0 / pow(staleness + 1.0, self.staleness_factor)
 
     async def aggregate_weights(
         self,

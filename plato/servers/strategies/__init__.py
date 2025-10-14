@@ -23,6 +23,7 @@ from plato.servers.strategies.aggregation import (
     FedAsyncAggregationStrategy,
     FedAvgAggregationStrategy,
     FedNovaAggregationStrategy,
+    PiscesAggregationStrategy,
 )
 from plato.servers.strategies.base import (
     AggregationStrategy,
@@ -35,6 +36,7 @@ from plato.servers.strategies.base import (
 from plato.servers.strategies.client_selection import (
     AFLSelectionStrategy,
     OortSelectionStrategy,
+    PiscesSelectionStrategy,
     RandomSelectionStrategy,
 )
 
@@ -48,8 +50,10 @@ __all__ = [
     "FedAvgAggregationStrategy",
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
+    "PiscesAggregationStrategy",
     # Client selection strategies
     "RandomSelectionStrategy",
     "OortSelectionStrategy",
     "AFLSelectionStrategy",
+    "PiscesSelectionStrategy",
 ]
