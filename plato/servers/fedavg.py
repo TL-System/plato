@@ -12,6 +12,7 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 from plato.servers import base
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, fonts
 
@@ -20,9 +21,18 @@ class Server(base.Server):
     """Federated learning server using federated averaging."""
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        aggregation_strategy=None,
+        client_selection_strategy=None,
     ):
-        super().__init__(callbacks=callbacks)
+        super().__init__(
+            callbacks=callbacks, client_selection_strategy=client_selection_strategy
+        )
 
         self.custom_model = model
         self.model = None
@@ -42,6 +52,9 @@ class Server(base.Server):
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
+
+        # Initialize aggregation strategy (default: FedAvg)
+        self.aggregation_strategy = aggregation_strategy or FedAvgAggregationStrategy()
 
         logging.info(
             "[Server #%d] Started training on %d clients with %d per round.",
@@ -89,6 +102,13 @@ class Server(base.Server):
             "Server", server_id=os.getpid(), trainer=self.trainer
         )
 
+        # Setup context for aggregation strategy
+        self.context.trainer = self.trainer
+        self.context.algorithm = self.algorithm
+
+        # Setup aggregation strategy
+        self.aggregation_strategy.setup(self.context)
+
         if not (hasattr(Config().server, "do_test") and not Config().server.do_test):
             if self.datasource is None and self.custom_datasource is None:
                 self.datasource = datasources_registry.get(client_id=0)
@@ -135,26 +155,26 @@ class Server(base.Server):
             self.algorithm = self.custom_algorithm(trainer=self.trainer)
 
     async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate weight updates from the clients using federated averaging."""
-        # Extract the total number of samples
+        """Aggregate weight updates from the clients using federated averaging.
+
+        This method now delegates to the aggregation_strategy for extensibility.
+        Subclasses can still override this method for backward compatibility.
+        """
+        # Check if subclass overrode this method (backward compatibility)
+        if type(self).aggregate_deltas is not Server.aggregate_deltas:
+            # Legacy path: use subclass implementation
+            return await super(Server, self).aggregate_deltas(updates, deltas_received)
+
+        # New path: delegate to strategy
+        self.context.updates = updates
+        self.context.current_round = self.current_round
+
+        avg_update = await self.aggregation_strategy.aggregate_deltas(
+            updates, deltas_received, self.context
+        )
+
+        # Update total_samples for compatibility
         self.total_samples = sum(update.report.num_samples for update in updates)
-
-        # Perform weighted averaging
-        avg_update = {
-            name: self.trainer.zeros(delta.shape)
-            for name, delta in deltas_received[0].items()
-        }
-
-        for i, update in enumerate(deltas_received):
-            report = updates[i].report
-            num_samples = report.num_samples
-
-            for name, delta in update.items():
-                # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples)
-
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
 
         return avg_update
 
@@ -165,11 +185,33 @@ class Server(base.Server):
         weights_received = self.weights_received(weights_received)
         self.callback_handler.call_event("on_weights_received", self, weights_received)
 
+        # Notify client selection strategy about received reports
+        self.context.updates = self.updates
+        self.context.current_round = self.current_round
+        self.client_selection_strategy.on_reports_received(self.updates, self.context)
+
         # Extract the current model weights as the baseline
         baseline_weights = self.algorithm.extract_weights()
 
-        if hasattr(self, "aggregate_weights"):
-            # Runs a server aggregation algorithm using weights rather than deltas
+        # Check if we should aggregate weights directly or use deltas
+        # Try strategy's aggregate_weights first, fall back to aggregate_deltas
+        strategy_weights = None
+        if hasattr(self.aggregation_strategy, "aggregate_weights"):
+            strategy_weights = await self.aggregation_strategy.aggregate_weights(
+                self.updates, baseline_weights, weights_received, self.context
+            )
+
+        if strategy_weights is not None:
+            # Strategy provided weight aggregation
+            logging.info(
+                "[Server #%d] Aggregating model weights directly rather than weight deltas.",
+                os.getpid(),
+            )
+            updated_weights = strategy_weights
+            # Loads the new model weights
+            self.algorithm.load_weights(updated_weights)
+        elif hasattr(self, "aggregate_weights"):
+            # Backward compatibility: subclass overrode aggregate_weights
             logging.info(
                 "[Server #%d] Aggregating model weights directly rather than weight deltas.",
                 os.getpid(),
@@ -177,10 +219,10 @@ class Server(base.Server):
             updated_weights = await self.aggregate_weights(
                 self.updates, baseline_weights, weights_received
             )
-
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
         else:
+            # Use delta aggregation (default path)
             # Computes the weight deltas by comparing the weights received with
             # the current global model weights
             deltas_received = self.algorithm.compute_weight_deltas(

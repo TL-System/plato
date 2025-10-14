@@ -22,6 +22,8 @@ from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.server import LogProgressCallback
 from plato.client import run
 from plato.config import Config
+from plato.servers.strategies.base import ServerContext
+from plato.servers.strategies.client_selection import RandomSelectionStrategy
 from plato.utils import fonts, s3
 
 
@@ -71,7 +73,7 @@ class ServerEvents(socketio.AsyncNamespace):
 class Server:
     """The base class for federated learning servers."""
 
-    def __init__(self, callbacks=None):
+    def __init__(self, callbacks=None, client_selection_strategy=None):
         self.sio = None
         self.client = None
         self.clients = {}
@@ -106,6 +108,14 @@ class Server:
         if callbacks is not None:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
+
+        # Initialize server context for strategies
+        self.context = ServerContext()
+
+        # Initialize client selection strategy (default: random selection)
+        self.client_selection_strategy = (
+            client_selection_strategy or RandomSelectionStrategy()
+        )
 
         # Accumulated communication overhead (MB) throughout the FL training session
         self.comm_overhead = 0
@@ -257,6 +267,15 @@ class Server:
             self.uplink_bandwidth = self.uplink_bandwidth / self.minimum_clients
         else:
             self.uplink_bandwidth = self.uplink_bandwidth / self.clients_per_round
+
+        # Setup server context for strategies
+        self.context.server = self
+        self.context.total_clients = self.total_clients
+        self.context.clients_per_round = self.clients_per_round
+        self.context.state["prng_state"] = self.prng_state
+
+        # Setup client selection strategy
+        self.client_selection_strategy.setup(self.context)
 
     def run(self, client=None, edge_server=None, edge_client=None, trainer=None):
         """Starts a run loop for the server."""
@@ -677,15 +696,41 @@ class Server:
             )
 
     def choose_clients(self, clients_pool, clients_count):
-        """Chooses a subset of the clients to participate in each round."""
+        """
+        Chooses a subset of the clients to participate in each round.
+
+        This method now delegates to the client_selection_strategy for
+        extensibility. Subclasses can still override this method for
+        backward compatibility.
+        """
         assert clients_count <= len(clients_pool)
-        random.setstate(self.prng_state)
 
-        # Select clients randomly
-        selected_clients = random.sample(clients_pool, clients_count)
+        # Check if subclass overrode this method (backward compatibility)
+        if type(self).choose_clients is not Server.choose_clients:
+            # Legacy path: use subclass implementation
+            random.setstate(self.prng_state)
+            selected_clients = super(Server, self).choose_clients(
+                clients_pool, clients_count
+            )
+            self.prng_state = random.getstate()
+            return selected_clients
 
-        self.prng_state = random.getstate()
-        logging.info("[%s] Selected clients: %s", self, selected_clients)
+        # New path: delegate to strategy
+        self.context.current_round = self.current_round
+        self.context.state["prng_state"] = self.prng_state
+
+        selected_clients = self.client_selection_strategy.select_clients(
+            clients_pool, clients_count, self.context
+        )
+
+        # Update PRNG state from context
+        self.prng_state = self.context.state["prng_state"]
+
+        # Call strategy hook
+        self.client_selection_strategy.on_clients_selected(
+            selected_clients, self.context
+        )
+
         return selected_clients
 
     async def _periodic(self, periodic_interval):
