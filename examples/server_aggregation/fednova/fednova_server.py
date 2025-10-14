@@ -20,7 +20,7 @@ class Server(fedavg.Server):
         # Extracting the total number of samples
         self.total_samples = sum(update.report.num_samples for update in updates)
 
-        # Extracting the number of local epoches, tau_i, from the updates
+        # Extracting the number of local epochs, tau_i, from the updates
         local_epochs = [update.report.epochs for update in updates]
 
         # Performing weighted averaging

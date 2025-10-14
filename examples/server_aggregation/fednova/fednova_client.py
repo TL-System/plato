@@ -1,5 +1,5 @@
 """
-A federated learning client using FedNova, and the local number of epochs is randomly
+A federated learning client using FedNova, where the local number of epochs is randomly
 generated and communicated to the server at each communication round.
 
 Reference:
@@ -11,23 +11,15 @@ https://proceedings.neurips.cc/paper/2020/hash/564127c03caab942e503ee6f810f54fd-
 """
 
 import logging
-from dataclasses import dataclass
 
 import numpy as np
 
-from plato.clients import base, simple
+from plato.clients import simple
 from plato.config import Config
 
 
-@dataclass
-class Report(base.Report):
-    """A client report containing the number of local epochs."""
-
-    epochs: int
-
-
 class Client(simple.Client):
-    """A fednova federated learning client who sends weight updates
+    """A FedNova federated learning client who sends weight updates
     and the number of local epochs."""
 
     def configure(self) -> None:
@@ -37,27 +29,23 @@ class Client(simple.Client):
     async def _train(self):
         """FedNova clients use different number of local epochs."""
 
-        # generate the number of local epochs randomly
+        # Generate the number of local epochs randomly
         if (
             hasattr(Config().algorithm, "pattern")
             and Config().algorithm.pattern == "uniform_random"
         ):
             local_epochs = np.random.randint(2, Config().algorithm.max_local_epochs + 1)
-            # Perform model training for a specific number of epoches
+            # Perform model training for a specific number of epochs
             Config().trainer = Config().trainer._replace(epochs=local_epochs)
 
             logging.info(
-                "[Client #%d] Training with %d epoches.", self.client_id, local_epochs
+                "[Client #%d] Training with %d epochs.", self.client_id, local_epochs
             )
 
-        report, weights = await super().train()
+        # Call parent's _train method to get report and weights
+        report, weights = await super()._train()
 
-        return (
-            Report(
-                report.num_samples,
-                report.accuracy,
-                report.training_time,
-                Config().trainer.epochs,
-            ),
-            weights,
-        )
+        # Add the epochs information to the report
+        report.epochs = Config().trainer.epochs
+
+        return report, weights
