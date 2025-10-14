@@ -16,11 +16,11 @@ from plato.clients import simple
 from plato.datasources import base
 from plato.servers import fedavg
 from plato.servers.strategies import (
+    AFLSelectionStrategy,
     FedAvgAggregationStrategy,
     FedNovaAggregationStrategy,
-    RandomSelectionStrategy,
     OortSelectionStrategy,
-    AFLSelectionStrategy,
+    RandomSelectionStrategy,
 )
 from plato.trainers import basic
 
@@ -93,9 +93,9 @@ def example_1_default_strategies():
     Example 1: Server with default strategies (FedAvg + Random).
     This is the same as not specifying strategies at all.
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 1: Default Strategies (FedAvg + Random)")
-    print("="*60)
+    print("=" * 60)
 
     model = partial(
         nn.Sequential,
@@ -121,9 +121,9 @@ def example_2_custom_aggregation():
     """
     Example 2: Server with custom aggregation strategy (FedNova).
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 2: Custom Aggregation (FedNova + Random)")
-    print("="*60)
+    print("=" * 60)
 
     model = partial(
         nn.Sequential,
@@ -143,7 +143,7 @@ def example_2_custom_aggregation():
         model=model,
         datasource=datasource,
         trainer=trainer,
-        aggregation_strategy=FedNovaAggregationStrategy()
+        aggregation_strategy=FedNovaAggregationStrategy(),
     )
 
     print(f"Server created with:")
@@ -156,9 +156,9 @@ def example_3_custom_selection():
     """
     Example 3: Server with custom client selection strategy (Oort).
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 3: Custom Selection (FedAvg + Oort)")
-    print("="*60)
+    print("=" * 60)
 
     model = partial(
         nn.Sequential,
@@ -179,16 +179,16 @@ def example_3_custom_selection():
         datasource=datasource,
         trainer=trainer,
         client_selection_strategy=OortSelectionStrategy(
-            exploration_factor=0.3,
-            desired_duration=100.0,
-            blacklist_num=10
-        )
+            exploration_factor=0.3, desired_duration=100.0, blacklist_num=10
+        ),
     )
 
     print(f"Server created with:")
     print(f"  - Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  - Selection: {type(server.client_selection_strategy).__name__}")
-    print(f"  - Oort params: exploration={server.client_selection_strategy.exploration_factor}")
+    print(
+        f"  - Oort params: exploration={server.client_selection_strategy.exploration_factor}"
+    )
     print("Ready to run with: server.run(client)")
 
 
@@ -196,9 +196,9 @@ def example_4_both_custom():
     """
     Example 4: Server with both custom strategies (FedNova + AFL).
     """
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Example 4: Both Custom (FedNova + AFL)")
-    print("="*60)
+    print("=" * 60)
 
     model = partial(
         nn.Sequential,
@@ -220,17 +220,17 @@ def example_4_both_custom():
         trainer=trainer,
         aggregation_strategy=FedNovaAggregationStrategy(),
         client_selection_strategy=AFLSelectionStrategy(
-            alpha1=0.75,
-            alpha2=0.01,
-            alpha3=0.1
-        )
+            alpha1=0.75, alpha2=0.01, alpha3=0.1
+        ),
     )
 
     print(f"Server created with:")
     print(f"  - Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  - Selection: {type(server.client_selection_strategy).__name__}")
-    print(f"  - AFL params: alpha1={server.client_selection_strategy.alpha1}, "
-          f"alpha2={server.client_selection_strategy.alpha2}")
+    print(
+        f"  - AFL params: alpha1={server.client_selection_strategy.alpha1}, "
+        f"alpha2={server.client_selection_strategy.alpha2}"
+    )
     print("Ready to run with: server.run(client)")
 
 
@@ -242,9 +242,9 @@ def main():
     - Uncomment one of the example functions below
     - Run with: python basic_with_strategies.py -c config.yml
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PLATO SERVER STRATEGIES DEMONSTRATION")
-    print("="*70)
+    print("=" * 70)
     print("\nThis example shows how to compose different strategies with servers.")
     print("Strategies allow mixing and matching aggregation and client selection")
     print("algorithms without requiring inheritance or code duplication.")
@@ -255,11 +255,11 @@ def main():
     example_3_custom_selection()
     example_4_both_custom()
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("To run one of these examples:")
     print("1. Edit this file to uncomment one server.run(client) call")
     print("2. Run: python basic_with_strategies.py -c config.yml")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Uncomment ONE of the following to actually run training:
 

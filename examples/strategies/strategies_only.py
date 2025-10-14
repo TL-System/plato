@@ -23,12 +23,12 @@ from plato.clients import simple
 from plato.datasources import base
 from plato.servers import fedavg
 from plato.servers.strategies import (
+    AFLSelectionStrategy,
+    FedAsyncAggregationStrategy,
     FedAvgAggregationStrategy,
     FedNovaAggregationStrategy,
-    FedAsyncAggregationStrategy,
-    RandomSelectionStrategy,
     OortSelectionStrategy,
-    AFLSelectionStrategy,
+    RandomSelectionStrategy,
 )
 from plato.trainers import basic
 
@@ -128,7 +128,9 @@ def example_2_fednova():
     print("=" * 70)
     print("Using: FedNova aggregation + Random client selection")
 
-    model = partial(nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10))
+    model = partial(
+        nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10)
+    )
     client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
 
     server = fedavg.Server(
@@ -151,7 +153,9 @@ def example_3_oort():
     print("=" * 70)
     print("Using: FedAvg aggregation + Oort client selection")
 
-    model = partial(nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10))
+    model = partial(
+        nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10)
+    )
     client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
 
     server = fedavg.Server(
@@ -168,7 +172,9 @@ def example_3_oort():
     print(f"\nServer configuration:")
     print(f"  Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  Selection: {type(server.client_selection_strategy).__name__}")
-    print(f"  Exploration factor: {server.client_selection_strategy.exploration_factor}")
+    print(
+        f"  Exploration factor: {server.client_selection_strategy.exploration_factor}"
+    )
     print("\n✓ Server ready to run")
 
 
@@ -179,7 +185,9 @@ def example_4_fedasync():
     print("=" * 70)
     print("Using: FedAsync aggregation + Random client selection")
 
-    model = partial(nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10))
+    model = partial(
+        nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10)
+    )
     client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
 
     server = fedavg.Server(
@@ -209,7 +217,9 @@ def example_5_afl():
     print("=" * 70)
     print("Using: FedAvg aggregation + AFL client selection")
 
-    model = partial(nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10))
+    model = partial(
+        nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10)
+    )
     client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
 
     server = fedavg.Server(
@@ -226,8 +236,10 @@ def example_5_afl():
     print(f"\nServer configuration:")
     print(f"  Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  Selection: {type(server.client_selection_strategy).__name__}")
-    print(f"  Alpha parameters: α1={server.client_selection_strategy.alpha1}, "
-          f"α2={server.client_selection_strategy.alpha2}, α3={server.client_selection_strategy.alpha3}")
+    print(
+        f"  Alpha parameters: α1={server.client_selection_strategy.alpha1}, "
+        f"α2={server.client_selection_strategy.alpha2}, α3={server.client_selection_strategy.alpha3}"
+    )
     print("\n✓ Server ready to run")
 
 
@@ -238,7 +250,9 @@ def example_6_combined():
     print("=" * 70)
     print("Using: FedNova aggregation + Oort client selection")
 
-    model = partial(nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10))
+    model = partial(
+        nn.Sequential, nn.Linear(28 * 28, 128), nn.ReLU(), nn.Linear(128, 10)
+    )
     client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
 
     server = fedavg.Server(
@@ -255,7 +269,9 @@ def example_6_combined():
     print(f"\nServer configuration:")
     print(f"  Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  Selection: {type(server.client_selection_strategy).__name__}")
-    print(f"  Exploration factor: {server.client_selection_strategy.exploration_factor}")
+    print(
+        f"  Exploration factor: {server.client_selection_strategy.exploration_factor}"
+    )
     print("\n✓ Server ready to run")
     print("\n💡 This combination was impossible with inheritance-based approach!")
 

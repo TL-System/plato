@@ -7,8 +7,8 @@ federated learning algorithms.
 
 import asyncio
 import logging
-from typing import Dict, List, Optional
 from types import SimpleNamespace
+from typing import Dict, List, Optional
 
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext

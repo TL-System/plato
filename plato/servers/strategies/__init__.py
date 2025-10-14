@@ -18,18 +18,17 @@ Example:
 """
 
 # Base classes and context
-from plato.servers.strategies.base import (
-    AggregationStrategy,
-    ClientSelectionStrategy,
-    ServerContext,
-    ServerStrategy,
-)
-
 # Aggregation strategies
 from plato.servers.strategies.aggregation import (
     FedAsyncAggregationStrategy,
     FedAvgAggregationStrategy,
     FedNovaAggregationStrategy,
+)
+from plato.servers.strategies.base import (
+    AggregationStrategy,
+    ClientSelectionStrategy,
+    ServerContext,
+    ServerStrategy,
 )
 
 # Client selection strategies

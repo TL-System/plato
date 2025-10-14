@@ -1,5 +1,7 @@
 """
-A federated learning training session using Oort.
+A federated learning training session using Oort with strategy pattern.
+
+This is the updated version using the strategy-based API instead of inheritance.
 
 Reference:
 
@@ -9,15 +11,15 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 """
 
 import oort_client
-import oort_server
+import oort_server_strategy
 import oort_trainer
 
 
 def main():
-    """A Plato federated learning training session using Oort for client selection."""
+    """A Plato federated learning training session using Oort strategy."""
     trainer = oort_trainer.Trainer
     client = oort_client.Client(trainer=trainer)
-    server = oort_server.Server(trainer=trainer)
+    server = oort_server_strategy.Server(trainer=trainer)
     server.run(client)
 
 

@@ -43,7 +43,9 @@ class Server(fedavg.Server):
             staleness_func_param = Config().server.staleness_weighting_function
             staleness_func_type = staleness_func_param.type.lower()
 
-            if staleness_func_type == "polynomial" and hasattr(staleness_func_param, "a"):
+            if staleness_func_type == "polynomial" and hasattr(
+                staleness_func_param, "a"
+            ):
                 staleness_func_params["a"] = staleness_func_param.a
             elif staleness_func_type == "hinge":
                 if hasattr(staleness_func_param, "a"):

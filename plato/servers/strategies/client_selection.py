@@ -36,9 +36,9 @@ class RandomSelectionStrategy(ClientSelectionStrategy):
         context: ServerContext,
     ) -> List[int]:
         """Select clients uniformly at random."""
-        assert clients_count <= len(
-            clients_pool
-        ), f"Cannot select {clients_count} clients from pool of {len(clients_pool)}"
+        assert clients_count <= len(clients_pool), (
+            f"Cannot select {clients_count} clients from pool of {len(clients_pool)}"
+        )
 
         # Use server's PRNG state for reproducibility
         prng_state = context.state.get("prng_state")
@@ -185,7 +185,9 @@ class OortSelectionStrategy(ClientSelectionStrategy):
             # Calculate cut-off utility
             if len(sorted_by_utility) >= exploited_clients_count:
                 cut_off_util = (
-                    self.client_utilities[sorted_by_utility[exploited_clients_count - 1]]
+                    self.client_utilities[
+                        sorted_by_utility[exploited_clients_count - 1]
+                    ]
                     * self.cut_off
                 )
             else:
@@ -204,7 +206,10 @@ class OortSelectionStrategy(ClientSelectionStrategy):
             # Sample clients with their utilities as probabilities
             if exploited_clients:
                 total_utility = float(
-                    sum(self.client_utilities[client_id] for client_id in exploited_clients)
+                    sum(
+                        self.client_utilities[client_id]
+                        for client_id in exploited_clients
+                    )
                 )
 
                 if total_utility > 0:
@@ -434,7 +439,9 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
         """Extract valuations from client reports."""
         for update in updates:
             if hasattr(update.report, "valuation"):
-                self.local_values[update.client_id]["valuation"] = update.report.valuation
+                self.local_values[update.client_id]["valuation"] = (
+                    update.report.valuation
+                )
                 logging.debug(
                     "AFL: Client #%d valuation = %.4f",
                     update.client_id,
@@ -459,6 +466,4 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
             if valuation == -float("inf"):
                 self.local_values[client_id]["prob"] = 0.0
             else:
-                self.local_values[client_id]["prob"] = math.exp(
-                    self.alpha2 * valuation
-                )
+                self.local_values[client_id]["prob"] = math.exp(self.alpha2 * valuation)
