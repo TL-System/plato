@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from typing import Dict, List, Optional
 
 import numpy as np
+import torch
 
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
@@ -133,15 +134,6 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         adaptive_mixing: Whether to adjust mixing based on staleness
         staleness_func_type: Type of staleness function ('constant', 'polynomial', 'hinge')
         staleness_func_params: Parameters for the staleness function
-
-    Example:
-        >>> strategy = FedAsyncAggregationStrategy(
-        ...     mixing_hyperparameter=0.9,
-        ...     adaptive_mixing=True,
-        ...     staleness_func_type='polynomial',
-        ...     staleness_func_params={'a': 0.5}
-        ... )
-        >>> server = fedavg.Server(aggregation_strategy=strategy)
     """
 
     def __init__(
@@ -151,14 +143,12 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         staleness_func_type: str = "constant",
         staleness_func_params: Optional[Dict] = None,
     ):
-        """Initialize FedAsync aggregation strategy."""
         super().__init__()
         self.mixing_hyperparam = mixing_hyperparameter
         self.adaptive_mixing = adaptive_mixing
         self.staleness_func_type = staleness_func_type.lower()
         self.staleness_func_params = staleness_func_params or {}
 
-        # Validate mixing hyperparameter
         if not 0 < self.mixing_hyperparam < 1:
             logging.warning(
                 "FedAsync: Mixing hyperparameter should be between 0 and 1 (exclusive). "
@@ -167,16 +157,12 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
             )
 
     def setup(self, context: ServerContext) -> None:
-        """Setup and validate configuration."""
-        # Try to load from config if not provided
         try:
             if hasattr(Config().server, "mixing_hyperparameter"):
                 self.mixing_hyperparam = Config().server.mixing_hyperparameter
-
             if hasattr(Config().server, "adaptive_mixing"):
                 self.adaptive_mixing = Config().server.adaptive_mixing
         except ValueError:
-            # Config not initialized, use constructor parameters
             pass
 
         logging.info(
@@ -191,13 +177,7 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         deltas_received: List[Dict],
         context: ServerContext,
     ) -> Dict:
-        """
-        Aggregate deltas (fallback implementation).
-
-        FedAsync typically aggregates weights directly, but this method
-        provides a fallback for compatibility.
-        """
-        # Use FedAvg-style aggregation as fallback
+        """Fallback delta aggregation (FedAvg-style)."""
         total_samples = sum(update.report.num_samples for update in updates)
 
         avg_update = {
@@ -205,15 +185,76 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
             for name, delta in deltas_received[0].items()
         }
 
-        for i, update in enumerate(deltas_received):
+        for i, delta in enumerate(deltas_received):
             num_samples = updates[i].report.num_samples
+            weight = num_samples / total_samples if total_samples > 0 else 0.0
 
-            for name, delta in update.items():
-                avg_update[name] += delta * (num_samples / total_samples)
+            for name, value in delta.items():
+                avg_update[name] += value * weight
 
             await asyncio.sleep(0)
 
         return avg_update
+
+    async def aggregate_weights(
+        self,
+        updates: List[SimpleNamespace],
+        baseline_weights: Dict,
+        weights_received: List[Dict],
+        context: ServerContext,
+    ) -> Dict:
+        """Aggregate weights directly with staleness-aware mixing."""
+        if not updates:
+            return baseline_weights
+
+        client_staleness = getattr(updates[0], "staleness", 0)
+        mixing = self.mixing_hyperparam
+
+        if self.adaptive_mixing:
+            staleness_factor = self._staleness_function(client_staleness)
+            mixing *= staleness_factor
+            logging.debug(
+                "FedAsync: Adjusted mixing to %s (staleness=%s, factor=%s)",
+                mixing,
+                client_staleness,
+                staleness_factor,
+            )
+
+        return await context.algorithm.aggregate_weights(
+            baseline_weights, weights_received, mixing=mixing
+        )
+
+    def _staleness_function(self, staleness: int) -> float:
+        """Calculate staleness weighting factor."""
+        if self.staleness_func_type == "constant":
+            return self._constant_function()
+        if self.staleness_func_type == "polynomial":
+            a = self.staleness_func_params.get("a", 1.0)
+            return self._polynomial_function(staleness, a)
+        if self.staleness_func_type == "hinge":
+            a = self.staleness_func_params.get("a", 1.0)
+            b = self.staleness_func_params.get("b", 10)
+            return self._hinge_function(staleness, a, b)
+
+        logging.warning(
+            "FedAsync: Unknown staleness function type '%s'. Using constant.",
+            self.staleness_func_type,
+        )
+        return self._constant_function()
+
+    @staticmethod
+    def _constant_function() -> float:
+        return 1.0
+
+    @staticmethod
+    def _polynomial_function(staleness: int, a: float) -> float:
+        return 1 / (staleness + 1) ** a
+
+    @staticmethod
+    def _hinge_function(staleness: int, a: float, b: int) -> float:
+        if staleness <= b:
+            return 1.0
+        return 1 / (a * (staleness - b) + 1)
 
 
 class PiscesAggregationStrategy(AggregationStrategy):
@@ -231,12 +272,10 @@ class PiscesAggregationStrategy(AggregationStrategy):
         self.client_staleness: Dict[int, List[float]] = {}
 
     def setup(self, context: ServerContext) -> None:
-        """Initialize staleness tracking and load config overrides."""
         try:
             if hasattr(Config().server, "staleness_factor"):
                 self.staleness_factor = Config().server.staleness_factor
         except ValueError:
-            # Config not initialized, keep constructor values
             pass
 
         total_clients = context.total_clients
@@ -251,7 +290,6 @@ class PiscesAggregationStrategy(AggregationStrategy):
         deltas_received: List[Dict],
         context: ServerContext,
     ) -> Dict:
-        """Aggregate weight updates with staleness-based weighting."""
         if not updates or not deltas_received:
             return {}
 
@@ -264,28 +302,24 @@ class PiscesAggregationStrategy(AggregationStrategy):
             for name, delta in deltas_received[0].items()
         }
 
-        for i, update in enumerate(deltas_received):
+        for i, delta in enumerate(deltas_received):
             client_id = updates[i].client_id
             report = updates[i].report
             num_samples = report.num_samples
-
             staleness = getattr(updates[i], "staleness", 0.0)
+
             self.client_staleness.setdefault(client_id, []).append(staleness)
-
             staleness_factor = self._calculate_staleness_factor(client_id)
+            weight = (num_samples / total_samples) * staleness_factor if total_samples > 0 else 0.0
 
-            for name, delta in update.items():
-                weight = 0.0
-                if total_samples > 0:
-                    weight = (num_samples / total_samples) * staleness_factor
-                avg_update[name] += delta * weight
+            for name, value in delta.items():
+                avg_update[name] += value * weight
 
             await asyncio.sleep(0)
 
         return avg_update
 
     def _calculate_staleness_factor(self, client_id: int) -> float:
-        """Compute the staleness decay factor for a client."""
         history = self.client_staleness.get(client_id, [])
         if not history:
             return 1.0
@@ -294,84 +328,107 @@ class PiscesAggregationStrategy(AggregationStrategy):
         staleness = float(np.mean(recent_history))
         return 1.0 / pow(staleness + 1.0, self.staleness_factor)
 
-    async def aggregate_weights(
+
+class PolarisAggregationStrategy(FedAvgAggregationStrategy):
+    """
+    Polaris aggregation with gradient bound tracking for unexplored clients.
+
+    Computes convolutional gradient norms for reporting clients, estimates
+    bounds for unexplored clients, and keeps client-level statistics for the
+    selection strategy.
+    """
+
+    def __init__(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
-        context: ServerContext,
-    ) -> Dict:
-        """Aggregate weights directly with staleness mixing."""
-        # Calculate mixing parameter based on staleness
-        client_staleness = updates[0].staleness
-        mixing = self.mixing_hyperparam
+        alpha: float = 10.0,
+        initial_gradient_bound: float = 0.5,
+        initial_staleness: float = 0.01,
+    ):
+        super().__init__()
+        self.alpha = alpha
+        self.initial_gradient_bound = initial_gradient_bound
+        self.initial_staleness = initial_staleness
+        self.total_clients = 0
+        self.squared_deltas_current_round: Optional[np.ndarray] = None
+        self.unexplored_clients: Optional[set[int]] = None
 
-        if self.adaptive_mixing:
-            staleness_factor = self._staleness_function(client_staleness)
-            mixing *= staleness_factor
-            logging.debug(
-                "FedAsync: Adjusted mixing to %s (staleness=%s, factor=%s)",
-                mixing,
-                client_staleness,
-                staleness_factor,
-            )
+    def setup(self, context: ServerContext) -> None:
+        super().setup(context)
 
-        # Use algorithm's aggregate_weights with mixing parameter
-        return await context.algorithm.aggregate_weights(
-            baseline_weights, weights_received, mixing=mixing
+        self.total_clients = context.total_clients
+        self.squared_deltas_current_round = np.zeros(self.total_clients)
+        self.unexplored_clients = set(range(self.total_clients))
+
+        polaris_state = context.state.setdefault("polaris", {})
+        polaris_state.setdefault(
+            "local_gradient_bounds",
+            np.full(self.total_clients, self.initial_gradient_bound, dtype=float),
+        )
+        polaris_state.setdefault(
+            "local_stalenesses",
+            np.full(self.total_clients, self.initial_staleness, dtype=float),
+        )
+        polaris_state.setdefault(
+            "aggregation_weights",
+            np.full(self.total_clients, 1.0 / max(1, self.total_clients), dtype=float),
+        )
+        polaris_state.setdefault(
+            "squared_deltas_current_round",
+            np.zeros(self.total_clients, dtype=float),
         )
 
-    def _staleness_function(self, staleness: int) -> float:
-        """Calculate staleness weighting factor."""
-        if self.staleness_func_type == "constant":
-            return self._constant_function()
-        elif self.staleness_func_type == "polynomial":
-            a = self.staleness_func_params.get("a", 1.0)
-            return self._polynomial_function(staleness, a)
-        elif self.staleness_func_type == "hinge":
-            a = self.staleness_func_params.get("a", 1.0)
-            b = self.staleness_func_params.get("b", 10)
-            return self._hinge_function(staleness, a, b)
-        else:
-            logging.warning(
-                "FedAsync: Unknown staleness function type '%s'. Using constant.",
-                self.staleness_func_type,
-            )
-            return self._constant_function()
+    async def aggregate_deltas(
+        self,
+        updates: List[SimpleNamespace],
+        deltas_received: List[Dict],
+        context: ServerContext,
+    ) -> Dict:
+        avg_update = await super().aggregate_deltas(updates, deltas_received, context)
 
-    @staticmethod
-    def _constant_function() -> float:
-        """Constant staleness function (no adjustment)."""
-        return 1.0
+        if not updates or not deltas_received:
+            return avg_update
 
-    @staticmethod
-    def _polynomial_function(staleness: int, a: float) -> float:
-        """
-        Polynomial staleness function.
+        polaris_state = context.state.setdefault("polaris", {})
+        local_gradient_bounds = polaris_state["local_gradient_bounds"]
 
-        Args:
-            staleness: Number of rounds since client started training
-            a: Polynomial exponent parameter
+        self.squared_deltas_current_round = np.zeros(self.total_clients)
+        sum_deltas_current_round = 0.0
+        deltas_counter = 0
 
-        Returns:
-            (staleness + 1)^(-a)
-        """
-        return (staleness + 1) ** (-a)
+        for update, delta in zip(updates, deltas_received):
+            client_index = update.client_id - 1
+            squared_delta = 0.0
 
-    @staticmethod
-    def _hinge_function(staleness: int, a: float, b: int) -> float:
-        """
-        Hinge staleness function.
+            for layer_name, value in delta.items():
+                if "conv" not in layer_name:
+                    continue
 
-        Args:
-            staleness: Number of rounds since client started training
-            a: Slope parameter
-            b: Threshold parameter
+                tensor_value = value
+                if isinstance(tensor_value, torch.Tensor):
+                    tensor_value = tensor_value.detach().cpu().numpy()
+                squared_delta += float(np.sum(np.square(tensor_value)))
 
-        Returns:
-            1 if staleness <= b, else 1/(a*(staleness-b)+1)
-        """
-        if staleness <= b:
-            return 1.0
-        else:
-            return 1.0 / (a * (staleness - b) + 1)
+            norm_delta = float(np.sqrt(max(squared_delta, 0.0)))
+            self.squared_deltas_current_round[client_index] = norm_delta
+
+            if self.unexplored_clients is not None and client_index in self.unexplored_clients:
+                self.unexplored_clients.remove(client_index)
+
+            sum_deltas_current_round += norm_delta
+            deltas_counter += 1
+
+        if deltas_counter > 0:
+            avg_deltas_current_round = sum_deltas_current_round / deltas_counter
+            expect_deltas = self.alpha * avg_deltas_current_round
+
+            if self.unexplored_clients:
+                for client_index in self.unexplored_clients:
+                    self.squared_deltas_current_round[client_index] = expect_deltas
+
+        for idx, bound in enumerate(self.squared_deltas_current_round):
+            if bound != 0:
+                local_gradient_bounds[idx] = bound
+
+        polaris_state["squared_deltas_current_round"] = self.squared_deltas_current_round.copy()
+
+        return avg_update

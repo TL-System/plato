@@ -1,7 +1,7 @@
 [project]
 name = "pisces"
 version = "0.1.0"
-description = "Add your description here"
+description = "Pisces - an asynchronous client selection and server aggregation algorithm"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
