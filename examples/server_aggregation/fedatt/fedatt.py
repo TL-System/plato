@@ -10,14 +10,12 @@ with Attentive Aggregation," in Proc. International Joint Conference on Neural N
 https://arxiv.org/abs/1812.07108
 """
 
-import fedatt_algorithm
 import fedatt_server
 
 
 def main():
     """A Plato federated learning training session using the FedAtt algorithm."""
-    algorithm = fedatt_algorithm.Algorithm
-    server = fedatt_server.Server(algorithm=algorithm)
+    server = fedatt_server.Server()
     server.run()
 
 

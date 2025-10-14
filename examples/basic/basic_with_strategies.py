@@ -1,5 +1,5 @@
 """
-This example demonstrates the new strategy-based server API in Plato.
+This example demonstrates the strategy-based server API in Plato.
 
 It shows how to use different aggregation and client selection strategies
 by composing them with the server, rather than using inheritance.

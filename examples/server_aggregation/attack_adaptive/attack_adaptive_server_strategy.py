@@ -92,36 +92,3 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             updated_weights[name] = weight + att_update[name]
 
         return updated_weights
-
-
-class Server(fedavg.Server):
-    """
-    A federated learning server using attack-adaptive aggregation strategy.
-
-    The attack-adaptive aggregation logic is implemented in the aggregation strategy,
-    following the composition-over-inheritance pattern.
-    """
-
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        aggregation_strategy=None,
-        client_selection_strategy=None,
-    ):
-        # Use attack-adaptive aggregation strategy by default
-        if aggregation_strategy is None:
-            aggregation_strategy = AttackAdaptiveAggregationStrategy()
-
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            aggregation_strategy=aggregation_strategy,
-            client_selection_strategy=client_selection_strategy,
-        )
