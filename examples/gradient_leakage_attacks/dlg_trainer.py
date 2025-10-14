@@ -151,7 +151,11 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
         context.state["list_grad"] = self.list_grad
         context.state["feature_fc1_graph"] = self.feature_fc1_graph
 
-        return loss
+    def on_train_run_start(self, trainer, config, **kwargs):
+        """Initialize DLG trainer state and inject trainer into context."""
+        trainer.target_grad = None
+        # Inject trainer reference into context for strategy access
+        trainer.context.state["trainer"] = trainer
 
 
 class DLGTrainingCallbacks(TrainerCallback):
@@ -256,7 +260,6 @@ class DLGTrainingCallbacks(TrainerCallback):
                 for i, grad_item in enumerate(list_grad):
                     grad_tensor = grad_item.cpu().numpy()
                     flattened_weights = np.abs(grad_tensor.flatten())
-                    # Generate the pruning threshold according to 'prune by percentage'
                     thresh = np.percentile(
                         flattened_weights, Config().algorithm.prune_pct
                     )
@@ -315,9 +318,9 @@ class DLGTrainingCallbacks(TrainerCallback):
                 total_local_steps = config["epochs"] * math.ceil(
                     Config().data.partition_size / config["batch_size"]
                 )
-                self.target_grad = [x / total_local_steps for x in self.target_grad]
+                trainer.target_grad = [x / total_local_steps for x in trainer.target_grad]
             except:
-                self.target_grad = None
+                trainer.target_grad = None
 
         if self.full_examples is not None:
             self.full_examples = self.full_examples.detach()
