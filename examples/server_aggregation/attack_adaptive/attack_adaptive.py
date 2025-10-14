@@ -8,17 +8,15 @@ Unpublished
 (https://arxiv.org/pdf/2102.05257.pdf)
 """
 
-import os
-
-os.environ["config_file"] = "attack-adaptive_MNIST_lenet5.yml"
-
+import attack_adaptive_algorithm
 import attack_adaptive_server
 
 
 def main():
     """A Plato federated learning training session using the attack-adaptive
     federation algorithm."""
-    server = attack_adaptive_server.Server()
+    algorithm = attack_adaptive_algorithm.Algorithm
+    server = attack_adaptive_server.Server(algorithm=algorithm)
     server.run()
 
 

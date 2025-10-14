@@ -1,6 +1,7 @@
 """
-A federated learning server using the algorithm proposed in the following unpublished
-manuscript:
+Server aggregation using attack-adaptive aggregation.
+
+Reference:
 
 Ching Pui Wan, Qifeng Chen, "Robust Federated Learning with Attack-Adaptive Aggregation"
 Unpublished
@@ -16,22 +17,22 @@ from collections import OrderedDict
 import torch
 import torch.nn.functional as F
 
-from plato.servers import fedavg
+from plato.algorithms import fedavg
+from plato.config import Config
 
 
-class Server(fedavg.Server):
-    """A federated learning server using the fed_attack_adapt algorithm."""
+class Algorithm(fedavg.Algorithm):
+    """The federated learning algorithm for attack-adaptive aggregation, used by the server."""
 
-    async def aggregate_deltas(self, updates, deltas_received):
+    async def aggregate_weights(self, baseline_weights, weights_received, **kwargs):
         """Aggregate weight updates from the clients using attack-adaptive aggregation."""
+        deltas_received = self.compute_weight_deltas(baseline_weights, weights_received)
+
         # Performing attack-adaptive aggregation
         att_update = {
             name: self.trainer.zeros(weights.shape)
             for name, weights in deltas_received[0].items()
         }
-
-        # Extracting baseline model weights
-        baseline_weights = self.algorithm.extract_weights()
 
         # Calculating attention
         atts = OrderedDict()
@@ -44,8 +45,12 @@ class Server(fedavg.Server):
                 cos = torch.nn.CosineSimilarity(dim=0)
                 atts[name][i] = cos(torch.flatten(weight), torch.flatten(delta))
 
-            # scaling factor for the temperature
-            scaling_factor = 10
+            # Scaling factor for the temperature
+            scaling_factor = (
+                Config().algorithm.scaling_factor
+                if hasattr(Config().algorithm, "scaling_factor")
+                else 10
+            )
             atts[name] = F.softmax(atts[name] * scaling_factor, dim=0)
 
         for name, weight in baseline_weights.items():
@@ -55,4 +60,4 @@ class Server(fedavg.Server):
                 att_weight += delta.mul(atts[name][i])
             att_update[name] = att_weight
 
-        return att_update
+        return self.update_weights(att_update)
