@@ -7,43 +7,35 @@ P. Wang, et al. "MistNet: Towards Private Neural Network Training with Local
 Differential Privacy," found in docs/papers.
 """
 
-import logging
-import time
-from types import SimpleNamespace
-
 from plato.clients import simple
-from plato.config import Config
+from plato.clients.strategies import MistNetTrainingStrategy
 
 
 class Client(simple.Client):
     """A federated learning client for MistNet."""
 
-    async def _train(self):
-        """A MistNet client only uses the first several layers in a forward pass."""
-        logging.info("Training on MistNet client #%d", self.client_id)
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
+        )
 
-        # Since training is performed on the server, the client should not be doing
-        # its own testing for the model accuracy
-        assert not Config().clients.do_test
-
-        tic = time.perf_counter()
-
-        # Perform a forward pass till the cut layer in the model
-        features = self.algorithm.extract_features(self.trainset, self.sampler)
-
-        training_time = time.perf_counter() - tic
-
-        # Generate a report for the server, performing model testing if applicable
-        comm_time = time.time()
-        return (
-            SimpleNamespace(
-                client_id=self.client_id,
-                num_samples=self.sampler.num_samples(),
-                accuracy=0,
-                training_time=training_time,
-                comm_time=comm_time,
-                update_response=False,
-                payload_length=len(features),
-            ),
-            features,
+        self._configure_composable(
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=self.payload_strategy,
+            training_strategy=MistNetTrainingStrategy(),
+            reporting_strategy=self.reporting_strategy,
+            communication_strategy=self.communication_strategy,
         )

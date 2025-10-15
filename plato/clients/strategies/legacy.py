@@ -143,7 +143,7 @@ class LegacyPayloadStrategy(DefaultPayloadStrategy):
         )
         context.processing_time = time.perf_counter() - tic
 
-        report, outbound_payload = await owner._start_training(processed_inbound)
+        report, outbound_payload = await owner.inbound_processed(processed_inbound)
 
         if callbacks is not None:
             callbacks.call_event("on_inbound_processed", owner, processed_inbound)

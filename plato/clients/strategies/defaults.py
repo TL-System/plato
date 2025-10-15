@@ -148,6 +148,25 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
 class DefaultPayloadStrategy(PayloadStrategy):
     """Default payload processing, mirroring `Client._handle_payload`."""
 
+    def inbound_received(self, context: ClientContext) -> None:
+        """Invoke legacy hook on the owning client."""
+        owner = context.owner
+        inbound_processor = context.inbound_processor
+        if owner is not None:
+            owner.inbound_received(inbound_processor)
+
+    def outbound_ready(
+        self,
+        context: ClientContext,
+        report: Any,
+        outbound_payload: Any,
+    ) -> None:
+        """Invoke legacy outbound hook on the owning client."""
+        owner = context.owner
+        outbound_processor = context.outbound_processor
+        if owner is not None:
+            owner.outbound_ready(report, outbound_processor)
+
     async def commit_chunk_group(
         self,
         context: ClientContext,

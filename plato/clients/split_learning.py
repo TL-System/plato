@@ -19,6 +19,13 @@ import time
 from types import SimpleNamespace
 
 from plato.clients import simple
+from plato.clients.strategies.legacy import (
+    LegacyCommunicationStrategy,
+    LegacyLifecycleStrategy,
+    LegacyPayloadStrategy,
+    LegacyReportingStrategy,
+    LegacyTrainingStrategy,
+)
 from plato.config import Config
 from plato.utils import fonts
 
@@ -43,6 +50,14 @@ class Client(simple.Client):
             callbacks=callbacks,
         )
         assert not Config().clients.do_test
+
+        self._configure_composable(
+            lifecycle_strategy=LegacyLifecycleStrategy(self),
+            payload_strategy=LegacyPayloadStrategy(self),
+            training_strategy=LegacyTrainingStrategy(self),
+            reporting_strategy=LegacyReportingStrategy(self),
+            communication_strategy=LegacyCommunicationStrategy(self),
+        )
 
         self.model_received = False
         self.gradient_received = False

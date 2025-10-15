@@ -21,6 +21,8 @@ from plato.clients.strategies.defaults import (
     DefaultReportingStrategy,
     DefaultTrainingStrategy,
 )
+from plato.clients.strategies.edge import EdgeLifecycleStrategy, EdgeTrainingStrategy
+from plato.clients.strategies.mistnet import MistNetTrainingStrategy
 
 __all__ = [
     "ClientContext",
@@ -35,4 +37,7 @@ __all__ = [
     "DefaultTrainingStrategy",
     "DefaultReportingStrategy",
     "DefaultCommunicationStrategy",
+    "EdgeLifecycleStrategy",
+    "EdgeTrainingStrategy",
+    "MistNetTrainingStrategy",
 ]

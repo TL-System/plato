@@ -2,22 +2,18 @@
 A basic federated learning client who sends weight updates to the server.
 """
 
-import logging
-import time
-from types import SimpleNamespace
-
-from plato.algorithms import registry as algorithms_registry
 from plato.clients import base
-from plato.config import Config
-from plato.datasources import registry as datasources_registry
-from plato.processors import registry as processor_registry
-from plato.samplers import registry as samplers_registry
-from plato.trainers import registry as trainers_registry
-from plato.utils import fonts
+from plato.clients.strategies import (
+    DefaultCommunicationStrategy,
+    DefaultLifecycleStrategy,
+    DefaultPayloadStrategy,
+    DefaultReportingStrategy,
+    DefaultTrainingStrategy,
+)
 
 
 class Client(base.Client):
-    """A basic federated learning client who sends simple weight updates."""
+    """A basic federated learning client who composes default strategies."""
 
     def __init__(
         self,
@@ -29,194 +25,91 @@ class Client(base.Client):
         trainer_callbacks=None,
     ):
         super().__init__(callbacks=callbacks)
-        # Save the callbacks that will be passed to trainer later
+
+        # Preserve legacy attributes for backward compatibility
+        self.custom_model = model
+        self.custom_datasource = datasource
+        self.custom_algorithm = algorithm
+        self.custom_trainer = trainer
         self.trainer_callbacks = trainer_callbacks
 
-        self.custom_model = model
         self.model = None
-
-        self.custom_datasource = datasource
         self.datasource = None
-
-        self.custom_algorithm = algorithm
         self.algorithm = None
-
-        self.custom_trainer = trainer
         self.trainer = None
-
-        self.trainset = None  # Training dataset
-        self.testset = None  # Testing dataset
+        self.trainset = None
+        self.testset = None
         self.sampler = None
-        self.testset_sampler = None  # Sampler for the test set
-
+        self.testset_sampler = None
         self._report = None
 
-    def configure(self) -> None:
-        """Prepares this client for training."""
-        super().configure()
+        # Mirror configuration metadata into the shared context
+        self._context.custom_model = model
+        self._context.custom_datasource = datasource
+        self._context.custom_algorithm = algorithm
+        self._context.custom_trainer = trainer
+        self._context.trainer_callbacks = trainer_callbacks
+        self._context.report_customizer = self.customize_report
 
-        if self.model is None and self.custom_model is not None:
-            self.model = self.custom_model
-
-        if self.trainer is None and self.custom_trainer is None:
-            self.trainer = trainers_registry.get(
-                model=self.model, callbacks=self.trainer_callbacks
-            )
-        elif self.trainer is None and self.custom_trainer is not None:
-            self.trainer = self.custom_trainer(
-                model=self.model, callbacks=self.trainer_callbacks
-            )
-
-        self.trainer.set_client_id(self.client_id)
-
-        if self.algorithm is None and self.custom_algorithm is None:
-            self.algorithm = algorithms_registry.get(trainer=self.trainer)
-        elif self.algorithm is None and self.custom_algorithm is not None:
-            self.algorithm = self.custom_algorithm(trainer=self.trainer)
-
-        self.algorithm.set_client_id(self.client_id)
-
-        # Pass inbound and outbound data payloads through processors for
-        # additional data processing
-        self.outbound_processor, self.inbound_processor = processor_registry.get(
-            "Client", client_id=self.client_id, trainer=self.trainer
+        # Default strategy stack reproducing the legacy client behaviour
+        self._configure_composable(
+            lifecycle_strategy=DefaultLifecycleStrategy(),
+            payload_strategy=DefaultPayloadStrategy(),
+            training_strategy=DefaultTrainingStrategy(),
+            reporting_strategy=DefaultReportingStrategy(),
+            communication_strategy=DefaultCommunicationStrategy(),
         )
 
-        # Setting up the data sampler
-        if self.datasource:
-            self.sampler = samplers_registry.get(self.datasource, self.client_id)
+    def configure(self) -> None:
+        """Prepare this client for training using lifecycle strategies."""
+        self._context.custom_model = self.custom_model
+        self._context.custom_trainer = self.custom_trainer
+        self._context.custom_algorithm = self.custom_algorithm
+        self._context.trainer_callbacks = self.trainer_callbacks
+        self._context.report_customizer = self.customize_report
 
-            if (
-                hasattr(Config().clients, "do_test")
-                and Config().clients.do_test
-                and hasattr(Config().data, "testset_sampler")
-            ):
-                # Set the sampler for test set
-                self.testset_sampler = samplers_registry.get(
-                    self.datasource, self.client_id, testing=True
-                )
+        self.lifecycle_strategy.configure(self._context)
+        self._sync_from_context(
+            (
+                "model",
+                "trainer",
+                "algorithm",
+                "outbound_processor",
+                "inbound_processor",
+                "sampler",
+                "testset_sampler",
+            )
+        )
 
     def _load_data(self) -> None:
-        """Generates data and loads them onto this client."""
-        # The only case where Config().data.reload_data is set to true is
-        # when clients with different client IDs need to load from different datasets,
-        # such as in the pre-partitioned Federated EMNIST dataset. We do not support
-        # reloading data from a custom datasource at this time.
-        if (
-            self.datasource is None
-            or hasattr(Config().data, "reload_data")
-            and Config().data.reload_data
-        ):
-            logging.info("[%s] Loading its data source...", self)
-
-            if self.custom_datasource is None:
-                self.datasource = datasources_registry.get(client_id=self.client_id)
-            elif self.custom_datasource is not None:
-                self.datasource = self.custom_datasource()
-
-            logging.info(
-                "[%s] Dataset size: %s", self, self.datasource.num_train_examples()
-            )
+        """Generate data sources using the configured lifecycle strategy."""
+        self._context.custom_datasource = self.custom_datasource
+        self.lifecycle_strategy.load_data(self._context)
+        self._sync_from_context(("datasource",))
 
     def _allocate_data(self) -> None:
-        """Allocate training or testing dataset of this client."""
-        # PyTorch uses samplers when loading data with a data loader
-        self.trainset = self.datasource.get_train_set()
-
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-            # Set the testset if local testing is needed
-            self.testset = self.datasource.get_test_set()
+        """Allocate train/test datasets via the lifecycle strategy."""
+        self.lifecycle_strategy.allocate_data(self._context)
+        self._sync_from_context(("trainset", "testset"))
 
     def _load_payload(self, server_payload) -> None:
-        """Loads the server model onto this client."""
-        self.algorithm.load_weights(server_payload)
+        """Load inbound payload via the training strategy."""
+        self.training_strategy.load_payload(self._context, server_payload)
 
     async def _train(self):
-        """The machine learning training workload on a client."""
-        logging.info(
-            fonts.colourize(
-                f"[{self}] Started training in communication round #{self.current_round}."
-            )
-        )
-
-        # Perform model training
-        try:
-            if hasattr(self.trainer, "current_round"):
-                self.trainer.current_round = self.current_round
-            training_time = self.trainer.train(self.trainset, self.sampler)
-
-        except ValueError as exc:
-            logging.info(
-                fonts.colourize(f"[{self}] Error occurred during training: {exc}")
-            )
-            await self.sio.disconnect()
-
-        # Extract model weights and biases
-        weights = self.algorithm.extract_weights()
-
-        # Generate a report for the server, performing model testing if applicable
-        if (hasattr(Config().clients, "do_test") and Config().clients.do_test) and (
-            not hasattr(Config().clients, "test_interval")
-            or self.current_round % Config().clients.test_interval == 0
-        ):
-            accuracy = self.trainer.test(self.testset, self.testset_sampler)
-
-            if accuracy == -1:
-                # The testing process failed, disconnect from the server
-                logging.info(
-                    fonts.colourize(
-                        f"[{self}] Accuracy is -1 when testing. Disconnecting from the server."
-                    )
-                )
-                await self.sio.disconnect()
-
-            if hasattr(Config().trainer, "target_perplexity"):
-                logging.info("[%s] Test perplexity: %.2f", self, accuracy)
-            else:
-                logging.info("[%s] Test accuracy: %.2f%%", self, 100 * accuracy)
-        else:
-            accuracy = 0
-
-        comm_time = time.time()
-
-        if (
-            hasattr(Config().clients, "sleep_simulation")
-            and Config().clients.sleep_simulation
-        ):
-            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
-            avg_training_time = Config().clients.avg_training_time
-
-            training_time = (
-                avg_training_time + sleep_seconds
-            ) * Config().trainer.epochs
-
-        report = SimpleNamespace(
-            client_id=self.client_id,
-            num_samples=self.sampler.num_samples(),
-            accuracy=accuracy,
-            training_time=training_time,
-            comm_time=comm_time,
-            update_response=False,
-        )
-
-        self._report = self.customize_report(report)
-
-        return self._report, weights
+        """Run local training using the configured training strategy."""
+        report, payload = await self.training_strategy.train(self._context)
+        report = self.reporting_strategy.build_report(self._context, report)
+        self._context.latest_report = report
+        self._report = report
+        return report, payload
 
     async def _obtain_model_at_time(self, client_id, requested_time):
-        """Retrieves a model update corresponding to a particular wall clock time.
+        """Delegate asynchronous model retrieval to the reporting strategy."""
+        return await self.reporting_strategy.obtain_model_at_time(
+            self._context, client_id, requested_time
+        )
 
-        This method is called during asynchronous training when the server requests
-        a model update at a specific wall-clock time.
-        """
-        model = self.trainer.obtain_model_at_time(client_id, requested_time)
-        weights = self.algorithm.extract_weights(model)
-        self._report.comm_time = time.time()
-        self._report.client_id = client_id
-        self._report.update_response = True
-
-        return self._report, weights
-
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
+    def customize_report(self, report):
         """Customizes the report with any additional information."""
         return report

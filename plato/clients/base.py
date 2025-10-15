@@ -9,6 +9,7 @@ import re
 import sys
 import uuid
 from abc import abstractmethod
+from typing import Iterable, Optional
 
 import numpy as np
 
@@ -72,11 +73,48 @@ class Client:
         self._context.processing_time = self.processing_time
 
         # Strategy adapters preserving legacy hooks
-        self.lifecycle_strategy = LegacyLifecycleStrategy(self)
-        self.training_strategy = LegacyTrainingStrategy(self)
-        self.reporting_strategy = LegacyReportingStrategy(self)
-        self.communication_strategy = LegacyCommunicationStrategy(self)
-        self.payload_strategy = LegacyPayloadStrategy(self)
+        self._configure_composable(
+            lifecycle_strategy=LegacyLifecycleStrategy(self),
+            payload_strategy=LegacyPayloadStrategy(self),
+            training_strategy=LegacyTrainingStrategy(self),
+            reporting_strategy=LegacyReportingStrategy(self),
+            communication_strategy=LegacyCommunicationStrategy(self),
+        )
+
+    def __repr__(self):
+        return f"Client #{self.client_id}"
+
+    def _configure_composable(
+        self,
+        *,
+        lifecycle_strategy,
+        payload_strategy,
+        training_strategy,
+        reporting_strategy,
+        communication_strategy,
+    ) -> None:
+        """Attach strategies and rebuild the composable client runtime."""
+
+        if hasattr(self, "_composable_strategies"):
+            for strategy in self._composable_strategies:
+                try:
+                    strategy.teardown(self._context)
+                except Exception:  # pragma: no cover - defensive cleanup
+                    logging.debug("Failed to teardown strategy %s.", strategy)
+
+        self.lifecycle_strategy = lifecycle_strategy
+        self.payload_strategy = payload_strategy
+        self.training_strategy = training_strategy
+        self.reporting_strategy = reporting_strategy
+        self.communication_strategy = communication_strategy
+
+        self._composable_strategies = (
+            self.lifecycle_strategy,
+            self.payload_strategy,
+            self.training_strategy,
+            self.reporting_strategy,
+            self.communication_strategy,
+        )
 
         self._composable = ComposableClient(
             owner=self,
@@ -88,8 +126,17 @@ class Client:
             communication_strategy=self.communication_strategy,
         )
 
-    def __repr__(self):
-        return f"Client #{self.client_id}"
+    def _sync_to_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+        """Propagate selected owner attributes to the shared context."""
+        if attrs is None:
+            attrs = self._composable._SYNC_ATTRS
+        self._composable._sync_context_from_owner(attrs)
+
+    def _sync_from_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+        """Propagate selected context attributes back to the owner."""
+        if attrs is None:
+            attrs = self._composable._SYNC_ATTRS
+        self._composable._sync_owner_from_context(attrs)
 
     async def start_client(self) -> None:
         """Startup function for a client."""
