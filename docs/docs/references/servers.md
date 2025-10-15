@@ -1,6 +1,6 @@
 # Servers
 
-## Strategy-Based Customization
+## Strategy-Based Server Architecture
 
 Plato servers now support strategy-based composition for the two most common customization points:
 client selection and update aggregation. Instead of subclassing the server and overriding hooks, you
@@ -136,9 +136,9 @@ The hook-based approach, as documented in the next section, continues to work fo
 2. Move helper attributes into the strategy's internal state or the shared `context.state`.
 3. Register the strategy in your server factory or experiment script.
 
-## Customizing Servers using Inheritance
+## Customizing Servers using Subclassing
 
-The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
+The common practice is to customize the server using subclassing for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
 !!! example "configure()"
     **`def configure(self) -> None`**
