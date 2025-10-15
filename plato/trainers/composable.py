@@ -269,34 +269,11 @@ class ComposableTrainer(base.Trainer):
                 time.sleep(sleep_seconds)
 
     def train_process(self, config, trainset, sampler, **kwargs):
-        """
-        The training process in a federated learning workload, run in a
-        separate process with a new CUDA context, so that CUDA memory can be
-        released after the training completes.
-
-        Args:
-            config: A dictionary of configuration parameters
-            trainset: The training dataset
-            sampler: The sampler that extracts a partition for this client
-            **kwargs: Additional keyword arguments
-        """
-        # Extract the actual PyTorch sampler from the wrapper if needed
-        if sampler is not None and hasattr(sampler, "get"):
-            sampler = sampler.get()
-
-        try:
-            self.train_model(config, trainset, sampler, **kwargs)
-        except Exception as training_exception:
-            client_id = config.get("client_id", self.client_id)
-            logging.info("Training on client #%d failed.", client_id)
-            raise training_exception
-
-        if "max_concurrency" in config:
-            self.model.cpu()
+        """The training process in a federated learning workload."""
+        self.train_model(config, trainset, sampler, **kwargs)
 
         model_name = Config().trainer.model_name
-        client_id = config.get("client_id", self.client_id)
-        filename = f"{model_name}_{client_id}_{config['run_id']}.pth"
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
         self.save_model(filename)
 
     def train_model(self, config, trainset, sampler, **kwargs):
@@ -320,23 +297,20 @@ class ComposableTrainer(base.Trainer):
                 if retain_graph is not None:
                     self.training_step_strategy.retain_graph = retain_graph
 
-        # Get client_id from config if available (for multiprocessing), else use self.client_id
-        client_id = config.get("client_id", self.client_id)
-
         if trainset is None:
             logging.warning(
                 "[Client #%d] No training dataset received in worker process; "
                 "reloading from data source.",
-                client_id,
+                self.client_id,
             )
             try:
-                datasource = datasources_registry.get(client_id=client_id)
+                datasource = datasources_registry.get(client_id=self.client_id)
                 trainset = datasource.get_train_set()
                 self.trainset = trainset
             except Exception as exc:
                 logging.error(
                     "[Client #%d] Failed to reload training dataset: %s",
-                    client_id,
+                    self.client_id,
                     exc,
                 )
                 self.callback_handler.call_event("on_train_run_end", self, config)
@@ -345,7 +319,7 @@ class ComposableTrainer(base.Trainer):
         if sampler is None:
             logging.warning(
                 "[Client #%d] No sampler provided; defaulting to full dataset.",
-                client_id,
+                self.client_id,
             )
 
         # Reset tracking
@@ -512,7 +486,6 @@ class ComposableTrainer(base.Trainer):
         """
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
-        config["client_id"] = self.client_id  # Pass client_id through config for subprocess
 
         # Set the start time of training in absolute time
         self.training_start_time = time.time()
@@ -523,12 +496,9 @@ class ComposableTrainer(base.Trainer):
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
 
-            # Extract the PyTorch sampler before multiprocessing to ensure it's pickleable
-            sampler_for_process = sampler.get() if (sampler is not None and hasattr(sampler, "get")) else sampler
-
             train_proc = mp.Process(
                 target=self.train_process,
-                args=(config, trainset, sampler_for_process),
+                args=(config, trainset, sampler),
                 kwargs=kwargs,
             )
             train_proc.start()
@@ -570,24 +540,11 @@ class ComposableTrainer(base.Trainer):
         return training_time
 
     def test_process(self, config, testset, sampler=None, **kwargs):
-        """
-        The testing loop, run in a separate process.
-
-        Args:
-            config: A dictionary of configuration parameters
-            testset: The test dataset
-            sampler: The sampler for the test dataset
-            **kwargs: Additional keyword arguments
-        """
-        # Extract the actual PyTorch sampler from the wrapper if needed
-        if sampler is not None and hasattr(sampler, "get"):
-            sampler = sampler.get()
-
+        """The testing loop, run in a separate process."""
         self.test_model(config, testset, sampler, **kwargs)
 
         model_name = Config().trainer.model_name
-        client_id = config.get("client_id", self.client_id)
-        filename = f"{model_name}_{client_id}_{config['run_id']}.acc"
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
         self.save_accuracy(self.accuracy, filename)
 
     def test(self, testset, sampler=None, **kwargs) -> float:
@@ -604,7 +561,6 @@ class ComposableTrainer(base.Trainer):
         """
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
-        config["client_id"] = self.client_id  # Pass client_id through config for subprocess
 
         if "max_concurrency" in config:
             self.model.cpu()
@@ -612,12 +568,9 @@ class ComposableTrainer(base.Trainer):
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
 
-            # Extract the PyTorch sampler before multiprocessing to ensure it's pickleable
-            sampler_for_process = sampler.get() if (sampler is not None and hasattr(sampler, "get")) else sampler
-
             test_proc = mp.Process(
                 target=self.test_process,
-                args=(config, testset, sampler_for_process),
+                args=(config, testset, sampler),
                 kwargs=kwargs,
             )
             test_proc.start()
