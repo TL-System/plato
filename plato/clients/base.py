@@ -125,6 +125,7 @@ class Client:
             reporting_strategy=self.reporting_strategy,
             communication_strategy=self.communication_strategy,
         )
+        self._composable_configured = True
 
     def _sync_to_context(self, attrs: Optional[Iterable[str]] = None) -> None:
         """Propagate selected owner attributes to the shared context."""

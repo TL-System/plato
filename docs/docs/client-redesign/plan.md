@@ -29,6 +29,9 @@
   - Add regression tests covering payload round-trips, async model requests, and strategy swapping; ensure existing integration tests run against both legacy and composable paths during the
     transition.
 
+    - Migrate the split-learning pipeline from the legacy stack to purpose-built strategies.
+    - Audit remaining specialised clients for any direct attribute tweaks and replace them with context-driven strategy adaptations.
+
   Next Steps
 
   1. Align on strategy boundaries/naming and document the default behaviours for review.
