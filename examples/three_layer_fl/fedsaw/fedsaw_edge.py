@@ -10,7 +10,29 @@ import torch
 from torch.nn.utils import prune
 
 from plato.clients import edge
+from plato.clients.strategies.edge import EdgeLifecycleStrategy
 from plato.config import Config
+
+
+class FedSawEdgeLifecycleStrategy(EdgeLifecycleStrategy):
+    """Lifecycle strategy that records pruning amounts for FedSaw edge clients."""
+
+    def process_server_response(self, context, server_response):
+        super().process_server_response(context, server_response)
+
+        pruning_amounts = server_response.get("pruning_amount")
+        if pruning_amounts is None:
+            return
+
+        logical_client_id = Config().args.id
+        try:
+            pruning_amount = pruning_amounts[str(logical_client_id)]
+        except (KeyError, TypeError):
+            return
+
+        owner = context.owner
+        if owner is not None and hasattr(owner, "server"):
+            owner.server.edge_pruning_amount = pruning_amount
 
 
 class Client(edge.Client):
@@ -59,6 +81,37 @@ class Client(edge.Client):
 
         return updates_model.cpu().state_dict()
 
+    def __init__(
+        self,
+        server,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            server=server,
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+        )
+
+        payload_strategy = self.payload_strategy
+        training_strategy = self.training_strategy
+        reporting_strategy = self.reporting_strategy
+        communication_strategy = self.communication_strategy
+
+        self._configure_composable(
+            lifecycle_strategy=FedSawEdgeLifecycleStrategy(),
+            payload_strategy=payload_strategy,
+            training_strategy=training_strategy,
+            reporting_strategy=reporting_strategy,
+            communication_strategy=communication_strategy,
+        )
+
     def compute_weight_updates(self, previous_weights, new_weights):
         """Computes the weight updates."""
         # Calculate deltas from the received weights
@@ -71,18 +124,3 @@ class Client(edge.Client):
             deltas[name] = delta
 
         return deltas
-
-    def process_server_response(self, server_response):
-        """Additional client-specific processing on the server response."""
-        super().process_server_response(server_response)
-
-        # Get the logical client ID from our configuration
-        # In cross-silo training, Config().args.id represents the logical edge server ID
-        logical_client_id = Config().args.id
-
-        pruning_amount_list = server_response["pruning_amount"]
-
-        # Convert to string since pruning_amount_list has string keys
-        pruning_amount = pruning_amount_list[str(logical_client_id)]
-        # Update pruning amount
-        self.server.edge_pruning_amount = pruning_amount

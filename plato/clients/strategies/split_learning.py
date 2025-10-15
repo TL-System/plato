@@ -38,9 +38,7 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
         """Store inbound payload for later processing."""
         self._state(context)["incoming_payload"] = server_payload
 
-    async def train(
-        self, context: ClientContext
-    ) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
         """Handle split learning training steps."""
         state = self._state(context)
         inbound = state.pop("incoming_payload", None)

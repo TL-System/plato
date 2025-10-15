@@ -9,8 +9,8 @@ Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 URL: https://arxiv.org/abs/2206.09264
 """
 
-from pisces_selection_strategy import PiscesSelectionStrategy
 from pisces_aggregation_strategy import PiscesAggregationStrategy
+from pisces_selection_strategy import PiscesSelectionStrategy
 
 from plato.config import Config
 from plato.servers import fedavg

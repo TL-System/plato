@@ -142,9 +142,7 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
             or sparse is None
             or log is None
         ):
-            raise ImportError(
-                "PolarisSelectionStrategy requires 'mosek' and 'cvxopt'."
-            )
+            raise ImportError("PolarisSelectionStrategy requires 'mosek' and 'cvxopt'.")
 
     def _calculate_selection_probability(self, clients_pool: List[int]) -> np.ndarray:
         """Solve the geometric program defining Polaris sampling probabilities."""
@@ -158,7 +156,9 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
         agg_weight_square = np.square(agg_weights)
         gradient_bound_square = np.square(gradient_bounds)
 
-        f1_params = matrix(self.beta * np.multiply(agg_weight_square, gradient_bound_square))
+        f1_params = matrix(
+            self.beta * np.multiply(agg_weight_square, gradient_bound_square)
+        )
 
         f2_temp = np.multiply(staleness, gradient_bounds)
         f2_params = matrix(

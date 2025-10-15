@@ -56,10 +56,7 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
 
         should_reload = bool(
             getattr(context, "datasource", None) is None
-            or (
-                hasattr(Config().data, "reload_data")
-                and Config().data.reload_data
-            )
+            or (hasattr(Config().data, "reload_data") and Config().data.reload_data)
         )
 
         if not should_reload:
@@ -68,9 +65,7 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
         LOGGER.info("[%s] Loading its data source...", context)
 
         if custom_datasource is None:
-            context.datasource = datasources_registry.get(
-                client_id=context.client_id
-            )
+            context.datasource = datasources_registry.get(client_id=context.client_id)
         else:
             context.datasource = custom_datasource()
 
@@ -104,9 +99,7 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
 
         if context.algorithm is None:
             if custom_algorithm is None:
-                context.algorithm = algorithms_registry.get(
-                    trainer=context.trainer
-                )
+                context.algorithm = algorithms_registry.get(trainer=context.trainer)
             else:
                 context.algorithm = custom_algorithm(trainer=context.trainer)
 
@@ -121,9 +114,7 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
         if context.datasource is None:
             return
 
-        context.sampler = samplers_registry.get(
-            context.datasource, context.client_id
-        )
+        context.sampler = samplers_registry.get(context.datasource, context.client_id)
 
         if (
             hasattr(Config().clients, "do_test")
@@ -174,9 +165,7 @@ class DefaultPayloadStrategy(PayloadStrategy):
     ) -> None:
         """Commit buffered chunks similarly to `_payload_arrived`."""
         if client_id != context.client_id:
-            raise ValueError(
-                "Chunk group client ID does not match the active client."
-            )
+            raise ValueError("Chunk group client ID does not match the active client.")
 
         if not context.chunks:
             return
@@ -221,9 +210,7 @@ class DefaultPayloadStrategy(PayloadStrategy):
                 for key, value in context.server_payload.items():
                     payload_size += sys.getsizeof(pickle.dumps({key: value}))
             elif context.server_payload is not None:
-                payload_size = sys.getsizeof(
-                    pickle.dumps(context.server_payload)
-                )
+                payload_size = sys.getsizeof(pickle.dumps(context.server_payload))
 
         LOGGER.info(
             "[Client #%d] Received %.2f MB of payload data from the server.",
@@ -264,18 +251,14 @@ class DefaultPayloadStrategy(PayloadStrategy):
         report, outbound_payload = await training.train(context)
 
         if callbacks is not None:
-            callbacks.call_event(
-                "on_inbound_processed", owner, processed_inbound
-            )
+            callbacks.call_event("on_inbound_processed", owner, processed_inbound)
 
         report = reporting.build_report(context, report)
 
         self.outbound_ready(context, report, outbound_payload)
 
         if callbacks is not None:
-            callbacks.call_event(
-                "on_outbound_ready", owner, report, outbound_processor
-            )
+            callbacks.call_event("on_outbound_ready", owner, report, outbound_processor)
 
         tic = time.perf_counter()
         if outbound_processor is not None:
@@ -293,9 +276,7 @@ class DefaultPayloadStrategy(PayloadStrategy):
                 report,
             )
 
-        await communication.send_report_and_payload(
-            context, report, processed_outbound
-        )
+        await communication.send_report_and_payload(context, report, processed_outbound)
 
 
 class DefaultTrainingStrategy(TrainingStrategy):
@@ -306,9 +287,7 @@ class DefaultTrainingStrategy(TrainingStrategy):
             raise RuntimeError("Algorithm is required before loading payload.")
         context.algorithm.load_weights(server_payload)
 
-    async def train(
-        self, context: ClientContext
-    ) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
         LOGGER.info(
             fonts.colourize(
                 f"[{context}] Started training in communication "
@@ -323,9 +302,7 @@ class DefaultTrainingStrategy(TrainingStrategy):
         try:
             if hasattr(context.trainer, "current_round"):
                 context.trainer.current_round = context.current_round
-            training_time = context.trainer.train(
-                context.trainset, context.sampler
-            )
+            training_time = context.trainer.train(context.trainset, context.sampler)
         except ValueError as err:
             LOGGER.info(
                 fonts.colourize(f"[{context}] Error occurred during training: {err}")
@@ -339,20 +316,15 @@ class DefaultTrainingStrategy(TrainingStrategy):
 
         weights = context.algorithm.extract_weights()
 
-        should_test = (
-            hasattr(Config().clients, "do_test") and Config().clients.do_test
-        )
+        should_test = hasattr(Config().clients, "do_test") and Config().clients.do_test
         interval = getattr(Config().clients, "test_interval", None)
         run_test = should_test and (
-            interval is None
-            or context.current_round % interval == 0
+            interval is None or context.current_round % interval == 0
         )
 
         accuracy = 0
         if run_test:
-            accuracy = context.trainer.test(
-                context.testset, context.testset_sampler
-            )
+            accuracy = context.trainer.test(context.testset, context.testset_sampler)
 
             if accuracy == -1:
                 LOGGER.info(
@@ -452,9 +424,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
     def __init__(self, chunk_size: int = 1024**2) -> None:
         self.chunk_size = chunk_size
 
-    async def send_report(
-        self, context: ClientContext, report: Any
-    ) -> None:
+    async def send_report(self, context: ClientContext, report: Any) -> None:
         if context.sio is None:
             raise RuntimeError("Socket client not initialised.")
 
@@ -463,9 +433,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
             {"id": context.client_id, "report": pickle.dumps(report)},
         )
 
-    async def send_payload(
-        self, context: ClientContext, payload: Any
-    ) -> None:
+    async def send_payload(self, context: ClientContext, payload: Any) -> None:
         if context.comm_simulation:
             model_name = (
                 Config().trainer.model_name
@@ -522,9 +490,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
             data_size / 1024**2,
         )
 
-    async def send_in_chunks(
-        self, context: ClientContext, data: bytes
-    ) -> None:
+    async def send_in_chunks(self, context: ClientContext, data: bytes) -> None:
         if context.sio is None:
             raise RuntimeError("Socket client not initialised.")
 

@@ -57,9 +57,7 @@ class OortSelectionStrategy(ClientSelectionStrategy):
             self.desired_duration = getattr(
                 server_config, "desired_duration", self.desired_duration
             )
-            self.step_window = getattr(
-                server_config, "step_window", self.step_window
-            )
+            self.step_window = getattr(server_config, "step_window", self.step_window)
             self.penalty = getattr(server_config, "penalty", self.penalty)
             self.cut_off = getattr(server_config, "cut_off", self.cut_off)
             self.blacklist_num = getattr(
@@ -123,14 +121,11 @@ class OortSelectionStrategy(ClientSelectionStrategy):
                     reverse=True,
                 )
                 sorted_by_utility = [
-                    client
-                    for client in sorted_by_utility
-                    if client in clients_pool
+                    client for client in sorted_by_utility if client in clients_pool
                 ]
 
-                if (
+                if sorted_by_utility and exploited_clients_count <= len(
                     sorted_by_utility
-                    and exploited_clients_count <= len(sorted_by_utility)
                 ):
                     cut_off_util = (
                         self.client_utilities[
@@ -151,7 +146,10 @@ class OortSelectionStrategy(ClientSelectionStrategy):
                 ]
 
                 total_utility = float(
-                    sum(self.client_utilities[client_id] for client_id in exploited_candidates)
+                    sum(
+                        self.client_utilities[client_id]
+                        for client_id in exploited_candidates
+                    )
                 )
                 if (
                     exploited_candidates
@@ -257,15 +255,11 @@ class OortSelectionStrategy(ClientSelectionStrategy):
 
         if updates:
             total_utility = sum(
-                getattr(update.report, "statistical_utility", 0.0)
-                for update in updates
+                getattr(update.report, "statistical_utility", 0.0) for update in updates
             )
             self.util_history.append(total_utility)
 
-        if (
-            self.step_window > 0
-            and len(self.util_history) >= 2 * self.step_window
-        ):
+        if self.step_window > 0 and len(self.util_history) >= 2 * self.step_window:
             last_window = sum(
                 self.util_history[-2 * self.step_window : -self.step_window]
             )
@@ -276,8 +270,7 @@ class OortSelectionStrategy(ClientSelectionStrategy):
         for update in updates:
             client_id = update.client_id
             if (
-                self.client_selected_times.get(client_id, 0)
-                > self.blacklist_num
+                self.client_selected_times.get(client_id, 0) > self.blacklist_num
                 and client_id not in self.blacklist
             ):
                 self.blacklist.append(client_id)
@@ -297,9 +290,7 @@ class OortSelectionStrategy(ClientSelectionStrategy):
 
         client_duration = self.client_durations.get(client_id, 0.0)
         if client_duration > 0 and self.desired_duration < client_duration:
-            global_utility = (
-                self.desired_duration / client_duration
-            ) ** self.penalty
+            global_utility = (self.desired_duration / client_duration) ** self.penalty
             client_utility *= global_utility
 
         return client_utility

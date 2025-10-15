@@ -14,9 +14,6 @@ from plato.clients.strategies.base import (
     ReportingStrategy,
     TrainingStrategy,
 )
-from plato.clients.strategies.fedavg_personalized import (
-    FedAvgPersonalizedPayloadStrategy,
-)
 from plato.clients.strategies.defaults import (
     DefaultCommunicationStrategy,
     DefaultLifecycleStrategy,
@@ -25,6 +22,9 @@ from plato.clients.strategies.defaults import (
     DefaultTrainingStrategy,
 )
 from plato.clients.strategies.edge import EdgeLifecycleStrategy, EdgeTrainingStrategy
+from plato.clients.strategies.fedavg_personalized import (
+    FedAvgPersonalizedPayloadStrategy,
+)
 from plato.clients.strategies.mistnet import MistNetTrainingStrategy
 from plato.clients.strategies.split_learning import SplitLearningTrainingStrategy
 

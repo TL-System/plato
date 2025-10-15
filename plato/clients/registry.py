@@ -40,9 +40,7 @@ def _instantiate_with_signature(cls: Type[Client], **kwargs) -> Client:
     """Instantiate a client class using only parameters supported by its signature."""
     signature = inspect.signature(cls.__init__)
     supported_kwargs = {
-        name: value
-        for name, value in kwargs.items()
-        if name in signature.parameters
+        name: value for name, value in kwargs.items() if name in signature.parameters
     }
     return cls(**supported_kwargs)
 
@@ -160,10 +158,14 @@ def get(
 
     if factory is None:
         client_cls = _resolve_external_class(client_type)
-        supports_trainer_callbacks = "trainer_callbacks" in inspect.signature(
-            client_cls.__init__
-        ).parameters
-        factory = _simple_like_factory(client_cls) if supports_trainer_callbacks else _legacy_factory(client_cls)
+        supports_trainer_callbacks = (
+            "trainer_callbacks" in inspect.signature(client_cls.__init__).parameters
+        )
+        factory = (
+            _simple_like_factory(client_cls)
+            if supports_trainer_callbacks
+            else _legacy_factory(client_cls)
+        )
         registered_clients[client_type] = factory
 
     logging.info("Client: %s", client_type)

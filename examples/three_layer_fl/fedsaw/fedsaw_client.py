@@ -10,7 +10,31 @@ import torch
 from torch.nn.utils import prune
 
 from plato.clients import simple
+from plato.clients.strategies import DefaultLifecycleStrategy
 from plato.config import Config
+
+
+class FedSawClientLifecycleStrategy(DefaultLifecycleStrategy):
+    """Lifecycle strategy that records pruning amounts for FedSaw clients."""
+
+    _STATE_KEY = "fedsaw_client"
+
+    @staticmethod
+    def _state(context):
+        return context.state.setdefault(FedSawClientLifecycleStrategy._STATE_KEY, {})
+
+    def process_server_response(self, context, server_response):
+        super().process_server_response(context, server_response)
+        amount = server_response.get("pruning_amount")
+        if amount is None:
+            return
+
+        state = self._state(context)
+        state["pruning_amount"] = amount
+
+        owner = context.owner
+        if owner is not None:
+            owner.pruning_amount = amount
 
 
 class Client(simple.Client):
@@ -23,6 +47,19 @@ class Client(simple.Client):
             model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
         )
         self.pruning_amount = 0
+
+        payload_strategy = self.payload_strategy
+        training_strategy = self.training_strategy
+        reporting_strategy = self.reporting_strategy
+        communication_strategy = self.communication_strategy
+
+        self._configure_composable(
+            lifecycle_strategy=FedSawClientLifecycleStrategy(),
+            payload_strategy=payload_strategy,
+            training_strategy=training_strategy,
+            reporting_strategy=reporting_strategy,
+            communication_strategy=communication_strategy,
+        )
 
     async def _train(self):
         """The training process on a FedSaw client."""
@@ -80,8 +117,3 @@ class Client(simple.Client):
             deltas[name] = delta
 
         return deltas
-
-    def process_server_response(self, server_response):
-        """Additional client-specific processing on the server response."""
-        # Update pruning amount
-        self.pruning_amount = server_response["pruning_amount"]

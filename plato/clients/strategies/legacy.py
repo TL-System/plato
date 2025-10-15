@@ -153,9 +153,7 @@ class LegacyPayloadStrategy(DefaultPayloadStrategy):
         self.outbound_ready(context, report, outbound_payload)
 
         if callbacks is not None:
-            callbacks.call_event(
-                "on_outbound_ready", owner, report, outbound_processor
-            )
+            callbacks.call_event("on_outbound_ready", owner, report, outbound_processor)
 
         tic = time.perf_counter()
         processed_outbound = (
@@ -170,7 +168,5 @@ class LegacyPayloadStrategy(DefaultPayloadStrategy):
         except AttributeError:
             pass
 
-        await communication.send_report_and_payload(
-            context, report, processed_outbound
-        )
+        await communication.send_report_and_payload(context, report, processed_outbound)
         context.latest_report = report

@@ -37,3 +37,19 @@
   1. Align on strategy boundaries/naming and document the default behaviours for review.
   2. Prototype the ClientContext + default strategies using the current simple client to validate parity.
   3. Plan incremental migration/testing milestones (e.g., migrate simple + edge first, then split/mistnet).
+
+• Findings
+
+  - Core runtime now follows the plan’s composition design: ClientContext plus strategy interfaces live in plato/clients/strategies/base.py:17-
+    223, base.Client wires them into a ComposableClient bridge plato/clients/base.py:30-144, and the orchestrator drives lifecycle/communication
+    events plato/clients/composable.py:217-334.
+  - Default stacks back simple.Client and the in-tree specialisations—edge, MistNet, split—through dedicated strategy classes, with the registry
+    falling back to legacy adapters when a subclass does not self-configure (plato/clients/simple.py:15-111, plato/clients/strategies/edge.py:21-
+    109, plato/clients/strategies/mistnet.py:20-47, plato/clients/strategies/split_learning.py:1-142, plato/clients/registry.py:1-125).
+  - However, the migration step to “audit remaining specialised clients” is still open: the default lifecycle strategy’s process_server_response
+    is a no-op (plato/clients/strategies/defaults.py:43-51), yet many example/custom clients still rely on the old override (e.g. examples/
+    model_search/heterofl/heterofl_client.py:9-17, examples/unlearning/knot/knot_client.py:14-36), so they now skip required behaviour unless
+    refactored into strategies or reattached to the legacy shim (docs/docs/client-redesign/plan.md:32-33).
+  - The plan also called for regression coverage of payload round-trips, async requests, and strategy swaps (docs/docs/client-redesign/
+    plan.md:24-30), but the test suite still only exercises the legacy-style direct hooks via tests/client_tests.py:13-31, leaving the composable
+    workflow untested.

@@ -7,10 +7,11 @@ selection.
 
 from __future__ import annotations
 
-import numpy as np
-import torch
 from types import SimpleNamespace
 from typing import Dict, List, Optional, Set
+
+import numpy as np
+import torch
 
 from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
 from plato.servers.strategies.base import ServerContext

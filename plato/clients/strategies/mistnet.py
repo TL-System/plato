@@ -12,17 +12,15 @@ import time
 from types import SimpleNamespace
 from typing import Any, Tuple
 
-from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.config import Config
 
 
 class MistNetTrainingStrategy(DefaultTrainingStrategy):
     """Training strategy that extracts features instead of training locally."""
 
-    async def train(
-        self, context: ClientContext
-    ) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
         logging.info("Training on MistNet client #%d", context.client_id)
 
         # MistNet delegates testing to the server

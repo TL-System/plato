@@ -77,10 +77,7 @@ class ClientContext:
         """Return a readable identifier for logging/debugging."""
         if self.owner is not None:
             return repr(self.owner)
-        return (
-            f"ClientContext(client_id={self.client_id}, "
-            f"round={self.current_round})"
-        )
+        return f"ClientContext(client_id={self.client_id}, round={self.current_round})"
 
 
 class ClientStrategy(ABC):
@@ -185,9 +182,7 @@ class TrainingStrategy(ClientStrategy):
         """Load processed server payload onto the client."""
 
     @abstractmethod
-    async def train(
-        self, context: ClientContext
-    ) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
         """Run local training and return (report, outbound_payload)."""
 
 
@@ -208,15 +203,11 @@ class ReportingStrategy(ClientStrategy):
 class CommunicationStrategy(ClientStrategy):
     """Strategy interface for sending data to the server."""
 
-    async def send_report(
-        self, context: ClientContext, report: Any
-    ) -> None:
+    async def send_report(self, context: ClientContext, report: Any) -> None:
         """Send the client report to the server."""
         raise NotImplementedError
 
-    async def send_payload(
-        self, context: ClientContext, payload: Any
-    ) -> None:
+    async def send_payload(self, context: ClientContext, payload: Any) -> None:
         """Send the client payload to the server."""
         raise NotImplementedError
 

@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from collections import OrderedDict
 
-from plato.clients.strategies.defaults import DefaultPayloadStrategy
 from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultPayloadStrategy
 from plato.config import Config
 
 
