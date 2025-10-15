@@ -14,6 +14,9 @@ from plato.clients.strategies.base import (
     ReportingStrategy,
     TrainingStrategy,
 )
+from plato.clients.strategies.fedavg_personalized import (
+    FedAvgPersonalizedPayloadStrategy,
+)
 from plato.clients.strategies.defaults import (
     DefaultCommunicationStrategy,
     DefaultLifecycleStrategy,
@@ -33,6 +36,7 @@ __all__ = [
     "TrainingStrategy",
     "ReportingStrategy",
     "CommunicationStrategy",
+    "FedAvgPersonalizedPayloadStrategy",
     "DefaultLifecycleStrategy",
     "DefaultPayloadStrategy",
     "DefaultTrainingStrategy",

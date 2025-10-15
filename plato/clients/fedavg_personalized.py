@@ -3,10 +3,8 @@ A personalized federated learning client that saves its local layers before
 sending the shared global model to the server after local training.
 """
 
-from collections import OrderedDict
-
 from plato.clients import simple
-from plato.config import Config
+from plato.clients.strategies import FedAvgPersonalizedPayloadStrategy
 
 
 class Client(simple.Client):
@@ -15,26 +13,28 @@ class Client(simple.Client):
     shared global model to the server after local training.
     """
 
-    def outbound_ready(self, report, outbound_processor):
-        super().outbound_ready(report, outbound_processor)
-        weights = self.algorithm.extract_weights()
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
+        )
 
-        # Save local layers before giving them to the outbound processor
-        if hasattr(Config().algorithm, "local_layer_names"):
-            # Extract weights of desired local layers
-            local_layers = OrderedDict(
-                [
-                    (name, param)
-                    for name, param in weights.items()
-                    if any(
-                        param_name in name.strip().split(".")
-                        for param_name in Config().algorithm.local_layer_names
-                    )
-                ]
-            )
-
-            model_path = Config().params["model_path"]
-            model_name = Config().trainer.model_name
-            filename = f"{model_path}/{model_name}_{self.client_id}_local_layers.pth"
-
-            self.algorithm.save_local_layers(local_layers, filename)
+        self._configure_composable(
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=FedAvgPersonalizedPayloadStrategy(),
+            training_strategy=self.training_strategy,
+            reporting_strategy=self.reporting_strategy,
+            communication_strategy=self.communication_strategy,
+        )
