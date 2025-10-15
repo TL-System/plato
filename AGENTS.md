@@ -4,10 +4,12 @@
 Plato's core runtime lives in `plato/`. Key submodules include `algorithms/` (federated strategies), `clients/` plus `client.py` (orchestration logic), `servers/` (coordination), `trainers/` (model/optimizer loops), and supporting layers in `datasources/`, `samplers/`, `processors/`, and `utils/`. Scenario definitions sit under `configs/<dataset>/` as YAML, while reproducible research case studies live in `examples/` with their own workspace entries described in `pyproject.toml`. Shared documentation is under `docs/`, and automated checks are centralized in `tests/`.
 
 ## Build, Test, and Development Commands
-- `uv sync` (or `pip install -e .[dev]`) provisions dependencies declared in `pyproject.toml` and `uv.lock`.
+- `uv sync` provisions dependencies declared in `pyproject.toml` and `uv.lock`.
+- `source .venv/bin/activate` to activate the Python virtual environment after `uv sync`.
 - `uv run python plato.py --config configs/MNIST/fedavg_lenet5.yml` launches a reference experiment; swap in different config paths as needed.
 - `uv run pytest` runs the complete suite; scope it with a target like `tests/test_strategies_simple.py` for faster feedback.
 - `uv run ruff check . --select I --fix` enforces the repo's import-order policy before creating a pull request.
+- When running any shell commands, use `zsh -lc` to load the current `.zshrc` environment.
 
 ## Coding Style & Naming Conventions
 Follow PEP 8 with 4-space indentation and keep lines ≤88 characters (matching the Ruff configuration). Package and module names stay lowercase with underscores; classes use PascalCase; functions, methods, and variables use snake_case. Prefer explicit type hints on new public APIs, and keep docstrings concise but descriptive. YAML configuration keys should remain lowercase_with_underscores and align to the indentation already present in `configs/`.

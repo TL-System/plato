@@ -5,6 +5,21 @@ theme:
   font:
     text: Inter
     code: IBM Plex Mono
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny # Icon for light mode toggle
+        name: Switch to dark mode # Tooltip text for accessibility
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night # Icon for dark mode toggle
+        name: Switch to light mode # Tooltip text for accessibility
 markdown_extensions:
   - admonition
   - pymdownx.details
