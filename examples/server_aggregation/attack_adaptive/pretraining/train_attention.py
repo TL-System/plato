@@ -27,16 +27,15 @@ from typing import List, Tuple
 
 import torch
 import torch.nn.functional as F
+
+# Allow running as a script without installing the examples package.
+SCRIPT_DIR = Path(__file__).resolve().parent
+MODULE_ROOT = SCRIPT_DIR.parent
+if str(MODULE_ROOT) not in sys.path:
+    sys.path.insert(0, str(MODULE_ROOT))
+
+from attack_adaptive_server_strategy import _AttentionLoop
 from torch.utils.data import DataLoader, Dataset, random_split
-
-# Ensure the repository root is importable when the script is executed directly.
-REPO_ROOT = Path(__file__).resolve().parents[3]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.append(str(REPO_ROOT))
-
-from examples.server_aggregation.attack_adaptive.attack_adaptive_server_strategy import (  # noqa: E402
-    _AttentionLoop,
-)
 
 
 def _normalise_weights(weights: torch.Tensor) -> torch.Tensor:
@@ -67,7 +66,6 @@ class RoundDataset(Dataset):
         return len(self.files)
 
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor]:
-
         payload = torch.load(self.files[index], map_location="cpu")
         projection = payload["projection"].float()
         reference = payload.get("reference_weights")
@@ -212,8 +210,7 @@ def main(argv: List[str]) -> None:
                 "val_loss": val_loss,
             }
         print(
-            f"[Epoch {epoch:03d}] train_loss={train_loss:.6f} "
-            f"val_loss={val_loss:.6f}"
+            f"[Epoch {epoch:03d}] train_loss={train_loss:.6f} val_loss={val_loss:.6f}"
         )
 
     if best_state is None:

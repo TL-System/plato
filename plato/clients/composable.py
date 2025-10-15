@@ -225,16 +225,16 @@ class ComposableClient:
         LOGGER.info("[Client #%d] Selected by the server.", self.owner.client_id)
 
         self.lifecycle_strategy.process_server_response(self.context, response)
-        self._sync_context_from_owner()
+        self._sync_owner_from_context()
 
         self.lifecycle_strategy.load_data(self.context)
-        self._sync_context_from_owner()
+        self._sync_owner_from_context()
 
         self.lifecycle_strategy.configure(self.context)
-        self._sync_context_from_owner()
+        self._sync_owner_from_context()
 
         self.lifecycle_strategy.allocate_data(self.context)
-        self._sync_context_from_owner()
+        self._sync_owner_from_context()
 
         self.payload_strategy.reset_payload(self.context)
         self._sync_owner_from_context(("server_payload", "processing_time", "chunks"))
