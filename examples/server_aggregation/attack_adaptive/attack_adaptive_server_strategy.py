@@ -103,9 +103,9 @@ def _apply_weights_to_state_dicts(
 
         accumulator = torch.zeros_like(tensor)
         for client_idx, delta in enumerate(deltas):
-            accumulator = accumulator + delta[name].to(accumulator.device) * weights[
-                client_idx
-            ]
+            accumulator = (
+                accumulator + delta[name].to(accumulator.device) * weights[client_idx]
+            )
         result[name] = accumulator
 
     return result
@@ -224,7 +224,13 @@ class _AttentionConv(nn.Module):
     """Single attention pass that mirrors the reference architecture."""
 
     def __init__(
-        self, in_channels: int, out_channels: int, *, bias: bool = False, epsilon: float, scale: float
+        self,
+        in_channels: int,
+        out_channels: int,
+        *,
+        bias: bool = False,
+        epsilon: float,
+        scale: float,
     ):
         super().__init__()
         self.affinity = _Affinity(
@@ -359,7 +365,9 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         if self.epsilon is None:
             self.epsilon = (
-                algorithm_cfg.threshold if hasattr(algorithm_cfg, "threshold") else 0.005
+                algorithm_cfg.threshold
+                if hasattr(algorithm_cfg, "threshold")
+                else 0.005
             )
 
         if self.scaling_factor is None:
@@ -384,7 +392,8 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
                 "examples/server_aggregation/attack_adaptive/attention_model.pt"
             )
             logging.warning(
-                "No attention model path configured; defaulting to '%s'.", default_model_path
+                "No attention model path configured; defaulting to '%s'.",
+                default_model_path,
             )
             self.attention_model_path = str(default_model_path)
 
@@ -530,9 +539,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             )
             return None
 
-        return [
-            name for name, param in model.named_parameters() if param.requires_grad
-        ]
+        return [name for name, param in model.named_parameters() if param.requires_grad]
 
     def _compute_reference_weights(
         self,
@@ -548,9 +555,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         total_samples = float(sum(num_samples))
         if total_samples <= 0:
-            return torch.full(
-                (len(deltas),), 1.0 / len(deltas), dtype=torch.float32
-            )
+            return torch.full((len(deltas),), 1.0 / len(deltas), dtype=torch.float32)
 
         names = sorted(deltas[0].keys(), key=str.lower)
         global_grad_dict: Dict[str, torch.Tensor] = {}
@@ -563,11 +568,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         global_vec = _flatten_grad_dict(global_grad_dict)
         current_round = max(context.current_round, 1)
-        alpha = (
-            Config().algorithm.alpha
-            if hasattr(Config().algorithm, "alpha")
-            else 5
-        )
+        alpha = Config().algorithm.alpha if hasattr(Config().algorithm, "alpha") else 5
 
         contribs: List[float] = []
         global_norm = torch.norm(global_vec)
@@ -579,8 +580,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
                 angle = torch.tensor(0.0)
             else:
                 cosine = torch.clamp(
-                    torch.dot(global_vec, local_vec)
-                    / (global_norm * local_norm),
+                    torch.dot(global_vec, local_vec) / (global_norm * local_norm),
                     -1.0,
                     1.0,
                 )
@@ -588,10 +588,9 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
             client_id = updates[idx].client_id
             previous = self._local_angles.get(client_id, angle.item())
-            smoothed_angle = (
-                (current_round - 1) / current_round * previous
-                + (1 / current_round) * angle.item()
-            )
+            smoothed_angle = (current_round - 1) / current_round * previous + (
+                1 / current_round
+            ) * angle.item()
             self._local_angles[client_id] = smoothed_angle
 
             angle_tensor = torch.tensor(smoothed_angle, dtype=torch.float32)
@@ -605,9 +604,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         numerators = sample_tensor * torch.exp(contrib_tensor)
         denom = numerators.sum()
         if denom.item() == 0.0:
-            return torch.full(
-                (len(deltas),), 1.0 / len(deltas), dtype=torch.float32
-            )
+            return torch.full((len(deltas),), 1.0 / len(deltas), dtype=torch.float32)
         return numerators / denom
 
     def _capture_round(

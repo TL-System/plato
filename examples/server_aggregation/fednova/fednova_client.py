@@ -15,37 +15,69 @@ import logging
 import numpy as np
 
 from plato.clients import simple
+from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.config import Config
+
+
+class FedNovaTrainingStrategy(DefaultTrainingStrategy):
+    """Training strategy that samples local epochs and annotates reports."""
+
+    async def train(self, context):
+        client_id = getattr(context, "client_id", "unknown")
+
+        if (
+            hasattr(Config().algorithm, "pattern")
+            and Config().algorithm.pattern == "uniform_random"
+        ):
+            max_local_epochs = getattr(Config().algorithm, "max_local_epochs", 1)
+            local_epochs = int(np.random.randint(2, max_local_epochs + 1))
+            Config().trainer = Config().trainer._replace(epochs=local_epochs)
+
+            logging.info(
+                "[Client #%s] Training with %d epochs.", client_id, local_epochs
+            )
+        else:
+            local_epochs = int(getattr(Config().trainer, "epochs", 1))
+
+        context.state["local_epochs"] = local_epochs
+
+        report, weights = await super().train(context)
+
+        report.epochs = int(local_epochs)
+
+        return report, weights
 
 
 class Client(simple.Client):
     """A FedNova federated learning client who sends weight updates
     and the number of local epochs."""
 
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
+        )
+
+        self._configure_composable(
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=self.payload_strategy,
+            training_strategy=FedNovaTrainingStrategy(),
+            reporting_strategy=self.reporting_strategy,
+            communication_strategy=self.communication_strategy,
+        )
+
     def configure(self) -> None:
         super().configure()
         np.random.seed(3000 + self.client_id)
-
-    async def _train(self):
-        """FedNova clients use different number of local epochs."""
-
-        # Generate the number of local epochs randomly
-        if (
-            hasattr(Config().algorithm, "pattern")
-            and Config().algorithm.pattern == "uniform_random"
-        ):
-            local_epochs = np.random.randint(2, Config().algorithm.max_local_epochs + 1)
-            # Perform model training for a specific number of epochs
-            Config().trainer = Config().trainer._replace(epochs=local_epochs)
-
-            logging.info(
-                "[Client #%d] Training with %d epochs.", self.client_id, local_epochs
-            )
-
-        # Call parent's _train method to get report and weights
-        report, weights = await super()._train()
-
-        # Add the epochs information to the report
-        report.epochs = Config().trainer.epochs
-
-        return report, weights

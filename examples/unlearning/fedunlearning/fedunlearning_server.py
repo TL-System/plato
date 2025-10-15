@@ -119,9 +119,7 @@ class Server(mia_server.Server):
         deltas = await self.aggregation_strategy.aggregate_deltas(
             recent_updates, recent_deltas_received, self.context
         )
-        self.total_samples = sum(
-            update.report.num_samples for update in recent_updates
-        )
+        self.total_samples = sum(update.report.num_samples for update in recent_updates)
 
         return deltas
 
