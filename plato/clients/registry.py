@@ -121,7 +121,7 @@ registered_clients: Dict[str, ClientFactory] = {
     "fedavg_personalized": _simple_like_factory(fedavg_personalized.Client),
     "self_supervised_learning": _simple_like_factory(self_supervised_learning.Client),
     "mistnet": _simple_like_factory(mistnet.Client),
-    "split_learning": _legacy_factory(split_learning.Client),
+    "split_learning": _simple_like_factory(split_learning.Client),
     "edge": _edge_factory(),
 }
 

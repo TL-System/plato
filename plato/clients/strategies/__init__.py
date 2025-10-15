@@ -23,6 +23,7 @@ from plato.clients.strategies.defaults import (
 )
 from plato.clients.strategies.edge import EdgeLifecycleStrategy, EdgeTrainingStrategy
 from plato.clients.strategies.mistnet import MistNetTrainingStrategy
+from plato.clients.strategies.split_learning import SplitLearningTrainingStrategy
 
 __all__ = [
     "ClientContext",
@@ -40,4 +41,5 @@ __all__ = [
     "EdgeLifecycleStrategy",
     "EdgeTrainingStrategy",
     "MistNetTrainingStrategy",
+    "SplitLearningTrainingStrategy",
 ]
