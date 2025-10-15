@@ -10,12 +10,12 @@ from __future__ import annotations
 import copy
 from typing import List, Optional
 
+from moon_model import Model as MoonModel
+from moon_trainer import Trainer as MoonTrainer
+
 from plato.clients import simple
 from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.config import Config
-
-from .moon_model import Model as MoonModel
-from .moon_trainer import Trainer as MoonTrainer
 
 
 class MoonTrainingStrategy(DefaultTrainingStrategy):

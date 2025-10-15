@@ -14,13 +14,12 @@ from typing import List, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from moon_model import Model as MoonModel
 
 from plato.config import Config
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import TrainingContext, TrainingStepStrategy
 from plato.trainers.strategies.loss_criterion import LossCriterionStrategy
-
-from .moon_model import Model as MoonModel
 
 
 class MoonLossStrategy(LossCriterionStrategy):
