@@ -284,6 +284,19 @@ class ComposableTrainer(base.Trainer):
         self.context.config = config
         self.context.current_round = self.current_round
 
+        # Ensure training step strategy respects higher-order gradient settings
+        if self.training_step_strategy is not None:
+            if hasattr(self.training_step_strategy, "create_graph"):
+                create_graph = config.get("create_graph")
+                if create_graph is not None:
+                    self.training_step_strategy.create_graph = create_graph
+            if hasattr(self.training_step_strategy, "retain_graph"):
+                retain_graph = config.get("retain_graph")
+                if retain_graph is None and config.get("create_graph"):
+                    retain_graph = True
+                if retain_graph is not None:
+                    self.training_step_strategy.retain_graph = retain_graph
+
         if trainset is None:
             logging.warning(
                 "[Client #%d] No training dataset received in worker process; "

@@ -41,6 +41,29 @@ class FedUnlearningLifecycleStrategy(DefaultLifecycleStrategy):
 
         owner.previous_round[client_id] = context.current_round
 
+    def configure(self, context):
+        super().configure(context)
+
+        owner = context.owner
+        if owner is None:
+            return
+
+        owner.sampler = context.sampler
+        owner.testset_sampler = getattr(context, "testset_sampler", None)
+
+        if owner.client_id in owner.unlearning_clients:
+            logging.info(
+                "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
+                owner,
+                Config().clients.deleted_data_ratio * 100,
+            )
+
+            sampler = unlearning_iid.Sampler(
+                context.datasource, context.client_id, testing=False
+            )
+            context.sampler = sampler
+            owner.sampler = sampler
+
 
 class Client(mia_client.Client):
     """A federated learning client of federated unlearning."""
@@ -76,21 +99,3 @@ class Client(mia_client.Client):
             reporting_strategy=reporting_strategy,
             communication_strategy=communication_strategy,
         )
-
-    def configure(self):
-        """
-        If a client requested deletion, replace its sampler accordingly in the
-        retraining phase.
-        """
-        super().configure()
-
-        if self.client_id in self.unlearning_clients:
-            logging.info(
-                "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
-                self,
-                Config().clients.deleted_data_ratio * 100,
-            )
-
-            self.sampler = unlearning_iid.Sampler(
-                self.datasource, self.client_id, testing=False
-            )

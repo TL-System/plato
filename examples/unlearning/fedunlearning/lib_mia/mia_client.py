@@ -36,8 +36,17 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Customizes the report with assigned sample indices."""
-        report.indices = self.sampler.subset_indices
-        report.deleted_indices = []
-        if hasattr(self.sampler, "deleted_subset_indices"):
-            report.deleted_indices = self.sampler.deleted_subset_indices
+        sampler = getattr(self, "sampler", None)
+        if sampler is None and hasattr(self, "_context"):
+            sampler = getattr(self._context, "sampler", None)
+
+        if sampler is not None and hasattr(sampler, "subset_indices"):
+            report.indices = sampler.subset_indices
+            report.deleted_indices = []
+            if hasattr(sampler, "deleted_subset_indices"):
+                report.deleted_indices = sampler.deleted_subset_indices
+        else:
+            report.indices = []
+            report.deleted_indices = []
+
         return report
