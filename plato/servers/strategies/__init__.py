@@ -8,12 +8,12 @@ Example:
     >>> from plato.servers import fedavg
     >>> from plato.servers.strategies import (
     ...     FedNovaAggregationStrategy,
-    ...     OortSelectionStrategy
+    ...     RandomSelectionStrategy
     ... )
     >>>
     >>> server = fedavg.Server(
     ...     aggregation_strategy=FedNovaAggregationStrategy(),
-    ...     client_selection_strategy=OortSelectionStrategy()
+    ...     client_selection_strategy=RandomSelectionStrategy()
     ... )
 """
 
@@ -24,8 +24,6 @@ from plato.servers.strategies.aggregation import (
     FedAvgAggregationStrategy,
     FedBuffAggregationStrategy,
     FedNovaAggregationStrategy,
-    PiscesAggregationStrategy,
-    PolarisAggregationStrategy,
 )
 from plato.servers.strategies.base import (
     AggregationStrategy,
@@ -35,13 +33,7 @@ from plato.servers.strategies.base import (
 )
 
 # Client selection strategies
-from plato.servers.strategies.client_selection import (
-    AFLSelectionStrategy,
-    OortSelectionStrategy,
-    PiscesSelectionStrategy,
-    PolarisSelectionStrategy,
-    RandomSelectionStrategy,
-)
+from plato.servers.strategies.client_selection import RandomSelectionStrategy
 
 __all__ = [
     # Base classes
@@ -54,12 +46,6 @@ __all__ = [
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
     "FedBuffAggregationStrategy",
-    "PiscesAggregationStrategy",
-    "PolarisAggregationStrategy",
     # Client selection strategies
     "RandomSelectionStrategy",
-    "OortSelectionStrategy",
-    "AFLSelectionStrategy",
-    "PiscesSelectionStrategy",
-    "PolarisSelectionStrategy",
 ]

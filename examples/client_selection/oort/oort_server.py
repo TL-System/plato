@@ -10,7 +10,9 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 
 from plato.config import Config
 from plato.servers import fedavg
-from plato.servers.strategies import OortSelectionStrategy
+from examples.client_selection.oort.oort_selection_strategy import (
+    OortSelectionStrategy,
+)
 
 
 class Server(fedavg.Server):

@@ -9,8 +9,10 @@ Intelligent Client Selection," 2020.
 
 from plato.config import Config
 from plato.servers import fedavg
-from plato.servers.strategies import (
+from examples.client_selection.polaris.polaris_aggregation_strategy import (
     PolarisAggregationStrategy,
+)
+from examples.client_selection.polaris.polaris_selection_strategy import (
     PolarisSelectionStrategy,
 )
 
