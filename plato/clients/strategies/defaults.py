@@ -378,11 +378,34 @@ class DefaultTrainingStrategy(TrainingStrategy):
                 avg_training_time + sleep_seconds
             ) * Config().trainer.epochs
 
+        num_samples = 0
+        sampler = context.sampler
+        if sampler is not None:
+            if hasattr(sampler, "num_samples"):
+                try:
+                    num_samples = sampler.num_samples()
+                except TypeError:
+                    num_samples = 0
+            if num_samples == 0 and hasattr(sampler, "__len__"):
+                try:
+                    num_samples = len(sampler)
+                except TypeError:
+                    num_samples = 0
+
+        if num_samples == 0:
+            num_samples = context.state.get("num_samples", 0)
+
+        if num_samples == 0:
+            trainset = getattr(context, "trainset", None)
+            if trainset is not None and hasattr(trainset, "__len__"):
+                try:
+                    num_samples = len(trainset)
+                except TypeError:
+                    num_samples = 0
+
         report = SimpleNamespace(
             client_id=context.client_id,
-            num_samples=context.sampler.num_samples()
-            if context.sampler is not None
-            else 0,
+            num_samples=num_samples,
             accuracy=accuracy,
             training_time=training_time,
             comm_time=time.time(),

@@ -12,6 +12,41 @@ from abc import ABC
 from plato.utils import fonts
 
 
+def resolve_num_samples(trainer):
+    """Best-effort estimate of the number of samples available for training."""
+    sampler = getattr(trainer, "sampler", None)
+
+    if sampler is not None:
+        if hasattr(sampler, "num_samples"):
+            try:
+                return sampler.num_samples()
+            except TypeError:
+                pass
+        if hasattr(sampler, "__len__"):
+            try:
+                return len(sampler)
+            except TypeError:
+                pass
+
+    train_loader = getattr(trainer, "train_loader", None)
+    if train_loader is not None:
+        dataset = getattr(train_loader, "dataset", None)
+        if dataset is not None and hasattr(dataset, "__len__"):
+            try:
+                return len(dataset)
+            except TypeError:
+                pass
+
+    trainset = getattr(trainer, "trainset", None)
+    if trainset is not None and hasattr(trainset, "__len__"):
+        try:
+            return len(trainset)
+        except TypeError:
+            pass
+
+    return None
+
+
 class TrainerCallback(ABC):
     """
     The abstract base class to be subclassed when creating new trainer callbacks.
@@ -71,23 +106,23 @@ class LogProgressCallback(TrainerCallback):
         """
         Event called at the start of training run.
         """
-        # Handle both Sampler objects and list/indices
-        if hasattr(trainer.sampler, "num_samples"):
-            num_samples = trainer.sampler.num_samples()
+        num_samples = resolve_num_samples(trainer)
+        if num_samples is not None:
+            message = f"Loading the dataset with size {num_samples}."
         else:
-            num_samples = len(trainer.sampler)
+            message = "Loading the dataset."
 
         if trainer.client_id == 0:
             logging.info(
-                "[Server #%s] Loading the dataset with size %d.",
+                "[Server #%s] %s",
                 os.getpid(),
-                num_samples,
+                message,
             )
         else:
             logging.info(
-                "[Client #%d] Loading the dataset with size %d.",
+                "[Client #%d] %s",
                 trainer.client_id,
-                num_samples,
+                message,
             )
 
     def on_train_epoch_start(self, trainer, config, **kwargs):

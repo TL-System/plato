@@ -44,7 +44,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
 
         self.client_utilities: dict[int, float] = {}
         self.client_staleness: dict[int, List[float]] = {}
-        self.explored_clients: set[int] = set()
+        self.explored_clients: List[int] = []
         self.unexplored_clients: List[int] = []
         self.reliability_credit_record: dict[int, int] = {}
         self.detected_corrupted_clients: List[int] = []
@@ -84,7 +84,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
             client_id: [] for client_id in range(1, total_clients + 1)
         }
         self.unexplored_clients = list(range(1, total_clients + 1))
-        self.explored_clients = set()
+        self.explored_clients = []
         self.reliability_credit_record = {
             client_id: self.reliability_credit_initial
             for client_id in range(1, total_clients + 1)
@@ -127,19 +127,15 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         selected_clients: List[int] = []
         current_round = context.current_round
 
+        exploration_quota = 0
+
         if current_round > 1:
             unexplored_available = [
                 client_id
                 for client_id in self.unexplored_clients
                 if client_id in available_clients
             ]
-            explored_available = [
-                client_id
-                for client_id in self.explored_clients
-                if client_id in available_clients
-            ]
-
-            explored_clients_count = min(
+            exploration_quota = min(
                 len(unexplored_available),
                 np.random.binomial(effective_count, self.exploration_factor, 1)[0],
             )
@@ -149,7 +145,13 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                 self.min_explore_factor,
             )
 
-            exploited_clients_target = max(0, effective_count - explored_clients_count)
+            explored_available = [
+                client_id
+                for client_id in self.explored_clients
+                if client_id in available_clients
+            ]
+
+            exploited_clients_target = max(0, effective_count - exploration_quota)
             exploited_clients_count = min(
                 len(explored_available), exploited_clients_target
             )
@@ -162,31 +164,46 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
             ]
 
             selected_clients = sorted_by_utility[:exploited_clients_count]
+        else:
+            exploration_quota = min(effective_count, len(self.unexplored_clients))
 
         prng_state = context.state.get("prng_state")
         if prng_state:
             random.setstate(prng_state)
 
         remaining_slots = effective_count - len(selected_clients)
-        if remaining_slots > 0:
+        if remaining_slots > 0 and exploration_quota > 0:
             exploration_candidates = [
                 client_id
                 for client_id in self.unexplored_clients
                 if client_id in available_clients and client_id not in selected_clients
             ]
-            explore_count = min(remaining_slots, len(exploration_candidates))
+            explore_count = min(
+                exploration_quota, remaining_slots, len(exploration_candidates)
+            )
 
             if explore_count > 0:
                 selected_unexplored = random.sample(
                     exploration_candidates, explore_count
                 )
-                self.explored_clients.update(selected_unexplored)
-
                 for client_id in selected_unexplored:
+                    self.explored_clients.append(client_id)
                     if client_id in self.unexplored_clients:
                         self.unexplored_clients.remove(client_id)
 
-                selected_clients += selected_unexplored
+                selected_clients.extend(selected_unexplored)
+
+        if len(selected_clients) < effective_count:
+            remaining_candidates = [
+                client_id
+                for client_id in available_clients
+                if client_id not in selected_clients
+            ]
+            fill_count = min(
+                effective_count - len(selected_clients), len(remaining_candidates)
+            )
+            if fill_count > 0:
+                selected_clients.extend(random.sample(remaining_candidates, fill_count))
 
         context.state["prng_state"] = random.getstate()
 
@@ -277,14 +294,15 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
             current_credit = self.reliability_credit_record.get(
                 client_id, self.reliability_credit_initial
             )
-            current_credit = max(0, current_credit - 1)
+            current_credit = current_credit - 1
             self.reliability_credit_record[client_id] = current_credit
 
-            if current_credit == 0 and client_id not in self.detected_corrupted_clients:
+            if current_credit <= 0 and client_id not in self.detected_corrupted_clients:
                 self.detected_corrupted_clients.append(client_id)
                 newly_detected.append(client_id)
 
         if newly_detected:
+            newly_detected.sort()
             logging.info(
                 "PiscesSelection: detected corrupted clients %s", newly_detected
             )

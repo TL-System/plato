@@ -26,8 +26,11 @@ class Client(simple.Client):
             "train_squared_loss_step"
         )
 
-        report.statistical_utility = report.num_samples * np.sqrt(
-            1.0 / report.num_samples * sum(train_squared_loss_step)
-        )
+        num_samples = getattr(report, "num_samples", 0)
+        if num_samples > 0 and train_squared_loss_step:
+            mean_squared_loss = sum(train_squared_loss_step) / num_samples
+            report.statistical_utility = num_samples * np.sqrt(mean_squared_loss)
+        else:
+            report.statistical_utility = 0.0
 
         return report

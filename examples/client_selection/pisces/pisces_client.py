@@ -38,10 +38,12 @@ class Client(simple.Client):
                 1 - self.loss_decay
             ) * moving_average_loss + self.loss_decay * batch_loss
 
-        train_squared_loss = np.sqrt(moving_average_loss.item())
+        if train_batch_loss and report.num_samples > 0:
+            train_squared_loss = np.sqrt(moving_average_loss.item())
+            mean_loss = train_squared_loss / report.num_samples
+            report.statistical_utility = report.num_samples * np.sqrt(mean_loss)
+        else:
+            report.statistical_utility = 0.0
 
-        report.statistical_utility = report.num_samples * np.sqrt(
-            1.0 / report.num_samples * train_squared_loss
-        )
         report.start_round = self.current_round
         return report

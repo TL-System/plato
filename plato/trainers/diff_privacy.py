@@ -308,6 +308,7 @@ class Trainer(ComposableTrainer):
         which is required for memory-efficient DP training.
         """
         batch_size = config["batch_size"]
+        self.trainset = trainset
         self.sampler = sampler
         self.context.config = config
         self.context.current_round = self.current_round
@@ -329,6 +330,25 @@ class Trainer(ComposableTrainer):
 
         # Store train_loader in context
         self.context.state["train_loader"] = self.train_loader
+        sampled_size = 0
+        if sampler is not None and hasattr(sampler, "num_samples"):
+            try:
+                sampled_size = sampler.num_samples()
+            except TypeError:
+                sampled_size = 0
+        if sampled_size == 0 and self.train_loader is not None:
+            loader_sampler = getattr(self.train_loader, "sampler", None)
+            if loader_sampler is not None and hasattr(loader_sampler, "__len__"):
+                try:
+                    sampled_size = len(loader_sampler)
+                except TypeError:
+                    sampled_size = 0
+        if sampled_size == 0 and trainset is not None and hasattr(trainset, "__len__"):
+            try:
+                sampled_size = len(trainset)
+            except TypeError:
+                sampled_size = 0
+        self.context.state["num_samples"] = sampled_size
 
         # Create optimizer using strategy (wraps with PrivacyEngine)
         # This also updates train_loader with poisson sampling

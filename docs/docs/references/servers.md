@@ -43,13 +43,7 @@ to its default implementation.
 | Aggregation | `FedAsyncAggregationStrategy` | Staleness-aware mixing for asynchronous training. |
 | Aggregation | `FedBuffAggregationStrategy` | Simple asynchronous aggregation strategy without using weights. |
 | Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
-| Aggregation | `PiscesAggregationStrategy` | More complex asynchronous aggregation strategy. |
-| Aggregation | `PolarisAggregationStrategy` | More complex asynchronous aggregation strategy. |
 | Client selection | `RandomSelectionStrategy` | Uniform random selection (default). |
-| Client selection | `OortSelectionStrategy` | Utility-based exploration/exploitation selection. |
-| Client selection | `AFLSelectionStrategy` | Active federated learning prioritization. |
-| Client selection | `PiscesAggregationStrategy` | Client selection based on the Pisces algorithm. |
-| Client selection | `PolarisAggregationStrategy` | Client selection based on the Polaris algorithm. |
 
 ### Implementing Custom Strategies
 
