@@ -8,8 +8,12 @@ from plato.servers.strategies.client_selection.random_selection import (
 from plato.servers.strategies.client_selection.split_learning import (
     SplitLearningSequentialSelectionStrategy,
 )
+from plato.servers.strategies.client_selection.personalized import (
+    PersonalizedRatioSelectionStrategy,
+)
 
 __all__ = [
     "RandomSelectionStrategy",
     "SplitLearningSequentialSelectionStrategy",
+    "PersonalizedRatioSelectionStrategy",
 ]

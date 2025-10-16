@@ -179,6 +179,14 @@ The common practice is to customize the server using subclassing for important f
 
     `clients_count` the number of clients that need to be selected in this round.
 
+    When overriding this method, delegate to `_select_clients_with_strategy()` if you only need to filter the candidate pool. This keeps the strategy stack (and reproducible random state) in sync with the rest of the server.
+
+    ```py
+    def choose_clients(self, clients_pool, clients_count):
+        filtered = [cid for cid in clients_pool if cid not in self.blacklist]
+        return self._select_clients_with_strategy(filtered, clients_count)
+    ```
+
     **Returns:** a list of selected client IDs.
 
 !!! example "weights_received()"

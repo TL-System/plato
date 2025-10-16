@@ -696,26 +696,19 @@ class Server:
             )
 
     def choose_clients(self, clients_pool, clients_count):
-        """
-        Chooses a subset of the clients to participate in each round.
-
-        This method now delegates to the client_selection_strategy for
-        extensibility. Subclasses can still override this method for
-        backward compatibility.
-        """
+        """Chooses a subset of clients to participate in each round."""
         assert clients_count <= len(clients_pool)
 
-        # Check if subclass overrode this method (backward compatibility)
         if type(self).choose_clients is not Server.choose_clients:
-            # Legacy path: use subclass implementation
-            random.setstate(self.prng_state)
-            selected_clients = super(Server, self).choose_clients(
-                clients_pool, clients_count
+            raise RuntimeError(
+                "Custom choose_clients overrides should use the strategy API." \
+                " Please update the subclass to call `_select_clients_with_strategy`."
             )
-            self.prng_state = random.getstate()
-            return selected_clients
 
-        # New path: delegate to strategy
+        return self._select_clients_with_strategy(clients_pool, clients_count)
+
+    def _select_clients_with_strategy(self, clients_pool, clients_count):
+        """Delegate client selection to the configured strategy."""
         self.context.current_round = self.current_round
         self.context.state["prng_state"] = self.prng_state
 

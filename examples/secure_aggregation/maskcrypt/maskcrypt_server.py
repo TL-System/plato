@@ -75,19 +75,3 @@ class Server(fedavg_he.Server):
             indices.sort()
             self.final_mask = interleaved_indices[indices]
             self.final_mask = self.final_mask.int().tolist()
-
-    def _select_clients_with_strategy(self, clients_pool, clients_count):
-        """Delegate client selection to the configured strategy to preserve randomness."""
-        self.context.current_round = self.current_round
-        self.context.state["prng_state"] = self.prng_state
-
-        selected_clients = self.client_selection_strategy.select_clients(
-            clients_pool, clients_count, self.context
-        )
-
-        self.prng_state = self.context.state["prng_state"]
-        self.client_selection_strategy.on_clients_selected(
-            selected_clients, self.context
-        )
-
-        return selected_clients
