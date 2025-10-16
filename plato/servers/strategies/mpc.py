@@ -48,7 +48,9 @@ class MPCBaseAggregationStrategy(FedAvgAggregationStrategy):
     ) -> Dict[str, torch.Tensor]:
         total_samples = sum(update.report.num_samples for update in updates)
         if total_samples == 0:
-            LOGGER.warning("No samples reported in MPC round; retaining baseline weights.")
+            LOGGER.warning(
+                "No samples reported in MPC round; retaining baseline weights."
+            )
             return baseline_weights
 
         aggregated: Dict[str, torch.Tensor] = {}
@@ -68,7 +70,9 @@ class MPCBaseAggregationStrategy(FedAvgAggregationStrategy):
 class MPCAdditiveAggregationStrategy(MPCBaseAggregationStrategy):
     """Reconstructs additive-secret-shared payloads before aggregation."""
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received, context):
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
         state = self.round_store.load_state()
         combined = []
         for update, weights in zip(updates, weights_received):
@@ -80,7 +84,9 @@ class MPCAdditiveAggregationStrategy(MPCBaseAggregationStrategy):
                 merged = weights
             combined.append(merged)
 
-        return await self._aggregate_scaled_weights(combined, updates, baseline_weights, context)
+        return await self._aggregate_scaled_weights(
+            combined, updates, baseline_weights, context
+        )
 
 
 @dataclass
@@ -113,7 +119,12 @@ class MPCShamirAggregationStrategy(MPCBaseAggregationStrategy):
 
     SCALING_FACTOR = 1_000_000
 
-    def __init__(self, round_store: RoundInfoStore, debug_artifacts: bool = False, threshold: int | None = None):
+    def __init__(
+        self,
+        round_store: RoundInfoStore,
+        debug_artifacts: bool = False,
+        threshold: int | None = None,
+    ):
         super().__init__(round_store, debug_artifacts)
         self.threshold = threshold
 
@@ -128,7 +139,9 @@ class MPCShamirAggregationStrategy(MPCBaseAggregationStrategy):
             accumulator = accumulator.add(term)
         return (accumulator.num / accumulator.den) / self.SCALING_FACTOR
 
-    def _decrypt_tensor(self, tensors: torch.Tensor, threshold: int | None = None) -> torch.Tensor:
+    def _decrypt_tensor(
+        self, tensors: torch.Tensor, threshold: int | None = None
+    ) -> torch.Tensor:
         num_participants = tensors.size(0)
         threshold = threshold or max(num_participants - 2, 1)
 
@@ -159,7 +172,9 @@ class MPCShamirAggregationStrategy(MPCBaseAggregationStrategy):
         output_shape.pop(-1)
         return secret.view(output_shape)
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received, context):
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
         state = self.round_store.load_state()
         selected = state.selected_clients
         combined = []
@@ -195,4 +210,6 @@ class MPCShamirAggregationStrategy(MPCBaseAggregationStrategy):
 
             combined.append(reconstructed)
 
-        return await self._aggregate_scaled_weights(combined, updates, baseline_weights, context)
+        return await self._aggregate_scaled_weights(
+            combined, updates, baseline_weights, context
+        )

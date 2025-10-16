@@ -21,27 +21,18 @@ class DummyTrainer:
 
 class DummyAlgorithm:
     def __init__(self, baseline):
-        self.current = {
-            name: tensor.clone()
-            for name, tensor in baseline.items()
-        }
+        self.current = {name: tensor.clone() for name, tensor in baseline.items()}
 
     def compute_weight_deltas(self, baseline_weights, weights_list):
         return [
-            {
-                name: weights[name] - baseline_weights[name]
-                for name in weights.keys()
-            }
+            {name: weights[name] - baseline_weights[name] for name in weights.keys()}
             for weights in weights_list
         ]
 
     def update_weights(self, deltas):
         for name, delta in deltas.items():
             self.current[name] = self.current[name] + delta
-        return {
-            name: tensor.clone()
-            for name, tensor in self.current.items()
-        }
+        return {name: tensor.clone() for name, tensor in self.current.items()}
 
 
 class DummyServer:
@@ -105,9 +96,7 @@ def test_hermes_aggregation_strategy_produces_weighted_average():
     context.updates = updates
 
     aggregated = asyncio.run(
-        strategy.aggregate_weights(
-            updates, baseline, weights_received, context
-        )
+        strategy.aggregate_weights(updates, baseline, weights_received, context)
     )
 
     expected_weight = torch.full((2, 2), 4.0 / 3.0)

@@ -72,15 +72,11 @@ class Server(fedavg.Server):
             avg_update = await self.aggregation_strategy.aggregate_deltas(
                 updates, deltas_received, self.context
             )
-            self.total_samples = sum(
-                update.report.num_samples for update in updates
-            )
+            self.total_samples = sum(update.report.num_samples for update in updates)
             self.context.updates = original_updates
             return avg_update
 
-        recent_mask = [
-            update.staleness <= self.current_round for update in updates
-        ]
+        recent_mask = [update.staleness <= self.current_round for update in updates]
         recent_updates = [
             update for update, is_recent in zip(updates, recent_mask) if is_recent
         ]
@@ -94,9 +90,7 @@ class Server(fedavg.Server):
             avg_update = await self.aggregation_strategy.aggregate_deltas(
                 updates, deltas_received, self.context
             )
-            self.total_samples = sum(
-                update.report.num_samples for update in updates
-            )
+            self.total_samples = sum(update.report.num_samples for update in updates)
             self.context.updates = original_updates
             return avg_update
 
@@ -104,9 +98,7 @@ class Server(fedavg.Server):
         avg_update = await self.aggregation_strategy.aggregate_deltas(
             recent_updates, recent_deltas, self.context
         )
-        self.total_samples = sum(
-            update.report.num_samples for update in recent_updates
-        )
+        self.total_samples = sum(update.report.num_samples for update in recent_updates)
         self.context.updates = original_updates
         return avg_update
 

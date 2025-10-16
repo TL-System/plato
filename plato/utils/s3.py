@@ -122,9 +122,7 @@ class S3:
                 ) from None
 
         except botocore.exceptions.ClientError as error:
-            raise ValueError(
-                f"Error occurred sending data to S3: {error}"
-            ) from error
+            raise ValueError(f"Error occurred sending data to S3: {error}") from error
 
         except botocore.exceptions.ParamValidationError as error:
             raise ValueError(f"Incorrect parameters: {error}") from error

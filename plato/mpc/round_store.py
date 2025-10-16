@@ -196,13 +196,17 @@ class RoundInfoStore:
                         f"{self._s3_key_prefix}/{self.ROUND_INFO_FILENAME}"
                     )
                 except Exception:  # pragma: no cover - defensive cleanup for S3
-                    logger.debug("Unable to delete MPC round info from S3.", exc_info=True)
+                    logger.debug(
+                        "Unable to delete MPC round info from S3.", exc_info=True
+                    )
             else:
                 path = os.path.join(self._storage_dir, self.ROUND_INFO_FILENAME)
                 if os.path.exists(path):
                     os.remove(path)
 
-    def initialise_round(self, round_number: int, selected_clients: Iterable[int]) -> RoundInfoState:
+    def initialise_round(
+        self, round_number: int, selected_clients: Iterable[int]
+    ) -> RoundInfoState:
         """Create and persist the bookkeeping structure for a new round."""
         with self._acquire():
             state = RoundInfoState(round_number=round_number)
@@ -218,7 +222,9 @@ class RoundInfoStore:
             self._save_state(state)
             return state
 
-    def append_additive_share(self, target_client: int, share_payload: Dict[str, Any]) -> RoundInfoState:
+    def append_additive_share(
+        self, target_client: int, share_payload: Dict[str, Any]
+    ) -> RoundInfoState:
         """Accumulate additive-share payloads destined for ``target_client``."""
         with self._acquire():
             state = self._ensure_state()

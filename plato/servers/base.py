@@ -729,7 +729,7 @@ class Server:
 
         if type(self).choose_clients is not Server.choose_clients:
             raise RuntimeError(
-                "Custom choose_clients overrides should use the strategy API." \
+                "Custom choose_clients overrides should use the strategy API."
                 " Please update the subclass to call `_select_clients_with_strategy`."
             )
 

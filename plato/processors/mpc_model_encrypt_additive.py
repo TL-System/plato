@@ -30,9 +30,7 @@ class Processor(model.Processor):
         self.client_id = client_id
         self.round_store = round_store
         if debug_artifacts is None:
-            debug_artifacts = getattr(
-                Config().clients, "mpc_debug_artifacts", False
-            )
+            debug_artifacts = getattr(Config().clients, "mpc_debug_artifacts", False)
         self.debug_artifacts = debug_artifacts
 
     @staticmethod
@@ -48,10 +46,13 @@ class Processor(model.Processor):
             shares[idx] += perturb
         return shares
 
-    def _write_debug_artifact(self, round_number: int, label: str, payload: Dict[str, Any]) -> None:
+    def _write_debug_artifact(
+        self, round_number: int, label: str, payload: Dict[str, Any]
+    ) -> None:
         if self.debug_artifacts and not self.round_store.uses_s3:
             path = os.path.join(
-                self.round_store.storage_dir, f"{label}_round{round_number}_client{self.client_id}"
+                self.round_store.storage_dir,
+                f"{label}_round{round_number}_client{self.client_id}",
             )
             try:
                 with open(path, "w", encoding="utf8") as debug_file:

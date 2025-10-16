@@ -86,7 +86,10 @@ class Server(fedavg.Server):
         subset1 = []
         if num1 > 0:
             probs = np.array(
-                [self.local_values[client_id]["prob"] for client_id in weighted_candidates]
+                [
+                    self.local_values[client_id]["prob"]
+                    for client_id in weighted_candidates
+                ]
             )
             total_prob = probs.sum()
             if total_prob <= 0:

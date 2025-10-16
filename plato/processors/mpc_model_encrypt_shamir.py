@@ -35,15 +35,16 @@ class Processor(model.Processor):
         self.round_store = round_store
         self.threshold = threshold
         if debug_artifacts is None:
-            debug_artifacts = getattr(
-                Config().clients, "mpc_debug_artifacts", False
-            )
+            debug_artifacts = getattr(Config().clients, "mpc_debug_artifacts", False)
         self.debug_artifacts = debug_artifacts
 
-    def _write_debug_artifact(self, round_number: int, label: str, payload: Dict[str, Any]) -> None:
+    def _write_debug_artifact(
+        self, round_number: int, label: str, payload: Dict[str, Any]
+    ) -> None:
         if self.debug_artifacts and not self.round_store.uses_s3:
             path = os.path.join(
-                self.round_store.storage_dir, f"{label}_round{round_number}_client{self.client_id}"
+                self.round_store.storage_dir,
+                f"{label}_round{round_number}_client{self.client_id}",
             )
             try:
                 with open(path, "w", encoding="utf8") as debug_file:
@@ -61,7 +62,9 @@ class Processor(model.Processor):
             power *= x
         return y_val
 
-    def _secret_shares(self, secret: torch.Tensor, num_clients: int, threshold: int) -> torch.Tensor:
+    def _secret_shares(
+        self, secret: torch.Tensor, num_clients: int, threshold: int
+    ) -> torch.Tensor:
         """Generate Shamir shares for a single scalar secret."""
         scaled_secret = round(secret.item() * 1_000_000)
         coefficients = torch.zeros(threshold)
@@ -80,7 +83,9 @@ class Processor(model.Processor):
 
         return points
 
-    def _split_tensor(self, tensor: torch.Tensor, num_clients: int, threshold: int) -> torch.Tensor:
+    def _split_tensor(
+        self, tensor: torch.Tensor, num_clients: int, threshold: int
+    ) -> torch.Tensor:
         """Encrypt tensor entries using Shamir secret sharing."""
         if num_clients == 1:
             size = list(tensor.size())
@@ -122,7 +127,9 @@ class Processor(model.Processor):
         num_clients = len(selected_clients)
         threshold = self.threshold or max(num_clients - 2, 1)
 
-        data_shares: List[Dict[str, Any]] = [copy.deepcopy(data) for _ in range(num_clients)]
+        data_shares: List[Dict[str, Any]] = [
+            copy.deepcopy(data) for _ in range(num_clients)
+        ]
 
         self._write_debug_artifact(state.round_number, "raw_weights", data)
 

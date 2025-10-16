@@ -35,9 +35,7 @@ class HermesAggregationStrategy(AggregationStrategy):
         deltas_received: List[Dict],
         context: ServerContext,
     ) -> Dict:
-        return await self._fedavg.aggregate_deltas(
-            updates, deltas_received, context
-        )
+        return await self._fedavg.aggregate_deltas(updates, deltas_received, context)
 
     async def aggregate_weights(
         self,
@@ -76,12 +74,8 @@ class HermesAggregationStrategy(AggregationStrategy):
 
         for layer_name in weights_numpy[0].keys():
             if layer_name in masked_layers:
-                mask_count = np.zeros_like(
-                    masks_received[0][step].reshape([-1])
-                )
-                avg = np.zeros_like(
-                    weights_numpy[0][layer_name].reshape([-1])
-                )
+                mask_count = np.zeros_like(masks_received[0][step].reshape([-1]))
+                avg = np.zeros_like(weights_numpy[0][layer_name].reshape([-1]))
 
                 for index in range(num_clients):
                     num_samples = updates[index].report.num_samples

@@ -52,16 +52,12 @@ class PersonalizedRatioSelectionStrategy(ClientSelectionStrategy):
             max_candidates = min(max_candidates, len(clients_pool))
             candidates = clients_pool[:max_candidates]
 
-        return self.base_strategy.select_clients(
-            candidates, clients_count, context
-        )
+        return self.base_strategy.select_clients(candidates, clients_count, context)
 
     def on_clients_selected(
         self, selected_clients: List[int], context: ServerContext
     ) -> None:
         self.base_strategy.on_clients_selected(selected_clients, context)
 
-    def on_reports_received(
-        self, updates, context: ServerContext
-    ) -> None:
+    def on_reports_received(self, updates, context: ServerContext) -> None:
         self.base_strategy.on_reports_received(updates, context)
