@@ -67,16 +67,32 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
             random.setstate(prng_state)
 
         num_weighted = int(math.floor((1 - self.alpha3) * clients_count))
-        probs = np.array([self.local_values[cid]["prob"] for cid in clients_pool])
-        probs = probs + 0.01
-        probs /= probs.sum()
+        weighted_candidates = [
+            cid for cid in clients_pool if self.local_values[cid]["prob"] > 0.0
+        ]
+        num_weighted = min(num_weighted, len(weighted_candidates))
 
-        subset_weighted = np.random.choice(
-            clients_pool, num_weighted, p=probs, replace=False
-        ).tolist()
+        subset_weighted: List[int] = []
+        if num_weighted > 0:
+            probs = np.array(
+                [self.local_values[cid]["prob"] for cid in weighted_candidates],
+                dtype=float,
+            )
+            total_prob = probs.sum()
+            if total_prob <= 0:
+                probs = np.ones(len(weighted_candidates), dtype=float) / len(
+                    weighted_candidates
+                )
+            else:
+                probs = probs / total_prob
 
+            subset_weighted = np.random.choice(
+                weighted_candidates, num_weighted, p=probs, replace=False
+            ).tolist()
+
+        num_random = clients_count - len(subset_weighted)
         remaining = [c for c in clients_pool if c not in subset_weighted]
-        subset_random = random.sample(remaining, clients_count - num_weighted)
+        subset_random = random.sample(remaining, num_random) if num_random > 0 else []
 
         selected_clients = subset_weighted + subset_random
         context.state["prng_state"] = random.getstate()
@@ -119,10 +135,6 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
             )
 
         total_prob = sum(self.local_values[cid]["prob"] for cid in clients_pool)
-        if total_prob == 0:
-            uniform_prob = 1.0 / len(clients_pool)
-            for client_id in clients_pool:
-                self.local_values[client_id]["prob"] = uniform_prob
-        else:
+        if total_prob > 0:
             for client_id in clients_pool:
                 self.local_values[client_id]["prob"] /= total_prob

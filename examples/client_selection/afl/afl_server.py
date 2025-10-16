@@ -76,24 +76,37 @@ class Server(fedavg.Server):
 
         # 1. Sample a subset of the clients according to the sampling distribution
         num1 = int(math.floor((1 - Config().algorithm.alpha3) * clients_count))
-        probs = np.array(
-            [self.local_values[client_id]["prob"] for client_id in clients_pool]
-        )
+        weighted_candidates = [
+            client_id
+            for client_id in clients_pool
+            if self.local_values[client_id]["prob"] > 0.0
+        ]
+        num1 = min(num1, len(weighted_candidates))
 
-        # Still give a small probability to those with zeros
-        probs = probs + 0.01
-        probs /= probs.sum()
-
-        subset1 = np.random.choice(clients_pool, num1, p=probs, replace=False).tolist()
+        subset1 = []
+        if num1 > 0:
+            probs = np.array(
+                [self.local_values[client_id]["prob"] for client_id in weighted_candidates]
+            )
+            total_prob = probs.sum()
+            if total_prob <= 0:
+                probs = np.ones(len(weighted_candidates), dtype=float) / len(
+                    weighted_candidates
+                )
+            else:
+                probs = probs / total_prob
+            subset1 = np.random.choice(
+                weighted_candidates, num1, p=probs, replace=False
+            ).tolist()
 
         # 2. Sample a subset of the remaining clients uniformly at random
-        num2 = clients_count - num1
+        num2 = clients_count - len(subset1)
         remaining = clients_pool.copy()
 
         for client_id in subset1:
             remaining.remove(client_id)
 
-        subset2 = random.sample(remaining, num2)
+        subset2 = random.sample(remaining, num2) if num2 > 0 else []
 
         # 3. Selected clients are the union of these two subsets
         selected_clients = subset1 + subset2
