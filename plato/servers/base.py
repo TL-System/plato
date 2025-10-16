@@ -107,7 +107,8 @@ class Server:
         if getattr(Config().clients, "type", None) == "mpc" and not hasattr(
             Config().server, "s3_endpoint_url"
         ):
-            self._mpc_round_lock = mp.Lock()
+            spawn_context = mp.get_context("spawn")
+            self._mpc_round_lock = spawn_context.Lock()
 
         # Starting from the default server callback class, add all supplied server callbacks
         self.callbacks = [LogProgressCallback]
