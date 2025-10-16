@@ -9,6 +9,8 @@ from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrateg
 from plato.servers.strategies.aggregation.fedbuff import FedBuffAggregationStrategy
 from plato.servers.strategies.aggregation.fednova import FedNovaAggregationStrategy
 from plato.servers.strategies.aggregation.hermes import HermesAggregationStrategy
+from plato.servers.strategies.aggregation.gan import FedAvgGanAggregationStrategy
+from plato.servers.strategies.aggregation.he import FedAvgHEAggregationStrategy
 
 __all__ = [
     "FedAvgAggregationStrategy",
@@ -16,4 +18,6 @@ __all__ = [
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
     "HermesAggregationStrategy",
+    "FedAvgGanAggregationStrategy",
+    "FedAvgHEAggregationStrategy",
 ]

@@ -44,6 +44,8 @@ to its default implementation.
 | Aggregation | `FedBuffAggregationStrategy` | Simple asynchronous aggregation strategy without using weights. |
 | Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
 | Aggregation | `HermesAggregationStrategy` | Mask-aware aggregation used by the Hermes personalization algorithm. |
+| Aggregation | `FedAvgGanAggregationStrategy` | Generator/discriminator-aware averaging for GAN training. |
+| Aggregation | `FedAvgHEAggregationStrategy` | Hybrid encrypted/plain averaging for CKKS-based workflows. |
 | Client selection | `RandomSelectionStrategy` | Uniform random selection (default). |
 | Client selection | `SplitLearningSequentialSelectionStrategy` | Sequentially serves one client at a time for split learning. |
 | Client selection | `PersonalizedRatioSelectionStrategy` | Limits participation by ratio before a personalization phase. |

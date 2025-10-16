@@ -28,6 +28,7 @@ class Server(fedavg.Server):
         algorithm=None,
         trainer=None,
         callbacks=None,
+        aggregation_strategy=None,
         client_selection_strategy=None,
     ):
         ratio = 1.0
@@ -50,6 +51,7 @@ class Server(fedavg.Server):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            aggregation_strategy=aggregation_strategy,
             client_selection_strategy=client_selection_strategy,
         )
         # Personalization starts after the final regular round of training
