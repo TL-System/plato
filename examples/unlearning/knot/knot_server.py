@@ -176,47 +176,40 @@ class Server(fedunlearning_server.Server):
             return baseline_weights
 
         self.clustered_updates = {}
+        data_deletion_round = Config().clients.data_deletion_round
+
         for client_update in updates:
             client_id = client_update.client_id
+            cluster_id = self.clusters[client_id]
 
-            if self.clustered_retraining[self.clusters[client_id]] is True:
-                if (
+            include_update = True
+            if self.clustered_retraining[cluster_id]:
+                include_update = (
                     abs(client_update.staleness)
-                    <= self.current_round - Config().clients.data_deletion_round - 1
-                ):
-                    if self.clusters[client_id] in self.clustered_updates:
-                        self.clustered_updates[self.clusters[client_id]].append(
-                            client_update
-                        )
-                    else:
-                        self.clustered_updates[self.clusters[client_id]] = [
-                            client_update
-                        ]
+                    <= self.current_round - data_deletion_round - 1
+                )
 
-            else:
-                if self.clusters[client_id] in self.clustered_updates:
-                    self.clustered_updates[self.clusters[client_id]].append(
-                        client_update
-                    )
-                else:
-                    self.clustered_updates[self.clusters[client_id]] = [client_update]
+            if not include_update:
+                continue
 
-            for cluster_id, update in self.clustered_updates.items():
-                if len(update) != 0:
-                    # Perform server aggregation within a cluster (with cluster_id)
-                    weights_received = [_update.payload for _update in update]
+            self.clustered_updates.setdefault(cluster_id, []).append(client_update)
 
-                    deltas_received = self.algorithm.compute_weight_deltas(
-                        baseline_weights,
-                        weights_received,
-                        cluster_id=cluster_id,
-                    )
-                    deltas = await self.aggregate_deltas(update, deltas_received)
-                    updated_weights = self.algorithm.update_weights(
-                        deltas, cluster_id=cluster_id
-                    )
+        for cluster_id, cluster_updates in self.clustered_updates.items():
+            if not cluster_updates:
+                continue
 
-                    self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
+            weights_received = [update.payload for update in cluster_updates]
+            deltas_received = self.algorithm.compute_weight_deltas(
+                baseline_weights,
+                weights_received,
+                cluster_id=cluster_id,
+            )
+            deltas = await self.aggregate_deltas(cluster_updates, deltas_received)
+            updated_weights = self.algorithm.update_weights(
+                deltas, cluster_id=cluster_id
+            )
+
+            self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
 
         return baseline_weights
 
