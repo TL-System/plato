@@ -106,7 +106,6 @@ class Server(fedunlearning_server.Server):
         after and at second round, training process resume.
         """
         assert clients_count <= len(clients_pool)
-        random.setstate(self.prng_state)
 
         if (
             hasattr(Config().server, "do_optimized_clustering")
@@ -120,10 +119,10 @@ class Server(fedunlearning_server.Server):
                 self.clients_per_round = Config().clients.per_round
                 clients_count = self.clients_per_round
 
-        # Select clients randomly
-        selected_clients = random.sample(clients_pool, clients_count)
+        selected_clients = self._select_clients_with_strategy(
+            clients_pool, clients_count
+        )
 
-        self.prng_state = random.getstate()
         logging.info("[%s] Selected clients: %s", self, selected_clients)
         return selected_clients
 
@@ -371,6 +370,22 @@ class Server(fedunlearning_server.Server):
             server_response["rollback_round"] = self.rollback_round[cluster_id]
 
         return server_response
+
+    def _select_clients_with_strategy(self, clients_pool, clients_count):
+        """Delegate client selection to the configured strategy and update PRNG state."""
+        self.context.current_round = self.current_round
+        self.context.state["prng_state"] = self.prng_state
+
+        selected_clients = self.client_selection_strategy.select_clients(
+            clients_pool, clients_count, self.context
+        )
+
+        self.prng_state = self.context.state["prng_state"]
+        self.client_selection_strategy.on_clients_selected(
+            selected_clients, self.context
+        )
+
+        return selected_clients
 
     def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
