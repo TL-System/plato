@@ -43,7 +43,10 @@ to its default implementation.
 | Aggregation | `FedAsyncAggregationStrategy` | Staleness-aware mixing for asynchronous training. |
 | Aggregation | `FedBuffAggregationStrategy` | Simple asynchronous aggregation strategy without using weights. |
 | Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
+| Aggregation | `HermesAggregationStrategy` | Mask-aware aggregation used by the Hermes personalization algorithm. |
 | Client selection | `RandomSelectionStrategy` | Uniform random selection (default). |
+| Client selection | `SplitLearningSequentialSelectionStrategy` | Sequentially serves one client at a time for split learning. |
+| Client selection | `PersonalizedRatioSelectionStrategy` | Limits participation by ratio before a personalization phase. |
 
 ### Implementing Custom Strategies
 
