@@ -160,3 +160,6 @@ docs/_build/
 
 # uv
 uv.lock
+
+# multi-party computation data
+mpc_data
