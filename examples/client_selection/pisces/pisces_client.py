@@ -11,7 +11,7 @@ URL: https://arxiv.org/abs/2206.09264
 
 from types import SimpleNamespace
 
-import numpy as np
+import math
 
 from plato.clients import simple
 
@@ -27,21 +27,29 @@ class Client(simple.Client):
 
     def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
         """Compute the moving average of batch loss for statistical utility."""
-        train_batch_loss = self.trainer.run_history.get_metric_values(
-            "train_batch_loss"
-        )
+        train_batch_loss = [
+            float(loss)
+            for loss in self.trainer.run_history.get_metric_values("train_batch_loss")
+        ]
 
-        moving_average_loss = 0
+        moving_average_sq_loss = None
 
         for batch_loss in train_batch_loss:
-            moving_average_loss = (
-                1 - self.loss_decay
-            ) * moving_average_loss + self.loss_decay * batch_loss
+            squared_loss = batch_loss**2
+            if moving_average_sq_loss is None:
+                moving_average_sq_loss = squared_loss
+            else:
+                moving_average_sq_loss = (
+                    1 - self.loss_decay
+                ) * moving_average_sq_loss + self.loss_decay * squared_loss
 
-        train_squared_loss = np.sqrt(moving_average_loss.item())
+        if moving_average_sq_loss is not None and report.num_samples > 0:
+            loss_norm = math.sqrt(moving_average_sq_loss)
+            report.statistical_utility = report.num_samples * loss_norm
+            report.moving_loss_norm = loss_norm
+        else:
+            report.statistical_utility = 0.0
+            report.moving_loss_norm = 0.0
 
-        report.statistical_utility = report.num_samples * np.sqrt(
-            1.0 / report.num_samples * train_squared_loss
-        )
         report.start_round = self.current_round
         return report

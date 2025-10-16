@@ -7,7 +7,21 @@ import os
 import pickle
 
 from plato.clients import simple
+from plato.clients.strategies import DefaultLifecycleStrategy
 from plato.config import Config
+
+
+class FlMamlLifecycleStrategy(DefaultLifecycleStrategy):
+    """Lifecycle strategy that toggles personalization tests."""
+
+    def process_server_response(self, context, server_response):
+        super().process_server_response(context, server_response)
+        if "personalization_test" not in server_response:
+            return
+
+        owner = context.owner
+        if owner is not None:
+            owner.do_personalization_test = True
 
 
 class Client(simple.Client):
@@ -30,10 +44,18 @@ class Client(simple.Client):
         )
         self.do_personalization_test = False
 
-    def process_server_response(self, server_response):
-        """Additional client-specific processing on the server response."""
-        if "personalization_test" in server_response:
-            self.do_personalization_test = True
+        payload_strategy = self.payload_strategy
+        training_strategy = self.training_strategy
+        reporting_strategy = self.reporting_strategy
+        communication_strategy = self.communication_strategy
+
+        self._configure_composable(
+            lifecycle_strategy=FlMamlLifecycleStrategy(),
+            payload_strategy=payload_strategy,
+            training_strategy=training_strategy,
+            reporting_strategy=reporting_strategy,
+            communication_strategy=communication_strategy,
+        )
 
     async def _start_training(self):
         """Complete one round of training on this client."""

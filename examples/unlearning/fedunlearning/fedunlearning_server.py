@@ -15,6 +15,7 @@ Reference: https://arxiv.org/abs/2203.07320
 import logging
 import os
 
+import torch
 from lib_mia import mia_server
 
 from plato.config import Config
@@ -80,7 +81,13 @@ class Server(mia_server.Server):
         will be aggregated after data_deletion_round.
         """
         if not self.retraining:
-            return await super().aggregate_deltas(updates, deltas_received)
+            self.context.updates = updates
+            self.context.current_round = self.current_round
+            deltas = await self.aggregation_strategy.aggregate_deltas(
+                updates, deltas_received, self.context
+            )
+            self.total_samples = sum(update.report.num_samples for update in updates)
+            return deltas
 
         recent_mask = list(
             map(lambda update: update.staleness <= self.current_round, updates)
@@ -93,7 +100,28 @@ class Server(mia_server.Server):
             delta for delta, fresh in zip(deltas_received, recent_mask) if fresh
         ]
 
-        return await super().aggregate_deltas(recent_updates, recent_deltas_received)
+        if not recent_updates:
+            if deltas_received:
+                zero_delta = {
+                    name: tensor.clone().zero_()
+                    for name, tensor in deltas_received[0].items()
+                }
+            else:
+                baseline = self.algorithm.extract_weights()
+                zero_delta = {
+                    name: weight.clone().zero_() for name, weight in baseline.items()
+                }
+            return zero_delta
+
+        self.context.updates = recent_updates
+        self.context.current_round = self.current_round
+
+        deltas = await self.aggregation_strategy.aggregate_deltas(
+            recent_updates, recent_deltas_received, self.context
+        )
+        self.total_samples = sum(update.report.num_samples for update in recent_updates)
+
+        return deltas
 
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""

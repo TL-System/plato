@@ -16,7 +16,7 @@ import torch
 import torch.nn as nn
 import torchvision
 
-from plato.callbacks.trainer import TrainerCallback
+from plato.callbacks.trainer import TrainerCallback, resolve_num_samples
 from plato.config import Config
 from plato.models import registry as models_registry
 from plato.trainers import optimizers
@@ -189,23 +189,23 @@ class GANLoggingCallback(TrainerCallback):
 
     def on_train_run_start(self, trainer, config, **kwargs):
         """Log dataset loading at start of training."""
-        # Handle both Sampler objects and list/indices
-        if hasattr(trainer.sampler, "num_samples"):
-            num_samples = trainer.sampler.num_samples()
+        num_samples = resolve_num_samples(trainer)
+        if num_samples is not None:
+            message = f"Loading the dataset with size {num_samples}."
         else:
-            num_samples = len(trainer.sampler)
+            message = "Loading the dataset."
 
         if trainer.client_id == 0:
             logging.info(
-                "[Server #%s] Loading the dataset with size %d.",
+                "[Server #%s] %s",
                 os.getpid(),
-                num_samples,
+                message,
             )
         else:
             logging.info(
-                "[Client #%d] Loading the dataset with size %d.",
+                "[Client #%d] %s",
                 trainer.client_id,
-                num_samples,
+                message,
             )
 
     def on_train_step_end(self, trainer, config, batch=None, loss=None, **kwargs):

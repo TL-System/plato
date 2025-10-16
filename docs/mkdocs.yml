@@ -5,10 +5,34 @@ theme:
   font:
     text: Inter
     code: IBM Plex Mono
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny # Icon for light mode toggle
+        name: Switch to dark mode # Tooltip text for accessibility
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night # Icon for dark mode toggle
+        name: Switch to light mode # Tooltip text for accessibility
 markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
 nav:
   - Home: index.md
   - Installation: install.md
@@ -41,9 +65,9 @@ nav:
       - Results: configurations/results.md
       - Parameters: configurations/parameters.md
   - API Reference:
-      - Trainers: references/trainers.md
-      - Servers: references/servers.md
       - Clients: references/clients.md
+      - Servers: references/servers.md
+      - Trainers: references/trainers.md
   - Developer's Guide: development.md
   - Deployment Guide: deployment.md
   - Digital Research Alliance of Canada: ccdb.md

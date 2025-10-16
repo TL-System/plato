@@ -49,12 +49,16 @@ server:
 
     # What is the staleness bound, beyond which the server should wait for stale clients?
     staleness_bound: 10
-    #penalty: 2
     exploration_factor: 0.9
     staleness_factor: 0.5
     exploration_decaying_factor: 0.98
     min_explore_factor: 0.3
-    staleness_penalty_factor: 0.5
+    speed_penalty_factor: 0.5
+    robustness: false
+    augmented_factor: 5
+    threshold_factor: 1.0
+    reliability_credit_initial: 5
+    history_window: 5
     checkpoint_path: results/test/checkpoint
     model_path: results/test/model
 

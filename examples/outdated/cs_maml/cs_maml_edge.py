@@ -7,11 +7,25 @@ import pickle
 from dataclasses import dataclass
 
 from plato.clients import edge
+from plato.clients.strategies.edge import EdgeLifecycleStrategy
 
 
 @dataclass
 class Report(edge.Report):
     """Report from an Axiothea edge server, to be sent to the central server."""
+
+
+class CsMamlEdgeLifecycleStrategy(EdgeLifecycleStrategy):
+    """Lifecycle strategy that toggles personalization tests for edge clients."""
+
+    def process_server_response(self, context, server_response):
+        if "personalization_test" in server_response:
+            owner = context.owner
+            if owner is not None:
+                owner.do_personalization_test = True
+            return
+
+        super().process_server_response(context, server_response)
 
 
 class Client(edge.Client):
@@ -21,12 +35,18 @@ class Client(edge.Client):
         super().__init__(server)
         self.do_personalization_test = False
 
-    def process_server_response(self, server_response):
-        """Additional client-specific processing on the server response."""
-        if "personalization_test" in server_response:
-            self.do_personalization_test = True
-        else:
-            super().process_server_response(server_response)
+        payload_strategy = self.payload_strategy
+        training_strategy = self.training_strategy
+        reporting_strategy = self.reporting_strategy
+        communication_strategy = self.communication_strategy
+
+        self._configure_composable(
+            lifecycle_strategy=CsMamlEdgeLifecycleStrategy(),
+            payload_strategy=payload_strategy,
+            training_strategy=training_strategy,
+            reporting_strategy=reporting_strategy,
+            communication_strategy=communication_strategy,
+        )
 
     async def test_personalization(self):
         """Test personalization by passing the global meta model to its clients,

@@ -11,5 +11,21 @@ class FeatureDataset(torch.utils.data.Dataset):
         return len(self.dataset)
 
     def __getitem__(self, item):
-        image, label = self.dataset[item]
-        return image, label
+        sample = self.dataset[item]
+
+        if isinstance(sample, (list, tuple)):
+            if len(sample) >= 2:
+                feature, label = sample[0], sample[1]
+            elif len(sample) == 1:
+                feature = sample[0]
+                label = torch.tensor(0, dtype=torch.long)
+            else:
+                raise ValueError("Empty sample encountered in FeatureDataset.")
+        else:
+            feature = sample
+            label = torch.tensor(0, dtype=torch.long)
+
+        if torch.is_tensor(label) and label.dim() > 0:
+            label = label.squeeze()
+
+        return feature, label

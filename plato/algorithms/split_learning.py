@@ -76,6 +76,14 @@ class Algorithm(fedavg.Algorithm):
 
     def train(self, trainset, sampler):
         """General training method that trains model with provided trainset and sampler."""
+        if len(trainset.feature_dataset) > 0:
+            sample = trainset.feature_dataset[0]
+            sample_len = len(sample) if hasattr(sample, "__len__") else "N/A"
+            logging.debug(
+                "SplitLearningAlgorithm trainset sample type: %s len: %s",
+                type(sample),
+                sample_len,
+            )
         self.trainer.train(
             feature_dataset.FeatureDataset(trainset.feature_dataset), sampler
         )

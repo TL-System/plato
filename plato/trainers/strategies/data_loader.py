@@ -5,6 +5,7 @@ This module provides default and common data loader strategies for
 the composable trainer architecture.
 """
 
+import logging
 from typing import Optional
 
 import torch
@@ -71,6 +72,16 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
         else:
             sampler_obj = None
             shuffle = self.shuffle
+
+        if sampler is None and not shuffle:
+            logging.warning(
+                "Data loader strategy received no sampler; falling back to SequentialSampler."
+            )
+        elif sampler is not None and sampler_obj is None:
+            logging.warning(
+                "Sampler %s did not provide indices; falling back to SequentialSampler.",
+                type(sampler),
+            )
 
         return torch.utils.data.DataLoader(
             dataset=trainset,

@@ -2,7 +2,6 @@
     The type of the server.
 
     - `simple` a basic client who sends weight updates to the server.
-    - `mistnet` a client following the MistNet algorithm.
     - `split_learning` a client following the Split Learning algorithm. When this client is used, `clients.do_test` in configuration should be set as `False` because in split learning, we conduct the test on the server.
     - `fedavg_personalized` a client saves its local layers before sending the shared global model to the server after local training.
     - `self_supervised_learning` a client to prepare the datasource for personalized learning based on self-supervised learning.
@@ -71,11 +70,6 @@
 !!! example "outbound_processors"
     A list of processors for the client to apply on the payload before sending it out to the server. Multiple processors are permitted.
 
-    - `feature_randomized_response` Activate randomized response on features for MistNet, must also set `algorithm.epsilon` to activate. Must be placed before `feature_unbatch`.
-    - `feature_laplace` Add random noise with laplace distribution to features for MistNet. Must be placed before `feature_unbatch`.
-    - `feature_gaussian` Add random noise with gaussian distribution to features for MistNet. Must be placed before `feature_unbatch`.
-    - `feature_quantize` Quantize features for MistNet. Must not be used together with `outbound_feature_ndarrays`.
-    - `feature_unbatch` Unbatch features for MistNet clients, must use this processor for every MistNet client before sending.
     - `outbound_feature_ndarrays` Convert PyTorch tensor features into NumPy arrays before sending to the server, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be placed after `feature_unbatch`.
     - `model_deepcopy` Return a deepcopy of the state_dict to prevent changing internal parameters of the model within clients.
     - `model_randomized_response` Activate randomized response on model parameters, must also set `algorithm.epsilon` to activate.

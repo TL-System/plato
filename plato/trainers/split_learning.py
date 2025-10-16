@@ -182,8 +182,15 @@ class SplitLearningTestingStrategy(TestingStrategy):
             raise ValueError("Trainer must be stored in context.state['trainer']")
 
         batch_size = config["batch_size"]
+        sampler_obj = None
+        if sampler is not None:
+            if hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
+            else:
+                sampler_obj = sampler
+
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=batch_size, shuffle=False, sampler=sampler
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler_obj
         )
 
         correct = 0

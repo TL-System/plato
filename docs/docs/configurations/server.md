@@ -3,7 +3,6 @@
 
     - `fedavg` a Federated Averaging (FedAvg) server.
     - `fedavg_cross_silo` a Federated Averaging server that handles cross-silo federated learning by interacting with edge servers rather than with clients directly. When this server is used, `algorithm.type` must be `fedavg`.
-    - `mistnet` a MistNet server.
     - `fedavg_gan` a Federated Averaging server that handles Generative Adversarial Networks (GANs).
     - `fedavg_he` a Federated Averaging server that handles model updates after homomorphic encryption. When this server is used, the clients need to enable inbound processor `model_decrypt` to decrypt the global model from server, and outbound processor `model_encrypt` to encrypt the model updates.
     - `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
@@ -93,8 +92,7 @@
     A list of processors to apply on the payload right after receiving. Multiple processors are permitted.
 
     - `model_decompress` Decompress model parameters. Must be placed as the first processor if `model_compress` is applied on the client side.
-    - `inbound_feature_tensors` Convert tensor features into NumPy arrays before sending to client, for the benefit of saving a substantial amount of communication overhead if the feature dataset is large. Must be used if `clients.outbound_processors` includes `outbound_feature_ndarrays`.
-    - `feature_dequantize` Dequantize features for MistNet. Must not be used together with `inbound_feature_tensors`.
+ `outbound_feature_ndarrays`.
     - `model_dequantize` Dequantize model parameters back to the 32-bit floating number format.
     - `model_dequantize_qsgd` Dequantize model parameters quantized with QSGD.
 

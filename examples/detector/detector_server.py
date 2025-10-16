@@ -57,7 +57,9 @@ class Server(fedavg.Server):
         clients_pool = list(filter(lambda x: x not in self.blacklist, clients_pool))
         # logging.info(f"len of cliets pool after removal: %d", len(clients_pool))
 
-        selected_clients = super().choose_clients(clients_pool, clients_count)
+        selected_clients = self._select_clients_with_strategy(
+            clients_pool, clients_count
+        )
 
         # recording how many attackers are selected this round to track the defence performance
         selected_attackers = []

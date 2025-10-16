@@ -24,9 +24,14 @@ class Server(fedavg_he.Server):
 
     def choose_clients(self, clients_pool, clients_count):
         """Choose the same clients every two rounds."""
-        if self.current_round % 2 != 0:
-            self.last_selected_clients = super().choose_clients(
+        if self.current_round % 2 != 0 or not self.last_selected_clients:
+            self.last_selected_clients = self._select_clients_with_strategy(
                 clients_pool, clients_count
+            )
+        else:
+            self.context.current_round = self.current_round
+            self.client_selection_strategy.on_clients_selected(
+                self.last_selected_clients, self.context
             )
 
         return self.last_selected_clients

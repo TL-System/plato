@@ -8,9 +8,10 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 (OSDI 2021), July 2021.
 """
 
+from oort_selection_strategy import OortSelectionStrategy
+
 from plato.config import Config
 from plato.servers import fedavg
-from plato.servers.strategies import OortSelectionStrategy
 
 
 class Server(fedavg.Server):

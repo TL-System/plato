@@ -63,26 +63,52 @@ class Server(fedavg.Server):
         self.save_to_checkpoint()
 
     async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate the reported weight updates from the selected clients.
-        If in retraing phase, staleness clients should not be aggregated.
-        Otherwise the stale clients updates contains old model's info,
-        will be aggregated after data_deletion_round.
-        """
+        """Aggregate weight updates while supporting retraining-aware filtering."""
+        self.context.current_round = self.current_round
+        original_updates = updates
+
         if not self.retraining:
-            return await super().aggregate_deltas(updates, deltas_received)
+            self.context.updates = updates
+            avg_update = await self.aggregation_strategy.aggregate_deltas(
+                updates, deltas_received, self.context
+            )
+            self.total_samples = sum(
+                update.report.num_samples for update in updates
+            )
+            self.context.updates = original_updates
+            return avg_update
 
-        recent_mask = list(
-            map(lambda update: update.staleness <= self.current_round, updates)
-        )
-        recent_updates = list(
-            filter(lambda update: update.staleness <= self.current_round, updates)
-        )
-
-        recent_deltas_received = [
-            delta for delta, fresh in zip(deltas_received, recent_mask) if fresh
+        recent_mask = [
+            update.staleness <= self.current_round for update in updates
+        ]
+        recent_updates = [
+            update for update, is_recent in zip(updates, recent_mask) if is_recent
+        ]
+        recent_deltas = [
+            delta for delta, is_recent in zip(deltas_received, recent_mask) if is_recent
         ]
 
-        return await super().aggregate_deltas(recent_updates, recent_deltas_received)
+        if not recent_updates:
+            # Fall back to the original set to avoid empty aggregation.
+            self.context.updates = updates
+            avg_update = await self.aggregation_strategy.aggregate_deltas(
+                updates, deltas_received, self.context
+            )
+            self.total_samples = sum(
+                update.report.num_samples for update in updates
+            )
+            self.context.updates = original_updates
+            return avg_update
+
+        self.context.updates = recent_updates
+        avg_update = await self.aggregation_strategy.aggregate_deltas(
+            recent_updates, recent_deltas, self.context
+        )
+        self.total_samples = sum(
+            update.report.num_samples for update in recent_updates
+        )
+        self.context.updates = original_updates
+        return avg_update
 
     def clients_processed(self) -> None:
         """Enters the retraining phase if a specific set of conditions are satisfied."""

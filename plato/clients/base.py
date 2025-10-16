@@ -2,74 +2,29 @@
 The base class for all federated learning clients on edge devices or edge servers.
 """
 
-import asyncio
 import logging
 import os
 import pickle
 import re
 import sys
-import time
 import uuid
 from abc import abstractmethod
+from typing import Iterable, Optional
 
 import numpy as np
-import socketio
 
 from plato.callbacks.client import LogProgressCallback
 from plato.callbacks.handler import CallbackHandler
+from plato.clients.composable import ComposableClient
+from plato.clients.strategies import ClientContext
+from plato.clients.strategies.legacy import (
+    LegacyCommunicationStrategy,
+    LegacyLifecycleStrategy,
+    LegacyPayloadStrategy,
+    LegacyReportingStrategy,
+    LegacyTrainingStrategy,
+)
 from plato.config import Config
-from plato.utils import s3
-
-
-# pylint: disable=unused-argument, protected-access
-class ClientEvents(socketio.AsyncClientNamespace):
-    """A custom namespace for socketio.AsyncServer."""
-
-    def __init__(self, namespace, plato_client):
-        super().__init__(namespace)
-        self.plato_client = plato_client
-        self.client_id = plato_client.client_id
-
-    async def on_connect(self):
-        """Upon a new connection to the server."""
-        logging.info("[Client #%d] Connected to the server.", self.client_id)
-
-    async def on_disconnect(self):
-        """Upon a disconnection event."""
-        logging.info(
-            "[Client #%d] The server disconnected the connection.", self.client_id
-        )
-        self.plato_client._clear_checkpoint_files()
-        os._exit(0)
-
-    async def on_connect_error(self, data):
-        """Upon a failed connection attempt to the server."""
-        logging.info(
-            "[Client #%d] A connection attempt to the server failed.", self.client_id
-        )
-
-    async def on_payload_to_arrive(self, data):
-        """New payload is about to arrive from the server."""
-        await self.plato_client._payload_to_arrive(data["response"])
-
-    async def on_request_update(self, data):
-        """The server is requesting an urgent model update."""
-        await self.plato_client._request_update(data)
-
-    async def on_chunk(self, data):
-        """A chunk of data from the server arrived."""
-        await self.plato_client._chunk_arrived(data["data"])
-
-    async def on_payload(self, data):
-        """A portion of the new payload from the server arrived."""
-        await self.plato_client._payload_arrived(data["id"])
-
-    async def on_payload_done(self, data):
-        """All of the new payload sent from the server arrived."""
-        if "s3_key" in data:
-            await self.plato_client._payload_done(data["id"], s3_key=data["s3_key"])
-        else:
-            await self.plato_client._payload_done(data["id"])
 
 
 class Client:
@@ -106,51 +61,87 @@ class Client:
             self.callbacks.extend(callbacks)
         self.callback_handler = CallbackHandler(self.callbacks)
 
+        # Shared context bridging legacy attributes and strategy-based runtime
+        self._context = ClientContext()
+        self._context.owner = self
+        self._context.client_id = self.client_id
+        self._context.current_round = self.current_round
+        self._context.comm_simulation = self.comm_simulation
+        self._context.chunks = self.chunks
+        self._context.callback_handler = self.callback_handler
+        self._context.server_payload = self.server_payload
+        self._context.processing_time = self.processing_time
+
+        # Strategy adapters preserving legacy hooks
+        self._configure_composable(
+            lifecycle_strategy=LegacyLifecycleStrategy(self),
+            payload_strategy=LegacyPayloadStrategy(self),
+            training_strategy=LegacyTrainingStrategy(self),
+            reporting_strategy=LegacyReportingStrategy(self),
+            communication_strategy=LegacyCommunicationStrategy(self),
+        )
+
     def __repr__(self):
         return f"Client #{self.client_id}"
 
+    def _configure_composable(
+        self,
+        *,
+        lifecycle_strategy,
+        payload_strategy,
+        training_strategy,
+        reporting_strategy,
+        communication_strategy,
+    ) -> None:
+        """Attach strategies and rebuild the composable client runtime."""
+
+        if hasattr(self, "_composable_strategies"):
+            for strategy in self._composable_strategies:
+                try:
+                    strategy.teardown(self._context)
+                except Exception:  # pragma: no cover - defensive cleanup
+                    logging.debug("Failed to teardown strategy %s.", strategy)
+
+        self.lifecycle_strategy = lifecycle_strategy
+        self.payload_strategy = payload_strategy
+        self.training_strategy = training_strategy
+        self.reporting_strategy = reporting_strategy
+        self.communication_strategy = communication_strategy
+
+        self._composable_strategies = (
+            self.lifecycle_strategy,
+            self.payload_strategy,
+            self.training_strategy,
+            self.reporting_strategy,
+            self.communication_strategy,
+        )
+
+        self._composable = ComposableClient(
+            owner=self,
+            context=self._context,
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=self.payload_strategy,
+            training_strategy=self.training_strategy,
+            reporting_strategy=self.reporting_strategy,
+            communication_strategy=self.communication_strategy,
+        )
+        self._composable_configured = True
+
+    def _sync_to_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+        """Propagate selected owner attributes to the shared context."""
+        if attrs is None:
+            attrs = self._composable._SYNC_ATTRS
+        self._composable._sync_context_from_owner(attrs)
+
+    def _sync_from_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+        """Propagate selected context attributes back to the owner."""
+        if attrs is None:
+            attrs = self._composable._SYNC_ATTRS
+        self._composable._sync_owner_from_context(attrs)
+
     async def start_client(self) -> None:
         """Startup function for a client."""
-        if hasattr(Config().algorithm, "cross_silo") and not Config().is_edge_server():
-            # Contact one of the edge servers
-            self.edge_server_id = self.get_edge_server_id()
-
-            logging.info(
-                "[Client #%d] Contacting Edge Server #%d.",
-                self.client_id,
-                self.edge_server_id,
-            )
-        else:
-            await asyncio.sleep(5)
-            logging.info("[Client #%d] Contacting the server.", self.client_id)
-
-        self.sio = socketio.AsyncClient(reconnection=True)
-        self.sio.register_namespace(ClientEvents(namespace="/", plato_client=self))
-
-        if hasattr(Config().server, "s3_endpoint_url"):
-            self.s3_client = s3.S3()
-
-        if hasattr(Config().server, "use_https"):
-            uri = f"https://{Config().server.address}"
-        else:
-            uri = f"http://{Config().server.address}"
-
-        if hasattr(Config().server, "port"):
-            # If we are not using a production server deployed in the cloud
-            if (
-                hasattr(Config().algorithm, "cross_silo")
-                and not Config().is_edge_server()
-            ):
-                uri = f"{uri}:{int(Config().server.port) + int(self.edge_server_id)}"
-            else:
-                uri = f"{uri}:{Config().server.port}"
-
-        logging.info("[%s] Connecting to the server at %s.", self, uri)
-        await self.sio.connect(uri, wait_timeout=600)
-        await self.sio.emit("client_alive", {"pid": os.getpid(), "id": self.client_id})
-
-        logging.info("[Client #%d] Waiting to be selected.", self.client_id)
-        await self.sio.wait()
+        await self._composable.start_client()
 
     def get_edge_server_id(self):
         """Returns the edge server id of the client in cross-silo FL."""
@@ -180,72 +171,11 @@ class Client:
 
     async def _payload_to_arrive(self, response) -> None:
         """Upon receiving a response from the server."""
-        self.current_round = response["current_round"]
-
-        # Update (virtual) client id for client, trainer and algorithm
-        self.client_id = response["id"]
-
-        logging.info("[Client #%d] Selected by the server.", self.client_id)
-
-        self.process_server_response(response)
-
-        self._load_data()
-        self.configure()
-        self._allocate_data()
-
-        self.server_payload = None
-
-        if self.comm_simulation:
-            payload_filename = response["payload_filename"]
-            with open(payload_filename, "rb") as payload_file:
-                self.server_payload = pickle.load(payload_file)
-
-            payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
-
-            logging.info(
-                "[%s] Received %.2f MB of payload data from the server (simulated).",
-                self,
-                payload_size / 1024**2,
-            )
-
-            await self._handle_payload(self.server_payload)
+        await self._composable.on_payload_to_arrive(response)
 
     async def _handle_payload(self, inbound_payload):
         """Handles the inbound payload upon receiving it from the server."""
-        self.inbound_received(self.inbound_processor)
-        self.callback_handler.call_event(
-            "on_inbound_received", self, self.inbound_processor
-        )
-
-        tic = time.perf_counter()
-        processed_inbound_payload = self.inbound_processor.process(inbound_payload)
-        self.processing_time = time.perf_counter() - tic
-
-        # Inbound data is processed, computing outbound response
-        report, outbound_payload = await self.inbound_processed(
-            processed_inbound_payload
-        )
-        self.callback_handler.call_event(
-            "on_inbound_processed", self, processed_inbound_payload
-        )
-
-        # Outbound data is ready to be processed
-        tic = time.perf_counter()
-        self.outbound_ready(report, self.outbound_processor)
-        self.callback_handler.call_event(
-            "on_outbound_ready", self, report, self.outbound_processor
-        )
-        processed_outbound_payload = self.outbound_processor.process(outbound_payload)
-        self.processing_time += time.perf_counter() - tic
-        report.processing_time = self.processing_time
-
-        # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit(
-            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
-        )
-
-        # Sending the client training payload to the server
-        await self._send(processed_outbound_payload)
+        await self._composable.handle_server_payload(inbound_payload)
 
     def inbound_received(self, inbound_processor):
         """
@@ -269,78 +199,19 @@ class Client:
 
     async def _chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
-        self.chunks.append(data)
+        await self._composable.on_chunk(data)
 
     async def _request_update(self, data) -> None:
         """Upon receiving a request for an urgent model update."""
-        logging.info(
-            "[Client #%s] Urgent request received for model update at time %s.",
-            data["client_id"],
-            data["time"],
-        )
-
-        report, payload = await self._obtain_model_at_time(
-            client_id=data["client_id"],
-            requested_time=data["time"],
-        )
-
-        # Process outbound data when necessary
-        self.callback_handler.call_event(
-            "on_outbound_ready", self, report, self.outbound_processor
-        )
-        self.outbound_ready(report, self.outbound_processor)
-        payload = self.outbound_processor.process(payload)
-
-        # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit(
-            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
-        )
-
-        # Sending the client training payload to the server
-        await self._send(payload)
+        await self._composable.on_request_update(data)
 
     async def _payload_arrived(self, client_id) -> None:
         """Upon receiving a portion of the new payload from the server."""
-        assert client_id == self.client_id
-
-        payload = b"".join(self.chunks)
-        _data = pickle.loads(payload)
-        self.chunks = []
-
-        if self.server_payload is None:
-            self.server_payload = _data
-        elif isinstance(self.server_payload, list):
-            self.server_payload.append(_data)
-        else:
-            self.server_payload = [self.server_payload]
-            self.server_payload.append(_data)
+        await self._composable.on_payload_arrived(client_id)
 
     async def _payload_done(self, client_id, s3_key=None) -> None:
         """Upon receiving all the new payload from the server."""
-        payload_size = 0
-
-        if s3_key is None:
-            if isinstance(self.server_payload, list):
-                for _data in self.server_payload:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
-            elif isinstance(self.server_payload, dict):
-                for key, value in self.server_payload.items():
-                    payload_size += sys.getsizeof(pickle.dumps({key: value}))
-            else:
-                payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
-        else:
-            self.server_payload = self.s3_client.receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(self.server_payload))
-
-        assert client_id == self.client_id
-
-        logging.info(
-            "[Client #%d] Received %.2f MB of payload data from the server.",
-            client_id,
-            payload_size / 1024**2,
-        )
-
-        await self._handle_payload(self.server_payload)
+        await self._composable.on_payload_done(client_id, s3_key=s3_key)
 
     async def _start_training(self, inbound_payload):
         """Complete one round of training on this client."""
@@ -438,6 +309,7 @@ class Client:
     def add_callbacks(self, callbacks):
         """Adds a list of callbacks to the client callback handler."""
         self.callback_handler.add_callbacks(callbacks)
+        self._context.callback_handler = self.callback_handler
 
     @abstractmethod
     async def _train(self):

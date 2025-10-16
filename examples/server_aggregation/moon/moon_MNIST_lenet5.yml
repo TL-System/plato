@@ -1,0 +1,56 @@
+clients:
+  type: simple
+  total_clients: 100
+  per_round: 10
+  random_seed: 1
+  do_test: false
+  speed_simulation: true
+  simulation_distribution:
+    distribution: normal
+    mean: 10
+    sd: 3
+  sleep_simulation: true
+  avg_training_time: 20
+
+server:
+  address: 127.0.0.1
+  port: 8000
+  synchronous: false
+  simulate_wall_time: true
+  minimum_clients_aggregated: 6
+  staleness_bound: 10
+  random_seed: 1
+
+data:
+  datasource: MNIST
+  data_path: data
+  partition_size: 200
+  sampler: noniid
+  concentration: 0.5
+  random_seed: 1
+
+trainer:
+  rounds: 20
+  type: basic
+  max_concurrency: 4
+  target_accuracy: 1.0
+  epochs: 5
+  batch_size: 64
+  optimizer: SGD
+  model_name: moon_lenet5
+
+algorithm:
+  type: fedavg
+  mu: 5.0
+  temperature: 0.5
+  history_size: 2
+
+parameters:
+  optimizer:
+    lr: 0.01
+    momentum: 0.9
+    weight_decay: 0.0
+
+results:
+  result_path: results/MNIST_lenet5/MOON
+  types: round, accuracy, elapsed_time, comm_time, round_time

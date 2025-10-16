@@ -9,6 +9,9 @@ training using their local dataset.
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.client_selection import (
+    PersonalizedRatioSelectionStrategy,
+)
 
 
 class Server(fedavg.Server):
@@ -19,30 +22,41 @@ class Server(fedavg.Server):
     """
 
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        aggregation_strategy=None,
+        client_selection_strategy=None,
     ):
+        ratio = 1.0
+        if hasattr(Config().algorithm, "personalization"):
+            personalization_cfg = Config().algorithm.personalization
+            if hasattr(personalization_cfg, "participating_client_ratio"):
+                ratio = personalization_cfg.participating_client_ratio
+
+        personalization_rounds = Config().trainer.rounds
+
+        if client_selection_strategy is None:
+            client_selection_strategy = PersonalizedRatioSelectionStrategy(
+                ratio=ratio,
+                personalization_rounds=personalization_rounds,
+            )
+
         super().__init__(
             model=model,
             datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            aggregation_strategy=aggregation_strategy,
+            client_selection_strategy=client_selection_strategy,
         )
         # Personalization starts after the final regular round of training
         self.personalization_started = False
-
-    def choose_clients(self, clients_pool, clients_count):
-        """Choose a subset of the clients to participate in each round."""
-        if self.current_round > Config().trainer.rounds:
-            # In the final personalization round, choose from all clients
-            return super().choose_clients(clients_pool, clients_count)
-        else:
-            ratio = Config().algorithm.personalization.participating_client_ratio
-
-            return super().choose_clients(
-                clients_pool[: int(self.total_clients * ratio)],
-                clients_count,
-            )
+        self.personalization_rounds = personalization_rounds
 
     async def wrap_up(self) -> None:
         """Wraps up when each round of training is done."""
@@ -53,5 +67,5 @@ class Server(fedavg.Server):
             # the final round of training for personalization on the clients
             self.save_to_checkpoint()
 
-            if self.current_round >= Config().trainer.rounds:
+            if self.current_round >= self.personalization_rounds:
                 self.personalization_started = True

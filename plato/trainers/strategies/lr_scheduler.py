@@ -43,9 +43,19 @@ class DefaultLRSchedulerStrategy(LRSchedulerStrategy):
             # Check if scheduler is configured
             if "lr_scheduler" not in context.config:
                 return None
-            return lr_scheduler_registry.get(
-                optimizer, len(context.state.get("train_loader", []))
-            )
+            train_loader = context.state.get("train_loader")
+            if train_loader is None:
+                iterations_per_epoch = 0
+            else:
+                try:
+                    iterations_per_epoch = len(train_loader)
+                except TypeError:
+                    iterations_per_epoch = 0
+
+            if iterations_per_epoch <= 0:
+                iterations_per_epoch = 1
+
+            return lr_scheduler_registry.get(optimizer, iterations_per_epoch)
         else:
             return self.scheduler_fn(optimizer)
 

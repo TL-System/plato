@@ -33,6 +33,7 @@ import torch.nn as nn
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
+from plato.datasources import registry as datasources_registry
 from plato.models import registry as models_registry
 from plato.trainers import base, tracking
 from plato.trainers.strategies.base import (
@@ -146,6 +147,7 @@ class ComposableTrainer(base.Trainer):
         self._loss_tracker = tracking.LossTracker()
 
         # Training state
+        self.trainset = None
         self.train_loader = None
         self.sampler = None
         self.optimizer = None
@@ -277,9 +279,48 @@ class ComposableTrainer(base.Trainer):
     def train_model(self, config, trainset, sampler, **kwargs):
         """The main training loop using strategies."""
         batch_size = config["batch_size"]
+        self.trainset = trainset
         self.sampler = sampler
         self.context.config = config
         self.context.current_round = self.current_round
+
+        # Ensure training step strategy respects higher-order gradient settings
+        if self.training_step_strategy is not None:
+            if hasattr(self.training_step_strategy, "create_graph"):
+                create_graph = config.get("create_graph")
+                if create_graph is not None:
+                    self.training_step_strategy.create_graph = create_graph
+            if hasattr(self.training_step_strategy, "retain_graph"):
+                retain_graph = config.get("retain_graph")
+                if retain_graph is None and config.get("create_graph"):
+                    retain_graph = True
+                if retain_graph is not None:
+                    self.training_step_strategy.retain_graph = retain_graph
+
+        if trainset is None:
+            logging.warning(
+                "[Client #%d] No training dataset received in worker process; "
+                "reloading from data source.",
+                self.client_id,
+            )
+            try:
+                datasource = datasources_registry.get(client_id=self.client_id)
+                trainset = datasource.get_train_set()
+                self.trainset = trainset
+            except Exception as exc:
+                logging.error(
+                    "[Client #%d] Failed to reload training dataset: %s",
+                    self.client_id,
+                    exc,
+                )
+                self.callback_handler.call_event("on_train_run_end", self, config)
+                raise
+
+        if sampler is None:
+            logging.warning(
+                "[Client #%d] No sampler provided; defaulting to full dataset.",
+                self.client_id,
+            )
 
         # Reset tracking
         self.run_history.reset()
@@ -298,6 +339,25 @@ class ComposableTrainer(base.Trainer):
 
         # Store train_loader in context for potential use by strategies
         self.context.state["train_loader"] = self.train_loader
+        sampled_size = 0
+        if sampler is not None and hasattr(sampler, "num_samples"):
+            try:
+                sampled_size = sampler.num_samples()
+            except TypeError:
+                sampled_size = 0
+        if sampled_size == 0 and self.train_loader is not None:
+            loader_sampler = getattr(self.train_loader, "sampler", None)
+            if loader_sampler is not None and hasattr(loader_sampler, "__len__"):
+                try:
+                    sampled_size = len(loader_sampler)
+                except TypeError:
+                    sampled_size = 0
+        if sampled_size == 0 and trainset is not None and hasattr(trainset, "__len__"):
+            try:
+                sampled_size = len(trainset)
+            except TypeError:
+                sampled_size = 0
+        self.context.state["num_samples"] = sampled_size
 
         # Create optimizer using strategy
         self.optimizer = self.optimizer_strategy.create_optimizer(

@@ -1,46 +1,35 @@
-"""
-A federated learning server using federated averaging to train GAN models.
-"""
-
-import asyncio
+"""Federated averaging server specialized for GAN training."""
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgGanAggregationStrategy
 
 
 class Server(fedavg.Server):
-    """Federated learning server using federated averaging to train GAN models."""
+    """Federated learning server using the GAN-specific aggregation strategy."""
 
-    async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate weight updates from the clients using federated averaging."""
-        # Total sample is the same for both Generator and Discriminator
-        self.total_samples = sum(update.report.num_samples for update in updates)
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        aggregation_strategy=None,
+        client_selection_strategy=None,
+    ):
+        if aggregation_strategy is None:
+            aggregation_strategy = FedAvgGanAggregationStrategy()
 
-        # Perform weighted averaging for both Generator and Discriminator
-        gen_avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0][0].items()
-        }
-        disc_avg_update = {
-            name: self.trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0][1].items()
-        }
-
-        for i, update in enumerate(deltas_received):
-            num_samples = updates[i].report.num_samples
-
-            update_from_gen, update_from_disc = update
-
-            for name, delta in update_from_gen.items():
-                gen_avg_update[name] += delta * (num_samples / self.total_samples)
-
-            for name, delta in update_from_disc.items():
-                disc_avg_update[name] += delta * (num_samples / self.total_samples)
-
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
-
-        return gen_avg_update, disc_avg_update
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            aggregation_strategy=aggregation_strategy,
+            client_selection_strategy=client_selection_strategy,
+        )
 
     def customize_server_payload(self, payload):
         """

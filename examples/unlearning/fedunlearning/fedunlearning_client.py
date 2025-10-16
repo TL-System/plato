@@ -17,7 +17,52 @@ import logging
 import unlearning_iid
 from lib_mia import mia_client
 
+from plato.clients.strategies import DefaultLifecycleStrategy
 from plato.config import Config
+
+
+class FedUnlearningLifecycleStrategy(DefaultLifecycleStrategy):
+    """Lifecycle strategy tracking rollback rounds for unlearning."""
+
+    def process_server_response(self, context, server_response):
+        super().process_server_response(context, server_response)
+
+        owner = context.owner
+        if owner is None:
+            return
+
+        client_id = context.client_id
+        previous_round = owner.previous_round.get(client_id, 0)
+        client_pool = Config().clients.clients_requesting_deletion
+
+        if client_id in client_pool and context.current_round <= previous_round:
+            if client_id not in owner.unlearning_clients:
+                owner.unlearning_clients.append(client_id)
+
+        owner.previous_round[client_id] = context.current_round
+
+    def configure(self, context):
+        super().configure(context)
+
+        owner = context.owner
+        if owner is None:
+            return
+
+        owner.sampler = context.sampler
+        owner.testset_sampler = getattr(context, "testset_sampler", None)
+
+        if owner.client_id in owner.unlearning_clients:
+            logging.info(
+                "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
+                owner,
+                Config().clients.deleted_data_ratio * 100,
+            )
+
+            sampler = unlearning_iid.Sampler(
+                context.datasource, context.client_id, testing=False
+            )
+            context.sampler = sampler
+            owner.sampler = sampler
 
 
 class Client(mia_client.Client):
@@ -42,37 +87,15 @@ class Client(mia_client.Client):
         self.previous_round = {}
         self.unlearning_clients = []
 
-    def process_server_response(self, server_response):
-        """
-        Register the client when the retraining happens (communication round rollback).
-        """
-        if self.client_id in self.previous_round:
-            previous_round = self.previous_round[self.client_id]
-        else:
-            previous_round = 0
+        payload_strategy = self.payload_strategy
+        training_strategy = self.training_strategy
+        reporting_strategy = self.reporting_strategy
+        communication_strategy = self.communication_strategy
 
-        client_pool = Config().clients.clients_requesting_deletion
-
-        if self.client_id in client_pool and self.current_round <= previous_round:
-            if self.client_id not in self.unlearning_clients:
-                self.unlearning_clients.append(self.client_id)
-
-        self.previous_round[self.client_id] = self.current_round
-
-    def configure(self):
-        """
-        If a client requested deletion, replace its sampler accordingly in the
-        retraining phase.
-        """
-        super().configure()
-
-        if self.client_id in self.unlearning_clients:
-            logging.info(
-                "[%s] Unlearning sampler deployed: %s%% of the samples were deleted.",
-                self,
-                Config().clients.deleted_data_ratio * 100,
-            )
-
-            self.sampler = unlearning_iid.Sampler(
-                self.datasource, self.client_id, testing=False
-            )
+        self._configure_composable(
+            lifecycle_strategy=FedUnlearningLifecycleStrategy(),
+            payload_strategy=payload_strategy,
+            training_strategy=training_strategy,
+            reporting_strategy=reporting_strategy,
+            communication_strategy=communication_strategy,
+        )

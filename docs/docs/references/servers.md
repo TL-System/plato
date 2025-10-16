@@ -1,6 +1,6 @@
 # Servers
 
-## Strategy-Based Customization
+## Strategy-Based Server Architecture
 
 Plato servers now support strategy-based composition for the two most common customization points:
 client selection and update aggregation. Instead of subclassing the server and overriding hooks, you
@@ -43,13 +43,12 @@ to its default implementation.
 | Aggregation | `FedAsyncAggregationStrategy` | Staleness-aware mixing for asynchronous training. |
 | Aggregation | `FedBuffAggregationStrategy` | Simple asynchronous aggregation strategy without using weights. |
 | Aggregation | `FedNovaAggregationStrategy` | Normalized FedNova variant for heterogeneous local epochs. |
-| Aggregation | `PiscesAggregationStrategy` | More complex asynchronous aggregation strategy. |
-| Aggregation | `PolarisAggregationStrategy` | More complex asynchronous aggregation strategy. |
+| Aggregation | `HermesAggregationStrategy` | Mask-aware aggregation used by the Hermes personalization algorithm. |
+| Aggregation | `FedAvgGanAggregationStrategy` | Generator/discriminator-aware averaging for GAN training. |
+| Aggregation | `FedAvgHEAggregationStrategy` | Hybrid encrypted/plain averaging for CKKS-based workflows. |
 | Client selection | `RandomSelectionStrategy` | Uniform random selection (default). |
-| Client selection | `OortSelectionStrategy` | Utility-based exploration/exploitation selection. |
-| Client selection | `AFLSelectionStrategy` | Active federated learning prioritization. |
-| Client selection | `PiscesAggregationStrategy` | Client selection based on the Pisces algorithm. |
-| Client selection | `PolarisAggregationStrategy` | Client selection based on the Polaris algorithm. |
+| Client selection | `SplitLearningSequentialSelectionStrategy` | Sequentially serves one client at a time for split learning. |
+| Client selection | `PersonalizedRatioSelectionStrategy` | Limits participation by ratio before a personalization phase. |
 
 ### Implementing Custom Strategies
 
@@ -142,9 +141,9 @@ The hook-based approach, as documented in the next section, continues to work fo
 2. Move helper attributes into the strategy's internal state or the shared `context.state`.
 3. Register the strategy in your server factory or experiment script.
 
-## Customizing Servers using Inheritance
+## Customizing Servers using Subclassing
 
-The common practice is to customize the server using inheritance for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
+The common practice is to customize the server using subclassing for important features that change the state of the server. To customize the server using inheritance, subclass the `fedavg.Server` (or `fedavg_cs.Server` for cross-silo federated learning) class in `plato.servers`, and override the following methods:
 
 !!! example "configure()"
     **`def configure(self) -> None`**
@@ -184,6 +183,14 @@ The common practice is to customize the server using inheritance for important f
     `clients_pool` a list of available clients for selection.
 
     `clients_count` the number of clients that need to be selected in this round.
+
+    When overriding this method, delegate to `_select_clients_with_strategy()` if you only need to filter the candidate pool. This keeps the strategy stack (and reproducible random state) in sync with the rest of the server.
+
+    ```py
+    def choose_clients(self, clients_pool, clients_count):
+        filtered = [cid for cid in clients_pool if cid not in self.blacklist]
+        return self._select_clients_with_strategy(filtered, clients_count)
+    ```
 
     **Returns:** a list of selected client IDs.
 

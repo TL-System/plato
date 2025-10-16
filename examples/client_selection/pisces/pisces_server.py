@@ -9,12 +9,11 @@ Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 URL: https://arxiv.org/abs/2206.09264
 """
 
+from pisces_aggregation_strategy import PiscesAggregationStrategy
+from pisces_selection_strategy import PiscesSelectionStrategy
+
 from plato.config import Config
 from plato.servers import fedavg
-from plato.servers.strategies import (
-    PiscesAggregationStrategy,
-    PiscesSelectionStrategy,
-)
 
 
 class Server(fedavg.Server):
@@ -43,6 +42,7 @@ class Server(fedavg.Server):
             robustness=getattr(server_cfg, "robustness", False),
             augmented_factor=getattr(server_cfg, "augmented_factor", 5),
             threshold_factor=getattr(server_cfg, "threshold_factor", 1.0),
+            speed_penalty_factor=getattr(server_cfg, "speed_penalty_factor", 0.5),
             reliability_credit_initial=getattr(
                 server_cfg, "reliability_credit_initial", 5
             ),
