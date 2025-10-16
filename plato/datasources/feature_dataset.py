@@ -5,10 +5,25 @@ def _ensure_tuple(sample):
     """Normalize sample to (feature, target) tuple, discarding extras."""
     if isinstance(sample, tuple):
         if len(sample) >= 2:
-            return sample[0], sample[1]
-        if len(sample) == 1:
-            return sample[0], torch.zeros(1)
-    return sample, torch.zeros(1)
+            feature = sample[0]
+            target = sample[1]
+        elif len(sample) == 1:
+            feature = sample[0]
+            target = torch.zeros(1)
+        else:
+            feature = torch.zeros(1)
+            target = torch.zeros(1)
+    elif isinstance(sample, torch.Tensor):
+        feature = sample
+        target = torch.zeros(1)
+    else:
+        feature = torch.tensor(sample)
+        target = torch.zeros(1)
+
+    if torch.is_tensor(target) and target.ndim == 0:
+        target = target.unsqueeze(0)
+
+    return feature, target
 
 
 class FeatureDataset(torch.utils.data.Dataset):

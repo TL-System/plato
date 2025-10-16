@@ -48,7 +48,17 @@ class DataSource(base.DataSource):
 
         for feature_pair in _flatten_feature_iterables(features):
             expanded = _expand_feature_batch(feature_pair)
-            self.feature_dataset.extend(expanded)
+            for sample in expanded:
+                if isinstance(sample, torch.Tensor):
+                    # Fall back to zero label if only feature tensor provided.
+                    self.feature_dataset.append((sample, torch.zeros(1)))
+                elif isinstance(sample, tuple):
+                    if len(sample) == 1:
+                        self.feature_dataset.append((sample[0], torch.zeros(1)))
+                    elif len(sample) >= 2:
+                        self.feature_dataset.append((sample[0], sample[1]))
+                else:
+                    self.feature_dataset.append((sample, torch.zeros(1)))
 
         self.trainset = self.feature_dataset
         self.testset = []
