@@ -11,14 +11,12 @@ from plato.algorithms import (
     fedavg,
     fedavg_gan,
     fedavg_personalized,
-    mistnet,
     split_learning,
 )
 from plato.config import Config
 
 registered_algorithms = {
     "fedavg": fedavg.Algorithm,
-    "mistnet": mistnet.Algorithm,
     "fedavg_gan": fedavg_gan.Algorithm,
     "fedavg_personalized": fedavg_personalized.Algorithm,
     "split_learning": split_learning.Algorithm,

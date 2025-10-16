@@ -25,7 +25,6 @@ from plato.clients.strategies.edge import EdgeLifecycleStrategy, EdgeTrainingStr
 from plato.clients.strategies.fedavg_personalized import (
     FedAvgPersonalizedPayloadStrategy,
 )
-from plato.clients.strategies.mistnet import MistNetTrainingStrategy
 from plato.clients.strategies.split_learning import SplitLearningTrainingStrategy
 
 __all__ = [
@@ -44,6 +43,5 @@ __all__ = [
     "DefaultCommunicationStrategy",
     "EdgeLifecycleStrategy",
     "EdgeTrainingStrategy",
-    "MistNetTrainingStrategy",
     "SplitLearningTrainingStrategy",
 ]

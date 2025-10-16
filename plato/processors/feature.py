@@ -1,5 +1,5 @@
 """
-Implements a generalized Processor for applying operations onto MistNet PyTorch features.
+Implements a generalized Processor for applying operations onto PyTorch features.
 """
 
 from typing import Any, Callable
@@ -11,7 +11,7 @@ from plato.processors import base
 
 class Processor(base.Processor):
     """
-    Implements a generalized Processor for applying operations onto MistNet PyTorch features.
+    Implements a generalized Processor for applying operations onto PyTorch features.
     """
 
     def __init__(
@@ -29,7 +29,7 @@ class Processor(base.Processor):
 
     def process(self, data: Any) -> Any:
         """
-        Implements a generalized Processor for applying operations onto MistNet PyTorch features.
+        Implements a generalized Processor for applying operations onto PyTorch features.
         """
 
         output = []
