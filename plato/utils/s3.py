@@ -71,38 +71,14 @@ class S3:
             except botocore.exceptions.ClientError as s3_exception:
                 raise ValueError("Fail to create a bucket.") from s3_exception
 
-    def send_to_s3(self, object_key, object_to_send) -> str:
-        """Sends an object to an S3-compatible object storage service.
-
-        Returns: A presigned URL for use later to retrieve the data.
-        """
+    def send_to_s3(self, object_key, object_to_send) -> None:
+        """Sends an object to an S3-compatible object storage service if the key is unused."""
         object_key = self.key_prefix + "/" + object_key
         try:
             # Does the object key exist already in S3?
             self.s3_client.head_object(Bucket=self.bucket, Key=object_key)
         except botocore.exceptions.ClientError:
-            try:
-                # Only send the object if the key does not exist yet
-                data = pickle.dumps(object_to_send)
-                put_url = self.s3_client.generate_presigned_url(
-                    ClientMethod="put_object",
-                    Params={"Bucket": self.bucket, "Key": object_key},
-                    ExpiresIn=300,
-                )
-                response = requests.put(put_url, data=data)
-
-                if response.status_code != 200:
-                    raise ValueError(
-                        f"Error occurred sending data: status code = {response.status_code}"
-                    ) from None
-
-            except botocore.exceptions.ClientError as error:
-                raise ValueError(
-                    f"Error occurred sending data to S3: {error}"
-                ) from error
-
-            except botocore.exceptions.ParamValidationError as error:
-                raise ValueError(f"Incorrect parameters: {error}") from error
+            self.put_to_s3(object_key, object_to_send)
 
     def receive_from_s3(self, object_key) -> Any:
         """Retrieves an object from an S3-compatible object storage service.
@@ -127,6 +103,29 @@ class S3:
         raise ValueError(
             f"Error occurred sending data: request status code = {response.status_code}"
         )
+
+    def put_to_s3(self, object_key, object_to_put) -> None:
+        """Uploads an object regardless of whether the key already exists."""
+        object_key = self.key_prefix + "/" + object_key
+        try:
+            data = pickle.dumps(object_to_put)
+            put_url = self.s3_client.generate_presigned_url(
+                ClientMethod="put_object",
+                Params={"Bucket": self.bucket, "Key": object_key},
+                ExpiresIn=300,
+            )
+            response = requests.put(put_url, data=data)
+
+            if response.status_code != 200:
+                raise ValueError(
+                    f"Error occurred sending data: status code = {response.status_code}"
+                ) from None
+
+        except botocore.exceptions.ClientError as error:
+            raise ValueError(f"Error occurred sending data to S3: {error}") from error
+
+        except botocore.exceptions.ParamValidationError as error:
+            raise ValueError(f"Incorrect parameters: {error}") from error
 
     def delete_from_s3(self, object_key):
         """Deletes an object using its key from S3."""

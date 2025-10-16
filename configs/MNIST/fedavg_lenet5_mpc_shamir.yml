@@ -1,0 +1,45 @@
+clients:
+    type: mpc
+    total_clients: 10
+    per_round: 3
+    do_test: false
+    outbound_processors:
+        - mpc_model_encrypt_shamir
+    mpc_debug_artifacts: false
+
+server:
+    type: fedavg_mpc_shamir
+    address: 127.0.0.1
+    port: 8001
+    random_seed: 1
+    simulate_wall_time: true
+    # Optional S3 + ZooKeeper configuration for distributed coordination.
+    # s3_bucket: "fl-mpc"
+    # s3_endpoint_url: "https://s3.us-east-1.amazonaws.com"
+    # zk_address: 127.0.0.1
+    # zk_port: 2181
+    # Custom reconstruction threshold (defaults to number_of_clients - 2).
+    # mpc_shamir_threshold: 3
+
+data: !include mnist_iid.yml
+
+trainer:
+    type: basic
+    rounds: 5
+    max_concurrency: 5
+    target_accuracy: 0.985
+    model_name: lenet5
+    epochs: 5
+    batch_size: 32
+    optimizer: SGD
+
+algorithm:
+    type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

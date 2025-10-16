@@ -1,9 +1,9 @@
 """Tests for the homomorphic-encrypted FedAvg aggregation strategy."""
 
+import asyncio
 from collections import OrderedDict
 from types import SimpleNamespace
 
-import asyncio
 import numpy as np
 import torch
 
@@ -92,12 +92,8 @@ def test_he_aggregation_strategy_weighted_average_without_encryption():
     strategy = FedAvgHEAggregationStrategy()
     strategy.setup(context)
 
-    payload_a = homo_enc.wrap_encrypted_model(
-        np.array([1.0, 2.0]), None, []
-    )
-    payload_b = homo_enc.wrap_encrypted_model(
-        np.array([3.0, 4.0]), None, []
-    )
+    payload_a = homo_enc.wrap_encrypted_model(np.array([1.0, 2.0]), None, [])
+    payload_b = homo_enc.wrap_encrypted_model(np.array([3.0, 4.0]), None, [])
 
     weights_received = [payload_a, payload_b]
     updates = [

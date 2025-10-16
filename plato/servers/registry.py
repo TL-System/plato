@@ -13,6 +13,8 @@ from plato.servers import (
     fedavg,
     fedavg_cs,
     fedavg_gan,
+    fedavg_mpc_additive,
+    fedavg_mpc_shamir,
     fedavg_personalized,
     split_learning,
 )
@@ -29,6 +31,8 @@ else:
         "fedavg_cross_silo": fedavg_cs.Server,
         "fedavg_gan": fedavg_gan.Server,
         "fedavg_personalized": fedavg_personalized.Server,
+        "fedavg_mpc_additive": fedavg_mpc_additive.Server,
+        "fedavg_mpc_shamir": fedavg_mpc_shamir.Server,
         "split_learning": split_learning.Server,
     }
 

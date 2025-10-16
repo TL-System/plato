@@ -1,0 +1,44 @@
+clients:
+    type: mpc
+    total_clients: 10
+    per_round: 3
+    do_test: false
+    outbound_processors:
+        - mpc_model_encrypt_additive
+    # Optional: enable local dumps of raw/encrypted payloads.
+    mpc_debug_artifacts: false
+
+server:
+    type: fedavg_mpc_additive
+    address: 127.0.0.1
+    port: 8001
+    random_seed: 1
+    simulate_wall_time: true
+    # Configure S3 + ZooKeeper to share round metadata across machines.
+    # s3_bucket: "fl-mpc"
+    # s3_endpoint_url: "https://s3.us-east-1.amazonaws.com"
+    # zk_address: 127.0.0.1
+    # zk_port: 2181
+
+data: !include mnist_iid.yml
+
+trainer:
+    type: basic
+    rounds: 5
+    max_concurrency: 5
+    target_accuracy: 0.985
+    model_name: lenet5
+    epochs: 5
+    batch_size: 32
+    optimizer: SGD
+
+algorithm:
+    type: fedavg
+
+parameters:
+    model:
+        num_classes: 10
+    optimizer:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0

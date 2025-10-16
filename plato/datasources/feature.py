@@ -43,7 +43,11 @@ class DataSource(base.DataSource):
                 return
 
             if torch.is_tensor(data) and torch.is_tensor(target):
-                if data.dim() >= 1 and target.dim() >= 1 and data.size(0) == target.size(0):
+                if (
+                    data.dim() >= 1
+                    and target.dim() >= 1
+                    and data.size(0) == target.size(0)
+                ):
                     for i in range(data.size(0)):
                         feature = data[i]
                         label = target[i]

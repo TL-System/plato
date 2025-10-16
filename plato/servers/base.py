@@ -103,6 +103,13 @@ class Server:
             else True
         )
 
+        self._mpc_round_lock = None
+        if getattr(Config().clients, "type", None) == "mpc" and not hasattr(
+            Config().server, "s3_endpoint_url"
+        ):
+            spawn_context = mp.get_context("spawn")
+            self._mpc_round_lock = spawn_context.Lock()
+
         # Starting from the default server callback class, add all supplied server callbacks
         self.callbacks = [LogProgressCallback]
         if callbacks is not None:
@@ -285,6 +292,15 @@ class Server:
         if Config().args.resume:
             self._resume_from_checkpoint()
 
+        client_kwargs = None
+        if getattr(Config().clients, "type", None) == "mpc":
+            client_kwargs = {
+                "round_store_lock": self._mpc_round_lock,
+                "debug_artifacts": getattr(
+                    Config().clients, "mpc_debug_artifacts", False
+                ),
+            }
+
         if Config().is_central_server():
             # Start the edge servers as clients of the central server first
             # Once all edge servers are live, clients will be initialized in the
@@ -295,6 +311,7 @@ class Server:
                 edge_server=edge_server,
                 edge_client=edge_client,
                 trainer=trainer,
+                client_kwargs=client_kwargs,
             )
 
             asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
@@ -309,7 +326,7 @@ class Server:
             if self.disable_clients:
                 logging.info("No clients are launched (server:disable_clients = true)")
             else:
-                Server._start_clients(client=self.client)
+                Server._start_clients(client=self.client, client_kwargs=client_kwargs)
 
             asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
 
@@ -385,6 +402,7 @@ class Server:
         edge_server=None,
         edge_client=None,
         trainer=None,
+        client_kwargs=None,
     ):
         """Starts all the clients as separate processes."""
         starting_id = 1
@@ -436,13 +454,23 @@ class Server:
                         edge_server,
                         edge_client,
                         trainer,
+                        client_kwargs,
                     ),
                 )
                 proc.start()
             else:
                 logging.info("Starting client #%d's process.", client_id)
                 proc = mp.Process(
-                    target=run, args=(client_id, None, client, None, None, None)
+                    target=run,
+                    args=(
+                        client_id,
+                        None,
+                        client,
+                        None,
+                        None,
+                        None,
+                        client_kwargs,
+                    ),
                 )
                 proc.start()
 
@@ -701,7 +729,7 @@ class Server:
 
         if type(self).choose_clients is not Server.choose_clients:
             raise RuntimeError(
-                "Custom choose_clients overrides should use the strategy API." \
+                "Custom choose_clients overrides should use the strategy API."
                 " Please update the subclass to call `_select_clients_with_strategy`."
             )
 
@@ -1425,7 +1453,15 @@ class Server:
             if self.disable_clients:
                 logging.info("No clients are launched (server:disable_clients = true)")
             else:
-                Server._start_clients(client=self.client)
+                client_kwargs = None
+                if getattr(Config().clients, "type", None) == "mpc":
+                    client_kwargs = {
+                        "round_store_lock": self._mpc_round_lock,
+                        "debug_artifacts": getattr(
+                            Config().clients, "mpc_debug_artifacts", False
+                        ),
+                    }
+                Server._start_clients(client=self.client, client_kwargs=client_kwargs)
 
     def server_will_close(self) -> None:
         """

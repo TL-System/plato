@@ -5,6 +5,7 @@
     - `split_learning` a client following the Split Learning algorithm. When this client is used, `clients.do_test` in configuration should be set as `False` because in split learning, we conduct the test on the server.
     - `fedavg_personalized` a client saves its local layers before sending the shared global model to the server after local training.
     - `self_supervised_learning` a client to prepare the datasource for personalized learning based on self-supervised learning.
+    - `mpc` a client that encrypts outbound model updates using multiparty computation processors.
 
 !!! example "total_clients"
     The total number of clients in a training session.
@@ -79,6 +80,11 @@
     - `structured_pruning` Process structured pruning on model weights. The `model_compress` processor needs to be applied after it in the configuration file or the communication overhead will not be reduced.
     - `model_compress` Compress model parameters with `Zstandard` compression algorithm. Must be placed as the last processor if applied.
     - `model_encrypt` Encrypts the model parameters using homomorphic encryption.
+    - `mpc_model_encrypt_additive` Encrypts model parameters using additive secret sharing for MPC.
+    - `mpc_model_encrypt_shamir` Encrypts model parameters using Shamir secret sharing for MPC (adds misbehaving-client detection).
+
+!!! example "mpc_debug_artifacts"
+    When set to `true`, raw and encrypted client payloads are dumped to `mpc_data/` for inspection. Defaults to `false`.
 
 !!! example "inbound_processors"
     A list of processors for the client to apply on the payload before receiving it from the server.
