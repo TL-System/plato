@@ -53,9 +53,9 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
 !!! tip "API Documentation"
     Detailed API reference for customizing Plato components.
 
-    - **[Trainers](references/trainers.md)** - Customizing training loops and callbacks
-    - **[Servers](references/servers.md)** - Customizing server behavior and aggregation
     - **[Clients](references/clients.md)** - Customizing client behavior and processing
+    - **[Servers](references/servers.md)** - Customizing server behavior and aggregation
+    - **[Trainers](references/trainers.md)** - Customizing training loops and callbacks
 
 ## Development and Deployment
 
