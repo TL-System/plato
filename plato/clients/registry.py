@@ -18,6 +18,7 @@ from typing import Any, Callable, Dict, Optional, Type
 from plato.clients import (
     edge,
     fedavg_personalized,
+    mpc,
     self_supervised_learning,
     simple,
     split_learning,
@@ -116,6 +117,7 @@ def _legacy_factory(cls: Type[Client]) -> ClientFactory:
 registered_clients: Dict[str, ClientFactory] = {
     "simple": _simple_like_factory(simple.Client),
     "fedavg_personalized": _simple_like_factory(fedavg_personalized.Client),
+    "mpc": _simple_like_factory(mpc.Client),
     "self_supervised_learning": _simple_like_factory(self_supervised_learning.Client),
     "split_learning": _simple_like_factory(split_learning.Client),
     "edge": _edge_factory(),

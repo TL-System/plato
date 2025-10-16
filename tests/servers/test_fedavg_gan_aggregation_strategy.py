@@ -1,8 +1,8 @@
 """Tests for the FedAvg GAN aggregation strategy."""
 
+import asyncio
 from types import SimpleNamespace
 
-import asyncio
 import torch
 
 from plato.servers.strategies.aggregation import FedAvgGanAggregationStrategy

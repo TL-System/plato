@@ -4,11 +4,11 @@ Hermes aggregation strategy.
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Dict, List
 
 import numpy as np
 import torch
-from types import SimpleNamespace
 
 from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
 from plato.servers.strategies.base import AggregationStrategy, ServerContext

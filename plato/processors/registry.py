@@ -28,6 +28,8 @@ from plato.processors import (
     model_quantize,
     model_quantize_qsgd,
     model_randomized_response,
+    mpc_model_encrypt_additive,
+    mpc_model_encrypt_shamir,
     pipeline,
     structured_pruning,
     unstructured_pruning,
@@ -53,6 +55,8 @@ registered_processors = {
     "model_randomized_response": model_randomized_response.Processor,
     "structured_pruning": structured_pruning.Processor,
     "unstructured_pruning": unstructured_pruning.Processor,
+    "mpc_model_encrypt_additive": mpc_model_encrypt_additive.Processor,
+    "mpc_model_encrypt_shamir": mpc_model_encrypt_shamir.Processor,
 }
 
 

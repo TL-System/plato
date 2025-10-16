@@ -34,6 +34,11 @@ from plato.servers.strategies.base import (
 
 # Client selection strategies
 from plato.servers.strategies.client_selection import RandomSelectionStrategy
+from plato.servers.strategies.mpc import (
+    MPCAdditiveAggregationStrategy,
+    MPCRoundSelectionStrategy,
+    MPCShamirAggregationStrategy,
+)
 
 __all__ = [
     # Base classes
@@ -46,6 +51,9 @@ __all__ = [
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
     "FedBuffAggregationStrategy",
+    "MPCAdditiveAggregationStrategy",
+    "MPCShamirAggregationStrategy",
     # Client selection strategies
     "RandomSelectionStrategy",
+    "MPCRoundSelectionStrategy",
 ]

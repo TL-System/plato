@@ -203,6 +203,15 @@ class Config:
                 )
             os.makedirs(Config.params["checkpoint_path"], exist_ok=True)
 
+            if hasattr(Config().server, "mpc_data_path"):
+                mpc_dir = os.path.join(
+                    Config.params["base_path"], Config().server.mpc_data_path
+                )
+            else:
+                mpc_dir = os.path.join(Config.params["base_path"], "mpc_data")
+            Config.params["mpc_data_path"] = mpc_dir
+            os.makedirs(mpc_dir, exist_ok=True)
+
             if "results" in config:
                 Config.results = Config.namedtuple_from_dict(config["results"])
 

@@ -16,6 +16,7 @@ dependencies = [
     "datasets",
     "evaluate",
     "gym",
+    "kazoo",
     "lightly",
     "numpy",
     "opacus",

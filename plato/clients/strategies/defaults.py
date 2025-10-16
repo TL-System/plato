@@ -106,8 +106,12 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
         if context.algorithm is not None:
             context.algorithm.set_client_id(context.client_id)
 
+        processor_kwargs = getattr(context, "processor_kwargs", None)
         processors = processor_registry.get(
-            "Client", client_id=context.client_id, trainer=context.trainer
+            "Client",
+            processor_kwargs=processor_kwargs,
+            client_id=context.client_id,
+            trainer=context.trainer,
         )
         context.outbound_processor, context.inbound_processor = processors
 

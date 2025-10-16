@@ -1,9 +1,9 @@
 """Tests for the homomorphic-encrypted FedAvg aggregation strategy."""
 
+import asyncio
 from collections import OrderedDict
 from types import SimpleNamespace
 
-import asyncio
 import numpy as np
 import torch
 

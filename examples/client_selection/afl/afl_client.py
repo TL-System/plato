@@ -12,8 +12,8 @@ https://arxiv.org/pdf/1909.12641.pdf
 
 import logging
 import math
-from typing import Iterable, Optional
 from types import SimpleNamespace
+from typing import Iterable, Optional
 
 import torch
 
