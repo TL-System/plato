@@ -96,6 +96,64 @@ and adaptation methods.
 
 Use these fields instead of storing state on the trainer subclass directly.
 
+## Example: Creating a Custom Strategy
+
+```python
+from plato.trainers.strategies.base import LossCriterionStrategy, TrainingContext
+import torch
+import torch.nn as nn
+
+class MyCustomLossStrategy(LossCriterionStrategy):
+    """
+    Custom loss strategy with L2 regularization.
+
+    This strategy adds L2 regularization to the base loss.
+
+    Args:
+        weight: Regularization weight (default: 0.01)
+        base_loss_fn: Base loss function (default: CrossEntropyLoss)
+
+    Example:
+        >>> strategy = MyCustomLossStrategy(weight=0.01)
+        >>> trainer = ComposableTrainer(loss_strategy=strategy)
+    """
+
+    def __init__(self, weight=0.01, base_loss_fn=None):
+        self.weight = weight
+        self.base_loss_fn = base_loss_fn
+        self._criterion = None
+
+    def setup(self, context: TrainingContext):
+        """Initialize loss criterion."""
+        if self.base_loss_fn is None:
+            self._criterion = nn.CrossEntropyLoss()
+        else:
+            self._criterion = self.base_loss_fn
+
+    def compute_loss(self, outputs, labels, context):
+        """Compute loss with L2 regularization."""
+        # Base loss
+        base_loss = self._criterion(outputs, labels)
+
+        # L2 regularization
+        l2_reg = 0.0
+        for param in context.model.parameters():
+            l2_reg += torch.norm(param, p=2)
+
+        return base_loss + self.weight * l2_reg
+```
+
+To use the custom strategy:
+
+```python
+from plato.trainers.composable import ComposableTrainer
+
+trainer = ComposableTrainer(
+    model=my_model,
+    loss_strategy=MyCustomLossStrategy(weight=0.01)
+)
+```
+
 ## Customizing Trainers using Callbacks
 
 For infrastructure changes, such as logging, recording metrics, and stopping the training loop early, we tend to customize the training loop using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the trainer when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.

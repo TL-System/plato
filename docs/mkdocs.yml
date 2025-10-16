@@ -56,9 +56,9 @@ nav:
       - Results: configurations/results.md
       - Parameters: configurations/parameters.md
   - API Reference:
-      - Trainers: references/trainers.md
-      - Servers: references/servers.md
       - Clients: references/clients.md
+      - Servers: references/servers.md
+      - Trainers: references/trainers.md
   - Developer's Guide: development.md
   - Deployment Guide: deployment.md
   - Digital Research Alliance of Canada: ccdb.md
