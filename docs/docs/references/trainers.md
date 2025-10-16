@@ -61,9 +61,7 @@ callback events via `context.callback_handler`.
 
 ## Composing Trainers
 
-`ComposableTrainer` accepts either concrete strategy instances or `None` for the
-defaults. You can start from `plato.trainers.basic.Trainer` (which simply wraps
-the defaults) and override only the pieces you need:
+`ComposableTrainer` accepts either concrete strategy instances or `None` for the defaults. You can start from `plato.trainers.basic.Trainer` (which simply wraps the defaults) and override only the pieces you need:
 
 ```py
 from plato.trainers.basic import Trainer
@@ -98,18 +96,221 @@ and adaptation methods.
 
 Use these fields instead of storing state on the trainer subclass directly.
 
-## Callbacks
+## Customizing Trainers using Callbacks
 
-Callbacks remain the recommended way to add logging or metrics. Subclass
-`plato.callbacks.trainer.TrainerCallback`, override hooks such as
-`on_train_epoch_start` or `on_test_end`, and pass the callback class through the
-trainer constructor. Strategies can reuse the same callback pipeline by calling
-`context.callback_handler.call_event(...)`.
+For infrastructure changes, such as logging, recording metrics, and stopping the training loop early, we tend to customize the training loop using callbacks instead. The advantage of using callbacks is that one can pass a list of multiple callbacks to the trainer when it is initialized, and they will be called in their order in the provided list. This helps when it is necessary to group features into different callback classes.
 
-## Legacy Hooks
+Within the implementation of these callback methods, one can access additional information about the training loop by using the `trainer` instance. For example, `trainer.sampler` can be used to access the sampler used by the train dataloader, `trainer.trainloader` can be used to access the current train dataloader, and `trainer.current_epoch` can be used to access the current epoch number.
 
-Historic trainers that inherited `basic.Trainer` and overrode methods like
-`train`, `test`, or `_load_weights` continue to work. The backward-compatible
-constructor still installs the default strategies and forwards legacy hooks
-through them. When migrating, move custom logic into dedicated strategies and
-remove the override once behaviour matches the new pipeline.
+To use callbacks, subclass the `TrainerCallback` class in `plato.callbacks.trainer`, and override the following methods, then pass it to the trainer when it is initialized, or call `trainer.add_callbacks` after initialization. For built-in trainers that user has no access to the initialization, one can also pass the trainer callbacks to client through parameter `trainer_callbacks`, which will be delivered to trainers later. Examples can be found in `examples/callbacks`.
+
+!!! example "**on_train_run_start()**"
+    **`def on_train_run_start(self, trainer, config)`**
+
+    Override this method to complete additional tasks before the training loop starts.
+
+    `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+    `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+    **Example:**
+
+    ```py
+    def on_train_run_start(self, trainer, config):
+        logging.info(
+            "[Client #%d] Loading the dataset with size %d.",
+            trainer.client_id,
+            len(list(trainer.sampler)),
+        )
+    ```
+
+!!! example "**on_train_run_end()**"
+    **`def on_train_run_end(self, trainer, config)`**
+
+    Override this method to complete additional tasks after the training loop ends.
+
+    `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+    `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+    **Example:**
+
+    ```py
+    def on_train_run_end(self, trainer, config):
+        logging.info("[Client #%d] Completed the training loop.", trainer.client_id)
+    ```
+
+!!! example "**on_train_epoch_start()**"
+    **`def on_train_epoch_start(self, trainer, config)`**
+
+    Override this method to complete additional tasks at the starting point of each training epoch.
+
+    `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+    `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+    **Example:**
+
+    ```py
+    def train_epoch_start(self, trainer, config):
+        logging.info("[Client #%d] Started training epoch %d.", trainer.client_id, trainer.current_epoch)
+    ```
+
+!!! example "**on_train_epoch_end()**"
+    **`def on_train_epoch_end(self, trainer, config)`**
+
+    Override this method to complete additional tasks at the end of each training epoch.
+
+    `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+    `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+    **Example:**
+
+    ```py
+    def on_train_epoch_end(self, trainer, config):
+        logging.info("[Client #%d] Finished training epoch %d.", trainer.client_id, trainer.current_epoch)
+    ```
+
+!!! example "**on_train_step_start()**"
+    **`def on_train_step_start(self, trainer, config, batch=None)`**
+
+    Override this method to complete additional tasks at the beginning of each step within a training epoch.
+
+    `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+    `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+    `batch` the index of the current batch of data that has just been processed in the current step.
+
+    **Example:**
+
+    ```py
+    def on_train_step_start(self, trainer, config, batch):
+        logging.info("[Client #%d] Started training epoch %d batch %d.", trainer.client_id, trainer.current_epoch, batch)
+    ```
+
+!!! example "**on_train_step_end()**"
+    **`def on_train_step_end(self, trainer, config, batch=None, loss=None)`**
+
+    Override this method to complete additional tasks at the end of each step within a training epoch.
+
+    `trainer` the trainer instance that activated this callback upon the occurrence of the corresponding event.
+
+    `config` the configuration settings used in the training loop. It corresponds directly to the `trainer` section in the configuration file.
+
+    `batch` the index of the current batch of data that has just been processed in the current step.
+
+    `loss` the loss value computed using the current batch of data after training.
+
+    **Example:**
+
+    ```py
+    def on_train_step_end(self, trainer, config, batch, loss):
+        logging.info(
+            "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+            trainer.client_id,
+            trainer.current_epoch,
+            config["epochs"],
+            batch,
+            len(trainer.train_loader),
+            loss.data.item(),
+        )
+    ```
+
+---
+
+## Accessing and Customizing the Run History During Training
+
+An instance of the `plato.trainers.tracking.RunHistory` class, called `self.run_history`, is used to store any number of performance metrics during the training process, one iterable list of values for each performance metric. By default, it stores the average loss values in each epoch.
+
+The run history in the trainer can be accessed by the client as well, using `self.trainer.run_history`.  It can also be read, updated, or reset in the hooks or callback methods. For example, in the implementation of some algorithms such as Oort, a per-step loss value needs to be stored by calling `update_metric()` in `train_step_end()`:
+
+```py
+def train_step_end(self, config, batch=None, loss=None):
+    self.run_history.update_metric("train_loss_step", loss.cpu().detach().numpy())
+```
+
+Here is a list of all the methods available in the `RunHistory` class:
+
+!!! example "**get_metric_names()**"
+    **`def get_metric_names(self)`**
+
+    Returns an iterable set containing of all unique metric names which are being tracked.
+
+!!! example "**get_metric_values()**"
+    **`def get_metric_values(self, metric_name)`**
+
+    Returns an ordered iterable list of values that has been stored since the last reset corresponding to the provided metric name.
+
+!!! example "**get_latest_metric()**"
+    **`def get_latest_metric(self, metric_name)`**
+
+    Returns the most recent value that has been recorded for the given metric.
+
+!!! example "**update_metric()**"
+    **`def update_metric(self, metric_name, metric_value)`**
+
+    Records a new value for the given metric.
+
+!!! example "**reset()**"
+    **`def reset(self)`**
+
+    Resets the run history.
+
+---
+
+## Customizing Trainers using Subclassing and Hooks
+
+When using the strategy pattern is no longer feasible, it is also possible to customize the training or testing procedure using subclassing, and overriding hook methods. To customize the training loop using subclassing, subclass the `basic.Trainer` class in `plato.trainers`, and override the following hook methods:
+
+!!! note "`train_model()`"
+    **`def train_model(self, config, trainset, sampler, **kwargs):`**
+
+    Override this method to provide a custom training loop.
+
+    `config` A dictionary of configuration parameters.
+    `trainset` The training dataset.
+    `sampler` the sampler that extracts a partition for this client.
+
+    **Example:** A complete example can be found in the Hugging Face trainer, located at `plato/trainers/huggingface.py`.
+
+!!! note "`test_model()`"
+    **`def test_model(self, config, testset, sampler=None, **kwargs):`**
+
+    Override this method to provide a custom testing loop.
+
+    `config` A dictionary of configuration parameters.
+    `testset` The test dataset.
+
+    **Example:** A complete example can be found in `plato/trainers/huggingface.py`.
+
+!!! note "`save_model(filename=None, location=None)`"
+    Save model weights and training history.
+
+    **Parameters:**
+
+    - `filename`: Optional custom filename
+    - `location`: Optional custom directory
+
+    **Example:**
+
+    ```python
+    trainer.save_model("my_model.pth")
+    ```
+
+!!! note "`load_model(filename=None, location=None)`"
+    Load model weights and training history.
+
+    **Parameters:**
+
+    - `filename`: Optional custom filename
+    - `location`: Optional custom directory
+
+    **Example:**
+
+    ```python
+    trainer.load_model("my_model.pth")
+    ```
+
+---
