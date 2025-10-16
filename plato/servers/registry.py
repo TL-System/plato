@@ -14,7 +14,6 @@ from plato.servers import (
     fedavg_cs,
     fedavg_gan,
     fedavg_personalized,
-    mistnet,
     split_learning,
 )
 
@@ -28,7 +27,6 @@ else:
     registered_servers = {
         "fedavg": fedavg.Server,
         "fedavg_cross_silo": fedavg_cs.Server,
-        "mistnet": mistnet.Server,
         "fedavg_gan": fedavg_gan.Server,
         "fedavg_personalized": fedavg_personalized.Server,
         "split_learning": split_learning.Server,

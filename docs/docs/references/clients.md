@@ -21,7 +21,7 @@ strategies can collaborate without touching private attributes on the client.
 The default stack (`Default*Strategy` in
 `plato/clients/strategies/defaults.py`) reproduces the legacy behaviour that
 powered `simple.Client`. Specialised presets build on top of the same base,
-for example `EdgeLifecycleStrategy` or `MistNetTrainingStrategy`.
+for example `EdgeLifecycleStrategy`.
 
 ## Composing Clients
 
@@ -98,8 +98,7 @@ them in place (see `ComposableClient._sync_owner_from_context` for reference).
 
 - **`ReportingStrategy`** finalises metadata. Override `build_report` to enrich
   the report before it leaves the client, or customise
-  `obtain_model_at_time` to serve asynchronous updates (used by draw-and-discard
-  or MistNet workloads).
+  `obtain_model_at_time` to serve asynchronous updates.
 
 - **`CommunicationStrategy`** handles transport. The default emits Socket.IO
   events and optionally uploads to S3, but you can substitute a strategy for

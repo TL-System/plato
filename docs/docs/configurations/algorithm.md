@@ -4,7 +4,6 @@
     The input should be:
 
     - `fedavg` the federated averaging algorithm
-    - `mistnet` the MistNet algorithm
     - `split_learning` the Split Learning algorithm
     - `fedavg_personalized` the personalized federated learning algorithm
 

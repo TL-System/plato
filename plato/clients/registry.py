@@ -18,7 +18,6 @@ from typing import Any, Callable, Dict, Optional, Type
 from plato.clients import (
     edge,
     fedavg_personalized,
-    mistnet,
     self_supervised_learning,
     simple,
     split_learning,
@@ -118,7 +117,6 @@ registered_clients: Dict[str, ClientFactory] = {
     "simple": _simple_like_factory(simple.Client),
     "fedavg_personalized": _simple_like_factory(fedavg_personalized.Client),
     "self_supervised_learning": _simple_like_factory(self_supervised_learning.Client),
-    "mistnet": _simple_like_factory(mistnet.Client),
     "split_learning": _simple_like_factory(split_learning.Client),
     "edge": _edge_factory(),
 }

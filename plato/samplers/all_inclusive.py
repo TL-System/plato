@@ -1,6 +1,6 @@
 """
 Samples all the data from a dataset. Applicable in cases where the dataset comes from
-local sources only. Used by the Federated EMNIST dataset and the MistNet server.
+local sources only. Used by the Federated EMNIST dataset.
 """
 
 import random
@@ -10,9 +10,7 @@ from plato.samplers import base
 
 
 class Sampler(base.Sampler):
-    """Create a data sampler that samples all the data in the dataset.
-    Used by the MistNet server.
-    """
+    """Create a data sampler that samples all the data in the dataset."""
 
     def __init__(self, datasource, client_id=0, testing=False):
         super().__init__()
