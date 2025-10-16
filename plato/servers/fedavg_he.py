@@ -25,7 +25,8 @@ class Server(fedavg.Server):
             callbacks=callbacks,
         )
 
-        self.context = homo_enc.get_ckks_context()
+        # Keep the composable server context intact; store CKKS context separately.
+        self.he_context = homo_enc.get_ckks_context()
         self.encrypted_model = None
         self.weight_shapes = {}
         self.para_nums = {}
@@ -41,7 +42,7 @@ class Server(fedavg.Server):
             self.para_nums[key] = extract_model[key].numel()
 
         self.encrypted_model = homo_enc.encrypt_weights(
-            extract_model, True, self.context, []
+            extract_model, True, self.he_context, []
         )
 
     def customize_server_payload(self, payload):
@@ -67,7 +68,7 @@ class Server(fedavg.Server):
     def _fedavg_hybrid(self, updates):
         """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
         weights_received = [
-            homo_enc.deserialize_weights(update.payload, self.context)
+            homo_enc.deserialize_weights(update.payload, self.he_context)
             for update in updates
         ]
         unencrypted_weights = [
