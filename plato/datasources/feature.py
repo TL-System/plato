@@ -2,40 +2,11 @@
 The feature dataset server received from clients.
 """
 
+from typing import Any, Iterable
+
 import torch
 
 from plato.datasources import base
-
-
-def _flatten_feature_iterables(items):
-    """Flatten nested lists while keeping feature tuples intact."""
-    for item in items:
-        if isinstance(item, list):
-            yield from _flatten_feature_iterables(item)
-        else:
-            yield item
-
-
-def _expand_feature_batch(feature_pair):
-    """
-    Expand a batched feature tuple into individual samples when possible.
-
-    Args:
-        feature_pair: Tuple of (features, targets) possibly batched.
-
-    Returns:
-        Iterable of (feature, target) pairs.
-    """
-    if not isinstance(feature_pair, tuple) or len(feature_pair) != 2:
-        return [feature_pair]
-
-    features, targets = feature_pair
-
-    if torch.is_tensor(features) and torch.is_tensor(targets):
-        if features.dim() >= 1 and targets.dim() >= 1 and features.size(0) == targets.size(0):
-            return list(zip(features, targets))
-
-    return [feature_pair]
 
 
 class DataSource(base.DataSource):
@@ -46,19 +17,8 @@ class DataSource(base.DataSource):
 
         self.feature_dataset = []
 
-        for feature_pair in _flatten_feature_iterables(features):
-            expanded = _expand_feature_batch(feature_pair)
-            for sample in expanded:
-                if isinstance(sample, torch.Tensor):
-                    # Fall back to zero label if only feature tensor provided.
-                    self.feature_dataset.append((sample, torch.zeros(1)))
-                elif isinstance(sample, tuple):
-                    if len(sample) == 1:
-                        self.feature_dataset.append((sample[0], torch.zeros(1)))
-                    elif len(sample) >= 2:
-                        self.feature_dataset.append((sample[0], sample[1]))
-                else:
-                    self.feature_dataset.append((sample, torch.zeros(1)))
+        for item in self._yield_items(features):
+            self._append_feature(item)
 
         self.trainset = self.feature_dataset
         self.testset = []
@@ -68,3 +28,32 @@ class DataSource(base.DataSource):
 
     def __getitem__(self, item):
         return self.trainset[item]
+
+    def _append_feature(self, item: Any) -> None:
+        """
+        Append flattened feature items, expanding batched tensors into per-sample entries.
+        """
+        if isinstance(item, tuple) and len(item) == 2:
+            data, target = item
+
+            if torch.is_tensor(data) and torch.is_tensor(target):
+                if data.dim() >= 1 and target.dim() >= 1 and data.size(0) == target.size(0):
+                    for i in range(data.size(0)):
+                        feature = data[i]
+                        label = target[i]
+                        if torch.is_tensor(label):
+                            label = label.squeeze()
+                        self.feature_dataset.append((feature, label))
+                    return
+
+            self.feature_dataset.append((data, target))
+        else:
+            self.feature_dataset.append(item)
+
+    def _yield_items(self, items: Iterable[Any]):
+        """Recursively yield non-list items from nested iterables."""
+        for item in items:
+            if isinstance(item, list):
+                yield from self._yield_items(item)
+            else:
+                yield item

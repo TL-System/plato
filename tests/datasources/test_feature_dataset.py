@@ -1,32 +1,31 @@
-"""Tests for FeatureDataset that prepares split learning features."""
+"""Unit tests for FeatureDataset."""
 
 import torch
 
 from plato.datasources.feature_dataset import FeatureDataset
 
 
-def test_feature_dataset_extracts_first_two_elements():
-    """Ensure extra elements in sample tuples are ignored."""
-    features = torch.randn(8, 4, 4)
-    target = torch.tensor(3)
-    extra = torch.tensor([1, 2, 3])
+def test_feature_dataset_returns_feature_and_label():
+    """Dataset should return the feature and label unmodified."""
+    feature = torch.randn(3, 32, 32)
+    label = torch.tensor(5)
 
-    dataset = FeatureDataset([(features, target, extra)])
+    dataset = FeatureDataset([(feature, label)])
 
-    loaded_feature, loaded_target = dataset[0]
+    loaded_feature, loaded_label = dataset[0]
 
-    assert torch.equal(loaded_feature, features)
-    assert torch.equal(loaded_target, target)
+    assert torch.equal(loaded_feature, feature)
+    assert loaded_label.item() == label.item()
 
 
-def test_feature_dataset_handles_plain_tensor():
-    """Fallback when sample is just a tensor (no label)."""
-    features = torch.randn(8, 4, 4)
+def test_feature_dataset_handles_multiple_samples():
+    """Dataset should iterate over all provided samples."""
+    features = torch.randn(4, 3, 32, 32)
+    labels = torch.tensor([0, 1, 2, 3])
+    samples = [(features[i], labels[i]) for i in range(len(labels))]
 
-    dataset = FeatureDataset([features])
+    dataset = FeatureDataset(samples)
 
-    loaded_feature, loaded_target = dataset[0]
-
-    assert torch.equal(loaded_feature, features)
-    assert loaded_target.shape == (1,)
-    assert torch.allclose(loaded_target, torch.zeros_like(loaded_target))
+    assert len(dataset) == len(samples)
+    all_labels = [dataset[i][1].item() for i in range(len(dataset))]
+    assert all_labels == labels.tolist()
