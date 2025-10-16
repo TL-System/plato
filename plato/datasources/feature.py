@@ -33,8 +33,14 @@ class DataSource(base.DataSource):
         """
         Append flattened feature items, expanding batched tensors into per-sample entries.
         """
-        if isinstance(item, tuple) and len(item) == 2:
-            data, target = item
+        if isinstance(item, tuple):
+            if len(item) >= 2:
+                data, target = item[0], item[1]
+            elif len(item) == 1:
+                data = item[0]
+                target = torch.tensor(0, dtype=torch.long)
+            else:
+                return
 
             if torch.is_tensor(data) and torch.is_tensor(target):
                 if data.dim() >= 1 and target.dim() >= 1 and data.size(0) == target.size(0):
@@ -48,7 +54,8 @@ class DataSource(base.DataSource):
 
             self.feature_dataset.append((data, target))
         else:
-            self.feature_dataset.append(item)
+            # Non-tuple entries are ignored as they don't conform to (feature, label)
+            pass
 
     def _yield_items(self, items: Iterable[Any]):
         """Recursively yield non-list items from nested iterables."""
