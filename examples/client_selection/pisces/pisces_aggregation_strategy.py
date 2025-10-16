@@ -30,6 +30,8 @@ class PiscesAggregationStrategy(AggregationStrategy):
         try:
             if hasattr(Config().server, "staleness_factor"):
                 self.staleness_factor = Config().server.staleness_factor
+            if hasattr(Config().server, "history_window"):
+                self.history_window = Config().server.history_window
         except ValueError:
             pass
 

@@ -28,6 +28,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         robustness: bool = False,
         augmented_factor: int = 5,
         threshold_factor: float = 1.0,
+        speed_penalty_factor: float = 0.5,
         reliability_credit_initial: int = 5,
         history_window: int = 5,
     ):
@@ -39,6 +40,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         self.robustness = robustness
         self.augmented_factor = augmented_factor
         self.threshold_factor = threshold_factor
+        self.speed_penalty_factor = speed_penalty_factor
         self.reliability_credit_initial = reliability_credit_initial
         self.history_window = history_window
 
@@ -49,6 +51,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         self.reliability_credit_record: dict[int, int] = {}
         self.detected_corrupted_clients: List[int] = []
         self.model_versions_clients_dict: dict[int, List[Tuple[int, float]]] = {}
+        self.client_last_latency: dict[int, float] = {}
         self.per_round = 0
 
     def setup(self, context: ServerContext) -> None:
@@ -73,6 +76,10 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                 self.threshold_factor = server_cfg.threshold_factor
             if hasattr(server_cfg, "reliability_credit_initial"):
                 self.reliability_credit_initial = server_cfg.reliability_credit_initial
+            if hasattr(server_cfg, "speed_penalty_factor"):
+                self.speed_penalty_factor = server_cfg.speed_penalty_factor
+            if hasattr(server_cfg, "history_window"):
+                self.history_window = server_cfg.history_window
         except ValueError:
             pass
 
@@ -91,6 +98,9 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         }
         self.detected_corrupted_clients = []
         self.model_versions_clients_dict = {}
+        self.client_last_latency = {
+            client_id: 1.0 for client_id in range(1, total_clients + 1)
+        }
         self.per_round = context.clients_per_round
 
     def select_clients(
@@ -127,7 +137,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         selected_clients: List[int] = []
         current_round = context.current_round
 
-        exploration_quota = 0
+        score_dict = self._compute_scores(available_clients, effective_count)
 
         if current_round > 1:
             unexplored_available = [
@@ -156,14 +166,12 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                 len(explored_available), exploited_clients_target
             )
 
-            sorted_by_utility = sorted(
-                self.client_utilities, key=self.client_utilities.get, reverse=True
+            explored_sorted = sorted(
+                explored_available,
+                key=lambda client: score_dict.get(client, 0.0),
+                reverse=True,
             )
-            sorted_by_utility = [
-                client for client in sorted_by_utility if client in explored_available
-            ]
-
-            selected_clients = sorted_by_utility[:exploited_clients_count]
+            selected_clients = explored_sorted[:exploited_clients_count]
         else:
             exploration_quota = min(effective_count, len(self.unexplored_clients))
 
@@ -222,10 +230,22 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
             staleness = getattr(update, "staleness", 0.0)
             self.client_staleness.setdefault(client_id, []).append(staleness)
 
+            latency = (
+                getattr(update.report, "training_time", 0.0)
+                + getattr(update.report, "processing_time", 0.0)
+                + getattr(update.report, "comm_time", 0.0)
+            )
+            if latency and latency > 0:
+                self.client_last_latency[client_id] = float(latency)
+
             if hasattr(update.report, "statistical_utility"):
                 base_utility = update.report.statistical_utility
-                staleness_factor = self._calculate_staleness_factor(client_id)
-                self.client_utilities[client_id] = base_utility * staleness_factor
+                self.client_utilities[client_id] = base_utility
+
+                if client_id not in self.explored_clients:
+                    self.explored_clients.append(client_id)
+                if client_id in self.unexplored_clients:
+                    self.unexplored_clients.remove(client_id)
 
                 if self.robustness:
                     start_round = getattr(update.report, "start_round", None)
@@ -234,6 +254,33 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                             start_round, []
                         ).append((client_id, base_utility))
                         self._maybe_detect_outliers(start_round)
+
+    def _compute_scores(
+        self, available_clients: List[int], selection_count: int
+    ) -> dict[int, float]:
+        """Compute combined utility scores including speed and staleness penalties."""
+        if self.per_round > 0:
+            dynamic_speed_factor = self.speed_penalty_factor * (
+                1 - selection_count / self.per_round
+            )
+        else:
+            dynamic_speed_factor = self.speed_penalty_factor
+
+        scores: dict[int, float] = {}
+        for client_id in available_clients:
+            score = self.client_utilities.get(client_id, 0.0)
+
+            if dynamic_speed_factor > 0:
+                latency = self.client_last_latency.get(client_id, 1.0)
+                if latency <= 0:
+                    latency = 1.0
+                score *= (1.0 / latency) ** dynamic_speed_factor
+
+            staleness_penalty = self._calculate_staleness_factor(client_id)
+            score *= staleness_penalty
+
+            scores[client_id] = score
+        return scores
 
     def _maybe_detect_outliers(self, start_version: int) -> None:
         """Pool recent utilities and trigger anomaly detection if enough data."""

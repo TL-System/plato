@@ -32,11 +32,11 @@ class PiscesLossStrategy(LossCriterionStrategy):
 
         # Get the trainer from context to access run_history
         trainer = context.state.get("trainer")
-        if trainer is not None:
-            # Store the per_batch loss value
-            trainer.run_history.update_metric(
-                "train_batch_loss", per_batch_loss.cpu().detach().numpy()
-            )
+        current_epoch = getattr(context, "current_epoch", 1)
+        if trainer is not None and current_epoch == 1:
+            # Store scalar loss value for the first epoch only
+            loss_value = float(per_batch_loss.detach().cpu().item())
+            trainer.run_history.update_metric("train_batch_loss", loss_value)
 
         return per_batch_loss
 

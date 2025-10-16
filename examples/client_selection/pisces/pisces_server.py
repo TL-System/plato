@@ -42,6 +42,7 @@ class Server(fedavg.Server):
             robustness=getattr(server_cfg, "robustness", False),
             augmented_factor=getattr(server_cfg, "augmented_factor", 5),
             threshold_factor=getattr(server_cfg, "threshold_factor", 1.0),
+            speed_penalty_factor=getattr(server_cfg, "speed_penalty_factor", 0.5),
             reliability_credit_initial=getattr(
                 server_cfg, "reliability_credit_initial", 5
             ),
