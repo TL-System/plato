@@ -63,8 +63,8 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 
 - [Model Pruning Algorithms](algorithms/13.%20Model%20Pruning%20Algorithms.md)
 
-## Examples of using Plato's API
+## Case Studies
 
-- Composable Trainer API
+- [Federated LoRA Fine-Tuning](case-studies/1.%20LoRA.md)
 
-  A simple example located at `examples/composable_trainer` has been provided to demonstrate the composable trainer API design with strategy composition.
+- [Composable Trainer API](case-studies/2.%20Composable%20Trainer.md)
