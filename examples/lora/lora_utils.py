@@ -75,6 +75,8 @@ class Trainer(huggingface.Trainer):
         self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
         self.trainer = huggingface.SampledHuggingFaceTrainer(
             model=self.model,
             args=self.training_args,
@@ -85,7 +87,7 @@ class Trainer(huggingface.Trainer):
                 self.tokenizer,
                 mlm=False,
             ),
-            sampler=sampler,
+            sampler=sampler_obj,
             callbacks=self.trainer_callbacks,
         )
 
@@ -103,6 +105,8 @@ class Trainer(huggingface.Trainer):
 
         self.training_args.per_device_eval_batch_size = config["batch_size"]
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
         self.trainer = huggingface.SampledHuggingFaceTrainer(
             model=self.model,
             args=self.training_args,
@@ -113,7 +117,7 @@ class Trainer(huggingface.Trainer):
                 self.tokenizer,
                 mlm=False,
             ),
-            sampler=sampler,
+            sampler=sampler_obj,
             callbacks=None,
         )
 

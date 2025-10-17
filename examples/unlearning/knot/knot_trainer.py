@@ -44,7 +44,9 @@ class ClusteredTestingStrategy(DefaultTestingStrategy):
         batch_size = config.get("batch_size", 32)
 
         # Preparing the test data loader
-        if sampler is None:
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
+        if sampler_obj is None:
             test_loader = torch.utils.data.DataLoader(
                 testset, batch_size=batch_size, shuffle=False
             )
@@ -53,7 +55,7 @@ class ClusteredTestingStrategy(DefaultTestingStrategy):
                 testset,
                 batch_size=batch_size,
                 shuffle=False,
-                sampler=sampler,
+                sampler=sampler_obj,
             )
 
         for cluster_id in updated_cluster_ids:

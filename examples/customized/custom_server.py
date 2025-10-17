@@ -61,11 +61,13 @@ class Trainer(basic.Trainer):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
         train_loader = torch.utils.data.DataLoader(
             dataset=trainset,
             shuffle=False,
             batch_size=config["batch_size"],
-            sampler=sampler,
+            sampler=sampler_obj,
         )
 
         num_epochs = 1
@@ -83,10 +85,12 @@ class Trainer(basic.Trainer):
 
     def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
         """A custom testing loop."""
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
         test_loader = torch.utils.data.DataLoader(
             testset,
             batch_size=config["batch_size"],
-            sampler=sampler,
+            sampler=sampler_obj,
             shuffle=False,
         )
 

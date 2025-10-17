@@ -139,6 +139,8 @@ class LLMSplitLearningTestingStrategy(TestingStrategy):
         # Get base model if available
         base_model = model.base_model if hasattr(model, "base_model") else model
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
         tester = SampledHuggingFaceTrainer(
             model=base_model,
             args=self.training_args,
@@ -146,7 +148,7 @@ class LLMSplitLearningTestingStrategy(TestingStrategy):
             eval_dataset=testset,
             tokenizer=self.tokenizer,
             data_collator=default_data_collator,
-            sampler=sampler,
+            sampler=sampler_obj,
             callbacks=None,
         )
 
