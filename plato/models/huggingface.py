@@ -23,8 +23,12 @@ class Model:
         if getattr(config, "loss_type", None) is None:
             config.loss_type = "ForCausalLM"
 
-        return AutoModelForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             model_name,
             config=config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
+        if hasattr(model, "loss_type"):
+            model.loss_type = "ForCausalLM"
+
+        return model

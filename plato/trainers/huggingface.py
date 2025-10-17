@@ -277,6 +277,9 @@ class Trainer(ComposableTrainer):
         if hf_callbacks:
             self.add_callbacks(hf_callbacks)
 
+        if hasattr(self.model, "loss_type"):
+            self.model.loss_type = "ForCausalLM"
+
         # Ensure model checkpoints can be saved when model names include slashes.
         params = Config().params
         try:
