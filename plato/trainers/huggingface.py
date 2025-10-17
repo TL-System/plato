@@ -1,9 +1,10 @@
 """
 Strategy-based trainer for HuggingFace transformer models.
 
-This implementation adapts the legacy HuggingFace trainer to Plato's composable
-trainer architecture by wiring HuggingFace data handling through strategy
-objects instead of overriding `load_model`/`save_model` hooks.
+This implementation uses Plato's composable trainer architecture by wiring 
+HuggingFace data handling through strategy objects instead of overriding 
+`load_model`/`save_model` hooks.
+
 """
 
 import logging
