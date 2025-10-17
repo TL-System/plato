@@ -238,8 +238,8 @@ class Trainer(ComposableTrainer):
             "use_auth_token": None,
         }
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
-        if hasattr(self.config, "loss_type") and self.config.loss_type is None:
-            delattr(self.config, "loss_type")
+        if getattr(self.config, "loss_type", None) is None:
+            self.config.loss_type = "ForCausalLMLoss"
 
         tokenizer_kwargs = {
             "cache_dir": None,
