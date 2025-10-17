@@ -12,6 +12,7 @@ license = "Apache-2.0"
 
 dependencies = [
     "aiohttp",
+    "accelerate",
     "boto3",
     "datasets",
     "evaluate",
