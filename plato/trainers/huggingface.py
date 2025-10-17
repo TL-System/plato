@@ -146,7 +146,9 @@ class HuggingFaceTestingStrategy(TestingStrategy):
                     raise ValueError("HuggingFace model did not return a tensor loss.")
 
                 if labels is not None:
-                    weight = labels.numel()
+                    weight = labels.ne(-100).sum().item()
+                    if weight == 0:
+                        continue
                 else:
                     weight = 1
 
