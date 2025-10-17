@@ -28,6 +28,7 @@ if hasattr(Config().server, "type") and Config().server.type == "fedavg_he":
 else:
     registered_servers = {
         "fedavg": fedavg.Server,
+        "fedavg_lora": fedavg.Server,
         "fedavg_cross_silo": fedavg_cs.Server,
         "fedavg_gan": fedavg_gan.Server,
         "fedavg_personalized": fedavg_personalized.Server,

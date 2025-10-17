@@ -19,6 +19,8 @@ import torch
 
 from plato.callbacks.trainer import TrainerCallback
 from plato.clients import simple
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
 from plato.utils import fonts
 
 
@@ -107,6 +109,61 @@ class AFLPreTrainingLossCallback(TrainerCallback):
         return bool(length) if length is not None else True
 
 
+class AFLReportingStrategy(DefaultReportingStrategy):
+    """Reporting strategy that annotates AFL valuation metrics."""
+
+    def build_report(self, context: ClientContext, report):
+        report = super().build_report(context, report)
+
+        loss = self._get_pre_training_loss(context)
+        logging.info(
+            fonts.colourize(
+                f"[Client #{context.client_id}] Pre-training loss value: {loss}"
+            )
+        )
+
+        num_samples = getattr(report, "num_samples", None)
+        report.valuation = self._calc_valuation(num_samples, loss)
+        return report
+
+    @staticmethod
+    def _calc_valuation(num_samples, loss):
+        """Calculate the valuation value based on the number of samples and loss value."""
+        if loss is None or num_samples is None or num_samples <= 0:
+            return 0.0
+        valuation = float(1 / math.sqrt(num_samples)) * loss
+        return valuation
+
+    @staticmethod
+    def _get_pre_training_loss(context: ClientContext) -> Optional[float]:
+        """Retrieve the loss captured before local training, with safe fallbacks."""
+        trainer = context.trainer
+        if trainer is None:
+            return 0.0
+
+        trainer_context = getattr(trainer, "context", None)
+        if trainer_context is not None:
+            loss = trainer_context.state.get("pre_train_loss")
+            if loss is not None:
+                return loss
+
+        if getattr(trainer, "run_history", None) is not None:
+            try:
+                return trainer.run_history.get_latest_metric("train_loss")
+            except ValueError:
+                logging.warning(
+                    "[Client #%d] AFL: Unable to obtain loss metric; defaulting to zero.",
+                    context.client_id,
+                )
+        else:
+            logging.warning(
+                "[Client #%d] AFL: Trainer history unavailable; defaulting to zero.",
+                context.client_id,
+            )
+
+        return 0.0
+
+
 class Client(simple.Client):
     """A federated learning client for AFL."""
 
@@ -135,39 +192,10 @@ class Client(simple.Client):
             callbacks=callbacks,
             trainer_callbacks=callbacks_list,
         )
-
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        loss = self._get_pre_training_loss()
-        logging.info(
-            fonts.colourize(
-                f"[Client #{self.client_id}] Pre-training loss value: {loss}"
-            )
+        self._configure_composable(
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=self.payload_strategy,
+            training_strategy=self.training_strategy,
+            reporting_strategy=AFLReportingStrategy(),
+            communication_strategy=self.communication_strategy,
         )
-        report.valuation = self.calc_valuation(report.num_samples, loss)
-        return report
-
-    def calc_valuation(self, num_samples, loss):
-        """Calculate the valuation value based on the number of samples and loss value."""
-        if loss is None or num_samples is None or num_samples <= 0:
-            return 0.0
-        valuation = float(1 / math.sqrt(num_samples)) * loss
-        return valuation
-
-    def _get_pre_training_loss(self) -> Optional[float]:
-        """Retrieve the loss captured before local training, with safe fallbacks."""
-        loss = None
-        trainer_context = getattr(self.trainer, "context", None)
-        if trainer_context is not None:
-            loss = trainer_context.state.get("pre_train_loss")
-
-        if loss is not None:
-            return loss
-
-        try:
-            return self.trainer.run_history.get_latest_metric("train_loss")
-        except ValueError:
-            logging.warning(
-                "[Client #%d] AFL: Unable to obtain loss metric; defaulting to zero.",
-                self.client_id,
-            )
-            return 0.0

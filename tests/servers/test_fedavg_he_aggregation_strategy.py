@@ -59,7 +59,19 @@ class DummyServer:
             zip(unencrypted_weights, encrypted_weights), updates
         ):
             weight = update.report.num_samples / self.total_samples
-            unencrypted_avg_update += unenc_w * weight
+            if isinstance(unenc_w, torch.Tensor):
+                unenc_tensor = unenc_w.to(
+                    device=unencrypted_avg_update.device,
+                    dtype=unencrypted_avg_update.dtype,
+                )
+            else:
+                unenc_tensor = torch.tensor(
+                    unenc_w,
+                    dtype=unencrypted_avg_update.dtype,
+                    device=unencrypted_avg_update.device,
+                )
+
+            unencrypted_avg_update += unenc_tensor * weight
 
             if enc_w is not None:
                 if encrypted_avg_update is None:

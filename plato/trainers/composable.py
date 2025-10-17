@@ -358,6 +358,9 @@ class ComposableTrainer(base.Trainer):
             except TypeError:
                 sampled_size = 0
         self.context.state["num_samples"] = sampled_size
+        self.context.state["grad_accum_counter"] = 0
+        self.context.state["grad_accum_loss_total"] = 0.0
+        self.context.state["grad_accum_loss_count"] = 0
 
         # Create optimizer using strategy
         self.optimizer = self.optimizer_strategy.create_optimizer(
@@ -376,18 +379,32 @@ class ComposableTrainer(base.Trainer):
         # Training epochs
         total_epochs = config["epochs"]
         tic = time.perf_counter()
+        training_stop_requested = False
+        try:
+            total_batches = len(self.train_loader)
+        except (TypeError, AttributeError):
+            total_batches = None
 
         for self.current_epoch in range(1, total_epochs + 1):
             self.context.current_epoch = self.current_epoch
             self._loss_tracker.reset()
+            self.context.state["hf_optimizer_step_index"] = 0
 
             # Callbacks: epoch start
             self.callback_handler.call_event("on_train_epoch_start", self, config)
 
             # Training steps
+            batches_seen = False
+            last_batch_id = -1
             for batch_id, (examples, labels) in enumerate(self.train_loader):
                 # Store current batch in context
                 self.context.state["current_batch"] = batch_id
+                batches_seen = True
+                last_batch_id = batch_id
+                is_last_batch = (
+                    total_batches is not None and batch_id == total_batches - 1
+                )
+                self.context.state["is_last_batch"] = is_last_batch
 
                 # Callbacks: step start
                 self.callback_handler.call_event(
@@ -399,7 +416,8 @@ class ComposableTrainer(base.Trainer):
 
                 # Move data to device
                 examples = examples.to(self.device)
-                labels = labels.to(self.device)
+                if labels is not None:
+                    labels = labels.to(self.device)
 
                 # Create loss criterion callable
                 def compute_loss(outputs, labels_inner):
@@ -422,17 +440,103 @@ class ComposableTrainer(base.Trainer):
 
                 # Store last loss in context
                 self.context.state["last_loss"] = loss.item()
-
-                # Strategy hook: after optimizer step
-                self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
-
-                # Strategy hook: after_step
-                self.model_update_strategy.after_step(self.context)
-
-                # Callbacks: step end
-                self.callback_handler.call_event(
-                    "on_train_step_end", self, config, batch=batch_id, loss=loss
+                optimizer_step_done = bool(
+                    self.context.state.get("optimizer_step_completed", True)
                 )
+
+                if optimizer_step_done:
+                    # Strategy hook: after optimizer step
+                    self.optimizer_strategy.on_optimizer_step(
+                        self.optimizer, self.context
+                    )
+
+                    # Strategy hook: after_step
+                    self.model_update_strategy.after_step(self.context)
+
+                    # Callbacks: step end
+                    self.callback_handler.call_event(
+                        "on_train_step_end", self, config, batch=batch_id, loss=loss
+                    )
+                    self.context.state.pop("optimizer_step_completed", None)
+
+                    control_actions = {}
+                    if hasattr(self, "_consume_control_flags"):
+                        control_actions = self._consume_control_flags()
+
+                    if control_actions.get("save"):
+                        self.save_model()
+
+                    if control_actions.get("evaluate") and hasattr(
+                        self, "_handle_control_evaluate"
+                    ):
+                        self._handle_control_evaluate()
+
+                    if control_actions.get("log") and hasattr(
+                        self, "_handle_control_log"
+                    ):
+                        self._handle_control_log()
+
+                    if control_actions.get("stop_training"):
+                        training_stop_requested = True
+                        break
+
+                    if control_actions.get("stop_epoch"):
+                        break
+
+            finalize_loss = None
+            finalize_step_done = False
+            finalize_callable = getattr(self.training_step_strategy, "finalize", None)
+            if batches_seen and callable(finalize_callable):
+                finalize_loss = finalize_callable(
+                    model=self.model,
+                    optimizer=self.optimizer,
+                    context=self.context,
+                )
+                finalize_step_done = (
+                    bool(self.context.state.get("optimizer_step_completed", False))
+                    and finalize_loss is not None
+                )
+            if finalize_step_done:
+                self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
+                self.model_update_strategy.after_step(self.context)
+                self.callback_handler.call_event(
+                    "on_train_step_end",
+                    self,
+                    config,
+                    batch=last_batch_id,
+                    loss=finalize_loss,
+                )
+                self.context.state["last_loss"] = (
+                    finalize_loss.item()
+                    if hasattr(finalize_loss, "item")
+                    else float(finalize_loss)
+                )
+                self.context.state.pop("optimizer_step_completed", None)
+
+                control_actions = {}
+                if hasattr(self, "_consume_control_flags"):
+                    control_actions = self._consume_control_flags()
+
+                if control_actions.get("save"):
+                    self.save_model()
+
+                if control_actions.get("evaluate") and hasattr(
+                    self, "_handle_control_evaluate"
+                ):
+                    self._handle_control_evaluate()
+
+                if control_actions.get("log") and hasattr(self, "_handle_control_log"):
+                    self._handle_control_log()
+
+                if control_actions.get("stop_training"):
+                    training_stop_requested = True
+
+                if control_actions.get("stop_epoch"):
+                    # No batches remain, but respect control flag.
+                    pass
+
+            self.context.state.pop("is_last_batch", None)
+            self.context.state.pop("hf_optimizer_step_index", None)
 
             # LR scheduler step
             self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
@@ -465,6 +569,9 @@ class ComposableTrainer(base.Trainer):
 
             # Callbacks: epoch end
             self.callback_handler.call_event("on_train_epoch_end", self, config)
+
+            if training_stop_requested:
+                break
 
         # Strategy hook: on_train_end
         self.model_update_strategy.on_train_end(self.context)

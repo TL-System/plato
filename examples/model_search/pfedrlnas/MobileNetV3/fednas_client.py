@@ -2,10 +2,10 @@
 Customized Client for PerFedRLNAS.
 """
 
-from types import SimpleNamespace
-
 from plato.clients import simple
 from plato.clients.strategies import DefaultLifecycleStrategy
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
 from plato.config import Config
 
 
@@ -55,7 +55,72 @@ class PerFedRLNASMobileNetLifecycleStrategy(DefaultLifecycleStrategy):
                 owner.trainer.model = model
 
 
+class PerFedRLNASMobileNetReportingStrategy(DefaultReportingStrategy):
+    """Reporting strategy that optionally attaches memory utilisation metrics."""
+
+    def __init__(self, *, include_memory_metrics: bool) -> None:
+        super().__init__()
+        self.include_memory_metrics = include_memory_metrics
+
+    def build_report(self, context: ClientContext, report):
+        report = super().build_report(context, report)
+        if not self.include_memory_metrics:
+            return report
+
+        trainer = context.trainer
+        if trainer is None:
+            return report
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{context.client_id}_{Config().params['run_id']}.mem"
+        max_mem_allocated, exceed_memory, sim_mem = trainer.load_memory(filename)
+        if exceed_memory:
+            report.accuracy = 0
+        report.utilization = max_mem_allocated
+        report.exceed = exceed_memory
+        report.budget = sim_mem
+        return report
+
+
 class ClientSync(simple.Client):
+    """A FedRLNAS client. Different clients hold different models."""
+
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
+        *,
+        include_memory_metrics: bool = False,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
+        )
+
+        payload_strategy = self.payload_strategy
+        training_strategy = self.training_strategy
+        communication_strategy = self.communication_strategy
+
+        self._configure_composable(
+            lifecycle_strategy=PerFedRLNASMobileNetLifecycleStrategy(),
+            payload_strategy=payload_strategy,
+            training_strategy=training_strategy,
+            reporting_strategy=PerFedRLNASMobileNetReportingStrategy(
+                include_memory_metrics=include_memory_metrics
+            ),
+            communication_strategy=communication_strategy,
+        )
+
+
+class ClientAsync(ClientSync):
     """A FedRLNAS client. Different clients hold different models."""
 
     def __init__(
@@ -74,36 +139,8 @@ class ClientSync(simple.Client):
             trainer=trainer,
             callbacks=callbacks,
             trainer_callbacks=trainer_callbacks,
+            include_memory_metrics=True,
         )
-
-        payload_strategy = self.payload_strategy
-        training_strategy = self.training_strategy
-        reporting_strategy = self.reporting_strategy
-        communication_strategy = self.communication_strategy
-
-        self._configure_composable(
-            lifecycle_strategy=PerFedRLNASMobileNetLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
-            reporting_strategy=reporting_strategy,
-            communication_strategy=communication_strategy,
-        )
-
-
-class ClientAsync(ClientSync):
-    """A FedRLNAS client. Different clients hold different models."""
-
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Customize the information in report."""
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.mem"
-        max_mem_allocated, exceed_memory, sim_mem = self.trainer.load_memory(filename)
-        if exceed_memory:
-            report.accuracy = 0
-        report.utilization = max_mem_allocated
-        report.exceed = exceed_memory
-        report.budget = sim_mem
-        return super().customize_report(report)
 
 
 if hasattr(Config().server, "synchronous") and not Config().server.synchronous:

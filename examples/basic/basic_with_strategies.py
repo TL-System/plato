@@ -12,14 +12,19 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
+# Import example client-selection strategies for demonstration purposes.
+from examples.client_selection.afl.afl_selection_strategy import (
+    AFLSelectionStrategy,
+)
+from examples.client_selection.oort.oort_selection_strategy import (
+    OortSelectionStrategy,
+)
 from plato.clients import simple
 from plato.datasources import base
 from plato.servers import fedavg
 from plato.servers.strategies import (
-    AFLSelectionStrategy,
     FedAvgAggregationStrategy,
     FedNovaAggregationStrategy,
-    OortSelectionStrategy,
     RandomSelectionStrategy,
 )
 from plato.trainers import basic
@@ -44,11 +49,12 @@ class Trainer(basic.Trainer):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
         train_loader = torch.utils.data.DataLoader(
             dataset=trainset,
             shuffle=False,
             batch_size=config["batch_size"],
-            sampler=sampler,
+            sampler=sampler_obj,
         )
 
         num_epochs = 1

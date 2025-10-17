@@ -8,21 +8,24 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 (OSDI 2021), July 2021.
 """
 
-from types import SimpleNamespace
-
 import numpy as np
 
 from plato.clients import simple
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
 
 
-class Client(simple.Client):
-    """
-    A federated learning client that calculates its statistical utility
-    """
+class OortReportingStrategy(DefaultReportingStrategy):
+    """Reporting strategy that attaches Oort's statistical utility."""
 
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Wrap up generating the report with any additional information."""
-        train_squared_loss_step = self.trainer.run_history.get_metric_values(
+    def build_report(self, context: ClientContext, report):
+        report = super().build_report(context, report)
+
+        run_history = getattr(context.trainer, "run_history", None)
+        if run_history is None:
+            return report
+
+        train_squared_loss_step = run_history.get_metric_values(
             "train_squared_loss_step"
         )
 
@@ -34,3 +37,33 @@ class Client(simple.Client):
             report.statistical_utility = 0.0
 
         return report
+
+
+class Client(simple.Client):
+    """A federated learning client that calculates its statistical utility."""
+
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        trainer_callbacks=None,
+    ):
+        super().__init__(
+            model=model,
+            datasource=datasource,
+            algorithm=algorithm,
+            trainer=trainer,
+            callbacks=callbacks,
+            trainer_callbacks=trainer_callbacks,
+        )
+
+        self._configure_composable(
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=self.payload_strategy,
+            training_strategy=self.training_strategy,
+            reporting_strategy=OortReportingStrategy(),
+            communication_strategy=self.communication_strategy,
+        )

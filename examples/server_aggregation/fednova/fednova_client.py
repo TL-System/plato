@@ -15,8 +15,19 @@ import logging
 import numpy as np
 
 from plato.clients import simple
-from plato.clients.strategies.defaults import DefaultTrainingStrategy
+from plato.clients.strategies.defaults import (
+    DefaultLifecycleStrategy,
+    DefaultTrainingStrategy,
+)
 from plato.config import Config
+
+
+class FedNovaLifecycleStrategy(DefaultLifecycleStrategy):
+    """Lifecycle strategy that seeds the RNG for each client."""
+
+    def configure(self, context) -> None:
+        super().configure(context)
+        np.random.seed(3000 + context.client_id)
 
 
 class FedNovaTrainingStrategy(DefaultTrainingStrategy):
@@ -71,13 +82,9 @@ class Client(simple.Client):
         )
 
         self._configure_composable(
-            lifecycle_strategy=self.lifecycle_strategy,
+            lifecycle_strategy=FedNovaLifecycleStrategy(),
             payload_strategy=self.payload_strategy,
             training_strategy=FedNovaTrainingStrategy(),
             reporting_strategy=self.reporting_strategy,
             communication_strategy=self.communication_strategy,
         )
-
-    def configure(self) -> None:
-        super().configure()
-        np.random.seed(3000 + self.client_id)

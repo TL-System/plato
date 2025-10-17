@@ -12,6 +12,7 @@ license = "Apache-2.0"
 
 dependencies = [
     "aiohttp",
+    "accelerate",
     "boto3",
     "datasets",
     "evaluate",
@@ -29,6 +30,7 @@ dependencies = [
     "torch-optimizer",
     "torchvision",
     "transformers",
+    "peft",
     "zstd",
 ]
 
@@ -76,4 +78,9 @@ members = [
 [dependency-groups]
 dev = [
     "pytest",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests that require end-to-end config smoke runs.",
 ]

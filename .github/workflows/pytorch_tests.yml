@@ -24,7 +24,9 @@ jobs:
       - name: Training workloads
         shell: bash -l {0}
         run: |
-          uv run plato.py --config=configs/MNIST/fedavg_lenet5.yml
-          uv run plato.py --config=configs/MNIST/fedavg_cross_silo_lenet5.yml
-          uv run plato.py --config=configs/MNIST/fedavg_async_lenet5.yml
-          uv run plato.py --config=configs/MNIST/fedavg_lenet5_noniid.yml
+          uv run pytest tests
+          uv run plato.py --config configs/MNIST/fedavg_lenet5.yml
+          uv run plato.py --config configs/MNIST/fedavg_cross_silo_lenet5.yml
+          uv run plato.py --config configs/HuggingFace/fedavg_opt_lora.yml
+          uv run plato.py --config configs/MNIST/fedavg_async_lenet5.yml
+          uv run plato.py --config configs/MNIST/fedavg_lenet5_noniid.yml

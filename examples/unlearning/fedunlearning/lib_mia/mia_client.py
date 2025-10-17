@@ -10,9 +10,29 @@ https://ieeexplore.ieee.org/document/9521274
 https://arxiv.org/pdf/1610.05820.pdf
 """
 
-from types import SimpleNamespace
-
 from plato.clients import simple
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
+
+
+class FedUnlearningReportingStrategy(DefaultReportingStrategy):
+    """Reporting strategy that records sampler indices for unlearning."""
+
+    def build_report(self, context: ClientContext, report):
+        report = super().build_report(context, report)
+
+        sampler = getattr(context, "sampler", None)
+
+        if sampler is not None and hasattr(sampler, "subset_indices"):
+            report.indices = sampler.subset_indices
+            report.deleted_indices = []
+            if hasattr(sampler, "deleted_subset_indices"):
+                report.deleted_indices = sampler.deleted_subset_indices
+        else:
+            report.indices = []
+            report.deleted_indices = []
+
+        return report
 
 
 class Client(simple.Client):
@@ -34,19 +54,10 @@ class Client(simple.Client):
             callbacks=None,
         )
 
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Customizes the report with assigned sample indices."""
-        sampler = getattr(self, "sampler", None)
-        if sampler is None and hasattr(self, "_context"):
-            sampler = getattr(self._context, "sampler", None)
-
-        if sampler is not None and hasattr(sampler, "subset_indices"):
-            report.indices = sampler.subset_indices
-            report.deleted_indices = []
-            if hasattr(sampler, "deleted_subset_indices"):
-                report.deleted_indices = sampler.deleted_subset_indices
-        else:
-            report.indices = []
-            report.deleted_indices = []
-
-        return report
+        self._configure_composable(
+            lifecycle_strategy=self.lifecycle_strategy,
+            payload_strategy=self.payload_strategy,
+            training_strategy=self.training_strategy,
+            reporting_strategy=FedUnlearningReportingStrategy(),
+            communication_strategy=self.communication_strategy,
+        )

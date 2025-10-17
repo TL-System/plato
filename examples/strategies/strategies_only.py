@@ -50,11 +50,12 @@ class Trainer(basic.Trainer):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
         criterion = nn.CrossEntropyLoss()
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
         train_loader = torch.utils.data.DataLoader(
             dataset=trainset,
             shuffle=False,
             batch_size=config["batch_size"],
-            sampler=sampler,
+            sampler=sampler_obj,
         )
 
         for examples, labels in train_loader:

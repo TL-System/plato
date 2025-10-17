@@ -36,11 +36,11 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         if "optimizer_name" in kwargs
         else Config().trainer.optimizer
     )
-    optimizer_params = (
-        kwargs["optimizer_params"]
-        if "optimizer_params" in kwargs
-        else Config().parameters.optimizer._asdict()
-    )
+    if "optimizer_params" in kwargs:
+        optimizer_params = kwargs["optimizer_params"]
+    else:
+        params_section = getattr(Config().parameters, "optimizer", None)
+        optimizer_params = params_section._asdict() if params_section else {}
 
     # Ensure eps is a float
     if "eps" in optimizer_params:

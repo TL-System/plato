@@ -291,8 +291,15 @@ class TestLRSchedulerStrategy:
         strategy = SimpleScheduler()
 
         scheduler = strategy.create_scheduler(optimizer, context)
-
-        assert isinstance(scheduler, torch.optim.lr_scheduler._LRScheduler)
+        lr_scheduler_types = tuple(
+            cls
+            for cls in (
+                getattr(torch.optim.lr_scheduler, "LRScheduler", None),
+                getattr(torch.optim.lr_scheduler, "_LRScheduler", None),
+            )
+            if cls is not None
+        )
+        assert isinstance(scheduler, lr_scheduler_types)
 
     def test_step_method(self):
         """Test that step method works."""

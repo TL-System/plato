@@ -53,6 +53,8 @@ class BaseModel(torch.nn.Module):
             cache_dir=Config().params["model_path"] + "/huggingface",
             token=use_auth_token,
         )
+        if hasattr(self.base_model, "loss_type"):
+            self.base_model.loss_type = "ForCausalLM"
         self.cut_layer = Config().parameters.model.cut_layer
 
     def get_input_embeddings(self):
@@ -129,6 +131,8 @@ class ServerModel(BaseModel):
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
+        if hasattr(self.server_model, "loss_type"):
+            self.server_model.loss_type = "ForCausalLM"
         transformer_module = get_module(
             self.base_model,
             Config().parameters.model.transformer_module_name.split("."),

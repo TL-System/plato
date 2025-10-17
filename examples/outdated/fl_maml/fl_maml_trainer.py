@@ -31,11 +31,16 @@ class Trainer(basic.Trainer):
         logging.info("[Client #%d] Loading the dataset.", self.client_id)
         _train_loader = getattr(self, "train_loader", None)
 
+        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
+
         if callable(_train_loader):
-            train_loader = self.train_loader(batch_size, trainset, sampler)
+            train_loader = self.train_loader(batch_size, trainset, sampler_obj)
         else:
             train_loader = torch.utils.data.DataLoader(
-                dataset=trainset, shuffle=False, batch_size=batch_size, sampler=sampler
+                dataset=trainset,
+                shuffle=False,
+                batch_size=batch_size,
+                sampler=sampler_obj,
             )
 
         epochs = config["epochs"]

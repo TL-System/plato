@@ -1,0 +1,48 @@
+clients:
+    type: simple
+    total_clients: 1
+    per_round: 1
+    do_test: true
+    comm_simulation: false
+
+server:
+    address: 127.0.0.1
+    port: 8000
+    comm_simulation: false
+    do_test: true
+
+data:
+    datasource: LoRA
+    dataset_name: srivatsavaasista/textgenerator-ds-mini
+    text_field: review
+    partition_size: 512
+    sampler: iid
+    random_seed: 1
+
+trainer:
+    type: HuggingFace
+    rounds: 1
+    target_perplexity: 50
+    model_name: facebook/opt-125m
+    model_type: huggingface
+    epochs: 1
+    batch_size: 8
+    gradient_accumulation_steps: 4
+    optimizer: AdamW
+
+algorithm:
+    type: fedavg_lora
+
+parameters:
+    optimizer:
+        lr: 0.0005
+        weight_decay: 0.0
+    lora:
+        r: 8
+        lora_alpha: 16
+        target_modules:
+            - q_proj
+            - v_proj
+        lora_dropout: 0.05
+        bias: none
+        task_type: CAUSAL_LM

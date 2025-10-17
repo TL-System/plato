@@ -17,13 +17,6 @@ from plato.callbacks.client import LogProgressCallback
 from plato.callbacks.handler import CallbackHandler
 from plato.clients.composable import ComposableClient
 from plato.clients.strategies import ClientContext
-from plato.clients.strategies.legacy import (
-    LegacyCommunicationStrategy,
-    LegacyLifecycleStrategy,
-    LegacyPayloadStrategy,
-    LegacyReportingStrategy,
-    LegacyTrainingStrategy,
-)
 from plato.config import Config
 
 
@@ -72,14 +65,8 @@ class Client:
         self._context.server_payload = self.server_payload
         self._context.processing_time = self.processing_time
 
-        # Strategy adapters preserving legacy hooks
-        self._configure_composable(
-            lifecycle_strategy=LegacyLifecycleStrategy(self),
-            payload_strategy=LegacyPayloadStrategy(self),
-            training_strategy=LegacyTrainingStrategy(self),
-            reporting_strategy=LegacyReportingStrategy(self),
-            communication_strategy=LegacyCommunicationStrategy(self),
-        )
+        self._composable = None
+        self._composable_configured = False
 
     def __repr__(self):
         return f"Client #{self.client_id}"
