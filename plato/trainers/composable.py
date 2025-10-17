@@ -376,6 +376,7 @@ class ComposableTrainer(base.Trainer):
         # Training epochs
         total_epochs = config["epochs"]
         tic = time.perf_counter()
+        training_stop_requested = False
 
         for self.current_epoch in range(1, total_epochs + 1):
             self.context.current_epoch = self.current_epoch
@@ -434,6 +435,30 @@ class ComposableTrainer(base.Trainer):
                     "on_train_step_end", self, config, batch=batch_id, loss=loss
                 )
 
+                control_actions = {}
+                if hasattr(self, "_consume_control_flags"):
+                    control_actions = self._consume_control_flags()
+
+                if control_actions.get("save"):
+                    self.save_model()
+
+                if control_actions.get("evaluate") and hasattr(
+                    self, "_handle_control_evaluate"
+                ):
+                    self._handle_control_evaluate()
+
+                if control_actions.get("log") and hasattr(
+                    self, "_handle_control_log"
+                ):
+                    self._handle_control_log()
+
+                if control_actions.get("stop_training"):
+                    training_stop_requested = True
+                    break
+
+                if control_actions.get("stop_epoch"):
+                    break
+
             # LR scheduler step
             self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
 
@@ -465,6 +490,9 @@ class ComposableTrainer(base.Trainer):
 
             # Callbacks: epoch end
             self.callback_handler.call_event("on_train_epoch_end", self, config)
+
+            if training_stop_requested:
+                break
 
         # Strategy hook: on_train_end
         self.model_update_strategy.on_train_end(self.context)

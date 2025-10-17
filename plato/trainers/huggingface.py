@@ -6,6 +6,7 @@ trainer architecture by wiring HuggingFace data handling through strategy
 objects instead of overriding `load_model`/`save_model` hooks.
 """
 
+import logging
 import math
 import os
 from typing import Iterable, Optional, Sequence, Tuple, Union
@@ -24,6 +25,7 @@ from transformers import (
 from transformers.trainer_callback import TrainerControl, TrainerState
 
 from plato.config import Config
+from plato.datasources import registry as datasources_registry
 from plato.callbacks.trainer import TrainerCallback as PlatoTrainerCallback
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies import CustomCollateFnDataLoaderStrategy
@@ -206,6 +208,7 @@ class HuggingFaceCallbackBridge(PlatoTrainerCallback):
 
     def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
         self._trainer._hf_on_step_end(batch, loss)
+        self._trainer._hf_handle_control_flags()
 
 
 class Trainer(ComposableTrainer):
@@ -284,6 +287,9 @@ class Trainer(ComposableTrainer):
         if model_path and sub_dir:
             os.makedirs(os.path.join(model_path, sub_dir), exist_ok=True)
         self.context.state["hf_trainer"] = self
+        self._hf_pending_keys = ("save", "evaluate", "log", "stop_epoch", "stop_training")
+        self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+        self._hf_pending_log_data = None
 
     def add_callbacks(self, callbacks: Sequence[Union[type, object]]):
         """
@@ -325,6 +331,8 @@ class Trainer(ComposableTrainer):
             self._hf_state.num_train_epochs = config.get("epochs", 1)
             self._hf_state.max_steps = 0
             self._hf_steps_per_epoch = None
+            self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+            self._hf_pending_log_data = None
         return super().train_model(config, trainset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):
@@ -341,6 +349,7 @@ class Trainer(ComposableTrainer):
         super().save_model(filename=filename, location=location)
         if self._hf_callbacks:
             self._hf_call_callbacks("on_save", model=self.model)
+            self._hf_handle_control_flags()
 
     # --- HuggingFace callback integration helpers ---
 
@@ -357,6 +366,8 @@ class Trainer(ComposableTrainer):
         self._hf_control._new_training()
         self._hf_state.global_step = 0
         self._hf_state.epoch = 0
+        self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+        self._hf_pending_log_data = None
         self._hf_call_callbacks(
             "on_train_begin",
             model=self.model,
@@ -371,6 +382,7 @@ class Trainer(ComposableTrainer):
             tokenizer=self.tokenizer,
             train_dataloader=self.train_loader,
         )
+        self._hf_handle_control_flags()
 
     def _hf_update_training_metadata(self):
         if self.train_loader is None:
@@ -399,6 +411,7 @@ class Trainer(ComposableTrainer):
             lr_scheduler=self.lr_scheduler,
             train_dataloader=self.train_loader,
         )
+        self._hf_handle_control_flags()
 
     def _hf_on_epoch_end(self):
         self._hf_state.epoch = float(self.current_epoch)
@@ -410,6 +423,7 @@ class Trainer(ComposableTrainer):
             lr_scheduler=self.lr_scheduler,
             train_dataloader=self.train_loader,
         )
+        self._hf_handle_control_flags()
 
     def _hf_on_step_begin(self, batch_index: int):
         self._hf_control._new_step()
@@ -422,6 +436,7 @@ class Trainer(ComposableTrainer):
             train_dataloader=self.train_loader,
             step=batch_index,
         )
+        self._hf_handle_control_flags()
 
     def _hf_on_pre_optimizer_step(self):
         self._hf_call_callbacks(
@@ -447,6 +462,17 @@ class Trainer(ComposableTrainer):
             progress = min(progress, 1.0)
             self._hf_state.epoch = float(self.current_epoch - 1 + progress)
         self._hf_state.global_step += 1
+        loss_value = loss.item() if hasattr(loss, "item") else float(loss)
+        log_entry = {
+            "loss": float(loss_value),
+            "step": self._hf_state.global_step,
+            "epoch": self._hf_state.epoch,
+        }
+        current_lr = self._get_current_lr()
+        if current_lr is not None:
+            log_entry["learning_rate"] = current_lr
+        self._hf_state.log_history.append(log_entry)
+        self._hf_pending_log_data = log_entry
         self._hf_call_callbacks(
             "on_step_end",
             model=self.model,
@@ -465,3 +491,93 @@ class Trainer(ComposableTrainer):
             metrics=metrics,
             eval_dataloader=self.context.state.get("eval_loader"),
         )
+        self._hf_handle_control_flags()
+
+    def _hf_handle_control_flags(self):
+        if not self._hf_callbacks:
+            return
+
+        control = self._hf_control
+
+        if control.should_save:
+            self._hf_pending_actions["save"] = True
+            control.should_save = False
+
+        if control.should_evaluate:
+            self._hf_pending_actions["evaluate"] = True
+            control.should_evaluate = False
+
+        if control.should_log:
+            self._hf_pending_actions["log"] = True
+            control.should_log = False
+
+        if control.should_epoch_stop:
+            self._hf_pending_actions["stop_epoch"] = True
+            control.should_epoch_stop = False
+
+        if control.should_training_stop:
+            self._hf_pending_actions["stop_training"] = True
+            self._hf_pending_actions["stop_epoch"] = True
+            control.should_training_stop = False
+
+    def _consume_control_flags(self):
+        if not self._hf_callbacks:
+            return {}
+
+        actions = {key: bool(self._hf_pending_actions.get(key)) for key in self._hf_pending_keys}
+        self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
+        return actions
+
+    def _handle_control_evaluate(self):
+        metrics = {}
+        try:
+            datasource = datasources_registry.get(client_id=self.client_id)
+            testset = datasource.get_test_set()
+            metrics_value = self.testing_strategy.test_model(
+                self.model,
+                self.context.config,
+                testset,
+                None,
+                self.context,
+            )
+            metrics = {"perplexity": metrics_value}
+        except Exception as exc:
+            logging.warning(
+                "HuggingFace trainer failed to run evaluation requested by callback: %s",
+                exc,
+            )
+        finally:
+            self._hf_on_evaluate(metrics)
+
+    def _handle_control_log(self):
+        logs = {}
+        if self._hf_pending_log_data is not None:
+            logs = dict(self._hf_pending_log_data)
+        elif self._hf_state.log_history:
+            logs = dict(self._hf_state.log_history[-1])
+        else:
+            last_loss = self.context.state.get("last_loss")
+            if last_loss is not None:
+                logs = {"loss": float(last_loss)}
+
+        if logs and "learning_rate" not in logs:
+            current_lr = self._get_current_lr()
+            if current_lr is not None:
+                logs["learning_rate"] = current_lr
+
+        self._hf_call_callbacks(
+            "on_log",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            logs=logs,
+        )
+        self._hf_pending_log_data = None
+
+    def _get_current_lr(self):
+        if self.optimizer is None:
+            return None
+        for group in getattr(self.optimizer, "param_groups", []):
+            lr = group.get("lr")
+            if lr is not None:
+                return lr
+        return None
