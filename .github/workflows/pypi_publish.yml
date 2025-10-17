@@ -1,32 +1,35 @@
 # This workflow will upload a Python Package using uv when a release is created.
 
 name: Upload the plato-learn Python Package to PyPI
+permissions:
+  contents: read
+  pull-requests: read
 
 on:
-    release:
-        types:
-            - created
+  release:
+    types:
+      - created
 
 jobs:
-    build_and_deploy:
-        runs-on: ubuntu-latest
+  build_and_deploy:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v3
-              with:
-                  version: "latest"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: "3.13"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-            - name: Build package
-              run: uv build
+      - name: Build package
+        run: uv build
 
-            - name: Publish package to PyPI
-              run: uv publish --token ${{ secrets.PYPI_API_TOKEN }}
+      - name: Publish package to PyPI
+        run: uv publish --token ${{ secrets.PYPI_API_TOKEN }}

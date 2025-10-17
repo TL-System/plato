@@ -1,16 +1,18 @@
 # This workflow will delete old workflow runs, on a schedule or manually triggered.
-
 name: Delete old workflow runs
+permissions:
+  contents: read
+  pull-requests: read
 
 on:
   workflow_dispatch:
     inputs:
       days:
-        description: 'Number of days.'
+        description: "Number of days."
         required: true
         default: 30
       minimum_runs:
-        description: 'The minimum runs to keep for each workflow.'
+        description: "The minimum runs to keep for each workflow."
         required: true
         default: 6
 
