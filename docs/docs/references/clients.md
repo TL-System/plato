@@ -108,6 +108,41 @@ them in place (see `ComposableClient._sync_owner_from_context` for reference).
 Each strategy exposes optional `setup`/`teardown` hooks; use them to allocate
 resources when the client boots or release them once the round finishes.
 
+## Strategy Recipes in Examples
+
+Most example workloads now customise clients by swapping strategies instead of
+overriding legacy hooks. The following patterns provide practical templates:
+
+- **Reporting augmentations.** `OortReportingStrategy`,
+  `PiscesReportingStrategy`, and `AFLReportingStrategy` (under
+  `examples/client_selection/`) compute statistical utility or valuations
+  inside `build_report`, pulling metrics from trainer run histories and
+  tolerating missing data.
+- **Lifecycle configuration.** `ScaffoldLifecycleStrategy`
+  (`examples/customized_client_training/scaffold/scaffold_client.py`) restores
+  persisted control variates, while `FedNovaLifecycleStrategy`
+  (`examples/server_aggregation/fednova/fednova_client.py`) performs per-client
+  RNG seeding during `configure`.
+- **Training specialisation.** Strategies such as `DLGTrainingStrategy`
+  (`examples/gradient_leakage_attacks/dlg_client.py`), `SubFedAvgTrainingStrategy`
+  (`examples/model_pruning/sub_fedavg/subfedavg_client.py`), and
+  `FedSawTrainingStrategy` / `FedSawEdgeTrainingStrategy`
+  (`examples/three_layer_fl/fedsaw/`) show how to augment payloads, add logging,
+  or prune updates before transmission. `FlMamlTrainingStrategy`
+  (`examples/outdated/fl_maml/fl_maml_client.py`) illustrates personalised
+  evaluation flows.
+- **Metadata propagation.** NAS and pruning case studies attach algorithm state
+  to reports via strategy overrides (`FedRLNASReportingStrategy`,
+  `PerFedRLNASReportingStrategy`, `FedSCRReportingStrategy`, etc.), eliminating
+  the need to mutate the client directly.
+- **Edge coordination.** Cross-silo scenarios extend
+  `EdgeTrainingStrategy`: see `CsMamlEdgeTrainingStrategy` and
+  `FedSawEdgeTrainingStrategy` for examples that add personalisation tests or
+  post-aggregation pruning.
+
+Copy one of these strategies, tailor the hook you need, then wire it into
+`_configure_composable(...)` on your client subclass.
+
 ## Backwards Compatibility Hooks
 
 Existing subclasses that overrode the legacy methods—`configure`,
@@ -181,7 +216,13 @@ To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client
 
 ### Customizing Clients using Subclassing
 
-The legacy practice is to customize the client using subclassing for important features that change internal states within a client. To customize the client using inheritance, subclass the `simple.Client` class (or `edge.Client` for cross-silo federated learning) in `plato.clients`, and override the following methods:
+Subclassing is still supported for legacy integrations, but new features should
+prefer bespoke strategies so behaviour can be shared across workloads. When a
+direct override is unavoidable, subclass `simple.Client` (or `edge.Client` for
+cross-silo federated learning) in `plato.clients`, and override the following
+methods. The strategy adaptor layer in
+`plato/clients/strategies/legacy.py` will forward calls into the appropriate
+hooks.
 
 !!! example "configure()"
     **`def configure(self) -> None`**
