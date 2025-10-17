@@ -143,19 +143,12 @@ overriding legacy hooks. The following patterns provide practical templates:
 Copy one of these strategies, tailor the hook you need, then wire it into
 `_configure_composable(...)` on your client subclass.
 
-## Backwards Compatibility Hooks
+## Migration Notes
 
-Existing subclasses that overrode the legacy methods—`configure`,
-`process_server_response`, `_load_data`, `_allocate_data`,
-`inbound_processed`, and friends—still function. `base.Client` now attaches
-`Legacy*Strategy` adapters (`plato/clients/strategies/legacy.py`) that forward
-strategy calls into those overrides. This safety net keeps historical clients
-operational, but new development should migrate into dedicated strategies so
-behaviour is explicit and reusable.
-
-If you gradually port an existing client, you can mix approaches: keep the
-legacy adapters for the parts you have not touched yet, and replace individual
-strategies once they have been rewritten.
+The legacy adapter layer (`plato/clients/strategies/legacy.py`) has been
+removed. Client subclasses must configure strategies explicitly via
+`_configure_composable(...)`; overriding legacy hooks such as `_train` or
+`_load_payload` no longer affects the runtime.
 
 ## Client Callbacks
 
@@ -211,92 +204,3 @@ To use callbacks, subclass the `ClientCallback` class in `plato.callbacks.client
     Override this method to complete additional tasks before the outbound processors start to process the data to be sent to the server.
 
     `outbound_processor` the pipeline of outbound processors. The list of inbound processor instances can be accessed through its attribute 'processors'.
-
-## Legacy Client API
-
-### Customizing Clients using Subclassing
-
-Subclassing is still supported for legacy integrations, but new features should
-prefer bespoke strategies so behaviour can be shared across workloads. When a
-direct override is unavoidable, subclass `simple.Client` (or `edge.Client` for
-cross-silo federated learning) in `plato.clients`, and override the following
-methods. The strategy adaptor layer in
-`plato/clients/strategies/legacy.py` will forward calls into the appropriate
-hooks.
-
-!!! example "configure()"
-    **`def configure(self) -> None`**
-
-    Override this method to implement additional tasks for initializing and configuring the client. Make sure that `super().configure()` is called first.
-
-!!! example "process_server_response()"
-    **`def process_server_response(self, server_response) -> None`**
-
-    Override this method to conduct additional client-specific processing on the server response.
-
-    **Example:**
-
-    ```py
-    def process_server_response(self, server_response):
-        if "current_global_round" in server_response:
-            self.server.current_global_round = server_response["current_global_round"]
-    ```
-
-!!! example "inbound_received()"
-    **`def inbound_received(self, inbound_processor)`**
-
-    Override this method to complete additional tasks before the inbound processors start to process the data received from the server.
-
-    `inbound_processor` the pipeline of inbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
-
-    **Example:**
-
-    ```py
-    def inbound_received(self, inbound_processor):
-        # insert a customized processor to the list of inbound processors
-        customized_processor = DummyProcessor(
-                client_id=client.client_id,
-                current_round=client.current_round,
-                name="DummyProcessor",
-            )
-
-        inbound_processor.processors.insert(0, customized_processor)
-    ```
-
-!!! example "inbound_processed()"
-    **`def inbound_processed(self, processed_inbound_payload)`**
-
-    Override this method to conduct customized operations to generate a client's response to the server when inbound data from the server has been processed.
-
-    `processed_inbound_payload` the inbound payload after being processed by inbound processors, e.g., model weights before loaded to the trainer.
-
-    **Returns:** the report and the outbound payload.
-
-    **Example:**
-
-    ```py
-    async def inbound_processed(self, processed_inbound_payload: Any) -> (SimpleNamespace, Any):
-        report, outbound_payload = await self.customized_train(processed_inbound_payload)
-        return report, outbound_payload
-    ```
-
-!!! example "outbound_ready()"
-    **`def outbound_ready(self, report, outbound_processor)`**
-
-    Override this method to complete additional tasks before the outbound processors start to process the data to be sent to the server.
-
-    `report` the metadata sent back to the server, e.g., training time, accuracy, etc.
-
-    `outbound_processor` the pipeline of outbound processors. The list of inbound processor instances can be accessed through its attribute 'processors', as in the following example.
-
-    **Example:**
-
-    ```py
-    def outbound_ready(self, report, outbound_processor):
-        # customize the report
-        loss = self.get_loss()
-        report.valuation = self.calc_valuation(report.num_samples, loss)
-
-        # remove the first processor from the list of outbound processors
-        outbound_processor.processors.pop()
-    ```

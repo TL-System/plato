@@ -1,11 +1,10 @@
 """
 Client registry for instantiating configured clients.
 
-The registry coordinates known client implementations and offers a best-effort
-compatibility shim for externally supplied subclasses. Each instantiated client
-is expected to build its composable strategy stack during initialisation; if a
-custom subclass does not, we fall back to the legacy strategy adapters to keep
-behaviour consistent with the pre-refactor architecture.
+The registry coordinates known client implementations and validates that each
+instance configures its composable strategy stack during initialisation. Custom
+subclasses must call `_configure_composable(...)`; otherwise, instantiation
+fails with a helpful error so callers can migrate to the strategy API.
 """
 
 from __future__ import annotations
@@ -24,13 +23,6 @@ from plato.clients import (
     split_learning,
 )
 from plato.clients.base import Client
-from plato.clients.strategies.legacy import (
-    LegacyCommunicationStrategy,
-    LegacyLifecycleStrategy,
-    LegacyPayloadStrategy,
-    LegacyReportingStrategy,
-    LegacyTrainingStrategy,
-)
 from plato.config import Config
 
 ClientFactory = Callable[..., Client]
@@ -45,20 +37,16 @@ def _instantiate_with_signature(cls: Type[Client], **kwargs) -> Client:
     return cls(**supported_kwargs)
 
 
-def _ensure_strategy_configuration(instance: Client) -> Client:
-    """Ensure the client has an active composable strategy stack."""
+def _verify_strategy_configuration(instance: Client) -> Client:
+    """Ensure the client has configured composable strategies."""
     if getattr(instance, "_composable_configured", False):
         return instance
 
-    instance._configure_composable(  # pylint: disable=protected-access
-        lifecycle_strategy=LegacyLifecycleStrategy(instance),
-        payload_strategy=LegacyPayloadStrategy(instance),
-        training_strategy=LegacyTrainingStrategy(instance),
-        reporting_strategy=LegacyReportingStrategy(instance),
-        communication_strategy=LegacyCommunicationStrategy(instance),
+    raise RuntimeError(
+        f"{instance.__class__.__name__} did not configure client strategies. "
+        "Override its constructor to call `_configure_composable(...)` with the "
+        "desired strategy instances."
     )
-
-    return instance
 
 
 def _simple_like_factory(cls: Type[Client]) -> ClientFactory:
@@ -83,7 +71,7 @@ def _simple_like_factory(cls: Type[Client]) -> ClientFactory:
             trainer_callbacks=trainer_callbacks,
             **kwargs,
         )
-        return _ensure_strategy_configuration(instance)
+        return _verify_strategy_configuration(instance)
 
     return factory
 
@@ -99,17 +87,17 @@ def _edge_factory() -> ClientFactory:
             raise ValueError("Edge client instantiation requires a `server` argument.")
 
         instance = _instantiate_with_signature(edge.Client, server=server, **kwargs)
-        return _ensure_strategy_configuration(instance)
+        return _verify_strategy_configuration(instance)
 
     return factory
 
 
-def _legacy_factory(cls: Type[Client]) -> ClientFactory:
-    """Factory for legacy-style clients that retain bespoke lifecycle overrides."""
+def _generic_factory(cls: Type[Client]) -> ClientFactory:
+    """Factory for custom client subclasses."""
 
     def factory(**kwargs) -> Client:
         instance = _instantiate_with_signature(cls, **kwargs)
-        return _ensure_strategy_configuration(instance)
+        return _verify_strategy_configuration(instance)
 
     return factory
 
@@ -164,7 +152,7 @@ def get(
         factory = (
             _simple_like_factory(client_cls)
             if supports_trainer_callbacks
-            else _legacy_factory(client_cls)
+            else _generic_factory(client_cls)
         )
         registered_clients[client_type] = factory
 
