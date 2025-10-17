@@ -6,10 +6,10 @@ Reference:
 Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedings of ICDCS 2021.
 """
 
-from types import SimpleNamespace
-
 from plato.clients import simple
 from plato.clients.strategies import DefaultLifecycleStrategy
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
 
 
 class FedRLNASLifecycleStrategy(DefaultLifecycleStrategy):
@@ -63,6 +63,21 @@ class FedRLNASLifecycleStrategy(DefaultLifecycleStrategy):
                 owner.trainer.model = model
 
 
+class FedRLNASReportingStrategy(DefaultReportingStrategy):
+    """Reporting strategy attaching mask metadata for aggregation."""
+
+    def build_report(self, context: ClientContext, report):
+        report = super().build_report(context, report)
+
+        algorithm = context.algorithm
+        if algorithm is None:
+            return report
+
+        report.mask_normal = getattr(algorithm, "mask_normal", None)
+        report.mask_reduce = getattr(algorithm, "mask_reduce", None)
+        return report
+
+
 class Client(simple.Client):
     """A FedRLNAS client. Different clients hold different models."""
 
@@ -86,20 +101,12 @@ class Client(simple.Client):
 
         payload_strategy = self.payload_strategy
         training_strategy = self.training_strategy
-        reporting_strategy = self.reporting_strategy
         communication_strategy = self.communication_strategy
 
         self._configure_composable(
             lifecycle_strategy=FedRLNASLifecycleStrategy(),
             payload_strategy=payload_strategy,
             training_strategy=training_strategy,
-            reporting_strategy=reporting_strategy,
+            reporting_strategy=FedRLNASReportingStrategy(),
             communication_strategy=communication_strategy,
         )
-
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Mask information should be sent to the server for supernet aggregation."""
-        report.mask_normal = self.algorithm.mask_normal
-        report.mask_reduce = self.algorithm.mask_reduce
-
-        return report

@@ -3,11 +3,11 @@ A federated learning client at the edge server in a cross-silo training workload
 """
 
 import logging
-import pickle
 from dataclasses import dataclass
 
 from plato.clients import edge
-from plato.clients.strategies.edge import EdgeLifecycleStrategy
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.edge import EdgeLifecycleStrategy, EdgeTrainingStrategy
 
 
 @dataclass
@@ -43,47 +43,38 @@ class Client(edge.Client):
         self._configure_composable(
             lifecycle_strategy=CsMamlEdgeLifecycleStrategy(),
             payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
+            training_strategy=CsMamlEdgeTrainingStrategy(),
             reporting_strategy=reporting_strategy,
             communication_strategy=communication_strategy,
         )
 
-    async def test_personalization(self):
-        """Test personalization by passing the global meta model to its clients,
-        and let them train their personlized models and test accuracy."""
-        logging.info(
-            "[Edge Server #%d] Passing the global meta model to its clients.",
-            self.client_id,
-        )
 
-        # Edge server select clients to conduct personalization test
-        await self.server.select_testing_clients()
+class CsMamlEdgeTrainingStrategy(EdgeTrainingStrategy):
+    """Training strategy that adds personalization support for CS-MAML edge clients."""
 
-        # Wait for clients conducting personalization test
-        await self.server.per_accuracy_aggregated.wait()
-        self.server.per_accuracy_aggregated.clear()
+    async def train(self, context: ClientContext):
+        owner = context.owner
+        if owner is None:
+            raise RuntimeError("CS-MAML edge training requires an owning client.")
 
-        report = self.server.personalization_accuracy
-        payload = "personalization_accuracy"
+        if getattr(owner, "do_personalization_test", False):
+            owner.do_personalization_test = False
+            return await self._run_personalization(owner)
 
+        report, payload = await super().train(context)
+        logging.info("[%s] Model aggregated on edge server.", owner)
         return report, payload
 
-    async def _start_training(self):
-        """Complete one round of training on this client."""
-        self._load_payload(self.server_payload)
-        self.server_payload = None
-
-        if self.do_personalization_test:
-            report, payload = await self.test_personalization()
-            self.do_personalization_test = False
-        else:
-            report, payload = await self.train()
-            logging.info("[%s] Model aggregated on edge server.", self)
-
-        # Sending the client report as metadata to the server (payload to follow)
-        await self.sio.emit(
-            "client_report", {"id": self.client_id, "report": pickle.dumps(report)}
+    async def _run_personalization(self, owner):
+        logging.info(
+            "[Edge Server #%d] Passing the global meta model to its clients.",
+            owner.client_id,
         )
 
-        # Sending the client training payload to the server
-        await self.send(payload)
+        await owner.server.select_testing_clients()
+        await owner.server.per_accuracy_aggregated.wait()
+        owner.server.per_accuracy_aggregated.clear()
+
+        report = owner.server.personalization_accuracy
+        payload = "personalization_accuracy"
+        return report, payload

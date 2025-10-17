@@ -11,6 +11,8 @@ from torch.nn.utils import prune
 
 from plato.clients import simple
 from plato.clients.strategies import DefaultLifecycleStrategy
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.config import Config
 
 
@@ -37,6 +39,67 @@ class FedSawClientLifecycleStrategy(DefaultLifecycleStrategy):
             owner.pruning_amount = amount
 
 
+class FedSawTrainingStrategy(DefaultTrainingStrategy):
+    """Training strategy that prunes local updates before transmission."""
+
+    async def train(self, context: ClientContext):
+        algorithm = context.algorithm
+        if algorithm is None:
+            raise RuntimeError("Algorithm is required for FedSaw training.")
+
+        previous_weights = copy.deepcopy(algorithm.extract_weights())
+        report, new_weights = await super().train(context)
+
+        weight_updates = self._prune_updates(context, previous_weights, new_weights)
+        logging.info("[Client #%d] Pruned its weight updates.", context.client_id)
+
+        return report, weight_updates
+
+    def _prune_updates(self, context, previous_weights, new_weights):
+        updates = self._compute_weight_updates(previous_weights, new_weights)
+
+        algorithm = context.algorithm
+        algorithm.load_weights(updates)
+        updates_model = algorithm.model
+
+        parameters_to_prune = []
+        for _, module in updates_model.named_modules():
+            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
+                parameters_to_prune.append((module, "weight"))
+
+        if (
+            hasattr(Config().clients, "pruning_method")
+            and Config().clients.pruning_method == "random"
+        ):
+            pruning_method = prune.RandomUnstructured
+        else:
+            pruning_method = prune.L1Unstructured
+
+        pruning_amount = getattr(context.owner, "pruning_amount", None)
+        if pruning_amount is None:
+            state = FedSawClientLifecycleStrategy._state(context)
+            pruning_amount = state.get("pruning_amount", 0)
+
+        prune.global_unstructured(
+            parameters_to_prune,
+            pruning_method=pruning_method,
+            amount=pruning_amount,
+        )
+
+        for module, name in parameters_to_prune:
+            prune.remove(module, name)
+
+        return updates_model.cpu().state_dict()
+
+    @staticmethod
+    def _compute_weight_updates(previous_weights, new_weights):
+        deltas = OrderedDict()
+        for name, new_weight in new_weights.items():
+            previous_weight = previous_weights[name]
+            deltas[name] = new_weight - previous_weight
+        return deltas
+
+
 class Client(simple.Client):
     """
     A federated learning client prunes its update before sending out.
@@ -49,71 +112,13 @@ class Client(simple.Client):
         self.pruning_amount = 0
 
         payload_strategy = self.payload_strategy
-        training_strategy = self.training_strategy
         reporting_strategy = self.reporting_strategy
         communication_strategy = self.communication_strategy
 
         self._configure_composable(
             lifecycle_strategy=FedSawClientLifecycleStrategy(),
             payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
+            training_strategy=FedSawTrainingStrategy(),
             reporting_strategy=reporting_strategy,
             communication_strategy=communication_strategy,
         )
-
-    async def _train(self):
-        """The training process on a FedSaw client."""
-        previous_weights = copy.deepcopy(self.algorithm.extract_weights())
-
-        # Perform model training
-        self._report, new_weights = await super()._train()
-
-        weight_updates = self.prune_updates(previous_weights, new_weights)
-        logging.info("[Client #%d] Pruned its weight updates.", self.client_id)
-
-        return self._report, weight_updates
-
-    def prune_updates(self, previous_weights, new_weights):
-        """Prunes locally trained updates."""
-        updates = self.compute_weight_updates(previous_weights, new_weights)
-        self.algorithm.load_weights(updates)
-        updates_model = self.algorithm.model
-
-        parameters_to_prune = []
-        for _, module in updates_model.named_modules():
-            if isinstance(module, torch.nn.Conv2d) or isinstance(
-                module, torch.nn.Linear
-            ):
-                parameters_to_prune.append((module, "weight"))
-
-        if (
-            hasattr(Config().clients, "pruning_method")
-            and Config().clients.pruning_method == "random"
-        ):
-            pruning_method = prune.RandomUnstructured
-        else:
-            pruning_method = prune.L1Unstructured
-
-        prune.global_unstructured(
-            parameters_to_prune,
-            pruning_method=pruning_method,
-            amount=self.pruning_amount,
-        )
-
-        for module, name in parameters_to_prune:
-            prune.remove(module, name)
-
-        return updates_model.cpu().state_dict()
-
-    def compute_weight_updates(self, previous_weights, new_weights):
-        """Compute the weight updates."""
-        # Calculate deltas from the received weights
-        deltas = OrderedDict()
-        for name, new_weight in new_weights.items():
-            previous_weight = previous_weights[name]
-
-            # Calculate deltas
-            delta = new_weight - previous_weight
-            deltas[name] = delta
-
-        return deltas

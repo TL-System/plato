@@ -3,10 +3,11 @@ A federated learning client of FedSCR.
 """
 
 import logging
-from types import SimpleNamespace
 
 from plato.clients import simple
 from plato.clients.strategies import DefaultLifecycleStrategy
+from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
 
 
 class FedSCRLifecycleStrategy(DefaultLifecycleStrategy):
@@ -35,6 +36,26 @@ class FedSCRLifecycleStrategy(DefaultLifecycleStrategy):
         )
 
 
+class FedSCRReportingStrategy(DefaultReportingStrategy):
+    """Reporting strategy that appends FedSCR adaptive metrics."""
+
+    def build_report(self, context: ClientContext, report):
+        report = super().build_report(context, report)
+
+        trainer = context.trainer
+        if trainer is None or not getattr(trainer, "use_adaptive", False):
+            return report
+
+        run_history = getattr(trainer, "run_history", None)
+        if run_history is None:
+            return report
+
+        report.div_from_global = run_history.get_latest_metric("div_from_global")
+        report.avg_update = run_history.get_latest_metric("avg_update")
+        report.loss = run_history.get_latest_metric("train_loss")
+        return report
+
+
 class Client(simple.Client):
     """
     A federated learning client prunes its update before sending out.
@@ -60,24 +81,12 @@ class Client(simple.Client):
 
         payload_strategy = self.payload_strategy
         training_strategy = self.training_strategy
-        reporting_strategy = self.reporting_strategy
         communication_strategy = self.communication_strategy
 
         self._configure_composable(
             lifecycle_strategy=FedSCRLifecycleStrategy(),
             payload_strategy=payload_strategy,
             training_strategy=training_strategy,
-            reporting_strategy=reporting_strategy,
+            reporting_strategy=FedSCRReportingStrategy(),
             communication_strategy=communication_strategy,
         )
-
-    def customize_report(self, report: SimpleNamespace) -> SimpleNamespace:
-        """Wraps up generating the report with any additional information."""
-        if self.trainer.use_adaptive:
-            report.div_from_global = self.trainer.run_history.get_latest_metric(
-                "div_from_global"
-            )
-            report.avg_update = self.trainer.run_history.get_latest_metric("avg_update")
-            report.loss = self.trainer.run_history.get_latest_metric("train_loss")
-
-        return report
