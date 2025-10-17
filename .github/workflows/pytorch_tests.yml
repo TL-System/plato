@@ -1,4 +1,7 @@
 name: PyTorch CI Tests
+permissions:
+  contents: read
+  pull-requests: read
 
 on:
   push:
