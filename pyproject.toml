@@ -30,6 +30,7 @@ dependencies = [
     "torch-optimizer",
     "torchvision",
     "transformers",
+    "peft",
     "zstd",
 ]
 
@@ -71,7 +72,6 @@ members = [
     "examples/model_search/heterofl",
     "examples/model_search/fedrolex",
     "examples/detector",
-    "examples/lora",
     "examples/gradient_leakage_attacks",
 ]
 

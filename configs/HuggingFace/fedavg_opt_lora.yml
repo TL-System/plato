@@ -14,6 +14,7 @@ server:
 data:
     datasource: LoRA
     dataset_name: srivatsavaasista/textgenerator-ds-mini
+    text_field: review
     partition_size: 512
     sampler: iid
     random_seed: 1
@@ -30,7 +31,7 @@ trainer:
     optimizer: AdamW
 
 algorithm:
-    type: fedavg
+    type: fedavg_lora
 
 parameters:
     optimizer:

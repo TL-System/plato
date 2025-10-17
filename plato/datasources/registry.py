@@ -16,6 +16,7 @@ from plato.datasources import (
     feature,
     femnist,
     huggingface,
+    lora,
     mnist,
     purchase,
     qoenflx,
@@ -34,6 +35,7 @@ registered_datasources = {
     "Purchase": purchase,
     "Texas": texas,
     "HuggingFace": huggingface,
+    "LoRA": lora,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
     "QoENFLX": qoenflx,
@@ -79,12 +81,7 @@ def get(client_id: int = 0, **kwargs):
 
         return coco.DataSource(**kwargs)
 
-    if datasource_name == "LoRA":
-        from examples.lora import lora_utils
-
-        return lora_utils.DataSource(**kwargs)
-
-    elif datasource_name in registered_datasources:
+    if datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:
         dataset = registered_partitioned_datasources[datasource_name].DataSource(
