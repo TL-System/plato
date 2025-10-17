@@ -71,8 +71,6 @@ class DataSource(base.DataSource):
         }
 
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
-        if getattr(self.config, "loss_type", None) is None:
-            self.config.loss_type = "ForCausalLM"
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, config=self.config, **tokenizer_kwargs
