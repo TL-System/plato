@@ -1,81 +1,224 @@
 """
-Training and testing loops for HuggingFace's transformer models for natural
-language processing.
+Strategy-based trainer for HuggingFace transformer models.
+
+This implementation adapts the legacy HuggingFace trainer to Plato's composable
+trainer architecture by wiring HuggingFace data handling through strategy
+objects instead of overriding `load_model`/`save_model` hooks.
 """
 
 import math
-from typing import Optional
+import os
+from typing import Iterable, Optional, Sequence, Tuple, Union
 
-from torch.utils.data import RandomSampler, Sampler
+import torch
+import torch.utils.data
 from transformers import (
     AutoConfig,
     AutoTokenizer,
     HfArgumentParser,
     LlamaTokenizer,
-    TrainerCallback,
+    TrainerCallback as HFTrainerCallback,
     TrainingArguments,
     default_data_collator,
 )
-from transformers import Trainer as HuggingFaceTrainer
+from transformers.trainer_callback import TrainerControl, TrainerState
 
 from plato.config import Config
-from plato.trainers import basic
+from plato.callbacks.trainer import TrainerCallback as PlatoTrainerCallback
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies import CustomCollateFnDataLoaderStrategy
+from plato.trainers.strategies.base import (
+    TrainingContext,
+    TrainingStepStrategy,
+    TestingStrategy,
+)
 
 
-class SampledHuggingFaceTrainer(HuggingFaceTrainer):
-    """
-    Training and testing loops for HuggingFace's transformer models for natural
-    language processing.
-    """
+class HuggingFaceBatch(dict):
+    """Dictionary-style batch that supports `.to(device)` like torch tensors."""
 
-    def __init__(
+    def to(self, device):
+        for key, value in self.items():
+            if hasattr(value, "to"):
+                self[key] = value.to(device)
+        return self
+
+
+class HuggingFaceCollateWrapper:
+    """Wraps the default HuggingFace data collator for Plato data loader strategy."""
+
+    def __call__(
+        self, examples: Iterable[dict]
+    ) -> Tuple[HuggingFaceBatch, Optional[torch.Tensor]]:
+        batch = default_data_collator(examples)
+        labels = batch.pop("labels", None)
+        return HuggingFaceBatch(batch), labels
+
+
+class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
+    """Performs a forward/backward pass using HuggingFace causal language models."""
+
+    def training_step(
         self,
         model,
-        args,
-        train_dataset,
-        eval_dataset,
-        tokenizer,
-        data_collator,
-        sampler,
-        callbacks,
+        optimizer,
+        examples,
+        labels,
+        loss_criterion,  # pylint: disable=unused-argument
+        context: TrainingContext,
     ):
-        super().__init__(
-            model=model,
-            args=args,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
-            tokenizer=tokenizer,
-            data_collator=data_collator,
-            callbacks=callbacks,
+        optimizer.zero_grad()
+
+        batch_inputs = dict(examples)
+        if labels is not None:
+            batch_inputs["labels"] = labels
+
+        outputs = model(**batch_inputs)
+        loss = getattr(outputs, "loss", outputs[0] if isinstance(outputs, tuple) else outputs)
+
+        if not torch.is_tensor(loss):
+            raise ValueError("HuggingFace model did not return a tensor loss.")
+
+        loss.backward()
+        trainer = context.state.get("hf_trainer")
+        if trainer is not None:
+            trainer._hf_on_pre_optimizer_step()
+        optimizer.step()
+        if trainer is not None:
+            trainer._hf_on_optimizer_step()
+
+        return loss.detach()
+
+
+class HuggingFaceTestingStrategy(TestingStrategy):
+    """Evaluates HuggingFace models and reports perplexity based on loss."""
+
+    def __init__(self, collate_fn: HuggingFaceCollateWrapper):
+        self.collate_fn = collate_fn
+
+    def test_model(self, model, config, testset, sampler, context: TrainingContext):
+        batch_size = config.get("batch_size", 1)
+
+        # Resolve sampler into a torch sampler when provided.
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
+                sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
+            else:
+                sampler_obj = sampler
+        else:
+            sampler_obj = None
+
+        data_loader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=batch_size,
+            shuffle=False,
+            sampler=sampler_obj,
+            collate_fn=self.collate_fn,
         )
-        self.sampler = sampler
 
-    def _get_train_sampler(self) -> Optional[Sampler]:
-        if self.sampler is None:
-            return RandomSampler(self.train_dataset)
+        model.to(context.device)
+        model.eval()
+        context.state["eval_loader"] = data_loader
 
-        return self.sampler
+        total_loss = 0.0
+        total_weight = 0
 
-    def _get_eval_sampler(self, eval_dataset) -> Optional[Sampler]:
-        if self.sampler is None:
-            return super()._get_eval_sampler(eval_dataset)
+        with torch.no_grad():
+            for batch_inputs, labels in data_loader:
+                batch_inputs = batch_inputs.to(context.device)
+                if labels is not None:
+                    labels = labels.to(context.device)
+                    batch_inputs["labels"] = labels
 
-        return self.sampler
+                outputs = model(**batch_inputs)
+                loss = getattr(
+                    outputs, "loss", outputs[0] if isinstance(outputs, tuple) else outputs
+                )
+
+                if not torch.is_tensor(loss):
+                    raise ValueError("HuggingFace model did not return a tensor loss.")
+
+                if labels is not None:
+                    weight = labels.numel()
+                else:
+                    weight = 1
+
+                total_loss += loss.item() * weight
+                total_weight += weight
+
+        model.train()
+        context.state.pop("eval_loader", None)
+
+        if total_weight == 0:
+            return float("inf")
+
+        avg_loss = total_loss / total_weight
+        try:
+            return math.exp(avg_loss)
+        except OverflowError:
+            return float("inf")
 
 
-class Trainer(basic.Trainer):
-    """The trainer for HuggingFace transformer models for natural language processing."""
+def _split_callback_types(
+    callbacks: Optional[Sequence[Union[type, object]]]
+) -> Tuple[Sequence[Union[type, object]], Sequence[Union[type, object]]]:
+    """Separate HuggingFace callbacks from Plato trainer callbacks."""
+    if not callbacks:
+        return [], []
+
+    hf_callbacks = []
+    plato_callbacks = []
+    for callback in callbacks:
+        callback_cls = callback if isinstance(callback, type) else callback.__class__
+        if isinstance(callback_cls, type) and issubclass(callback_cls, HFTrainerCallback):
+            hf_callbacks.append(callback)
+        elif isinstance(callback, HFTrainerCallback):
+            hf_callbacks.append(callback)
+        else:
+            plato_callbacks.append(callback)
+    return hf_callbacks, plato_callbacks
+
+
+class HuggingFaceCallbackBridge(PlatoTrainerCallback):
+    """Adapter that invokes HuggingFace callbacks via Plato callback events."""
+
+    def __init__(self, trainer: "Trainer"):
+        self._trainer = trainer
+
+    def on_train_run_start(self, trainer, config, **kwargs):
+        self._trainer._hf_on_train_begin(config)
+
+    def on_train_run_end(self, trainer, config, **kwargs):
+        self._trainer._hf_on_train_end()
+
+    def on_train_epoch_start(self, trainer, config, **kwargs):
+        self._trainer._hf_on_epoch_begin()
+
+    def on_train_epoch_end(self, trainer, config, **kwargs):
+        self._trainer._hf_on_epoch_end()
+
+    def on_train_step_start(self, trainer, config, batch, **kwargs):
+        self._trainer._hf_on_step_begin(batch)
+
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+        self._trainer._hf_on_step_end(batch, loss)
+
+
+class Trainer(ComposableTrainer):
+    """Composable HuggingFace trainer built on Plato's strategy API."""
 
     def __init__(self, model=None, callbacks=None):
-        super().__init__(model)
+        hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
 
-        self.trainer = None
-        self.trainer_callbacks = []
-        if callbacks:
-            # Huggingface needs to check callback types
-            self.add_callbacks(callbacks)
-
-        self.model.train()
+        self._hf_callbacks: list[TrainerCallback] = []
+        self._hf_bridge: Optional[HuggingFaceCallbackBridge] = None
+        self._hf_state = TrainerState()
+        self._hf_control = TrainerControl()
+        self._hf_steps_per_epoch: Optional[int] = None
 
         parser = HfArgumentParser(TrainingArguments)
         (self.training_args,) = parser.parse_args_into_dataclasses(
@@ -92,6 +235,8 @@ class Trainer(basic.Trainer):
             "use_auth_token": None,
         }
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+        if hasattr(self.config, "loss_type") and self.config.loss_type is None:
+            delattr(self.config, "loss_type")
 
         tokenizer_kwargs = {
             "cache_dir": None,
@@ -106,68 +251,217 @@ class Trainer(basic.Trainer):
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(
                 model_name, config=self.config, **tokenizer_kwargs
-            )
+        )
 
-    # pylint: disable=unused-argument
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """The training loop for HuggingFace models.
+        self._collate_wrapper = HuggingFaceCollateWrapper()
 
-        Arguments:
-        config: A dictionary of configuration parameters.
-        trainset: The training dataset.
-        sampler: the sampler that extracts a partition for this client.
+        super().__init__(
+            model=model,
+            callbacks=plato_callbacks,
+            loss_strategy=None,
+            optimizer_strategy=None,
+            training_step_strategy=HuggingFaceTrainingStepStrategy(),
+            lr_scheduler_strategy=None,
+            model_update_strategy=None,
+            data_loader_strategy=CustomCollateFnDataLoaderStrategy(
+                collate_fn=self._collate_wrapper,
+                num_workers=0,
+                pin_memory=True,
+            ),
+            testing_strategy=HuggingFaceTestingStrategy(self._collate_wrapper),
+        )
+
+        if hf_callbacks:
+            self.add_callbacks(hf_callbacks)
+
+        # Ensure model checkpoints can be saved when model names include slashes.
+        params = Config().params
+        try:
+            model_path = params["model_path"]
+        except (TypeError, KeyError):
+            model_path = None
+        sub_dir = os.path.dirname(model_name)
+        if model_path and sub_dir:
+            os.makedirs(os.path.join(model_path, sub_dir), exist_ok=True)
+        self.context.state["hf_trainer"] = self
+
+    def add_callbacks(self, callbacks: Sequence[Union[type, object]]):
         """
+        Add callbacks to the HuggingFace trainer.
 
+        HuggingFace TrainerCallbacks are stored for future integration, while
+        Plato trainer callbacks are registered with the composable callback
+        handler.
+        """
+        hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
+
+        for callback in hf_callbacks:
+            instance = callback() if isinstance(callback, type) else callback
+            callback_cls = instance.__class__
+            if not isinstance(instance, HFTrainerCallback):
+                raise ValueError(
+                    f"HuggingFace trainer expects subclass of {HFTrainerCallback}, got {callback_cls}."
+                )
+            self._hf_callbacks.append(instance)
+
+        if self._hf_callbacks:
+            self._ensure_hf_bridge()
+
+        if plato_callbacks:
+            self.callback_handler.add_callbacks(plato_callbacks)
+
+    def _ensure_hf_bridge(self):
+        if self._hf_bridge is None:
+            self._hf_bridge = HuggingFaceCallbackBridge(self)
+            self.callback_handler.add_callbacks([self._hf_bridge])
+
+    def train_model(self, config, trainset, sampler, **kwargs):
+        """Update HuggingFace training arguments before delegating to strategies."""
         self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
+        if self._hf_callbacks:
+            self._hf_state = TrainerState()
+            self._hf_control = TrainerControl()
+            self._hf_state.num_train_epochs = config.get("epochs", 1)
+            self._hf_state.max_steps = 0
+            self._hf_steps_per_epoch = None
+        return super().train_model(config, trainset, sampler, **kwargs)
 
-        self.trainer = SampledHuggingFaceTrainer(
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        """Update HuggingFace evaluation batch size before testing."""
+        self.training_args.per_device_eval_batch_size = config.get("batch_size", 1)
+        result = super().test_model(config, testset, sampler=sampler, **kwargs)
+        if self._hf_callbacks:
+            metrics = {"perplexity": result} if isinstance(result, (int, float)) else result
+            self._hf_on_evaluate(metrics)
+        return result
+
+    def save_model(self, filename=None, location=None):
+        """Save checkpoint and inform HuggingFace callbacks."""
+        super().save_model(filename=filename, location=location)
+        if self._hf_callbacks:
+            self._hf_call_callbacks("on_save", model=self.model)
+
+    # --- HuggingFace callback integration helpers ---
+
+    def _hf_call_callbacks(self, method: str, **kwargs):
+        for callback in self._hf_callbacks:
+            handler = getattr(callback, method, None)
+            if handler is None:
+                continue
+            result = handler(self.training_args, self._hf_state, self._hf_control, **kwargs)
+            if isinstance(result, TrainerControl):
+                self._hf_control = result
+
+    def _hf_on_train_begin(self, config):
+        self._hf_control._new_training()
+        self._hf_state.global_step = 0
+        self._hf_state.epoch = 0
+        self._hf_call_callbacks(
+            "on_train_begin",
             model=self.model,
-            args=self.training_args,
-            train_dataset=trainset,
-            eval_dataset=None,
             tokenizer=self.tokenizer,
-            data_collator=default_data_collator,
-            sampler=sampler,
-            callbacks=self.trainer_callbacks,
+            train_dataloader=self.train_loader,
         )
 
-        self.trainer.train()
-
-    def test_model(self, config, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
-        """The testing loop for HuggingFace models.
-
-        Arguments:
-            config: Configuration parameters as a dictionary.
-            testset: The test dataset.
-        """
-        self.training_args.per_device_eval_batch_size = config["batch_size"]
-
-        self.trainer = SampledHuggingFaceTrainer(
+    def _hf_on_train_end(self):
+        self._hf_call_callbacks(
+            "on_train_end",
             model=self.model,
-            args=self.training_args,
-            train_dataset=None,
-            eval_dataset=testset,
             tokenizer=self.tokenizer,
-            data_collator=default_data_collator,
-            sampler=sampler,
-            callbacks=None,
+            train_dataloader=self.train_loader,
         )
 
-        metrics = self.trainer.evaluate()
+    def _hf_update_training_metadata(self):
+        if self.train_loader is None:
+            return
+        if self._hf_steps_per_epoch is None:
+            try:
+                steps = len(self.train_loader)
+            except TypeError:
+                steps = None
+            if steps:
+                self._hf_steps_per_epoch = steps
+                self._hf_state.max_steps = steps * self._hf_state.num_train_epochs
+                batch_size = getattr(self.train_loader, "batch_size", None)
+                self._hf_state.train_batch_size = batch_size
 
-        try:
-            perplexity = math.exp(metrics["eval_loss"])
-        except OverflowError:
-            perplexity = float("inf")
+    def _hf_on_epoch_begin(self):
+        self._hf_control._new_epoch()
+        self._hf_update_training_metadata()
+        current_epoch = max(self.current_epoch - 1, 0)
+        self._hf_state.epoch = float(current_epoch)
+        self._hf_call_callbacks(
+            "on_epoch_begin",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+        )
 
-        return perplexity
+    def _hf_on_epoch_end(self):
+        self._hf_state.epoch = float(self.current_epoch)
+        self._hf_call_callbacks(
+            "on_epoch_end",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+        )
 
-    def add_callbacks(self, callbacks):
-        """Callbacks will be handled by Huggingface instead of Plato."""
-        for callback in callbacks:
-            if not issubclass(callback, TrainerCallback):
-                raise ValueError(
-                    f"Huggingface trainer expects subclass of {TrainerCallback}, got {callback} instead."
-                )
-        self.trainer_callbacks.extend(callbacks)
+    def _hf_on_step_begin(self, batch_index: int):
+        self._hf_control._new_step()
+        self._hf_call_callbacks(
+            "on_step_begin",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+            step=batch_index,
+        )
+
+    def _hf_on_pre_optimizer_step(self):
+        self._hf_call_callbacks(
+            "on_pre_optimizer_step",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+        )
+
+    def _hf_on_optimizer_step(self):
+        self._hf_call_callbacks(
+            "on_optimizer_step",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+        )
+
+    def _hf_on_step_end(self, batch_index: int, loss: torch.Tensor):
+        if self._hf_steps_per_epoch:
+            progress = (batch_index + 1) / self._hf_steps_per_epoch
+            progress = min(progress, 1.0)
+            self._hf_state.epoch = float(self.current_epoch - 1 + progress)
+        self._hf_state.global_step += 1
+        self._hf_call_callbacks(
+            "on_step_end",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            optimizer=self.optimizer,
+            lr_scheduler=self.lr_scheduler,
+            train_dataloader=self.train_loader,
+            metrics={"loss": loss.item() if hasattr(loss, "item") else loss},
+        )
+
+    def _hf_on_evaluate(self, metrics):
+        self._hf_call_callbacks(
+            "on_evaluate",
+            model=self.model,
+            tokenizer=self.tokenizer,
+            metrics=metrics,
+            eval_dataloader=self.context.state.get("eval_loader"),
+        )
