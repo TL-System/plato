@@ -16,7 +16,7 @@ dependencies = [
     "boto3",
     "datasets",
     "evaluate",
-    "gym",
+    "gymnasium",
     "kazoo",
     "lightly",
     "numpy",

@@ -11,9 +11,9 @@ https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 import asyncio
 import logging
 
-import gym
+import gymnasium as gym
 import numpy as np
-from gym import spaces
+from gymnasium import spaces
 
 from plato.config import Config
 
