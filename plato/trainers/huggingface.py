@@ -14,6 +14,7 @@ from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.utils.data
+import torch.nn.functional as F
 from transformers import (
     AutoConfig,
     AutoTokenizer,
@@ -50,12 +51,102 @@ class HuggingFaceBatch(dict):
 class HuggingFaceCollateWrapper:
     """Wraps the default HuggingFace data collator for Plato data loader strategy."""
 
+    def __init__(self, tokenizer=None):
+        self.tokenizer = tokenizer
+
     def __call__(
         self, examples: Iterable[dict]
     ) -> Tuple[HuggingFaceBatch, Optional[torch.Tensor]]:
         batch = default_data_collator(examples)
         labels = batch.pop("labels", None)
+        if labels is None:
+            input_ids = batch.get("input_ids")
+            if input_ids is not None:
+                labels = input_ids.clone()
+                attention_mask = batch.get("attention_mask")
+                if attention_mask is not None:
+                    labels = labels.masked_fill(attention_mask == 0, -100)
+                elif self.tokenizer is not None and self.tokenizer.pad_token_id is not None:
+                    labels = labels.masked_fill(
+                        labels == self.tokenizer.pad_token_id, -100
+                    )
         return HuggingFaceBatch(batch), labels
+
+
+def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
+    """
+    Resolve a loss tensor from HuggingFace model outputs.
+
+    Args:
+        outputs: HuggingFace model outputs (ModelOutput, tuple, tensor, etc.).
+        labels: Labels tensor if available.
+        allow_fallback: Whether to compute loss manually when not provided.
+
+    Returns:
+        A torch.Tensor representing the loss.
+
+    Raises:
+        ValueError: If no loss tensor can be determined.
+    """
+    loss = getattr(outputs, "loss", None)
+    if loss is None:
+        if isinstance(outputs, dict):
+            loss = outputs.get("loss")
+        elif isinstance(outputs, tuple) and len(outputs) > 0:
+            loss = outputs[0]
+        else:
+            loss = outputs
+
+    if torch.is_tensor(loss):
+        return loss
+
+    if not allow_fallback:
+        raise ValueError("HuggingFace model did not return a tensor loss.")
+
+    logits = getattr(outputs, "logits", None)
+    if logits is None and isinstance(outputs, dict):
+        logits = outputs.get("logits")
+    if logits is None and isinstance(outputs, tuple) and len(outputs) > 0:
+        logits = outputs[0]
+
+    if logits is None or labels is None:
+        logits_shape = None if logits is None else tuple(logits.shape)
+        labels_shape = None if labels is None else tuple(labels.shape)
+        logging.error(
+            "Unable to resolve HuggingFace loss: logits=%s labels=%s outputs_type=%s",
+            "None" if logits is None else f"{type(logits)} shape={logits_shape}",
+            "None" if labels is None else f"{type(labels)} shape={labels_shape}",
+            type(outputs),
+        )
+        if hasattr(outputs, "keys"):
+            logging.error("Outputs keys: %s", list(outputs.keys()))
+        elif isinstance(outputs, tuple):
+            logging.error("Outputs tuple length: %d", len(outputs))
+        raise ValueError("HuggingFace model did not return a tensor loss.")
+
+    logits = logits.to(labels.device) if labels.device != logits.device else logits
+    labels = labels.to(logits.device)
+
+    vocab_size = logits.size(-1)
+    if logits.ndim > 2:
+        shift_logits = logits[..., :-1, :].contiguous()
+        shift_labels = labels[..., 1:].contiguous()
+        if shift_logits.numel() > 0:
+            logits = shift_logits
+            labels = shift_labels
+
+    logits_flat = logits.view(-1, vocab_size)
+    labels_flat = labels.view(-1)
+    valid_mask = labels_flat != -100
+    if not torch.any(valid_mask):
+        return torch.tensor(0.0, device=logits.device, dtype=logits.dtype)
+
+    loss = F.cross_entropy(
+        logits_flat,
+        labels_flat,
+        ignore_index=-100,
+    )
+    return loss
 
 
 class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
@@ -101,14 +192,11 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
         batch_inputs = dict(examples)
         if labels is not None:
             batch_inputs["labels"] = labels
+        batch_inputs.setdefault("return_dict", True)
 
         outputs = model(**batch_inputs)
-        loss = getattr(
-            outputs, "loss", outputs[0] if isinstance(outputs, tuple) else outputs
-        )
-
-        if not torch.is_tensor(loss):
-            raise ValueError("HuggingFace model did not return a tensor loss.")
+        labels_tensor = batch_inputs.get("labels")
+        loss = _resolve_hf_loss(outputs, labels_tensor)
 
         loss_for_backward = loss.div(accum_steps) if accum_steps > 1 else loss
         loss_for_backward.backward()
@@ -240,13 +328,9 @@ class HuggingFaceTestingStrategy(TestingStrategy):
                     labels = labels.to(context.device)
                     batch_inputs["labels"] = labels
 
+                batch_inputs.setdefault("return_dict", True)
                 outputs = model(**batch_inputs)
-                loss = getattr(
-                    outputs, "loss", outputs[0] if isinstance(outputs, tuple) else outputs
-                )
-
-                if not torch.is_tensor(loss):
-                    raise ValueError("HuggingFace model did not return a tensor loss.")
+                loss = _resolve_hf_loss(outputs, labels)
 
                 if labels is not None:
                     weight = labels.ne(-100).sum().item()
@@ -370,7 +454,7 @@ class Trainer(ComposableTrainer):
         except (TypeError, ValueError):
             grad_accum_steps = 1
         self._gradient_accumulation_steps = max(grad_accum_steps, 1)
-        self._collate_wrapper = HuggingFaceCollateWrapper()
+        self._collate_wrapper = HuggingFaceCollateWrapper(self.tokenizer)
         self.training_args.gradient_accumulation_steps = self._gradient_accumulation_steps
 
         super().__init__(

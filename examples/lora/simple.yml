@@ -12,6 +12,7 @@ server:
     do_test: true
 
 data:
+    datasource: LoRA
     dataset_name: srivatsavaasista/textgenerator-ds-mini
     partition_size: 512
     sampler: iid

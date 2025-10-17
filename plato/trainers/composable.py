@@ -416,7 +416,8 @@ class ComposableTrainer(base.Trainer):
 
                 # Move data to device
                 examples = examples.to(self.device)
-                labels = labels.to(self.device)
+                if labels is not None:
+                    labels = labels.to(self.device)
 
                 # Create loss criterion callable
                 def compute_loss(outputs, labels_inner):
