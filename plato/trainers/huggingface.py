@@ -59,7 +59,29 @@ class HuggingFaceCollateWrapper:
 
 
 class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
-    """Performs a forward/backward pass using HuggingFace causal language models."""
+    """Performs forward/backward steps with optional gradient accumulation."""
+
+    def __init__(self, gradient_accumulation_steps: Optional[int] = None):
+        self.gradient_accumulation_steps = (
+            int(gradient_accumulation_steps) if gradient_accumulation_steps else 1
+        )
+
+    def setup(self, context: TrainingContext) -> None:
+        """Ensure gradient accumulation state is initialized."""
+        context.state.setdefault("grad_accum_counter", 0)
+        context.state.setdefault("grad_accum_loss_total", 0.0)
+        context.state.setdefault("grad_accum_loss_count", 0)
+
+    def get_accumulation_steps(self, context: TrainingContext) -> int:
+        """Return configured gradient accumulation steps."""
+        steps = context.config.get("gradient_accumulation_steps")
+        if steps is None:
+            steps = self.gradient_accumulation_steps
+        try:
+            steps = int(steps)
+        except (TypeError, ValueError):
+            steps = 1
+        return max(steps, 1)
 
     def training_step(
         self,
@@ -70,27 +92,108 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
         loss_criterion,  # pylint: disable=unused-argument
         context: TrainingContext,
     ):
-        optimizer.zero_grad()
+        accum_steps = self.get_accumulation_steps(context)
+        counter = int(context.state.get("grad_accum_counter", 0))
+
+        if counter == 0:
+            optimizer.zero_grad()
 
         batch_inputs = dict(examples)
         if labels is not None:
             batch_inputs["labels"] = labels
 
         outputs = model(**batch_inputs)
-        loss = getattr(outputs, "loss", outputs[0] if isinstance(outputs, tuple) else outputs)
+        loss = getattr(
+            outputs, "loss", outputs[0] if isinstance(outputs, tuple) else outputs
+        )
 
         if not torch.is_tensor(loss):
             raise ValueError("HuggingFace model did not return a tensor loss.")
 
-        loss.backward()
+        loss_for_backward = loss.div(accum_steps) if accum_steps > 1 else loss
+        loss_for_backward.backward()
+
+        counter += 1
+        context.state["grad_accum_counter"] = counter
+        loss_detached = loss.detach()
+        context.state["grad_accum_loss_total"] = (
+            context.state.get("grad_accum_loss_total", 0.0) + loss_detached.item()
+        )
+        context.state["grad_accum_loss_count"] = (
+            context.state.get("grad_accum_loss_count", 0) + 1
+        )
+
+        should_step = counter >= accum_steps
+        if not should_step and context.state.get("is_last_batch", False):
+            should_step = counter > 0
+
+        trainer = context.state.get("hf_trainer")
+
+        if should_step:
+            if trainer is not None:
+                trainer._hf_on_pre_optimizer_step()
+
+            optimizer.step()
+
+            if trainer is not None:
+                trainer._hf_on_optimizer_step()
+
+            optimizer.zero_grad()
+
+            loss_total = context.state.get("grad_accum_loss_total", 0.0)
+            loss_count = max(context.state.get("grad_accum_loss_count", 0), 1)
+            context.state["hf_loss_for_step"] = loss_total / loss_count
+            context.state["grad_accum_loss_total"] = 0.0
+            context.state["grad_accum_loss_count"] = 0
+            context.state["optimizer_step_completed"] = True
+            context.state["hf_optimizer_step_index"] = (
+                context.state.get("hf_optimizer_step_index", 0) + 1
+            )
+            context.state["grad_accum_counter"] = 0
+        else:
+            context.state["optimizer_step_completed"] = False
+
+        return loss_detached
+
+    def finalize(self, model, optimizer, context: TrainingContext):
+        """
+        Flush any remaining accumulated gradients (e.g., partial final micro-batch).
+
+        Returns a detached loss tensor representative of the accumulated step
+        when a step is executed, otherwise None.
+        """
+        counter = int(context.state.get("grad_accum_counter", 0))
+        if counter == 0:
+            return None
+
         trainer = context.state.get("hf_trainer")
         if trainer is not None:
             trainer._hf_on_pre_optimizer_step()
+
         optimizer.step()
+
         if trainer is not None:
             trainer._hf_on_optimizer_step()
 
-        return loss.detach()
+        optimizer.zero_grad()
+
+        loss_total = context.state.get("grad_accum_loss_total", 0.0)
+        loss_count = max(context.state.get("grad_accum_loss_count", 0), 1)
+        average_loss = loss_total / loss_count if loss_count else 0.0
+        context.state["hf_loss_for_step"] = average_loss
+        context.state["grad_accum_loss_total"] = 0.0
+        context.state["grad_accum_loss_count"] = 0
+        context.state["grad_accum_counter"] = 0
+        context.state["optimizer_step_completed"] = True
+        context.state["hf_optimizer_step_index"] = (
+            context.state.get("hf_optimizer_step_index", 0) + 1
+        )
+
+        if context.device is not None:
+            loss_tensor = torch.tensor(average_loss, device=context.device)
+        else:
+            loss_tensor = torch.tensor(average_loss)
+        return loss_tensor.detach()
 
 
 class HuggingFaceTestingStrategy(TestingStrategy):
@@ -207,9 +310,13 @@ class HuggingFaceCallbackBridge(PlatoTrainerCallback):
         self._trainer._hf_on_epoch_end()
 
     def on_train_step_start(self, trainer, config, batch, **kwargs):
-        self._trainer._hf_on_step_begin(batch)
+        counter = trainer.context.state.get("grad_accum_counter", 0)
+        if counter == 0:
+            self._trainer._hf_on_step_begin(batch)
 
     def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+        if not trainer.context.state.get("optimizer_step_completed", True):
+            return
         self._trainer._hf_on_step_end(batch, loss)
         self._trainer._hf_handle_control_flags()
 
@@ -257,14 +364,23 @@ class Trainer(ComposableTrainer):
                 model_name, config=self.config, **tokenizer_kwargs
         )
 
+        grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
+        try:
+            grad_accum_steps = int(grad_accum_steps)
+        except (TypeError, ValueError):
+            grad_accum_steps = 1
+        self._gradient_accumulation_steps = max(grad_accum_steps, 1)
         self._collate_wrapper = HuggingFaceCollateWrapper()
+        self.training_args.gradient_accumulation_steps = self._gradient_accumulation_steps
 
         super().__init__(
             model=model,
             callbacks=plato_callbacks,
             loss_strategy=None,
             optimizer_strategy=None,
-            training_step_strategy=HuggingFaceTrainingStepStrategy(),
+            training_step_strategy=HuggingFaceTrainingStepStrategy(
+                gradient_accumulation_steps=self._gradient_accumulation_steps
+            ),
             lr_scheduler_strategy=None,
             model_update_strategy=None,
             data_loader_strategy=CustomCollateFnDataLoaderStrategy(
@@ -291,6 +407,9 @@ class Trainer(ComposableTrainer):
         if model_path and sub_dir:
             os.makedirs(os.path.join(model_path, sub_dir), exist_ok=True)
         self.context.state["hf_trainer"] = self
+        self.context.state["grad_accum_counter"] = 0
+        self.context.state["grad_accum_loss_total"] = 0.0
+        self.context.state["grad_accum_loss_count"] = 0
         self._hf_pending_keys = ("save", "evaluate", "log", "stop_epoch", "stop_training")
         self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
         self._hf_pending_log_data = None
@@ -329,6 +448,22 @@ class Trainer(ComposableTrainer):
         """Update HuggingFace training arguments before delegating to strategies."""
         self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
+        accum_steps = config.get(
+            "gradient_accumulation_steps", self._gradient_accumulation_steps
+        )
+        try:
+            accum_steps = int(accum_steps)
+        except (TypeError, ValueError):
+            accum_steps = 1
+        accum_steps = max(accum_steps, 1)
+        self.training_args.gradient_accumulation_steps = accum_steps
+        self._gradient_accumulation_steps = accum_steps
+        if hasattr(self.training_step_strategy, "gradient_accumulation_steps"):
+            self.training_step_strategy.gradient_accumulation_steps = accum_steps
+        self.context.state["grad_accum_counter"] = 0
+        self.context.state["grad_accum_loss_total"] = 0.0
+        self.context.state["grad_accum_loss_count"] = 0
+        self.context.state["hf_optimizer_step_index"] = 0
         if self._hf_callbacks:
             self._hf_state = TrainerState()
             self._hf_control = TrainerControl()
@@ -397,6 +532,11 @@ class Trainer(ComposableTrainer):
             except TypeError:
                 steps = None
             if steps:
+                accum_steps = self.training_step_strategy.get_accumulation_steps(
+                    self.context
+                )
+                if accum_steps > 0:
+                    steps = math.ceil(steps / accum_steps)
                 self._hf_steps_per_epoch = steps
                 self._hf_state.max_steps = steps * self._hf_state.num_train_epochs
                 batch_size = getattr(self.train_loader, "batch_size", None)
@@ -462,11 +602,19 @@ class Trainer(ComposableTrainer):
 
     def _hf_on_step_end(self, batch_index: int, loss: torch.Tensor):
         if self._hf_steps_per_epoch:
-            progress = (batch_index + 1) / self._hf_steps_per_epoch
+            step_index = self.context.state.get("hf_optimizer_step_index")
+            if step_index is None:
+                progress = (batch_index + 1) / self._hf_steps_per_epoch
+            else:
+                progress = step_index / self._hf_steps_per_epoch
             progress = min(progress, 1.0)
             self._hf_state.epoch = float(self.current_epoch - 1 + progress)
         self._hf_state.global_step += 1
-        loss_value = loss.item() if hasattr(loss, "item") else float(loss)
+        loss_override = self.context.state.pop("hf_loss_for_step", None)
+        if loss_override is not None:
+            loss_value = float(loss_override)
+        else:
+            loss_value = loss.item() if hasattr(loss, "item") else float(loss)
         log_entry = {
             "loss": float(loss_value),
             "step": self._hf_state.global_step,
@@ -484,7 +632,7 @@ class Trainer(ComposableTrainer):
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
             train_dataloader=self.train_loader,
-            metrics={"loss": loss.item() if hasattr(loss, "item") else loss},
+            metrics={"loss": loss_value},
         )
 
     def _hf_on_evaluate(self, metrics):

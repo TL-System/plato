@@ -25,6 +25,7 @@ trainer:
     model_type: huggingface
     epochs: 1
     batch_size: 8
+    gradient_accumulation_steps: 4
     optimizer: AdamW
 
 algorithm:
