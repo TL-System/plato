@@ -239,7 +239,7 @@ class Trainer(ComposableTrainer):
         }
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
         if getattr(self.config, "loss_type", None) is None:
-            self.config.loss_type = "ForCausalLMLoss"
+            self.config.loss_type = "ForCausalLM"
 
         tokenizer_kwargs = {
             "cache_dir": None,

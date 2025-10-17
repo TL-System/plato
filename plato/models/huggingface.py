@@ -21,7 +21,7 @@ class Model:
 
         config = AutoConfig.from_pretrained(model_name, **config_kwargs)
         if getattr(config, "loss_type", None) is None:
-            config.loss_type = "ForCausalLMLoss"
+            config.loss_type = "ForCausalLM"
 
         return AutoModelForCausalLM.from_pretrained(
             model_name,

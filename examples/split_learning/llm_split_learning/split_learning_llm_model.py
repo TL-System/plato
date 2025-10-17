@@ -47,7 +47,7 @@ class BaseModel(torch.nn.Module):
 
         self.config = AutoConfig.from_pretrained(self.model_name, **config_kwargs)
         if getattr(self.config, "loss_type", None) is None:
-            self.config.loss_type = "ForCausalLMLoss"
+            self.config.loss_type = "ForCausalLM"
 
         self.base_model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
