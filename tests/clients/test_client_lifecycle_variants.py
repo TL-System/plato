@@ -9,15 +9,14 @@ import pickle
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
-import torch
 import pytest
+import torch
 
 from plato.callbacks.client import LogProgressCallback
 from plato.clients import base, mpc, split_learning
 from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.clients.strategies.mpc import MPCTrainingStrategy
 from plato.config import Config
-
 from tests.test_utils.fakes import (
     IdentityLifecycleStrategy,
     InMemoryReportingStrategy,
@@ -41,11 +40,15 @@ class DummyClient(base.Client):
         communication_strategy,
     ):
         self.custom_model_factory = model_factory
-        self._custom_datasource_factory = getattr(lifecycle_strategy, "_datasource_factory", None)
+        self._custom_datasource_factory = getattr(
+            lifecycle_strategy, "_datasource_factory", None
+        )
 
         super().__init__(callbacks=None)
 
-        self.custom_model = model_factory() if callable(model_factory) else model_factory
+        self.custom_model = (
+            model_factory() if callable(model_factory) else model_factory
+        )
         self.model = self.custom_model
         self.custom_datasource = self._custom_datasource_factory
         self.custom_trainer = None
@@ -177,7 +180,9 @@ def test_composable_client_handles_payload_roundtrip(
     payload_strategy = RecordingPayloadStrategy()
     client = DummyClient(
         model_factory=fake_model_cls,
-        lifecycle_strategy=IdentityLifecycleStrategy(datasource_factory=fake_datasource_cls),
+        lifecycle_strategy=IdentityLifecycleStrategy(
+            datasource_factory=fake_datasource_cls
+        ),
         payload_strategy=payload_strategy,
         training_strategy=StaticTrainingStrategy(),
         reporting_strategy=fake_reporting_strategy,
@@ -248,17 +253,20 @@ def test_composable_client_request_update_orders_callbacks(dummy_client):
     recording_callback = RecordingClientCallback
     client.add_callbacks([recording_callback])
     callback_instance = next(
-        cb for cb in client.callback_handler.callbacks if isinstance(cb, RecordingClientCallback)
+        cb
+        for cb in client.callback_handler.callbacks
+        if isinstance(cb, RecordingClientCallback)
     )
 
     client._context.state["event_log"] = []
     payload_strategy.events.clear()
 
-    asyncio.run(
-        client._request_update({"client_id": client.client_id, "time": 0.5})
-    )
+    asyncio.run(client._request_update({"client_id": client.client_id, "time": 0.5}))
 
-    assert client._context.state["event_log"] == ["callback_outbound", "payload_outbound"]
+    assert client._context.state["event_log"] == [
+        "callback_outbound",
+        "payload_outbound",
+    ]
     assert callback_instance.events == ["callback_outbound"]
     assert payload_strategy.events.count("outbound_ready") == 1
     assert client._context.state["sent_reports"]
@@ -344,7 +352,9 @@ def test_mpc_client_round_store_configuration(temp_config, tmp_path):
         assert client._context.round_store is client.round_store
         assert client._context.debug_artifacts is True
 
-        processor_kwargs = client.lifecycle_strategy._build_processor_kwargs(client._context)
+        processor_kwargs = client.lifecycle_strategy._build_processor_kwargs(
+            client._context
+        )
         encrypt_settings = processor_kwargs["mpc_model_encrypt_aes"]
         assert encrypt_settings["client_id"] == client.client_id
         assert encrypt_settings["round_store"] is client.round_store

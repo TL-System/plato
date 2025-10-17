@@ -106,8 +106,7 @@ class StaticTrainingStrategy(TrainingStrategy):
             num_samples=num_samples,
         )
         payload = {
-            name: tensor.clone()
-            for name, tensor in self._payload_template.items()
+            name: tensor.clone() for name, tensor in self._payload_template.items()
         }
         context.state["last_report"] = report
         context.state["last_payload"] = payload
@@ -165,7 +164,9 @@ class InMemoryReportingStrategy(ReportingStrategy):
         customiser = getattr(context, "report_customizer", None)
         return customiser(report) if callable(customiser) else report
 
-    async def obtain_model_at_time(self, context: ClientContext, client_id: int, requested_time: float):
+    async def obtain_model_at_time(
+        self, context: ClientContext, client_id: int, requested_time: float
+    ):
         payload = context.state.get("last_payload")
         report = context.state.get("last_report")
         return report, payload
@@ -312,9 +313,7 @@ class RecordingPayloadStrategy(PayloadStrategy):
         if outbound_processor is not None:
             outbound_payload = outbound_processor.process(outbound_payload)
 
-        await communication.send_report_and_payload(
-            context, report, outbound_payload
-        )
+        await communication.send_report_and_payload(context, report, outbound_payload)
         context.state["last_payload"] = outbound_payload
 
         self.events.append("handle_done")

@@ -50,7 +50,9 @@ class FedSawEdgeTrainingStrategy(EdgeTrainingStrategy):
         report, new_weights = await super().train(context)
 
         weight_updates = self._prune_updates(context, previous_weights, new_weights)
-        logging.info("[Edge Server #%d] Pruned its aggregated updates.", context.client_id)
+        logging.info(
+            "[Edge Server #%d] Pruned its aggregated updates.", context.client_id
+        )
 
         return report, weight_updates
 

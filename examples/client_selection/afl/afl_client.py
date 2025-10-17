@@ -117,7 +117,9 @@ class AFLReportingStrategy(DefaultReportingStrategy):
 
         loss = self._get_pre_training_loss(context)
         logging.info(
-            fonts.colourize(f"[Client #{context.client_id}] Pre-training loss value: {loss}")
+            fonts.colourize(
+                f"[Client #{context.client_id}] Pre-training loss value: {loss}"
+            )
         )
 
         num_samples = getattr(report, "num_samples", None)

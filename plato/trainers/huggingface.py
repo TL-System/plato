@@ -1,8 +1,8 @@
 """
 Strategy-based trainer for HuggingFace transformer models.
 
-This implementation uses Plato's composable trainer architecture by wiring 
-HuggingFace data handling through strategy objects instead of overriding 
+This implementation uses Plato's composable trainer architecture by wiring
+HuggingFace data handling through strategy objects instead of overriding
 `load_model`/`save_model` hooks.
 
 """
@@ -13,28 +13,30 @@ import os
 from typing import Iterable, Optional, Sequence, Tuple, Union
 
 import torch
-import torch.utils.data
 import torch.nn.functional as F
+import torch.utils.data
 from transformers import (
     AutoConfig,
     AutoTokenizer,
     HfArgumentParser,
     LlamaTokenizer,
-    TrainerCallback as HFTrainerCallback,
     TrainingArguments,
     default_data_collator,
 )
+from transformers import (
+    TrainerCallback as HFTrainerCallback,
+)
 from transformers.trainer_callback import TrainerControl, TrainerState
 
+from plato.callbacks.trainer import TrainerCallback as PlatoTrainerCallback
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
-from plato.callbacks.trainer import TrainerCallback as PlatoTrainerCallback
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies import CustomCollateFnDataLoaderStrategy
 from plato.trainers.strategies.base import (
+    TestingStrategy,
     TrainingContext,
     TrainingStepStrategy,
-    TestingStrategy,
 )
 
 
@@ -66,7 +68,10 @@ class HuggingFaceCollateWrapper:
                 attention_mask = batch.get("attention_mask")
                 if attention_mask is not None:
                     labels = labels.masked_fill(attention_mask == 0, -100)
-                elif self.tokenizer is not None and self.tokenizer.pad_token_id is not None:
+                elif (
+                    self.tokenizer is not None
+                    and self.tokenizer.pad_token_id is not None
+                ):
                     labels = labels.masked_fill(
                         labels == self.tokenizer.pad_token_id, -100
                     )
@@ -356,7 +361,7 @@ class HuggingFaceTestingStrategy(TestingStrategy):
 
 
 def _split_callback_types(
-    callbacks: Optional[Sequence[Union[type, object]]]
+    callbacks: Optional[Sequence[Union[type, object]]],
 ) -> Tuple[Sequence[Union[type, object]], Sequence[Union[type, object]]]:
     """Separate HuggingFace callbacks from Plato trainer callbacks."""
     if not callbacks:
@@ -366,7 +371,9 @@ def _split_callback_types(
     plato_callbacks = []
     for callback in callbacks:
         callback_cls = callback if isinstance(callback, type) else callback.__class__
-        if isinstance(callback_cls, type) and issubclass(callback_cls, HFTrainerCallback):
+        if isinstance(callback_cls, type) and issubclass(
+            callback_cls, HFTrainerCallback
+        ):
             hf_callbacks.append(callback)
         elif isinstance(callback, HFTrainerCallback):
             hf_callbacks.append(callback)
@@ -446,7 +453,7 @@ class Trainer(ComposableTrainer):
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(
                 model_name, config=self.config, **tokenizer_kwargs
-        )
+            )
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -455,7 +462,9 @@ class Trainer(ComposableTrainer):
             grad_accum_steps = 1
         self._gradient_accumulation_steps = max(grad_accum_steps, 1)
         self._collate_wrapper = HuggingFaceCollateWrapper(self.tokenizer)
-        self.training_args.gradient_accumulation_steps = self._gradient_accumulation_steps
+        self.training_args.gradient_accumulation_steps = (
+            self._gradient_accumulation_steps
+        )
 
         super().__init__(
             model=model,
@@ -494,7 +503,13 @@ class Trainer(ComposableTrainer):
         self.context.state["grad_accum_counter"] = 0
         self.context.state["grad_accum_loss_total"] = 0.0
         self.context.state["grad_accum_loss_count"] = 0
-        self._hf_pending_keys = ("save", "evaluate", "log", "stop_epoch", "stop_training")
+        self._hf_pending_keys = (
+            "save",
+            "evaluate",
+            "log",
+            "stop_epoch",
+            "stop_training",
+        )
         self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
         self._hf_pending_log_data = None
 
@@ -563,7 +578,9 @@ class Trainer(ComposableTrainer):
         self.training_args.per_device_eval_batch_size = config.get("batch_size", 1)
         result = super().test_model(config, testset, sampler=sampler, **kwargs)
         if self._hf_callbacks:
-            metrics = {"perplexity": result} if isinstance(result, (int, float)) else result
+            metrics = (
+                {"perplexity": result} if isinstance(result, (int, float)) else result
+            )
             self._hf_on_evaluate(metrics)
         return result
 
@@ -581,7 +598,9 @@ class Trainer(ComposableTrainer):
             handler = getattr(callback, method, None)
             if handler is None:
                 continue
-            result = handler(self.training_args, self._hf_state, self._hf_control, **kwargs)
+            result = handler(
+                self.training_args, self._hf_state, self._hf_control, **kwargs
+            )
             if isinstance(result, TrainerControl):
                 self._hf_control = result
 
@@ -760,7 +779,10 @@ class Trainer(ComposableTrainer):
         if not self._hf_callbacks:
             return {}
 
-        actions = {key: bool(self._hf_pending_actions.get(key)) for key in self._hf_pending_keys}
+        actions = {
+            key: bool(self._hf_pending_actions.get(key))
+            for key in self._hf_pending_keys
+        }
         self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
         return actions
 

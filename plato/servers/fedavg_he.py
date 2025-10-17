@@ -103,9 +103,7 @@ class Server(fedavg.Server):
                     device=unencrypted_avg_update.device,
                 )
 
-            unencrypted_avg_update += unenc_tensor * (
-                num_samples / self.total_samples
-            )
+            unencrypted_avg_update += unenc_tensor * (num_samples / self.total_samples)
             if enc_w is not None:
                 if encrypted_avg_update is None:
                     encrypted_avg_update = enc_w * 0

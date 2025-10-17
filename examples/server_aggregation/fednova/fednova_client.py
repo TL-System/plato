@@ -15,7 +15,10 @@ import logging
 import numpy as np
 
 from plato.clients import simple
-from plato.clients.strategies.defaults import DefaultLifecycleStrategy, DefaultTrainingStrategy
+from plato.clients.strategies.defaults import (
+    DefaultLifecycleStrategy,
+    DefaultTrainingStrategy,
+)
 from plato.config import Config
 
 

@@ -12,6 +12,13 @@ from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
+# Import example client-selection strategies for demonstration purposes.
+from examples.client_selection.afl.afl_selection_strategy import (
+    AFLSelectionStrategy,
+)
+from examples.client_selection.oort.oort_selection_strategy import (
+    OortSelectionStrategy,
+)
 from plato.clients import simple
 from plato.datasources import base
 from plato.servers import fedavg
@@ -21,14 +28,6 @@ from plato.servers.strategies import (
     RandomSelectionStrategy,
 )
 from plato.trainers import basic
-
-# Import example client-selection strategies for demonstration purposes.
-from examples.client_selection.afl.afl_selection_strategy import (
-    AFLSelectionStrategy,
-)
-from examples.client_selection.oort.oort_selection_strategy import (
-    OortSelectionStrategy,
-)
 
 
 class DataSource(base.DataSource):

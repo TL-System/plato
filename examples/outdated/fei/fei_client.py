@@ -4,6 +4,7 @@ A federated learning client for FEI.
 
 import logging
 import math
+
 from plato.clients import simple
 from plato.clients.strategies import DefaultLifecycleStrategy
 from plato.clients.strategies.base import ClientContext

@@ -47,7 +47,9 @@ class ComposableClientEvents(socketio.AsyncClientNamespace):
         LOGGER.info(
             "[Client #%d] The server disconnected the connection.", owner.client_id
         )
-        shutdown_delay = getattr(getattr(Config(), "clients", object()), "shutdown_delay", 1.0)
+        shutdown_delay = getattr(
+            getattr(Config(), "clients", object()), "shutdown_delay", 1.0
+        )
         if shutdown_delay and shutdown_delay > 0:
             await asyncio.sleep(shutdown_delay)
         owner._clear_checkpoint_files()

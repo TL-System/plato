@@ -11,7 +11,11 @@ import pytest
 import torch
 from torch.utils.data import TensorDataset
 
-from tests.integration.utils import async_run, build_minimal_config, configure_environment
+from tests.integration.utils import (
+    async_run,
+    build_minimal_config,
+    configure_environment,
+)
 
 
 class MNISTSmokeDatasource:
@@ -68,7 +72,9 @@ def test_fedavg_lenet5_smoke(monkeypatch):
 
         # Build fake updates to trigger aggregation without real clients.
         trainer = server.trainer
-        weights = {name: tensor.clone() for name, tensor in trainer.model.state_dict().items()}
+        weights = {
+            name: tensor.clone() for name, tensor in trainer.model.state_dict().items()
+        }
         update = SimpleNamespace(
             client_id=1,
             report=SimpleNamespace(

@@ -58,6 +58,7 @@ class Client(simple.Client):
             communication_strategy=communication_strategy,
         )
 
+
 class FlMamlTrainingStrategy(DefaultTrainingStrategy):
     """Training strategy that supports personalization tests for FL MAML."""
 

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from plato.config import Config
 from tests.test_utils.fakes import (
     FakeDatasource,
     FakeModel,
@@ -17,8 +18,6 @@ from tests.test_utils.fakes import (
     StaticTrainingStrategy,
     WeightedAverageAggregation,
 )
-
-from plato.config import Config
 
 
 @pytest.fixture

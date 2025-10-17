@@ -11,8 +11,8 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 import numpy as np
 
 from plato.clients import simple
-from plato.clients.strategies.defaults import DefaultReportingStrategy
 from plato.clients.strategies.base import ClientContext
+from plato.clients.strategies.defaults import DefaultReportingStrategy
 
 
 class OortReportingStrategy(DefaultReportingStrategy):

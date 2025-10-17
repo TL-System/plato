@@ -7,7 +7,13 @@ based on a configuration at run-time.
 
 import logging
 
-from plato.algorithms import fedavg, fedavg_gan, fedavg_personalized, lora, split_learning
+from plato.algorithms import (
+    fedavg,
+    fedavg_gan,
+    fedavg_personalized,
+    lora,
+    split_learning,
+)
 from plato.config import Config
 
 registered_algorithms = {

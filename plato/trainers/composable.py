@@ -492,13 +492,12 @@ class ComposableTrainer(base.Trainer):
                     optimizer=self.optimizer,
                     context=self.context,
                 )
-                finalize_step_done = bool(
-                    self.context.state.get("optimizer_step_completed", False)
-                ) and finalize_loss is not None
-            if finalize_step_done:
-                self.optimizer_strategy.on_optimizer_step(
-                    self.optimizer, self.context
+                finalize_step_done = (
+                    bool(self.context.state.get("optimizer_step_completed", False))
+                    and finalize_loss is not None
                 )
+            if finalize_step_done:
+                self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
                 self.model_update_strategy.after_step(self.context)
                 self.callback_handler.call_event(
                     "on_train_step_end",
@@ -526,9 +525,7 @@ class ComposableTrainer(base.Trainer):
                 ):
                     self._handle_control_evaluate()
 
-                if control_actions.get("log") and hasattr(
-                    self, "_handle_control_log"
-                ):
+                if control_actions.get("log") and hasattr(self, "_handle_control_log"):
                     self._handle_control_log()
 
                 if control_actions.get("stop_training"):
