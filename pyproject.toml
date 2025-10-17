@@ -79,3 +79,8 @@ members = [
 dev = [
     "pytest",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests that require end-to-end config smoke runs.",
+]
