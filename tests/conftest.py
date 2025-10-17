@@ -7,6 +7,17 @@ from pathlib import Path
 
 import pytest
 
+from tests.test_utils.fakes import (
+    FakeDatasource,
+    FakeModel,
+    IdentityLifecycleStrategy,
+    InMemoryReportingStrategy,
+    NoOpCommunicationStrategy,
+    RecordingPayloadStrategy,
+    StaticTrainingStrategy,
+    WeightedAverageAggregation,
+)
+
 from plato.config import Config
 
 
@@ -61,6 +72,8 @@ def temp_config(tmp_path, monkeypatch):
     Config._instance = None
 
     config = Config()
+    if getattr(Config, "args", None) is not None and Config.args.id is None:
+        Config.args.id = 1
 
     # Redirect model and checkpoint directories into the temp folder.
     base_path = Path(tmp_path)
@@ -74,3 +87,53 @@ def temp_config(tmp_path, monkeypatch):
 
     # Tear down the singleton so subsequent tests can configure a new instance.
     Config._instance = None
+    if getattr(Config, "args", None) is not None:
+        Config.args.id = None
+
+
+@pytest.fixture
+def fake_model_cls():
+    """Return the lightweight fake model class for composing components."""
+    return FakeModel
+
+
+@pytest.fixture
+def fake_datasource_cls():
+    """Return the fake datasource class to create deterministic datasets."""
+    return FakeDatasource
+
+
+@pytest.fixture
+def fake_training_strategy():
+    """Instantiate a training strategy that skips optimisation."""
+    return StaticTrainingStrategy()
+
+
+@pytest.fixture
+def fake_lifecycle_strategy(fake_datasource_cls):
+    """Lifecycle strategy that injects fake datasource/trainer components."""
+    return IdentityLifecycleStrategy(datasource_factory=fake_datasource_cls)
+
+
+@pytest.fixture
+def fake_reporting_strategy():
+    """Reporting strategy storing the most recent report in memory."""
+    return InMemoryReportingStrategy()
+
+
+@pytest.fixture
+def fake_communication_strategy():
+    """Communication strategy that records outbound artefacts."""
+    return NoOpCommunicationStrategy()
+
+
+@pytest.fixture
+def recording_payload_strategy():
+    """Payload strategy that records lifecycle events for assertions."""
+    return RecordingPayloadStrategy()
+
+
+@pytest.fixture
+def fake_aggregation_strategy():
+    """Aggregation strategy performing a simple weighted average."""
+    return WeightedAverageAggregation()
