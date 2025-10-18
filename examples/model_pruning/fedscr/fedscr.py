@@ -15,7 +15,7 @@ import fedscr_trainer
 def main():
     """A Plato federated learning training session using the FedSCR algorithm."""
     trainer = fedscr_trainer.Trainer
-    client = fedscr_client.Client(trainer=trainer)
+    client = fedscr_client.create_client(trainer=trainer)
     server = fedscr_server.Server(trainer=trainer)
     server.run(client)
 

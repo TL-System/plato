@@ -100,25 +100,36 @@ class FedSawTrainingStrategy(DefaultTrainingStrategy):
         return deltas
 
 
-class Client(simple.Client):
-    """
-    A federated learning client prunes its update before sending out.
-    """
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks=None,
+):
+    """Build a FedSaw client that prunes its updates before reporting."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=trainer_callbacks,
+    )
+    client.pruning_amount = 0
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
-        super().__init__(
-            model=model, datasource=datasource, algorithm=algorithm, trainer=trainer
-        )
-        self.pruning_amount = 0
+    client._configure_composable(
+        lifecycle_strategy=FedSawClientLifecycleStrategy(),
+        payload_strategy=client.payload_strategy,
+        training_strategy=FedSawTrainingStrategy(),
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
 
-        payload_strategy = self.payload_strategy
-        reporting_strategy = self.reporting_strategy
-        communication_strategy = self.communication_strategy
+    return client
 
-        self._configure_composable(
-            lifecycle_strategy=FedSawClientLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=FedSawTrainingStrategy(),
-            reporting_strategy=reporting_strategy,
-            communication_strategy=communication_strategy,
-        )
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

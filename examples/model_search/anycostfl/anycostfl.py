@@ -8,7 +8,7 @@ in InfoCom 2023.
 """
 
 from anycostfl_algorithm import Algorithm
-from anycostfl_client import Client
+from anycostfl_client import create_client
 from anycostfl_server import Server
 from anycostfl_trainer import ServerTrainer
 from resnet import resnet18
@@ -24,7 +24,7 @@ def main():
     else:
         model = ViT
     server = Server(model=model, algorithm=Algorithm, trainer=ServerTrainer)
-    client = Client(model=model)
+    client = create_client(model=model)
     server.run(client)
 
 

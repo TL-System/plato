@@ -14,7 +14,7 @@ def main():
     """
     algorithm = knot_algorithm.Algorithm
     trainer = knot_trainer.Trainer
-    client = knot_client.Client(algorithm=algorithm, trainer=trainer)
+    client = knot_client.create_client(algorithm=algorithm, trainer=trainer)
     server = knot_server.Server(algorithm=algorithm, trainer=trainer)
     server.run(client)
 

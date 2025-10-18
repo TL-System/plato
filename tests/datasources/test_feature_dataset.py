@@ -1,6 +1,7 @@
 """Unit tests for FeatureDataset."""
 
 import torch
+import pytest
 
 from plato.datasources.feature_dataset import FeatureDataset
 
@@ -16,6 +17,29 @@ def test_feature_dataset_returns_feature_and_label():
 
     assert torch.equal(loaded_feature, feature)
     assert loaded_label.item() == label.item()
+
+
+def test_feature_dataset_defaults_label_for_single_element():
+    """Samples without labels should receive a default label."""
+    feature = torch.randn(2, 4)
+
+    dataset = FeatureDataset([(feature,)])
+
+    loaded_feature, loaded_label = dataset[0]
+
+    assert torch.equal(loaded_feature, feature)
+    assert loaded_label.item() == 0
+
+
+def test_feature_dataset_defaults_label_for_tensor_sample():
+    """Tensor samples should be wrapped with a zero label."""
+    feature = torch.randn(3)
+
+    dataset = FeatureDataset([feature])
+
+    _, loaded_label = dataset[0]
+
+    assert loaded_label.item() == 0
 
 
 def test_feature_dataset_handles_multiple_samples():
@@ -43,3 +67,24 @@ def test_feature_dataset_ignores_extra_fields():
 
     assert torch.equal(loaded_feature, feature)
     assert loaded_label.item() == label.item()
+
+
+def test_feature_dataset_squeezes_label_dimension():
+    """Labels with extra dimensions should be squeezed."""
+    feature = torch.randn(3, 32, 32)
+    label = torch.tensor([7])
+
+    dataset = FeatureDataset([(feature, label)])
+
+    _, loaded_label = dataset[0]
+
+    assert loaded_label.ndim == 0
+    assert loaded_label.item() == 7
+
+
+def test_feature_dataset_raises_for_empty_sample():
+    """Empty samples should raise an informative error."""
+    dataset = FeatureDataset([()])
+
+    with pytest.raises(ValueError):
+        _ = dataset[0]

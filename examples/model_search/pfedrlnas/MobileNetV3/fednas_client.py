@@ -82,68 +82,49 @@ class PerFedRLNASMobileNetReportingStrategy(DefaultReportingStrategy):
         return report
 
 
-class ClientSync(simple.Client):
-    """A FedRLNAS client. Different clients hold different models."""
+def _default_include_memory_metrics(include_memory_metrics):
+    if include_memory_metrics is not None:
+        return include_memory_metrics
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks=None,
-        *,
-        include_memory_metrics: bool = False,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=trainer_callbacks,
-        )
-
-        payload_strategy = self.payload_strategy
-        training_strategy = self.training_strategy
-        communication_strategy = self.communication_strategy
-
-        self._configure_composable(
-            lifecycle_strategy=PerFedRLNASMobileNetLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
-            reporting_strategy=PerFedRLNASMobileNetReportingStrategy(
-                include_memory_metrics=include_memory_metrics
-            ),
-            communication_strategy=communication_strategy,
-        )
+    server_cfg = getattr(Config(), "server", None)
+    synchronous = getattr(server_cfg, "synchronous", True)
+    return not synchronous
 
 
-class ClientAsync(ClientSync):
-    """A FedRLNAS client. Different clients hold different models."""
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks=None,
+    include_memory_metrics=None,
+):
+    """Build a PerFedRLNAS MobileNet client with optional memory metrics."""
+    include_memory_metrics = _default_include_memory_metrics(include_memory_metrics)
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=trainer_callbacks,
-            include_memory_metrics=True,
-        )
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=trainer_callbacks,
+    )
+
+    client._configure_composable(
+        lifecycle_strategy=PerFedRLNASMobileNetLifecycleStrategy(),
+        payload_strategy=client.payload_strategy,
+        training_strategy=client.training_strategy,
+        reporting_strategy=PerFedRLNASMobileNetReportingStrategy(
+            include_memory_metrics=include_memory_metrics
+        ),
+        communication_strategy=client.communication_strategy,
+    )
+
+    return client
 
 
-if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-    Client = ClientAsync
-else:
-    Client = ClientSync
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

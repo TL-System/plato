@@ -18,7 +18,7 @@ import oort_trainer
 def main():
     """A Plato federated learning training session using Oort strategy."""
     trainer = oort_trainer.Trainer
-    client = oort_client.Client(trainer=trainer)
+    client = oort_client.create_client(trainer=trainer)
     server = oort_server.Server(trainer=trainer)
     server.run(client)
 

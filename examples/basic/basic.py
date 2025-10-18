@@ -14,8 +14,8 @@ from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
 from plato.clients import simple
-from plato.datasources import base
 from plato.config import Config
+from plato.datasources import base
 from plato.servers import fedavg
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
@@ -38,8 +38,12 @@ class DataSource(base.DataSource):
         Config()
         base_path = Path(Config.params.get("base_path", "./runtime"))
         data_dir = Path(Config.params.get("data_path", base_path / "data"))
-        self.trainset = MNIST(str(data_dir), train=True, download=True, transform=ToTensor())
-        self.testset = MNIST(str(data_dir), train=False, download=True, transform=ToTensor())
+        self.trainset = MNIST(
+            str(data_dir), train=True, download=True, transform=ToTensor()
+        )
+        self.testset = MNIST(
+            str(data_dir), train=False, download=True, transform=ToTensor()
+        )
 
 
 class MNISTTrainingStepStrategy(TrainingStepStrategy):

@@ -13,7 +13,7 @@ from plato.trainers.basic import Trainer
 
 def main():
     """A Plato federated learning training session using the PerFedRLNAS algorithm."""
-    client = fednas_client.Client(
+    client = fednas_client.create_client(
         model=Network, algorithm=ClientAlgorithm, trainer=Trainer
     )
     server = fednas_server.Server(

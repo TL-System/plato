@@ -16,7 +16,7 @@ import afl_server
 
 def main():
     """A Plato federated learning training session using the AFL algorithm."""
-    client = afl_client.Client()
+    client = afl_client.create_client()
     server = afl_server.Server()
     server.run(client)
 

@@ -21,7 +21,7 @@ def main():
     A Plato federated learning training session using PerFedRLNAS, paper unpublished.
     """
     supernet = AttentiveNasDynamicModel
-    client = fednas_client.Client(
+    client = fednas_client.create_client(
         model=supernet,
         algorithm=fednas_algorithm.ClientAlgorithm,
         trainer=fednas_trainer.Trainer,

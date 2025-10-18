@@ -97,35 +97,35 @@ class FedSawEdgeTrainingStrategy(EdgeTrainingStrategy):
         return deltas
 
 
-class Client(edge.Client):
-    """A federated learning client at the edge server in a cross-silo training workload."""
+def create_client(
+    *,
+    server,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+):
+    """Build a FedSaw edge client with pruning-aware strategies."""
+    client = edge.Client(
+        server=server,
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+    )
 
-    def __init__(
-        self,
-        server,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-    ):
-        super().__init__(
-            server=server,
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-        )
+    client._configure_composable(
+        lifecycle_strategy=FedSawEdgeLifecycleStrategy(),
+        payload_strategy=client.payload_strategy,
+        training_strategy=FedSawEdgeTrainingStrategy(),
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
 
-        payload_strategy = self.payload_strategy
-        reporting_strategy = self.reporting_strategy
-        communication_strategy = self.communication_strategy
+    return client
 
-        self._configure_composable(
-            lifecycle_strategy=FedSawEdgeLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=FedSawEdgeTrainingStrategy(),
-            reporting_strategy=reporting_strategy,
-            communication_strategy=communication_strategy,
-        )
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

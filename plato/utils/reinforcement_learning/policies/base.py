@@ -126,11 +126,13 @@ class Policy(ABC):
 
         torch.save(self.actor.state_dict(), model_path / f"{prefix}actor.pth")
         torch.save(
-            self.actor_optimizer.state_dict(), model_path / f"{prefix}actor_optimizer.pth"
+            self.actor_optimizer.state_dict(),
+            model_path / f"{prefix}actor_optimizer.pth",
         )
         torch.save(self.critic.state_dict(), model_path / f"{prefix}critic.pth")
         torch.save(
-            self.critic_optimizer.state_dict(), model_path / f"{prefix}critic_optimizer.pth"
+            self.critic_optimizer.state_dict(),
+            model_path / f"{prefix}critic_optimizer.pth",
         )
 
         logging.info("[RL Agent] Model saved to %s.", model_path)

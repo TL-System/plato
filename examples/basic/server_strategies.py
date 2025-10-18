@@ -62,8 +62,12 @@ class DataSource(base.DataSource):
         Config()
         base_path = Path(Config.params.get("base_path", "./runtime"))
         data_dir = Path(Config.params.get("data_path", base_path / "data"))
-        self.trainset = MNIST(str(data_dir), train=True, download=True, transform=ToTensor())
-        self.testset = MNIST(str(data_dir), train=False, download=True, transform=ToTensor())
+        self.trainset = MNIST(
+            str(data_dir), train=True, download=True, transform=ToTensor()
+        )
+        self.testset = MNIST(
+            str(data_dir), train=False, download=True, transform=ToTensor()
+        )
 
 
 class MNISTTrainingStepStrategy(TrainingStepStrategy):

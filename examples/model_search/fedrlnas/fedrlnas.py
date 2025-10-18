@@ -21,7 +21,7 @@ from plato.trainers.basic import Trainer
 
 def main():
     """A Plato federated learning training session using the FedRLNAS algorithm."""
-    client = fedrlnas_client.Client(
+    client = fedrlnas_client.create_client(
         model=Network, algorithm=ClientAlgorithm, trainer=Trainer
     )
     server = fedrlnas_server.Server(

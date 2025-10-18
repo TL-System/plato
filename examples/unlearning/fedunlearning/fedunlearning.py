@@ -18,7 +18,7 @@ def main():
     """
     Federated unlearning with retraining from scratch.
     """
-    client = fedunlearning_client.Client()
+    client = fedunlearning_client.create_client()
     server = fedunlearning_server.Server()
     server.run(client)
 

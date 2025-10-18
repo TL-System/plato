@@ -18,7 +18,7 @@ from scaffold_callback import ScaffoldCallback
 def main():
     """A Plato federated learning training session using the SCAFFOLD algorithm."""
     trainer = scaffold_trainer.Trainer
-    client = scaffold_client.Client(trainer=trainer, callbacks=[ScaffoldCallback])
+    client = scaffold_client.create_client(trainer=trainer, callbacks=[ScaffoldCallback])
     server = scaffold_server.Server(trainer=trainer)
 
     server.run(client)

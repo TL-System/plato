@@ -23,6 +23,7 @@ from torchvision.transforms import ToTensor
 
 from plato.clients import simple
 from plato.clients.composable import ComposableClientEvents
+from plato.clients.strategies import DefaultLifecycleStrategy
 from plato.config import Config
 from plato.datasources import base
 from plato.trainers.composable import ComposableTrainer
@@ -44,8 +45,12 @@ class DataSource(base.DataSource):
         Config()
         base_path = Path(Config.params.get("base_path", "./runtime"))
         data_dir = Path(Config.params.get("data_path", base_path / "data"))
-        self.trainset = MNIST(str(data_dir), train=True, download=True, transform=ToTensor())
-        self.testset = MNIST(str(data_dir), train=False, download=True, transform=ToTensor())
+        self.trainset = MNIST(
+            str(data_dir), train=True, download=True, transform=ToTensor()
+        )
+        self.testset = MNIST(
+            str(data_dir), train=False, download=True, transform=ToTensor()
+        )
 
 
 class MNISTTrainingStepStrategy(TrainingStepStrategy):
@@ -126,12 +131,30 @@ class Trainer(ComposableTrainer):
         )
 
 
-class CustomClient(simple.Client):
-    """An example for customizing the client."""
+class CustomLifecycleStrategy(DefaultLifecycleStrategy):
+    """Lifecycle strategy that wires custom model, datasource, and trainer factories."""
 
-    def __init__(self, model=None, datasource=None, trainer=None):
-        super().__init__(model=model, datasource=datasource, trainer=trainer)
-        logging.info("A customized client has been initialized.")
+    def __init__(
+        self,
+        *,
+        model_factory,
+        datasource_factory,
+        trainer_factory,
+    ):
+        super().__init__()
+        self._model_factory = model_factory
+        self._datasource_factory = datasource_factory
+        self._trainer_factory = trainer_factory
+
+    def configure(self, context) -> None:
+        context.custom_model = self._model_factory
+        context.custom_trainer = self._trainer_factory
+        logging.info("Configuring a customized client instance.")
+        super().configure(context)
+
+    def load_data(self, context) -> None:
+        context.custom_datasource = self._datasource_factory
+        super().load_data(context)
 
 
 def _ensure_client_id(client, default_id=1):
@@ -144,7 +167,7 @@ def _ensure_client_id(client, default_id=1):
         default_id,
     )
     client.client_id = default_id
-    client._sync_to_context(("client_id",))
+    client._context.client_id = default_id
 
 
 def _run_client(client):
@@ -203,7 +226,8 @@ def main():
     A Plato federated learning training session using a custom client.
 
     To run this example:
-    python examples/customized/custom_client.py -c examples/customized/client.yml -i <client_id>
+    cd examples/customized
+    uv run custom_client.py -c client.yml -i <client_id>
     """
     model = partial(
         nn.Sequential,
@@ -216,7 +240,21 @@ def main():
     datasource = DataSource
     trainer = Trainer
 
-    client = CustomClient(model=model, datasource=datasource, trainer=trainer)
+    client = simple.Client()
+    client.custom_model = model
+    client.custom_datasource = datasource
+    client.custom_trainer = trainer
+    client._configure_composable(
+        lifecycle_strategy=CustomLifecycleStrategy(
+            model_factory=model,
+            datasource_factory=datasource,
+            trainer_factory=trainer,
+        ),
+        payload_strategy=client.payload_strategy,
+        training_strategy=client.training_strategy,
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
     client.configure()
     _ensure_client_id(client)
 
@@ -229,7 +267,7 @@ def main():
         server_port = getattr(server_config, "port", "unknown")
         logging.error(
             "Unable to connect to the server at %s:%s (%s). "
-            "Ensure the federated server example is running.",
+            "Ensure the federated learning server is running.",
             server_address,
             server_port,
             exc,

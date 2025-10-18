@@ -1,5 +1,8 @@
 """Tests for sampler registry implementations."""
 
+from types import SimpleNamespace
+
+import pytest
 import torch
 from torch.utils.data import Dataset
 
@@ -70,3 +73,72 @@ def test_sampler_reports_partition_size(temp_config):
     sampler = samplers_registry.get(datasource, client_id=1)
 
     assert sampler.num_samples() == 4
+
+
+def test_sampler_registry_accepts_explicit_sampler_type(
+    temp_config, monkeypatch
+):
+    """Explicit sampler_type kwargs should bypass the config default."""
+
+    class StubSampler:
+        def __init__(self, datasource, client_id, testing):
+            self.datasource = datasource
+            self.client_id = client_id
+            self.testing = testing
+
+        def get(self):
+            return iter(())
+
+    monkeypatch.setitem(samplers_registry.registered_samplers, "stub", StubSampler)
+
+    datasource = ToyDatasource()
+    sampler = samplers_registry.get(datasource, client_id=2, sampler_type="stub")
+
+    assert isinstance(sampler, StubSampler)
+    assert sampler.client_id == 2
+    assert sampler.testing is False
+
+
+def test_sampler_registry_uses_testset_sampler_when_testing(
+    temp_config, monkeypatch
+):
+    """Config.testset_sampler should be respected for evaluation splits."""
+
+    class StubSampler:
+        def __init__(self, datasource, client_id, testing):
+            self.datasource = datasource
+            self.client_id = client_id
+            self.testing = testing
+
+        def get(self):
+            return iter(())
+
+    monkeypatch.setitem(
+        samplers_registry.registered_samplers,
+        "test_stub",
+        StubSampler,
+    )
+    monkeypatch.setattr(
+        samplers_registry,
+        "Config",
+        lambda: SimpleNamespace(
+            data=SimpleNamespace(
+                sampler="iid", testset_sampler="test_stub"
+            )
+        ),
+    )
+
+    datasource = ToyDatasource()
+    sampler = samplers_registry.get(datasource, client_id=1, testing=True)
+
+    assert isinstance(sampler, StubSampler)
+    assert sampler.testing is True
+
+
+def test_sampler_registry_raises_for_unknown_sampler(temp_config):
+    """Missing samplers should trigger a ValueError."""
+
+    datasource = ToyDatasource()
+
+    with pytest.raises(ValueError):
+        samplers_registry.get(datasource, client_id=1, sampler_type="missing")
