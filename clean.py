@@ -15,30 +15,45 @@ EXCLUDED_NAMES = {".venv"}
 
 
 def iter_target_directories(root: Path) -> Iterable[Path]:
-    """Yield directories whose names match the configured target set."""
+    """Yield target directories that live under any runtime folders within ``root``."""
     root = root.resolve()
-    runtime_root = (root / "runtime").resolve()
-    walk_roots = []
 
-    if runtime_root.exists():
-        walk_roots.append(runtime_root)
-    if root.name == "runtime" and root.is_dir():
-        walk_roots.append(root)
+    runtime_roots: list[Path] = []
+    seen_runtime: set[Path] = set()
 
-    if not walk_roots:
-        return
+    def add_runtime(candidate: Path) -> None:
+        resolved = candidate.resolve()
+        if resolved in seen_runtime or not candidate.is_dir():
+            return
+        seen_runtime.add(resolved)
+        runtime_roots.append(candidate)
 
-    seen: set[Path] = set()
-    for walk_root in walk_roots:
-        resolved_root = walk_root.resolve()
-        if resolved_root in seen:
-            continue
-        seen.add(resolved_root)
-        for current, dirnames, _ in os.walk(resolved_root):
+    if root.name == "runtime":
+        add_runtime(root)
+
+    for current, dirnames, _ in os.walk(root, topdown=True):
+        pruned_dirs = []
+        for dirname in dirnames:
+            if dirname in EXCLUDED_NAMES:
+                continue
+            if dirname == "runtime":
+                add_runtime(Path(current) / dirname)
+                continue
+            pruned_dirs.append(dirname)
+        dirnames[:] = pruned_dirs
+
+    seen_targets: set[Path] = set()
+    for walk_root in runtime_roots:
+        for current, dirnames, _ in os.walk(walk_root):
             dirnames[:] = [dirname for dirname in dirnames if dirname not in EXCLUDED_NAMES]
             for dirname in dirnames:
                 if dirname in TARGET_NAMES:
-                    yield Path(current) / dirname
+                    candidate = Path(current) / dirname
+                    resolved_candidate = candidate.resolve()
+                    if resolved_candidate in seen_targets:
+                        continue
+                    seen_targets.add(resolved_candidate)
+                    yield candidate
 
 
 def clean_directory(path: Path) -> int:
