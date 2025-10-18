@@ -13,7 +13,13 @@ https://arxiv.org/pdf/1610.05820.pdf
 """
 
 from .mia import launch_attack, train_attack_model
-from .mia_client import Client
+from .mia_client import Client, create_client
 from .mia_server import Server
 
-__all__ = ["launch_attack", "train_attack_model", "Client", "Server"]
+__all__ = [
+    "launch_attack",
+    "train_attack_model",
+    "create_client",
+    "Client",
+    "Server",
+]

@@ -10,10 +10,10 @@ import fedsaw_server
 
 def main():
     """A Plato federated learning training session using the FedSaw algorithm."""
-    client = fedsaw_client.Client()
+    client = fedsaw_client.create_client()
     server = fedsaw_server.Server()
     edge_server = fedsaw_server.Server
-    edge_client = fedsaw_edge.Client
+    edge_client = fedsaw_edge.create_client
     server.run(client, edge_server, edge_client)
 
 

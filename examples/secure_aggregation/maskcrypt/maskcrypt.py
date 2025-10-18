@@ -11,7 +11,9 @@ from maskcrypt_callbacks import MaskCryptCallback
 def main():
     """A Plato federated learning training session using selective homomorphic encryption."""
     trainer = maskcrypt_trainer.Trainer
-    client = maskcrypt_client.Client(trainer=trainer, callbacks=[MaskCryptCallback])
+    client = maskcrypt_client.create_client(
+        trainer=trainer, callbacks=[MaskCryptCallback]
+    )
     server = maskcrypt_server.Server(trainer=trainer)
 
     server.run(client)

@@ -33,36 +33,35 @@ class TempoEdgeLifecycleStrategy(EdgeLifecycleStrategy):
         Config().trainer = Config().trainer._replace(epochs=local_epoch_num)
 
 
-class Client(edge.Client):
-    """A federated learning edge client of Tempo."""
+def create_client(
+    *,
+    server,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+):
+    """Build a Tempo edge client with adaptive lifecycle strategy."""
+    client = edge.Client(
+        server=server,
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+    )
 
-    def __init__(
-        self,
-        server,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-    ):
-        super().__init__(
-            server=server,
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-        )
+    client._configure_composable(
+        lifecycle_strategy=TempoEdgeLifecycleStrategy(),
+        payload_strategy=client.payload_strategy,
+        training_strategy=client.training_strategy,
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
 
-        payload_strategy = self.payload_strategy
-        training_strategy = self.training_strategy
-        reporting_strategy = self.reporting_strategy
-        communication_strategy = self.communication_strategy
+    return client
 
-        self._configure_composable(
-            lifecycle_strategy=TempoEdgeLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
-            reporting_strategy=reporting_strategy,
-            communication_strategy=communication_strategy,
-        )
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

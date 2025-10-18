@@ -166,60 +166,78 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
         return topk.to(dtype=torch.long)
 
 
-class Client(simple.Client):
-    """A MaskCrypt client with bespoke training strategy."""
+def _attach_final_mask_property(client):
+    """Attach a property that proxies the final mask through client context."""
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-        )
+    if getattr(client, "_maskcrypt_final_mask_attached", False):
+        return
 
-        self.encrypt_ratio = Config().clients.encrypt_ratio
-        self.random_mask = Config().clients.random_mask
-        self.attack_prep_dir = (
-            f"{Config().data.datasource}_{Config().trainer.model_name}"
-            f"_{self.encrypt_ratio}"
-        )
-        if self.random_mask:
-            self.attack_prep_dir += "_random"
-
-        self.checkpoint_path = Config().params["checkpoint_path"]
-
-        state = self._context.state.setdefault("maskcrypt", {})
-        state.setdefault("model_buffer", {})
-        state.setdefault("final_mask", None)
-
-        self.final_mask = None
-
-        self._configure_composable(
-            lifecycle_strategy=self.lifecycle_strategy,
-            payload_strategy=self.payload_strategy,
-            training_strategy=MaskCryptTrainingStrategy(
-                encrypt_ratio=self.encrypt_ratio,
-                random_mask=self.random_mask,
-                checkpoint_path=self.checkpoint_path,
-                attack_prep_dir=self.attack_prep_dir,
-            ),
-            reporting_strategy=self.reporting_strategy,
-            communication_strategy=self.communication_strategy,
-        )
-
-    @property
-    def final_mask(self):
-        """Expose the final mask agreed by the server for callbacks/processors."""
+    def _get_final_mask(self):
         return self._context.state.get("maskcrypt", {}).get("final_mask")
 
-    @final_mask.setter
-    def final_mask(self, value):
+    def _set_final_mask(self, value):
         self._context.state.setdefault("maskcrypt", {})["final_mask"] = value
+
+    proxy_class = type(
+        "MaskCryptClientProxy",
+        (client.__class__,),
+        {"final_mask": property(_get_final_mask, _set_final_mask)},
+    )
+
+    client.__class__ = proxy_class
+    client._maskcrypt_final_mask_attached = True
+
+
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+):
+    """Build a MaskCrypt client configured with selective encryption."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+    )
+
+    client.encrypt_ratio = Config().clients.encrypt_ratio
+    client.random_mask = Config().clients.random_mask
+    client.attack_prep_dir = (
+        f"{Config().data.datasource}_{Config().trainer.model_name}"
+        f"_{client.encrypt_ratio}"
+    )
+    if client.random_mask:
+        client.attack_prep_dir += "_random"
+
+    client.checkpoint_path = Config().params["checkpoint_path"]
+
+    state = client._context.state.setdefault("maskcrypt", {})
+    state.setdefault("model_buffer", {})
+    state.setdefault("final_mask", None)
+
+    _attach_final_mask_property(client)
+    client.final_mask = None
+
+    client._configure_composable(
+        lifecycle_strategy=client.lifecycle_strategy,
+        payload_strategy=client.payload_strategy,
+        training_strategy=MaskCryptTrainingStrategy(
+            encrypt_ratio=client.encrypt_ratio,
+            random_mask=client.random_mask,
+            checkpoint_path=client.checkpoint_path,
+            attack_prep_dir=client.attack_prep_dir,
+        ),
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
+
+    return client
+
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

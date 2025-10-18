@@ -21,31 +21,35 @@ class DLGTrainingStrategy(DefaultTrainingStrategy):
         return report, outbound_payload
 
 
-class Client(simple.Client):
-    """A federated learning client for gradient leakage attacks."""
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks=None,
+):
+    """Build a DLG client that appends ground-truth data to payloads."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=trainer_callbacks,
+    )
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=trainer_callbacks,
-        )
+    client._configure_composable(
+        lifecycle_strategy=client.lifecycle_strategy,
+        payload_strategy=client.payload_strategy,
+        training_strategy=DLGTrainingStrategy(),
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
 
-        self._configure_composable(
-            lifecycle_strategy=self.lifecycle_strategy,
-            payload_strategy=self.payload_strategy,
-            training_strategy=DLGTrainingStrategy(),
-            reporting_strategy=self.reporting_strategy,
-            communication_strategy=self.communication_strategy,
-        )
+    return client
+
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

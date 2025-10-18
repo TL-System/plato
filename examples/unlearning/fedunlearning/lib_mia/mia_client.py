@@ -35,29 +35,33 @@ class FedUnlearningReportingStrategy(DefaultReportingStrategy):
         return report
 
 
-class Client(simple.Client):
-    """A federated learning client of federated unlearning with local PGA."""
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+):
+    """Build a federated unlearning client with sampler metadata reporting."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+    )
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=None,
-        )
+    client._configure_composable(
+        lifecycle_strategy=client.lifecycle_strategy,
+        payload_strategy=client.payload_strategy,
+        training_strategy=client.training_strategy,
+        reporting_strategy=FedUnlearningReportingStrategy(),
+        communication_strategy=client.communication_strategy,
+    )
 
-        self._configure_composable(
-            lifecycle_strategy=self.lifecycle_strategy,
-            payload_strategy=self.payload_strategy,
-            training_strategy=self.training_strategy,
-            reporting_strategy=FedUnlearningReportingStrategy(),
-            communication_strategy=self.communication_strategy,
-        )
+    return client
+
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

@@ -64,41 +64,48 @@ class MoonTrainingStrategy(DefaultTrainingStrategy):
         return report, weights
 
 
-class Client(simple.Client):
-    """MOON client wiring the customised trainer and training strategy."""
+def _resolve_history_size(history_size: Optional[int]) -> int:
+    if history_size is not None:
+        return history_size
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks=None,
-        history_size: Optional[int] = None,
-    ):
-        model = model or MoonModel
-        trainer = trainer or MoonTrainer
+    algorithm_cfg = getattr(Config(), "algorithm", None)
+    return getattr(algorithm_cfg, "history_size", 1) if algorithm_cfg else 1
 
-        if history_size is None:
-            algorithm_cfg = getattr(Config(), "algorithm", None)
-            history_size = (
-                getattr(algorithm_cfg, "history_size", 1) if algorithm_cfg else 1
-            )
 
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=trainer_callbacks,
-        )
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks=None,
+    history_size: Optional[int] = None,
+):
+    """Build a MOON client with the contrastive training strategy."""
+    model = model or MoonModel
+    trainer = trainer or MoonTrainer
+    history_size = _resolve_history_size(history_size)
 
-        self._configure_composable(
-            lifecycle_strategy=self.lifecycle_strategy,
-            payload_strategy=self.payload_strategy,
-            training_strategy=MoonTrainingStrategy(buffer_size=history_size),
-            reporting_strategy=self.reporting_strategy,
-            communication_strategy=self.communication_strategy,
-        )
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=trainer_callbacks,
+    )
+
+    client._configure_composable(
+        lifecycle_strategy=client.lifecycle_strategy,
+        payload_strategy=client.payload_strategy,
+        training_strategy=MoonTrainingStrategy(buffer_size=history_size),
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
+
+    return client
+
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

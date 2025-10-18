@@ -14,7 +14,7 @@ def main():
     """A Plato federated learning training session with the honest-but-curious server."""
     model = dlg_model.get()
     trainer = dlg_trainer.Trainer
-    client = dlg_client.Client(model=model, trainer=trainer)
+    client = dlg_client.create_client(model=model, trainer=trainer)
     server = dlg_server.Server(model=model, trainer=trainer)
     server.run(client)
 

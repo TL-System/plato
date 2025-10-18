@@ -12,7 +12,7 @@ from moon_model import Model as MoonModel
 def main():
     """Launch a Plato training session with the MOON algorithm."""
     model = MoonModel
-    client = moon_client.Client(model=model)
+    client = moon_client.create_client(model=model)
     server = moon_server.Server(model=model)
     server.run(client)
 
