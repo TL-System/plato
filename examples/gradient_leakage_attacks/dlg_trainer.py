@@ -115,9 +115,11 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
             and Config().algorithm.clip is True
         ):
             self.list_grad = []
+            step_losses = []
             for example, label in zip(examples, labels):
-                outputs = model(torch.unsqueeze(example, dim=0))
-                loss = loss_criterion(outputs, torch.unsqueeze(label, dim=0))
+                output = model(torch.unsqueeze(example, dim=0))
+                loss = loss_criterion(output, torch.unsqueeze(label, dim=0))
+                step_losses.append(loss)
                 grad = torch.autograd.grad(
                     loss,
                     model.parameters(),
@@ -126,6 +128,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
                     only_inputs=True,
                 )
                 self.list_grad.append(list((_.detach().clone() for _ in grad)))
+            loss = torch.mean(step_losses)
         else:
             if (
                 hasattr(Config().algorithm, "defense")
@@ -150,6 +153,8 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
         context.state["labels"] = labels
         context.state["list_grad"] = self.list_grad
         context.state["feature_fc1_graph"] = self.feature_fc1_graph
+
+        return loss
 
     def on_train_run_start(self, trainer, config, **kwargs):
         """Initialize DLG trainer state and inject trainer into context."""
@@ -236,12 +241,9 @@ class DLGTrainingCallbacks(TrainerCallback):
                             deviation_f1_target, retain_graph=True
                         )
                         deviation_f1_x = examples.grad.data
-                        deviation_f1_x_norm[:, f] = (
-                            torch.norm(
-                                deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
-                            )
-                            / (feature_fc1_graph.data[:, f])
-                        )
+                        deviation_f1_x_norm[:, f] = torch.norm(
+                            deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
+                        ) / (feature_fc1_graph.data[:, f])
                         trainer.model.zero_grad()
                         examples.grad.data.zero_()
                         deviation_f1_target[:, f] = 0
