@@ -1,7 +1,7 @@
 """Behavioural tests for key model implementations."""
 
-import torch
 import pytest
+import torch
 
 from plato.models import lenet5, resnet
 

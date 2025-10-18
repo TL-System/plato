@@ -66,6 +66,7 @@ def test_registry_uses_configured_name(monkeypatch):
 
 def test_registry_supports_feature_datasource(monkeypatch):
     """Feature datasource should flatten batched tensors into per-sample items."""
+
     class DummyConfig:
         def __init__(self):
             self.data = SimpleNamespace(datasource="Feature")
