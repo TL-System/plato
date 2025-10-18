@@ -33,7 +33,7 @@ class Trainer(ComposableTrainer):
         # Initialize with default strategies
         super().__init__(
             model=model,
-            callbacks=None,
+            callbacks=callbacks,
             loss_strategy=None,  # Uses DefaultLossCriterionStrategy
             optimizer_strategy=None,  # Uses DefaultOptimizerStrategy
             training_step_strategy=None,  # Uses DefaultTrainingStepStrategy
