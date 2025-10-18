@@ -2,23 +2,38 @@
 This example demonstrates the strategy-based server API in Plato.
 
 It shows how to use different aggregation and client selection strategies
-by composing them with the server, rather than using inheritance.
+by composing them with the server.
 """
 
+import sys
 from functools import partial
+from pathlib import Path
+from typing import Callable
 
 import torch
 from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
+# Ensure repository root is importable when running as a script.
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 # Import example client-selection strategies for demonstration purposes.
-from examples.client_selection.afl.afl_selection_strategy import (
-    AFLSelectionStrategy,
-)
-from examples.client_selection.oort.oort_selection_strategy import (
-    OortSelectionStrategy,
-)
+try:
+    from examples.client_selection.afl.afl_selection_strategy import (
+        AFLSelectionStrategy,
+    )
+    from examples.client_selection.oort.oort_selection_strategy import (
+        OortSelectionStrategy,
+    )
+except ModuleNotFoundError:
+    EXAMPLES_DIR = Path(__file__).resolve().parents[1]
+    if str(EXAMPLES_DIR) not in sys.path:
+        sys.path.insert(0, str(EXAMPLES_DIR))
+    from client_selection.afl.afl_selection_strategy import AFLSelectionStrategy
+    from client_selection.oort.oort_selection_strategy import OortSelectionStrategy
 from plato.clients import simple
 from plato.datasources import base
 from plato.servers import fedavg
@@ -27,7 +42,14 @@ from plato.servers.strategies import (
     FedNovaAggregationStrategy,
     RandomSelectionStrategy,
 )
-from plato.trainers import basic
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import (
+    TestingStrategy,
+    TrainingContext,
+    TrainingStepStrategy,
+)
+from plato.trainers.strategies.loss_criterion import CrossEntropyLossStrategy
+from plato.trainers.strategies.optimizer import AdamOptimizerStrategy
 
 
 class DataSource(base.DataSource):
@@ -40,58 +62,84 @@ class DataSource(base.DataSource):
         self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
 
 
-class Trainer(basic.Trainer):
-    """A custom trainer with custom training and testing loops."""
+class MNISTTrainingStepStrategy(TrainingStepStrategy):
+    """Custom training step that flattens MNIST images and prints the loss."""
 
-    # pylint: disable=unused-argument
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """A custom training loop."""
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
-        criterion = nn.CrossEntropyLoss()
+    def training_step(
+        self,
+        model: nn.Module,
+        optimizer: torch.optim.Optimizer,
+        examples: torch.Tensor,
+        labels: torch.Tensor,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
+        context: TrainingContext,
+    ) -> torch.Tensor:
+        """Perform a single MNIST training step."""
+        optimizer.zero_grad()
 
-        sampler_obj = sampler.get() if hasattr(sampler, "get") else sampler
-        train_loader = torch.utils.data.DataLoader(
-            dataset=trainset,
-            shuffle=False,
-            batch_size=config["batch_size"],
-            sampler=sampler_obj,
-        )
+        flattened_examples = examples.view(examples.size(0), -1)
+        outputs = model(flattened_examples)
+        loss = loss_criterion(outputs, labels)
 
-        num_epochs = 1
-        for __ in range(num_epochs):
-            for examples, labels in train_loader:
-                examples = examples.view(len(examples), -1)
+        loss.backward()
+        optimizer.step()
 
-                logits = self.model(examples)
-                loss = criterion(logits, labels)
-                print("train loss: ", loss.item())
+        print(f"train loss: {loss.item():.6f}")
 
-                loss.backward()
-                optimizer.step()
-                optimizer.zero_grad()
+        return loss
 
-    # pylint: disable=unused-argument
-    def test_model(self, config, testset, sampler=None, **kwargs):
-        """A custom testing loop."""
+
+class MNISTTestingStrategy(TestingStrategy):
+    """Testing strategy that flattens MNIST images before evaluation."""
+
+    def test_model(self, model, config, testset, sampler, context):
+        """Evaluate the model with flattened MNIST images."""
+        batch_size = config.get("batch_size", 32)
+
+        if sampler is not None and hasattr(sampler, "get") and callable(sampler.get):
+            sampler = sampler.get()
+
         test_loader = torch.utils.data.DataLoader(
-            testset, batch_size=config["batch_size"], shuffle=False
+            testset, batch_size=batch_size, shuffle=False, sampler=sampler
         )
+
+        model.to(context.device)
+        model.eval()
 
         correct = 0
         total = 0
 
         with torch.no_grad():
             for examples, labels in test_loader:
-                examples, labels = examples.to(self.device), labels.to(self.device)
+                examples, labels = (
+                    examples.to(context.device),
+                    labels.to(context.device),
+                )
 
-                examples = examples.view(len(examples), -1)
-                outputs = self.model(examples)
+                flattened_examples = examples.view(examples.size(0), -1)
+                outputs = model(flattened_examples)
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-        accuracy = correct / total
+        accuracy = correct / total if total > 0 else 0.0
         return accuracy
+
+
+class Trainer(ComposableTrainer):
+    """
+    A custom trainer composed with MNIST-specific training and testing strategies.
+    """
+
+    def __init__(self, model=None, callbacks=None):
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            loss_strategy=CrossEntropyLossStrategy(),
+            optimizer_strategy=AdamOptimizerStrategy(lr=1e-3),
+            training_step_strategy=MNISTTrainingStepStrategy(),
+            testing_strategy=MNISTTestingStrategy(),
+        )
 
 
 def example_1_default_strategies():
@@ -243,55 +291,15 @@ def example_4_both_custom():
 def main():
     """
     Demonstrates different ways to use server strategies.
-
-    To actually run one of these examples with training:
-    - Uncomment one of the example functions below
-    - Run with: python basic_with_strategies.py -c config.yml
     """
-    print("\n" + "=" * 70)
-    print("PLATO SERVER STRATEGIES DEMONSTRATION")
-    print("=" * 70)
     print("\nThis example shows how to compose different strategies with servers.")
     print("Strategies allow mixing and matching aggregation and client selection")
     print("algorithms without requiring inheritance or code duplication.")
 
-    # Show all examples
     example_1_default_strategies()
     example_2_custom_aggregation()
     example_3_custom_selection()
     example_4_both_custom()
-
-    print("\n" + "=" * 70)
-    print("To run one of these examples:")
-    print("1. Edit this file to uncomment one server.run(client) call")
-    print("2. Run: python basic_with_strategies.py -c config.yml")
-    print("=" * 70 + "\n")
-
-    # Uncomment ONE of the following to actually run training:
-
-    # Option 1: Default strategies
-    # model = partial(nn.Sequential, nn.Linear(28*28, 128), nn.ReLU(), nn.Linear(128, 10))
-    # client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
-    # server = fedavg.Server(model=model, datasource=DataSource, trainer=Trainer)
-    # server.run(client)
-
-    # Option 2: FedNova aggregation
-    # model = partial(nn.Sequential, nn.Linear(28*28, 128), nn.ReLU(), nn.Linear(128, 10))
-    # client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
-    # server = fedavg.Server(
-    #     model=model, datasource=DataSource, trainer=Trainer,
-    #     aggregation_strategy=FedNovaAggregationStrategy()
-    # )
-    # server.run(client)
-
-    # Option 3: Oort client selection
-    # model = partial(nn.Sequential, nn.Linear(28*28, 128), nn.ReLU(), nn.Linear(128, 10))
-    # client = simple.Client(model=model, datasource=DataSource, trainer=Trainer)
-    # server = fedavg.Server(
-    #     model=model, datasource=DataSource, trainer=Trainer,
-    #     client_selection_strategy=OortSelectionStrategy(exploration_factor=0.3)
-    # )
-    # server.run(client)
 
 
 if __name__ == "__main__":

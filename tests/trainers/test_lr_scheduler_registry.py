@@ -26,11 +26,13 @@ def test_step_lr_scheduler_decays_at_step():
     )
 
     for _ in range(5):
+        optimizer.step()
         scheduler.step()
 
     assert _current_lr(optimizer) == pytest.approx(0.05)
 
     for _ in range(5):
+        optimizer.step()
         scheduler.step()
 
     assert _current_lr(optimizer) == pytest.approx(0.025)
@@ -47,6 +49,7 @@ def test_multi_step_scheduler_applies_milestones():
     )
 
     for step in range(10):
+        optimizer.step()
         scheduler.step()
         if step == 1:
             assert _current_lr(optimizer) == pytest.approx(0.02)
@@ -65,16 +68,20 @@ def test_lambda_scheduler_supports_linear_warmup():
     )
 
     # The warmup schedule should scale lr linearly until reaching base lr.
+    optimizer.step()
     scheduler.step()
     assert _current_lr(optimizer) == pytest.approx(0.08 / 3)
 
+    optimizer.step()
     scheduler.step()
     assert _current_lr(optimizer) == pytest.approx(2 * 0.08 / 3)
 
+    optimizer.step()
     scheduler.step()
     assert _current_lr(optimizer) == pytest.approx(0.08)
 
     # Subsequent steps should keep the base lr (gamma=1.0).
     for _ in range(5):
+        optimizer.step()
         scheduler.step()
     assert _current_lr(optimizer) == pytest.approx(0.08)

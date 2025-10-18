@@ -17,9 +17,17 @@ from plato.trainers.strategies.base import LossCriterionStrategy
 class PiscesLossStrategy(LossCriterionStrategy):
     """Loss strategy for Pisces that tracks per-batch loss values."""
 
+    def __init__(self):
+        self._criterion = None
+        self._run_history = None
+
     def setup(self, context):
         """Initialize the loss criterion."""
         self._criterion = loss_criterion.get()
+
+    def attach_run_history(self, run_history):
+        """Attach run history for metric tracking."""
+        self._run_history = run_history
 
     def compute_loss(self, outputs, labels, context):
         """
@@ -30,13 +38,10 @@ class PiscesLossStrategy(LossCriterionStrategy):
         """
         per_batch_loss = self._criterion(outputs, labels)
 
-        # Get the trainer from context to access run_history
-        trainer = context.state.get("trainer")
         current_epoch = getattr(context, "current_epoch", 1)
-        if trainer is not None and current_epoch == 1:
-            # Store scalar loss value for the first epoch only
+        if self._run_history is not None and current_epoch == 1:
             loss_value = float(per_batch_loss.detach().cpu().item())
-            trainer.run_history.update_metric("train_batch_loss", loss_value)
+            self._run_history.update_metric("train_batch_loss", loss_value)
 
         return per_batch_loss
 
@@ -62,10 +67,5 @@ class Trainer(ComposableTrainer):
             loss_strategy=loss_strategy,
         )
 
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """Training loop that provides trainer reference to context."""
-        # Store trainer reference in context so loss strategy can access run_history
-        self.context.state["trainer"] = self
-
-        # Call parent training loop
-        super().train_model(config, trainset, sampler, **kwargs)
+        if hasattr(self.loss_strategy, "attach_run_history"):
+            self.loss_strategy.attach_run_history(self.run_history)

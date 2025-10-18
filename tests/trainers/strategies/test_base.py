@@ -324,6 +324,7 @@ class TestLRSchedulerStrategy:
         scheduler = strategy.create_scheduler(optimizer, context)
         initial_lr = optimizer.param_groups[0]["lr"]
 
+        optimizer.step()
         strategy.step(scheduler, context)
         assert strategy.step_count == 1
 
