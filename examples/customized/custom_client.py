@@ -13,15 +13,17 @@ from contextlib import contextmanager
 from functools import partial
 from typing import Callable
 
+import socketio
 import torch
+from socketio.exceptions import ConnectionError as SocketIOConnectionError
 from torch import nn
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
 
 from plato.clients import simple
 from plato.clients.composable import ComposableClientEvents
-from plato.datasources import base
 from plato.config import Config
+from plato.datasources import base
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     TestingStrategy,
@@ -30,8 +32,6 @@ from plato.trainers.strategies.base import (
 )
 from plato.trainers.strategies.loss_criterion import CrossEntropyLossStrategy
 from plato.trainers.strategies.optimizer import AdamOptimizerStrategy
-from socketio.exceptions import ConnectionError as SocketIOConnectionError
-import socketio
 
 
 class DataSource(base.DataSource):

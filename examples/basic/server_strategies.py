@@ -5,11 +5,10 @@ It shows how to use different aggregation and client selection strategies
 by composing them with the server.
 """
 
+import sys
 from functools import partial
 from pathlib import Path
 from typing import Callable
-
-import sys
 
 import torch
 from torch import nn
