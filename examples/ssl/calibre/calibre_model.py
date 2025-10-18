@@ -2,6 +2,8 @@
 Implementation of Net used in calibre.
 """
 
+from collections.abc import Sequence
+
 import torch
 from lightly.models.modules.heads import SimCLRProjectionHead
 
@@ -35,8 +37,28 @@ class CalibreNet(torch.nn.Module):
         )
 
     def forward(self, multiview_samples):
-        """Forward two batch of contrastive samples."""
-        sample1, sample2 = multiview_samples
+        """
+        Forward pass for both SSL (multi-view) and personalization (single-view) phases.
+        """
+        if isinstance(multiview_samples, torch.Tensor):
+            # Personalization phase: a single batch of images.
+            return self.encoder(multiview_samples)
+
+        # SSL phase: expect a sequence of at least two augmented views.
+        if isinstance(multiview_samples, Sequence):
+            views = list(multiview_samples)
+        else:
+            # Fallback for datatypes like UserList.
+            views = list(multiview_samples)
+
+        if len(views) < 2:
+            raise ValueError(
+                "CalibreNet expects at least two views for SSL training, "
+                f"but received {len(views)}."
+            )
+
+        # Use the first two views even if additional crops are present.
+        sample1, sample2 = views[0], views[1]
         encoded_sample1 = self.encoder(sample1)
         encoded_sample2 = self.encoder(sample2)
 
