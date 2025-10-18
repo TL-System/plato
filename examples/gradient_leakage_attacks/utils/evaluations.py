@@ -5,7 +5,7 @@ from statistics import mean
 
 import lpips
 import torch
-from torchmetrics import StructuralSimilarityIndexMeasure
+from torchmetrics.image import StructuralSimilarityIndexMeasure
 
 from plato.config import Config
 
