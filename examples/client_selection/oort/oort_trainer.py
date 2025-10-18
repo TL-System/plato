@@ -19,9 +19,17 @@ from plato.trainers.strategies.base import LossCriterionStrategy
 class OortLossStrategy(LossCriterionStrategy):
     """Loss strategy for Oort that tracks sum of squared per-sample losses."""
 
+    def __init__(self):
+        self._criterion = None
+        self._run_history = None
+
     def setup(self, context):
         """Initialize the loss criterion."""
         self._criterion = nn.CrossEntropyLoss(reduction="none")
+
+    def attach_run_history(self, run_history):
+        """Attach run history for metric tracking."""
+        self._run_history = run_history
 
     def compute_loss(self, outputs, labels, context):
         """
@@ -32,11 +40,9 @@ class OortLossStrategy(LossCriterionStrategy):
         """
         per_sample_loss = self._criterion(outputs, labels)
 
-        # Get the trainer from context to access run_history
-        trainer = context.state.get("trainer")
-        if trainer is not None:
+        if self._run_history is not None:
             # Store the sum of squares over per_sample loss values
-            trainer.run_history.update_metric(
+            self._run_history.update_metric(
                 "train_squared_loss_step",
                 sum(np.power(per_sample_loss.cpu().detach().numpy(), 2)),
             )
@@ -65,10 +71,5 @@ class Trainer(ComposableTrainer):
             loss_strategy=loss_strategy,
         )
 
-    def train_model(self, config, trainset, sampler, **kwargs):
-        """Training loop that provides trainer reference to context."""
-        # Store trainer reference in context so loss strategy can access run_history
-        self.context.state["trainer"] = self
-
-        # Call parent training loop
-        super().train_model(config, trainset, sampler, **kwargs)
+        if hasattr(self.loss_strategy, "attach_run_history"):
+            self.loss_strategy.attach_run_history(self.run_history)
