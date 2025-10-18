@@ -164,3 +164,6 @@ uv.lock
 
 # multi-party computation data
 mpc_data
+
+# models
+**/*.pt

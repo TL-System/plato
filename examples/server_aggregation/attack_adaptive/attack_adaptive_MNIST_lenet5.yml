@@ -69,7 +69,7 @@ algorithm:
   attention_loops: 5
   attention_hidden: 32
   # Optional: set to capture per-round tensors for pretraining the attention module.
-  dataset_capture_dir: ./attack_adaptive_dataset
+  dataset_capture_dir: attack_adaptive_dataset
 
 parameters:
   optimizer:
