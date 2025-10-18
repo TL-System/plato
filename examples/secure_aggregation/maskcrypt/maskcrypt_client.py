@@ -166,26 +166,16 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
         return topk.to(dtype=torch.long)
 
 
-def _attach_final_mask_property(client):
-    """Attach a property that proxies the final mask through client context."""
+class MaskCryptClientProxy(simple.Client):
+    """Client variant exposing MaskCrypt state via a convenient property."""
 
-    if getattr(client, "_maskcrypt_final_mask_attached", False):
-        return
-
-    def _get_final_mask(self):
+    @property
+    def final_mask(self):
         return self._context.state.get("maskcrypt", {}).get("final_mask")
 
-    def _set_final_mask(self, value):
+    @final_mask.setter
+    def final_mask(self, value):
         self._context.state.setdefault("maskcrypt", {})["final_mask"] = value
-
-    proxy_class = type(
-        "MaskCryptClientProxy",
-        (client.__class__,),
-        {"final_mask": property(_get_final_mask, _set_final_mask)},
-    )
-
-    client.__class__ = proxy_class
-    client._maskcrypt_final_mask_attached = True
 
 
 def create_client(
@@ -197,7 +187,7 @@ def create_client(
     callbacks=None,
 ):
     """Build a MaskCrypt client configured with selective encryption."""
-    client = simple.Client(
+    client = MaskCryptClientProxy(
         model=model,
         datasource=datasource,
         algorithm=algorithm,
@@ -220,7 +210,6 @@ def create_client(
     state.setdefault("model_buffer", {})
     state.setdefault("final_mask", None)
 
-    _attach_final_mask_property(client)
     client.final_mask = None
 
     client._configure_composable(
