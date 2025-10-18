@@ -320,11 +320,11 @@ class DLGTrainingCallbacks(TrainerCallback):
                 total_local_steps = config["epochs"] * math.ceil(
                     Config().data.partition_size / config["batch_size"]
                 )
-                trainer.target_grad = [
-                    x / total_local_steps for x in trainer.target_grad
+                self.target_grad = [
+                    grad / total_local_steps for grad in self.target_grad
                 ]
             except:
-                trainer.target_grad = None
+                self.target_grad = None
 
         if self.full_examples is not None:
             self.full_examples = self.full_examples.detach()
