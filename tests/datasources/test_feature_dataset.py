@@ -1,7 +1,7 @@
 """Unit tests for FeatureDataset."""
 
-import torch
 import pytest
+import torch
 
 from plato.datasources.feature_dataset import FeatureDataset
 

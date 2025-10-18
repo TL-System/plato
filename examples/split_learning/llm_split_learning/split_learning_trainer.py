@@ -262,9 +262,7 @@ class Trainer(split_learning.Trainer):
         training_args_callback.on_trainer_initialized(self)
 
         if self.tokenizer is None:
-            raise ValueError(
-                "LLMTokenizerCallback failed to initialize the tokenizer."
-            )
+            raise ValueError("LLMTokenizerCallback failed to initialize the tokenizer.")
         if self.training_args is None:
             raise ValueError(
                 "LLMTrainingArgsCallback failed to initialize training arguments."

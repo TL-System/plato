@@ -650,9 +650,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             self._capture_metadata_written = True
 
     @staticmethod
-    def _resolve_capture_dir(
-        path_like: Optional[Union[str, Path]]
-    ) -> Optional[Path]:
+    def _resolve_capture_dir(path_like: Optional[Union[str, Path]]) -> Optional[Path]:
         """Resolve the capture directory relative to the runtime base path."""
         if path_like is None:
             return None
@@ -661,7 +659,5 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         if capture_dir.is_absolute():
             return capture_dir
 
-        base_root = Path(
-            getattr(Config, "params", {}).get("base_path", "./runtime")
-        )
+        base_root = Path(getattr(Config, "params", {}).get("base_path", "./runtime"))
         return base_root / capture_dir
