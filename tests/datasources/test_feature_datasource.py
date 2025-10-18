@@ -31,3 +31,26 @@ def test_feature_datasource_handles_unbatched_entries():
     sample_feature, sample_target = datasource[0]
     assert torch.equal(sample_feature, feature)
     assert torch.equal(sample_target, target)
+
+
+def test_feature_datasource_defaults_label_when_missing():
+    """Features without labels should receive a zero label."""
+    feature = torch.randn(8, 4, 4)
+
+    datasource = DataSource([[[(feature,)]]])
+
+    assert len(datasource) == 1
+    _, sample_target = datasource[0]
+    assert sample_target.item() == 0
+
+
+def test_feature_datasource_ignores_non_tuple_entries():
+    """Non-tuple items should be skipped from the resulting dataset."""
+    feature = torch.randn(8, 4, 4)
+    target = torch.tensor(3)
+
+    datasource = DataSource([["noise", (feature, target)]])
+
+    assert len(datasource) == 1
+    _, sample_target = datasource[0]
+    assert sample_target.item() == 3
