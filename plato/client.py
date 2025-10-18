@@ -64,6 +64,15 @@ def run(
             logging.info("Starting a %s client #%d.", Config().clients.type, client_id)
         else:
             client.client_id = client_id
+            # Keep the shared context aligned with the explicit client ID.
+            if hasattr(client, "_sync_to_context"):
+                try:
+                    client._sync_to_context(("client_id",))
+                except Exception:
+                    if hasattr(client, "_context"):
+                        client._context.client_id = client_id
+            elif hasattr(client, "_context"):
+                client._context.client_id = client_id
             logging.info("Starting a custom client #%d.", client_id)
 
         client.configure()
