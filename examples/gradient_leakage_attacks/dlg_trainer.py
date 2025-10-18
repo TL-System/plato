@@ -241,9 +241,12 @@ class DLGTrainingCallbacks(TrainerCallback):
                             deviation_f1_target, retain_graph=True
                         )
                         deviation_f1_x = examples.grad.data
-                        deviation_f1_x_norm[:, f] = torch.norm(
-                            deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
-                        ) / (feature_fc1_graph.data[:, f])
+                        deviation_f1_x_norm[:, f] = (
+                            torch.norm(
+                                deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
+                            )
+                            / (feature_fc1_graph.data[:, f])
+                        )
                         trainer.model.zero_grad()
                         examples.grad.data.zero_()
                         deviation_f1_target[:, f] = 0
