@@ -2,27 +2,9 @@
 
 In `examples/`, we included a wide variety of examples that showed how federated learning algorithms in the research literature can be implemented using Plato by customizing the `client`, `server`, `algorithm`, and `trainer` classes.
 
-### Downloading the Dataset
+### Dataset Preparation
 
-When you first run some of the examples, you'll may need to first download the dataset they use using the `-d` flag. For example, before running the [Calibre](algorithms/9.%20Personalized%20Federated%20Learning%20Algorithms%20based%20on%20Self-Supervised%20Learning.md) example, you should first run:
-
-```bash
-cd examples/ssl/calibre
-uv run calibre.py -c ../configs/calibre_CIFAR10_resnet18.yml -d
-```
-
-Wait for the confirmation message:
-
-```
-The dataset has been successfully downloaded. Re-run the experiment without '-d'
-or '--download'.
-```
-
-And then run the command again without the `-d` flag:
-
-```bash
-uv run calibre.py -c ../configs/calibre_CIFAR10_resnet18.yml
-```
+When you run an example for the first time, Plato downloads the required datasets automatically before training begins. Depending on the dataset size and your connection speed, the first round may take a little longer while the assets are prepared.
 
 Plato uses [uv](https://docs.astral.sh/uv/) for hierarchical dependency management. Example-specific packages are defined in local `pyproject.toml` files rather than in the top-level directory.
 

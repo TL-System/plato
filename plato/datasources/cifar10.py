@@ -2,9 +2,7 @@
 The CIFAR-10 dataset from the torchvision package.
 """
 
-import logging
 import os
-import sys
 
 from torchvision import datasets, transforms
 
@@ -51,34 +49,21 @@ class DataSource(base.DataSource):
         )
 
         _path = Config().params["data_path"]
+        dataset_dir = os.path.join(_path, "cifar-10-batches-py")
 
-        if not os.path.exists(_path):
-            if hasattr(Config().server, "do_test") and not Config().server.do_test:
-                # If the server is not performing local tests for accuracy, concurrent
-                # downloading on the clients may lead to PyTorch errors
-                if Config().clients.total_clients > 1:
-                    if (
-                        not hasattr(Config().data, "concurrent_download")
-                        or not Config().data.concurrent_download
-                    ):
-                        raise ValueError(
-                            "The dataset has not yet been downloaded from the Internet. "
-                            "Please re-run with '-d' or '--download' first. "
-                        )
-
-        self.trainset = datasets.CIFAR10(
-            root=_path, train=True, download=True, transform=train_transform
-        )
-        self.testset = datasets.CIFAR10(
-            root=_path, train=False, download=True, transform=test_transform
-        )
-
-        if Config().args.download:
-            logging.info(
-                "The dataset has been successfully downloaded. "
-                "Re-run the experiment without '-d' or '--download'."
+        def load_datasets():
+            self.trainset = datasets.CIFAR10(
+                root=_path, train=True, download=True, transform=train_transform
             )
-            sys.exit()
+            self.testset = datasets.CIFAR10(
+                root=_path, train=False, download=True, transform=test_transform
+            )
+
+        if not os.path.exists(dataset_dir):
+            with base.DataSource._download_guard(_path):
+                load_datasets()
+        else:
+            load_datasets()
 
     def num_train_examples(self):
         return 50000

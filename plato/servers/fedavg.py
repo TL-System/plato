@@ -162,10 +162,13 @@ class Server(base.Server):
         """
         # Check if subclass overrode this method (backward compatibility)
         if type(self).aggregate_deltas is not Server.aggregate_deltas:
-            # Legacy path: use subclass implementation
-            return await super(Server, self).aggregate_deltas(updates, deltas_received)
+            # Legacy path: use superclass implementation when available
+            base_method = getattr(super(Server, self), "aggregate_deltas", None)
+            if base_method is not None:
+                return await base_method(updates, deltas_received)
+            # Fall through and delegate to the strategy if no superclass implementation exists.
 
-        # New path: delegate to strategy
+        # Delegate to aggregation strategy
         self.context.updates = updates
         self.context.current_round = self.current_round
 

@@ -16,9 +16,9 @@ The following command-line parameters are supported:
 
 - `-r`: resume a previously interrupted training session (only works correctly in synchronous training sessions).
 
-- `-d`: download the dataset to prepare for a training session.
-
 - `--cpu`: use the CPU as the device only.
+
+Datasets required by an example are downloaded automatically the first time it runs; subsequent executions reuse the cached copies stored under the chosen base path.
 
 _Plato_ uses the YAML format for its configuration files to manage runtime configuration parameters. Example configuration files have been provided in the `configs/` directory.
 
