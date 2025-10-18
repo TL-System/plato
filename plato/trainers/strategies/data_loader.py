@@ -14,6 +14,26 @@ import torch.utils.data
 from plato.trainers.strategies.base import DataLoaderStrategy, TrainingContext
 
 
+def _context_uses_cuda(context: TrainingContext) -> bool:
+    """Return True if the training context targets a CUDA device."""
+    device = getattr(context, "device", None)
+    if isinstance(device, torch.device):
+        return device.type == "cuda"
+    if device is None:
+        return torch.cuda.is_available()
+    return str(device).startswith("cuda")
+
+
+def _resolve_pin_memory(setting: Optional[bool], context: TrainingContext) -> bool:
+    """Resolve the pin_memory flag for a given context."""
+    if setting is False:
+        return False
+    if setting is True:
+        return _context_uses_cuda(context)
+    # Auto-detect when None (default behaviour)
+    return _context_uses_cuda(context)
+
+
 class DefaultDataLoaderStrategy(DataLoaderStrategy):
     """
     Default data loader strategy.
@@ -35,7 +55,7 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
     def __init__(
         self,
         num_workers: int = 0,
-        pin_memory: bool = True,
+        pin_memory: Optional[bool] = False,
         drop_last: bool = False,
         shuffle: bool = False,
         persistent_workers: bool = False,
@@ -89,7 +109,7 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
             shuffle=shuffle,
             sampler=sampler_obj,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
+            pin_memory=_resolve_pin_memory(self.pin_memory, context),
             drop_last=self.drop_last,
             persistent_workers=self.persistent_workers
             if self.num_workers > 0
@@ -119,7 +139,7 @@ class CustomCollateFnDataLoaderStrategy(DataLoaderStrategy):
         self,
         collate_fn: callable,
         num_workers: int = 0,
-        pin_memory: bool = True,
+        pin_memory: Optional[bool] = False,
         drop_last: bool = False,
     ):
         """Initialize custom collate data loader parameters."""
@@ -153,7 +173,7 @@ class CustomCollateFnDataLoaderStrategy(DataLoaderStrategy):
             shuffle=shuffle,
             sampler=sampler_obj,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
+            pin_memory=_resolve_pin_memory(self.pin_memory, context),
             drop_last=self.drop_last,
             collate_fn=self.collate_fn,
         )
@@ -184,7 +204,7 @@ class PrefetchDataLoaderStrategy(DataLoaderStrategy):
         self,
         prefetch_factor: int = 2,
         num_workers: int = 2,
-        pin_memory: bool = True,
+        pin_memory: Optional[bool] = False,
         drop_last: bool = False,
     ):
         """Initialize prefetch data loader parameters."""
@@ -218,7 +238,7 @@ class PrefetchDataLoaderStrategy(DataLoaderStrategy):
             shuffle=shuffle,
             sampler=sampler_obj,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
+            pin_memory=_resolve_pin_memory(self.pin_memory, context),
             drop_last=self.drop_last,
             prefetch_factor=self.prefetch_factor if self.num_workers > 0 else None,
             persistent_workers=True if self.num_workers > 0 else False,
@@ -256,7 +276,7 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
         max_batch_size: int = 128,
         adjust_fn: Optional[callable] = None,
         num_workers: int = 0,
-        pin_memory: bool = True,
+        pin_memory: Optional[bool] = False,
     ):
         """Initialize dynamic batch size data loader parameters."""
         self.initial_batch_size = initial_batch_size
@@ -297,7 +317,7 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
             shuffle=shuffle,
             sampler=sampler_obj,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
+            pin_memory=_resolve_pin_memory(self.pin_memory, context),
         )
 
 
@@ -321,7 +341,7 @@ class ShuffleDataLoaderStrategy(DataLoaderStrategy):
     def __init__(
         self,
         num_workers: int = 0,
-        pin_memory: bool = True,
+        pin_memory: Optional[bool] = False,
         drop_last: bool = False,
     ):
         """Initialize shuffle data loader parameters."""
@@ -360,6 +380,6 @@ class ShuffleDataLoaderStrategy(DataLoaderStrategy):
             shuffle=shuffle,
             sampler=sampler_obj,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
+            pin_memory=_resolve_pin_memory(self.pin_memory, context),
             drop_last=self.drop_last,
         )
