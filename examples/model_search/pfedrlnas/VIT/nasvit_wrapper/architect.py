@@ -4,8 +4,8 @@ NAS architect in PerFedRLNAS, a wrapper over the supernet.
 
 import copy
 import logging
-import os
 import pickle
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -64,13 +64,12 @@ class Architect(nn.Module):
         ]
         self.baseline = {}
         if Config().args.resume:
-            # Use model_path if available, otherwise use default models/pretrained directory
-            if hasattr(Config().server, "model_path"):
-                model_dir = Config().server.model_path
-            else:
-                model_dir = "./models/pretrained"
-            save_config = f"{model_dir}/baselines.pickle"
-            if os.path.exists(save_config):
+            base_path = Path(Config.params.get("base_path", "./runtime"))
+            model_dir = Path(
+                Config.params.get("model_path", base_path / "models" / "pretrained")
+            )
+            save_config = model_dir / "baselines.pickle"
+            if save_config.exists():
                 with open(save_config, "rb") as file:
                     self.baseline = pickle.load(file)
         self.lambda_time = Config().parameters.architect.lambda_time

@@ -5,6 +5,7 @@ be customized in Plato.
 """
 
 from functools import partial
+from pathlib import Path
 from typing import Callable
 
 import torch
@@ -14,6 +15,7 @@ from torchvision.transforms import ToTensor
 
 from plato.clients import simple
 from plato.datasources import base
+from plato.config import Config
 from plato.servers import fedavg
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
@@ -33,8 +35,11 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST("./data", train=True, download=True, transform=ToTensor())
-        self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
+        Config()
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        data_dir = Path(Config.params.get("data_path", base_path / "data"))
+        self.trainset = MNIST(str(data_dir), train=True, download=True, transform=ToTensor())
+        self.testset = MNIST(str(data_dir), train=False, download=True, transform=ToTensor())
 
 
 class MNISTTrainingStepStrategy(TrainingStepStrategy):

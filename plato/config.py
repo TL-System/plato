@@ -66,8 +66,8 @@ class Config:
                 "-b",
                 "--base",
                 type=str,
-                default="./",
-                help="The base path for datasets and models.",
+                default="./runtime",
+                help="The base path for datasets, models, checkpoints, and results.",
             )
             parser.add_argument(
                 "-s",
@@ -170,6 +170,8 @@ class Config:
 
                 if hasattr(Config.general, "base_path"):
                     Config.params["base_path"] = Config().general.base_path
+
+            os.makedirs(Config.params["base_path"], exist_ok=True)
 
             # Directory of dataset
             if hasattr(Config().data, "data_path"):

@@ -13,6 +13,7 @@ import re
 import numpy as np
 import scipy.io as sio
 import torch
+from torch.utils.data import DataLoader, Dataset
 
 from plato.config import Config
 from plato.datasources import base
@@ -20,7 +21,7 @@ from plato.datasources import base
 FEATURE_NAMES = ["VQA", "R$_1$", "R$_2$", "M", "I"]
 
 
-class QoENFLXDataset(torch.utils.data.Dataset):
+class QoENFLXDataset(Dataset):
     def __init__(self, dataset):
         self.dataset = dataset
 
@@ -112,7 +113,7 @@ class DataSource(base.DataSource):
     @staticmethod
     def get_train_loader(batch_size, trainset, sampler, shuffle=False):
         """The custom train loader for QoENFLX."""
-        return torch.utils.data.DataLoader(
+        return DataLoader(
             QoENFLXDataset(trainset),
             batch_size=batch_size,
             sampler=sampler,

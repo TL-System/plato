@@ -11,6 +11,7 @@ import asyncio
 import logging
 from contextlib import contextmanager
 from functools import partial
+from pathlib import Path
 from typing import Callable
 
 import socketio
@@ -40,8 +41,11 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST("./data", train=True, download=True, transform=ToTensor())
-        self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
+        Config()
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        data_dir = Path(Config.params.get("data_path", base_path / "data"))
+        self.trainset = MNIST(str(data_dir), train=True, download=True, transform=ToTensor())
+        self.testset = MNIST(str(data_dir), train=False, download=True, transform=ToTensor())
 
 
 class MNISTTrainingStepStrategy(TrainingStepStrategy):

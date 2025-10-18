@@ -134,6 +134,9 @@ If a custom `DataSource` is needed for a custom training session, one can subcla
 Example excerpt from `examples/custom_model.py`:
 
 ```python
+from pathlib import Path
+from plato.config import Config
+
 class DataSource(base.DataSource):
     """A custom datasource with custom training and validation
        datasets.
@@ -141,11 +144,14 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST("./data",
+        Config()
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        data_dir = Path(Config.params.get("data_path", base_path / "data"))
+        self.trainset = MNIST(str(data_dir),
                               train=True,
                               download=True,
                               transform=ToTensor())
-        self.testset = MNIST("./data",
+        self.testset = MNIST(str(data_dir),
                              train=False,
                              download=True,
                              transform=ToTensor())

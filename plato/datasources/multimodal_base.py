@@ -9,6 +9,7 @@ from abc import abstractmethod
 from collections import namedtuple
 
 import torch
+from torch.utils.data import Dataset
 from torchvision.datasets.utils import (
     download_file_from_google_drive,
     download_url,
@@ -249,7 +250,7 @@ class MultiModalDataSource(base.DataSource):
         raise NotImplementedError("Please implement the 'get_test_set' method.")
 
 
-class MultiModalDataset(torch.utils.data.Dataset):
+class MultiModalDataset(Dataset):
     """The base interface for multimodal data."""
 
     def __init__(self):

@@ -18,12 +18,12 @@
 !!! example "data_path"
     Where the dataset is located.
 
-    Default value: `./data`
+    Default value: `<base_path>/data`
 
     !!! note "Note"
-        For the `CINIC10` dataset, the default is `./data/CINIC-10`
+        For the `CINIC10` dataset, the default is `<base_path>/data/CINIC-10`
 
-        For the `TinyImageNet` dataset, the default is `./data/tiny-imagenet-200`
+        For the `TinyImageNet` dataset, the default is `<base_path>/data/tiny-imagenet-200`
 
 !!! example "train_path"
     Where the training dataset is located.

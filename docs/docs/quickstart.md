@@ -12,7 +12,7 @@ The following command-line parameters are supported:
 
 - `-c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
 
-- `-b`: the base path, to be used to contain all models, datasets, checkpoints, and results.
+- `-b`: the base path, to be used to contain all models, datasets, checkpoints, and results (defaults to `./runtime`).
 
 - `-r`: resume a previously interrupted training session (only works correctly in synchronous training sessions).
 

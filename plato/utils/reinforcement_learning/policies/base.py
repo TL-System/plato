@@ -1,8 +1,8 @@
 import copy
 import logging
-import os
 import random
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -116,19 +116,21 @@ class Policy(ABC):
     def save_model(self, ep=None):
         """Saving the model to a file."""
         model_name = Config().algorithm.model_name
-        model_path = f"./models/{model_name}/"
-        if not os.path.exists(model_path):
-            os.makedirs(model_path)
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        model_path = base_path / "models" / model_name
+        model_path.mkdir(parents=True, exist_ok=True)
         if ep is not None:
-            model_path += "iter" + str(ep) + "_"
+            prefix = f"iter{ep}_"
+        else:
+            prefix = ""
 
-        torch.save(self.actor.state_dict(), model_path + "actor.pth")
+        torch.save(self.actor.state_dict(), model_path / f"{prefix}actor.pth")
         torch.save(
-            self.actor_optimizer.state_dict(), model_path + "actor_optimizer.pth"
+            self.actor_optimizer.state_dict(), model_path / f"{prefix}actor_optimizer.pth"
         )
-        torch.save(self.critic.state_dict(), model_path + "critic.pth")
+        torch.save(self.critic.state_dict(), model_path / f"{prefix}critic.pth")
         torch.save(
-            self.critic_optimizer.state_dict(), model_path + "critic_optimizer.pth"
+            self.critic_optimizer.state_dict(), model_path / f"{prefix}critic_optimizer.pth"
         )
 
         logging.info("[RL Agent] Model saved to %s.", model_path)
@@ -136,19 +138,22 @@ class Policy(ABC):
     def load_model(self, ep=None):
         """Loading pre-trained model weights from a file."""
         model_name = Config().algorithm.model_name
-        model_path = f"./models/{model_name}/"
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        model_path = base_path / "models" / model_name
         if ep is not None:
-            model_path += "iter" + str(ep) + "_"
+            prefix = f"iter{ep}_"
+        else:
+            prefix = ""
 
         logging.info("[RL Agent] Loading a model from %s.", model_path)
 
-        self.actor.load_state_dict(torch.load(model_path + "actor.pth"))
+        self.actor.load_state_dict(torch.load(model_path / f"{prefix}actor.pth"))
         self.actor_optimizer.load_state_dict(
-            torch.load(model_path + "actor_optimizer.pth")
+            torch.load(model_path / f"{prefix}actor_optimizer.pth")
         )
-        self.critic.load_state_dict(torch.load(model_path + "critic.pth"))
+        self.critic.load_state_dict(torch.load(model_path / f"{prefix}critic.pth"))
         self.critic_optimizer.load_state_dict(
-            torch.load(model_path + "critic_optimizer.pth")
+            torch.load(model_path / f"{prefix}critic_optimizer.pth")
         )
 
     @abstractmethod

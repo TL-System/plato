@@ -35,6 +35,7 @@ except ModuleNotFoundError:
     from client_selection.afl.afl_selection_strategy import AFLSelectionStrategy
     from client_selection.oort.oort_selection_strategy import OortSelectionStrategy
 from plato.clients import simple
+from plato.config import Config
 from plato.datasources import base
 from plato.servers import fedavg
 from plato.servers.strategies import (
@@ -58,8 +59,11 @@ class DataSource(base.DataSource):
     def __init__(self):
         super().__init__()
 
-        self.trainset = MNIST("./data", train=True, download=True, transform=ToTensor())
-        self.testset = MNIST("./data", train=False, download=True, transform=ToTensor())
+        Config()
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        data_dir = Path(Config.params.get("data_path", base_path / "data"))
+        self.trainset = MNIST(str(data_dir), train=True, download=True, transform=ToTensor())
+        self.testset = MNIST(str(data_dir), train=False, download=True, transform=ToTensor())
 
 
 class MNISTTrainingStepStrategy(TrainingStepStrategy):

@@ -7,6 +7,7 @@ import os
 import pickle
 import sys
 import time
+from pathlib import Path
 
 import fedtools
 import numpy as np
@@ -114,34 +115,27 @@ class ServerSync(fedavg.Server):
             if cfg:
                 logging.info("the config of client %s is %s", str(i), str(cfg))
 
-        # Use model_path if available, otherwise use default models/pretrained directory
-        if hasattr(Config().server, "model_path"):
-            model_dir = Config().server.model_path
-        else:
-            model_dir = "./models/pretrained"
-
-        save_config = f"{model_dir}/subnet_configs.pickle"
-
-        # Create directory if it doesn't exist
-        os.makedirs(model_dir, exist_ok=True)
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        model_dir = Path(
+            Config.params.get("model_path", base_path / "models" / "pretrained")
+        )
+        model_dir.mkdir(parents=True, exist_ok=True)
+        save_config = model_dir / "subnet_configs.pickle"
 
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
 
     def save_to_checkpoint(self) -> None:
-        # Use model_path if available, otherwise use default models/pretrained directory
-        if hasattr(Config().server, "model_path"):
-            model_dir = Config().server.model_path
-        else:
-            model_dir = "./models/pretrained"
+        base_path = Path(Config.params.get("base_path", "./runtime"))
+        model_dir = Path(
+            Config.params.get("model_path", base_path / "models" / "pretrained")
+        )
+        model_dir.mkdir(parents=True, exist_ok=True)
 
-        # Create directory if it doesn't exist
-        os.makedirs(model_dir, exist_ok=True)
-
-        save_config = f"{model_dir}/subnet_configs.pickle"
+        save_config = model_dir / "subnet_configs.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
-        save_config = f"{model_dir}/baselines.pickle"
+        save_config = model_dir / "baselines.pickle"
         with open(save_config, "wb") as file:
             pickle.dump(self.algorithm.model.baseline, file)
         return super().save_to_checkpoint()
