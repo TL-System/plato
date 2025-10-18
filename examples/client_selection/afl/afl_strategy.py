@@ -16,7 +16,7 @@ import afl_server_strategy
 
 def main():
     """A Plato federated learning training session using AFL strategy."""
-    client = afl_client.Client()
+    client = afl_client.create_client()
     server = afl_server_strategy.Server()
     server.run(client)
 

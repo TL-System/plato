@@ -54,36 +54,35 @@ class SysHeteroFLLifecycleStrategy(DefaultLifecycleStrategy):
                 owner.trainer.model = model
 
 
-class Client(simple.Client):
-    """A federated learning server using the ElasticArch algorithm."""
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks=None,
+):
+    """Build a SysHeteroFL client configured with dynamic model adaptation."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=trainer_callbacks,
+    )
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=trainer_callbacks,
-        )
+    client._configure_composable(
+        lifecycle_strategy=SysHeteroFLLifecycleStrategy(),
+        payload_strategy=client.payload_strategy,
+        training_strategy=client.training_strategy,
+        reporting_strategy=client.reporting_strategy,
+        communication_strategy=client.communication_strategy,
+    )
 
-        payload_strategy = self.payload_strategy
-        training_strategy = self.training_strategy
-        reporting_strategy = self.reporting_strategy
-        communication_strategy = self.communication_strategy
+    return client
 
-        self._configure_composable(
-            lifecycle_strategy=SysHeteroFLLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
-            reporting_strategy=reporting_strategy,
-            communication_strategy=communication_strategy,
-        )
+
+# Maintain compatibility for imports expecting a Client callable/class.
+Client = create_client

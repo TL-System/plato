@@ -7,7 +7,7 @@ https://pytorch.org/vision/stable/_modules/torchvision/models/mobilenetv3.html.
 """
 
 from fednas_algorithm import ClientAlgorithm, ServerAlgorithm
-from fednas_client import Client
+from fednas_client import create_client
 from fednas_server import Server
 from fednas_trainer import Trainer
 from model.architect import Architect
@@ -19,7 +19,7 @@ def main():
     A Plato federated learning training session using PerFedRLNAS.
     """
     supernet = NasDynamicModel
-    client = Client(
+    client = create_client(
         model=supernet,
         algorithm=ClientAlgorithm,
         trainer=Trainer,

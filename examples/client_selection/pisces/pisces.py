@@ -17,7 +17,7 @@ import pisces_trainer
 def main():
     """Pisces: an asynchronous client selection and server aggregation algorithm."""
     trainer = pisces_trainer.Trainer
-    client = pisces_client.Client(trainer=trainer)
+    client = pisces_client.create_client(trainer=trainer)
     server = pisces_server.Server(trainer=trainer)
 
     server.run(client)

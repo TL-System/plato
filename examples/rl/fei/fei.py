@@ -12,7 +12,7 @@ import fei_server
 def main():
     """A Plato federated learning training session using the FEI algorithm."""
     logging.info("Starting RL Environment's process.")
-    client = fei_client.Client()
+    client = fei_client.create_client()
     agent = fei_agent.RLAgent()
     server = fei_server.RLServer(agent=agent)
     server.run(client)

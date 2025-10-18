@@ -12,8 +12,7 @@ https://arxiv.org/pdf/1909.12641.pdf
 
 import logging
 import math
-from types import SimpleNamespace
-from typing import Iterable, Optional
+from typing import Iterable, List, Optional
 
 import torch
 
@@ -164,38 +163,51 @@ class AFLReportingStrategy(DefaultReportingStrategy):
         return 0.0
 
 
-class Client(simple.Client):
-    """A federated learning client for AFL."""
-
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks: Optional[Iterable] = None,
+def _ensure_pretraining_callback(
+    trainer_callbacks: Optional[Iterable],
+) -> List:
+    """Ensure AFL's pre-training loss callback is present once."""
+    callbacks_list = list(trainer_callbacks) if trainer_callbacks else []
+    if not any(
+        cb == AFLPreTrainingLossCallback
+        or getattr(cb, "__class__", None) == AFLPreTrainingLossCallback
+        for cb in callbacks_list
     ):
-        callbacks_list = list(trainer_callbacks) if trainer_callbacks else []
-        if not any(
-            cb == AFLPreTrainingLossCallback
-            or getattr(cb, "__class__", None) == AFLPreTrainingLossCallback
-            for cb in callbacks_list
-        ):
-            callbacks_list.append(AFLPreTrainingLossCallback)
+        callbacks_list.append(AFLPreTrainingLossCallback)
+    return callbacks_list
 
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=callbacks_list,
-        )
-        self._configure_composable(
-            lifecycle_strategy=self.lifecycle_strategy,
-            payload_strategy=self.payload_strategy,
-            training_strategy=self.training_strategy,
-            reporting_strategy=AFLReportingStrategy(),
-            communication_strategy=self.communication_strategy,
-        )
+
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks: Optional[Iterable] = None,
+):
+    """Build an AFL client configured with valuation hooks."""
+    callbacks_list = _ensure_pretraining_callback(trainer_callbacks)
+
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=callbacks_list,
+    )
+
+    client._configure_composable(
+        lifecycle_strategy=client.lifecycle_strategy,
+        payload_strategy=client.payload_strategy,
+        training_strategy=client.training_strategy,
+        reporting_strategy=AFLReportingStrategy(),
+        communication_strategy=client.communication_strategy,
+    )
+
+    return client
+
+
+# Maintain compatibility for previous imports that expected a Client callable.
+Client = create_client

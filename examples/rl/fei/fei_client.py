@@ -54,35 +54,39 @@ class FeiReportingStrategy(DefaultReportingStrategy):
         return valuation
 
 
-class Client(simple.Client):
-    """A federated learning client for FEI."""
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+    trainer_callbacks=None,
+):
+    """Build a FEI client with customised lifecycle and reporting strategies."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+        trainer_callbacks=trainer_callbacks,
+    )
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-        trainer_callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-            trainer_callbacks=trainer_callbacks,
-        )
+    payload_strategy = client.payload_strategy
+    training_strategy = client.training_strategy
+    communication_strategy = client.communication_strategy
 
-        payload_strategy = self.payload_strategy
-        training_strategy = self.training_strategy
-        communication_strategy = self.communication_strategy
+    client._configure_composable(
+        lifecycle_strategy=FeiLifecycleStrategy(),
+        payload_strategy=payload_strategy,
+        training_strategy=training_strategy,
+        reporting_strategy=FeiReportingStrategy(),
+        communication_strategy=communication_strategy,
+    )
 
-        self._configure_composable(
-            lifecycle_strategy=FeiLifecycleStrategy(),
-            payload_strategy=payload_strategy,
-            training_strategy=training_strategy,
-            reporting_strategy=FeiReportingStrategy(),
-            communication_strategy=communication_strategy,
-        )
+    return client
+
+
+# Maintain compatibility for existing imports expecting a Client callable.
+Client = create_client

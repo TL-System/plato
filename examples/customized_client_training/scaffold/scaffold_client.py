@@ -53,32 +53,39 @@ class ScaffoldLifecycleStrategy(DefaultLifecycleStrategy):
         trainer.client_control_variate_path = client_control_variate_path
 
 
-class Client(simple.Client):
-    """A SCAFFOLD federated learning client who sends weight updates
-    and client control variate."""
+def create_client(
+    *,
+    model=None,
+    datasource=None,
+    algorithm=None,
+    trainer=None,
+    callbacks=None,
+):
+    """Build a SCAFFOLD client configured with the lifecycle strategy."""
+    client = simple.Client(
+        model=model,
+        datasource=datasource,
+        algorithm=algorithm,
+        trainer=trainer,
+        callbacks=callbacks,
+    )
+    client.client_control_variate = None
 
-    def __init__(
-        self,
-        model=None,
-        datasource=None,
-        algorithm=None,
-        trainer=None,
-        callbacks=None,
-    ):
-        super().__init__(
-            model=model,
-            datasource=datasource,
-            algorithm=algorithm,
-            trainer=trainer,
-            callbacks=callbacks,
-        )
+    payload_strategy = client.payload_strategy
+    training_strategy = client.training_strategy
+    reporting_strategy = client.reporting_strategy
+    communication_strategy = client.communication_strategy
 
-        self.client_control_variate = None
+    client._configure_composable(
+        lifecycle_strategy=ScaffoldLifecycleStrategy(),
+        payload_strategy=payload_strategy,
+        training_strategy=training_strategy,
+        reporting_strategy=reporting_strategy,
+        communication_strategy=communication_strategy,
+    )
 
-        self._configure_composable(
-            lifecycle_strategy=ScaffoldLifecycleStrategy(),
-            payload_strategy=self.payload_strategy,
-            training_strategy=self.training_strategy,
-            reporting_strategy=self.reporting_strategy,
-            communication_strategy=self.communication_strategy,
-        )
+    return client
+
+
+# Backwards compatibility for previous imports expecting a Client class-like callable.
+Client = create_client

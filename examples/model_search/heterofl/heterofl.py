@@ -10,7 +10,7 @@ Reference "https://github.com/dem123456789/HeteroFL-Computation-and-Communicatio
 
 import resnet
 from heterofl_algorithm import Algorithm
-from heterofl_client import Client
+from heterofl_client import create_client
 from heterofl_server import Server
 from heterofl_trainer import ServerTrainer
 from mobilenetv3 import MobileNetV3
@@ -25,7 +25,7 @@ def main():
     else:
         model = resnet.resnet18
     server = Server(trainer=ServerTrainer, model=model, algorithm=Algorithm)
-    client = Client(model=model)
+    client = create_client(model=model)
     server.run(client)
 
 

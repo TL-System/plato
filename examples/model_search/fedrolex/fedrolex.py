@@ -8,7 +8,7 @@ in FedRolex NIPS2022.
 """
 
 from fedrolex_algorithm import Algorithm
-from fedrolex_client import Client
+from fedrolex_client import create_client
 from fedrolex_server import Server
 from fedrolex_trainer import ServerTrainer
 from resnet import resnet18
@@ -24,7 +24,7 @@ def main():
     else:
         model = ViT
     server = Server(model=model, algorithm=Algorithm, trainer=ServerTrainer)
-    client = Client(model=model)
+    client = create_client(model=model)
     server.run(client)
 
 
