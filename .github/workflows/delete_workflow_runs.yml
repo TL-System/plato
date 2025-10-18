@@ -1,7 +1,5 @@
 # This workflow will delete old workflow runs, on a schedule or manually triggered.
 name: Delete old workflow runs
-permissions:
-  contents: read and write
 
 on:
   workflow_dispatch:
