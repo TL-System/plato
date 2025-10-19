@@ -8,6 +8,11 @@ import os
 from collections import OrderedDict
 from typing import Mapping
 
+import attacks as attack_registry
+import defences
+import detectors as defence_registry
+import numpy as np
+import torch
 from aggregations import (
     AfaAggregationStrategy,
     BulyanAggregationStrategy,
@@ -17,11 +22,6 @@ from aggregations import (
     MultiKrumAggregationStrategy,
     TrimmedMeanAggregationStrategy,
 )
-import attacks as attack_registry
-import defences
-import detectors as defence_registry
-import numpy as np
-import torch
 
 from plato.config import Config
 from plato.servers import fedavg

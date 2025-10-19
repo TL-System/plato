@@ -312,7 +312,9 @@ def afa(updates, baseline_weights, weights_attacked):
             alpha = pickle.load(file)
             beta = pickle.load(file)
     else:
-        good_hist = np.zeros(getattr(Config().clients, "total_clients", len(clients_id)))
+        good_hist = np.zeros(
+            getattr(Config().clients, "total_clients", len(clients_id))
+        )
         bad_hist = np.zeros(getattr(Config().clients, "total_clients", len(clients_id)))
         alpha = 3
         beta = 3
