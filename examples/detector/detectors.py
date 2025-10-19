@@ -10,9 +10,6 @@ from sklearn.cluster import AgglomerativeClustering, KMeans
 
 from plato.config import Config
 
-# Configure logging
-logging.basicConfig(filename="app.log", filemode="w", level=logging.INFO)
-
 
 def get():
     detector_type = (

@@ -3,9 +3,9 @@ An implementation of the attack-defence scenario.
 
 """
 
-from detector_server import Server
+import detector_server
 
-from plato.clients.simple import Client
+from plato.clients import simple
 from plato.trainers.basic import Trainer
 
 
@@ -15,8 +15,9 @@ def main():
     supervised learning setting.
     """
 
-    client = Client(trainer=Trainer)
-    server = Server(trainer=Trainer)
+    trainer = Trainer
+    client = simple.Client(trainer=trainer)
+    server = detector_server.Server(trainer=trainer)
 
     server.run(client)
 
