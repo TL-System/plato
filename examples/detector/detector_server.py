@@ -8,7 +8,15 @@ import os
 from collections import OrderedDict
 from typing import Mapping
 
-import aggregations as aggregation_registry
+from aggregations import (
+    AfaAggregationStrategy,
+    BulyanAggregationStrategy,
+    FLTrustAggregationStrategy,
+    KrumAggregationStrategy,
+    MedianAggregationStrategy,
+    MultiKrumAggregationStrategy,
+    TrimmedMeanAggregationStrategy,
+)
 import attacks as attack_registry
 import defences
 import detectors as defence_registry
@@ -20,18 +28,38 @@ from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 
 
-class DetectorAggregationStrategy(FedAvgAggregationStrategy):
-    """Aggregation strategy supporting optional secure aggregation for detectors."""
+def _normalize_secure_aggregation_type(aggregation_type: str) -> str:
+    """Normalize the aggregation type declared in the configuration."""
+    return aggregation_type.strip().lower().replace("_", "-").replace(" ", "-")
 
-    async def aggregate_weights(
-        self, updates, baseline_weights, weights_received, context
-    ):
-        """Aggregate weights directly when secure aggregation is configured."""
-        if not hasattr(Config().server, "secure_aggregation_type"):
-            return None
 
-        aggregation = aggregation_registry.get()
-        return aggregation(updates, baseline_weights, weights_received)
+def _resolve_detector_aggregation_strategy(aggregation_strategy=None):
+    """Select the aggregation strategy based on the configuration."""
+    if aggregation_strategy is not None:
+        return aggregation_strategy
+
+    secure_type = getattr(Config().server, "secure_aggregation_type", None)
+    if not secure_type:
+        return FedAvgAggregationStrategy()
+
+    normalized_type = _normalize_secure_aggregation_type(secure_type)
+
+    if normalized_type == "median":
+        return MedianAggregationStrategy()
+    if normalized_type == "bulyan":
+        return BulyanAggregationStrategy()
+    if normalized_type == "krum":
+        return KrumAggregationStrategy()
+    if normalized_type == "multi-krum":
+        return MultiKrumAggregationStrategy()
+    if normalized_type == "trimmed-mean":
+        return TrimmedMeanAggregationStrategy()
+    if normalized_type == "afa":
+        return AfaAggregationStrategy()
+    if normalized_type == "fl-trust":
+        return FLTrustAggregationStrategy()
+
+    raise ValueError(f"Unknown secure aggregation type: {secure_type}")
 
 
 class Server(fedavg.Server):
@@ -44,13 +72,17 @@ class Server(fedavg.Server):
         callbacks=None,
         aggregation_strategy=None,
     ):
+        resolved_aggregation_strategy = _resolve_detector_aggregation_strategy(
+            aggregation_strategy
+        )
+
         super().__init__(
             model=model,
             datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
-            aggregation_strategy=aggregation_strategy or DetectorAggregationStrategy(),
+            aggregation_strategy=resolved_aggregation_strategy,
         )
         self.attacker_list = None
         self.attack_type = None
