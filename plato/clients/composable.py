@@ -246,7 +246,16 @@ class ComposableClient:
 
         self._sync_owner_from_context()
 
-        await self.context.sio.wait()
+        try:
+            await self.context.sio.wait()
+        except asyncio.CancelledError:
+            LOGGER.info(
+                "[Client #%d] Socket wait task cancelled; shutting down.",
+                self.owner.client_id,
+            )
+        finally:
+            if self.context.sio.connected:
+                await self.context.sio.disconnect()
 
     async def on_payload_to_arrive(self, response: dict) -> None:
         """Handle notification that a new payload is about to arrive."""

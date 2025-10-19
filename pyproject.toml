@@ -67,10 +67,11 @@ members = [
     "examples/split_learning/llm_split_learning",
     "examples/ssl/calibre",
     "examples/ssl/smog",
+    "examples/model_search/anycostfl",
+    "examples/model_search/fedrolex",
     "examples/model_search/pfedrlnas/VIT",
     "examples/model_search/pfedrlnas/MobileNetV3",
     "examples/model_search/heterofl",
-    "examples/model_search/fedrolex",
     "examples/detector",
     "examples/gradient_leakage_attacks",
 ]
