@@ -42,18 +42,44 @@ class ComposableClientEvents(socketio.AsyncClientNamespace):
         owner = self.core.owner
         LOGGER.info("[Client #%d] Connected to the server.", owner.client_id)
 
-    async def on_disconnect(self) -> None:
-        owner = self.core.owner
-        LOGGER.info(
-            "[Client #%d] The server disconnected the connection.", owner.client_id
-        )
-        shutdown_delay = getattr(
-            getattr(Config(), "clients", object()), "shutdown_delay", 1.0
-        )
-        if shutdown_delay and shutdown_delay > 0:
-            await asyncio.sleep(shutdown_delay)
-        owner._clear_checkpoint_files()
-        raise SystemExit(0)
+    async def on_disconnect(self, reason: Any | None = None) -> None:
+        try:
+            owner = self.core.owner
+            if reason is not None:
+                LOGGER.info(
+                    "[Client #%d] The server disconnected the connection (%s).",
+                    owner.client_id,
+                    reason,
+                )
+            else:
+                LOGGER.info(
+                    "[Client #%d] The server disconnected the connection.",
+                    owner.client_id,
+                )
+            shutdown_delay = getattr(
+                getattr(Config(), "clients", object()), "shutdown_delay", 1.0
+            )
+            if shutdown_delay and shutdown_delay > 0:
+                await asyncio.sleep(shutdown_delay)
+            try:
+                owner._clear_checkpoint_files()
+            except SystemExit as exc:
+                LOGGER.warning(
+                    "[Client #%d] Cleanup raised SystemExit (%s); ignoring.",
+                    owner.client_id,
+                    exc,
+                )
+            else:
+                LOGGER.info(
+                    "[Client #%d] Disconnect cleanup finished.",
+                    owner.client_id,
+                )
+        except SystemExit as exc:
+            LOGGER.warning(
+                "[Client #%s] Disconnect handler raised SystemExit (%s); ignoring.",
+                getattr(self.core.owner, "client_id", "?"),
+                exc,
+            )
 
     async def on_connect_error(self, data: Any) -> None:
         owner = self.core.owner
@@ -185,7 +211,10 @@ class ComposableClient:
             await asyncio.sleep(5)
             LOGGER.info("[%s] Contacting the server.", self.owner)
 
-        self.context.sio = socketio.AsyncClient(reconnection=True)
+        client_cfg = getattr(Config(), "clients", object())
+        reconnection = getattr(client_cfg, "enable_reconnect", False)
+
+        self.context.sio = socketio.AsyncClient(reconnection=reconnection)
         self.context.sio.register_namespace(
             ComposableClientEvents(namespace="/", core=self)
         )
@@ -217,7 +246,16 @@ class ComposableClient:
 
         self._sync_owner_from_context()
 
-        await self.context.sio.wait()
+        try:
+            await self.context.sio.wait()
+        except asyncio.CancelledError:
+            LOGGER.info(
+                "[Client #%d] Socket wait task cancelled; shutting down.",
+                self.owner.client_id,
+            )
+        finally:
+            if self.context.sio.connected:
+                await self.context.sio.disconnect()
 
     async def on_payload_to_arrive(self, response: dict) -> None:
         """Handle notification that a new payload is about to arrive."""

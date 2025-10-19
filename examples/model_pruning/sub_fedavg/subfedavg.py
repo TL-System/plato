@@ -5,7 +5,7 @@ S. Vahidian, M. Morafah, and B. Lin,
 “Personalized Federated Learning by Structured and Unstructured Pruning Under Data Heterogeneity,”
 in 41st IEEE International Conference on Distributed Computing Systems Workshops (ICDCSW). 2021.
 
-Original sourcecode: https://github.com/MMorafah/Sub-FedAvg
+Original source code: https://github.com/MMorafah/Sub-FedAvg
 
 """
 

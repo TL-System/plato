@@ -603,6 +603,14 @@ class ComposableTrainer(base.Trainer):
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
 
+            if hasattr(torch.multiprocessing, "set_sharing_strategy"):
+                try:
+                    torch.multiprocessing.set_sharing_strategy("file_system")
+                except (RuntimeError, ValueError):
+                    logging.debug(
+                        "Unable to set torch sharing strategy to file_system."
+                    )
+
             train_proc = mp.Process(
                 target=self.train_process,
                 args=(config, trainset, sampler),

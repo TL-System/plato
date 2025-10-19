@@ -586,19 +586,14 @@ class Trainer(BasicTrainer):
         if callbacks is not None:
             all_callbacks.extend(callbacks)
 
-        # Initialize parent with model and custom strategies
-        # Note: We bypass BasicTrainer.__init__ to directly use ComposableTrainer
-        from plato.callbacks.handler import CallbackHandler
-        from plato.callbacks.trainer import LogProgressCallback
-        from plato.trainers import tracking
-        from plato.trainers.basic import LegacyHookBridgeCallback
+        # Initialize parent with model and custom strategies.
+        # Note: We bypass BasicTrainer.__init__ to directly use ComposableTrainer.
         from plato.trainers.composable import ComposableTrainer
 
-        # Initialize ComposableTrainer
         ComposableTrainer.__init__(
             self,
             model=temp_model,
-            callbacks=None,  # We'll set up callbacks manually
+            callbacks=all_callbacks,
             loss_strategy=ssl_loss_strategy,
             optimizer_strategy=ssl_optimizer_strategy,
             training_step_strategy=ssl_training_step_strategy,
@@ -607,16 +602,6 @@ class Trainer(BasicTrainer):
             data_loader_strategy=ssl_data_loader_strategy,
             testing_strategy=ssl_testing_strategy,
         )
-
-        # Setup callbacks with both legacy bridge and SSL callbacks
-        self.callbacks = (
-            [LegacyHookBridgeCallback] + all_callbacks + [LogProgressCallback]
-        )
-        self.callback_handler = CallbackHandler(self.callbacks)
-
-        # Reinitialize tracking (parent might have set these up already)
-        self.run_history = tracking.RunHistory()
-        self._loss_tracker = tracking.LossTracker()
 
         # Convenience attributes
         self._loss_criterion = None

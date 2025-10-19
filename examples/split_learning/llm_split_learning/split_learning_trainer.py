@@ -241,6 +241,10 @@ class Trainer(split_learning.Trainer):
             model: The model to train (HuggingFace model)
             callbacks: List of callback classes or instances
         """
+        # Ensure tokenizer and training arguments attributes always exist
+        self.tokenizer = None
+        self.training_args = None
+
         # Create LLM-specific callbacks
         tokenizer_callback = LLMTokenizerCallback()
         training_args_callback = LLMTrainingArgsCallback()
@@ -253,11 +257,23 @@ class Trainer(split_learning.Trainer):
         # Initialize parent split learning trainer
         super().__init__(model=model, callbacks=all_callbacks)
 
+        # Manually trigger initialization callbacks so required attributes are ready
+        tokenizer_callback.on_trainer_initialized(self)
+        training_args_callback.on_trainer_initialized(self)
+
+        if self.tokenizer is None:
+            raise ValueError("LLMTokenizerCallback failed to initialize the tokenizer.")
+        if self.training_args is None:
+            raise ValueError(
+                "LLMTrainingArgsCallback failed to initialize training arguments."
+            )
+
         # Replace testing strategy with LLM-specific one
         # Note: We need to do this after parent init so tokenizer and training_args are set
         self.testing_strategy = LLMSplitLearningTestingStrategy(
             self.tokenizer, self.training_args
         )
+        self.testing_strategy.setup(self.context)
 
     def process_training_samples_before_retrieving(self, training_samples):
         """

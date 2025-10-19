@@ -1,7 +1,7 @@
 [project]
-name = "fedrolex"
+name = "AnyCostFL"
 version = "0.1.0"
-description = "Model-Heterogeneous Federated Learning with Rolling Sub-Model Extraction"
+description = "Efficient On-Demand Federated Learning over Heterogeneous Edge Device"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

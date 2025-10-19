@@ -65,43 +65,103 @@ Most federated learning algorithms can be divided into four components: a *clien
 
 ### Component Overview
 
-**Client Component:** The *client* implements all algorithm logic on the client side. Typically, one would subclass from the `simple.Client` class to reuse some of the useful methods there, but it is also possible to subclass from the `base.Client` class.
+Plato still separates workloads into *client*, *server*, *algorithm*, and
+*trainer* components, but the client, server, and trainer runtime is now driven
+by strategies instead of deep inheritance chains. The defaults reproduce the
+legacy behaviour, while custom strategies let you swap individual pieces.
 
-**Server Component:** The *server* implements all algorithm logic on the server side. Typically, one would subclass from the `fedavg.Server` class to reuse some of the useful methods there, but it is also possible to subclass from the `base.Server` class.
+**Client Component:** `plato.clients.base.Client` owns a
+`ComposableClient` that orchestrates lifecycle, payload, training, reporting,
+and communication strategies. `plato.clients.simple.Client` wires the default
+stack; subclass it (or the base client) only to call `_configure_composable(...)`
+with your own strategy instances or to add callback plumbing.
 
+**Server Component:** `plato.servers.base.Server` provides lifecycle management
+and delegates aggregation plus client selection to strategy objects. Concrete
+servers such as `plato.servers.fedavg.Server` accept
+`aggregation_strategy=` and `client_selection_strategy=` keyword arguments,
+letting you mix built-in logic with custom implementations at runtime.
 
-**Algorithm Component:** Framework-specific algorithm logic should be implemented in an *algorithm* module. Typically, one would subclass from the `fedavg.Algorithm` class. Several frequently-used algorithms are provided in `algorithms/`, while more examples are provided outside the framework in `examples/`.
+**Algorithm Component:** Algorithm-specific coordination still lives under
+`plato/algorithms/`. Most implementations subclass the relevant algorithm base
+class (for example `fedavg.Algorithm`) to integrate with the shared trainer and
+payload pipeline.
 
-**Trainer Component:** Custom training loops should be implemented as a *trainer* class. If a trainer is to be implemented, one may subclass from the `basic.Trainer` class.
+**Trainer Component:** Trainers mirror the client/server composition model.
+`plato.trainers.basic.Trainer` and `plato.trainers.composable.ComposableTrainer`
+let you inject loss, optimiser, scheduler, and evaluation behaviour via strategy
+objects rather than overriding protected hooks.
 
-??? note "Note"
-    See the **Trainers** section in API reference documentation for customizing the training loops using inheritance or callbacks.
+??? note "Need more detail?"
+    See the **Clients**, **Servers**, and **Trainers** sections in the API
+    reference for complete strategy lists and extension hooks. Those pages also
+    document when subclassing remains appropriate.
 
 ### Implementation Examples
 
-Once the custom *client*, *server*, *algorithm*, *trainer* classes have been implemented, they can be initialized just like the following examples:
-
-From `examples/basic/basic.py`:
+Once the custom *client*, *server*, *algorithm*, and *trainer* pieces have been
+implemented, compose them by wiring strategy instances or factories together:
 
 ```python
-model = Model
-datasource = DataSource
-trainer = Trainer
-client = simple.Client(model=model, datasource=datasource, trainer=trainer)
-server = fedavg.Server(model=model, datasource=datasource, trainer=trainer)
+from functools import partial
+
+from plato.clients import simple
+from plato.clients.strategies import (
+    DefaultCommunicationStrategy,
+    DefaultLifecycleStrategy,
+    DefaultPayloadStrategy,
+    DefaultReportingStrategy,
+    DefaultTrainingStrategy,
+)
+from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedNovaAggregationStrategy
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.training_step import GradientClippingStepStrategy
+
+
+class AugmentedPayloadStrategy(DefaultPayloadStrategy):
+    def outbound_ready(self, context, report, outbound_payload):
+        super().outbound_ready(context, report, outbound_payload)
+        report.extra_metrics = context.metadata.get("custom_metrics", {})
+
+
+class CustomClient(simple.Client):
+    def __init__(self, *, trainer_factory):
+        super().__init__(trainer=trainer_factory)
+        self._configure_composable(
+            lifecycle_strategy=DefaultLifecycleStrategy(),
+            payload_strategy=AugmentedPayloadStrategy(),
+            training_strategy=DefaultTrainingStrategy(),
+            reporting_strategy=DefaultReportingStrategy(),
+            communication_strategy=DefaultCommunicationStrategy(),
+        )
+
+
+trainer_factory = partial(
+    ComposableTrainer,
+    training_step_strategy=GradientClippingStepStrategy(max_norm=1.0),
+)
+
+client = CustomClient(trainer_factory=trainer_factory)
+server = fedavg.Server(
+    aggregation_strategy=FedNovaAggregationStrategy(),
+)
+
 server.run(client)
 ```
 
-Example from `examples/FedRep/fedrep.py`:
+The example above:
 
-```python
-trainer = fedrep_trainer.Trainer
-algorithm = fedrep_algorithm.Algorithm
-client = fedrep_client.Client(algorithm=algorithm, trainer=trainer)
-server = fedrep_server.Server(algorithm=algorithm, trainer=trainer)
+- injects a gradient-clipping training step through the trainer factory each
+  time a client is instantiated,
+- subclasses the simple client to swap only the payload strategy while leaving
+  the remaining defaults untouched, and
+- swaps the server aggregation logic for FedNova without touching the server
+  subclass itself.
 
-server.run(client)
-```
+Most examples under `examples/` now follow this pattern—copy a nearby strategy,
+customise the hook you need, register it in a factory or config, and keep the
+rest of the stack unchanged.
 
 ---
 

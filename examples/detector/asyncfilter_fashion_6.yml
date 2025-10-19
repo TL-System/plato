@@ -82,4 +82,4 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_path: ./plato/results/asyncfilter/fashionmnist
+    result_path: results/asyncfilter/fashionmnist

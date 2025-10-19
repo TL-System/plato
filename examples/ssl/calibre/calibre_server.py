@@ -19,6 +19,32 @@ classes. This observation was also mentioned in the paper:
 import torch
 
 from plato.servers import fedavg_personalized as personalized_server
+from plato.servers.strategies.aggregation import fedavg as fedavg_strategy
+
+
+class CalibreAggregationStrategy(fedavg_strategy.FedAvgAggregationStrategy):
+    """Aggregation strategy that re-weights deltas using divergence scores."""
+
+    async def aggregate_deltas(self, updates, deltas_received, context):
+        server = context.server
+        divergence_rates = getattr(server, "divergence_rates_received", None)
+
+        if divergence_rates is None or len(divergence_rates) == 0:
+            return await super().aggregate_deltas(updates, deltas_received, context)
+
+        total_divergence = torch.sum(divergence_rates)
+        if total_divergence.item() == 0:
+            return await super().aggregate_deltas(updates, deltas_received, context)
+
+        weighted_deltas = []
+        for i, update in enumerate(deltas_received):
+            rate_ratio = (divergence_rates[i] / total_divergence).item()
+            weighted_update = {
+                name: delta * rate_ratio for name, delta in update.items()
+            }
+            weighted_deltas.append(weighted_update)
+
+        return await super().aggregate_deltas(updates, weighted_deltas, context)
 
 
 class Server(personalized_server.Server):
@@ -33,21 +59,9 @@ class Server(personalized_server.Server):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            aggregation_strategy=CalibreAggregationStrategy(),
         )
         self.divergence_rates_received = []
-
-    async def aggregate_deltas(self, updates, deltas_received):
-        """Apply the divergence rate as the weight to deltas."""
-        total_divergence = torch.sum(self.divergence_rates_received)
-        # Normalize the delta with the divergence rates
-        for i, update in enumerate(deltas_received):
-            divergence_rate = self.divergence_rates_received[i]
-            for name, delta in update.items():
-                update[name] = delta * (divergence_rate / total_divergence)
-
-            deltas_received[i] = update
-
-        return await super().aggregate_deltas(updates, deltas_received)
 
     def weights_received(self, weights_received):
         """Get the divergence rates from clients."""

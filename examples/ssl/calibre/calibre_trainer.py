@@ -13,6 +13,7 @@ from calibre_optimizer_strategy import CalibreOptimizerStrategy
 from clustering import kmeans_clustering
 
 from plato.config import Config
+from plato.trainers import loss_criterion
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     LossCriterionStrategy,
@@ -29,6 +30,7 @@ class CalibreLossStrategy(LossCriterionStrategy):
     def __init__(self):
         """Initialize the Calibre loss strategy."""
         self._calibre_loss = None
+        self._personalization_loss = None
 
     def setup(self, context: TrainingContext):
         """Initialize the Calibre loss criterion."""
@@ -72,8 +74,41 @@ class CalibreLossStrategy(LossCriterionStrategy):
             device=context.device,
         )
 
+        # Prepare personalization loss if the downstream stage is enabled
+        personalization_cfg = getattr(Config().algorithm, "personalization", None)
+        if personalization_cfg is not None and hasattr(
+            personalization_cfg, "loss_criterion"
+        ):
+            personalization_loss_name = personalization_cfg.loss_criterion
+            personalization_loss_params = {}
+            if hasattr(Config().parameters, "personalization") and hasattr(
+                Config().parameters.personalization, "loss_criterion"
+            ):
+                personalization_loss_params = (
+                    Config().parameters.personalization.loss_criterion._asdict()
+                )
+
+            self._personalization_loss = loss_criterion.get(
+                loss_criterion=personalization_loss_name,
+                loss_criterion_params=personalization_loss_params,
+            )
+
     def compute_loss(self, outputs, labels, context: TrainingContext):
         """Compute Calibre loss."""
+        if context.current_round > Config().trainer.rounds:
+            if self._personalization_loss is None:
+                raise RuntimeError(
+                    "Personalization loss is not configured but personalization "
+                    "phase was triggered."
+                )
+            local_layers = context.state.get("local_layers")
+            if local_layers is None:
+                raise RuntimeError(
+                    "Local personalization layers are not available in context."
+                )
+            logits = local_layers(outputs)
+            return self._personalization_loss(logits, labels)
+
         if isinstance(outputs, (list, tuple)):
             return self._calibre_loss(*outputs, labels=labels)
         else:
@@ -329,22 +364,28 @@ class Trainer(ComposableTrainer):
         Returns:
             Training time in seconds
         """
-        # Initialize local_layers if not done yet and model has encoder
-        if self.local_layers is None and hasattr(self.model, "encoder"):
-            from plato.models import registry as models_registry
+        # Initialize local_layers only during personalization rounds
+        if self.current_round > Config().trainer.rounds and hasattr(
+            self.model, "encoder"
+        ):
+            if self.local_layers is None:
+                from plato.models import registry as models_registry
 
-            model_params = Config().parameters.personalization.model._asdict()
-            model_params["input_dim"] = self.model.encoder.encoding_dim
-            model_params["output_dim"] = model_params["num_classes"]
-            self.local_layers = models_registry.get(
-                model_name=Config().algorithm.personalization.model_name,
-                model_type=Config().algorithm.personalization.model_type,
-                model_params=model_params,
-            )
+                model_params = Config().parameters.personalization.model._asdict()
+                model_params["input_dim"] = self.model.encoder.encoding_dim
+                model_params["output_dim"] = model_params["num_classes"]
+                self.local_layers = models_registry.get(
+                    model_name=Config().algorithm.personalization.model_name,
+                    model_type=Config().algorithm.personalization.model_type,
+                    model_params=model_params,
+                )
 
-        # Store local_layers in context for optimizer strategy
-        if self.local_layers is not None:
-            self.context.state["local_layers"] = self.local_layers
+            if self.local_layers is not None:
+                self.local_layers.to(self.device)
+                self.local_layers.train()
+                self.context.state["local_layers"] = self.local_layers
+        else:
+            self.context.state.pop("local_layers", None)
 
         # Store personalized trainset and sampler in context for divergence computation
         if self.personalized_trainset is not None:

@@ -22,8 +22,8 @@ server:
     do_test: false
     random_seed: 1
 
-    checkpoint_path: /scratch/dixiyao/plato/models/pfedrlnas_async_budget
-    model_path: /scratch/dixiyao/plato/models/pfedrlnas_async_budget
+    checkpoint_path: checkpoints
+    model_path: models
 
     simulate_wall_time: true
 
@@ -80,7 +80,7 @@ algorithm:
     
 results:
     types: round, accuracy, elapsed_time, comm_time, round_time, comm_overhead, server_overhead
-    result_path: /scratch/dixiyao/plato/results/pfedrlnas_async_budget
+    result_path: results
 
 parameters:
     model:

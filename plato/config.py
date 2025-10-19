@@ -83,12 +83,6 @@ class Config:
                 "-m", "--mps", action="store_true", help="Use MPS as the device."
             )
             parser.add_argument(
-                "-d",
-                "--download",
-                action="store_true",
-                help="Download the dataset to prepare for a training session.",
-            )
-            parser.add_argument(
                 "-r",
                 "--resume",
                 action="store_true",
@@ -145,10 +139,6 @@ class Config:
                     address=args.server.split(":")[0]
                 )
                 Config.server = Config.server._replace(port=args.server.split(":")[1])
-
-            if Config.args.download:
-                Config.clients = Config.clients._replace(total_clients=1)
-                Config.clients = Config.clients._replace(per_round=1)
 
             if (
                 hasattr(Config.clients, "speed_simulation")

@@ -7,6 +7,7 @@ trainer pattern with custom strategies and callbacks instead of inheritance.
 
 import logging
 import time
+from collections.abc import Iterable
 from typing import Optional
 
 import torch
@@ -68,6 +69,46 @@ class DPDataLoaderStrategy(DataLoaderStrategy):
     (based on the sampler) to enable Opacus poisson sampling.
     """
 
+    @staticmethod
+    def _extract_subset_indices(trainset, sampler):
+        """Resolve sampler into explicit subset indices for Opacus compatibility."""
+        if sampler is None:
+            return None
+
+        # Direct iterable of indices (list, tuple, range, etc.)
+        if isinstance(sampler, (list, tuple, range)):
+            return list(sampler)
+
+        # Plato sampler implementations often expose subset_indices for reuse.
+        if hasattr(sampler, "subset_indices"):
+            return list(sampler.subset_indices)
+
+        # Torch samplers may expose the indices attribute directly.
+        if hasattr(sampler, "indices"):
+            try:
+                return list(sampler.indices)
+            except TypeError:
+                pass
+
+        # Plato sampler objects provide get() -> torch Sampler.
+        if hasattr(sampler, "get"):
+            return DPDataLoaderStrategy._extract_subset_indices(trainset, sampler.get())
+
+        # Torch sampler instance (e.g., SubsetRandomSampler).
+        if isinstance(sampler, torch.utils.data.Sampler):
+            try:
+                return list(iter(sampler))
+            except TypeError:
+                pass
+
+        # Last resort: treat it as an iterable.
+        if isinstance(sampler, Iterable):
+            return list(iter(sampler))
+
+        raise TypeError(
+            f"Unsupported sampler type {type(sampler)!r} for DP data loader."
+        )
+
     def create_train_loader(
         self, trainset, sampler, batch_size: int, context: TrainingContext
     ) -> DataLoader:
@@ -83,8 +124,13 @@ class DPDataLoaderStrategy(DataLoaderStrategy):
         Returns:
             DataLoader without sampler (Opacus will add poisson sampling)
         """
-        # Convert sampler to subset indices
-        trainset_subset = Subset(trainset, list(sampler))
+        indices = self._extract_subset_indices(trainset, sampler)
+
+        # Create a Subset only when indices can be resolved.
+        if indices is not None:
+            trainset_subset = Subset(trainset, indices)
+        else:
+            trainset_subset = trainset
 
         # Create DataLoader without sampler - Opacus will recreate it with poisson sampling
         return DataLoader(

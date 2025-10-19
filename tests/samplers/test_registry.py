@@ -75,9 +75,7 @@ def test_sampler_reports_partition_size(temp_config):
     assert sampler.num_samples() == 4
 
 
-def test_sampler_registry_accepts_explicit_sampler_type(
-    temp_config, monkeypatch
-):
+def test_sampler_registry_accepts_explicit_sampler_type(temp_config, monkeypatch):
     """Explicit sampler_type kwargs should bypass the config default."""
 
     class StubSampler:
@@ -99,9 +97,7 @@ def test_sampler_registry_accepts_explicit_sampler_type(
     assert sampler.testing is False
 
 
-def test_sampler_registry_uses_testset_sampler_when_testing(
-    temp_config, monkeypatch
-):
+def test_sampler_registry_uses_testset_sampler_when_testing(temp_config, monkeypatch):
     """Config.testset_sampler should be respected for evaluation splits."""
 
     class StubSampler:
@@ -122,9 +118,7 @@ def test_sampler_registry_uses_testset_sampler_when_testing(
         samplers_registry,
         "Config",
         lambda: SimpleNamespace(
-            data=SimpleNamespace(
-                sampler="iid", testset_sampler="test_stub"
-            )
+            data=SimpleNamespace(sampler="iid", testset_sampler="test_stub")
         ),
     )
 

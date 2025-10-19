@@ -3,8 +3,11 @@ HeteroFL algorithm trainer.
 """
 
 import copy
+import logging
+import os
 
 import numpy as np
+import torch
 
 from plato.config import Config
 from plato.samplers import all_inclusive
@@ -59,10 +62,18 @@ class Server(fedavg.Server):
         # Implement sBN operation.
         trainset = self.datasource.get_train_set()
         trainset_sampler = all_inclusive.Sampler(self.datasource, testing=False)
-        trainloader = self.trainer.get_train_loader(
-            Config().trainer.batch_size, trainset, trainset_sampler.get()
+        trainloader = torch.utils.data.DataLoader(
+            dataset=trainset,
+            batch_size=Config().trainer.batch_size,
+            sampler=trainset_sampler.get(),
+        )
+        logging.info(
+            "[Server #%d] Running sBN over %d samples.",
+            os.getpid(),
+            len(trainloader.dataset) if hasattr(trainloader, "dataset") else -1,
         )
         test_model = self.algorithm.stat(self.model, trainloader)
+        logging.info("[Server #%d] sBN pass complete.", os.getpid())
         self.train_model = copy.deepcopy(self.algorithm.model)
         self.algorithm.model = test_model
 

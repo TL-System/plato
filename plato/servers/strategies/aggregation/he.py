@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Dict, List
+from collections.abc import Mapping
+from typing import Dict
 
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
 from plato.utils import homo_enc
@@ -27,7 +28,15 @@ class FedAvgHEAggregationStrategy(AggregationStrategy):
         baseline_weights,
         weights_received,
         context: ServerContext,
-    ) -> Dict:
+    ) -> Dict | None:
+        if not weights_received:
+            return None
+
+        # MaskCrypt alternates between mask tensors and encrypted weights.
+        # Skip aggregation when the payload lacks the serialized model structure.
+        if not all(isinstance(payload, Mapping) for payload in weights_received):
+            return None
+
         server = context.server
 
         aggregated = server._fedavg_hybrid(updates, weights_received)

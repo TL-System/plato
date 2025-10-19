@@ -17,11 +17,32 @@ import torch
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+
+
+class DetectorAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy supporting optional secure aggregation for detectors."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        """Aggregate weights directly when secure aggregation is configured."""
+        if not hasattr(Config().server, "secure_aggregation_type"):
+            return None
+
+        aggregation = aggregation_registry.get()
+        return aggregation(updates, baseline_weights, weights_received)
 
 
 class Server(fedavg.Server):
     def __init__(
-        self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+        aggregation_strategy=None,
     ):
         super().__init__(
             model=model,
@@ -29,6 +50,7 @@ class Server(fedavg.Server):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            aggregation_strategy=aggregation_strategy or DetectorAggregationStrategy(),
         )
         self.attacker_list = None
         self.attack_type = None
@@ -183,22 +205,3 @@ class Server(fedavg.Server):
         # self.detect_analysis(ids, received_ids)
 
         return weights_approved
-
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Aggregate the reported weight updates from the selected clients."""
-
-        if not hasattr(Config().server, "secure_aggregation_type"):
-            logging.info(f"Fedavg is applied.")
-            deltas_received = self.algorithm.compute_weight_deltas(
-                baseline_weights, weights_received
-            )
-            deltas = await self.aggregate_deltas(self.updates, deltas_received)
-            updated_weights = self.algorithm.update_weights(deltas)
-            return updated_weights
-
-        # if secure aggregation is applied.
-        aggregation = aggregation_registry.get()
-
-        weights_aggregated = aggregation(updates, baseline_weights, weights_received)
-
-        return weights_aggregated

@@ -93,4 +93,4 @@ parameters:
 results:
     # Write the following parameter(s) into a CSV
     types: round, accuracy, elapsed_time, comm_time, round_time
-    result_path: /data/ykang/plato/results/asyncfilter/cinic
+    result_path: results/asyncfilter/cinic

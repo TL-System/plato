@@ -78,12 +78,16 @@ class RoundInfoStore:
         self,
         *,
         lock=None,
-        storage_dir: str = "mpc_data",
+        storage_dir: Optional[str] = None,
         use_s3: bool = False,
         s3_key_prefix: str = "mpc",
     ):
         self._lock = lock
-        self._storage_dir = storage_dir
+        if storage_dir is None:
+            resolved_storage_dir = self._default_storage_dir()
+        else:
+            resolved_storage_dir = os.fspath(storage_dir)
+        self._storage_dir = resolved_storage_dir
         self._use_s3 = use_s3
         self._s3_key_prefix = s3_key_prefix.rstrip("/")
 
@@ -116,8 +120,23 @@ class RoundInfoStore:
         Automatically enables S3/ZooKeeper mode when ``server.s3_endpoint_url`` is set.
         """
         use_s3 = hasattr(Config().server, "s3_endpoint_url")
-        storage_dir = getattr(Config().params, "mpc_data_path", "mpc_data")
+        storage_dir = cls._default_storage_dir()
         return cls(lock=lock, storage_dir=storage_dir, use_s3=use_s3)
+
+    @staticmethod
+    def _default_storage_dir() -> str:
+        """Resolve the storage directory from the current configuration."""
+        params = getattr(Config, "params", {}) or {}
+        if isinstance(params, dict):
+            mpc_path = params.get("mpc_data_path")
+            if mpc_path:
+                return mpc_path
+
+            base_path = params.get("base_path")
+            if base_path:
+                return os.path.join(base_path, "mpc_data")
+
+        return os.path.join("./runtime", "mpc_data")
 
     @contextlib.contextmanager
     def _acquire(self):

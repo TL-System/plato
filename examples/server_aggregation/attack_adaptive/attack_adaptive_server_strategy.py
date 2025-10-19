@@ -21,7 +21,7 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -336,9 +336,8 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         self.scaling_factor = scaling_factor
         self.attention_hidden = attention_hidden
         self.attention_loops = attention_loops
-        self.dataset_capture_dir = (
-            Path(dataset_capture_dir) if dataset_capture_dir else None
-        )
+        self._requested_capture_dir = dataset_capture_dir
+        self.dataset_capture_dir: Optional[Path] = None
 
         self._cached_state_dict: Optional[Dict[str, torch.Tensor]] = None
         self._attention_model_path: Optional[Path] = (
@@ -383,9 +382,11 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         if hasattr(algorithm_cfg, "attention_hidden"):
             self.attention_hidden = algorithm_cfg.attention_hidden
 
-        if self.dataset_capture_dir is None and algorithm_cfg is not None:
+        capture_dir_setting: Optional[Union[str, Path]] = self._requested_capture_dir
+        if capture_dir_setting is None and algorithm_cfg is not None:
             if hasattr(algorithm_cfg, "dataset_capture_dir"):
-                self.dataset_capture_dir = Path(algorithm_cfg.dataset_capture_dir)
+                capture_dir_setting = algorithm_cfg.dataset_capture_dir
+        self.dataset_capture_dir = self._resolve_capture_dir(capture_dir_setting)
 
         if self.attention_model_path is None:
             default_model_path = Path(
@@ -402,7 +403,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         self._attention_model_path = model_path
 
         if self.dataset_capture_dir is not None:
-            capture_root = Path(self.dataset_capture_dir)
+            capture_root = self.dataset_capture_dir
             capture_root.mkdir(parents=True, exist_ok=True)
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             self._capture_run_dir = capture_root / f"run_{timestamp}"
@@ -647,3 +648,16 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             with metadata_path.open("w", encoding="utf-8") as meta_file:
                 json.dump(metadata, meta_file, indent=2)
             self._capture_metadata_written = True
+
+    @staticmethod
+    def _resolve_capture_dir(path_like: Optional[Union[str, Path]]) -> Optional[Path]:
+        """Resolve the capture directory relative to the runtime base path."""
+        if path_like is None:
+            return None
+
+        capture_dir = Path(path_like)
+        if capture_dir.is_absolute():
+            return capture_dir
+
+        base_root = Path(getattr(Config, "params", {}).get("base_path", "./runtime"))
+        return base_root / capture_dir

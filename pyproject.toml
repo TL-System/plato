@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "plato-learn"
-version = "1.32"
+version = "1.4"
 description = "Plato: a research framework for federated learning"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -67,10 +67,11 @@ members = [
     "examples/split_learning/llm_split_learning",
     "examples/ssl/calibre",
     "examples/ssl/smog",
+    "examples/model_search/anycostfl",
+    "examples/model_search/fedrolex",
     "examples/model_search/pfedrlnas/VIT",
     "examples/model_search/pfedrlnas/MobileNetV3",
     "examples/model_search/heterofl",
-    "examples/model_search/fedrolex",
     "examples/detector",
     "examples/gradient_leakage_attacks",
 ]

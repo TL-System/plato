@@ -7,12 +7,9 @@ L. Yang, W. Wang, and V. Smith, "Polaris: Efficient Federated Learning via
 Intelligent Client Selection," 2020.
 """
 
-from examples.client_selection.polaris.polaris_aggregation_strategy import (
-    PolarisAggregationStrategy,
-)
-from examples.client_selection.polaris.polaris_selection_strategy import (
-    PolarisSelectionStrategy,
-)
+from polaris_aggregation_strategy import PolarisAggregationStrategy
+from polaris_selection_strategy import PolarisSelectionStrategy
+
 from plato.config import Config
 from plato.servers import fedavg
 
