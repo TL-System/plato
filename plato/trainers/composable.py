@@ -607,7 +607,9 @@ class ComposableTrainer(base.Trainer):
                 try:
                     torch.multiprocessing.set_sharing_strategy("file_system")
                 except (RuntimeError, ValueError):
-                    logging.debug("Unable to set torch sharing strategy to file_system.")
+                    logging.debug(
+                        "Unable to set torch sharing strategy to file_system."
+                    )
 
             train_proc = mp.Process(
                 target=self.train_process,

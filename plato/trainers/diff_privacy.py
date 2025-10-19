@@ -92,9 +92,7 @@ class DPDataLoaderStrategy(DataLoaderStrategy):
 
         # Plato sampler objects provide get() -> torch Sampler.
         if hasattr(sampler, "get"):
-            return DPDataLoaderStrategy._extract_subset_indices(
-                trainset, sampler.get()
-            )
+            return DPDataLoaderStrategy._extract_subset_indices(trainset, sampler.get())
 
         # Torch sampler instance (e.g., SubsetRandomSampler).
         if isinstance(sampler, torch.utils.data.Sampler):

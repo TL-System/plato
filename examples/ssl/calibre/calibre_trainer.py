@@ -13,8 +13,8 @@ from calibre_optimizer_strategy import CalibreOptimizerStrategy
 from clustering import kmeans_clustering
 
 from plato.config import Config
-from plato.trainers.composable import ComposableTrainer
 from plato.trainers import loss_criterion
+from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     LossCriterionStrategy,
     ModelUpdateStrategy,
@@ -85,8 +85,7 @@ class CalibreLossStrategy(LossCriterionStrategy):
                 Config().parameters.personalization, "loss_criterion"
             ):
                 personalization_loss_params = (
-                    Config()
-                    .parameters.personalization.loss_criterion._asdict()
+                    Config().parameters.personalization.loss_criterion._asdict()
                 )
 
             self._personalization_loss = loss_criterion.get(

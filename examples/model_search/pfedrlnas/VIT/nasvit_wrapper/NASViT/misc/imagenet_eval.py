@@ -2,7 +2,6 @@
 
 import time
 
-import models
 import torch
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
@@ -12,6 +11,8 @@ import torch.nn.parallel
 import torch.optim
 import torch.utils.data
 import torch.utils.data.distributed
+
+import models
 
 from .flops_counter import count_net_flops_and_params
 from .progress import AverageMeter, ProgressMeter, accuracy

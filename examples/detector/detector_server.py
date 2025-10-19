@@ -50,8 +50,7 @@ class Server(fedavg.Server):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
-            aggregation_strategy=aggregation_strategy
-            or DetectorAggregationStrategy(),
+            aggregation_strategy=aggregation_strategy or DetectorAggregationStrategy(),
         )
         self.attacker_list = None
         self.attack_type = None
