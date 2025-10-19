@@ -42,7 +42,7 @@ def run(
                 server = edge_server(trainer=trainer())
             else:
                 server = edge_server()
-            client = edge_client(server)
+            client = edge_client(server=server)
 
         server.configure()
         client.configure()
