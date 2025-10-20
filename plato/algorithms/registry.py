@@ -12,6 +12,7 @@ from plato.algorithms import (
     fedavg_gan,
     fedavg_personalized,
     lora,
+    mlx_fedavg,
     split_learning,
 )
 from plato.config import Config
@@ -21,6 +22,7 @@ registered_algorithms = {
     "fedavg_gan": fedavg_gan.Algorithm,
     "fedavg_personalized": fedavg_personalized.Algorithm,
     "fedavg_lora": lora.Algorithm,
+    "mlx_fedavg": mlx_fedavg.Algorithm,
     "split_learning": split_learning.Algorithm,
 }
 
