@@ -21,6 +21,11 @@ from plato.models import (
     vit,
 )
 
+try:  # pragma: no cover - optional MLX models
+    from plato.models.mlx import lenet5 as mlx_lenet5
+except ImportError:  # pragma: no cover
+    mlx_lenet5 = None
+
 registered_models = {
     "lenet5": lenet5.Model,
     "dcgan": dcgan.Model,
@@ -36,6 +41,10 @@ registered_factories = {
     "huggingface": huggingface.Model,
     "vit": vit.Model,
 }
+
+registered_mlx_models = {}
+if mlx_lenet5 is not None:
+    registered_mlx_models["mlx_lenet5"] = mlx_lenet5.Model
 
 
 class ModelKwargs(TypedDict, total=False):
@@ -66,6 +75,23 @@ def get(**kwargs: Any) -> Any:
         if hasattr(trainer, "model_type"):
             model_type = getattr(trainer, "model_type")
 
+    # Get model framework (optional)
+    model_framework: str = ""
+    if "model_framework" in kwargs:
+        model_framework = cast(str, kwargs["model_framework"])
+    elif hasattr(config, "trainer"):
+        trainer = getattr(config, "trainer")
+        if hasattr(trainer, "model_framework"):
+            model_framework = getattr(trainer, "model_framework")
+        elif hasattr(trainer, "framework"):
+            model_framework = getattr(trainer, "framework")
+
+    if not model_framework and hasattr(config, "parameters"):
+        parameters = getattr(config, "parameters")
+        if hasattr(parameters, "model") and hasattr(parameters.model, "_asdict"):
+            model_dict = parameters.model._asdict()
+            model_framework = model_dict.get("framework", "")
+
     # If model_type is still empty, derive it from model_name
     if not model_type and model_name:
         model_type = model_name.split("_")[0]
@@ -89,5 +115,14 @@ def get(**kwargs: Any) -> Any:
         return registered_factories[model_type].get(
             model_name=model_name, **model_params
         )
+
+    mlx_key = model_type
+    if model_framework:
+        prefixed_key = f"{model_framework.lower()}_{model_type}"
+        if prefixed_key in registered_mlx_models:
+            mlx_key = prefixed_key
+
+    if mlx_key in registered_mlx_models:
+        return registered_mlx_models[mlx_key](**model_params)
 
     raise ValueError(f"No such model: {model_name}")

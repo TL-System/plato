@@ -14,6 +14,7 @@ from plato.processors import (
     base,
     compress,
     decompress,
+    mlx_numpy,
     model_compress,
     model_decompress,
     model_deepcopy,
@@ -45,6 +46,7 @@ registered_processors = {
     "unstructured_pruning": unstructured_pruning.Processor,
     "mpc_model_encrypt_additive": mpc_model_encrypt_additive.Processor,
     "mpc_model_encrypt_shamir": mpc_model_encrypt_shamir.Processor,
+    "mlx_numpy": mlx_numpy.Processor,
 }
 
 
