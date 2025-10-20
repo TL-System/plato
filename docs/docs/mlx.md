@@ -15,6 +15,7 @@ A reasonable roadmap now that the client/server layers no longer depend on PyTor
   - Configuration & registry wiring
       - Update the trainer/algorithm registries so configs can select type = "mlx" (both for trainer and algorithm).
       - Add new TOML examples demonstrating MLX usage, including any MLX-specific hyperparameters.
+      - Provide configuration shortcuts such as `framework = "mlx"` for trainer/algorithm/model sections.
   - Testing & validation
       - Build unit tests for the MLX trainer and algorithms, covering save/load, aggregation, and feature-specific logic.
       - Add smoke tests that run small MLX training loops end-to-end.
@@ -25,3 +26,28 @@ A reasonable roadmap now that the client/server layers no longer depend on PyTor
   - Performance & parity checks
       - Benchmark key examples against their PyTorch counterparts to confirm comparable behaviour, and identify any API
         gaps that require follow-up enhancements.
+
+### Configuration shortcuts
+
+With the MLX trainer and algorithm registered, configs can opt in by setting a
+`framework = "mlx"` key in the `[trainer]`, `[algorithm]`, or `[parameters.model]`
+sections. For example:
+
+```toml
+[trainer]
+type = "mlx"
+framework = "mlx"
+rounds = 5
+
+[algorithm]
+type = "mlx_fedavg"
+framework = "mlx"
+
+[parameters.model]
+framework = "mlx"
+model_name = "lenet5"
+```
+
+A complete reference configuration is available at
+`configs/MNIST/fedavg_lenet5_mlx.toml`, which pairs the MLX trainer, MLX FedAvg
+algorithm, numpy conversion processors, and the MLX LeNet-5 model.

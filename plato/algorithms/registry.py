@@ -27,9 +27,21 @@ registered_algorithms = {
 }
 
 
+def _resolve_algorithm_type(algorithm_config) -> str:
+    """Resolve algorithm type supporting framework shortcuts."""
+    algo_type = getattr(algorithm_config, "type", None)
+    framework = getattr(algorithm_config, "framework", "")
+
+    if not algo_type and framework:
+        if framework.lower() == "mlx":
+            return "mlx_fedavg"
+    return algo_type
+
+
 def get(trainer=None):
     """Get the algorithm with the provided type."""
-    algorithm_type = Config().algorithm.type
+    algorithm_config = Config().algorithm
+    algorithm_type = _resolve_algorithm_type(algorithm_config)
 
     if algorithm_type in registered_algorithms:
         logging.info("Algorithm: %s", algorithm_type)

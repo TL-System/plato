@@ -26,17 +26,29 @@ registered_trainers = {
 }
 
 
+def _resolve_trainer_name(trainer_config) -> str:
+    """Resolve trainer type supporting framework shortcuts."""
+    trainer_type = getattr(trainer_config, "type", None)
+    framework = getattr(trainer_config, "framework", "")
+
+    if not trainer_type and framework:
+        if framework.lower() == "mlx":
+            return "mlx"
+    return trainer_type
+
+
 def get(model=None, callbacks=None):
     """Get the trainer with the provided name."""
-    trainer_name = Config().trainer.type
+    config = Config().trainer
+    trainer_name = _resolve_trainer_name(config)
     logging.info("Trainer: %s", trainer_name)
 
-    if Config().trainer.type == "HuggingFace":
+    if getattr(config, "type", None) == "HuggingFace":
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)
 
-    elif Config().trainer.type == "self_supervised_learning":
+    elif getattr(config, "type", None) == "self_supervised_learning":
         from plato.trainers import self_supervised_learning
 
         return self_supervised_learning.Trainer(model=model, callbacks=callbacks)

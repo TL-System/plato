@@ -109,7 +109,8 @@ def get(**kwargs: Any) -> Any:
 
     if model_type in registered_models:
         registered_model = registered_models[model_type]
-        return registered_model(**model_params)
+        safe_params = {k: v for k, v in model_params.items() if k != "framework"}
+        return registered_model(**safe_params)
 
     if model_type in registered_factories:
         return registered_factories[model_type].get(
@@ -123,6 +124,7 @@ def get(**kwargs: Any) -> Any:
             mlx_key = prefixed_key
 
     if mlx_key in registered_mlx_models:
-        return registered_mlx_models[mlx_key](**model_params)
+        safe_params = {k: v for k, v in model_params.items() if k != "framework"}
+        return registered_mlx_models[mlx_key](**safe_params)
 
     raise ValueError(f"No such model: {model_name}")

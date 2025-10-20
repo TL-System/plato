@@ -361,7 +361,14 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
         if self.loss_fn is None:
             from mlx.nn import losses as mx_losses
 
-            self.loss_fn = mx_losses.softmax_cross_entropy
+            if hasattr(mx_losses, "softmax_cross_entropy"):
+                self.loss_fn = mx_losses.softmax_cross_entropy
+            elif hasattr(mx_losses, "cross_entropy"):
+                self.loss_fn = mx_losses.cross_entropy
+            else:
+                raise MLXNotAvailableError(
+                    "MLX installation does not provide a softmax/cross entropy loss."
+                )
 
     def compute_loss(
         self,
