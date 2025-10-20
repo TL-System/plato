@@ -4,10 +4,8 @@ A federated learning client at the edge server in a cross-silo training workload
 
 import copy
 import logging
-from collections import OrderedDict
 
-import torch
-from torch.nn.utils import prune
+from fedsaw_algorithm import Algorithm as FedSawAlgorithm
 
 from plato.clients import edge
 from plato.clients.strategies.base import ClientContext
@@ -45,7 +43,8 @@ class FedSawEdgeTrainingStrategy(EdgeTrainingStrategy):
             raise RuntimeError("FedSaw edge strategy requires an owning client.")
 
         server = owner.server
-        previous_weights = copy.deepcopy(server.algorithm.extract_weights())
+        algorithm = server.algorithm
+        previous_weights = copy.deepcopy(algorithm.extract_weights())
 
         report, new_weights = await super().train(context)
 
@@ -59,42 +58,19 @@ class FedSawEdgeTrainingStrategy(EdgeTrainingStrategy):
     def _prune_updates(self, context, previous_weights, new_weights):
         owner = context.owner
         server = owner.server
+        algorithm = server.algorithm
 
-        updates = self._compute_weight_updates(previous_weights, new_weights)
-        server.algorithm.load_weights(updates)
-        updates_model = server.algorithm.model
+        updates = algorithm.compute_weight_updates(previous_weights, new_weights)
 
-        parameters_to_prune = []
-        for _, module in updates_model.named_modules():
-            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
-                parameters_to_prune.append((module, "weight"))
-
-        if (
-            hasattr(Config().clients, "pruning_method")
-            and Config().clients.pruning_method == "random"
-        ):
-            pruning_method = prune.RandomUnstructured
-        else:
-            pruning_method = prune.L1Unstructured
-
-        prune.global_unstructured(
-            parameters_to_prune,
-            pruning_method=pruning_method,
-            amount=server.edge_pruning_amount,
+        pruning_method = (
+            "random"
+            if getattr(Config().clients, "pruning_method", None) == "random"
+            else "l1"
         )
 
-        for module, name in parameters_to_prune:
-            prune.remove(module, name)
-
-        return updates_model.cpu().state_dict()
-
-    @staticmethod
-    def _compute_weight_updates(previous_weights, new_weights):
-        deltas = OrderedDict()
-        for name, new_weight in new_weights.items():
-            previous_weight = previous_weights[name]
-            deltas[name] = new_weight - previous_weight
-        return deltas
+        return algorithm.prune_weight_updates(
+            updates, amount=server.edge_pruning_amount, method=pruning_method
+        )
 
 
 def create_client(
@@ -111,7 +87,7 @@ def create_client(
         server=server,
         model=model,
         datasource=datasource,
-        algorithm=algorithm,
+        algorithm=algorithm or FedSawAlgorithm,
         trainer=trainer,
         callbacks=callbacks,
     )

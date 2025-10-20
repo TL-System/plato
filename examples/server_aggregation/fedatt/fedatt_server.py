@@ -10,17 +10,10 @@ with Attentive Aggregation," in Proc. International Joint Conference on Neural N
 https://arxiv.org/abs/1812.07108
 """
 
-from collections import OrderedDict
-from types import SimpleNamespace
-from typing import Dict, List, Optional
-
-import torch
-import torch.nn.functional as F
+from fedatt_algorithm import Algorithm as FedAttAlgorithm
 from fedatt_server_strategy import FedAttAggregationStrategy
 
-from plato.config import Config
 from plato.servers import fedavg
-from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
 
 class Server(fedavg.Server):
@@ -45,10 +38,12 @@ class Server(fedavg.Server):
         if aggregation_strategy is None:
             aggregation_strategy = FedAttAggregationStrategy()
 
+        selected_algorithm = algorithm or FedAttAlgorithm
+
         super().__init__(
             model=model,
             datasource=datasource,
-            algorithm=algorithm,
+            algorithm=selected_algorithm,
             trainer=trainer,
             callbacks=callbacks,
             aggregation_strategy=aggregation_strategy,

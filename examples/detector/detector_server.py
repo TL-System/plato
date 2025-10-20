@@ -12,7 +12,6 @@ import attacks as attack_registry
 import defences
 import detectors as defence_registry
 import numpy as np
-import torch
 from aggregations import (
     AfaAggregationStrategy,
     BulyanAggregationStrategy,

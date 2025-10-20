@@ -5,13 +5,11 @@ A MaskCrypt client with selective homomorphic encryption support.
 from __future__ import annotations
 
 import os
-import pickle
-import random
 import time
 from typing import Any, Dict, Tuple
 
 import maskcrypt_utils
-import torch
+from maskcrypt_algorithm import Algorithm as MaskCryptAlgorithm
 
 from plato.clients import simple
 from plato.clients.strategies import DefaultTrainingStrategy
@@ -99,71 +97,40 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
             f"{model_name}_est_{client_id}.pth",
         )
 
-    def _ensure_attack_dir(self) -> None:
-        target_dir = os.path.join(self.checkpoint_path, self.attack_prep_dir)
-        os.makedirs(target_dir, exist_ok=True)
-
-    def _get_exposed_weights(self, client_id: int) -> torch.Tensor:
-        """Load the exposed weights tracked so far."""
-        estimate = maskcrypt_utils.get_est(self._get_estimate_path(client_id))
-        if estimate is None:
-            return torch.tensor([])
-        return torch.tensor(estimate)
-
-    def _store_plain_weights(self, client_id: int, latest_flat: torch.Tensor) -> None:
-        """Persist the plain (unencrypted) weights for analysis."""
-        self._ensure_attack_dir()
+    def _get_plain_path(self, client_id: int) -> str:
         model_name = Config().trainer.model_name
-        plain_path = os.path.join(
+        return os.path.join(
             self.checkpoint_path,
             self.attack_prep_dir,
             f"{model_name}_plain_{client_id}.pth",
         )
-        with open(plain_path, "wb") as plain_file:
-            pickle.dump(latest_flat.cpu(), plain_file)
 
     def _compute_mask(
         self,
         context: ClientContext,
-        latest_weights: Dict[str, torch.Tensor],
-        gradients: Dict[str, torch.Tensor],
-    ) -> torch.Tensor:
+        latest_weights,
+        gradients,
+    ):
         """Compute the selective encryption mask for the current client."""
         client_id = context.client_id
 
-        exposed_flat = self._get_exposed_weights(client_id)
-        latest_flat = torch.cat(
-            [torch.flatten(latest_weights[name]).cpu() for name in latest_weights]
+        algorithm = context.algorithm
+        latest_flat = algorithm.flatten_weights(latest_weights)
+        gradients_flat = algorithm.flatten_gradients(gradients)
+
+        plain_path = self._get_plain_path(client_id)
+        algorithm.store_plain_weights(plain_path, latest_flat)
+
+        estimate = maskcrypt_utils.get_est(self._get_estimate_path(client_id))
+        exposed_flat = algorithm.prepare_exposed_weights(estimate, latest_flat)
+
+        return algorithm.compute_mask(
+            latest_flat=latest_flat,
+            gradients_flat=gradients_flat,
+            exposed_flat=exposed_flat,
+            encrypt_ratio=self.encrypt_ratio,
+            random_mask=self.random_mask,
         )
-        self._store_plain_weights(client_id, latest_flat)
-
-        if self.random_mask:
-            mask_len = int(self.encrypt_ratio * len(latest_flat))
-            if mask_len <= 0:
-                return torch.tensor([], dtype=torch.long)
-            selected = random.sample(range(len(latest_flat)), mask_len)
-            return torch.tensor(selected, dtype=torch.long)
-
-        if exposed_flat.numel() == 0:
-            exposed_flat = torch.zeros_like(latest_flat)
-        else:
-            exposed_flat = exposed_flat.cpu()
-
-        grad_flat = torch.cat(
-            [torch.flatten(gradients[name]).cpu() for name in gradients]
-        )
-        grad_flat = grad_flat.to(latest_flat.dtype)
-
-        delta = exposed_flat.to(latest_flat.dtype) - latest_flat
-        product = delta * grad_flat
-
-        _, indices = torch.sort(product, descending=True)
-        mask_len = int(self.encrypt_ratio * len(indices))
-        if mask_len <= 0:
-            return torch.tensor([], dtype=torch.long)
-
-        topk = indices[:mask_len].clone().detach()
-        return topk.to(dtype=torch.long)
 
 
 class MaskCryptClientProxy(simple.Client):
@@ -190,7 +157,7 @@ def create_client(
     client = MaskCryptClientProxy(
         model=model,
         datasource=datasource,
-        algorithm=algorithm,
+        algorithm=algorithm or MaskCryptAlgorithm,
         trainer=trainer,
         callbacks=callbacks,
     )

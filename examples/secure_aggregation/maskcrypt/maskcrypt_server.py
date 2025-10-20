@@ -2,8 +2,7 @@
 A MaskCrypt server with selective homomorphic encryption support.
 """
 
-import numpy as np
-import torch
+from maskcrypt_algorithm import Algorithm as MaskCryptAlgorithm
 
 from plato.servers import fedavg_he
 
@@ -19,7 +18,8 @@ class Server(fedavg_he.Server):
         trainer=None,
         callbacks=None,
     ):
-        super().__init__(model, datasource, algorithm, trainer, callbacks)
+        selected_algorithm = algorithm or MaskCryptAlgorithm
+        super().__init__(model, datasource, selected_algorithm, trainer, callbacks)
         self.last_selected_clients = []
 
     def choose_clients(self, clients_pool, clients_count):
@@ -60,18 +60,4 @@ class Server(fedavg_he.Server):
     def _mask_consensus(self, updates):
         """Conduct mask consensus on the reported mask proposals."""
         proposals = [update.payload for update in updates]
-        mask_size = len(proposals[0])
-
-        if mask_size == 0:
-            self.final_mask = torch.tensor([])
-        else:
-            interleaved_indices = torch.zeros(
-                (sum([len(x) for x in proposals])), dtype=int
-            )
-            for i in range(len(proposals)):
-                interleaved_indices[i :: len(proposals)] = proposals[i]
-
-            _, indices = np.unique(interleaved_indices, return_index=True)
-            indices.sort()
-            self.final_mask = interleaved_indices[indices]
-            self.final_mask = self.final_mask.int().tolist()
+        self.final_mask = self.algorithm.build_consensus_mask(proposals)

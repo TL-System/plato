@@ -6,7 +6,7 @@ as either central or edge servers.
 import math
 import statistics
 
-import torch
+from fedsaw_algorithm import Algorithm as FedSawAlgorithm
 
 from plato.config import Config
 from plato.servers import fedavg_cs
@@ -16,7 +16,8 @@ class Server(fedavg_cs.Server):
     """Cross-silo federated learning server using FedSaw."""
 
     def __init__(self, model=None, algorithm=None, trainer=None):
-        super().__init__(model=model, algorithm=algorithm, trainer=trainer)
+        selected_algorithm = algorithm or FedSawAlgorithm
+        super().__init__(model=model, algorithm=selected_algorithm, trainer=trainer)
 
         # The central server uses a list to store each edge server's clients' pruning amount
         self.pruning_amount_list = None
@@ -89,29 +90,16 @@ class Server(fedavg_cs.Server):
             num_samples = update.report.num_samples
             received_updates = update.payload
 
-            weights_diff = self.compute_weights_difference(
-                received_updates, num_samples
+            weights_diff = self.algorithm.compute_weight_difference(
+                received_updates,
+                num_samples=num_samples,
+                total_samples=self.total_samples,
             )
 
             weights_diff_dict[client_id] = weights_diff
             weights_diff_list.append(weights_diff)
 
         return weights_diff_dict, weights_diff_list
-
-    def compute_weights_difference(self, received_updates, num_samples):
-        """
-        Computes the weight difference of an edge server's aggregated model
-        and the global model.
-        """
-        weights_diff = 0
-
-        for _, delta in received_updates.items():
-            delta = delta.float()
-            weights_diff += torch.norm(delta).item()
-
-        weights_diff = weights_diff * (num_samples / self.total_samples)
-
-        return weights_diff
 
     def get_logged_items(self) -> dict:
         """Gets items to be logged by the LogProgressCallback class in a .csv file."""

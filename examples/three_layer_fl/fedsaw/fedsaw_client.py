@@ -4,10 +4,8 @@ A federated learning client using pruning.
 
 import copy
 import logging
-from collections import OrderedDict
 
-import torch
-from torch.nn.utils import prune
+from fedsaw_algorithm import Algorithm as FedSawAlgorithm
 
 from plato.clients import simple
 from plato.clients.strategies import DefaultLifecycleStrategy
@@ -56,48 +54,22 @@ class FedSawTrainingStrategy(DefaultTrainingStrategy):
         return report, weight_updates
 
     def _prune_updates(self, context, previous_weights, new_weights):
-        updates = self._compute_weight_updates(previous_weights, new_weights)
-
         algorithm = context.algorithm
-        algorithm.load_weights(updates)
-        updates_model = algorithm.model
+        updates = algorithm.compute_weight_updates(previous_weights, new_weights)
 
-        parameters_to_prune = []
-        for _, module in updates_model.named_modules():
-            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
-                parameters_to_prune.append((module, "weight"))
-
-        if (
-            hasattr(Config().clients, "pruning_method")
-            and Config().clients.pruning_method == "random"
-        ):
-            pruning_method = prune.RandomUnstructured
-        else:
-            pruning_method = prune.L1Unstructured
-
+        pruning_method = (
+            "random"
+            if getattr(Config().clients, "pruning_method", None) == "random"
+            else "l1"
+        )
         pruning_amount = getattr(context.owner, "pruning_amount", None)
         if pruning_amount is None:
             state = FedSawClientLifecycleStrategy._state(context)
             pruning_amount = state.get("pruning_amount", 0)
 
-        prune.global_unstructured(
-            parameters_to_prune,
-            pruning_method=pruning_method,
-            amount=pruning_amount,
+        return algorithm.prune_weight_updates(
+            updates, amount=pruning_amount, method=pruning_method
         )
-
-        for module, name in parameters_to_prune:
-            prune.remove(module, name)
-
-        return updates_model.cpu().state_dict()
-
-    @staticmethod
-    def _compute_weight_updates(previous_weights, new_weights):
-        deltas = OrderedDict()
-        for name, new_weight in new_weights.items():
-            previous_weight = previous_weights[name]
-            deltas[name] = new_weight - previous_weight
-        return deltas
 
 
 def create_client(
@@ -113,7 +85,7 @@ def create_client(
     client = simple.Client(
         model=model,
         datasource=datasource,
-        algorithm=algorithm,
+        algorithm=algorithm or FedSawAlgorithm,
         trainer=trainer,
         callbacks=callbacks,
         trainer_callbacks=trainer_callbacks,
