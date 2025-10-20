@@ -32,7 +32,6 @@ dependencies = [
     "peft",
     "zstd",
     "munch",
-    "ruamel.yaml",
 ]
 
 [project.urls]
@@ -75,6 +74,7 @@ members = [
     "examples/model_search/heterofl",
     "examples/detector",
     "examples/gradient_leakage_attacks",
+    "tools",
 ]
 
 [dependency-groups]

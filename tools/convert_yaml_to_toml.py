@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-"""Convert YAML configuration files to TOML while preserving comments."""
+"""Convert YAML configuration files to TOML while preserving comments.
+
+Run with `uv run --workspace tools python tools/convert_yaml_to_toml.py`.
+"""
 
 from __future__ import annotations
 
