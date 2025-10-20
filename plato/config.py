@@ -8,11 +8,11 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import tomllib
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-import tomllib
 from munch import Munch
 
 
@@ -37,10 +37,7 @@ class ConfigNode(Munch):
 
     def _asdict(self) -> dict[str, Any]:
         """Return a plain dictionary representation of the node."""
-        return {
-            key: self._to_plain(value)
-            for key, value in self.items()
-        }
+        return {key: self._to_plain(value) for key, value in self.items()}
 
     @classmethod
     def _to_plain(cls, value: Any) -> Any:
@@ -82,17 +79,13 @@ class TomlConfigLoader:
                 )
                 return self._merge(included, resolved_overrides)
             return {
-                key: self._resolve(item, base_dir, seen)
-                for key, item in value.items()
+                key: self._resolve(item, base_dir, seen) for key, item in value.items()
             }
         if isinstance(value, list):
             resolved_list = [self._resolve(item, base_dir, seen) for item in value]
             if resolved_list and all(
                 item is None
-                or (
-                    isinstance(item, dict)
-                    and set(item.keys()) == {"value"}
-                )
+                or (isinstance(item, dict) and set(item.keys()) == {"value"})
                 for item in resolved_list
             ):
                 normalized_list = []
@@ -116,7 +109,9 @@ class TomlConfigLoader:
             for entry in include_spec:
                 included = self._resolve_include(entry, base_dir, seen)
                 aggregated = (
-                    included if aggregated is None else self._merge(aggregated, included)
+                    included
+                    if aggregated is None
+                    else self._merge(aggregated, included)
                 )
             return aggregated
         raise TypeError("Include directive must be a string or list of strings.")

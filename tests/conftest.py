@@ -47,9 +47,7 @@ def temp_config(tmp_path, monkeypatch):
             "model_name": "toy_model",
         },
         "algorithm": {"type": "fedavg"},
-        "parameters": {
-            "optimizer": {"lr": 0.1, "momentum": 0.0, "weight_decay": 0.0}
-        },
+        "parameters": {"optimizer": {"lr": 0.1, "momentum": 0.0, "weight_decay": 0.0}},
     }
 
     config_path = tmp_path / "config.toml"

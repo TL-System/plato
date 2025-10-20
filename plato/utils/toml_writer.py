@@ -14,9 +14,7 @@ def dumps(
 ) -> str:
     """Serialize a mapping into TOML."""
     normalized = _normalize(data)
-    comment_map = {
-        tuple(path): lines[:] for path, lines in (comments or {}).items()
-    }
+    comment_map = {tuple(path): lines[:] for path, lines in (comments or {}).items()}
     lines: list[str] = []
     if () in comment_map:
         _emit_comment(lines, comment_map.pop(()))
@@ -71,8 +69,10 @@ def _write_table(
                 inline_items.append((key, value))
             else:
                 tables.append((key, value))
-        elif isinstance(value, list) and value and all(
-            isinstance(item, MutableMapping) for item in value
+        elif (
+            isinstance(value, list)
+            and value
+            and all(isinstance(item, MutableMapping) for item in value)
         ):
             array_tables.append((key, value))
         else:

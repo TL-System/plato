@@ -7,9 +7,9 @@
 # --------------------------------------------------------'
 
 import os
+import tomllib
 from pathlib import Path
 
-import tomllib
 from yacs.config import CfgNode as CN
 
 _C = CN()
@@ -181,7 +181,7 @@ def _update_config_from_file(config, cfg_file):
     bases = raw_cfg.pop("BASE", [""])
     for base in bases:
         if base:
-            base_path = (cfg_path.parent / base)
+            base_path = cfg_path.parent / base
             if base_path.suffix == ".yml":
                 base_path = base_path.with_suffix(".toml")
             _update_config_from_file(config, str(base_path))
