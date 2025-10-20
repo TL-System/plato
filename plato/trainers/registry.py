@@ -11,6 +11,7 @@ from plato.trainers import (
     composable,
     diff_privacy,
     gan,
+    mlx,
     split_learning,
 )
 
@@ -21,6 +22,7 @@ registered_trainers = {
     "diff_privacy": diff_privacy.Trainer,
     "gan": gan.Trainer,
     "split_learning": split_learning.Trainer,
+    "mlx": mlx.ComposableMLXTrainer,
 }
 
 
