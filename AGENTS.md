@@ -7,12 +7,12 @@ Plato's core runtime lives in `plato/`. Key submodules include `algorithms/` (fe
 - `uv sync` provisions dependencies declared in `pyproject.toml` and `uv.lock`.
 - `source .venv/bin/activate` to activate the Python virtual environment after `uv sync`.
 - `uv run python plato.py --config configs/MNIST/fedavg_lenet5.toml` launches a reference experiment; swap in different config paths as needed.
-- `uv run pytest` runs the complete suite; scope it with a target like `tests/test_strategies_simple.py` for faster feedback.
+- `uv run pytest tests` runs the complete suite; scope it with a target like `tests/test_strategies_simple.py` for faster feedback.
 - `uv run ruff check . --select I --fix` enforces the repo's import-order policy before creating a pull request.
 - When running any shell commands, use `zsh -lc` to load the current `.zshrc` environment.
 
 ## Coding Style & Naming Conventions
-Follow PEP 8 with 4-space indentation and keep lines ≤88 characters (matching the Ruff configuration). Package and module names stay lowercase with underscores; classes use PascalCase; functions, methods, and variables use snake_case. Prefer explicit type hints on new public APIs, and keep docstrings concise but descriptive. TOML configuration keys should remain lowercase_with_underscores and align to the indentation already present in `configs/`.
+Follow PEP 8 with 4-space indentation and keep lines ≤88 characters (matching the Ruff configuration). Package and module names stay lowercase with underscores; classes use PascalCase; functions, methods, and variables use snake_case. Prefer explicit type hints on new public APIs, and keep docstrings concise but descriptive. TOML configuration keys should remain lowercase_with_underscores.
 
 ## Testing Guidelines
 Pytest is the standard harness. Add focused unit tests alongside the closest existing coverage (e.g., new server logic belongs near `tests/test_strategies_integration.py`). Integration scenarios should exercise their TOML configs via lightweight smoke tests when practical. Use deterministic seeds (see `server.random_seed` in configs) to make failures reproducible, and include negative-path or degradation checks whenever behaviour may regress existing algorithms.
