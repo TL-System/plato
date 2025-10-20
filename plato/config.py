@@ -51,6 +51,8 @@ class Config:
     def __new__(cls):
         if cls._instance is None:
             parser = argparse.ArgumentParser()
+            if not parser.prog.startswith("uv run "):
+                parser.prog = f"uv run {parser.prog}"
             parser.add_argument("-i", "--id", type=str, help="Unique client ID.")
             parser.add_argument(
                 "-p", "--port", type=str, help="The port number for running a server."
@@ -125,8 +127,11 @@ class Config:
                 with open(filename, "r", encoding="utf-8") as config_file:
                     config = yaml.load(config_file, Loader)
             else:
-                # if the configuration file does not exist, raise an error
-                raise ValueError("A configuration file must be supplied.")
+                usage = parser.format_usage().strip()
+                raise SystemExit(
+                    "Please provide a configuration file using the '-c' option.\n"
+                    f"{usage}"
+                )
 
             Config.clients = Config.namedtuple_from_dict(config["clients"])
             Config.server = Config.namedtuple_from_dict(config["server"])
