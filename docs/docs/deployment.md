@@ -88,10 +88,10 @@ uv run custom_server.py
 
 On the clients, make sure that the configuration file contains the correct domain name of the production server deployed in the cloud:
 
-```
-server:
-    address: example.com
-    use_https: true
+```toml
+[server]
+address = "example.com"
+use_https = true
 ```
 
 And then run the clients as usual. For example:
@@ -321,10 +321,10 @@ $ uv run custom_server.py
 
 On the side of a client, make sure that its configuration file contains the correct domain name of the production server deployed in the cloud:
 
-```yaml
-server:
-    address: example.com
-    use_https: true
+```toml
+[server]
+address = "example.com"
+use_https = true
 ```
 
 !!! warning "Port Configuration"

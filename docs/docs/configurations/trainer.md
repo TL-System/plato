@@ -86,17 +86,18 @@
 
     Alternatively, all four schedulers from [timm](https://timm.fast.ai/schedulers) are supported if `lr_scheduler` is specified as `timm` and `trainer -> type` is specified as `timm_basic`. For example, to use the `SGDR` scheduler, we specify `cosine` as `sched` in its arguments (`parameters -> learning_rate`):
 
-    ```yaml
-    trainer:
-        type: timm_basic
+    ```toml
+    [trainer]
+    type = "timm_basic"
 
-    parameters:
-        learning_rate:
-            sched: cosine
-            min_lr: 1.e-6
-            warmup_lr: 0.0001
-            warmup_epochs: 3
-            cooldown_epochs: 10
+    [parameters]
+
+    [parameters.learning_rate]
+    sched = cosine
+    min_lr = 1.e-6
+    warmup_lr = 0.0001
+    warmup_epochs = 3
+    cooldown_epochs = 10
     ```
 
 !!! example "loss_criterion"
@@ -135,10 +136,10 @@
     !!! note "Note"
         For `vit`, please replace the `/` in model name from [https://huggingface.co/models](https://huggingface.co/models) with `@`. For example, use `google@vit-base-patch16-224-in21k` instead of `google/vit-base-patch16-224-in21k`. If you do not want to use the pretrained weights, set `parameters -> model -> pretrained` to `false`, as in the following example:
 
-        ```yaml
-        parameters:
-            model:
-                pretrained: false
+        ```toml
+        [parameters]
+        [parameters.model]
+        pretrained = false
         ```
 
 !!! example "model_name"

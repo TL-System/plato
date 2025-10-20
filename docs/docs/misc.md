@@ -43,23 +43,4 @@ Continuous Integration (CI) tests have been set up for PyTorch in `.github/workf
 
 ## Setting up Zed for Formatting and Linting
 
-If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. In order to properly set up its TOML validation, add the following to your local configuration:
-
-```json
-"languages": {
-  "TOML": {
-    "language_servers": ["yaml-language-server"]
-  }
-}
-"lsp": {
-  "yaml-language-server": {
-    "settings": {
-      "yaml": {
-        "customTags": ["!include scalar"]
-      }
-    }
-  }
-}
-```
-
-This will help avoid tagging `!include` directives as invalid.
+If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. 

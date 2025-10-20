@@ -51,11 +51,12 @@
 
         For the normal distribution, we can specify `mean` for its mean value and `sd` for its standard deviation; for the Zipf distribution, we can specify `s`; and for the Pareto distribution, we can specify `alpha` to adjust how heavy-tailed it is. Here is an example:
 
-        ```yaml
-        speed_simulation: true
-        simulation_distribution:
-            distribution: pareto
-            alpha: 1
+        ```toml
+        speed_simulation = true
+        
+        [clients.simulation_distribution]
+        distribution = "pareto"
+        alpha = 1
         ```
 
 !!! example "sleep_simulation"
