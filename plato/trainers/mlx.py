@@ -10,13 +10,25 @@ modifying higher-level orchestration.
 from __future__ import annotations
 
 import logging
+import multiprocessing as mp
 import os
 import pickle
 import random
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 
@@ -85,7 +97,9 @@ def _tree_assign(target: Any, source: Any) -> None:
         return
 
     if mx is None:
-        raise MLXNotAvailableError("Attempted to assign MLX tensors without MLX installed.")
+        raise MLXNotAvailableError(
+            "Attempted to assign MLX tensors without MLX installed."
+        )
 
     if isinstance(target, mx.array):
         target[...] = source
@@ -128,7 +142,10 @@ def _to_mx_array(value: Any) -> Any:
         return mx.array(value.to_host())
     if hasattr(value, "detach") and callable(value.detach):
         # Works for PyTorch tensors without importing torch explicitly
-        tensor = value.detach().cpu().numpy() if hasattr(value, "cpu") else value.detach().numpy()
+        if hasattr(value, "cpu"):
+            tensor = value.detach().cpu().numpy()
+        else:
+            tensor = value.detach().numpy()
         return mx.array(tensor)
     if hasattr(value, "numpy"):
         return mx.array(value.numpy())
@@ -202,7 +219,10 @@ class MLXLossCriterionStrategy(MLXStrategy):
 
     @abstractmethod
     def compute_loss(
-        self, outputs: "mx.array", labels: Optional["mx.array"], context: MLXTrainingContext
+        self,
+        outputs: "mx.array",
+        labels: Optional["mx.array"],
+        context: MLXTrainingContext,
     ) -> "mx.array":
         """Compute scalar loss tensor."""
 
@@ -255,6 +275,15 @@ class MLXLRSchedulerStrategy(MLXStrategy):
     ) -> Optional[Any]:
         """Return an MLX-compatible LR scheduler if configured."""
         return None
+
+    def step(self, scheduler: Optional[Any], context: MLXTrainingContext) -> None:
+        """Advance the learning rate scheduler if one is active."""
+        if scheduler is None:
+            return
+        if hasattr(scheduler, "step") and callable(scheduler.step):
+            scheduler.step()
+        elif callable(scheduler):
+            scheduler()
 
 
 class MLXModelUpdateStrategy(MLXStrategy):
@@ -335,7 +364,10 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
             self.loss_fn = mx_losses.softmax_cross_entropy
 
     def compute_loss(
-        self, outputs: "mx.array", labels: Optional["mx.array"], context: MLXTrainingContext
+        self,
+        outputs: "mx.array",
+        labels: Optional["mx.array"],
+        context: MLXTrainingContext,
     ) -> "mx.array":
         _ensure_mlx_available()
         if labels is None:
@@ -381,7 +413,8 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
         optimizer_cls = self._REGISTERED_OPTIMIZERS[name]
         if optimizer_cls is None:
             raise MLXNotAvailableError(
-                f"MLX optimizer '{self.optimizer_name}' is unavailable in this installation."
+                "MLX optimizer "
+                f"'{self.optimizer_name}' is unavailable in this installation."
             )
 
         params = dict(self.optimizer_kwargs)
@@ -466,7 +499,13 @@ class DefaultMLXDataLoaderStrategy(MLXDataLoaderStrategy):
         shuffle: bool,
         drop_last: bool,
     ) -> "SimpleDataLoader":
-        return SimpleDataLoader(dataset, indices, batch_size, shuffle=shuffle, drop_last=drop_last)
+        return SimpleDataLoader(
+            dataset,
+            indices,
+            batch_size,
+            shuffle=shuffle,
+            drop_last=drop_last,
+        )
 
     def create_train_loader(
         self,
@@ -488,10 +527,17 @@ class DefaultMLXDataLoaderStrategy(MLXDataLoaderStrategy):
         batch_size: int,
         context: MLXTrainingContext,
     ) -> Iterable[Tuple[Any, Any]]:
-        indices = self._resolve_indices(testset, sampler) if sampler is not None else list(
-            range(len(testset))
+        if sampler is not None:
+            indices = self._resolve_indices(testset, sampler)
+        else:
+            indices = list(range(len(testset)))
+        return self._make_loader(
+            testset,
+            indices,
+            batch_size,
+            shuffle=False,
+            drop_last=False,
         )
-        return self._make_loader(testset, indices, batch_size, shuffle=False, drop_last=False)
 
 
 class DefaultMLXTestingStrategy(MLXTestingStrategy):
@@ -598,6 +644,8 @@ class SimpleDataLoader(Iterable[Tuple[Any, Any]]):
             return None
         if items[0] is None:
             return None
+        if mx is not None and isinstance(items[0], mx.array):
+            return mx.stack(items, axis=0)
         if hasattr(items[0], "stack") and callable(getattr(items[0], "stack")):
             return items[0].stack(items, axis=0)
         if isinstance(items[0], np.ndarray):
@@ -641,10 +689,14 @@ class ComposableMLXTrainer(base.Trainer):
 
         self.loss_strategy = loss_strategy or DefaultMLXLossStrategy()
         self.optimizer_strategy = optimizer_strategy or DefaultMLXOptimizerStrategy()
-        self.training_step_strategy = training_step_strategy or DefaultMLXTrainingStepStrategy()
+        self.training_step_strategy = (
+            training_step_strategy or DefaultMLXTrainingStepStrategy()
+        )
         self.lr_scheduler_strategy = lr_scheduler_strategy or MLXLRSchedulerStrategy()
         self.model_update_strategy = model_update_strategy or MLXModelUpdateStrategy()
-        self.data_loader_strategy = data_loader_strategy or DefaultMLXDataLoaderStrategy()
+        self.data_loader_strategy = (
+            data_loader_strategy or DefaultMLXDataLoaderStrategy()
+        )
         self.testing_strategy = testing_strategy or DefaultMLXTestingStrategy()
 
         self._setup_strategies()
@@ -706,7 +758,11 @@ class ComposableMLXTrainer(base.Trainer):
     # Model persistence
     # ---------------------------------------------------------------------
 
-    def save_model(self, filename: Optional[str] = None, location: Optional[str] = None) -> None:
+    def save_model(
+        self,
+        filename: Optional[str] = None,
+        location: Optional[str] = None,
+    ) -> None:
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
@@ -727,7 +783,11 @@ class ComposableMLXTrainer(base.Trainer):
         identity = "Server" if self.client_id == 0 else f"Client #{self.client_id}"
         logging.info("[%s] MLX model saved to %s.", identity, model_path)
 
-    def load_model(self, filename: Optional[str] = None, location: Optional[str] = None) -> None:
+    def load_model(
+        self,
+        filename: Optional[str] = None,
+        location: Optional[str] = None,
+    ) -> None:
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
 
@@ -803,8 +863,14 @@ class ComposableMLXTrainer(base.Trainer):
         sampled_size = self._infer_sampled_size(trainset, sampler)
         self.context.state["num_samples"] = sampled_size
 
-        self.optimizer = self.optimizer_strategy.create_optimizer(self.model, self.context)
-        self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(self.optimizer, self.context)
+        self.optimizer = self.optimizer_strategy.create_optimizer(
+            self.model,
+            self.context,
+        )
+        self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
+            self.optimizer,
+            self.context,
+        )
 
         total_epochs = config["epochs"]
         tic = time.perf_counter()
@@ -824,14 +890,23 @@ class ComposableMLXTrainer(base.Trainer):
                 batches_seen = True
                 last_batch_id = batch_id
 
-                self.callback_handler.call_event("on_train_step_start", self, config, batch=batch_id)
+                self.callback_handler.call_event(
+                    "on_train_step_start",
+                    self,
+                    config,
+                    batch=batch_id,
+                )
                 self.model_update_strategy.before_step(self.context)
 
                 examples = _tree_map(_to_mx_array, examples)
                 labels = _tree_map(_to_mx_array, labels)
 
                 def compute_loss_fn(outputs, labels_inner):
-                    return self.loss_strategy.compute_loss(outputs, labels_inner, self.context)
+                    return self.loss_strategy.compute_loss(
+                        outputs,
+                        labels_inner,
+                        self.context,
+                    )
 
                 loss = self.training_step_strategy.training_step(
                     model=self.model,
@@ -867,7 +942,10 @@ class ComposableMLXTrainer(base.Trainer):
                     context=self.context,
                 )
                 if finalize_loss is not None:
-                    self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
+                    self.optimizer_strategy.on_optimizer_step(
+                        self.optimizer,
+                        self.context,
+                    )
                     self.model_update_strategy.after_step(self.context)
                     self.callback_handler.call_event(
                         "on_train_step_end",
@@ -882,6 +960,25 @@ class ComposableMLXTrainer(base.Trainer):
                         else finalize_loss
                     )
 
+            self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
+
+            if (
+                self.client_id != 0
+                and hasattr(Config().clients, "speed_simulation")
+                and Config().clients.speed_simulation
+            ):
+                self.simulate_sleep_time()
+
+            if (
+                hasattr(Config().server, "request_update")
+                and Config().server.request_update
+            ):
+                epoch_time = time.perf_counter() - tic
+                filename = f"{self.client_id}_{self.current_epoch}_{epoch_time}.mlx"
+                self.save_model(filename)
+
+            self.run_history.update_metric("train_loss", self._loss_tracker.average)
+
             self.callback_handler.call_event("on_train_epoch_end", self, config)
 
             if training_stop_requested:
@@ -890,15 +987,13 @@ class ComposableMLXTrainer(base.Trainer):
         toc = time.perf_counter()
         training_time = toc - tic
 
+        self.model_update_strategy.on_train_end(self.context)
+
         self.callback_handler.call_event(
             "on_train_run_end", self, config, training_time=training_time
         )
-        self.model_update_strategy.on_train_end(self.context)
-        self.training_start_time = time.time()
 
-        self.run_history.update_epochs(
-            self.current_epoch, self._loss_tracker.average_loss, training_time
-        )
+        self.run_history.update_metric("train_time", training_time)
 
     def _infer_sampled_size(self, dataset: Any, sampler: Any) -> int:
         if sampler is not None:
@@ -913,16 +1008,44 @@ class ComposableMLXTrainer(base.Trainer):
             return len(dataset)
         return 0
 
+    def test_process(self, config, testset, sampler=None, **kwargs):
+        """Testing loop executed in a separate process."""
+        self.test_model(config, testset, sampler, **kwargs)
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
+        self.save_accuracy(self.accuracy, filename)
+
     def test(self, testset, sampler=None, **kwargs) -> float:
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
 
         if "max_concurrency" in config:
-            raise NotImplementedError(
-                "Multiprocessing-based MLX testing is not yet implemented."
-            )
+            if mp.get_start_method(allow_none=True) != "spawn":
+                mp.set_start_method("spawn", force=True)
 
-        return self.test_model(config, testset, sampler, **kwargs)
+            test_proc = mp.Process(
+                target=self.test_process,
+                args=(config, testset, sampler),
+                kwargs=kwargs,
+            )
+            test_proc.start()
+            test_proc.join()
+
+            model_name = Config().trainer.model_name
+            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+
+            try:
+                accuracy = self.load_accuracy(filename)
+            except OSError as error:
+                raise ValueError(
+                    f"Testing on client {self.client_id} failed."
+                ) from error
+
+            self.pause_training()
+            return accuracy
+        else:
+            return self.test_model(config, testset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):
         accuracy = self.testing_strategy.test_model(
@@ -939,14 +1062,98 @@ class ComposableMLXTrainer(base.Trainer):
             return {"model_update": model_update, **additional_payload}
         return model_update
 
+    def pause_training(self):
+        """Remove temporary MLX artifacts created during concurrent execution."""
+        if hasattr(Config().trainer, "max_concurrency"):
+            model_name = Config().trainer.model_name
+            model_path = Config().params["model_path"]
+            base_filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}"
+            model_file = f"{model_path}/{base_filename}.mlx"
+            history_file = f"{model_file}.pkl"
+            accuracy_file = f"{model_path}/{base_filename}.acc"
+
+            if os.path.exists(model_file):
+                os.remove(model_file)
+            if os.path.exists(history_file):
+                os.remove(history_file)
+            if os.path.exists(accuracy_file):
+                os.remove(accuracy_file)
+
     def obtain_model_at_time(self, client_id, requested_time):
-        raise NotImplementedError("Wall-clock model retrieval is not yet implemented for MLX.")
+        raise NotImplementedError(
+            "Wall-clock model retrieval is not yet implemented for MLX."
+        )
 
     def train(self, trainset, sampler, **kwargs) -> float:
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
-        self.train_model(config, trainset, sampler, **kwargs)
-        return self.training_start_time
+
+        self.training_start_time = time.time()
+
+        if "max_concurrency" in config:
+            tic = time.perf_counter()
+
+            if mp.get_start_method(allow_none=True) != "spawn":
+                mp.set_start_method("spawn", force=True)
+
+            try:
+                import torch
+            except ImportError:
+                torch = None  # type: ignore
+
+            if torch is not None and hasattr(
+                torch.multiprocessing,
+                "set_sharing_strategy",
+            ):
+                try:
+                    torch.multiprocessing.set_sharing_strategy("file_system")
+                except (RuntimeError, ValueError):
+                    logging.debug(
+                        "Unable to set torch sharing strategy to file_system."
+                    )
+
+            train_proc = mp.Process(
+                target=self.train_process,
+                args=(config, trainset, sampler),
+                kwargs=kwargs,
+            )
+            train_proc.start()
+            train_proc.join()
+
+            model_name = Config().trainer.model_name
+            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.mlx"
+
+            try:
+                self.load_model(filename)
+            except OSError as error:
+                logging.error(
+                    "[Client #%d] Failed to load MLX model from %s: %s",
+                    self.client_id,
+                    filename,
+                    error,
+                )
+                raise ValueError(
+                    f"Training on client {self.client_id} failed."
+                ) from error
+            except Exception as error:
+                logging.error(
+                    "[Client #%d] Unexpected error loading MLX model: %s",
+                    self.client_id,
+                    error,
+                )
+                raise ValueError(
+                    f"Training on client {self.client_id} failed."
+                ) from error
+
+            toc = time.perf_counter()
+            self.pause_training()
+        else:
+            tic = time.perf_counter()
+            self.train_process(config, trainset, sampler, **kwargs)
+            toc = time.perf_counter()
+
+        training_time = toc - tic
+        return training_time
 
     def _batch_size(self, labels: Any, examples: Any) -> int:
         if labels is not None:
@@ -958,4 +1165,4 @@ class ComposableMLXTrainer(base.Trainer):
             return int(examples.shape[0])
         if isinstance(examples, (list, tuple)):
             return len(examples)
-        return 0
+        return 1
