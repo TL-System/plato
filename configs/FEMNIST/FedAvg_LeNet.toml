@@ -1,0 +1,81 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 3597
+
+# The number of clients selected in each round
+per_round = 3
+
+# Should the clients compute test accuracy locally?
+do_test = true
+random_seed = 1
+comm_simulation = true
+compute_comm_time = true
+
+[server]
+address = "127.0.0.1"
+port = 8015
+do_test = false
+random_seed = 1
+simulate_wall_time = true
+
+[data]
+
+# The training and testing dataset
+datasource = "FEMNIST"
+sampler = "all_inclusive"
+
+# #
+testset_sampler = "all_inclusive"
+
+# #
+# #    # The random seed for sampling data
+random_seed = 1
+reload_data = true
+concurrent_download = true
+
+[trainer]
+
+# The type of the trainer
+type = "basic"
+
+# The maximum number of training rounds
+rounds = 60
+
+# The maximum number of clients running concurrently
+max_concurrency = 10
+
+# The target accuracy
+target_accuracy = 1.0
+
+# Number of epochs for local training in each communication round
+epochs = 5
+batch_size = 10
+loss_criterion = "CrossEntropyLoss"
+optimizer = "SGD"
+lr_scheduler = "CosineAnnealingLR"
+global_lr_scheduler = true
+model_name = "lenet5"
+
+[algorithm]
+
+# A aggregation algorithm
+type = "fedavg"
+
+[results]
+types = "round, accuracy, elapsed_time, comm_time, round_time, comm_overhead"
+
+[parameters]
+
+[parameters.model]
+num_classes = 62
+
+[parameters.optimizer]
+lr = 0.35
+weight_decay = 5e-06
+
+[parameters.learning_rate]
+T_max = 300

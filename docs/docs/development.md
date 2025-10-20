@@ -9,7 +9,7 @@ This framework makes extensive use of object oriented subclassing with the help 
 
 ## Configuration Parameters
 
-All configuration parameters are globally accessed using the Singleton `Config` class (found in `config.py`). They are read from a configuration file when the clients and the servers launch, and the configuration file follows the YAML format for the sake of simplicity and readability.
+All configuration parameters are globally accessed using the Singleton `Config` class (found in `config.py`). They are read from a configuration file when the clients and the servers launch, and the configuration file follows the TOML format for the sake of simplicity and readability.
 
 These parameters include parameters specific to:
 

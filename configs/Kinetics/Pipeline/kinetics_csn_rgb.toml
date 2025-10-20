@@ -1,0 +1,431 @@
+
+# the data configuration for the rgb dataset
+rgb_mean = [123.675, 116.28, 103.53]
+rgb_std = [58.395, 57.12, 57.375]
+rgb_to_bgr = 0
+
+[rgb_data_train]
+type = "RawframeDataset"
+ann_file = "train_list_rawframes.txt"
+data_prefix = "rawframes_train"
+
+[[rgb_data_train.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+
+[[rgb_data_train.pipeline]]
+type = "RawFrameDecode"
+
+[[rgb_data_train.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[rgb_data_train.pipeline]]
+type = "RandomResizedCrop"
+
+[[rgb_data_train.pipeline]]
+type = "Resize"
+scale = [224, 224]
+keep_ratio = false
+
+[[rgb_data_train.pipeline]]
+type = "Flip"
+flip_ratio = 0.5
+
+[[rgb_data_train.pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[rgb_data_train.pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[rgb_data_train.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[rgb_data_train.pipeline.8.meta_keys]]
+null = true
+
+[[rgb_data_train.pipeline]]
+type = "ToTensor"
+keys = ["imgs", "label"]
+
+[rgb_data_val]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_val"
+
+[[rgb_data_val.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+test_mode = true
+
+[[rgb_data_val.pipeline]]
+type = "RawFrameDecode"
+
+[[rgb_data_val.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[rgb_data_val.pipeline]]
+type = "CenterCrop"
+crop_size = 224
+
+[[rgb_data_val.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[rgb_data_val.pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[rgb_data_val.pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[rgb_data_val.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[rgb_data_val.pipeline.7.meta_keys]]
+null = true
+
+[[rgb_data_val.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[rgb_data_test]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_val"
+
+[[rgb_data_test.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 10
+test_mode = true
+
+[[rgb_data_test.pipeline]]
+type = "RawFrameDecode"
+
+[[rgb_data_test.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[rgb_data_test.pipeline]]
+type = "ThreeCrop"
+crop_size = 256
+
+[[rgb_data_test.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[rgb_data_test.pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[rgb_data_test.pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[rgb_data_test.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[rgb_data_test.pipeline.7.meta_keys]]
+null = true
+
+[[rgb_data_test.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[train]
+type = "RawframeDataset"
+ann_file = "train_list_rawframes.txt"
+data_prefix = "rawframes_train"
+
+[[train.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+
+[[train.pipeline]]
+type = "RawFrameDecode"
+
+[[train.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[train.pipeline]]
+type = "RandomResizedCrop"
+
+[[train.pipeline]]
+type = "Resize"
+scale = [224, 224]
+keep_ratio = false
+
+[[train.pipeline]]
+type = "Flip"
+flip_ratio = 0.5
+
+[[train.pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[train.pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[train.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[train.pipeline.8.meta_keys]]
+null = true
+
+[[train.pipeline]]
+type = "ToTensor"
+keys = ["imgs", "label"]
+
+[val]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_val"
+
+[[val.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+test_mode = true
+
+[[val.pipeline]]
+type = "RawFrameDecode"
+
+[[val.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[val.pipeline]]
+type = "CenterCrop"
+crop_size = 224
+
+[[val.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[val.pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[val.pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[val.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[val.pipeline.7.meta_keys]]
+null = true
+
+[[val.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[test]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_val"
+
+[[test.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 10
+test_mode = true
+
+[[test.pipeline]]
+type = "RawFrameDecode"
+
+[[test.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[test.pipeline]]
+type = "ThreeCrop"
+crop_size = 256
+
+[[test.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[test.pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[test.pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[test.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[test.pipeline.7.meta_keys]]
+null = true
+
+[[test.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[[rgb_train_pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+
+[[rgb_train_pipeline]]
+type = "RawFrameDecode"
+
+[[rgb_train_pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[rgb_train_pipeline]]
+type = "RandomResizedCrop"
+
+[[rgb_train_pipeline]]
+type = "Resize"
+scale = [224, 224]
+keep_ratio = false
+
+[[rgb_train_pipeline]]
+type = "Flip"
+flip_ratio = 0.5
+
+[[rgb_train_pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[rgb_train_pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[rgb_train_pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[rgb_train_pipeline.8.meta_keys]]
+null = true
+
+[[rgb_train_pipeline]]
+type = "ToTensor"
+keys = ["imgs", "label"]
+
+[[rgb_val_pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+test_mode = true
+
+[[rgb_val_pipeline]]
+type = "RawFrameDecode"
+
+[[rgb_val_pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[rgb_val_pipeline]]
+type = "CenterCrop"
+crop_size = 224
+
+[[rgb_val_pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[rgb_val_pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[rgb_val_pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[rgb_val_pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[rgb_val_pipeline.7.meta_keys]]
+null = true
+
+[[rgb_val_pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[[rgb_test_pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 10
+test_mode = true
+
+[[rgb_test_pipeline]]
+type = "RawFrameDecode"
+
+[[rgb_test_pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[rgb_test_pipeline]]
+type = "ThreeCrop"
+crop_size = 256
+
+[[rgb_test_pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[rgb_test_pipeline]]
+type = "Normalize"
+mean = [123.675, 116.28, 103.53]
+std = [58.395, 57.12, 57.375]
+to_bgr = 0
+
+[[rgb_test_pipeline]]
+type = "FormatShape"
+input_format = "NCTHW"
+
+[[rgb_test_pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[rgb_test_pipeline.7.meta_keys]]
+null = true
+
+[[rgb_test_pipeline]]
+type = "ToTensor"
+keys = ["imgs"]

@@ -1,0 +1,97 @@
+
+# rgb model settings
+
+[rgb_model]
+type = "Recognizer3D"
+train_cfg = { null = true }
+
+[rgb_model.backbone]
+type = "ResNet2Plus1d"
+depth = 50
+pretrained = { null = true }
+pretrained2d = false
+norm_eval = false
+conv1_kernel = [3, 7, 7]
+conv1_stride_t = 1
+pool1_stride_t = 1
+inflate = [1, 1, 1, 1]
+spatial_strides = [1, 2, 2, 2]
+temporal_strides = [1, 2, 2, 2]
+zero_init_residual = false
+
+[rgb_model.backbone.conv_cfg]
+type = "Conv2plus1d"
+
+[rgb_model.cls_head]
+type = "I3DHead"
+num_classes = 400
+in_channels = 2048
+spatial_type = "avg"
+dropout_ratio = 0.5
+init_std = 0.01
+
+[rgb_model.test_cfg]
+average_clips = "prob"
+
+[flow_model]
+type = "Recognizer3D"
+train_cfg = { null = true }
+
+[flow_model.backbone]
+type = "ResNet2Plus1d"
+depth = 50
+pretrained = { null = true }
+pretrained2d = false
+norm_eval = false
+conv1_kernel = [3, 7, 7]
+conv1_stride_t = 1
+pool1_stride_t = 1
+inflate = [1, 1, 1, 1]
+spatial_strides = [1, 2, 2, 2]
+temporal_strides = [1, 2, 2, 2]
+zero_init_residual = false
+
+[flow_model.backbone.conv_cfg]
+type = "Conv2plus1d"
+
+[flow_model.cls_head]
+type = "I3DHead"
+num_classes = 400
+in_channels = 2048
+spatial_type = "avg"
+dropout_ratio = 0.5
+init_std = 0.01
+
+[flow_model.test_cfg]
+average_clips = "prob"
+
+[audio_model]
+type = "AudioRecognizer"
+train_cfg = { null = true }
+
+[audio_model.backbone]
+type = "ResNet"
+depth = 50
+in_channels = 1
+norm_eval = false
+
+[audio_model.cls_head]
+type = "AudioTSNHead"
+num_classes = 400
+in_channels = 2048
+dropout_ratio = 0.5
+init_std = 0.01
+
+[audio_model.test_cfg]
+average_clips = "prob"
+
+[fuse_model]
+type = "FullyConnectedHead"
+num_classes = 400
+in_channels = 6144
+hidden_layer_size = [512]
+dropout_ratio = 0.5
+
+[fuse_model.loss_cls]
+type = "CrossEntropyLoss"
+loss_weight = 1.0

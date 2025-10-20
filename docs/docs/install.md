@@ -23,7 +23,7 @@ cd plato
 You can run Plato using `uv run`, using one of its configuration files:
 
 ```bash
-uv run plato.py -c configs/MNIST/fedavg_lenet5.yml
+uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
 In order to run any of the examples, first run the following command to include all global Python packages in a local Python environment:
@@ -36,10 +36,10 @@ and then run each example in its own respective directory. For example:
 
 ```bash
 cd examples/server_aggregation/fedatt
-uv run fedatt.py -c fedatt_FashionMNIST_lenet5.yml
+uv run fedatt.py -c fedatt_FashionMNIST_lenet5.toml
 ```
 
-This will make sure that any additional Python packages, specified in the local `pyproject.yaml` configuration, will be installed first.
+This will make sure that any additional Python packages, specified in the local `pyproject.toml` configuration, will be installed first.
 
 ### Building the `plato-learn` PyPi package
 

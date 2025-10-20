@@ -1,0 +1,436 @@
+
+# the data configuration for the flow dataset
+# Note: we did one slightly modification to the original configuration from the tsn config file
+# Converted the SampleFrames to the one used in the kinetics_csn_rgb
+# because we want to train a multimodal model
+flow_mean = [128, 128]
+flow_std = [128, 128]
+
+[flow_data_train]
+type = "RawframeDataset"
+ann_file = "train_list_rawframes.txt"
+data_prefix = "rawframes_train"
+filename_tmpl = "{}_{:05d}.jpg"
+modality = "Flow"
+
+[[flow_data_train.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+
+[[flow_data_train.pipeline]]
+type = "RawFrameDecode"
+
+[[flow_data_train.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[flow_data_train.pipeline]]
+type = "RandomResizedCrop"
+
+[[flow_data_train.pipeline]]
+type = "Resize"
+scale = [224, 224]
+keep_ratio = false
+
+[[flow_data_train.pipeline]]
+type = "Flip"
+flip_ratio = 0.5
+
+[[flow_data_train.pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[flow_data_train.pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[flow_data_train.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[flow_data_train.pipeline.8.meta_keys]]
+null = true
+
+[[flow_data_train.pipeline]]
+type = "ToTensor"
+keys = ["imgs", "label"]
+
+[flow_data_val]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_val"
+filename_tmpl = "{}_{:05d}.jpg"
+modality = "Flow"
+
+[[flow_data_val.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+test_mode = true
+
+[[flow_data_val.pipeline]]
+type = "RawFrameDecode"
+
+[[flow_data_val.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[flow_data_val.pipeline]]
+type = "CenterCrop"
+crop_size = 224
+
+[[flow_data_val.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[flow_data_val.pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[flow_data_val.pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[flow_data_val.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[flow_data_val.pipeline.7.meta_keys]]
+null = true
+
+[[flow_data_val.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[flow_data_test]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_test"
+filename_tmpl = "{}_{:05d}.jpg"
+modality = "Flow"
+
+[[flow_data_test.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 10
+test_mode = true
+
+[[flow_data_test.pipeline]]
+type = "RawFrameDecode"
+
+[[flow_data_test.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[flow_data_test.pipeline]]
+type = "TenCrop"
+crop_size = 224
+
+[[flow_data_test.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[flow_data_test.pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[flow_data_test.pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[flow_data_test.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[flow_data_test.pipeline.7.meta_keys]]
+null = true
+
+[[flow_data_test.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[train]
+type = "RawframeDataset"
+ann_file = "train_list_rawframes.txt"
+data_prefix = "rawframes_train"
+filename_tmpl = "{}_{:05d}.jpg"
+modality = "Flow"
+
+[[train.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+
+[[train.pipeline]]
+type = "RawFrameDecode"
+
+[[train.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[train.pipeline]]
+type = "RandomResizedCrop"
+
+[[train.pipeline]]
+type = "Resize"
+scale = [224, 224]
+keep_ratio = false
+
+[[train.pipeline]]
+type = "Flip"
+flip_ratio = 0.5
+
+[[train.pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[train.pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[train.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[train.pipeline.8.meta_keys]]
+null = true
+
+[[train.pipeline]]
+type = "ToTensor"
+keys = ["imgs", "label"]
+
+[val]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_val"
+filename_tmpl = "{}_{:05d}.jpg"
+modality = "Flow"
+
+[[val.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+test_mode = true
+
+[[val.pipeline]]
+type = "RawFrameDecode"
+
+[[val.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[val.pipeline]]
+type = "CenterCrop"
+crop_size = 224
+
+[[val.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[val.pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[val.pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[val.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[val.pipeline.7.meta_keys]]
+null = true
+
+[[val.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[test]
+type = "RawframeDataset"
+ann_file = "val_list_rawframes.txt"
+data_prefix = "rawframes_test"
+filename_tmpl = "{}_{:05d}.jpg"
+modality = "Flow"
+
+[[test.pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 10
+test_mode = true
+
+[[test.pipeline]]
+type = "RawFrameDecode"
+
+[[test.pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[test.pipeline]]
+type = "TenCrop"
+crop_size = 224
+
+[[test.pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[test.pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[test.pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[test.pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[test.pipeline.7.meta_keys]]
+null = true
+
+[[test.pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[[flow_train_pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+
+[[flow_train_pipeline]]
+type = "RawFrameDecode"
+
+[[flow_train_pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[flow_train_pipeline]]
+type = "RandomResizedCrop"
+
+[[flow_train_pipeline]]
+type = "Resize"
+scale = [224, 224]
+keep_ratio = false
+
+[[flow_train_pipeline]]
+type = "Flip"
+flip_ratio = 0.5
+
+[[flow_train_pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[flow_train_pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[flow_train_pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[flow_train_pipeline.8.meta_keys]]
+null = true
+
+[[flow_train_pipeline]]
+type = "ToTensor"
+keys = ["imgs", "label"]
+
+[[flow_val_pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 1
+test_mode = true
+
+[[flow_val_pipeline]]
+type = "RawFrameDecode"
+
+[[flow_val_pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[flow_val_pipeline]]
+type = "CenterCrop"
+crop_size = 224
+
+[[flow_val_pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[flow_val_pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[flow_val_pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[flow_val_pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[flow_val_pipeline.7.meta_keys]]
+null = true
+
+[[flow_val_pipeline]]
+type = "ToTensor"
+keys = ["imgs"]
+
+[[flow_test_pipeline]]
+type = "SampleFrames"
+clip_len = 32
+frame_interval = 2
+num_clips = 10
+test_mode = true
+
+[[flow_test_pipeline]]
+type = "RawFrameDecode"
+
+[[flow_test_pipeline]]
+type = "Resize"
+scale = [-1, 256]
+
+[[flow_test_pipeline]]
+type = "TenCrop"
+crop_size = 224
+
+[[flow_test_pipeline]]
+type = "Flip"
+flip_ratio = 0
+
+[[flow_test_pipeline]]
+type = "Normalize"
+mean = [128, 128]
+std = [128, 128]
+
+[[flow_test_pipeline]]
+type = "FormatShape"
+input_format = "NCHW_Flow"
+
+[[flow_test_pipeline]]
+type = "Collect"
+keys = ["imgs", "label"]
+
+[[flow_test_pipeline.7.meta_keys]]
+null = true
+
+[[flow_test_pipeline]]
+type = "ToTensor"
+keys = ["imgs"]

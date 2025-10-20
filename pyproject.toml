@@ -22,7 +22,6 @@ dependencies = [
     "numpy",
     "opacus",
     "python-socketio",
-    "pyyaml",
     "requests",
     "tenseal",
     "timm",
@@ -32,6 +31,8 @@ dependencies = [
     "transformers",
     "peft",
     "zstd",
+    "munch",
+    "ruamel.yaml",
 ]
 
 [project.urls]
