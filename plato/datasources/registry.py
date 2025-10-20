@@ -19,7 +19,6 @@ from plato.datasources import (
     lora,
     mnist,
     purchase,
-    qoenflx,
     stl10,
     texas,
     tiny_imagenet,
@@ -38,7 +37,6 @@ registered_datasources = {
     "LoRA": lora,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
-    "QoENFLX": qoenflx,
     "CelebA": celeba,
     "STL10": stl10,
 }
