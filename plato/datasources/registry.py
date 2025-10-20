@@ -56,31 +56,6 @@ def get(client_id: int = 0, **kwargs):
 
     logging.info("Data source: %s", datasource_name)
 
-    if datasource_name == "kinetics700":
-        from plato.datasources import kinetics
-
-        return kinetics.DataSource(**kwargs)
-
-    if datasource_name == "Gym":
-        from plato.datasources import gym
-
-        return gym.DataSource(**kwargs)
-
-    if datasource_name == "Flickr30KE":
-        from plato.datasources import flickr30k_entities
-
-        return flickr30k_entities.DataSource(**kwargs)
-
-    if datasource_name == "ReferItGame":
-        from plato.datasources import referitgame
-
-        return referitgame.DataSource(**kwargs)
-
-    if datasource_name == "COCO":
-        from plato.datasources import coco
-
-        return coco.DataSource(**kwargs)
-
     if datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
     elif datasource_name in registered_partitioned_datasources:
@@ -98,11 +73,7 @@ def get_input_shape():
     datasource_name = Config().data.datasource
 
     logging.info("Data source: %s", Config().data.datasource)
-    if Config().data.datasource == "YOLO":
-        from plato.datasources import yolo
-
-        return yolo.DataSource.input_shape()
-    elif datasource_name in registered_datasources:
+    if datasource_name in registered_datasources:
         input_shape = registered_datasources[datasource_name].DataSource.input_shape()
     elif datasource_name in registered_partitioned_datasources:
         input_shape = registered_partitioned_datasources[

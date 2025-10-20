@@ -7,7 +7,6 @@
     - `CIFAR10`
     - `CIFAR100`
     - `CINIC10`
-    - `YOLO`
     - `HuggingFace`
     - `TinyImageNet`
     - `CelebA`
@@ -28,14 +27,8 @@
 !!! example "train_path"
     Where the training dataset is located.
 
-    !!! note "Note"
-        `train_path` need to be specified for datasets using `YOLO`.
-
 !!! example "test_path"
     Where the test dataset is located.
-
-    !!! note "Note"
-        `test_path` need to be specified for datasets using `YOLO`.
 
 !!! example "sampler"
     How to divide the entire dataset to the clients. The following options are available:

@@ -148,7 +148,6 @@
     - `lenet5`
     - `resnet_x`
     - `vgg_x`
-    - `yolov5`
     - `dcgan`
     - `multilayer`
 

@@ -504,7 +504,7 @@ class TestingStrategy(Strategy):
     Implement this interface to customize testing behavior:
     - Custom evaluation metrics (MIoU, FID, KNN accuracy, etc.)
     - Multi-phase testing (SSL KNN vs personalization)
-    - External framework evaluation (HuggingFace, YOLO)
+    - External framework evaluation (HuggingFace)
     - Specialized test loops
 
     Example:
