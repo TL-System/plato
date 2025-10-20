@@ -46,6 +46,9 @@ framework = "mlx"
 [parameters.model]
 framework = "mlx"
 model_name = "lenet5"
+
+[parameters.optimizer]
+learning_rate = 0.001
 ```
 
 A complete reference configuration is available at

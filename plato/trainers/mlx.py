@@ -30,6 +30,9 @@ from typing import (
     Union,
 )
 
+import types
+from collections.abc import Iterable as ABCIterable
+
 import numpy as np
 
 from plato.callbacks.handler import CallbackHandler
@@ -43,13 +46,20 @@ try:  # pragma: no cover - import guard for optional dependency
     import mlx.core as mx
     import mlx.nn as mx_nn
     import mlx.optimizers as mx_optim
+    from mlx.nn import utils as nn_utils
 except ImportError as err:  # pragma: no cover - handled lazily
     mx = None
     mx_nn = None
     mx_optim = None
+    nn_utils = None
     _MLX_IMPORT_ERROR = err
 else:  # pragma: no cover - executed only when MLX is available
     _MLX_IMPORT_ERROR = None
+
+try:  # pragma: no cover - optional dependency
+    import torch
+except ImportError:  # pragma: no cover
+    torch = None
 
 
 class MLXNotAvailableError(ImportError):
@@ -84,14 +94,11 @@ def _tree_assign(target: Any, source: Any) -> None:
                 _tree_assign(value, source[key])
         return
 
-    if isinstance(target, list) and isinstance(source, (list, tuple)):
-        for idx, value in enumerate(target):
-            if idx < len(source):
-                _tree_assign(value, source[idx])
-        return
-
-    if isinstance(target, tuple) and isinstance(source, (list, tuple)):
-        for idx, value in enumerate(target):
+    if isinstance(target, (list, tuple, types.GeneratorType)) and isinstance(
+        source, (list, tuple)
+    ):
+        target_list = list(target)
+        for idx, value in enumerate(target_list):
             if idx < len(source):
                 _tree_assign(value, source[idx])
         return
@@ -103,6 +110,11 @@ def _tree_assign(target: Any, source: Any) -> None:
 
     if isinstance(target, mx.array):
         target[...] = source
+        return
+
+    if torch is not None and isinstance(target, torch.Tensor):
+        with torch.no_grad():
+            target.copy_(torch.as_tensor(source, device=target.device))
         return
 
     if hasattr(target, "value") and isinstance(target.value, mx.array):
@@ -122,10 +134,20 @@ def _to_host_array(value: Any) -> Any:
     """Convert MLX arrays to numpy arrays for serialization."""
     if value is None:
         return None
+    if torch is not None and isinstance(value, torch.Tensor):
+        return value.detach().cpu().numpy()
     if mx is not None and isinstance(value, mx.array):
         return value.to_host()
     if hasattr(value, "to_host"):
         return value.to_host()
+    if isinstance(value, types.GeneratorType):
+        return [_to_host_array(item) for item in value]
+    if isinstance(value, list):
+        return [_to_host_array(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_to_host_array(item) for item in value)
+    if isinstance(value, ABCIterable) and not isinstance(value, (str, bytes)):
+        return [_to_host_array(item) for item in value]
     return value
 
 
@@ -441,7 +463,7 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
 
     def setup(self, context: MLXTrainingContext) -> None:
         _ensure_mlx_available()
-        self._value_and_grad = mx.value_and_grad
+        self._value_and_grad = nn_utils.value_and_grad
 
     def training_step(
         self,
@@ -454,17 +476,26 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
     ) -> "mx.array":
         _ensure_mlx_available()
 
-        def loss_fn(current_model: "mx_nn.Module") -> "mx.array":
-            outputs = current_model(examples)
-            return loss_criterion(outputs, labels)
+        if labels is None:
 
-        loss, grads = self._value_and_grad(loss_fn)(model)
+            def inner_loss(examples_inner):
+                outputs = model(examples_inner)
+                return loss_criterion(outputs, None)
+
+            loss, grads = self._value_and_grad(model, inner_loss)(examples)
+        else:
+
+            def inner_loss(examples_inner, labels_inner):
+                outputs = model(examples_inner)
+                return loss_criterion(outputs, labels_inner)
+
+            loss, grads = self._value_and_grad(model, inner_loss)(examples, labels)
+
         if self.clip_grad_norm is not None:
             logging.warning(
                 "Gradient clipping is requested but not implemented for MLX yet."
             )
         optimizer.update(model, grads)
-        mx.eval(model.parameters())
         return loss
 
 
@@ -827,7 +858,6 @@ class ComposableMLXTrainer(base.Trainer):
         restored = _tree_map(_to_mx_array, state_tree)
         current = self.model.parameters()
         _tree_assign(current, restored)
-        mx.eval(self.model.parameters())
 
     # ---------------------------------------------------------------------
     # Training loop
@@ -1027,32 +1057,15 @@ class ComposableMLXTrainer(base.Trainer):
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
 
-        if "max_concurrency" in config:
-            if mp.get_start_method(allow_none=True) != "spawn":
-                mp.set_start_method("spawn", force=True)
-
-            test_proc = mp.Process(
-                target=self.test_process,
-                args=(config, testset, sampler),
-                kwargs=kwargs,
+        if config.get("max_concurrency"):
+            logging.warning(
+                "MLX trainer does not support multiprocessing during testing; "
+                "ignoring max_concurrency=%s.",
+                config.get("max_concurrency"),
             )
-            test_proc.start()
-            test_proc.join()
+            config.pop("max_concurrency", None)
 
-            model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
-
-            try:
-                accuracy = self.load_accuracy(filename)
-            except OSError as error:
-                raise ValueError(
-                    f"Testing on client {self.client_id} failed."
-                ) from error
-
-            self.pause_training()
-            return accuracy
-        else:
-            return self.test_model(config, testset, sampler, **kwargs)
+        return self.test_model(config, testset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):
         accuracy = self.testing_strategy.test_model(
@@ -1097,67 +1110,17 @@ class ComposableMLXTrainer(base.Trainer):
 
         self.training_start_time = time.time()
 
-        if "max_concurrency" in config:
-            tic = time.perf_counter()
-
-            if mp.get_start_method(allow_none=True) != "spawn":
-                mp.set_start_method("spawn", force=True)
-
-            try:
-                import torch
-            except ImportError:
-                torch = None  # type: ignore
-
-            if torch is not None and hasattr(
-                torch.multiprocessing,
-                "set_sharing_strategy",
-            ):
-                try:
-                    torch.multiprocessing.set_sharing_strategy("file_system")
-                except (RuntimeError, ValueError):
-                    logging.debug(
-                        "Unable to set torch sharing strategy to file_system."
-                    )
-
-            train_proc = mp.Process(
-                target=self.train_process,
-                args=(config, trainset, sampler),
-                kwargs=kwargs,
+        if config.get("max_concurrency"):
+            logging.warning(
+                "MLX trainer does not support multiprocessing; ignoring "
+                "max_concurrency=%s.",
+                config.get("max_concurrency"),
             )
-            train_proc.start()
-            train_proc.join()
+            config.pop("max_concurrency", None)
 
-            model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.mlx"
-
-            try:
-                self.load_model(filename)
-            except OSError as error:
-                logging.error(
-                    "[Client #%d] Failed to load MLX model from %s: %s",
-                    self.client_id,
-                    filename,
-                    error,
-                )
-                raise ValueError(
-                    f"Training on client {self.client_id} failed."
-                ) from error
-            except Exception as error:
-                logging.error(
-                    "[Client #%d] Unexpected error loading MLX model: %s",
-                    self.client_id,
-                    error,
-                )
-                raise ValueError(
-                    f"Training on client {self.client_id} failed."
-                ) from error
-
-            toc = time.perf_counter()
-            self.pause_training()
-        else:
-            tic = time.perf_counter()
-            self.train_process(config, trainset, sampler, **kwargs)
-            toc = time.perf_counter()
+        tic = time.perf_counter()
+        self.train_process(config, trainset, sampler, **kwargs)
+        toc = time.perf_counter()
 
         training_time = toc - tic
         return training_time

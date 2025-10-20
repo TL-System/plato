@@ -40,4 +40,4 @@ framework = "mlx"
 num_classes = 10
 
 [parameters.optimizer]
-lr = 0.001
+learning_rate = 0.001

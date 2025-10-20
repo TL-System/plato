@@ -20,6 +20,8 @@ try:  # pragma: no cover - optional dependency
 except ImportError:  # pragma: no cover
     torch = None
 
+import types
+
 
 def _to_numpy(value: Any) -> Any:
     """Recursively convert tensors/arrays to numpy arrays."""
@@ -34,6 +36,9 @@ def _to_numpy(value: Any) -> Any:
 
     if mx is not None and isinstance(value, mx.array):
         return value.to_host()
+
+    if isinstance(value, types.GeneratorType):
+        return [_to_numpy(item) for item in value]
 
     if isinstance(value, dict):
         return {key: _to_numpy(val) for key, val in value.items()}
