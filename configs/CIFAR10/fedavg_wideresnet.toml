@@ -1,0 +1,70 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 3
+
+# The number of clients selected in each round
+per_round = 2
+
+# Should the clients compute test accuracy locally?
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+
+[data]
+
+# The training and testing dataset
+datasource = "CIFAR10"
+
+# Number of samples in each partition
+partition_size = 20000
+
+# IID or non-IID?
+sampler = "iid"
+
+[trainer]
+
+# The type of the trainer
+type = "basic"
+
+# The maximum number of training rounds
+rounds = 10000
+
+# The maximum number of clients running concurrently
+max_concurrency = 2
+
+# The target accuracy
+target_accuracy = 0.8
+num_layers = 40
+
+# The machine learning model
+model_name = "wideresnet"
+
+# Number of epoches for local training in each communication round
+epochs = 1
+batch_size = 128
+optimizer = "SGD"
+lr_scheduler = "CosineAnnealingLR"
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg"
+
+[parameters]
+
+[parameters.model]
+num_classes = 10
+
+[parameters.optimizer]
+lr = 0.1
+momentum = 0.9
+weight_decay = 0.0005
+
+[parameters.learning_rate]
+T_max = 3125

@@ -7,8 +7,9 @@
 # --------------------------------------------------------'
 
 import os
+import tomllib
+from pathlib import Path
 
-import yaml
 from yacs.config import CfgNode as CN
 
 _C = CN()
@@ -173,16 +174,20 @@ _C.LOCAL_RANK = 0
 
 def _update_config_from_file(config, cfg_file):
     config.defrost()
-    with open(cfg_file, "r") as f:
-        yaml_cfg = yaml.load(f, Loader=yaml.SafeLoader)
+    cfg_path = Path(cfg_file)
+    with cfg_path.open("rb") as f:
+        raw_cfg = tomllib.load(f)
 
-    for cfg in yaml_cfg.setdefault("BASE", [""]):
-        if cfg:
-            _update_config_from_file(
-                config, os.path.join(os.path.dirname(cfg_file), cfg)
-            )
-    print("=> merge config from {}".format(cfg_file))
-    config.merge_from_file(cfg_file)
+    bases = raw_cfg.pop("BASE", [""])
+    for base in bases:
+        if base:
+            base_path = cfg_path.parent / base
+            if base_path.suffix == ".yml":
+                base_path = base_path.with_suffix(".toml")
+            _update_config_from_file(config, str(base_path))
+
+    print(f"=> merge config from {cfg_file}")
+    config.merge_from_other_cfg(CN(raw_cfg))
     config.freeze()
 
 

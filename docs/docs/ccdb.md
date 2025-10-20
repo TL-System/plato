@@ -52,7 +52,7 @@ source $HOME/.local/bin/env
 Now you can run Plato with `uv run`:
 
 ```bash
-uv run --active plato.py -c configs/MNIST/fedavg_lenet5.yml
+uv run --active plato.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
 In case you wish to exit your Python virtual environment, run the command:
@@ -113,7 +113,7 @@ source ~/.federated/bin/activate
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.local/bin/env
 
-uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.yml
+uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.toml
 ```
 
 Submit the job:
@@ -164,7 +164,7 @@ salloc: Granted job allocation 53923456
 Then you can run *Plato*:
 
 ```bash
-uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.yml
+uv run --active plato.py -c configs/CIFAR10/fedavg_wideresnet.toml
 ```
 
 After the job is done, use `exit` at the command to relinquish the job allocation.
@@ -210,7 +210,7 @@ module load python/3.12
 source ~/.federated/bin/activate
 
 # Running the test.sh under examples/async/fedbuff
-TRANSFORMERS_OFFLINE=1 uv run --active fedbuff.py -c fedbuff_cifar10.yml
+TRANSFORMERS_OFFLINE=1 uv run --active fedbuff.py -c fedbuff_cifar10.toml
 ```
 
 

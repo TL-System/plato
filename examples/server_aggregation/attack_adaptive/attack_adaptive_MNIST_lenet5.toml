@@ -1,0 +1,88 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 3
+
+# The number of clients selected in each round
+per_round = 3
+
+# Should the clients compute test accuracy locally?
+do_test = true
+
+[server]
+address = "127.0.0.1"
+port = 8000
+
+[data]
+
+# The training and testing dataset
+datasource = "MNIST"
+
+# Where the dataset is located
+data_path = "data"
+
+# Number of samples in each partition
+partition_size = 20000
+
+# IID or non-IID?
+sampler = "iid"
+
+# The random seed for sampling data
+random_seed = 1
+
+[trainer]
+
+# The type of the trainer
+type = "basic"
+
+# The maximum number of training rounds
+rounds = 5
+
+# The maximum number of clients running concurrently
+max_concurrency = 1
+
+# The target accuracy
+target_accuracy = 0.98
+
+# The machine learning model
+model_name = "lenet5"
+
+# Number of epoches for local training in each communication round
+epochs = 5
+batch_size = 32
+optimizer = "SGD"
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg"
+
+# Scaling factor (temperature) used by the attention module
+scaling_factor = 10
+
+# Path to the trained attention model shipped with the attack-adaptive paper.
+# Provide your own checkpoint before running the example.
+attention_model_path = "./attention_model.pt"
+
+# Number of PCA components per layer before feeding into attention.
+pca_components = 10
+
+# Threshold applied after the softmax step (epsilon in the paper).
+threshold = 0.005
+
+# Attention network hyperparameters from the reference implementation.
+attention_loops = 5
+attention_hidden = 32
+
+# Optional: set to capture per-round tensors for pretraining the attention module.
+dataset_capture_dir = "attack_adaptive_dataset"
+
+[parameters]
+
+[parameters.optimizer]
+lr = 0.01
+momentum = 0.9
+weight_decay = 0.0

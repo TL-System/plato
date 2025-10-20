@@ -1,10 +1,10 @@
 !!! note "Note"
     Your parameters in your configuration file must match the keywords in `__init__` of your model, optimizer, learning rate scheduler, or loss criterion. For example, if you want to set `base_lr` in the learning scheduler `CyclicLR`, you will need:
 
-    ```yaml
-    parameters:
-        learning_rate:
-            base_lr: 0.01
+    ```toml
+    [parameters]
+    [parameters.learning_rate]
+    base_lr = 0.01
     ```
 
 !!! example "model"

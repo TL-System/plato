@@ -1,0 +1,9 @@
+[project]
+name = "plato-tools"
+version = "0.1.0"
+description = "Utility scripts for Plato development."
+requires-python = ">=3.13"
+dependencies = [
+    "ruamel.yaml",
+]
+

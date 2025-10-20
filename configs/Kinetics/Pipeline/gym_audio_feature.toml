@@ -1,0 +1,281 @@
+
+# the configuration file for the audio dataset of the kinetics700
+
+[audio_data_train]
+type = "AudioFeatureDataset"
+ann_file = "gym99_train_list_audio_feature.txt"
+data_prefix = "audio_feature_train"
+
+[[audio_data_train.pipeline]]
+type = "LoadAudioFeature"
+
+[[audio_data_train.pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+
+[[audio_data_train.pipeline]]
+type = "AudioFeatureSelector"
+
+[[audio_data_train.pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[audio_data_train.pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[audio_data_train.pipeline.4.meta_keys]]
+null = true
+
+[[audio_data_train.pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[audio_data_val]
+type = "AudioFeatureDataset"
+ann_file = "gym99_val_list_audio_feature.txt"
+data_prefix = "audio_feature_val"
+
+[[audio_data_val.pipeline]]
+type = "LoadAudioFeature"
+
+[[audio_data_val.pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+test_mode = true
+
+[[audio_data_val.pipeline]]
+type = "AudioFeatureSelector"
+
+[[audio_data_val.pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[audio_data_val.pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[audio_data_val.pipeline.4.meta_keys]]
+null = true
+
+[[audio_data_val.pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[audio_data_test]
+type = "AudioFeatureDataset"
+ann_file = "gym99_val_list_audio_feature.txt"
+data_prefix = "audio_feature_val"
+
+[[audio_data_test.pipeline]]
+type = "LoadAudioFeature"
+
+[[audio_data_test.pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+test_mode = true
+
+[[audio_data_test.pipeline]]
+type = "AudioFeatureSelector"
+
+[[audio_data_test.pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[audio_data_test.pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[audio_data_test.pipeline.4.meta_keys]]
+null = true
+
+[[audio_data_test.pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[train]
+type = "AudioFeatureDataset"
+ann_file = "gym99_train_list_audio_feature.txt"
+data_prefix = "audio_feature_train"
+
+[[train.pipeline]]
+type = "LoadAudioFeature"
+
+[[train.pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+
+[[train.pipeline]]
+type = "AudioFeatureSelector"
+
+[[train.pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[train.pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[train.pipeline.4.meta_keys]]
+null = true
+
+[[train.pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[val]
+type = "AudioFeatureDataset"
+ann_file = "gym99_val_list_audio_feature.txt"
+data_prefix = "audio_feature_val"
+
+[[val.pipeline]]
+type = "LoadAudioFeature"
+
+[[val.pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+test_mode = true
+
+[[val.pipeline]]
+type = "AudioFeatureSelector"
+
+[[val.pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[val.pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[val.pipeline.4.meta_keys]]
+null = true
+
+[[val.pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[test]
+type = "AudioFeatureDataset"
+ann_file = "gym99_val_list_audio_feature.txt"
+data_prefix = "audio_feature_val"
+
+[[test.pipeline]]
+type = "LoadAudioFeature"
+
+[[test.pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+test_mode = true
+
+[[test.pipeline]]
+type = "AudioFeatureSelector"
+
+[[test.pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[test.pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[test.pipeline.4.meta_keys]]
+null = true
+
+[[test.pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[[audio_train_pipeline]]
+type = "LoadAudioFeature"
+
+[[audio_train_pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+
+[[audio_train_pipeline]]
+type = "AudioFeatureSelector"
+
+[[audio_train_pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[audio_train_pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[audio_train_pipeline.4.meta_keys]]
+null = true
+
+[[audio_train_pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[[audio_val_pipeline]]
+type = "LoadAudioFeature"
+
+[[audio_val_pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+test_mode = true
+
+[[audio_val_pipeline]]
+type = "AudioFeatureSelector"
+
+[[audio_val_pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[audio_val_pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[audio_val_pipeline.4.meta_keys]]
+null = true
+
+[[audio_val_pipeline]]
+type = "ToTensor"
+keys = ["audios"]
+
+[[audio_test_pipeline]]
+type = "LoadAudioFeature"
+
+[[audio_test_pipeline]]
+type = "SampleFrames"
+clip_len = 64
+frame_interval = 1
+num_clips = 1
+test_mode = true
+
+[[audio_test_pipeline]]
+type = "AudioFeatureSelector"
+
+[[audio_test_pipeline]]
+type = "FormatAudioShape"
+input_format = "NCTF"
+
+[[audio_test_pipeline]]
+type = "Collect"
+keys = ["audios", "label"]
+
+[[audio_test_pipeline.4.meta_keys]]
+null = true
+
+[[audio_test_pipeline]]
+type = "ToTensor"
+keys = ["audios"]

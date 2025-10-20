@@ -5,12 +5,12 @@
 To start a federated learning training workload with only a configuration file, run `uv run [Python file] -c [configuration file] ...`. For example:
 
 ```bash
-uv run plato.py -c configs/MNIST/fedavg_lenet5.yml
+uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
 The following command-line parameters are supported:
 
-- `-c`: the path to the configuration file to be used. The default is `config.yml` in the project's home directory.
+- `-c`: the path to the configuration file to be used. The default is `config.toml` in the project's home directory.
 
 - `-b`: the base path, to be used to contain all models, datasets, checkpoints, and results (defaults to `./runtime`).
 
@@ -20,12 +20,12 @@ The following command-line parameters are supported:
 
 Datasets required by an example are downloaded automatically the first time it runs; subsequent executions reuse the cached copies stored under the chosen base path.
 
-_Plato_ uses the YAML format for its configuration files to manage runtime configuration parameters. Example configuration files have been provided in the `configs/` directory.
+_Plato_ uses the TOML format for its configuration files to manage runtime configuration parameters. Example configuration files have been provided in the `configs/` directory.
 
 In `examples/`, a number of federated learning algorithms have been included. To run them, just run the main Python program in each of the directories with a suitable configuration file. For example, to run the `basic` example located at `examples/basic/`, run the command:
 
 ```bash
-uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.yml
+uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
 ## Running Plato in a Docker Container
@@ -113,12 +113,6 @@ The following command can be used to enter GPU-enabled Docker container with Pla
 ```bash
 ./dockerrun_gpu.sh
 ```
-
-## Running Plato on Google Colaboratory
-
-Go to [Google Colaboratory](https://colab.research.google.com/notebooks/intro.ipynb).
-
-Under directory `plato/examples/colab/`, the notebook `colab_use_terminal.ipynb` provides step-by-step instructions on running *Plato* on Google Colaboratory, while providing the facilities to use a secure shell to login and to open Visual Studio Code. To run Plato, just use the integrated terminal in the browser.
 
 ## Formatting the Code and Fixing Linter Errors
 

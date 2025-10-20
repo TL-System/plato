@@ -3,50 +3,147 @@ Reading runtime parameters from a standard configuration file (which is easier
 to work on than JSON).
 """
 
+from __future__ import annotations
+
 import argparse
-import json
 import logging
 import os
-from collections import OrderedDict, namedtuple
+import tomllib
 from pathlib import Path
-from typing import IO, Any
+from typing import Any
 
 import numpy as np
-import yaml
+from munch import Munch
 
 
-class Loader(yaml.SafeLoader):
-    """YAML Loader with `!include` constructor."""
+class ConfigNode(Munch):
+    """Dictionary-like container with dot access and `_replace` compatibility."""
 
-    def __init__(self, stream: IO) -> None:
-        """Initialise Loader."""
+    @classmethod
+    def from_object(cls, obj: Any) -> Any:
+        """Recursively convert mappings into ``ConfigNode`` instances."""
+        if isinstance(obj, dict):
+            return cls({key: cls.from_object(value) for key, value in obj.items()})
+        if isinstance(obj, list):
+            return [cls.from_object(item) for item in obj]
+        return obj
 
-        try:
-            self.root_path = os.path.split(stream.name)[0]
-        except AttributeError:
-            self.root_path = os.path.curdir
+    def _replace(self, **updates: Any) -> "ConfigNode":
+        """Return a new instance with the provided fields updated."""
+        data = dict(self)
+        for key, value in updates.items():
+            data[key] = self.from_object(value)
+        return type(self).from_object(data)
 
-        super().__init__(stream)
+    def _asdict(self) -> dict[str, Any]:
+        """Return a plain dictionary representation of the node."""
+        return {key: self._to_plain(value) for key, value in self.items()}
+
+    @classmethod
+    def _to_plain(cls, value: Any) -> Any:
+        if isinstance(value, ConfigNode):
+            return value._asdict()
+        if isinstance(value, list):
+            return [cls._to_plain(item) for item in value]
+        return value
+
+
+class TomlConfigLoader:
+    """Load TOML configuration files with simple include semantics."""
+
+    def __init__(self, root_path: Path) -> None:
+        self._root_path = Path(root_path)
+
+    def load(self) -> Any:
+        """Load and resolve the configuration rooted at ``root_path``."""
+        return self._load_file(self._root_path.resolve(), set())
+
+    def _load_file(self, filename: Path, seen: set[Path]) -> Any:
+        if filename in seen:
+            raise ValueError(f"Circular include detected while loading {filename}.")
+        seen.add(filename)
+        with filename.open("rb") as handle:
+            data = tomllib.load(handle)
+        return self._resolve(data, filename.parent, seen)
+
+    def _resolve(self, value: Any, base_dir: Path, seen: set[Path]) -> Any:
+        if isinstance(value, dict):
+            if set(value.keys()) == {"null"} and value["null"] is True:
+                return None
+            if "include" in value:
+                include_spec = value["include"]
+                overrides = {k: v for k, v in value.items() if k != "include"}
+                included = self._resolve_include(include_spec, base_dir, seen)
+                resolved_overrides = (
+                    self._resolve(overrides, base_dir, seen) if overrides else {}
+                )
+                return self._merge(included, resolved_overrides)
+            return {
+                key: self._resolve(item, base_dir, seen) for key, item in value.items()
+            }
+        if isinstance(value, list):
+            resolved_list = [self._resolve(item, base_dir, seen) for item in value]
+            if resolved_list and all(
+                item is None
+                or (isinstance(item, dict) and set(item.keys()) == {"value"})
+                for item in resolved_list
+            ):
+                normalized_list = []
+                for item in resolved_list:
+                    if item is None:
+                        normalized_list.append(None)
+                    else:
+                        normalized_list.append(item["value"])
+                return normalized_list
+            return resolved_list
+        return value
+
+    def _resolve_include(
+        self, include_spec: Any, base_dir: Path, seen: set[Path]
+    ) -> Any:
+        if isinstance(include_spec, str):
+            include_path = self._resolve_path(include_spec, base_dir)
+            return self._load_file(include_path, seen)
+        if isinstance(include_spec, list):
+            aggregated: Any = None
+            for entry in include_spec:
+                included = self._resolve_include(entry, base_dir, seen)
+                aggregated = (
+                    included
+                    if aggregated is None
+                    else self._merge(aggregated, included)
+                )
+            return aggregated
+        raise TypeError("Include directive must be a string or list of strings.")
+
+    @staticmethod
+    def _merge(base: Any, override: Any) -> Any:
+        if base is None:
+            return override
+        if override is None:
+            return base
+        if isinstance(base, dict) and isinstance(override, dict):
+            merged = dict(base)
+            for key, value in override.items():
+                merged[key] = TomlConfigLoader._merge(merged.get(key), value)
+            return merged
+        if isinstance(base, list) and isinstance(override, list):
+            return base + override
+        return override
+
+    @staticmethod
+    def _resolve_path(candidate: str, base_dir: Path) -> Path:
+        path = (base_dir / candidate).resolve()
+        return path
 
 
 class Config:
     """
     Retrieving configuration parameters by parsing a configuration file
-    using the YAML configuration file parser.
+    using the TOML configuration file parser.
     """
 
     _instance = None
-
-    @staticmethod
-    def construct_include(loader: Loader, node: yaml.Node) -> Any:
-        """Include file referenced at node."""
-        with open(
-            Path(loader.name)
-            .parent.joinpath(loader.construct_yaml_str(node))
-            .resolve(),
-            "r",
-        ) as f:
-            return yaml.load(f, type(loader))
 
     def __new__(cls):
         if cls._instance is None:
@@ -61,7 +158,7 @@ class Config:
                 "-c",
                 "--config",
                 type=str,
-                default="./config.yml",
+                default="./config.toml",
                 help="Federated learning configuration file.",
             )
             parser.add_argument(
@@ -121,11 +218,11 @@ class Config:
             else:
                 filename = args.config
 
-            yaml.add_constructor("!include", Config.construct_include, Loader)
-
-            if os.path.isfile(filename):
-                with open(filename, "r", encoding="utf-8") as config_file:
-                    config = yaml.load(config_file, Loader)
+            config_path = Path(filename)
+            if config_path.is_file():
+                loader = TomlConfigLoader(config_path)
+                raw_config = loader.load()
+                config = ConfigNode.from_object(raw_config)
             else:
                 usage = parser.format_usage().strip()
                 raise SystemExit(
@@ -133,17 +230,18 @@ class Config:
                     f"{usage}"
                 )
 
-            Config.clients = Config.namedtuple_from_dict(config["clients"])
-            Config.server = Config.namedtuple_from_dict(config["server"])
-            Config.data = Config.namedtuple_from_dict(config["data"])
-            Config.trainer = Config.namedtuple_from_dict(config["trainer"])
-            Config.algorithm = Config.namedtuple_from_dict(config["algorithm"])
+            Config.config_path = config_path
+            Config.config = config
+            Config.clients = config.clients
+            Config.server = config.server
+            Config.data = config.data
+            Config.trainer = config.trainer
+            Config.algorithm = config.algorithm
 
             if Config.args.server is not None:
-                Config.server = Config.server._replace(
-                    address=args.server.split(":")[0]
-                )
-                Config.server = Config.server._replace(port=args.server.split(":")[1])
+                address, port = args.server.split(":")
+                Config.server.address = address
+                Config.server.port = int(port)
 
             if (
                 hasattr(Config.clients, "speed_simulation")
@@ -152,7 +250,7 @@ class Config:
                 Config.simulate_client_speed()
 
             # Customizable dictionary of global parameters
-            Config.params: dict = {}
+            Config.params: dict[str, Any] = {}
 
             # A run ID is unique to each client in an experiment
             Config.params["run_id"] = os.getpid()
@@ -160,8 +258,8 @@ class Config:
             # The base path used for all datasets, models, checkpoints, and results
             Config.params["base_path"] = Config.args.base
 
-            if "general" in config:
-                Config.general = Config.namedtuple_from_dict(config["general"])
+            if hasattr(config, "general"):
+                Config.general = config.general
 
                 if hasattr(Config.general, "base_path"):
                     Config.params["base_path"] = Config().general.base_path
@@ -209,8 +307,8 @@ class Config:
             Config.params["mpc_data_path"] = mpc_dir
             os.makedirs(mpc_dir, exist_ok=True)
 
-            if "results" in config:
-                Config.results = Config.namedtuple_from_dict(config["results"])
+            if hasattr(config, "results"):
+                Config.results = config.results
 
             # Directory of the .csv file containing results
             if hasattr(Config, "results") and hasattr(Config.results, "result_path"):
@@ -235,32 +333,17 @@ class Config:
             else:
                 Config.params["plot_pairs"] = "round-accuracy, elapsed_time-accuracy"
 
-            if "parameters" in config:
-                Config.parameters = Config.namedtuple_from_dict(config["parameters"])
+            if hasattr(config, "parameters"):
+                Config.parameters = config.parameters
 
         return cls._instance
 
     @staticmethod
-    def namedtuple_from_dict(obj):
-        """Creates a named tuple from a dictionary."""
-        if isinstance(obj, dict):
-            fields = sorted(obj.keys())
-            namedtuple_type = namedtuple(
-                typename="Config", field_names=fields, rename=True
-            )
-            field_value_pairs = OrderedDict(
-                (str(field), Config.namedtuple_from_dict(obj[field]))
-                for field in fields
-            )
-            try:
-                return namedtuple_type(**field_value_pairs)
-            except TypeError:
-                # Cannot create namedtuple instance so fallback to dict (invalid attribute names)
-                return dict(**field_value_pairs)
-        elif isinstance(obj, (list, set, tuple, frozenset)):
-            return [Config.namedtuple_from_dict(item) for item in obj]
-        else:
-            return obj
+    def node_from_dict(obj: Any) -> Any:
+        """Construct a ``ConfigNode`` (recursively) from a plain mapping."""
+        return ConfigNode.from_object(obj)
+
+    namedtuple_from_dict = node_from_dict
 
     @staticmethod
     def simulate_client_speed() -> float:

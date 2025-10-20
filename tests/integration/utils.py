@@ -9,12 +9,10 @@ import contextlib
 import os
 import sys
 import tempfile
-import textwrap
 from pathlib import Path
 
-import yaml
-
 from plato.config import Config
+from plato.utils import toml_writer
 
 
 def build_minimal_config(
@@ -27,45 +25,42 @@ def build_minimal_config(
     client_type: str = "simple",
 ) -> dict:
     """Create a minimal config dictionary suitable for smoke tests."""
-    config_text = textwrap.dedent(
-        f"""
-        clients:
-            type: {client_type}
-            total_clients: {total_clients}
-            per_round: {clients_per_round}
-            do_test: false
-
-        server:
-            address: 127.0.0.1
-            port: 8000
-            random_seed: 1
-            simulate_wall_time: true
-
-        data:
-            datasource: toy
-            partition_size: 4
-            sampler: iid
-            random_seed: 1
-
-        trainer:
-            type: {trainer_type}
-            rounds: {rounds}
-            epochs: 1
-            batch_size: 2
-            optimizer: SGD
-            model_name: {model_name}
-
-        algorithm:
-            type: fedavg
-
-        parameters:
-            optimizer:
-                lr: 0.01
-                momentum: 0.0
-                weight_decay: 0.0
-        """
-    )
-    return yaml.safe_load(config_text)
+    return {
+        "clients": {
+            "type": client_type,
+            "total_clients": total_clients,
+            "per_round": clients_per_round,
+            "do_test": False,
+        },
+        "server": {
+            "address": "127.0.0.1",
+            "port": 8000,
+            "random_seed": 1,
+            "simulate_wall_time": True,
+        },
+        "data": {
+            "datasource": "toy",
+            "partition_size": 4,
+            "sampler": "iid",
+            "random_seed": 1,
+        },
+        "trainer": {
+            "type": trainer_type,
+            "rounds": rounds,
+            "epochs": 1,
+            "batch_size": 2,
+            "optimizer": "SGD",
+            "model_name": model_name,
+        },
+        "algorithm": {"type": "fedavg"},
+        "parameters": {
+            "optimizer": {
+                "lr": 0.01,
+                "momentum": 0.0,
+                "weight_decay": 0.0,
+            }
+        },
+    }
 
 
 @contextlib.contextmanager
@@ -74,9 +69,8 @@ def configure_environment(config_dict: dict):
     Context manager that writes the config to disk and initialises Config singleton.
     """
     with tempfile.TemporaryDirectory() as tmp_dir:
-        config_path = Path(tmp_dir) / "config.yml"
-        with config_path.open("w", encoding="utf-8") as handle:
-            yaml.safe_dump(config_dict, handle)
+        config_path = Path(tmp_dir) / "config.toml"
+        toml_writer.dump(config_dict, config_path)
 
         Config._instance = None  # reset singleton
         Config.params = {}

@@ -4,7 +4,7 @@ An example for running Plato with custom clients.
 To run this example:
 
 cd examples/customized
-uv run custom_client.py -c client.yml -i <client_id>
+uv run custom_client.py -c client.toml -i <client_id>
 """
 
 import asyncio
@@ -227,7 +227,7 @@ def main():
 
     To run this example:
     cd examples/customized
-    uv run custom_client.py -c client.yml -i <client_id>
+    uv run custom_client.py -c client.toml -i <client_id>
     """
     model = partial(
         nn.Sequential,

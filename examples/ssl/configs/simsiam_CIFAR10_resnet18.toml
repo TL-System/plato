@@ -1,0 +1,98 @@
+
+# The total number of clients
+[clients]
+total_clients = 10
+
+# The number of clients selected in each round
+per_round = 2
+
+# Should the clients compute test accuracy locally?
+do_test = true
+random_seed = 1
+
+[server]
+address = "127.0.0.1"
+port = 8009
+do_test = false
+random_seed = 1
+
+# Should we simulate the wall-clock time on the server? Useful if max_concurrency is specified
+simulate_wall_time = true
+
+# cifar10 non-iid distribution
+[data]
+include = "cifar10_ssl_noniid.toml"
+
+[trainer]
+type = "self_supervised_learning"
+
+# The maximum number of training rounds
+rounds = 2
+
+# The maximum number of clients running concurrently
+max_concurrency = 2
+
+# The target accuracy
+target_accuracy = 0.94
+
+# Number of epoches for local training in each communication round
+epochs = 5
+batch_size = 128
+optimizer = "LARS"
+lr_scheduler = "MultiStepLR"
+loss_criterion = "NegativeCosineSimilarity"
+
+# The machine learning model
+model_name = "SimCLR"
+encoder_name = "resnet_18"
+projection_hidden_dim = 512
+projection_out_dim = 128
+prediction_hidden_dim = 512
+prediction_out_dim = 128
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg_personalized"
+
+# - STL10 (Image size=96)
+# - CIFAR10 (Image size=32)
+# - MNIST (Image size=28)
+[algorithm.data_transforms]
+
+[algorithm.data_transforms.train_transform]
+name = "SimSiam"
+
+[algorithm.data_transforms.train_transform.parameters]
+input_size = 32
+
+[algorithm.personalization]
+include = "ssl_personalization.toml"
+
+[parameters]
+
+[parameters.optimizer]
+lr = 0.5
+momentum = 0.9
+trust_coeff = 0.001
+weight_decay = 1e-05
+
+[parameters.learning_rate]
+gamma = 0.1
+milestone_steps = "80ep,120ep"
+
+[parameters.loss_criterion]
+eps = 1e-08
+
+[parameters.model]
+num_classes = 10
+
+# ResNet-18 ssl's personalization params
+[parameters.personalization]
+include = "resnet18_pers_params.toml"
+
+[results]
+
+# Write the following parameter(s) into a CSV
+types = "round, accuracy, accuracy_std, elapsed_time, round_time, comm_overhead"
+result_path = "results/pfl-simsiam"

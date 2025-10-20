@@ -2,12 +2,12 @@
 
 import os
 import sys
-import textwrap
 from pathlib import Path
 
 import pytest
 
 from plato.config import Config
+from plato.utils import toml_writer
 from tests.test_utils.fakes import (
     FakeDatasource,
     FakeModel,
@@ -24,45 +24,34 @@ from tests.test_utils.fakes import (
 def temp_config(tmp_path, monkeypatch):
     """Provide an isolated configuration for tests relying on Config."""
 
-    config_text = textwrap.dedent(
-        """
-        clients:
-            type: simple
-            total_clients: 2
-            per_round: 2
-            do_test: false
+    config_data = {
+        "clients": {
+            "type": "simple",
+            "total_clients": 2,
+            "per_round": 2,
+            "do_test": False,
+        },
+        "server": {"address": "127.0.0.1", "port": 8000},
+        "data": {
+            "datasource": "toy",
+            "partition_size": 4,
+            "sampler": "iid",
+            "random_seed": 1,
+        },
+        "trainer": {
+            "type": "basic",
+            "rounds": 1,
+            "epochs": 1,
+            "batch_size": 2,
+            "optimizer": "SGD",
+            "model_name": "toy_model",
+        },
+        "algorithm": {"type": "fedavg"},
+        "parameters": {"optimizer": {"lr": 0.1, "momentum": 0.0, "weight_decay": 0.0}},
+    }
 
-        server:
-            address: 127.0.0.1
-            port: 8000
-
-        data:
-            datasource: toy
-            partition_size: 4
-            sampler: iid
-            random_seed: 1
-
-        trainer:
-            type: basic
-            rounds: 1
-            epochs: 1
-            batch_size: 2
-            optimizer: SGD
-            model_name: toy_model
-
-        algorithm:
-            type: fedavg
-
-        parameters:
-            optimizer:
-                lr: 0.1
-                momentum: 0.0
-                weight_decay: 0.0
-        """
-    ).strip()
-
-    config_path = tmp_path / "config.yml"
-    config_path.write_text(config_text, encoding="utf-8")
+    config_path = tmp_path / "config.toml"
+    toml_writer.dump(config_data, config_path)
 
     monkeypatch.setenv("config_file", str(config_path))
     monkeypatch.setattr(sys, "argv", [sys.argv[0]])

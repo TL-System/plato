@@ -5,7 +5,7 @@ be customized in Plato and executed in a standalone fashion.
 To run this example:
 
 cd examples/customized
-uv run custom_server.py -c server.yml
+uv run custom_server.py -c server.toml
 """
 
 import logging

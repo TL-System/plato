@@ -1,0 +1,163 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 50
+
+# The number of clients selected in each round
+per_round = 30
+
+# Should clients compute test accuracy locally?
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+
+[data]
+datasource = "kinetics700"
+data_path = "data/Kinetics"
+download_url = "https://storage.googleapis.com/deepmind-media/Datasets/kinetics700_2020.tar.gz"
+sampler = "distribution_noniid"
+modality_sampler = "modality_iid"
+client_quantity_concentration = 0.1
+label_concentration = 0.1
+min_partition_size = 200
+
+# The random seed for sampling data
+random_seed = 1
+
+[data.downloader]
+num_workers = 4
+failed_save_file = "failed_record.txt"
+log_file = "download_log.txt"
+compress = false
+verbose = false
+skip = false
+videos_per_gpu = 3
+workers_per_gpu = 4
+
+[data.multi_modal_configs]
+
+[data.multi_modal_configs.rgb]
+include = "Pipeline/kinetics_csn_rgb.toml"
+
+[data.multi_modal_configs.flow]
+include = "Pipeline/kinetics_tsn_flow.toml"
+
+[data.multi_modal_configs.audio]
+include = "Pipeline/kinetics_audio_feature.toml"
+
+[optimizer_config]
+
+[optimizer_config.grad_clip]
+max_norm = 40
+norm_type = 2
+
+[lr_configs]
+policy = "step"
+step = [32, 48]
+warmup = "linear"
+warmup_ratio = 0.1
+warmup_by_epoch = true
+warmup_iters = 16
+
+[log_config]
+interval = 20
+
+[[log_config.hooks]]
+type = "TextLoggerHook"
+
+[[log_config.hooks]]
+type = "TensorboardLoggerHook"
+
+[checkpoint_config]
+interval = 2
+
+[trainer]
+
+# The type of the trainer
+type = "basic"
+
+# The maximum number of training rounds
+rounds = 1000
+
+# The maximum number of clients running concurrently
+max_accuracy = 3
+
+# The target accuracy
+target_accuracy = 0.67
+
+# The machine learning model
+model_name = "rgb_flow_audio_model"
+batch_size = 24
+optimizer = "SGD"
+
+[trainer.optimizer_config]
+
+[trainer.optimizer_config.grad_clip]
+max_norm = 40
+norm_type = 2
+
+[trainer.learning_rate_config]
+policy = "step"
+step = [32, 48]
+warmup = "linear"
+warmup_ratio = 0.1
+warmup_by_epoch = true
+warmup_iters = 16
+
+[trainer.log_config]
+interval = 20
+
+[[trainer.log_config.hooks]]
+type = "TextLoggerHook"
+
+[[trainer.log_config.hooks]]
+type = "TensorboardLoggerHook"
+
+[trainer.checkpoint_config]
+interval = 2
+
+[evaluation]
+interval = 5
+metrics = ["top_k_accuracy", "mean_class_accuracy"]
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg"
+
+[parameters]
+
+[parameters.model]
+
+[parameters.model.model_config]
+include = "Models/kinetics_full_models.toml"
+
+[parameters.optimizer]
+lr = 0.000125
+
+# this lr is used for 8 gpus
+momentum = 0.9
+weight_decay = 0.0001
+
+[runner_setting]
+
+[runner_setting.dist_params]
+backend = "nccl"
+log_level = "INFO"
+work_dir = "./work_dirs/mmf"
+
+# noqa: E501
+load_from = { null = true }
+resume_from = { null = true }
+find_unused_parameters = true
+
+[[runner_setting.dist_params.workflow]]
+value = "train"
+
+[[runner_setting.dist_params.workflow]]
+value = 1

@@ -14,7 +14,7 @@ If runtime exceptions occur that prevent a federated learning session from runni
 
     **Potential solutions:** Add `ping_timeout` in the `server` section in your configuration file. The default value for `ping_timeout` is 360 (seconds).
 
-    For example, to run a training session on [Google Colaboratory or Compute Canada](https://github.com/TL-System/plato/blob/main/docs/Running.md) with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
+    For example, when running on [Compute Canada resources](https://github.com/TL-System/plato/blob/main/docs/Running.md) with the CIFAR-10 dataset and the ResNet-18 model, and if 10 clients are selected per round, `ping_timeout` needs to be 360 when clients' local datasets are non-iid by symmetric Dirichlet distribution with the concentration of 0.01. Consider an even larger number if you run with larger models and more clients.
 
 !!! warning "Process Cleanup"
     **Issue:** Running processes have not been terminated from previous runs.
@@ -43,23 +43,4 @@ Continuous Integration (CI) tests have been set up for PyTorch in `.github/workf
 
 ## Setting up Zed for Formatting and Linting
 
-If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. In order to properly set up its YAML validation, add the following to your local configuration:
-
-```json
-"languages": {
-  "YAML": {
-    "language_servers": ["yaml-language-server"]
-  }
-}
-"lsp": {
-  "yaml-language-server": {
-    "settings": {
-      "yaml": {
-        "customTags": ["!include scalar"]
-      }
-    }
-  }
-}
-```
-
-This will help avoid tagging `!include` directives as invalid.
+If you use [Zed](https://zed.dev) as your editor, it uses [Ruff](https://docs.astral.sh/ruff/) as its default Python formatter and linter. 

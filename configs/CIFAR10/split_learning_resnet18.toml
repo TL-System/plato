@@ -1,0 +1,85 @@
+[clients]
+
+# Type
+type = "split_learning"
+
+# The total number of clients
+total_clients = 5
+
+# The number of clients selected in each round
+per_round = 1
+
+# Should the clients compute test accuracy locally?
+do_test = false
+
+# Split learning iterations for each client
+iteration = 100
+
+[server]
+type = "split_learning"
+random_seed = 1
+address = "127.0.0.1"
+port = 8001
+
+# Server doesn't have to do test for every round in split learning
+do_test = false
+
+[data]
+
+# The training and testing dataset
+datasource = "CIFAR10"
+
+# Number of samples in each partition
+partition_size = 1000
+
+# Fixed random seed
+random_seed = 1
+
+# IID, biased, or sharded?
+sampler = "iid"
+
+[trainer]
+
+# The type of the trainer
+type = "split_learning"
+
+# The maximum number of training rounds
+rounds = 50000
+
+# The target accuracy
+target_accuracy = 0.9
+
+# The machine learning model
+model_name = "resnet_18"
+
+# Number of epoches for local training in each communication round
+epochs = 1
+batch_size = 128
+optimizer = "SGD"
+lr_scheduler = "LambdaLR"
+
+[algorithm]
+
+# Aggregation algorithm
+type = "split_learning"
+
+# Split learning flag
+split_learning = true
+
+[parameters]
+
+[parameters.model]
+num_classes = 10
+cut_layer = "layer2"
+
+[parameters.optimizer]
+lr = 0.1
+momentum = 0.9
+weight_decay = 0.0001
+
+[parameters.learning_rate]
+gamma = 0.1
+milestone_steps = "80ep,120ep"
+
+[results]
+types = "round, accuracy, elapsed_time, comm_overhead"

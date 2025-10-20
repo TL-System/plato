@@ -1,0 +1,81 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 2
+
+# The number of clients selected in each round
+per_round = 2
+
+# Should the clients compute test accuracy locally?
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+
+# Choose to send Generator or Discriminator to clients at
+# the end of each round.
+# Value here should be one of 'none', 'generator', 'discriminator', or 'both'
+network_to_sync = "generator"
+
+[data]
+
+# The training and testing dataset
+datasource = "CelebA"
+celeba_img_size = 64
+
+# Where the dataset is located
+data_path = "data"
+
+# Number of samples in each partition
+partition_size = 81000
+
+# IID or non-IID?
+sampler = "iid"
+
+# The concentration parameter for the Dirichlet distribution
+concentration = 0.5
+
+# The random seed for sampling data
+random_seed = 1
+
+# Only add face identity as labels for training
+[data.celeba_targets]
+attr = false
+identity = true
+
+[trainer]
+
+# The type of the trainer
+type = "gan"
+
+# The maximum number of training rounds
+rounds = 5
+
+# The maximum number of clients running concurrently
+max_concurrency = 3
+
+# The target Frechet Distance
+target_perplexity = 0
+
+# The machine learning model
+model_name = "dcgan"
+
+# Number of epoches for local training in each communication round
+epochs = 5
+batch_size = 128
+optimizer = "Adam"
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg_gan"
+
+[parameters]
+
+[parameters.optimizer]
+lr = 0.0002
+weight_decay = 0.0

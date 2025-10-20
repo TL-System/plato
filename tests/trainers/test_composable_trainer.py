@@ -34,7 +34,7 @@ def setup_environment(monkeypatch):
 
     test_args = ["pytest"]
     monkeypatch.setattr(sys, "argv", test_args)
-    monkeypatch.setenv("config_file", "tests/config.yml")
+    monkeypatch.setenv("config_file", "tests/config.toml")
     return None
 
 

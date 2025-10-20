@@ -22,7 +22,6 @@ dependencies = [
     "numpy",
     "opacus",
     "python-socketio",
-    "pyyaml",
     "requests",
     "tenseal",
     "timm",
@@ -32,6 +31,7 @@ dependencies = [
     "transformers",
     "peft",
     "zstd",
+    "munch",
 ]
 
 [project.urls]
@@ -74,6 +74,7 @@ members = [
     "examples/model_search/heterofl",
     "examples/detector",
     "examples/gradient_leakage_attacks",
+    "tools",
 ]
 
 [dependency-groups]
