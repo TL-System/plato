@@ -19,14 +19,14 @@ from plato.datasources import (
 )
 
 registered_datasources = {
+    "HuggingFace": huggingface,
+    "Torchvision": torchvision,
+    "LoRA": lora,
     "CINIC10": cinic10,
     "Purchase": purchase,
     "Texas": texas,
-    "HuggingFace": huggingface,
-    "LoRA": lora,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
-    "Torchvision": torchvision,
 }
 
 registered_partitioned_datasources = {"FEMNIST": femnist}
