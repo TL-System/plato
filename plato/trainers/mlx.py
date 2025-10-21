@@ -136,9 +136,17 @@ def _to_host_array(value: Any) -> Any:
     if torch is not None and isinstance(value, torch.Tensor):
         return value.detach().cpu().numpy()
     if mx is not None and isinstance(value, mx.array):
-        return value.to_host()
+        if hasattr(mx, "to_numpy"):
+            return mx.to_numpy(value)
+        if hasattr(value, "to_numpy"):
+            return value.to_numpy()
+        if hasattr(value, "__array__"):
+            return np.asarray(value)
+        return np.array(value)
     if hasattr(value, "to_host"):
         return value.to_host()
+    if hasattr(value, "to_numpy"):
+        return value.to_numpy()
     if isinstance(value, types.GeneratorType):
         return [_to_host_array(item) for item in value]
     if isinstance(value, list):

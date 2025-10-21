@@ -107,24 +107,30 @@ def get(**kwargs: Any) -> Any:
             if hasattr(model, "_asdict"):
                 model_params = model._asdict()
 
+    safe_params = {k: v for k, v in model_params.items() if k != "framework"}
+
+    framework = model_framework.lower()
+    if framework == "mlx":
+        candidate_keys = []
+        if model_type:
+            candidate_keys.append(f"{framework}_{model_type}")
+            candidate_keys.append(model_type)
+        if model_name:
+            candidate_keys.append(model_name)
+        for key in candidate_keys:
+            key_lower = key.lower()
+            if key_lower in registered_mlx_models:
+                return registered_mlx_models[key_lower](**safe_params)
+    elif model_name and model_name.lower() in registered_mlx_models:
+        return registered_mlx_models[model_name.lower()](**safe_params)
+
     if model_type in registered_models:
         registered_model = registered_models[model_type]
-        safe_params = {k: v for k, v in model_params.items() if k != "framework"}
         return registered_model(**safe_params)
 
     if model_type in registered_factories:
         return registered_factories[model_type].get(
             model_name=model_name, **model_params
         )
-
-    mlx_key = model_type
-    if model_framework:
-        prefixed_key = f"{model_framework.lower()}_{model_type}"
-        if prefixed_key in registered_mlx_models:
-            mlx_key = prefixed_key
-
-    if mlx_key in registered_mlx_models:
-        safe_params = {k: v for k, v in model_params.items() if k != "framework"}
-        return registered_mlx_models[mlx_key](**safe_params)
 
     raise ValueError(f"No such model: {model_name}")
