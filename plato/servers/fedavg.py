@@ -5,9 +5,9 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
+from typing import Any, Dict
 
 import numpy as np
-from typing import Any, Dict
 
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
@@ -305,9 +305,7 @@ class Server(base.Server):
             logging.debug("Unable to log %s weights: %s", label, exc)
 
     @staticmethod
-    def _log_difference(
-        baseline: Dict[str, Any], updated: Dict[str, Any]
-    ) -> None:
+    def _log_difference(baseline: Dict[str, Any], updated: Dict[str, Any]) -> None:
         if not logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
             return
         try:

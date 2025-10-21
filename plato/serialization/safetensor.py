@@ -9,7 +9,7 @@ import json
 from typing import Any, Dict
 
 import numpy as np
-from safetensors.numpy import save, load
+from safetensors.numpy import load, save
 
 from plato.utils.tree import TreeMetadata, flatten_tree, unflatten_tree
 

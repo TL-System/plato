@@ -14,7 +14,9 @@ import os
 import pickle
 import random
 import time
+import types
 from abc import ABC, abstractmethod
+from collections.abc import Iterable as ABCIterable
 from dataclasses import dataclass, field
 from typing import (
     Any,
@@ -28,9 +30,6 @@ from typing import (
     Tuple,
     Union,
 )
-
-import types
-from collections.abc import Iterable as ABCIterable
 
 import numpy as np
 
@@ -261,7 +260,7 @@ class MLXTrainingStepStrategy(MLXStrategy):
         optimizer: "mx_optim.Optimizer",
         examples: "mx.array",
         labels: Optional["mx.array"],
-        loss_criterion: Callable[[ "mx.array", Optional["mx.array"]], "mx.array"],
+        loss_criterion: Callable[["mx.array", Optional["mx.array"]], "mx.array"],
         context: MLXTrainingContext,
     ) -> "mx.array":
         """Execute a single training step and return the loss."""
@@ -359,7 +358,7 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
 
     def __init__(
         self,
-        loss_fn: Optional[Callable[[ "mx.array", "mx.array"], "mx.array"]] = None,
+        loss_fn: Optional[Callable[["mx.array", "mx.array"], "mx.array"]] = None,
         reduction: str = "mean",
     ):
         self.loss_fn = loss_fn
@@ -458,7 +457,7 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
         optimizer: "mx_optim.Optimizer",
         examples: "mx.array",
         labels: Optional["mx.array"],
-        loss_criterion: Callable[[ "mx.array", Optional["mx.array"]], "mx.array"],
+        loss_criterion: Callable[["mx.array", Optional["mx.array"]], "mx.array"],
         context: MLXTrainingContext,
     ) -> "mx.array":
         _ensure_mlx_available()
@@ -485,9 +484,10 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
 
             loss, grads = self._value_and_grad(model, inner_loss)(examples, labels)
 
-        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and context.state.get(
-            "grad_debug_logged", False
-        ) is False:
+        if (
+            logging.getLogger(__name__).isEnabledFor(logging.DEBUG)
+            and context.state.get("grad_debug_logged", False) is False
+        ):
             try:
                 grad_leaf = _first_leaf(grads)
                 grad_arr = (
@@ -641,9 +641,9 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
             examples = _tree_map(_to_mx_array, examples)
             examples = _tree_map(_ensure_nhwc_layout, examples)
             labels = _tree_map(_to_mx_array, labels)
-            if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not context.state.get(
-                "eval_label_debug_logged", False
-            ):
+            if logging.getLogger(__name__).isEnabledFor(
+                logging.DEBUG
+            ) and not context.state.get("eval_label_debug_logged", False):
                 label_arr = (
                     labels.to_numpy()
                     if hasattr(labels, "to_numpy")
@@ -652,15 +652,17 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
                     else np.asarray(labels)
                 )
                 logging.debug(
-                    "[MLX Eval] Label dtype=%s shape=%s", label_arr.dtype, label_arr.shape
+                    "[MLX Eval] Label dtype=%s shape=%s",
+                    label_arr.dtype,
+                    label_arr.shape,
                 )
                 context.state["eval_label_debug_logged"] = True
 
             logits = model(examples)
             predicted = mx.argmax(logits, axis=-1)
-            if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not context.state.get(
-                "eval_debug_logged", False
-            ):
+            if logging.getLogger(__name__).isEnabledFor(
+                logging.DEBUG
+            ) and not context.state.get("eval_debug_logged", False):
                 if hasattr(predicted, "to_numpy"):
                     pred_np = predicted.to_numpy()
                 elif hasattr(predicted, "to_host"):
@@ -676,9 +678,7 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
                 logging.debug(
                     "[MLX Eval] Sample predictions: %s", pred_np[:10].tolist()
                 )
-                logging.debug(
-                    "[MLX Eval] Sample labels: %s", label_np[:10].tolist()
-                )
+                logging.debug("[MLX Eval] Sample labels: %s", label_np[:10].tolist())
                 context.state["eval_debug_logged"] = True
             matches = predicted == labels
             correct_predictions += int(mx.sum(matches).item())
@@ -961,7 +961,9 @@ class ComposableMLXTrainer(base.Trainer):
             )
         if mx is not None:
             leaves = [
-                leaf for leaf in _tree_leaves(self.model.parameters()) if isinstance(leaf, mx.array)
+                leaf
+                for leaf in _tree_leaves(self.model.parameters())
+                if isinstance(leaf, mx.array)
             ]
             if leaves:
                 mx.eval(*leaves)
@@ -1042,9 +1044,9 @@ class ComposableMLXTrainer(base.Trainer):
                 examples = _tree_map(_to_mx_array, examples)
                 examples = _tree_map(_ensure_nhwc_layout, examples)
                 labels = _tree_map(_to_mx_array, labels)
-                if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not self.context.state.get(
-                    "train_label_debug_logged", False
-                ):
+                if logging.getLogger(__name__).isEnabledFor(
+                    logging.DEBUG
+                ) and not self.context.state.get("train_label_debug_logged", False):
                     label_arr = (
                         labels.to_numpy()
                         if hasattr(labels, "to_numpy")
@@ -1053,7 +1055,9 @@ class ComposableMLXTrainer(base.Trainer):
                         else np.asarray(labels)
                     )
                     logging.debug(
-                        "[MLX Train] Label dtype=%s shape=%s", label_arr.dtype, label_arr.shape
+                        "[MLX Train] Label dtype=%s shape=%s",
+                        label_arr.dtype,
+                        label_arr.shape,
                     )
                     self.context.state["train_label_debug_logged"] = True
 
@@ -1073,9 +1077,9 @@ class ComposableMLXTrainer(base.Trainer):
                     context=self.context,
                 )
 
-                if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not self.context.state.get(
-                    "train_pred_debug_logged", False
-                ):
+                if logging.getLogger(__name__).isEnabledFor(
+                    logging.DEBUG
+                ) and not self.context.state.get("train_pred_debug_logged", False):
                     preds = mx.argmax(self.model(examples), axis=-1)
                     pred_arr = (
                         preds.to_numpy()
@@ -1156,7 +1160,9 @@ class ComposableMLXTrainer(base.Trainer):
                 and Config().server.request_update
             ):
                 epoch_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{epoch_time}.safetensors"
+                filename = (
+                    f"{self.client_id}_{self.current_epoch}_{epoch_time}.safetensors"
+                )
                 self.save_model(filename)
 
             self.run_history.update_metric("train_loss", self._loss_tracker.average)

@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from types import SimpleNamespace
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -99,7 +99,9 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             return base
 
         if torch is not None and isinstance(value, torch.Tensor):
-            base = target if isinstance(target, torch.Tensor) else torch.zeros_like(value)
+            base = (
+                target if isinstance(target, torch.Tensor) else torch.zeros_like(value)
+            )
             base += value * weight
             return base
 

@@ -30,7 +30,9 @@ def test_save_and_load_roundtrip(temp_config, tmp_path):
     original_state = _clone_state_dict(trainer.model)
 
     trainer.save_model()
-    checkpoint_path = Path(Config.params["model_path"]) / "checkpoint_roundtrip.safetensors"
+    checkpoint_path = (
+        Path(Config.params["model_path"]) / "checkpoint_roundtrip.safetensors"
+    )
     history_path = checkpoint_path.with_suffix(checkpoint_path.suffix + ".pkl")
 
     assert checkpoint_path.exists()

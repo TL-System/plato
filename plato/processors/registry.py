@@ -15,8 +15,6 @@ from plato.processors import (
     compress,
     decompress,
     mlx_numpy,
-    safetensor_decode,
-    safetensor_encode,
     model_compress,
     model_decompress,
     model_deepcopy,
@@ -28,6 +26,8 @@ from plato.processors import (
     mpc_model_encrypt_additive,
     mpc_model_encrypt_shamir,
     pipeline,
+    safetensor_decode,
+    safetensor_encode,
     structured_pruning,
     unstructured_pruning,
 )

@@ -13,6 +13,7 @@ from copy import deepcopy
 
 import misc.attentive_nas_eval as attentive_nas_eval
 import misc.logger as logging
+import models
 import numpy as np
 import timm as timm
 import torch
@@ -35,8 +36,6 @@ from misc.utils import (
 )
 from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 from timm.utils import AverageMeter, ModelEma, accuracy
-
-import models
 
 try:
     from apex import amp

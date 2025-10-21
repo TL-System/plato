@@ -28,10 +28,7 @@ def _tree_binary_map(
 ) -> Any:
     """Apply a function to paired leaves of two trees."""
     if isinstance(tree_a, dict) and isinstance(tree_b, dict):
-        return {
-            key: _tree_binary_map(func, tree_a[key], tree_b[key])
-            for key in tree_a
-        }
+        return {key: _tree_binary_map(func, tree_a[key], tree_b[key]) for key in tree_a}
     if isinstance(tree_a, (list, tuple)) and isinstance(tree_b, (list, tuple)):
         mapped = [
             _tree_binary_map(func, item_a, item_b)
