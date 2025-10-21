@@ -7,12 +7,13 @@
     - `CIFAR10`
     - `CIFAR100`
     - `CINIC10`
-    - `HuggingFace`
+    - `FEMNIST`: Federated EMNIST
+    - `HuggingFace`: including all datasets from Hugging Face
     - `TinyImageNet`
     - `CelebA`
     - `Purchase`
     - `Texas`
-    - `STL10`
+    - `STL10`: The STL-10 dataset from the torchvision package
 
 !!! example "data_path"
     Where the dataset is located.
