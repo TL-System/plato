@@ -39,17 +39,23 @@ class ComposableClientEvents(socketio.AsyncClientNamespace):
         self.core = core
 
     async def on_connect(self) -> None:
+        await self.core.reset_disconnect_state()
         owner = self.core.owner
         LOGGER.info("[Client #%d] Connected to the server.", owner.client_id)
 
     async def on_disconnect(self, reason: Any | None = None) -> None:
         try:
             owner = self.core.owner
-            if reason is not None:
+            should_handle, disconnect_reason = await self.core.reserve_disconnect(
+                reason
+            )
+            if not should_handle:
+                return
+            if disconnect_reason is not None:
                 LOGGER.info(
                     "[Client #%d] The server disconnected the connection (%s).",
                     owner.client_id,
-                    reason,
+                    disconnect_reason,
                 )
             else:
                 LOGGER.info(
@@ -174,6 +180,10 @@ class ComposableClient:
             self.communication_strategy,
         )
 
+        self._disconnect_lock = asyncio.Lock()
+        self._disconnect_handled = False
+        self._disconnect_reason: Optional[str] = None
+
         self._sync_context_from_owner()
 
         for strategy in self._strategies:
@@ -195,6 +205,35 @@ class ComposableClient:
         for attr in fields:
             if hasattr(self.context, attr):
                 setattr(self.owner, attr, getattr(self.context, attr))
+
+    async def reserve_disconnect(
+        self, reason: Any | None = None
+    ) -> tuple[bool, Optional[str]]:
+        """Ensure disconnect handling runs exactly once and capture the reason."""
+        normalized_reason: Optional[str] = None
+        if reason not in (None, ""):
+            candidate = str(reason).strip()
+            if candidate:
+                normalized_reason = candidate
+
+        async with self._disconnect_lock:
+            if normalized_reason is not None:
+                self._disconnect_reason = normalized_reason
+
+            if self._disconnect_handled:
+                return False, self._disconnect_reason
+
+            self._disconnect_handled = True
+            if self._disconnect_reason is None:
+                self._disconnect_reason = normalized_reason
+
+            return True, self._disconnect_reason
+
+    async def reset_disconnect_state(self) -> None:
+        """Allow subsequent connections/disconnects to be handled normally."""
+        async with self._disconnect_lock:
+            self._disconnect_handled = False
+            self._disconnect_reason = None
 
     async def start_client(self) -> None:
         """Entry point that connects to the server and waits for events."""
