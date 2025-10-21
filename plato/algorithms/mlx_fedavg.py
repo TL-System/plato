@@ -48,9 +48,9 @@ def _to_numpy(value: Any) -> np.ndarray:
     if isinstance(value, np.ndarray):
         return value
     if mx is not None and isinstance(value, mx.array):
-        return value.to_host()
-    if hasattr(value, "to_host"):
-        return value.to_host()
+        return np.array(value)
+    if hasattr(value, "__array__"):
+        return np.asarray(value)
     return np.array(value)
 
 
@@ -110,7 +110,15 @@ class Algorithm(base.Algorithm):
     def load_weights(self, weights):
         """Load weights into the MLX model."""
         restored = mlx_trainer._tree_map(mlx_trainer._to_mx_array, weights)
-        current = self.model.parameters()
-        mlx_trainer._tree_assign(current, restored)
+        if hasattr(self.model, "update"):
+            self.model.update(restored)
+        else:
+            raise RuntimeError("MLX model does not support parameter updates.")
         if mx is not None:
-            mx.eval(self.model.parameters())
+            leaves = [
+                leaf
+                for leaf in mlx_trainer._tree_leaves(self.model.parameters())
+                if isinstance(leaf, mx.array)
+            ]
+            if leaves:
+                mx.eval(*leaves)

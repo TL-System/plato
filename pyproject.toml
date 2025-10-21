@@ -33,6 +33,7 @@ dependencies = [
     "zstd",
     "munch",
     "mlx>=0.29.3",
+    "safetensors",
 ]
 
 [project.urls]
