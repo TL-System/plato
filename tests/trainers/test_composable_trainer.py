@@ -365,11 +365,11 @@ class TestComposableTrainerModelOperations:
                 param.fill_(1.0)
 
         # Save model
-        trainer.save_model(filename="test_model.pth", location=str(tmp_path))
+        trainer.save_model(filename="test_model.safetensors", location=str(tmp_path))
 
         # Create new trainer and load
         trainer2 = ComposableTrainer(model=simple_model)
-        trainer2.load_model(filename="test_model.pth", location=str(tmp_path))
+        trainer2.load_model(filename="test_model.safetensors", location=str(tmp_path))
 
         # Check that weights match
         for p1, p2 in zip(trainer.model.parameters(), trainer2.model.parameters()):

@@ -354,7 +354,7 @@ When using the strategy pattern is no longer feasible, it is also possible to cu
     **Example:**
 
     ```python
-    trainer.save_model("my_model.pth")
+    trainer.save_model("my_model.safetensors")
     ```
 
 !!! note "`load_model(filename=None, location=None)`"
@@ -368,7 +368,7 @@ When using the strategy pattern is no longer feasible, it is also possible to cu
     **Example:**
 
     ```python
-    trainer.load_model("my_model.pth")
+    trainer.load_model("my_model.safetensors")
     ```
 
 ---

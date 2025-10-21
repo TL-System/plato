@@ -39,6 +39,7 @@ from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.models import registry as models_registry
+from plato.serialization.safetensor import deserialize_tree, serialize_tree
 from plato.trainers import base, tracking
 
 try:  # pragma: no cover - import guard for optional dependency
@@ -85,57 +86,16 @@ def _tree_map(func: Callable[[Any], Any], tree: Any) -> Any:
     return func(tree)
 
 
-def _tree_assign(target: Any, source: Any) -> Any:
-    """Recursively assign source leaves into target, returning the updated structure."""
-    if isinstance(target, dict) and isinstance(source, dict):
-        for key in target.keys():
-            if key in source:
-                target[key] = _tree_assign(target[key], source[key])
-        return target
-
-    if isinstance(target, list) and isinstance(source, (list, tuple)):
-        limit = min(len(target), len(source))
-        for idx in range(limit):
-            target[idx] = _tree_assign(target[idx], source[idx])
-        return target
-
-    if isinstance(target, tuple) and isinstance(source, (list, tuple)):
-        items = []
-        limit = min(len(target), len(source))
-        for idx in range(limit):
-            items.append(_tree_assign(target[idx], source[idx]))
-        items.extend(target[limit:])
-        return type(target)(items)
-
-    if mx is None:
-        raise MLXNotAvailableError(
-            "Attempted to assign MLX tensors without MLX installed."
-        )
-
-    if hasattr(target, "value") and isinstance(target.value, mx.array):
-        target.value = _tree_assign(target.value, source)
-        return target
-
-    if isinstance(target, mx.array):
-        if isinstance(source, mx.array):
-            return source
-        return _to_mx_array(source)
-
-    if torch is not None and isinstance(target, torch.Tensor):
-        tensor_source = (
-            source.detach().to(target.device)
-            if isinstance(source, torch.Tensor)
-            else torch.as_tensor(source, device=target.device)
-        )
-        with torch.no_grad():
-            target.copy_(tensor_source)
-        return target
-
-    if hasattr(target, "__array__"):
-        np.copyto(np.asarray(target), np.asarray(source))
-        return target
-
-    return source
+def _tree_leaves(tree: Any) -> Iterator[Any]:
+    """Yield leaves from a nested structure."""
+    if isinstance(tree, dict):
+        for value in tree.values():
+            yield from _tree_leaves(value)
+    elif isinstance(tree, (list, tuple)):
+        for value in tree:
+            yield from _tree_leaves(value)
+    else:
+        yield tree
 
 
 def _to_host_array(value: Any) -> Any:
@@ -410,10 +370,10 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
         if self.loss_fn is None:
             from mlx.nn import losses as mx_losses
 
-            if hasattr(mx_losses, "softmax_cross_entropy"):
-                self.loss_fn = mx_losses.softmax_cross_entropy
-            elif hasattr(mx_losses, "cross_entropy"):
+            if hasattr(mx_losses, "cross_entropy"):
                 self.loss_fn = mx_losses.cross_entropy
+            elif hasattr(mx_losses, "softmax_cross_entropy"):
+                self.loss_fn = mx_losses.softmax_cross_entropy
             else:
                 raise MLXNotAvailableError(
                     "MLX installation does not provide a softmax/cross entropy loss."
@@ -503,6 +463,13 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
     ) -> "mx.array":
         _ensure_mlx_available()
 
+        def _first_leaf(node):
+            if isinstance(node, dict):
+                return _first_leaf(next(iter(node.values())))
+            if isinstance(node, (list, tuple)):
+                return _first_leaf(node[0])
+            return node
+
         if labels is None:
 
             def inner_loss(examples_inner):
@@ -517,6 +484,27 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
                 return loss_criterion(outputs, labels_inner)
 
             loss, grads = self._value_and_grad(model, inner_loss)(examples, labels)
+
+        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and context.state.get(
+            "grad_debug_logged", False
+        ) is False:
+            try:
+                grad_leaf = _first_leaf(grads)
+                grad_arr = (
+                    grad_leaf.to_numpy()
+                    if hasattr(grad_leaf, "to_numpy")
+                    else grad_leaf.to_host()
+                    if hasattr(grad_leaf, "to_host")
+                    else np.asarray(grad_leaf)
+                )
+                logging.debug(
+                    "[MLX Train] Sample grad mean=%.6f std=%.6f",
+                    float(np.mean(grad_arr)),
+                    float(np.std(grad_arr)),
+                )
+            except Exception as exc:
+                logging.debug("[MLX Train] Unable to log grad stats: %s", exc)
+            context.state["grad_debug_logged"] = True
 
         if self.clip_grad_norm is not None:
             logging.warning(
@@ -640,6 +628,9 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
             testset, sampler, batch_size, context
         )
 
+        context.state.pop("eval_debug_logged", None)
+        context.state.pop("eval_label_debug_logged", None)
+
         total_samples = 0
         correct_predictions = 0
 
@@ -650,9 +641,45 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
             examples = _tree_map(_to_mx_array, examples)
             examples = _tree_map(_ensure_nhwc_layout, examples)
             labels = _tree_map(_to_mx_array, labels)
+            if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not context.state.get(
+                "eval_label_debug_logged", False
+            ):
+                label_arr = (
+                    labels.to_numpy()
+                    if hasattr(labels, "to_numpy")
+                    else labels.to_host()
+                    if hasattr(labels, "to_host")
+                    else np.asarray(labels)
+                )
+                logging.debug(
+                    "[MLX Eval] Label dtype=%s shape=%s", label_arr.dtype, label_arr.shape
+                )
+                context.state["eval_label_debug_logged"] = True
 
             logits = model(examples)
             predicted = mx.argmax(logits, axis=-1)
+            if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not context.state.get(
+                "eval_debug_logged", False
+            ):
+                if hasattr(predicted, "to_numpy"):
+                    pred_np = predicted.to_numpy()
+                elif hasattr(predicted, "to_host"):
+                    pred_np = predicted.to_host()
+                else:
+                    pred_np = np.asarray(predicted)
+                if hasattr(labels, "to_numpy"):
+                    label_np = labels.to_numpy()
+                elif hasattr(labels, "to_host"):
+                    label_np = labels.to_host()
+                else:
+                    label_np = np.asarray(labels)
+                logging.debug(
+                    "[MLX Eval] Sample predictions: %s", pred_np[:10].tolist()
+                )
+                logging.debug(
+                    "[MLX Eval] Sample labels: %s", label_np[:10].tolist()
+                )
+                context.state["eval_debug_logged"] = True
             matches = predicted == labels
             correct_predictions += int(mx.sum(matches).item())
             if hasattr(labels, "shape"):
@@ -700,6 +727,12 @@ class SimpleDataLoader(Iterable[Tuple[Any, Any]]):
                     example, label = item[0], item[1]
             else:
                 example, label = item, None
+
+            if torch is not None and isinstance(label, torch.Tensor):
+                if label.ndim == 0:
+                    label = int(label.item())
+                else:
+                    label = label.detach().cpu().numpy()
 
             batch_examples.append(example)
             batch_labels.append(label)
@@ -853,11 +886,12 @@ class ComposableMLXTrainer(base.Trainer):
         if filename is not None:
             model_path = f"{model_path}/{filename}"
         else:
-            model_path = f"{model_path}/{model_name}.mlx"
+            model_path = f"{model_path}/{model_name}.safetensors"
 
         state_tree = self._capture_model_state()
+        serialized = serialize_tree(state_tree)
         with open(model_path, "wb") as model_file:
-            pickle.dump(state_tree, model_file)
+            model_file.write(serialized)
 
         with open(model_path + ".pkl", "wb") as history_file:
             pickle.dump(self.run_history, history_file)
@@ -876,13 +910,15 @@ class ComposableMLXTrainer(base.Trainer):
         if filename is not None:
             model_path = f"{model_path}/{filename}"
         else:
-            model_path = f"{model_path}/{model_name}.mlx"
+            model_path = f"{model_path}/{model_name}.safetensors"
 
         if not os.path.exists(model_path):
             raise OSError(f"Model file not found: {model_path}")
 
         with open(model_path, "rb") as model_file:
-            state_tree = pickle.load(model_file)
+            serialized = model_file.read()
+
+        state_tree = deserialize_tree(serialized)
 
         self._apply_model_state(state_tree)
 
@@ -917,8 +953,18 @@ class ComposableMLXTrainer(base.Trainer):
 
     def _apply_model_state(self, state_tree: Any) -> None:
         restored = _tree_map(_to_mx_array, state_tree)
-        current = self.model.parameters()
-        _tree_assign(current, restored)
+        if hasattr(self.model, "update"):
+            self.model.update(restored)
+        else:
+            raise RuntimeError(
+                "The configured MLX model does not support parameter updates."
+            )
+        if mx is not None:
+            leaves = [
+                leaf for leaf in _tree_leaves(self.model.parameters()) if isinstance(leaf, mx.array)
+            ]
+            if leaves:
+                mx.eval(*leaves)
 
     # ---------------------------------------------------------------------
     # Training loop
@@ -953,6 +999,10 @@ class ComposableMLXTrainer(base.Trainer):
 
         sampled_size = self._infer_sampled_size(trainset, sampler)
         self.context.state["num_samples"] = sampled_size
+
+        self.context.state.pop("train_label_debug_logged", None)
+        self.context.state.pop("train_pred_debug_logged", None)
+        self.context.state.pop("grad_debug_logged", None)
 
         self.optimizer = self.optimizer_strategy.create_optimizer(
             self.model,
@@ -992,6 +1042,20 @@ class ComposableMLXTrainer(base.Trainer):
                 examples = _tree_map(_to_mx_array, examples)
                 examples = _tree_map(_ensure_nhwc_layout, examples)
                 labels = _tree_map(_to_mx_array, labels)
+                if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not self.context.state.get(
+                    "train_label_debug_logged", False
+                ):
+                    label_arr = (
+                        labels.to_numpy()
+                        if hasattr(labels, "to_numpy")
+                        else labels.to_host()
+                        if hasattr(labels, "to_host")
+                        else np.asarray(labels)
+                    )
+                    logging.debug(
+                        "[MLX Train] Label dtype=%s shape=%s", label_arr.dtype, label_arr.shape
+                    )
+                    self.context.state["train_label_debug_logged"] = True
 
                 def compute_loss_fn(outputs, labels_inner):
                     return self.loss_strategy.compute_loss(
@@ -1008,6 +1072,32 @@ class ComposableMLXTrainer(base.Trainer):
                     loss_criterion=compute_loss_fn,
                     context=self.context,
                 )
+
+                if logging.getLogger(__name__).isEnabledFor(logging.DEBUG) and not self.context.state.get(
+                    "train_pred_debug_logged", False
+                ):
+                    preds = mx.argmax(self.model(examples), axis=-1)
+                    pred_arr = (
+                        preds.to_numpy()
+                        if hasattr(preds, "to_numpy")
+                        else preds.to_host()
+                        if hasattr(preds, "to_host")
+                        else np.asarray(preds)
+                    )
+                    logging.debug(
+                        "[MLX Train] Sample predictions: %s", pred_arr[:10].tolist()
+                    )
+                    label_arr = (
+                        labels.to_numpy()
+                        if hasattr(labels, "to_numpy")
+                        else labels.to_host()
+                        if hasattr(labels, "to_host")
+                        else np.asarray(labels)
+                    )
+                    logging.debug(
+                        "[MLX Train] Sample labels: %s", label_arr[:10].tolist()
+                    )
+                    self.context.state["train_pred_debug_logged"] = True
 
                 loss_value = float(loss.item() if hasattr(loss, "item") else loss)
                 batch_size_effective = self._batch_size(labels, examples)
@@ -1066,7 +1156,7 @@ class ComposableMLXTrainer(base.Trainer):
                 and Config().server.request_update
             ):
                 epoch_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{epoch_time}.mlx"
+                filename = f"{self.client_id}_{self.current_epoch}_{epoch_time}.safetensors"
                 self.save_model(filename)
 
             self.run_history.update_metric("train_loss", self._loss_tracker.average)
@@ -1086,6 +1176,12 @@ class ComposableMLXTrainer(base.Trainer):
         )
 
         self.run_history.update_metric("train_time", training_time)
+
+        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
+            last_loss = self.context.state.get("last_loss")
+            logging.debug(
+                "[Client #%d] Final training loss: %s", self.client_id, last_loss
+            )
 
     def _infer_sampled_size(self, dataset: Any, sampler: Any) -> int:
         if sampler is not None:
@@ -1138,7 +1234,7 @@ class ComposableMLXTrainer(base.Trainer):
             model_name = Config().trainer.model_name
             model_path = Config().params["model_path"]
             base_filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}"
-            model_file = f"{model_path}/{base_filename}.mlx"
+            model_file = f"{model_path}/{base_filename}.safetensors"
             history_file = f"{model_file}.pkl"
             accuracy_file = f"{model_path}/{base_filename}.acc"
 
@@ -1170,7 +1266,7 @@ class ComposableMLXTrainer(base.Trainer):
         toc = time.perf_counter()
 
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.mlx"
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
         self.save_model(filename)
 
         training_time = toc - tic
