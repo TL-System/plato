@@ -1075,10 +1075,9 @@ class ComposableMLXTrainer(base.Trainer):
         config["run_id"] = Config().params["run_id"]
 
         if "max_concurrency" in config:
-            logging.info(
-                "MLX trainer executes in-process during testing; ignoring "
-                "max_concurrency=%s.",
-                config.pop("max_concurrency"),
+            logging.debug(
+                "MLX trainer executing in-process; respecting max_concurrency=%s via scheduler.",
+                config["max_concurrency"],
             )
 
         accuracy = self.test_model(config, testset, sampler, **kwargs)
@@ -1132,9 +1131,9 @@ class ComposableMLXTrainer(base.Trainer):
         self.training_start_time = time.time()
 
         if "max_concurrency" in config:
-            logging.info(
-                "MLX trainer executes in-process; ignoring max_concurrency=%s.",
-                config.pop("max_concurrency"),
+            logging.debug(
+                "MLX trainer executing in-process; respecting max_concurrency=%s via scheduler.",
+                config["max_concurrency"],
             )
         tic = time.perf_counter()
         self.train_model(config, trainset, sampler, **kwargs)
