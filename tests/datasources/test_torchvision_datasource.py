@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import types
 
+import torch
+from torchvision import transforms as tv_transforms
+
 from plato.config import Config as BaseConfig
 from plato.datasources import torchvision as torchvision_ds
 
@@ -13,6 +16,42 @@ class _StubTransforms:
 
     def ToTensor(self):
         return "to_tensor"
+
+
+class _DummyCelebA:
+    """Stand-in for torchvision.datasets.CelebA capturing constructor arguments."""
+
+    def __init__(
+        self,
+        root,
+        split="train",
+        target_type=None,
+        transform=None,
+        target_transform=None,
+        download=True,
+        **unused_kwargs,
+    ):
+        del unused_kwargs
+        self.root = root
+        self.split = split
+        self.target_type = target_type
+        self.transform = transform
+        self.target_transform = target_transform
+        self.download = download
+        # Simulate identity labels for three samples.
+        self.identity = torch.arange(3).reshape(-1, 1)
+        self.data = list(range(3))
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        attr = torch.zeros(1)
+        identity = torch.tensor([index])
+        label = (attr, identity)
+        if self.target_transform is not None:
+            label = self.target_transform(label)
+        return self.data[index], label
 
 
 def _build_config(tmp_path, data_dict):
@@ -143,3 +182,64 @@ def test_torchvision_datasource_supports_boolean_splits_and_kwargs(
 
     assert datasource.targets() == [1, 1, 1]
     assert datasource.classes() == ["neg", "pos"]
+
+
+def test_torchvision_datasource_celeba_defaults(monkeypatch, tmp_path):
+    """CelebA should inherit legacy defaults including target handling."""
+
+    class CelebA(_DummyCelebA):
+        """Named to match torchvision's CelebA dataset."""
+
+    stub_datasets = types.SimpleNamespace(CelebA=CelebA)
+    dummy_config = _build_config(
+        tmp_path,
+        {
+            "datasource": "Torchvision",
+            "dataset_name": "CelebA",
+        },
+    )
+
+    monkeypatch.setattr(torchvision_ds, "datasets", stub_datasets)
+    monkeypatch.setattr(torchvision_ds, "Config", lambda: dummy_config)
+
+    datasource = torchvision_ds.DataSource()
+
+    assert datasource.trainset.target_type == ["attr", "identity"]
+    assert isinstance(datasource.trainset.transform, tv_transforms.Compose)
+    resize = datasource.trainset.transform.transforms[0]
+    assert isinstance(resize, tv_transforms.Resize)
+    assert resize.size == 64
+    assert datasource.trainset.target_transform is torchvision_ds._celeba_target_transform
+    assert datasource.testset.target_transform is torchvision_ds._celeba_target_transform
+    assert datasource.targets() == [0, 1, 2]
+    assert datasource.classes()[0] == "Celebrity #0"
+
+
+def test_torchvision_datasource_celeba_respects_config(monkeypatch, tmp_path):
+    """Configuration overrides for CelebA targets and image size should be honoured."""
+
+    class CelebA(_DummyCelebA):
+        """Named to match torchvision's CelebA dataset."""
+
+    stub_datasets = types.SimpleNamespace(CelebA=CelebA)
+    dummy_config = _build_config(
+        tmp_path,
+        {
+            "datasource": "Torchvision",
+            "dataset_name": "CelebA",
+            "celeba_img_size": 32,
+            "celeba_targets": {"attr": True, "identity": False},
+        },
+    )
+
+    monkeypatch.setattr(torchvision_ds, "datasets", stub_datasets)
+    monkeypatch.setattr(torchvision_ds, "Config", lambda: dummy_config)
+
+    datasource = torchvision_ds.DataSource()
+
+    assert datasource.trainset.target_type == ["attr"]
+    resize = datasource.trainset.transform.transforms[0]
+    assert isinstance(resize, tv_transforms.Resize)
+    assert resize.size == 32
+    assert datasource.classes() == ["Celebrity #0", "Celebrity #1", "Celebrity #2"]
+    assert datasource.targets() == [0, 1, 2]

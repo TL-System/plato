@@ -13,6 +13,7 @@ import logging
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
+import torch
 from torchvision import datasets, transforms
 
 from plato.config import Config
@@ -56,7 +57,23 @@ def _default_transform():
     return transforms.ToTensor()
 
 
-def _dataset_defaults(dataset_name: str) -> Dict[str, Any]:
+def _celeba_target_transform(label):
+    """
+    Match the legacy CelebA target handling by flattening attribute and identity
+    tensors into a single vector.
+    """
+    if isinstance(label, tuple):
+        if len(label) == 1:
+            return label[0]
+        if len(label) == 2:
+            attr, identity = label
+            attr_tensor = attr.reshape([-1])
+            identity_tensor = identity.reshape([-1])
+            return torch.cat((attr_tensor, identity_tensor))
+    return label
+
+
+def _dataset_defaults(dataset_name: str, data_cfg) -> Dict[str, Any]:
     """Per-dataset defaults mirroring legacy torchvision-backed datasources."""
 
     name = dataset_name.lower()
@@ -128,6 +145,42 @@ def _dataset_defaults(dataset_name: str) -> Dict[str, Any]:
             "unlabeled_transform": train_transform,
         }
 
+    if name == "celeba":
+        target_types: List[str] = []
+        if data_cfg is not None and hasattr(data_cfg, "celeba_targets"):
+            targets_cfg = data_cfg.celeba_targets
+            if getattr(targets_cfg, "attr", False):
+                target_types.append("attr")
+            if getattr(targets_cfg, "identity", False):
+                target_types.append("identity")
+        if not target_types:
+            target_types = ["attr", "identity"]
+
+        image_size = 64
+        if data_cfg is not None and hasattr(data_cfg, "celeba_img_size"):
+            image_size = getattr(data_cfg, "celeba_img_size")
+
+        transform = transforms.Compose(
+            [
+                transforms.Resize(image_size),
+                transforms.CenterCrop(image_size),
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ]
+        )
+
+        defaults: Dict[str, Any] = {
+            "train_transform": transform,
+            "test_transform": transform,
+            "dataset_kwargs": {"target_type": target_types},
+        }
+
+        if target_types:
+            defaults["train_target_transform"] = _celeba_target_transform
+            defaults["test_target_transform"] = _celeba_target_transform
+
+        return defaults
+
     return {}
 
 
@@ -140,18 +193,22 @@ class DataSource(base.DataSource):
         config = Config()
         data_cfg = config.data
 
-        if not hasattr(data_cfg, "dataset_name"):
+        dataset_name_override = kwargs.pop("dataset_name", None)
+        dataset_name = getattr(data_cfg, "dataset_name", dataset_name_override)
+        if dataset_name is None:
             raise ValueError(
                 "`dataset_name` must be specified for the Torchvision datasource."
             )
 
-        dataset_name = data_cfg.dataset_name
+        if not hasattr(data_cfg, "dataset_name"):
+            setattr(data_cfg, "dataset_name", dataset_name)
+
         logging.info("Torchvision dataset: %s", dataset_name)
 
         dataset_cls = self._resolve_dataset_class(dataset_name)
         signature = inspect.signature(dataset_cls.__init__)
 
-        dataset_defaults = _dataset_defaults(dataset_name)
+        dataset_defaults = _dataset_defaults(dataset_name, data_cfg)
 
         split_parameter = self._determine_split_parameter(signature, data_cfg)
         default_train, default_test = self._default_split_values(split_parameter)
@@ -211,7 +268,7 @@ class DataSource(base.DataSource):
 
         common_kwargs.setdefault("root", config.params["data_path"])
 
-        download_flag = getattr(data_cfg, "download", True)
+        download_flag = getattr(data_cfg, "download", kwargs.get("download", True))
         download_supported = "download" in signature.parameters
 
         default_train_transform = dataset_defaults.get("train_transform")
@@ -224,6 +281,12 @@ class DataSource(base.DataSource):
         train_transform = kwargs.get("train_transform", default_train_transform)
         test_transform = kwargs.get("test_transform", default_test_transform)
 
+        default_train_target_transform = dataset_defaults.get("train_target_transform")
+        default_test_target_transform = dataset_defaults.get("test_target_transform")
+        default_unlabeled_target_transform = dataset_defaults.get(
+            "unlabeled_target_transform"
+        )
+
         default_unlabeled_transform = dataset_defaults.get(
             "unlabeled_transform", train_transform
         )
@@ -231,9 +294,15 @@ class DataSource(base.DataSource):
             "unlabeled_transform", default_unlabeled_transform
         )
 
-        train_target_transform = kwargs.get("train_target_transform")
-        test_target_transform = kwargs.get("test_target_transform")
-        unlabeled_target_transform = kwargs.get("unlabeled_target_transform")
+        train_target_transform = kwargs.get(
+            "train_target_transform", default_train_target_transform
+        )
+        test_target_transform = kwargs.get(
+            "test_target_transform", default_test_target_transform
+        )
+        unlabeled_target_transform = kwargs.get(
+            "unlabeled_target_transform", default_unlabeled_target_transform
+        )
 
         load_train = getattr(data_cfg, "load_train", True)
         load_test = getattr(data_cfg, "load_test", True)
@@ -406,6 +475,18 @@ class DataSource(base.DataSource):
     @staticmethod
     def _attach_metadata(dataset):
         """Ensure standard attributes are available for downstream components."""
+        class_name = dataset.__class__.__name__.lower()
+
+        if class_name == "celeba" and hasattr(dataset, "identity"):
+            identities = dataset.identity.reshape(-1)
+            dataset.targets = identities.tolist()
+            if not hasattr(dataset, "classes") or dataset.classes is None:
+                try:
+                    max_identity = int(identities.max().item())
+                except Exception:  # pylint: disable=broad-except
+                    max_identity = len(dataset.targets) - 1
+                dataset.classes = [f"Celebrity #{i}" for i in range(max_identity + 1)]
+
         if not hasattr(dataset, "targets") and hasattr(dataset, "labels"):
             dataset.targets = dataset.labels
         if not hasattr(dataset, "classes") and hasattr(dataset, "class_to_idx"):

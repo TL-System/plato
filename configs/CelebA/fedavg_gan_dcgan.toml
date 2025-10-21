@@ -24,7 +24,10 @@ network_to_sync = "generator"
 [data]
 
 # The training and testing dataset
-datasource = "CelebA"
+datasource = "Torchvision"
+dataset_name = "CelebA"
+download = true
+dataset_kwargs = { target_type = ["attr", "identity"] }
 celeba_img_size = 64
 
 # Where the dataset is located

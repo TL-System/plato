@@ -1,12 +1,11 @@
 !!! example "dataset"
     The training and test datasets. The following options are available:
 
+    - `HuggingFace`: including all datasets from Hugging Face (requires `dataset_name`)
+    - `Torchvision`: including torchvision datasets such as MNIST, FashionMNIST, EMNIST, CIFAR10, CIFAR100, CelebA, or STL10 (requires `dataset_name`)
     - `CINIC10`
     - `FEMNIST`: Federated EMNIST
-    - `HuggingFace`: including all datasets from Hugging Face
-    - `Torchvision`: including torchvision datasets such as MNIST, FashionMNIST, EMNIST, CIFAR10, CIFAR100, or STL10 (requires `dataset_name`)
     - `TinyImageNet`
-    - `CelebA`
     - `Purchase`
     - `Texas`
 
@@ -27,9 +26,8 @@
       supported by the selected dataset).
     - For EMNIST, the balanced split is assumed by default; override
       `dataset_kwargs = { split = "<variant>" }` to select a different subset.
-
-    Existing configs referencing `datasource = "STL10"` continue to work and now
-    resolve to the Torchvision datasource with `dataset_name = "STL10"`.
+    - For CelebA, attributes and identities are enabled by default; adjust
+      `dataset_kwargs.target_type` when a different combination is required.
 
     !!! example "Sample Torchvision block"
         ```toml

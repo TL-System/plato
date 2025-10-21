@@ -48,6 +48,10 @@ DATASET_SPECS: dict[str, DatasetSpec] = {
     "CIFAR10": DatasetSpec("CIFAR10"),
     "CIFAR100": DatasetSpec("CIFAR100"),
     "STL10": DatasetSpec("STL10"),
+    "CelebA": DatasetSpec(
+        "CelebA",
+        extra_lines=('dataset_kwargs = { target_type = ["attr", "identity"] }',),
+    ),
 }
 
 DATASOURCE_LINE_RE = re.compile(

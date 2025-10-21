@@ -7,7 +7,6 @@ import logging
 
 from plato.config import Config
 from plato.datasources import (
-    celeba,
     cinic10,
     feature,
     femnist,
@@ -27,7 +26,6 @@ registered_datasources = {
     "LoRA": lora,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
-    "CelebA": celeba,
     "Torchvision": torchvision,
 }
 
@@ -40,6 +38,7 @@ _datasource_aliases = {
     "EMNIST": ("Torchvision", {"dataset_name": "EMNIST"}),
     "CIFAR10": ("Torchvision", {"dataset_name": "CIFAR10"}),
     "CIFAR100": ("Torchvision", {"dataset_name": "CIFAR100"}),
+    "CelebA": ("Torchvision", {"dataset_name": "CelebA"}),
 }
 
 
