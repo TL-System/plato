@@ -25,11 +25,11 @@ import os
 import pickle
 import re
 import time
+from collections import OrderedDict
 from typing import Any, Callable, List, Optional, Union
 
 import torch
 import torch.nn as nn
-from collections import OrderedDict
 
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
@@ -223,22 +223,18 @@ class ComposableTrainer(base.Trainer):
             else self.model.state_dict()
         )
 
+        history_payload = pickle.dumps(self.run_history)
+
         if model_path.endswith(".safetensors"):
             serialized = serialize_tree(state_dict)
             with open(model_path, "wb") as model_file:
                 model_file.write(serialized)
-
-            # Maintain a legacy .pth checkpoint for compatibility.
-            legacy_path = model_path.replace(".safetensors", ".pth")
-            try:
-                torch.save(state_dict, legacy_path)
-            except Exception as exc:
-                logging.debug("Failed to write legacy .pth checkpoint: %s", exc)
         else:
+            logging.warning("Saving the model in legacy .pth format.")
             torch.save(state_dict, model_path)
 
         with open(model_path + ".pkl", "wb") as history_file:
-            pickle.dump(self.run_history, history_file)
+            history_file.write(history_payload)
 
         if self.client_id == 0:
             logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
@@ -604,7 +600,9 @@ class ComposableTrainer(base.Trainer):
             ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                filename = (
+                    f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                )
                 self.save_model(filename)
                 self.model.to(self.device)
 
@@ -664,7 +662,9 @@ class ComposableTrainer(base.Trainer):
             train_proc.join()
 
             model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
+            filename = (
+                f"{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
+            )
 
             try:
                 self.load_model(filename)
