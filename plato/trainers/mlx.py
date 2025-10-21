@@ -10,7 +10,6 @@ modifying higher-level orchestration.
 from __future__ import annotations
 
 import logging
-import multiprocessing as mp
 import os
 import pickle
 import random
@@ -496,6 +495,19 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
                 "Gradient clipping is requested but not implemented for MLX yet."
             )
         optimizer.update(model, grads)
+        if hasattr(mx, "eval"):
+            state = getattr(optimizer, "state", None)
+            try:
+                if state is not None:
+                    mx.eval(model.parameters(), state)
+                else:
+                    mx.eval(model.parameters())
+            except TypeError:
+                params_tuple = tuple(model.parameters())
+                if state is not None:
+                    mx.eval(params_tuple, state)
+                else:
+                    mx.eval(params_tuple)
         return loss
 
 
@@ -684,6 +696,9 @@ class SimpleDataLoader(Iterable[Tuple[Any, Any]]):
             return None
         if mx is not None and isinstance(items[0], mx.array):
             return mx.stack(items, axis=0)
+        if torch is not None and isinstance(items[0], torch.Tensor):
+            stacked = torch.stack(items)
+            return stacked.detach().cpu().numpy()
         if hasattr(items[0], "stack") and callable(getattr(items[0], "stack")):
             return items[0].stack(items, axis=0)
         if isinstance(items[0], np.ndarray):
@@ -850,6 +865,23 @@ class ComposableMLXTrainer(base.Trainer):
         identity = "Server" if self.client_id == 0 else f"Client #{self.client_id}"
         logging.info("[%s] MLX model loaded from %s.", identity, model_path)
 
+    def simulate_sleep_time(self) -> None:
+        """Simulate slower clients by pausing execution."""
+        if (
+            hasattr(Config().clients, "sleep_simulation")
+            and Config().clients.sleep_simulation
+        ):
+            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
+            sleep_seconds = max(0, sleep_seconds)
+
+            if sleep_seconds > 0:
+                logging.info(
+                    "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
+                    self.client_id,
+                    sleep_seconds,
+                )
+                time.sleep(sleep_seconds)
+
     def _capture_model_state(self) -> Any:
         parameters = self.model.parameters()
         return _tree_map(_to_host_array, parameters)
@@ -862,13 +894,6 @@ class ComposableMLXTrainer(base.Trainer):
     # ---------------------------------------------------------------------
     # Training loop
     # ---------------------------------------------------------------------
-
-    def train_process(self, config, trainset, sampler, **kwargs):
-        self.train_model(config, trainset, sampler, **kwargs)
-
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.mlx"
-        self.save_model(filename)
 
     def train_model(self, config, trainset, sampler, **kwargs):
         batch_size = config["batch_size"]
@@ -1045,27 +1070,23 @@ class ComposableMLXTrainer(base.Trainer):
             return len(dataset)
         return 0
 
-    def test_process(self, config, testset, sampler=None, **kwargs):
-        """Testing loop executed in a separate process."""
-        self.test_model(config, testset, sampler, **kwargs)
-
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-        self.save_accuracy(self.accuracy, filename)
-
     def test(self, testset, sampler=None, **kwargs) -> float:
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
 
-        if config.get("max_concurrency"):
-            logging.warning(
-                "MLX trainer does not support multiprocessing during testing; "
-                "ignoring max_concurrency=%s.",
-                config.get("max_concurrency"),
+        if "max_concurrency" in config:
+            logging.info(
+                "MLX trainer executes in-process during testing; ignoring "
+                "max_concurrency=%s.",
+                config.pop("max_concurrency"),
             )
-            config.pop("max_concurrency", None)
 
-        return self.test_model(config, testset, sampler, **kwargs)
+        accuracy = self.test_model(config, testset, sampler, **kwargs)
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
+        self.save_accuracy(accuracy, filename)
+        return accuracy
 
     def test_model(self, config, testset, sampler=None, **kwargs):
         accuracy = self.testing_strategy.test_model(
@@ -1110,17 +1131,18 @@ class ComposableMLXTrainer(base.Trainer):
 
         self.training_start_time = time.time()
 
-        if config.get("max_concurrency"):
-            logging.warning(
-                "MLX trainer does not support multiprocessing; ignoring "
-                "max_concurrency=%s.",
-                config.get("max_concurrency"),
+        if "max_concurrency" in config:
+            logging.info(
+                "MLX trainer executes in-process; ignoring max_concurrency=%s.",
+                config.pop("max_concurrency"),
             )
-            config.pop("max_concurrency", None)
-
         tic = time.perf_counter()
-        self.train_process(config, trainset, sampler, **kwargs)
+        self.train_model(config, trainset, sampler, **kwargs)
         toc = time.perf_counter()
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.mlx"
+        self.save_model(filename)
 
         training_time = toc - tic
         return training_time
