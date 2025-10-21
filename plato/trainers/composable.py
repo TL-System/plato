@@ -225,13 +225,14 @@ class ComposableTrainer(base.Trainer):
 
         history_payload = pickle.dumps(self.run_history)
 
-        if model_path.endswith(".safetensors"):
-            serialized = serialize_tree(state_dict)
-            with open(model_path, "wb") as model_file:
-                model_file.write(serialized)
-        else:
-            logging.warning("Saving the model in legacy .pth format.")
-            torch.save(state_dict, model_path)
+        if not model_path.endswith(".safetensors"):
+            raise ValueError(
+                f"ComposableTrainer.save_model requires a '.safetensors' filename: {model_path}"
+            )
+
+        serialized = serialize_tree(state_dict)
+        with open(model_path, "wb") as model_file:
+            model_file.write(serialized)
 
         with open(model_path + ".pkl", "wb") as history_file:
             history_file.write(history_payload)
@@ -251,40 +252,23 @@ class ComposableTrainer(base.Trainer):
         else:
             model_path = f"{model_path}/{model_name}.safetensors"
 
-        if model_path.endswith(".safetensors"):
-            legacy_path = os.path.splitext(model_path)[0] + ".pth"
-
-            if os.path.exists(model_path):
-                with open(model_path, "rb") as model_file:
-                    serialized = model_file.read()
-                state_dict_raw = deserialize_tree(serialized)
-                if not isinstance(state_dict_raw, dict):
-                    raise TypeError("Deserialised state dict is not a mapping.")
-                state_dict = OrderedDict(state_dict_raw.items())
-                self.model.load_state_dict(state_dict, strict=True)
-
-                logging.info(
-                    "[Client #%d] Model loaded from %s.", self.client_id, model_path
-                )
-            elif os.path.exists(legacy_path):
-                logging.warning(
-                    "Legacy .pth model detected; loading with torch.load for compatibility."
-                )
-                self.model.load_state_dict(torch.load(legacy_path, weights_only=False))
-
-                logging.info(
-                    "[Client #%d] Model loaded from %s.", self.client_id, legacy_path
-                )
-                model_path = legacy_path
-            else:
-                raise OSError(f"Model file not found: {model_path}")
-        else:
-            if not os.path.exists(model_path):
-                raise OSError(f"Model file not found: {model_path}")
-            self.model.load_state_dict(torch.load(model_path, weights_only=False))
-            logging.info(
-                "[Client #%d] Model loaded from %s.", self.client_id, model_path
+        if not model_path.endswith(".safetensors"):
+            raise ValueError(
+                f"ComposableTrainer.load_model requires a '.safetensors' filename: {model_path}"
             )
+
+        if not os.path.exists(model_path):
+            raise OSError(f"Model file not found: {model_path}")
+
+        with open(model_path, "rb") as model_file:
+            serialized = model_file.read()
+        state_dict_raw = deserialize_tree(serialized)
+        if not isinstance(state_dict_raw, dict):
+            raise TypeError("Deserialised state dict is not a mapping.")
+        state_dict = OrderedDict(state_dict_raw.items())
+        self.model.load_state_dict(state_dict, strict=True)
+
+        logging.info("[Client #%d] Model loaded from %s.", self.client_id, model_path)
 
         history_path = model_path + ".pkl"
         if os.path.exists(history_path):

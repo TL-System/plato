@@ -6,8 +6,6 @@ import logging
 import os
 from collections import OrderedDict
 
-import torch
-
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.serialization.safetensor import deserialize_tree, serialize_tree
@@ -31,7 +29,6 @@ class Algorithm(fedavg.Algorithm):
             filename = (
                 f"{model_path}/{model_name}_{self.client_id}_local_layers.safetensors"
             )
-            legacy_filename = filename.replace(".safetensors", ".pth")
 
             # Load local layers to the weights when the file exists
 
@@ -40,10 +37,6 @@ class Algorithm(fedavg.Algorithm):
                     serialized = local_file.read()
                 payload = deserialize_tree(serialized)
                 local_layers = OrderedDict(payload.items())
-            elif os.path.exists(legacy_filename):
-                local_layers = torch.load(
-                    legacy_filename, map_location=torch.device("cpu")
-                )
             else:
                 local_layers = None
 
@@ -64,21 +57,11 @@ class Algorithm(fedavg.Algorithm):
         """
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-        if filename.endswith(".safetensors"):
-            serialized = serialize_tree(local_layers)
-            with open(filename, "wb") as local_file:
-                local_file.write(serialized)
-            legacy_filename = filename.replace(".safetensors", ".pth")
-            try:
-                torch.save(local_layers, legacy_filename)
-            except Exception as exc:  # pragma: no cover - best effort
-                logging.debug(
-                    "Unable to write legacy local layers checkpoint %s: %s",
-                    legacy_filename,
-                    exc,
-                )
-        else:
-            logging.warning(
-                "Saving local personalized layers in legacy format at %s.", filename
+        if not filename.endswith(".safetensors"):
+            raise ValueError(
+                f"Personalized layer checkpoints must end with '.safetensors': {filename}"
             )
-            torch.save(local_layers, filename)
+
+        serialized = serialize_tree(local_layers)
+        with open(filename, "wb") as local_file:
+            local_file.write(serialized)
