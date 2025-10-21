@@ -19,7 +19,9 @@ port = 8000
 [data]
 
 # The training and testing dataset
-datasource = "CIFAR10"
+datasource = "Torchvision"
+dataset_name = "CIFAR10"
+download = true
 
 # Number of samples in each partition
 partition_size = 50000

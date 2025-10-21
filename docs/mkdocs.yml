@@ -20,6 +20,8 @@ theme:
       toggle:
         icon: material/weather-night # Icon for dark mode toggle
         name: Switch to light mode # Tooltip text for accessibility
+  features:
+    - navigation.footer
 markdown_extensions:
   - admonition
   - pymdownx.details
@@ -30,7 +32,6 @@ extra_javascript:
   - javascripts/katex.js
   - https://unpkg.com/katex@0/dist/katex.min.js
   - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
-
 extra_css:
   - https://unpkg.com/katex@0/dist/katex.min.css
 nav:

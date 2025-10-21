@@ -20,7 +20,9 @@ port = 8000
 [data]
 
 # The training and testing dataset
-datasource = "MNIST"
+datasource = "Torchvision"
+dataset_name = "MNIST"
+download = true
 
 # Number of samples in each partition
 partition_size = 20000

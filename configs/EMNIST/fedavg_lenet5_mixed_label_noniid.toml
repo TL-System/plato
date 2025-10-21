@@ -20,7 +20,10 @@ simulate_wall_time = true
 [data]
 
 # The training and testing dataset
-datasource = "EMNIST"
+datasource = "Torchvision"
+dataset_name = "EMNIST"
+download = true
+dataset_kwargs = { split = "balanced" }
 
 # Number of samples in each partition
 partition_size = 11280

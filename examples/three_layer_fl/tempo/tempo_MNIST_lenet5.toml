@@ -22,7 +22,9 @@ do_test = true
 [data]
 
 # The training and testing dataset
-datasource = "MNIST"
+datasource = "Torchvision"
+dataset_name = "MNIST"
+download = true
 
 # Where the dataset is located
 data_path = "../../../data"

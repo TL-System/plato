@@ -1,6 +1,8 @@
 
 # The training and testing dataset
-datasource = "CIFAR10"
+datasource = "Torchvision"
+dataset_name = "CIFAR10"
+download = true
 personalized_datasource = "CIFAR10"
 
 # Number of samples in each partition

@@ -1,24 +1,23 @@
 """Quick script to evaluate an MLX client checkpoint on MNIST.
 
 Usage:
-    uv run python scripts/validate_mlx_client.py \
+    uv run scripts/validate_mlx_client.py \
         --checkpoint runtime/models/pretrained/lenet5_2_49258.safetensors
 """
 
 from __future__ import annotations
 
 import argparse
-import numpy as np
 
 import mlx.core as mx
+import numpy as np
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
 
 from plato.models.mlx.lenet5 import Model
 from plato.serialization.safetensor import deserialize_tree
-from plato.utils import fonts
 from plato.trainers import mlx as mlx_trainer
-
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader
+from plato.utils import fonts
 
 
 def load_checkpoint(path: str) -> dict:

@@ -1,19 +1,47 @@
 !!! example "dataset"
     The training and test datasets. The following options are available:
 
-    - `MNIST`
-    - `FashionMNIST`
-    - `EMNIST`
-    - `CIFAR10`
-    - `CIFAR100`
     - `CINIC10`
     - `FEMNIST`: Federated EMNIST
     - `HuggingFace`: including all datasets from Hugging Face
+    - `Torchvision`: including torchvision datasets such as MNIST, FashionMNIST, EMNIST, CIFAR10, CIFAR100, or STL10 (requires `dataset_name`)
     - `TinyImageNet`
     - `CelebA`
     - `Purchase`
     - `Texas`
-    - `STL10`: The STL-10 dataset from the torchvision package
+
+!!! tip "Torchvision configuration"
+    When using the `Torchvision` datasource, specify `dataset_name` to choose the
+    dataset class exposed by `torchvision.datasets`. Optional fields include:
+
+    - `split_parameter`: name of the constructor argument controlling the split
+      (defaults to `train` or `split` when available).
+    - `train_split`, `test_split`, `unlabeled_split`: values passed to the split
+      parameter for each subset. For boolean splits, strings such as `"train"`
+      and `"test"` map to `True` and `False`.
+    - `dataset_args` / `dataset_kwargs`: positional or keyword arguments shared
+      across all splits.
+    - `train_args` / `train_kwargs` (and the equivalents for `test` or
+      `unlabeled`): per-split overrides.
+    - `download`: whether to trigger dataset downloads (defaults to `true` when
+      supported by the selected dataset).
+    - For EMNIST, the balanced split is assumed by default; override
+      `dataset_kwargs = { split = "<variant>" }` to select a different subset.
+
+    Existing configs referencing `datasource = "STL10"` continue to work and now
+    resolve to the Torchvision datasource with `dataset_name = "STL10"`.
+
+    !!! example "Sample Torchvision block"
+        ```toml
+        [data]
+        datasource = "Torchvision"
+        dataset_name = "MNIST"
+        download = true
+
+        dataset_kwargs = { root = "datasets" }
+        train_kwargs = { train = true }
+        test_kwargs = { train = false }
+        ```
 
 !!! example "data_path"
     Where the dataset is located.

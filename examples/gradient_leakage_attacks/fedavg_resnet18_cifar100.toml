@@ -21,7 +21,9 @@ model_path = "models/resnet18_cifar100_0.8"
 [data]
 
 # The training and testing dataset
-datasource = "CIFAR100"
+datasource = "Torchvision"
+dataset_name = "CIFAR100"
+download = true
 
 # Number of samples in each partition
 partition_size = 6000
