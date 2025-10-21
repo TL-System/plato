@@ -510,7 +510,9 @@ class Trainer(ComposableTrainer):
             ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
+                filename = (
+                    f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                )
                 self.save_model(filename)
                 self.model.to(self.device)
 

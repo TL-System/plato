@@ -448,7 +448,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
 
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = os.path.join(
-                checkpoint_path, f"{model_name}_client_{context.client_id}.pth"
+                checkpoint_path, f"{model_name}_client_{context.client_id}.pkl"
             )
 
             with open(payload_filename, "wb") as payload_file:

@@ -679,7 +679,7 @@ class Server:
                     checkpoint_path = Config().params["checkpoint_path"]
 
                     payload_filename = (
-                        f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pth"
+                        f"{checkpoint_path}/{model_name}_{self.selected_client_id}.pkl"
                     )
 
                     with open(payload_filename, "wb") as payload_file:
@@ -869,7 +869,7 @@ class Server:
             if "/" in model_name:
                 model_name = model_name.replace("/", "_")
             checkpoint_path = Config().params["checkpoint_path"]
-            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pth"
+            payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pkl"
             with open(payload_filename, "rb") as payload_file:
                 self.client_payload[sid] = pickle.load(payload_file)
 
@@ -1308,7 +1308,7 @@ class Server:
         )
         if "/" in model_name:
             model_name = model_name.replace("/", "_")
-        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+        filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
         logging.info(
             "[%s] Saving the checkpoint to %s/%s.",
             self,
@@ -1343,7 +1343,7 @@ class Server:
             if hasattr(Config().trainer, "model_name")
             else "custom"
         )
-        filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+        filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
         self.trainer.load_model(filename, checkpoint_path)
 
     def _save_random_states(self, round_to_save, checkpoint_path):

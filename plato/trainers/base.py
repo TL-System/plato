@@ -71,13 +71,7 @@ class Trainer(ABC):
             accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
             if os.path.exists(model_file):
-                os.remove(model_file)
-                os.remove(model_file + ".pkl")
-
-            legacy_model_file = model_file.replace(".safetensors", ".pth")
-            if os.path.exists(legacy_model_file):
-                os.remove(legacy_model_file)
-
+                os.remove(model_file + ".safetensors")
             if os.path.exists(accuracy_file):
                 os.remove(accuracy_file)
 
