@@ -8,6 +8,9 @@ Defines a default callback to print training progress.
 import logging
 import os
 from abc import ABC
+from typing import Any
+
+import numpy as np
 
 from plato.utils import fonts
 
@@ -151,24 +154,65 @@ class LogProgressCallback(TrainerCallback):
         """
         log_interval = 10
 
+        loss_value = self._extract_scalar(loss)
+
         if batch % log_interval == 0:
+            total_batches = self._total_batches(trainer)
             if trainer.client_id == 0:
                 logging.info(
-                    "[Server #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                    "[Server #%d] Epoch: [%d/%d][%d/%s]\tLoss: %s",
                     os.getpid(),
                     trainer.current_epoch,
                     config["epochs"],
                     batch,
-                    len(trainer.train_loader),
-                    loss.data.item(),
+                    total_batches,
+                    loss_value,
                 )
             else:
                 logging.info(
-                    "[Client #%d] Epoch: [%d/%d][%d/%d]\tLoss: %.6f",
+                    "[Client #%d] Epoch: [%d/%d][%d/%s]\tLoss: %s",
                     trainer.client_id,
                     trainer.current_epoch,
                     config["epochs"],
                     batch,
-                    len(trainer.train_loader),
-                    loss.data.item(),
+                    total_batches,
+                    loss_value,
                 )
+
+    @staticmethod
+    def _extract_scalar(loss: Any) -> str:
+        """Best effort conversion of backend-specific loss tensors to a string."""
+        if loss is None:
+            return "n/a"
+
+        candidate = loss
+
+        if hasattr(candidate, "item") and callable(candidate.item):
+            try:
+                candidate = candidate.item()
+            except (TypeError, ValueError):
+                pass
+
+        if hasattr(candidate, "to_host"):
+            candidate = candidate.to_host()
+
+        if hasattr(candidate, "__array__"):
+            np_value = np.asarray(candidate)
+            if np_value.size == 1:
+                candidate = np_value.item()
+
+        try:
+            return f"{float(candidate):.6f}"
+        except (TypeError, ValueError):
+            return str(candidate)
+
+    @staticmethod
+    def _total_batches(trainer) -> str:
+        """Return the total number of batches if known."""
+        train_loader = getattr(trainer, "train_loader", None)
+        if train_loader is not None and hasattr(train_loader, "__len__"):
+            try:
+                return str(len(train_loader))
+            except TypeError:
+                return "?"
+        return "?"

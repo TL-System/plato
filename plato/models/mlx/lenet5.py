@@ -41,11 +41,11 @@ class LeNet5(nn.Module):
         x = _ensure_batch(x)
         x = self.conv1(x)
         x = nn.relu(x)
-        x = nn.max_pool2d(x, kernel_size=2, stride=2)
+        x = nn.MaxPool2d(kernel_size=2, stride=2)(x)
 
         x = self.conv2(x)
         x = nn.relu(x)
-        x = nn.max_pool2d(x, kernel_size=2, stride=2)
+        x = nn.MaxPool2d(kernel_size=2, stride=2)(x)
 
         x = mx.reshape(x, (x.shape[0], -1))
         x = self.fc1(x)

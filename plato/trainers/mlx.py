@@ -85,48 +85,57 @@ def _tree_map(func: Callable[[Any], Any], tree: Any) -> Any:
     return func(tree)
 
 
-def _tree_assign(target: Any, source: Any) -> None:
-    """Recursively assign source leaves into target leaves in place."""
+def _tree_assign(target: Any, source: Any) -> Any:
+    """Recursively assign source leaves into target, returning the updated structure."""
     if isinstance(target, dict) and isinstance(source, dict):
-        for key, value in target.items():
+        for key in target.keys():
             if key in source:
-                _tree_assign(value, source[key])
-        return
+                target[key] = _tree_assign(target[key], source[key])
+        return target
 
-    if isinstance(target, (list, tuple, types.GeneratorType)) and isinstance(
-        source, (list, tuple)
-    ):
-        target_list = list(target)
-        for idx, value in enumerate(target_list):
-            if idx < len(source):
-                _tree_assign(value, source[idx])
-        return
+    if isinstance(target, list) and isinstance(source, (list, tuple)):
+        limit = min(len(target), len(source))
+        for idx in range(limit):
+            target[idx] = _tree_assign(target[idx], source[idx])
+        return target
+
+    if isinstance(target, tuple) and isinstance(source, (list, tuple)):
+        items = []
+        limit = min(len(target), len(source))
+        for idx in range(limit):
+            items.append(_tree_assign(target[idx], source[idx]))
+        items.extend(target[limit:])
+        return type(target)(items)
 
     if mx is None:
         raise MLXNotAvailableError(
             "Attempted to assign MLX tensors without MLX installed."
         )
 
+    if hasattr(target, "value") and isinstance(target.value, mx.array):
+        target.value = _tree_assign(target.value, source)
+        return target
+
     if isinstance(target, mx.array):
-        target[...] = source
-        return
+        if isinstance(source, mx.array):
+            return source
+        return _to_mx_array(source)
 
     if torch is not None and isinstance(target, torch.Tensor):
+        tensor_source = (
+            source.detach().to(target.device)
+            if isinstance(source, torch.Tensor)
+            else torch.as_tensor(source, device=target.device)
+        )
         with torch.no_grad():
-            target.copy_(torch.as_tensor(source, device=target.device))
-        return
+            target.copy_(tensor_source)
+        return target
 
-    if hasattr(target, "value") and isinstance(target.value, mx.array):
-        target.value[...] = source
-        return
-
-    # Fallback for objects exposing a mutable buffer
     if hasattr(target, "__array__"):
-        np_target = np.asarray(target)
-        np.copyto(np_target, np.asarray(source))
-        return
+        np.copyto(np.asarray(target), np.asarray(source))
+        return target
 
-    raise TypeError(f"Unable to assign MLX state for leaf of type {type(target)}.")
+    return source
 
 
 def _to_host_array(value: Any) -> Any:
@@ -183,6 +192,17 @@ def _to_mx_array(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return mx.array(np.array(value))
     return mx.array(value)
+
+
+def _ensure_nhwc_layout(array: Any) -> Any:
+    """Convert channel-first batches to NHWC for MLX convolutions."""
+    if mx is None or not isinstance(array, mx.array):
+        return array
+    if array.ndim == 4:
+        channels_first = array.shape[1] <= 4 and array.shape[-1] > 4
+        if channels_first:
+            return mx.transpose(array, (0, 2, 3, 1))
+    return array
 
 
 def _resolve_device(device_hint: Optional[str]) -> Optional[Any]:
@@ -628,6 +648,7 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
                 raise ValueError("Labels are required for evaluation.")
 
             examples = _tree_map(_to_mx_array, examples)
+            examples = _tree_map(_ensure_nhwc_layout, examples)
             labels = _tree_map(_to_mx_array, labels)
 
             logits = model(examples)
@@ -969,6 +990,7 @@ class ComposableMLXTrainer(base.Trainer):
                 self.model_update_strategy.before_step(self.context)
 
                 examples = _tree_map(_to_mx_array, examples)
+                examples = _tree_map(_ensure_nhwc_layout, examples)
                 labels = _tree_map(_to_mx_array, labels)
 
                 def compute_loss_fn(outputs, labels_inner):
