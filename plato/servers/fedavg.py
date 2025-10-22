@@ -5,10 +5,6 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
-from typing import Any, Dict
-
-import numpy as np
-
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
@@ -18,7 +14,6 @@ from plato.servers import base
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, fonts
-from plato.utils.tree import flatten_tree
 
 
 class Server(base.Server):
@@ -199,7 +194,6 @@ class Server(base.Server):
 
         # Extract the current model weights as the baseline
         baseline_weights = self.algorithm.extract_weights()
-        self._log_weight_sample("baseline", baseline_weights)
 
         # Check if we should aggregate weights directly or use deltas
         # Try strategy's aggregate_weights first, fall back to aggregate_deltas
@@ -218,8 +212,6 @@ class Server(base.Server):
             updated_weights = strategy_weights
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
-            self._log_weight_sample("updated", updated_weights)
-            self._log_difference(baseline_weights, updated_weights)
         elif hasattr(self, "aggregate_weights"):
             # Backward compatibility: subclass overrode aggregate_weights
             logging.info(
@@ -231,8 +223,6 @@ class Server(base.Server):
             )
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
-            self._log_weight_sample("updated", updated_weights)
-            self._log_difference(baseline_weights, updated_weights)
         else:
             # Use delta aggregation (default path)
             # Computes the weight deltas by comparing the weights received with
@@ -248,8 +238,6 @@ class Server(base.Server):
             updated_weights = self.algorithm.update_weights(deltas)
             # Loads the new model weights
             self.algorithm.load_weights(updated_weights)
-            self._log_weight_sample("updated", updated_weights)
-            self._log_difference(baseline_weights, updated_weights)
 
         # The model weights have already been aggregated, now calls the
         # corresponding hook and callback
@@ -283,49 +271,6 @@ class Server(base.Server):
 
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
-
-    @staticmethod
-    def _log_weight_sample(label: str, weights: Dict[str, Any]) -> None:
-        if not logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
-            return
-        try:
-            flat, _ = flatten_tree(weights)
-            if not flat:
-                logging.debug("[FedAvg] %s weights empty.", label)
-                return
-            sample_key, sample_value = next(iter(flat.items()))
-            logging.debug(
-                "[FedAvg] %s weight sample '%s': mean=%.6f std=%.6f",
-                label.capitalize(),
-                sample_key,
-                float(np.mean(sample_value)),
-                float(np.std(sample_value)),
-            )
-        except Exception as exc:
-            logging.debug("Unable to log %s weights: %s", label, exc)
-
-    @staticmethod
-    def _log_difference(baseline: Dict[str, Any], updated: Dict[str, Any]) -> None:
-        if not logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
-            return
-        try:
-            base_flat, _ = flatten_tree(baseline)
-            updated_flat, _ = flatten_tree(updated)
-            common_keys = set(base_flat.keys()) & set(updated_flat.keys())
-            if not common_keys:
-                logging.debug("[FedAvg] No overlapping keys while comparing weights.")
-                return
-            key = next(iter(sorted(common_keys)))
-            diff = updated_flat[key] - base_flat[key]
-            logging.debug(
-                "[FedAvg] Weight diff '%s': mean=%.6f std=%.6f max=%.6f",
-                key,
-                float(np.mean(diff)),
-                float(np.std(diff)),
-                float(np.max(np.abs(diff))),
-            )
-        except Exception as exc:
-            logging.debug("Unable to compute weight difference: %s", exc)
 
     def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""

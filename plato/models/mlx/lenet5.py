@@ -15,7 +15,7 @@ try:  # pragma: no cover - optional dependency
 except ImportError as exc:  # pragma: no cover
     raise ImportError(
         "The MLX LeNet-5 model requires the `mlx` package. "
-        "Install it with `pip install mlx` on Apple Silicon."
+        "Install it with `uv pip install mlx` on Apple Silicon."
     ) from exc
 
 

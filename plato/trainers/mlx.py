@@ -462,13 +462,6 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
     ) -> "mx.array":
         _ensure_mlx_available()
 
-        def _first_leaf(node):
-            if isinstance(node, dict):
-                return _first_leaf(next(iter(node.values())))
-            if isinstance(node, (list, tuple)):
-                return _first_leaf(node[0])
-            return node
-
         if labels is None:
 
             def inner_loss(examples_inner):
@@ -483,28 +476,6 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
                 return loss_criterion(outputs, labels_inner)
 
             loss, grads = self._value_and_grad(model, inner_loss)(examples, labels)
-
-        if (
-            logging.getLogger(__name__).isEnabledFor(logging.DEBUG)
-            and context.state.get("grad_debug_logged", False) is False
-        ):
-            try:
-                grad_leaf = _first_leaf(grads)
-                grad_arr = (
-                    grad_leaf.to_numpy()
-                    if hasattr(grad_leaf, "to_numpy")
-                    else grad_leaf.to_host()
-                    if hasattr(grad_leaf, "to_host")
-                    else np.asarray(grad_leaf)
-                )
-                logging.debug(
-                    "[MLX Train] Sample grad mean=%.6f std=%.6f",
-                    float(np.mean(grad_arr)),
-                    float(np.std(grad_arr)),
-                )
-            except Exception as exc:
-                logging.debug("[MLX Train] Unable to log grad stats: %s", exc)
-            context.state["grad_debug_logged"] = True
 
         if self.clip_grad_norm is not None:
             logging.warning(
@@ -628,7 +599,6 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
             testset, sampler, batch_size, context
         )
 
-        context.state.pop("eval_debug_logged", None)
         context.state.pop("eval_label_debug_logged", None)
 
         total_samples = 0
@@ -660,26 +630,6 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
 
             logits = model(examples)
             predicted = mx.argmax(logits, axis=-1)
-            if logging.getLogger(__name__).isEnabledFor(
-                logging.DEBUG
-            ) and not context.state.get("eval_debug_logged", False):
-                if hasattr(predicted, "to_numpy"):
-                    pred_np = predicted.to_numpy()
-                elif hasattr(predicted, "to_host"):
-                    pred_np = predicted.to_host()
-                else:
-                    pred_np = np.asarray(predicted)
-                if hasattr(labels, "to_numpy"):
-                    label_np = labels.to_numpy()
-                elif hasattr(labels, "to_host"):
-                    label_np = labels.to_host()
-                else:
-                    label_np = np.asarray(labels)
-                logging.debug(
-                    "[MLX Eval] Sample predictions: %s", pred_np[:10].tolist()
-                )
-                logging.debug("[MLX Eval] Sample labels: %s", label_np[:10].tolist())
-                context.state["eval_debug_logged"] = True
             matches = predicted == labels
             correct_predictions += int(mx.sum(matches).item())
             if hasattr(labels, "shape"):
@@ -1003,8 +953,6 @@ class ComposableMLXTrainer(base.Trainer):
         self.context.state["num_samples"] = sampled_size
 
         self.context.state.pop("train_label_debug_logged", None)
-        self.context.state.pop("train_pred_debug_logged", None)
-        self.context.state.pop("grad_debug_logged", None)
 
         self.optimizer = self.optimizer_strategy.create_optimizer(
             self.model,
@@ -1076,32 +1024,6 @@ class ComposableMLXTrainer(base.Trainer):
                     loss_criterion=compute_loss_fn,
                     context=self.context,
                 )
-
-                if logging.getLogger(__name__).isEnabledFor(
-                    logging.DEBUG
-                ) and not self.context.state.get("train_pred_debug_logged", False):
-                    preds = mx.argmax(self.model(examples), axis=-1)
-                    pred_arr = (
-                        preds.to_numpy()
-                        if hasattr(preds, "to_numpy")
-                        else preds.to_host()
-                        if hasattr(preds, "to_host")
-                        else np.asarray(preds)
-                    )
-                    logging.debug(
-                        "[MLX Train] Sample predictions: %s", pred_arr[:10].tolist()
-                    )
-                    label_arr = (
-                        labels.to_numpy()
-                        if hasattr(labels, "to_numpy")
-                        else labels.to_host()
-                        if hasattr(labels, "to_host")
-                        else np.asarray(labels)
-                    )
-                    logging.debug(
-                        "[MLX Train] Sample labels: %s", label_arr[:10].tolist()
-                    )
-                    self.context.state["train_pred_debug_logged"] = True
 
                 loss_value = float(loss.item() if hasattr(loss, "item") else loss)
                 batch_size_effective = self._batch_size(labels, examples)
