@@ -27,6 +27,7 @@ jobs:
       - name: Training workloads
         shell: bash -l {0}
         run: |
+          uv sync --all-extras
           uv run pytest tests
           uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
           uv run plato.py -c configs/MNIST/fedavg_cross_silo_lenet5.toml
