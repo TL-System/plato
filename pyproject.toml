@@ -17,7 +17,7 @@ dependencies = [
     "datasets",
     "evaluate",
     "gdown",
-    "mlx",
+    "lightly",
     "munch",
     "numpy",
     "python-socketio",
@@ -32,12 +32,25 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-ssl = [ "lightly" ]
-huggingface = [ "transformers", "peft" ]
-mpc = [ "kazoo" ]
-rl = [ "gymnasium" ]
-he = [ "tenseal" ]
-dp = [ "opacus" ]
+huggingface = [
+    "transformers",
+    "peft",
+]
+mpc = [
+    "kazoo"
+]
+rl = [
+    "gymnasium"
+]
+he = [
+    "tenseal"
+]
+dp = [
+    "opacus"
+]
+mlx = [
+    "mlx",
+]
 
 [project.urls]
 Homepage = "https://github.com/TL-System/plato"
