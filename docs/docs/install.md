@@ -65,7 +65,7 @@ uv sync --extra mlx
 
 See the [Quick Start guide](quickstart.md#using-mlx-as-a-backend) for configuration details.
 
-### Building the `plato-learn` PyPi package
+### Building the `plato-learn` PyPi Package
 
 The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
 
