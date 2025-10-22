@@ -9,9 +9,7 @@ from plato.config import Config
 from plato.trainers import (
     basic,
     composable,
-    diff_privacy,
     gan,
-    mlx,
     split_learning,
 )
 
@@ -19,10 +17,8 @@ registered_trainers = {
     "composable": composable.ComposableTrainer,
     "basic": basic.Trainer,
     "timm_basic": basic.TrainerWithTimmScheduler,
-    "diff_privacy": diff_privacy.Trainer,
     "gan": gan.Trainer,
     "split_learning": split_learning.Trainer,
-    "mlx": mlx.ComposableMLXTrainer,
 }
 
 
@@ -43,15 +39,22 @@ def get(model=None, callbacks=None):
     trainer_name = _resolve_trainer_name(config)
     logging.info("Trainer: %s", trainer_name)
 
-    if trainer_name == "HuggingFace":
+    if trainer_name == "diff_privacy":
+        from plato.trainers import diff_privacy
+
+        return diff_privacy.Trainer(model=model, callbacks=callbacks)
+    elif trainer_name == "HuggingFace":
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)
-
     elif trainer_name == "self_supervised_learning":
         from plato.trainers import self_supervised_learning
 
         return self_supervised_learning.Trainer(model=model, callbacks=callbacks)
+    elif trainer_name == "mlx":
+        from plato.trainers import mlx
+
+        return mlx.ComposableMLXTrainer(model=model, callbacks=callbacks)
     elif trainer_name in registered_trainers:
         return registered_trainers[trainer_name](model=model, callbacks=callbacks)
     else:
