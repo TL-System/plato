@@ -46,7 +46,7 @@ uv sync --extra mlx
 
 where `mlx` is the name of the dependency group.
 
-and then run each example in its own respective directory. For example:
+Each example should be run in its own directory:
 
 ```bash
 cd examples/server_aggregation/fedatt
@@ -55,7 +55,7 @@ uv run fedatt.py -c fedatt_FashionMNIST_lenet5.toml
 
 This will make sure that any additional Python packages, specified in the local `pyproject.toml` configuration, will be installed first.
 
-### Building the `plato-learn` PyPi package
+### Building the `plato-learn` PyPi Package
 
 The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
 
