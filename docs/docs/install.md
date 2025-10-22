@@ -32,6 +32,20 @@ In order to run any of the examples, first run the following command to include 
 uv sync
 ```
 
+In case you need extra dependencies (including homormorphic encryption, differential privacy, reinforcement learning, secure multi-party computation, self-supervised learning, HuggingFace transformers and PEFT, or the MLX framework), you should run:
+
+```bash
+uv sync --all-extras
+```
+
+or:
+
+```bash
+uv sync --extra mlx
+```
+
+where `mlx` is the name of the dependency group.
+
 and then run each example in its own respective directory. For example:
 
 ```bash
