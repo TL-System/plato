@@ -1,0 +1,43 @@
+[clients]
+
+type = "simple"
+total_clients = 10
+per_round = 2
+do_test = false
+outbound_processors = ["safetensor_encode"]
+
+[server]
+type = "fedavg"
+address = "127.0.0.1"
+port = 9006
+random_seed = 1
+simulate_wall_time = true
+
+inbound_processors = ["safetensor_decode"]
+
+[data]
+include = "mnist_iid.toml"
+
+[trainer]
+type = "mlx"
+framework = "mlx"
+rounds = 5
+max_concurrency = 1
+target_accuracy = 0.97
+model_name = "lenet5"
+epochs = 5
+batch_size = 32
+optimizer = "adam"
+
+[algorithm]
+type = "mlx_fedavg"
+framework = "mlx"
+
+[parameters]
+
+[parameters.model]
+framework = "mlx"
+num_classes = 10
+
+[parameters.optimizer]
+learning_rate = 0.001

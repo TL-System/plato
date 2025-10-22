@@ -9,6 +9,7 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
 
     - **[Installation](install.md)** - Installing Plato and setting up your development environment
     - **[Quick Start](quickstart.md)** - Getting started with Plato
+    - Plato supports both PyTorch and MLX backends (MLX for Apple Silicon devices)
 
 ## Examples
 

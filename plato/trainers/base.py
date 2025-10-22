@@ -67,13 +67,11 @@ class Trainer(ABC):
         if hasattr(Config().trainer, "max_concurrency"):
             model_name = Config().trainer.model_name
             model_path = Config().params["model_path"]
-            model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
             accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
 
             if os.path.exists(model_file):
                 os.remove(model_file)
-                os.remove(model_file + ".pkl")
-
             if os.path.exists(accuracy_file):
                 os.remove(accuracy_file)
 

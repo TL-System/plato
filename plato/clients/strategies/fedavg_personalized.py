@@ -46,6 +46,6 @@ class FedAvgPersonalizedPayloadStrategy(DefaultPayloadStrategy):
 
             model_path = Config().params["model_path"]
             model_name = Config().trainer.model_name
-            filename = f"{model_path}/{model_name}_{context.client_id}_local_layers.pth"
+            filename = f"{model_path}/{model_name}_{context.client_id}_local_layers.safetensors"
 
             context.algorithm.save_local_layers(local_layers, filename)

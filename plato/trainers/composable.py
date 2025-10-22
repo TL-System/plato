@@ -25,6 +25,7 @@ import os
 import pickle
 import re
 import time
+from collections import OrderedDict
 from typing import Any, Callable, List, Optional, Union
 
 import torch
@@ -35,6 +36,7 @@ from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.models import registry as models_registry
+from plato.serialization.safetensor import deserialize_tree, serialize_tree
 from plato.trainers import base, tracking
 from plato.trainers.strategies.base import (
     DataLoaderStrategy,
@@ -213,15 +215,27 @@ class ComposableTrainer(base.Trainer):
         if filename is not None:
             model_path = f"{model_path}/{filename}"
         else:
-            model_path = f"{model_path}/{model_name}.pth"
+            model_path = f"{model_path}/{model_name}.safetensors"
 
-        if self.model_state_dict is None:
-            torch.save(self.model.state_dict(), model_path)
-        else:
-            torch.save(self.model_state_dict, model_path)
+        state_dict = (
+            self.model_state_dict
+            if self.model_state_dict is not None
+            else self.model.state_dict()
+        )
+
+        history_payload = pickle.dumps(self.run_history)
+
+        if not model_path.endswith(".safetensors"):
+            raise ValueError(
+                f"ComposableTrainer.save_model requires a '.safetensors' filename: {model_path}"
+            )
+
+        serialized = serialize_tree(state_dict)
+        with open(model_path, "wb") as model_file:
+            model_file.write(serialized)
 
         with open(model_path + ".pkl", "wb") as history_file:
-            pickle.dump(self.run_history, history_file)
+            history_file.write(history_payload)
 
         if self.client_id == 0:
             logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
@@ -236,20 +250,30 @@ class ComposableTrainer(base.Trainer):
         if filename is not None:
             model_path = f"{model_path}/{filename}"
         else:
-            model_path = f"{model_path}/{model_name}.pth"
+            model_path = f"{model_path}/{model_name}.safetensors"
 
-        if os.path.exists(model_path):
-            self.model.load_state_dict(torch.load(model_path, weights_only=False))
-
-            logging.info(
-                "[Client #%d] Model loaded from %s.", self.client_id, model_path
+        if not model_path.endswith(".safetensors"):
+            raise ValueError(
+                f"ComposableTrainer.load_model requires a '.safetensors' filename: {model_path}"
             )
 
-            if os.path.exists(model_path + ".pkl"):
-                with open(model_path + ".pkl", "rb") as history_file:
-                    self.run_history = pickle.load(history_file)
-        else:
+        if not os.path.exists(model_path):
             raise OSError(f"Model file not found: {model_path}")
+
+        with open(model_path, "rb") as model_file:
+            serialized = model_file.read()
+        state_dict_raw = deserialize_tree(serialized)
+        if not isinstance(state_dict_raw, dict):
+            raise TypeError("Deserialised state dict is not a mapping.")
+        state_dict = OrderedDict(state_dict_raw.items())
+        self.model.load_state_dict(state_dict, strict=True)
+
+        logging.info("[Client #%d] Model loaded from %s.", self.client_id, model_path)
+
+        history_path = model_path + ".pkl"
+        if os.path.exists(history_path):
+            with open(history_path, "rb") as history_file:
+                self.run_history = pickle.load(history_file)
 
     def simulate_sleep_time(self):
         """Simulate client's speed variation."""
@@ -273,7 +297,7 @@ class ComposableTrainer(base.Trainer):
         self.train_model(config, trainset, sampler, **kwargs)
 
         model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
         self.save_model(filename)
 
     def train_model(self, config, trainset, sampler, **kwargs):
@@ -560,7 +584,9 @@ class ComposableTrainer(base.Trainer):
             ):
                 self.model.cpu()
                 training_time = time.perf_counter() - tic
-                filename = f"{self.client_id}_{self.current_epoch}_{training_time}.pth"
+                filename = (
+                    f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
+                )
                 self.save_model(filename)
                 self.model.to(self.device)
 
@@ -620,7 +646,9 @@ class ComposableTrainer(base.Trainer):
             train_proc.join()
 
             model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.pth"
+            filename = (
+                f"{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
+            )
 
             try:
                 self.load_model(filename)
@@ -780,7 +808,7 @@ class ComposableTrainer(base.Trainer):
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).safetensors$",
                 filename,
             )
 

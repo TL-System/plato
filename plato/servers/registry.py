@@ -40,6 +40,7 @@ else:
 
 def get(model=None, algorithm=None, trainer=None):
     """Get an instance of the server."""
+
     if hasattr(Config().server, "type"):
         server_type = Config().server.type
     else:

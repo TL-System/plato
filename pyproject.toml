@@ -16,22 +16,39 @@ dependencies = [
     "boto3",
     "datasets",
     "evaluate",
-    "gymnasium",
-    "kazoo",
+    "gdown",
     "lightly",
+    "munch",
     "numpy",
-    "opacus",
     "python-socketio",
     "requests",
-    "tenseal",
+    "safetensors",
     "timm",
     "torch",
     "torch-optimizer",
     "torchvision",
+    "zstd",
+]
+
+[project.optional-dependencies]
+huggingface = [
     "transformers",
     "peft",
-    "zstd",
-    "munch",
+]
+mpc = [
+    "kazoo"
+]
+rl = [
+    "gymnasium"
+]
+he = [
+    "tenseal"
+]
+dp = [
+    "opacus"
+]
+mlx = [
+    "mlx",
 ]
 
 [project.urls]

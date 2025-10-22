@@ -234,12 +234,15 @@ class Client:
                 if hasattr(Config().trainer, "model_name")
                 else "custom"
             )
+
             if "/" in model_name:
                 model_name = model_name.replace("/", "_")
+
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = (
-                f"{checkpoint_path}/{model_name}_client_{self.client_id}.pth"
+                f"{checkpoint_path}/{model_name}_client_{self.client_id}.pkl"
             )
+
             with open(payload_filename, "wb") as payload_file:
                 pickle.dump(payload, payload_file)
 
@@ -286,7 +289,7 @@ class Client:
         model_path = Config().params["model_path"]
         for filename in os.listdir(model_path):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+)\.(?:safetensors|pth)",
                 filename,
             )
             if split is not None:

@@ -4,11 +4,11 @@ A personalized federate learning algorithm that loads and saves local layers of 
 
 import logging
 import os
-
-import torch
+from collections import OrderedDict
 
 from plato.algorithms import fedavg
 from plato.config import Config
+from plato.serialization.safetensor import deserialize_tree, serialize_tree
 
 
 class Algorithm(fedavg.Algorithm):
@@ -26,12 +26,21 @@ class Algorithm(fedavg.Algorithm):
             # Get the filename of the previous saved local layer
             model_path = Config().params["model_path"]
             model_name = Config().trainer.model_name
-            filename = f"{model_path}/{model_name}_{self.client_id}_local_layers.pth"
+            filename = (
+                f"{model_path}/{model_name}_{self.client_id}_local_layers.safetensors"
+            )
 
             # Load local layers to the weights when the file exists
-            if os.path.exists(filename):
-                local_layers = torch.load(filename, map_location=torch.device("cpu"))
 
+            if os.path.exists(filename):
+                with open(filename, "rb") as local_file:
+                    serialized = local_file.read()
+                payload = deserialize_tree(serialized)
+                local_layers = OrderedDict(payload.items())
+            else:
+                local_layers = None
+
+            if local_layers:
                 # Update the received weights with the loaded local layers
                 weights.update(local_layers)
 
@@ -46,4 +55,13 @@ class Algorithm(fedavg.Algorithm):
         """
         Save local layers to a file with the filename provided.
         """
-        torch.save(local_layers, filename)
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+        if not filename.endswith(".safetensors"):
+            raise ValueError(
+                f"Personalized layer checkpoints must end with '.safetensors': {filename}"
+            )
+
+        serialized = serialize_tree(local_layers)
+        with open(filename, "wb") as local_file:
+            local_file.write(serialized)

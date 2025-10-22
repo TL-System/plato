@@ -30,8 +30,10 @@ def test_save_and_load_roundtrip(temp_config, tmp_path):
     original_state = _clone_state_dict(trainer.model)
 
     trainer.save_model()
-    checkpoint_path = Path(Config.params["model_path"]) / "checkpoint_roundtrip.pth"
-    history_path = checkpoint_path.with_suffix(".pth.pkl")
+    checkpoint_path = (
+        Path(Config.params["model_path"]) / "checkpoint_roundtrip.safetensors"
+    )
+    history_path = checkpoint_path.with_suffix(checkpoint_path.suffix + ".pkl")
 
     assert checkpoint_path.exists()
     assert history_path.exists()
@@ -53,10 +55,10 @@ def test_save_model_with_custom_filename(temp_config, tmp_path):
     Config.params["model_path"] = str(tmp_path / "models")
     Path(Config.params["model_path"]).mkdir(parents=True, exist_ok=True)
 
-    trainer.save_model(filename="custom_model.pth")
+    trainer.save_model(filename="custom_model.safetensors")
 
-    custom_path = Path(Config.params["model_path"]) / "custom_model.pth"
-    history_path = custom_path.with_suffix(".pth.pkl")
+    custom_path = Path(Config.params["model_path"]) / "custom_model.safetensors"
+    history_path = custom_path.with_suffix(custom_path.suffix + ".pkl")
 
     assert custom_path.exists()
     assert history_path.exists()

@@ -25,6 +25,8 @@ from plato.processors import (
     mpc_model_encrypt_additive,
     mpc_model_encrypt_shamir,
     pipeline,
+    safetensor_decode,
+    safetensor_encode,
     structured_pruning,
     unstructured_pruning,
 )
@@ -45,6 +47,8 @@ registered_processors = {
     "unstructured_pruning": unstructured_pruning.Processor,
     "mpc_model_encrypt_additive": mpc_model_encrypt_additive.Processor,
     "mpc_model_encrypt_shamir": mpc_model_encrypt_shamir.Processor,
+    "safetensor_encode": safetensor_encode.Processor,
+    "safetensor_decode": safetensor_decode.Processor,
 }
 
 
@@ -75,6 +79,11 @@ def get(
         config.inbound_processors, list
     ):
         inbound_processors = config.inbound_processors
+
+    if not outbound_processors:
+        outbound_processors = ["safetensor_encode"]
+    if not inbound_processors:
+        inbound_processors = ["safetensor_decode"]
 
     for processor in outbound_processors:
         logging.info("%s: Using Processor for sending payload: %s", user, processor)
