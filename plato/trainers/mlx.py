@@ -1105,12 +1105,6 @@ class ComposableMLXTrainer(base.Trainer):
 
         self.run_history.update_metric("train_time", training_time)
 
-        if logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
-            last_loss = self.context.state.get("last_loss")
-            logging.debug(
-                "[Client #%d] Final training loss: %s", self.client_id, last_loss
-            )
-
     def _infer_sampled_size(self, dataset: Any, sampler: Any) -> int:
         if sampler is not None:
             if hasattr(sampler, "num_samples") and callable(sampler.num_samples):
@@ -1127,12 +1121,6 @@ class ComposableMLXTrainer(base.Trainer):
     def test(self, testset, sampler=None, **kwargs) -> float:
         config = Config().trainer._asdict()
         config["run_id"] = Config().params["run_id"]
-
-        if "max_concurrency" in config:
-            logging.debug(
-                "MLX trainer executing in-process; respecting max_concurrency=%s via scheduler.",
-                config["max_concurrency"],
-            )
 
         accuracy = self.test_model(config, testset, sampler, **kwargs)
 
@@ -1184,11 +1172,6 @@ class ComposableMLXTrainer(base.Trainer):
 
         self.training_start_time = time.time()
 
-        if "max_concurrency" in config:
-            logging.debug(
-                "MLX trainer executing in-process; respecting max_concurrency=%s via scheduler.",
-                config["max_concurrency"],
-            )
         tic = time.perf_counter()
         self.train_model(config, trainset, sampler, **kwargs)
         toc = time.perf_counter()
