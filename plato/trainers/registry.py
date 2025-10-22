@@ -43,12 +43,12 @@ def get(model=None, callbacks=None):
     trainer_name = _resolve_trainer_name(config)
     logging.info("Trainer: %s", trainer_name)
 
-    if getattr(config, "type", None) == "HuggingFace":
+    if trainer_name == "HuggingFace":
         from plato.trainers import huggingface
 
         return huggingface.Trainer(model=model, callbacks=callbacks)
 
-    elif getattr(config, "type", None) == "self_supervised_learning":
+    elif trainer_name == "self_supervised_learning":
         from plato.trainers import self_supervised_learning
 
         return self_supervised_learning.Trainer(model=model, callbacks=callbacks)
