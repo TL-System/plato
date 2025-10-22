@@ -16,25 +16,28 @@ dependencies = [
     "boto3",
     "datasets",
     "evaluate",
-    "gymnasium",
-    "kazoo",
-    "lightly",
+    "gdown",
+    "mlx",
+    "munch",
     "numpy",
-    "opacus",
     "python-socketio",
     "requests",
-    "tenseal",
+    "safetensors",
     "timm",
     "torch",
     "torch-optimizer",
     "torchvision",
-    "transformers",
     "peft",
     "zstd",
-    "munch",
-    "mlx>=0.29.3",
-    "safetensors",
 ]
+
+[project.optional-dependencies]
+ssl = [ "lightly" ]
+huggingface = [ "transformers", "peft" ]
+mpc = [ "kazoo" ]
+rl = [ "gymnasium" ]
+he = [ "tenseal" ]
+dp = [ "opacus" ]
 
 [project.urls]
 Homepage = "https://github.com/TL-System/plato"
