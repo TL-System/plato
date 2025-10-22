@@ -209,8 +209,12 @@ def test_torchvision_datasource_celeba_defaults(monkeypatch, tmp_path):
     resize = datasource.trainset.transform.transforms[0]
     assert isinstance(resize, tv_transforms.Resize)
     assert resize.size == 64
-    assert datasource.trainset.target_transform is torchvision_ds._celeba_target_transform
-    assert datasource.testset.target_transform is torchvision_ds._celeba_target_transform
+    assert (
+        datasource.trainset.target_transform is torchvision_ds._celeba_target_transform
+    )
+    assert (
+        datasource.testset.target_transform is torchvision_ds._celeba_target_transform
+    )
     assert datasource.targets() == [0, 1, 2]
     assert datasource.classes()[0] == "Celebrity #0"
     _, label = datasource.trainset[1]

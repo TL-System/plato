@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "plato-learn"
-version = "1.41"
+version = "1.4.2"
 description = "Plato: a research framework for federated learning"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -97,7 +97,7 @@ members = [
 [dependency-groups]
 dev = [
     "pytest",
-    "ty>=0.0.1a23",
+    "ty",
 ]
 
 [tool.pytest.ini_options]

@@ -5,6 +5,7 @@ A simple federated learning server using federated averaging.
 import asyncio
 import logging
 import os
+
 from plato.algorithms import registry as algorithms_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
