@@ -31,7 +31,9 @@ random_seed = 1
 [data]
 
 # Custom datasource (overridden in basic.py)
-datasource = "MNIST"
+datasource = "Torchvision"
+dataset_name = "MNIST"
+download = true
 
 # Random seed for data sampling
 random_seed = 1

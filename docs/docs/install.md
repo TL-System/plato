@@ -32,7 +32,21 @@ In order to run any of the examples, first run the following command to include 
 uv sync
 ```
 
-and then run each example in its own respective directory. For example:
+In case you need extra dependencies (including homormorphic encryption, differential privacy, reinforcement learning, secure multi-party computation, self-supervised learning, HuggingFace transformers and PEFT, or the MLX framework), you should run:
+
+```bash
+uv sync --all-extras
+```
+
+or:
+
+```bash
+uv sync --extra mlx
+```
+
+where `mlx` is the name of the dependency group.
+
+Each example should be run in its own directory:
 
 ```bash
 cd examples/server_aggregation/fedatt
@@ -51,7 +65,7 @@ uv sync --extra mlx
 
 See the [Quick Start guide](quickstart.md#using-mlx-as-a-backend) for configuration details.
 
-### Building the `plato-learn` PyPi package
+### Building the `plato-learn` PyPi Package
 
 The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:
 

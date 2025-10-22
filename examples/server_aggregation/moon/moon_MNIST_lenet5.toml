@@ -23,7 +23,9 @@ staleness_bound = 10
 random_seed = 1
 
 [data]
-datasource = "MNIST"
+datasource = "Torchvision"
+dataset_name = "MNIST"
+download = true
 data_path = "data"
 partition_size = 200
 sampler = "noniid"

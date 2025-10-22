@@ -7,41 +7,39 @@ import logging
 
 from plato.config import Config
 from plato.datasources import (
-    celeba,
-    cifar10,
-    cifar100,
     cinic10,
-    emnist,
-    fashion_mnist,
     feature,
     femnist,
     huggingface,
     lora,
-    mnist,
     purchase,
-    stl10,
     texas,
     tiny_imagenet,
+    torchvision,
 )
 
 registered_datasources = {
-    "MNIST": mnist,
-    "FashionMNIST": fashion_mnist,
-    "EMNIST": emnist,
-    "CIFAR10": cifar10,
-    "CIFAR100": cifar100,
+    "HuggingFace": huggingface,
+    "Torchvision": torchvision,
+    "LoRA": lora,
     "CINIC10": cinic10,
     "Purchase": purchase,
     "Texas": texas,
-    "HuggingFace": huggingface,
-    "LoRA": lora,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
-    "CelebA": celeba,
-    "STL10": stl10,
 }
 
 registered_partitioned_datasources = {"FEMNIST": femnist}
+
+_datasource_aliases = {
+    "STL10": ("Torchvision", {"dataset_name": "STL10"}),
+    "MNIST": ("Torchvision", {"dataset_name": "MNIST"}),
+    "FashionMNIST": ("Torchvision", {"dataset_name": "FashionMNIST"}),
+    "EMNIST": ("Torchvision", {"dataset_name": "EMNIST"}),
+    "CIFAR10": ("Torchvision", {"dataset_name": "CIFAR10"}),
+    "CIFAR100": ("Torchvision", {"dataset_name": "CIFAR100"}),
+    "CelebA": ("Torchvision", {"dataset_name": "CelebA"}),
+}
 
 
 def get(client_id: int = 0, **kwargs):
@@ -53,6 +51,11 @@ def get(client_id: int = 0, **kwargs):
     )
 
     logging.info("Data source: %s", datasource_name)
+
+    if datasource_name in _datasource_aliases:
+        target_name, extra_kwargs = _datasource_aliases[datasource_name]
+        kwargs = {**extra_kwargs, **kwargs}
+        datasource_name = target_name
 
     if datasource_name in registered_datasources:
         dataset = registered_datasources[datasource_name].DataSource(**kwargs)
@@ -71,6 +74,10 @@ def get_input_shape():
     datasource_name = Config().data.datasource
 
     logging.info("Data source: %s", Config().data.datasource)
+
+    if datasource_name in _datasource_aliases:
+        datasource_name = _datasource_aliases[datasource_name][0]
+
     if datasource_name in registered_datasources:
         input_shape = registered_datasources[datasource_name].DataSource.input_shape()
     elif datasource_name in registered_partitioned_datasources:

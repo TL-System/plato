@@ -97,6 +97,7 @@ members = [
 [dependency-groups]
 dev = [
     "pytest",
+    "ty>=0.0.1a23",
 ]
 
 [tool.pytest.ini_options]

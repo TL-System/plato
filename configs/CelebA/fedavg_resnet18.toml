@@ -19,7 +19,10 @@ port = 8000
 [data]
 
 # The training and testing dataset
-datasource = "CelebA"
+datasource = "Torchvision"
+dataset_name = "CelebA"
+download = true
+dataset_kwargs = { target_type = ["attr", "identity"] }
 celeba_img_size = 32
 
 # Number of identity in CelebA
@@ -77,3 +80,6 @@ type = "fedavg"
 lr = 0.01
 momentum = 0.9
 weight_decay = 0.0
+
+[parameters.model]
+num_classes = 10178
