@@ -27,7 +27,6 @@ dependencies = [
     "torch",
     "torch-optimizer",
     "torchvision",
-    "peft",
     "zstd",
 ]
 
