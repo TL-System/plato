@@ -17,6 +17,7 @@ dependencies = [
     "datasets",
     "evaluate",
     "gdown",
+    "lightly",
     "munch",
     "numpy",
     "python-socketio",
@@ -31,9 +32,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-ssl = [
-    "lightly"
-]
 huggingface = [
     "transformers",
     "peft",
