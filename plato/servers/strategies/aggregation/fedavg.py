@@ -8,14 +8,12 @@ algorithms.
 from __future__ import annotations
 
 import asyncio
-import logging
 from types import SimpleNamespace
 from typing import Any, Dict, List
 
 import numpy as np
 
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
-from plato.utils.tree import flatten_tree
 
 try:  # pragma: no cover - optional dependency
     import torch
@@ -49,8 +47,6 @@ class FedAvgAggregationStrategy(AggregationStrategy):
 
             await asyncio.sleep(0)
 
-        self._log_structure("delta", avg_update)
-
         return avg_update
 
     async def aggregate_weights(
@@ -71,7 +67,6 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             )
             await asyncio.sleep(0)
 
-        self._log_structure("weights", avg_weights)
         return avg_weights
 
     def _accumulate_weighted(
@@ -119,26 +114,3 @@ class FedAvgAggregationStrategy(AggregationStrategy):
 
         base = 0.0 if target is None else target
         return base + value * weight
-
-    @staticmethod
-    def _log_structure(label: str, structure: Any) -> None:
-        if not logging.getLogger(__name__).isEnabledFor(logging.DEBUG):
-            return
-        if structure is None:
-            logging.debug("FedAvg aggregation produced no %s.", label)
-            return
-        try:
-            flat, _ = flatten_tree(structure)
-            if not flat:
-                logging.debug("FedAvg aggregation produced empty %s structure.", label)
-                return
-            sample_key, sample_value = next(iter(flat.items()))
-            logging.debug(
-                "FedAvg aggregated %s sample '%s' mean=%.6f std=%.6f",
-                label,
-                sample_key,
-                float(np.mean(sample_value)),
-                float(np.std(sample_value)),
-            )
-        except Exception as exc:
-            logging.debug("Unable to log FedAvg %s statistics: %s", label, exc)

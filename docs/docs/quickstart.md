@@ -28,6 +28,35 @@ In `examples/`, a number of federated learning algorithms have been included. To
 uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
+## Using MLX as a Backend
+
+Plato supports MLX as an alternative backend to PyTorch for Apple Silicon devices. To use MLX, first install the optional dependencies:
+
+```bash
+uv sync --extra mlx
+```
+
+Then configure your TOML file to use the MLX framework by setting `framework = "mlx"` in the relevant sections:
+
+```toml
+[trainer]
+type = "mlx"
+framework = "mlx"
+
+[algorithm]
+type = "mlx_fedavg"
+framework = "mlx"
+
+[parameters.model]
+framework = "mlx"
+```
+
+A complete example configuration is available at `configs/MNIST/fedavg_lenet5_mlx.toml`. Run it with:
+
+```bash
+uv run plato.py -c configs/MNIST/fedavg_lenet5_mlx.toml
+```
+
 ## Running Plato in a Docker Container
 
 To build such a Docker image, use the provided `Dockerfile`:
