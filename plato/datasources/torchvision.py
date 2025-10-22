@@ -58,18 +58,47 @@ def _default_transform():
 
 
 def _celeba_target_transform(label):
-    """
-    Match the legacy CelebA target handling by flattening attribute and identity
-    tensors into a single vector.
-    """
-    if isinstance(label, tuple):
-        if len(label) == 1:
-            return label[0]
-        if len(label) == 2:
-            attr, identity = label
-            attr_tensor = attr.reshape([-1])
-            identity_tensor = identity.reshape([-1])
-            return torch.cat((attr_tensor, identity_tensor))
+    """Normalize CelebA targets while honouring configured attribute/identity flags."""
+    if not isinstance(label, tuple):
+        return label
+
+    config = Config()
+    data_cfg = getattr(config, "data", None)
+    targets_cfg = getattr(data_cfg, "celeba_targets", None)
+
+    attr_enabled = True
+    identity_enabled = True
+
+    if targets_cfg is not None:
+        attr_enabled = bool(getattr(targets_cfg, "attr", False))
+        identity_enabled = bool(getattr(targets_cfg, "identity", False))
+
+        if not attr_enabled and not identity_enabled:
+            # Fall back to legacy behaviour if both targets were disabled.
+            attr_enabled = True
+            identity_enabled = True
+
+    pieces = list(label)
+    attr_value = pieces[0] if pieces else None
+    identity_value = pieces[-1] if pieces else None
+
+    if attr_enabled and identity_enabled:
+        attr_tensor = torch.as_tensor(attr_value).reshape(-1)
+        identity_tensor = torch.as_tensor(identity_value).reshape(-1)
+        return torch.cat((attr_tensor, identity_tensor))
+
+    if identity_enabled:
+        if isinstance(identity_value, torch.Tensor):
+            if identity_value.numel() == 1:
+                return identity_value.item()
+            return identity_value.squeeze()
+        return identity_value
+
+    if attr_enabled:
+        if isinstance(attr_value, torch.Tensor):
+            return attr_value.reshape(-1)
+        return attr_value
+
     return label
 
 

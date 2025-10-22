@@ -213,6 +213,9 @@ def test_torchvision_datasource_celeba_defaults(monkeypatch, tmp_path):
     assert datasource.testset.target_transform is torchvision_ds._celeba_target_transform
     assert datasource.targets() == [0, 1, 2]
     assert datasource.classes()[0] == "Celebrity #0"
+    _, label = datasource.trainset[1]
+    assert isinstance(label, torch.Tensor)
+    assert label.shape == (2,)
 
 
 def test_torchvision_datasource_celeba_respects_config(monkeypatch, tmp_path):
@@ -243,3 +246,33 @@ def test_torchvision_datasource_celeba_respects_config(monkeypatch, tmp_path):
     assert resize.size == 32
     assert datasource.classes() == ["Celebrity #0", "Celebrity #1", "Celebrity #2"]
     assert datasource.targets() == [0, 1, 2]
+    _, label = datasource.trainset[1]
+    assert isinstance(label, torch.Tensor)
+    assert label.shape == (1,)
+
+
+def test_torchvision_datasource_celeba_identity_only(monkeypatch, tmp_path):
+    """When only identities are requested, labels should be scalar indices."""
+
+    class CelebA(_DummyCelebA):
+        """Named to match torchvision's CelebA dataset."""
+
+    stub_datasets = types.SimpleNamespace(CelebA=CelebA)
+    dummy_config = _build_config(
+        tmp_path,
+        {
+            "datasource": "Torchvision",
+            "dataset_name": "CelebA",
+            "dataset_kwargs": {"target_type": ["attr", "identity"]},
+            "celeba_targets": {"attr": False, "identity": True},
+        },
+    )
+
+    monkeypatch.setattr(torchvision_ds, "datasets", stub_datasets)
+    monkeypatch.setattr(torchvision_ds, "Config", lambda: dummy_config)
+
+    datasource = torchvision_ds.DataSource()
+
+    _, label = datasource.trainset[2]
+    assert isinstance(label, int)
+    assert label == 2

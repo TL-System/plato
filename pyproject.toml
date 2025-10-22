@@ -16,13 +16,17 @@ dependencies = [
     "boto3",
     "datasets",
     "evaluate",
+    "gdown",
     "gymnasium",
     "kazoo",
     "lightly",
+    "mlx",
+    "munch",
     "numpy",
     "opacus",
     "python-socketio",
     "requests",
+    "safetensors",
     "tenseal",
     "timm",
     "torch",
@@ -31,9 +35,6 @@ dependencies = [
     "transformers",
     "peft",
     "zstd",
-    "munch",
-    "mlx",
-    "safetensors",
 ]
 
 [project.urls]
