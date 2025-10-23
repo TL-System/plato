@@ -12,6 +12,8 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
+_CLI_ARG_NOT_SUPPLIED = object()
+
 import numpy as np
 from munch import Munch
 
@@ -144,35 +146,46 @@ class Config:
     """
 
     _instance = None
+    _cli_overrides: dict[str, bool] = {}
 
     def __new__(cls):
         if cls._instance is None:
             parser = argparse.ArgumentParser()
             if not parser.prog.startswith("uv run "):
                 parser.prog = f"uv run {parser.prog}"
-            parser.add_argument("-i", "--id", type=str, help="Unique client ID.")
             parser.add_argument(
-                "-p", "--port", type=str, help="The port number for running a server."
+                "-i",
+                "--id",
+                type=int,
+                default=_CLI_ARG_NOT_SUPPLIED,
+                help="Unique client ID.",
+            )
+            parser.add_argument(
+                "-p",
+                "--port",
+                type=int,
+                default=_CLI_ARG_NOT_SUPPLIED,
+                help="The port number for running a server.",
             )
             parser.add_argument(
                 "-c",
                 "--config",
                 type=str,
-                default="./config.toml",
+                default=_CLI_ARG_NOT_SUPPLIED,
                 help="Federated learning configuration file.",
             )
             parser.add_argument(
                 "-b",
                 "--base",
                 type=str,
-                default="./runtime",
+                default=_CLI_ARG_NOT_SUPPLIED,
                 help="The base path for datasets, models, checkpoints, and results.",
             )
             parser.add_argument(
                 "-s",
                 "--server",
                 type=str,
-                default=None,
+                default=_CLI_ARG_NOT_SUPPLIED,
                 help="The server hostname and port number.",
             )
             parser.add_argument(
@@ -188,16 +201,42 @@ class Config:
                 help="Resume a previously interrupted training session.",
             )
             parser.add_argument(
-                "-l", "--log", type=str, default="info", help="Log messages level."
+                "-l",
+                "--log",
+                type=str,
+                default=_CLI_ARG_NOT_SUPPLIED,
+                help="Log messages level.",
             )
 
             args = parser.parse_args()
-            Config.args = args
+            cli_overrides: dict[str, bool] = {}
 
-            if Config.args.id is not None:
-                Config.args.id = int(args.id)
-            if Config.args.port is not None:
-                Config.args.port = int(args.port)
+            cli_overrides["id"] = args.id is not _CLI_ARG_NOT_SUPPLIED
+            if not cli_overrides["id"]:
+                args.id = None
+
+            cli_overrides["port"] = args.port is not _CLI_ARG_NOT_SUPPLIED
+            if not cli_overrides["port"]:
+                args.port = None
+
+            cli_overrides["config"] = args.config is not _CLI_ARG_NOT_SUPPLIED
+            if not cli_overrides["config"]:
+                args.config = "./config.toml"
+
+            cli_overrides["base"] = args.base is not _CLI_ARG_NOT_SUPPLIED
+            if not cli_overrides["base"]:
+                args.base = "./runtime"
+
+            cli_overrides["server"] = args.server is not _CLI_ARG_NOT_SUPPLIED
+            if not cli_overrides["server"]:
+                args.server = None
+
+            cli_overrides["log"] = args.log is not _CLI_ARG_NOT_SUPPLIED
+            if not cli_overrides["log"]:
+                args.log = "info"
+
+            Config.args = args
+            Config._cli_overrides = cli_overrides
 
             numeric_level = getattr(logging, args.log.upper(), None)
 
@@ -238,6 +277,9 @@ class Config:
             Config.trainer = config.trainer
             Config.algorithm = config.algorithm
 
+            if Config._cli_overrides.get("port") and Config.args.port is not None:
+                Config.server.port = Config.args.port
+
             if Config.args.server is not None:
                 address, port = args.server.split(":")
                 Config.server.address = address
@@ -261,8 +303,11 @@ class Config:
             if hasattr(config, "general"):
                 Config.general = config.general
 
-                if hasattr(Config.general, "base_path"):
-                    Config.params["base_path"] = Config().general.base_path
+                if (
+                    hasattr(Config.general, "base_path")
+                    and not Config._cli_overrides.get("base", False)
+                ):
+                    Config.params["base_path"] = Config.general.base_path
 
             os.makedirs(Config.params["base_path"], exist_ok=True)
 
