@@ -54,4 +54,5 @@ class Processor(model.Processor):
         return output
 
     def _process_layer(self, layer: torch.Tensor) -> torch.Tensor:
-        """No need to process individual layer of the model"""
+        """No need to process individual layer of the model."""
+        return layer

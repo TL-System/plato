@@ -2,10 +2,11 @@
 Base processor for processing PyTorch models.
 """
 
+from collections import OrderedDict
 import logging
 import pickle
 import sys
-from typing import OrderedDict
+from typing import MutableMapping
 
 import torch
 
@@ -20,14 +21,16 @@ class Processor(base.Processor):
         self.client_id = client_id
         self.server_id = server_id
 
-    def process(self, data: OrderedDict) -> OrderedDict:
+    def process(
+        self, data: MutableMapping[str, torch.Tensor]
+    ) -> MutableMapping[str, torch.Tensor]:
         """
         Processes PyTorch model parameter.
         The data is a state_dict of a PyTorch model.
         """
         old_data_size = sys.getsizeof(pickle.dumps(data))
 
-        new_data = OrderedDict()
+        new_data: MutableMapping[str, torch.Tensor] = OrderedDict()
         for layer_name, layer_params in data.items():
             new_data[layer_name] = self._process_layer(layer_params)
 

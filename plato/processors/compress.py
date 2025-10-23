@@ -4,9 +4,10 @@ Implements a Processor for compressing a numpy array.
 
 from typing import Any
 
-import zstd
-
 from plato.processors import base
+from plato.utils.zstd_helpers import get_zstd
+
+zstd = get_zstd()
 
 
 class Processor(base.Processor):

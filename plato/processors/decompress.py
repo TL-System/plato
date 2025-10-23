@@ -5,9 +5,11 @@ Implements a Processor for decompressing a numpy array.
 from typing import Any
 
 import numpy as np
-import zstd
 
 from plato.processors import base
+from plato.utils.zstd_helpers import get_zstd
+
+zstd = get_zstd()
 
 
 class Processor(base.Processor):
