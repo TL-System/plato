@@ -128,7 +128,9 @@ class GANTrainingStepStrategy(TrainingStepStrategy):
         latent_dim = getattr(model, "nz", None)
 
         if not callable(discriminator) or not callable(generator):
-            raise TypeError("GAN models must define callable 'discriminator' and 'generator'.")
+            raise TypeError(
+                "GAN models must define callable 'discriminator' and 'generator'."
+            )
         if not callable(loss_fn):
             raise TypeError("GAN model must provide a callable 'loss_criterion'.")
         if latent_dim is None:
@@ -136,7 +138,9 @@ class GANTrainingStepStrategy(TrainingStepStrategy):
 
         discriminator_fn = cast(Callable[[torch.Tensor], torch.Tensor], discriminator)
         generator_fn = cast(Callable[[torch.Tensor], torch.Tensor], generator)
-        loss_callable = cast(Callable[[torch.Tensor, torch.Tensor], torch.Tensor], loss_fn)
+        loss_callable = cast(
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor], loss_fn
+        )
 
         output = discriminator_fn(examples).view(-1)
 

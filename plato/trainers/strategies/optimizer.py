@@ -364,7 +364,9 @@ class GradientClippingOptimizerStrategy(OptimizerStrategy):
         # Clip gradients
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for gradient clipping.")
+            raise ValueError(
+                "Training context must provide a model for gradient clipping."
+            )
         torch.nn.utils.clip_grad_norm_(
             model.parameters(),
             max_norm=self.max_norm,

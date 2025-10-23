@@ -88,7 +88,9 @@ def _encrypt(data_vector, context, serialize=True):
         return ts.ckks_vector(context, data_vector)
 
 
-def deserialize_weights(serialized_weights: Mapping[str, Any], context: ts.Context) -> OrderedDict:
+def deserialize_weights(
+    serialized_weights: Mapping[str, Any], context: ts.Context
+) -> OrderedDict:
     """Deserialize the encrypted weights (not decrypted yet)."""
     deserialized_weights = OrderedDict()
     for name, weight in serialized_weights.items():

@@ -50,7 +50,9 @@ class DataSource(base.DataSource):
 
         train_split_dataset = dataset[train_split]
         if not isinstance(train_split_dataset, Dataset):
-            raise TypeError(f"Split '{train_split}' is not a HuggingFace Dataset instance.")
+            raise TypeError(
+                f"Split '{train_split}' is not a HuggingFace Dataset instance."
+            )
         column_names_raw = getattr(train_split_dataset, "column_names", None)
         if not isinstance(column_names_raw, list):
             raise AttributeError("Training split must expose 'column_names'.")

@@ -35,9 +35,7 @@ class DefaultLRSchedulerStrategy(LRSchedulerStrategy):
 
     def __init__(
         self,
-        scheduler_fn: Optional[
-            Callable[[torch.optim.Optimizer], LRScheduler]
-        ] = None,
+        scheduler_fn: Optional[Callable[[torch.optim.Optimizer], LRScheduler]] = None,
     ):
         """Initialize with optional custom scheduler factory."""
         self.scheduler_fn = scheduler_fn

@@ -47,7 +47,9 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         optimizer_params = params_section._asdict() if params_section else {}
 
     if not isinstance(optimizer_params, dict):
-        raise TypeError("optimizer_params must be provided as a mapping of keyword arguments.")
+        raise TypeError(
+            "optimizer_params must be provided as a mapping of keyword arguments."
+        )
 
     # Ensure eps is a float
     if "eps" in optimizer_params:

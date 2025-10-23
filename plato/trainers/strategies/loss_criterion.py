@@ -297,7 +297,9 @@ class L2RegularizationStrategy(LossCriterionStrategy):
 
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for L2 regularization.")
+            raise ValueError(
+                "Training context must provide a model for L2 regularization."
+            )
 
         for param in model.parameters():
             l2_loss = l2_loss + torch.sum(param**2)

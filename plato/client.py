@@ -44,7 +44,9 @@ def run(
             else:
                 server = edge_server()
             if edge_client is None:
-                raise ValueError("edge_client must be provided when edge_server is set.")
+                raise ValueError(
+                    "edge_client must be provided when edge_server is set."
+                )
             client = edge_client(server=server)
 
         server.configure()

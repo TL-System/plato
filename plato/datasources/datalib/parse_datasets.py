@@ -18,9 +18,7 @@ def _get_parse_file_list_module():
                 "mmaction.tools.data.parse_file_list"
             )
         except ImportError as exc:  # pragma: no cover - optional dependency
-            raise ImportError(
-                "mmaction is required to parse dataset splits."
-            ) from exc
+            raise ImportError("mmaction is required to parse dataset splits.") from exc
     return _PARSE_FILE_LIST_MODULE
 
 

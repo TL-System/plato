@@ -21,7 +21,10 @@ def _get_lines2dictlist():
         try:
             module = importlib.import_module("mmaction.tools.data.anno_txt2json")
             _LINES2DICTLIST = getattr(module, "lines2dictlist")
-        except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
+        except (
+            ImportError,
+            AttributeError,
+        ) as exc:  # pragma: no cover - optional dependency
             raise ImportError(
                 "mmaction is required to generate modality annotations."
             ) from exc
@@ -34,7 +37,10 @@ def _get_parse_directory():
         try:
             module = importlib.import_module("mmaction.tools.data.parse_file_list")
             _PARSE_DIRECTORY = getattr(module, "parse_directory")
-        except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
+        except (
+            ImportError,
+            AttributeError,
+        ) as exc:  # pragma: no cover - optional dependency
             raise ImportError(
                 "mmaction is required to parse dataset directories."
             ) from exc

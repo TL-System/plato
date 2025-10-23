@@ -2,10 +2,10 @@
 Base processor for processing PyTorch models.
 """
 
-from collections import OrderedDict
 import logging
 import pickle
 import sys
+from collections import OrderedDict
 from typing import MutableMapping
 
 import torch

@@ -1,6 +1,8 @@
-import torch
 import importlib
 from typing import Any
+
+import torch
+
 
 def _load_prettytable() -> Any:
     try:
@@ -8,6 +10,7 @@ def _load_prettytable() -> Any:
         return getattr(module, "PrettyTable")
     except (ImportError, AttributeError):
         return None
+
 
 PrettyTable = _load_prettytable()
 

@@ -57,9 +57,7 @@ def get(
         scheduler_args = SimpleNamespace(**lr_params)
         scheduler_args.epochs = Config().trainer.epochs
         factory = registered_factories[scheduler_spec]
-        lr_scheduler, __ = factory(
-            args=scheduler_args, optimizer=optimizer
-        )
+        lr_scheduler, __ = factory(args=scheduler_args, optimizer=optimizer)
         return lr_scheduler
 
     # The list containing the learning rate schedulers that must be returned or
@@ -79,9 +77,7 @@ def get(
     elif "SequentialLR" in scheduler_spec:
         use_sequential = True
         lr_scheduler = [
-            sched
-            for sched in scheduler_spec.split(",")
-            if sched != ("SequentialLR")
+            sched for sched in scheduler_spec.split(",") if sched != ("SequentialLR")
         ]
     else:
         lr_scheduler = [scheduler_spec]

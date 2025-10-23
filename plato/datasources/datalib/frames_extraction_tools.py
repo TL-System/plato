@@ -12,7 +12,6 @@ from multiprocessing import Pool
 
 from plato.datasources.datalib import modality_extraction_base
 
-
 _EXTRACT_DENSE_FLOW = None
 
 
@@ -22,7 +21,10 @@ def _get_extract_dense_flow():
         try:
             module = importlib.import_module("mmaction.tools.misc.flow_extraction")
             _EXTRACT_DENSE_FLOW = getattr(module, "extract_dense_flow")
-        except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
+        except (
+            ImportError,
+            AttributeError,
+        ) as exc:  # pragma: no cover - optional dependency
             raise ImportError(
                 "mmaction is required for optical flow extraction. "
                 "Install mmaction2 to enable this functionality."

@@ -17,7 +17,6 @@ import os
 import os.path as osp
 import subprocess
 
-
 _MMCV_MODULE = None
 
 

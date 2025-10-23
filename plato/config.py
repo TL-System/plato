@@ -298,7 +298,9 @@ class Config:
                 if not isinstance(server_spec, str):
                     raise ValueError("Server specification must be a string.")
                 if ":" not in server_spec:
-                    raise ValueError("Server specification must be in 'host:port' format.")
+                    raise ValueError(
+                        "Server specification must be in 'host:port' format."
+                    )
                 address, port = server_spec.split(":", 1)
                 Config.server.address = address
                 Config.server.port = int(port)
@@ -321,10 +323,9 @@ class Config:
             if hasattr(config, "general"):
                 Config.general = config.general
 
-                if (
-                    hasattr(Config.general, "base_path")
-                    and not Config._cli_overrides.get("base", False)
-                ):
+                if hasattr(
+                    Config.general, "base_path"
+                ) and not Config._cli_overrides.get("base", False):
                     Config.params["base_path"] = Config.general.base_path
 
             os.makedirs(Config.params["base_path"], exist_ok=True)
@@ -406,7 +407,9 @@ class Config:
         try:
             return getattr(type(self), name)
         except AttributeError as exc:
-            raise AttributeError(f"{type(self).__name__!s} has no attribute {name!r}") from exc
+            raise AttributeError(
+                f"{type(self).__name__!s} has no attribute {name!r}"
+            ) from exc
 
     @staticmethod
     def node_from_dict(obj: Any) -> Any:
@@ -432,7 +435,9 @@ class Config:
 
         total_clients = int(getattr(Config.clients, "total_clients", 0))
         if total_clients <= 0:
-            raise ValueError("total_clients must be a positive integer for speed simulation.")
+            raise ValueError(
+                "total_clients must be a positive integer for speed simulation."
+            )
 
         distribution = getattr(Config.clients, "simulation_distribution", None)
         sleep_times: np.ndarray

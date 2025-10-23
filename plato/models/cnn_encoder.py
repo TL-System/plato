@@ -60,7 +60,9 @@ class Model:
             else getattr(getattr(Config(), "trainer", None), "model_name", None)
         )
         if not isinstance(configured_name, str) or not configured_name:
-            raise ValueError("A valid model_name must be provided to build the encoder.")
+            raise ValueError(
+                "A valid model_name must be provided to build the encoder."
+            )
 
         normalized_name = configured_name.lower()
         encode_output_dim = None

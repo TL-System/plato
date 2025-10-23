@@ -7,7 +7,6 @@ import glob
 import importlib
 import os
 from multiprocessing import Pool
-
 from typing import Any
 
 from plato.datasources.datalib import modality_extraction_base

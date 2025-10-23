@@ -57,12 +57,13 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
 
         trainer = getattr(context, "trainer", None)
         if trainer is None or not hasattr(trainer, "zeros"):
-            raise AttributeError("FedAsync requires the trainer to provide a 'zeros' method.")
+            raise AttributeError(
+                "FedAsync requires the trainer to provide a 'zeros' method."
+            )
         zeros_fn = trainer.zeros
 
         avg_update = {
-            name: zeros_fn(delta.shape)
-            for name, delta in deltas_received[0].items()
+            name: zeros_fn(delta.shape) for name, delta in deltas_received[0].items()
         }
 
         for i, delta in enumerate(deltas_received):
@@ -95,7 +96,9 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
 
         algorithm = getattr(context, "algorithm", None)
         if algorithm is None or not hasattr(algorithm, "aggregate_weights"):
-            raise AttributeError("FedAsync requires an algorithm with 'aggregate_weights'.")
+            raise AttributeError(
+                "FedAsync requires an algorithm with 'aggregate_weights'."
+            )
 
         algorithm = cast(Any, algorithm)
 

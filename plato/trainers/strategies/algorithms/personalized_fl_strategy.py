@@ -126,7 +126,9 @@ class FedPerUpdateStrategy(ModelUpdateStrategy):
         """
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for layer freezing.")
+            raise ValueError(
+                "Training context must provide a model for layer freezing."
+            )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.global_layer_names):
                 param.requires_grad = False
@@ -140,7 +142,9 @@ class FedPerUpdateStrategy(ModelUpdateStrategy):
         """
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for layer activation.")
+            raise ValueError(
+                "Training context must provide a model for layer activation."
+            )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.global_layer_names):
                 param.requires_grad = True
@@ -333,7 +337,9 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         """Freeze global layers."""
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for layer freezing.")
+            raise ValueError(
+                "Training context must provide a model for layer freezing."
+            )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.global_layer_names):
                 param.requires_grad = False
@@ -342,7 +348,9 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         """Activate global layers."""
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for layer activation.")
+            raise ValueError(
+                "Training context must provide a model for layer activation."
+            )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.global_layer_names):
                 param.requires_grad = True
@@ -351,7 +359,9 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         """Freeze local layers."""
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for layer freezing.")
+            raise ValueError(
+                "Training context must provide a model for layer freezing."
+            )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.local_layer_names):
                 param.requires_grad = False
@@ -360,7 +370,9 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
         """Activate local layers."""
         model = context.model
         if model is None:
-            raise ValueError("Training context must provide a model for layer activation.")
+            raise ValueError(
+                "Training context must provide a model for layer activation."
+            )
         for name, param in model.named_parameters():
             if any(layer_name in name for layer_name in self.local_layer_names):
                 param.requires_grad = True

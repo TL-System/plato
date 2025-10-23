@@ -9,8 +9,8 @@ transport or persistence, and restore them back when needed.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import importlib
+from dataclasses import dataclass
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Dict, List, Tuple, cast
 

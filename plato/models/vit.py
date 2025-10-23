@@ -109,7 +109,9 @@ class DeepViT(nn.Module):
     def __init__(self, name) -> None:
         super().__init__()
         try:
-            dvit_module = importlib.import_module("plato.models.dvit.models.deep_vision_transformer")
+            dvit_module = importlib.import_module(
+                "plato.models.dvit.models.deep_vision_transformer"
+            )
         except ImportError as exc:  # pragma: no cover
             raise ImportError(
                 "DeepViT models are optional. Install the dependencies to use them."
