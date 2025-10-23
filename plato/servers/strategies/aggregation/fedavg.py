@@ -71,7 +71,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         baseline_weights: Dict,
         weights_received: List[Dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> Optional[Dict]:
         """Aggregate weights directly when possible."""
         eligible = [
             (update, weights_received[idx])
