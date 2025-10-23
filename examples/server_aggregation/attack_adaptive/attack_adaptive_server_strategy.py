@@ -471,7 +471,9 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             scale=scale,
         )
         if self._cached_state_dict is not None:
-            attention_module.load_state_dict(self._cached_state_dict)
+            # Allow older checkpoints that may not include non-trainable
+            # buffers (e.g., the temperature scale) to load without error.
+            attention_module.load_state_dict(self._cached_state_dict, strict=False)
         else:
             # Cache the randomly initialised weights so we reuse the same instance
             self._cached_state_dict = attention_module.state_dict()
@@ -489,7 +491,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         # Ensure we work with the cached parameters (trained or random)
         if self._cached_state_dict is not None:
-            attention_module.load_state_dict(self._cached_state_dict)
+            attention_module.load_state_dict(self._cached_state_dict, strict=False)
         attention_module.eval()
 
         data = proj_vec.unsqueeze(0)  # Shape: (1, channels, num_clients)
