@@ -55,6 +55,7 @@ class Trainer(ComposableTrainer):
                 return self.loss_strategy.compute_loss(outputs, labels, self.context)
 
             self._loss_criterion = compute_loss_fn
+
         return self._loss_criterion
 
 

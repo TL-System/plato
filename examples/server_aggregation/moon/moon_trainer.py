@@ -9,7 +9,7 @@ Qinbin Li, Bingsheng He, and Dawn Song.
 from __future__ import annotations
 
 import copy
-from typing import List, Optional
+from typing import List, Optional, cast
 
 import torch
 import torch.nn as nn
@@ -113,7 +113,8 @@ class MoonTrainingStepStrategy(TrainingStepStrategy):
         optimizer.zero_grad()
 
         # Local model forward pass (requires gradients)
-        _, local_projection, logits = model.forward_with_projection(examples)
+        moon_model = cast(MoonModel, model)
+        _, local_projection, logits = moon_model.forward_with_projection(examples)
 
         outputs = {
             "logits": logits,
@@ -166,7 +167,8 @@ class Trainer(ComposableTrainer):
             A deepcopy of the underlying model positioned on CPU with gradients
             disabled, suitable for reuse as a frozen encoder.
         """
-        cloned = copy.deepcopy(self.model)
+        cloned_any = copy.deepcopy(self.model)
+        cloned = cast(nn.Module, cloned_any)
         cloned.to(torch.device("cpu"))
         for param in cloned.parameters():
             param.requires_grad_(False)

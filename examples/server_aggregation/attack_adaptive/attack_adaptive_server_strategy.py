@@ -19,7 +19,7 @@ import json
 import logging
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Dict, List, Optional, Tuple, Union
@@ -201,13 +201,20 @@ class _Affinity(nn.Module):
         scale: float,
     ):
         super().__init__()
+        # Attribute type declarations to satisfy type checkers on nn.Module
+        self.key_conv: nn.Module
+        self.query_conv: nn.Module
+        self.scale: float
+        self.threshold: nn.Threshold
         self.key_conv = _NonLinearity(in_channels, out_channels, bias=bias)
         if self_attention:
             self.query_conv = self.key_conv
         else:
             self.query_conv = _NonLinearity(in_channels, out_channels, bias=bias)
 
-        self.scale = scale
+        # Use a registered buffer to store the scale to avoid issues with
+        # nn.Module's custom __setattr__ in static analyzers.
+        self.register_buffer("scale", torch.tensor(float(scale)))
         self.threshold = nn.Threshold(epsilon, 0.0)
 
     def forward(
@@ -270,8 +277,9 @@ class _AttentionLoop(nn.Module):
         scale: float,
     ):
         super().__init__()
-        self.iterations = iterations
-        self.attention = _AttentionConv(
+        # Attribute declarations for type checkers
+        self.iterations: int = int(iterations)
+        self.attention: _AttentionConv = _AttentionConv(
             in_channels,
             out_channels,
             bias=bias,
@@ -435,7 +443,11 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         trainable_names = self._get_trainable_parameter_names(context)
         stacked = _stack_state_dicts(deltas, trainable_names)
-        projected = _apply_pca_to_state_dict(stacked, self.pca_components)
+        # Ensure pca_components is a concrete int for type checking/runtime
+        n_components = (
+            int(self.pca_components) if self.pca_components is not None else 10
+        )
+        projected = _apply_pca_to_state_dict(stacked, n_components)
         proj_vec = _net2vec(projected)
 
         reference_weights = self._compute_reference_weights(
@@ -447,12 +459,16 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         input_channels = proj_vec.shape[0]
 
+        # Ensure epsilon/scale are concrete floats for type checking/runtime
+        epsilon = float(self.epsilon) if self.epsilon is not None else 0.005
+        scale = float(self.scaling_factor) if self.scaling_factor is not None else 10.0
+
         attention_module = _AttentionLoop(
             input_channels,
             self.attention_hidden,
             iterations=self.attention_loops,
-            epsilon=self.epsilon,
-            scale=self.scaling_factor,
+            epsilon=epsilon,
+            scale=scale,
         )
         if self._cached_state_dict is not None:
             attention_module.load_state_dict(self._cached_state_dict)
@@ -637,7 +653,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
         if not self._capture_metadata_written:
             metadata = {
-                "created_at": datetime.utcnow().isoformat() + "Z",
+                "created_at": datetime.now(timezone.utc).isoformat(),
                 "pca_components": self.pca_components,
                 "epsilon": self.epsilon,
                 "scaling_factor": self.scaling_factor,

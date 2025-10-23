@@ -41,6 +41,7 @@ class DifferentialPrivacyCallback(TrainerCallback):
     def on_train_run_start(self, trainer, config, **kwargs):
         """Wrap model with GradSampleModule for differential privacy."""
         trainer.model = GradSampleModule(trainer.model)
+
         logging.info(
             "[Client #%s] Model wrapped with GradSampleModule for differential privacy.",
             trainer.client_id,
@@ -57,6 +58,7 @@ class DifferentialPrivacyCallback(TrainerCallback):
             k[8:] if "_module." in k else k: v
             for k, v in trainer.model.state_dict().items()
         }
+
         logging.info(
             "[Client #%s] Cleaned up GradSampleModule wrapper from state dict.",
             trainer.client_id,
@@ -219,10 +221,12 @@ class DPOptimizerStrategy(OptimizerStrategy):
             epochs=epochs,
             max_grad_norm=max_grad_norm,
         )
+
         if not isinstance(private_result, (list, tuple)) or len(private_result) < 3:
             raise RuntimeError(
                 "PrivacyEngine.make_private_with_epsilon returned an unexpected result."
             )
+
         private_model, private_optimizer, private_train_loader = private_result[:3]
         context.state["privacy_engine_metadata"] = private_result[3:]
 
@@ -385,11 +389,13 @@ class Trainer(ComposableTrainer):
         # Store train_loader in context
         self.context.state["train_loader"] = self.train_loader
         sampled_size = 0
+
         if sampler is not None and hasattr(sampler, "num_samples"):
             try:
                 sampled_size = sampler.num_samples()
             except TypeError:
                 sampled_size = 0
+
         if sampled_size == 0 and self.train_loader is not None:
             loader_sampler = getattr(self.train_loader, "sampler", None)
             if loader_sampler is not None and hasattr(loader_sampler, "__len__"):
@@ -397,11 +403,13 @@ class Trainer(ComposableTrainer):
                     sampled_size = len(loader_sampler)
                 except TypeError:
                     sampled_size = 0
+
         if sampled_size == 0 and trainset is not None and hasattr(trainset, "__len__"):
             try:
                 sampled_size = len(trainset)
             except TypeError:
                 sampled_size = 0
+
         self.context.state["num_samples"] = sampled_size
 
         # Create optimizer using strategy (wraps with PrivacyEngine)

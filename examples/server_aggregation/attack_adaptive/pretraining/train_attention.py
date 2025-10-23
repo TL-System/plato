@@ -23,7 +23,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Sized, Tuple, cast
 
 import torch
 import torch.nn.functional as F
@@ -83,12 +83,14 @@ def _split_dataset(
     dataset: Dataset,
     val_ratio: float,
 ) -> tuple[Dataset, Dataset]:
-    if val_ratio <= 0 or len(dataset) == 1:
+    ds_len = len(cast(Sized, dataset))
+    if val_ratio <= 0 or ds_len == 1:
         return dataset, dataset
 
-    val_size = max(1, int(len(dataset) * val_ratio))
-    train_size = len(dataset) - val_size
-    return random_split(dataset, [train_size, val_size])
+    val_size = max(1, int(ds_len * val_ratio))
+    train_size = ds_len - val_size
+    splits = random_split(dataset, [train_size, val_size])
+    return cast(tuple[Dataset, Dataset], (splits[0], splits[1]))
 
 
 def _train_epoch(
@@ -111,7 +113,7 @@ def _train_epoch(
         optimizer.step()
         total_loss += loss.item() * projection.size(0)
 
-    return total_loss / len(loader.dataset)
+    return total_loss / len(cast(Sized, loader.dataset))
 
 
 def _evaluate(
@@ -129,7 +131,7 @@ def _evaluate(
             pred = model.get_weights(beta, projection).squeeze(1)
             loss = F.l1_loss(pred, target)
             total_loss += loss.item() * projection.size(0)
-    return total_loss / len(loader.dataset)
+    return total_loss / len(cast(Sized, loader.dataset))
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

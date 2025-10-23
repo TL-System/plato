@@ -14,7 +14,7 @@ import fednova_server
 
 
 def main():
-    """A Plato federated learning training session using the FedNova algorithm."""
+    """A federated learning training session using FedNova."""
     client = fednova_client.create_client()
     server = fednova_server.Server()
     server.run(client)
