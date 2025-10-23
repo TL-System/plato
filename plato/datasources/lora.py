@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from datasets import load_dataset
+from datasets import Dataset, load_dataset
 from transformers import AutoTokenizer, LlamaTokenizer
 
 from plato.config import Config
@@ -48,7 +48,13 @@ class DataSource(base.DataSource):
 
         dataset = load_dataset(dataset_name, **dataset_kwargs)
 
-        column_names: List[str] = dataset[train_split].column_names
+        train_split_dataset = dataset[train_split]
+        if not isinstance(train_split_dataset, Dataset):
+            raise TypeError(f"Split '{train_split}' is not a HuggingFace Dataset instance.")
+        column_names_raw = getattr(train_split_dataset, "column_names", None)
+        if not isinstance(column_names_raw, list):
+            raise AttributeError("Training split must expose 'column_names'.")
+        column_names: List[str] = [str(name) for name in column_names_raw]
 
         model_name = Config().trainer.model_name
         if "llama" in model_name.lower():
@@ -75,10 +81,19 @@ class DataSource(base.DataSource):
             remove_columns=column_names,
         )
 
-        train_data = tokenized_datasets[train_split].shuffle(seed=shuffle_seed)
+        train_tokenized = tokenized_datasets[train_split]
+        shuffle_fn = getattr(train_tokenized, "shuffle", None)
+        if not callable(shuffle_fn):
+            raise AttributeError("Training split does not support shuffling.")
+        train_data = shuffle_fn(seed=shuffle_seed)
         val_data: Optional[Any] = None
         if val_split in tokenized_datasets:
-            val_data = tokenized_datasets[val_split].shuffle(seed=shuffle_seed)
+            val_tokenized = tokenized_datasets[val_split]
+            shuffle_val = getattr(val_tokenized, "shuffle", None)
+            if callable(shuffle_val):
+                val_data = shuffle_val(seed=shuffle_seed)
+            else:
+                val_data = val_tokenized
 
         self.trainset = train_data
         self.testset = val_data

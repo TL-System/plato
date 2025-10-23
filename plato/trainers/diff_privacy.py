@@ -8,7 +8,7 @@ trainer pattern with custom strategies and callbacks instead of inheritance.
 import logging
 import time
 from collections.abc import Iterable
-from typing import Optional
+from typing import Callable, Optional
 
 import torch
 from opacus import GradSampleModule
@@ -243,7 +243,7 @@ class DPTrainingStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """

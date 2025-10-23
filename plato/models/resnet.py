@@ -168,6 +168,9 @@ class Model(nn.Module):
     @staticmethod
     def get(model_name=None, num_classes=None, cut_layer=None, **kwargs):
         """Returns a suitable ResNet model according to its type."""
+        if not isinstance(model_name, str):
+            raise ValueError("A valid ResNet model name must be provided.")
+
         if not Model.is_valid_model_type(model_name):
             raise ValueError(f"Invalid Resnet model name: {model_name}")
 

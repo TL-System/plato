@@ -4,6 +4,7 @@ Base class for algorithms.
 
 import os
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 
 from plato.trainers.base import Trainer
 
@@ -11,7 +12,7 @@ from plato.trainers.base import Trainer
 class Algorithm(ABC):
     """Base class for all the algorithms."""
 
-    def __init__(self, trainer: Trainer):
+    def __init__(self, trainer: Optional[Trainer]):
         """Initializes the algorithm with the provided model and trainer.
 
         Arguments:
@@ -19,8 +20,8 @@ class Algorithm(ABC):
         model: The model to train.
         """
         super().__init__()
-        self.trainer = trainer
-        self.model = trainer.model
+        self.trainer: Optional[Trainer] = trainer
+        self.model: Optional[Any] = getattr(trainer, "model", None) if trainer else None
         self.client_id = 0
 
     def __repr__(self):

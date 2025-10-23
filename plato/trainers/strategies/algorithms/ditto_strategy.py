@@ -32,7 +32,7 @@ Training procedure:
 import copy
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -95,7 +95,7 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
         self,
         ditto_lambda: float = 0.1,
         personalization_epochs: int = 5,
-        model_fn: Optional[callable] = None,
+        model_fn: Optional[Callable[[], nn.Module]] = None,
         save_path: Optional[str] = None,
     ):
         """
@@ -160,7 +160,10 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
             context: Training context with model
         """
         # Save initial global model weights (w^t in the paper)
-        self.initial_global_weights = copy.deepcopy(context.model.cpu().state_dict())
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for Ditto.")
+        self.initial_global_weights = copy.deepcopy(model.cpu().state_dict())
 
         # Load existing personalized model if available
         if os.path.exists(self.personalized_model_path):
@@ -320,7 +323,10 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
                 context.client_id,
             )
             # Copy personalized model weights to main model
-            context.model.load_state_dict(self.personalized_model.state_dict())
+            model = context.model
+            if model is None:
+                raise ValueError("Training context must provide a model for Ditto.")
+            model.load_state_dict(self.personalized_model.state_dict())
 
     def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
         """
@@ -370,7 +376,7 @@ class DittoUpdateStrategyFromConfig(DittoUpdateStrategy):
         ... )
     """
 
-    def __init__(self, model_fn: Optional[callable] = None):
+    def __init__(self, model_fn: Optional[Callable[[], nn.Module]] = None):
         """
         Initialize Ditto strategy from config.
 

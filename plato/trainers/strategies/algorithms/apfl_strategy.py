@@ -29,7 +29,7 @@ The update rules:
 
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import numpy as np
 import torch
@@ -94,7 +94,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         self,
         alpha: float = 0.5,
         adaptive_alpha: bool = True,
-        model_fn: Optional[callable] = None,
+        model_fn: Optional[Callable[[], nn.Module]] = None,
         save_path: Optional[str] = None,
     ):
         """
@@ -308,7 +308,7 @@ class APFLStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -400,7 +400,7 @@ class APFLStepStrategy(TrainingStepStrategy):
         alpha_lr: float,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
     ) -> float:
         """
         Update mixing parameter α based on gradient.
@@ -478,7 +478,7 @@ class APFLUpdateStrategyFromConfig(APFLUpdateStrategy):
         ... )
     """
 
-    def __init__(self, model_fn: Optional[callable] = None):
+    def __init__(self, model_fn: Optional[Callable[[], nn.Module]] = None):
         """
         Initialize APFL strategy from config.
 

@@ -10,7 +10,7 @@ HuggingFace data handling through strategy objects instead of overriding
 import logging
 import math
 import os
-from typing import Iterable, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn.functional as F
@@ -59,7 +59,7 @@ class HuggingFaceCollateWrapper:
     def __call__(
         self, examples: Iterable[dict]
     ) -> Tuple[HuggingFaceBatch, Optional[torch.Tensor]]:
-        batch = default_data_collator(examples)
+        batch = default_data_collator(list(examples))
         labels = batch.pop("labels", None)
         if labels is None:
             input_ids = batch.get("input_ids")
@@ -418,7 +418,7 @@ class Trainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
         hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
 
-        self._hf_callbacks: list[TrainerCallback] = []
+        self._hf_callbacks: list[HFTrainerCallback] = []
         self._hf_bridge: Optional[HuggingFaceCallbackBridge] = None
         self._hf_state = TrainerState()
         self._hf_control = TrainerControl()
@@ -440,20 +440,49 @@ class Trainer(ComposableTrainer):
         }
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
-        tokenizer_kwargs = {
-            "cache_dir": None,
-            "use_fast": True,
-            "revision": "main",
-            "use_auth_token": None,
-        }
+        cache_dir = Config().params["data_path"]
+        use_fast_tokenizer = True
+        revision = "main"
+        auth_token = getattr(
+            getattr(Config(), "parameters", None), "huggingface_token", None
+        )
+
         if "llama" in model_name:
-            self.tokenizer = LlamaTokenizer.from_pretrained(
-                model_name, config=self.config, **tokenizer_kwargs
-            )
+            if isinstance(auth_token, str) and auth_token:
+                self.tokenizer = LlamaTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                    use_auth_token=auth_token,
+                )
+            else:
+                self.tokenizer = LlamaTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                )
         else:
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                model_name, config=self.config, **tokenizer_kwargs
-            )
+            if isinstance(auth_token, str) and auth_token:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                    use_auth_token=auth_token,
+                )
+            else:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                )
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:

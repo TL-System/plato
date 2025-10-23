@@ -58,11 +58,21 @@ def get(client_id: int = 0, **kwargs):
         datasource_name = target_name
 
     if datasource_name in registered_datasources:
-        dataset = registered_datasources[datasource_name].DataSource(**kwargs)
+        module = registered_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered datasource '{datasource_name}' lacks a DataSource class."
+            )
+        dataset = datasource_cls(**kwargs)
     elif datasource_name in registered_partitioned_datasources:
-        dataset = registered_partitioned_datasources[datasource_name].DataSource(
-            client_id, **kwargs
-        )
+        module = registered_partitioned_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered partitioned datasource '{datasource_name}' lacks a DataSource class."
+            )
+        dataset = datasource_cls(client_id, **kwargs)
     else:
         raise ValueError(f"No such data source: {datasource_name}")
 
@@ -79,11 +89,21 @@ def get_input_shape():
         datasource_name = _datasource_aliases[datasource_name][0]
 
     if datasource_name in registered_datasources:
-        input_shape = registered_datasources[datasource_name].DataSource.input_shape()
+        module = registered_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered datasource '{datasource_name}' lacks a DataSource class."
+            )
+        input_shape = datasource_cls.input_shape()
     elif datasource_name in registered_partitioned_datasources:
-        input_shape = registered_partitioned_datasources[
-            datasource_name
-        ].DataSource.input_shape()
+        module = registered_partitioned_datasources[datasource_name]
+        datasource_cls = getattr(module, "DataSource", None)
+        if datasource_cls is None:
+            raise AttributeError(
+                f"Registered partitioned datasource '{datasource_name}' lacks a DataSource class."
+            )
+        input_shape = datasource_cls.input_shape()
     else:
         raise ValueError(f"No such data source: {datasource_name}")
 

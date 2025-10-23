@@ -348,7 +348,11 @@ class DefaultTrainingStrategy(TrainingStrategy):
             hasattr(Config().clients, "sleep_simulation")
             and Config().clients.sleep_simulation
         ):
-            sleep_seconds = Config().client_sleep_times[context.client_id - 1]
+            sleep_times = Config().client_sleep_times
+            if sleep_times is None:
+                sleep_times = Config.simulate_client_speed()
+            index = max(context.client_id - 1, 0)
+            sleep_seconds = float(sleep_times[index])
             avg_training_time = Config().clients.avg_training_time
             training_time = (
                 avg_training_time + sleep_seconds

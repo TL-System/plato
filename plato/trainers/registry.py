@@ -24,12 +24,15 @@ registered_trainers = {
 
 def _resolve_trainer_name(trainer_config) -> str:
     """Resolve trainer type supporting framework shortcuts."""
-    trainer_type = getattr(trainer_config, "type", None)
+    trainer_type_attr = getattr(trainer_config, "type", None)
+    trainer_type = trainer_type_attr if isinstance(trainer_type_attr, str) else None
     framework = getattr(trainer_config, "framework", "")
 
     if not trainer_type and framework:
         if framework.lower() == "mlx":
             return "mlx"
+    if not trainer_type:
+        raise ValueError("Trainer type must be specified in the configuration.")
     return trainer_type
 
 

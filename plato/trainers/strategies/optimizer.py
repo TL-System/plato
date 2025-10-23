@@ -5,7 +5,9 @@ This module provides default and common optimizer strategies for
 the composable trainer architecture.
 """
 
-from typing import Any, Dict, List, Optional
+from __future__ import annotations
+
+from typing import Any, Callable, Dict, List, Optional, Type
 
 import torch
 import torch.nn as nn
@@ -13,6 +15,10 @@ import torch.nn as nn
 from plato.config import Config
 from plato.trainers import optimizers as optimizer_registry
 from plato.trainers.strategies.base import OptimizerStrategy, TrainingContext
+
+OptimizerFactory = Callable[[nn.Module], torch.optim.Optimizer]
+ParameterGroupsFn = Callable[[nn.Module], List[Dict[str, Any]]]
+OptimizerClass = Type[torch.optim.Optimizer]
 
 
 class DefaultOptimizerStrategy(OptimizerStrategy):
@@ -30,7 +36,7 @@ class DefaultOptimizerStrategy(OptimizerStrategy):
         >>> trainer = ComposableTrainer(optimizer_strategy=strategy)
     """
 
-    def __init__(self, optimizer_fn: Optional[callable] = None):
+    def __init__(self, optimizer_fn: Optional[OptimizerFactory] = None):
         """Initialize with optional custom optimizer factory."""
         self.optimizer_fn = optimizer_fn
 
@@ -279,8 +285,8 @@ class ParameterGroupOptimizerStrategy(OptimizerStrategy):
 
     def __init__(
         self,
-        optimizer_class: type,
-        parameter_groups_fn: callable,
+        optimizer_class: OptimizerClass,
+        parameter_groups_fn: ParameterGroupsFn,
         default_lr: Optional[float] = None,
         **optimizer_kwargs,
     ):
@@ -356,8 +362,11 @@ class GradientClippingOptimizerStrategy(OptimizerStrategy):
     ) -> None:
         """Apply gradient clipping before optimizer step."""
         # Clip gradients
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for gradient clipping.")
         torch.nn.utils.clip_grad_norm_(
-            context.model.parameters(),
+            model.parameters(),
             max_norm=self.max_norm,
             norm_type=self.norm_type,
         )

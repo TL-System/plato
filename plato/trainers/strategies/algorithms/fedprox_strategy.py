@@ -25,7 +25,7 @@ Note: This implementation uses the L2 norm (not squared) for backward compatibil
 with the original Plato implementation, although the paper formula shows ||w - w^t||^2.
 """
 
-from typing import Optional
+from typing import Callable, Optional
 
 import torch
 import torch.nn as nn
@@ -85,7 +85,9 @@ class FedProxLossStrategy(LossCriterionStrategy):
     def __init__(
         self,
         mu: float = 0.01,
-        base_loss_fn: Optional[callable] = None,
+        base_loss_fn: Optional[
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        ] = None,
         norm_type: str = "l2",
     ):
         """
@@ -132,7 +134,11 @@ class FedProxLossStrategy(LossCriterionStrategy):
         # Capture global model weights at start of training
         # These represent w^t in the FedProx formulation
         self.global_weights = {}
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedProx.")
+
+        for name, param in model.named_parameters():
             self.global_weights[name] = param.clone().detach()
 
     def compute_loss(
@@ -165,7 +171,11 @@ class FedProxLossStrategy(LossCriterionStrategy):
         # Note: We use L2 norm (not squared) for backward compatibility
         squared_diff_sum = torch.tensor(0.0, device=outputs.device)
 
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedProx.")
+
+        for name, param in model.named_parameters():
             if param.requires_grad and name in self.global_weights:
                 global_param = self.global_weights[name].to(param.device)
 
@@ -231,7 +241,13 @@ class FedProxLossStrategyFromConfig(FedProxLossStrategy):
         ... )
     """
 
-    def __init__(self, base_loss_fn: Optional[callable] = None, norm_type: str = "l2"):
+    def __init__(
+        self,
+        base_loss_fn: Optional[
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        ] = None,
+        norm_type: str = "l2",
+    ):
         """
         Initialize FedProx loss strategy with config-based mu.
 

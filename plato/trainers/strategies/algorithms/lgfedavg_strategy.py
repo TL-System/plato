@@ -22,7 +22,7 @@ This allows clients to learn personalized representations while still benefiting
 from shared global features.
 """
 
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 import torch
 import torch.nn as nn
@@ -148,7 +148,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -329,8 +329,12 @@ class LGFedAvgStepStrategyAuto(LGFedAvgStepStrategy):
         Args:
             context: Training context with model
         """
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for LG-FedAvg.")
+
         # Get all parameter names
-        param_names = [name for name, _ in context.model.named_parameters()]
+        param_names = [name for name, _ in model.named_parameters()]
 
         if len(param_names) == 0:
             raise ValueError("Model has no parameters")
@@ -355,8 +359,12 @@ class LGFedAvgStepStrategyAuto(LGFedAvgStepStrategy):
             self.num_local_layers, total_layers - 1
         )  # Keep at least 1 global
 
-        self.local_layer_names = layer_names[-num_local:]
-        self.global_layer_names = layer_names[:-num_local]
+        if num_local <= 0:
+            self.local_layer_names = []
+            self.global_layer_names = layer_names
+        else:
+            self.local_layer_names = layer_names[-num_local:]
+            self.global_layer_names = layer_names[:-num_local]
 
         self._initialized = True
 
@@ -366,7 +374,7 @@ class LGFedAvgStepStrategyAuto(LGFedAvgStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """

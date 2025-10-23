@@ -24,7 +24,7 @@ from plato.models import (
 try:  # pragma: no cover - optional MLX models
     from plato.models.mlx import lenet5 as mlx_lenet5
 except ImportError:  # pragma: no cover
-    mlx_lenet5 = None
+    mlx_lenet5 = cast(Any, None)
 
 registered_models = {
     "lenet5": lenet5.Model,

@@ -5,13 +5,18 @@ This module provides default and common data loader strategies for
 the composable trainer architecture.
 """
 
+from __future__ import annotations
+
 import logging
-from typing import Optional
+from typing import Any, Callable, Optional
 
 import torch
 import torch.utils.data
 
 from plato.trainers.strategies.base import DataLoaderStrategy, TrainingContext
+
+CollateFn = Callable[[list[Any]], Any]
+AdjustFn = Callable[[TrainingContext], int]
 
 
 def _context_uses_cuda(context: TrainingContext) -> bool:
@@ -137,7 +142,7 @@ class CustomCollateFnDataLoaderStrategy(DataLoaderStrategy):
 
     def __init__(
         self,
-        collate_fn: callable,
+        collate_fn: CollateFn,
         num_workers: int = 0,
         pin_memory: Optional[bool] = False,
         drop_last: bool = False,
@@ -274,7 +279,7 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
         self,
         initial_batch_size: int = 32,
         max_batch_size: int = 128,
-        adjust_fn: Optional[callable] = None,
+        adjust_fn: Optional[AdjustFn] = None,
         num_workers: int = 0,
         pin_memory: Optional[bool] = False,
     ):
@@ -291,8 +296,10 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
         """Create data loader with dynamic batch size."""
         # Determine actual batch size
         if self.adjust_fn is not None:
-            actual_batch_size = self.adjust_fn(context)
-            actual_batch_size = min(actual_batch_size, self.max_batch_size)
+            proposed_batch = self.adjust_fn(context)
+            if not isinstance(proposed_batch, int):
+                raise TypeError("adjust_fn must return an integer batch size.")
+            actual_batch_size = min(proposed_batch, self.max_batch_size)
         else:
             actual_batch_size = batch_size
 

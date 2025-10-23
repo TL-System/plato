@@ -4,6 +4,7 @@ Base class for trainers.
 
 import os
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 
 from plato.config import Config
 
@@ -14,6 +15,8 @@ class Trainer(ABC):
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0
+        # Subclasses populate the actual model instance during initialization.
+        self.model: Optional[Any] = None
 
     def set_client_id(self, client_id):
         """Setting the client ID."""

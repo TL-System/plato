@@ -31,7 +31,7 @@ FedDyn different from FedProx and other methods.
 import copy
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -94,7 +94,9 @@ class FedDynLossStrategy(LossCriterionStrategy):
     def __init__(
         self,
         alpha: float = 0.01,
-        base_loss_fn: Optional[callable] = None,
+        base_loss_fn: Optional[
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        ] = None,
         adaptive_alpha: bool = True,
     ):
         """
@@ -128,20 +130,24 @@ class FedDynLossStrategy(LossCriterionStrategy):
         else:
             self._criterion = self.base_loss_fn
 
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedDyn.")
+
         # Try to retrieve state from context
         self.global_model_weights = context.state.get("feddyn_global_weights")
         self.cumulative_grad_vector = context.state.get("feddyn_cumulative_grad")
 
         # If not in context, initialize
         if self.global_model_weights is None:
-            self.global_model_weights = copy.deepcopy(context.model.state_dict())
+            self.global_model_weights = copy.deepcopy(model.state_dict())
             context.state["feddyn_global_weights"] = self.global_model_weights
 
         if self.cumulative_grad_vector is None:
             # Initialize cumulative gradient vector to zero
             self.cumulative_grad_vector = {
                 name: torch.zeros_like(param)
-                for name, param in context.model.named_parameters()
+                for name, param in model.named_parameters()
             }
             context.state["feddyn_cumulative_grad"] = self.cumulative_grad_vector
 
@@ -173,7 +179,11 @@ class FedDynLossStrategy(LossCriterionStrategy):
         # Compute linear penalty: α * <w, -w_global + grad_vector>
         linear_penalty = torch.tensor(0.0, device=outputs.device)
 
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedDyn.")
+
+        for name, param in model.named_parameters():
             if (
                 name in self.cumulative_grad_vector
                 and name in self.global_model_weights
@@ -191,7 +201,7 @@ class FedDynLossStrategy(LossCriterionStrategy):
         # Compute L2 regularization: (α/2)||w - w_global||^2
         l2_reg = torch.tensor(0.0, device=outputs.device)
 
-        for name, param in context.model.named_parameters():
+        for name, param in model.named_parameters():
             if name in self.global_model_weights:
                 w_global = self.global_model_weights[name].to(param.device)
                 l2_reg = l2_reg + torch.sum((param - w_global) ** 2)
@@ -322,7 +332,11 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             context: Training context
         """
         # Save global model weights at start of this round
-        self.global_model_weights = copy.deepcopy(context.model.state_dict())
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedDyn.")
+
+        self.global_model_weights = copy.deepcopy(model.state_dict())
 
         # Try to load cumulative gradient vector from previous rounds
         if os.path.exists(self.grad_vector_path):
@@ -344,7 +358,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
                 # Initialize to zero if loading fails
                 self.cumulative_grad_vector = {
                     name: torch.zeros_like(param)
-                    for name, param in context.model.named_parameters()
+                    for name, param in model.named_parameters()
                 }
         else:
             # First round: initialize cumulative gradient vector to zero
@@ -355,7 +369,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             )
             self.cumulative_grad_vector = {
                 name: torch.zeros_like(param)
-                for name, param in context.model.named_parameters()
+                for name, param in model.named_parameters()
             }
 
         # Store in context for loss strategy
@@ -373,7 +387,11 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             context: Training context
         """
         # Update cumulative gradient vector: grad_vec += (w_trained - w_global)
-        trained_weights = context.model.state_dict()
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedDyn.")
+
+        trained_weights = model.state_dict()
 
         for name in self.cumulative_grad_vector:
             if name in trained_weights and name in self.global_model_weights:
@@ -459,7 +477,9 @@ class FedDynLossStrategyFromConfig(FedDynLossStrategy):
 
     def __init__(
         self,
-        base_loss_fn: Optional[callable] = None,
+        base_loss_fn: Optional[
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        ] = None,
         adaptive_alpha: bool = True,
     ):
         """

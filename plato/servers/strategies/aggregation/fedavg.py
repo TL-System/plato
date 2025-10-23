@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 from types import SimpleNamespace
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Optional, cast
 
 import numpy as np
 
@@ -18,7 +18,7 @@ from plato.servers.strategies.base import AggregationStrategy, ServerContext
 try:  # pragma: no cover - optional dependency
     import torch
 except ImportError:  # pragma: no cover
-    torch = None
+    torch = cast(Any, None)
 
 
 class FedAvgAggregationStrategy(AggregationStrategy):
@@ -42,11 +42,11 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             if getattr(update.report, "type", "weights") != "features"
         ]
         if not eligible:
-            return None
+            return {}
 
         total_samples = sum(update.report.num_samples for update, _ in eligible)
         if total_samples == 0:
-            return None
+            return {}
 
         avg_update: Any = None
         for update, delta in eligible:
@@ -57,7 +57,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
 
             await asyncio.sleep(0)
 
-        return avg_update
+        return avg_update if avg_update is not None else {}
 
     async def aggregate_weights(
         self,
@@ -73,11 +73,11 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             if getattr(update.report, "type", "weights") != "features"
         ]
         if not eligible:
-            return None
+            return dict(baseline_weights)
 
         total_samples = sum(update.report.num_samples for update, _ in eligible)
         if total_samples == 0:
-            return None
+            return dict(baseline_weights)
 
         avg_weights: Any = None
         for update, weights in eligible:
@@ -88,7 +88,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             )
             await asyncio.sleep(0)
 
-        return avg_weights
+        return avg_weights if avg_weights is not None else dict(baseline_weights)
 
     def _accumulate_weighted(
         self,
@@ -98,6 +98,13 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         context: ServerContext,
     ) -> Any:
         """Accumulate weighted values into the target structure and return it."""
+        trainer = getattr(context, "trainer", None)
+        zeros_fn: Optional[Callable[[Any], Any]] = (
+            cast(Callable[[Any], Any], trainer.zeros)
+            if trainer is not None and hasattr(trainer, "zeros")
+            else None
+        )
+
         if value is None or weight == 0.0:
             return target
 
@@ -142,7 +149,10 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             base = target
             if base is None:
                 try:
-                    base = context.trainer.zeros(value.shape)
+                    if zeros_fn is not None:
+                        base = zeros_fn(value.shape)
+                    else:
+                        raise AttributeError
                 except (AttributeError, TypeError, ValueError):
                     base = np.zeros(value.shape, dtype=getattr(value, "dtype", None))
             if hasattr(base, "__iadd__"):

@@ -156,6 +156,10 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         # Receive server control variate from context
         self.server_control_variate = context.state.get("server_control_variate")
 
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+
         if self.server_control_variate is None:
             logging.warning(
                 "[Client #%d] No server_control_variate found in context. "
@@ -164,7 +168,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
             )
             # Initialize server control variate with zeros
             self.server_control_variate = OrderedDict()
-            for name, param in context.model.named_parameters():
+            for name, param in model.named_parameters():
                 self.server_control_variate[name] = torch.zeros_like(param)
 
         # Initialize client control variate if first time
@@ -174,11 +178,11 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                 context.client_id,
             )
             self.client_control_variate = OrderedDict()
-            for name, param in context.model.named_parameters():
+            for name, param in model.named_parameters():
                 self.client_control_variate[name] = torch.zeros_like(param)
 
         # Save global model weights for Option 2 in the paper
-        self.global_model_weights = copy.deepcopy(context.model.state_dict())
+        self.global_model_weights = copy.deepcopy(model.state_dict())
 
         # Reset local step counter
         self.local_steps = 0
@@ -215,7 +219,10 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         # Apply control variate correction: w += lr * (c - c_i)
         # Only apply to weight and bias parameters (matching original implementation)
         with torch.no_grad():
-            for name, param in context.model.named_parameters():
+            model = context.model
+            if model is None:
+                raise ValueError("Training context must provide a model for SCAFFOLD.")
+            for name, param in model.named_parameters():
                 if (
                     ("weight" in name or "bias" in name)
                     and name in self.server_control_variate
@@ -298,7 +305,11 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         new_client_cv = OrderedDict()
         delta_cv = OrderedDict()
 
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+
+        for name, param in model.named_parameters():
             # Current local model parameter
             x_local = param.data
 
@@ -401,7 +412,10 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
 
         # Initialize accumulator for Option 1
         self.accumulated_updates = OrderedDict()
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+        for name, param in model.named_parameters():
             self.accumulated_updates[name] = torch.zeros_like(param)
 
     def before_step(self, context: TrainingContext) -> None:
@@ -409,7 +423,10 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         if not hasattr(self, "_weights_before_step"):
             self._weights_before_step = OrderedDict()
 
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+        for name, param in model.named_parameters():
             self._weights_before_step[name] = param.data.clone()
 
     def after_step(self, context: TrainingContext) -> None:
@@ -421,7 +438,10 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         """
         # First accumulate the update for Option 1
         if hasattr(self, "_weights_before_step"):
-            for name, param in context.model.named_parameters():
+            model = context.model
+            if model is None:
+                raise ValueError("Training context must provide a model for SCAFFOLD.")
+            for name, param in model.named_parameters():
                 w_before = self._weights_before_step[name]
                 w_after = param.data
                 update = w_before - w_after

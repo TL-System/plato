@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import asyncio
 from types import SimpleNamespace
-from typing import Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+
+import numpy as np
 
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
@@ -21,16 +23,29 @@ class FedAvgGanAggregationStrategy(AggregationStrategy):
         """Aggregate generator and discriminator deltas with sample weighting."""
 
         total_samples = sum(update.report.num_samples for update in updates)
-        context.server.total_samples = total_samples
+        server_obj = getattr(context, "server", None)
+        if server_obj is None:
+            raise AttributeError("GAN aggregation requires a server context.")
+        server = cast(Any, server_obj)
+        server.total_samples = total_samples
 
-        trainer = context.trainer
+        trainer_obj = getattr(context, "trainer", None)
+        zeros_fn: Optional[Callable[[Any], Any]] = (
+            cast(Callable[[Any], Any], trainer_obj.zeros)
+            if trainer_obj is not None and hasattr(trainer_obj, "zeros")
+            else None
+        )
 
         gen_avg_update = {
-            name: trainer.zeros(weights.shape)
+            name: zeros_fn(weights.shape)
+            if zeros_fn is not None
+            else np.zeros_like(weights)
             for name, weights in deltas_received[0][0].items()
         }
         disc_avg_update = {
-            name: trainer.zeros(weights.shape)
+            name: zeros_fn(weights.shape)
+            if zeros_fn is not None
+            else np.zeros_like(weights)
             for name, weights in deltas_received[0][1].items()
         }
 

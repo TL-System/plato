@@ -5,7 +5,7 @@ The Purchase100 dataset.
 import logging
 import os
 import tarfile
-import urllib
+from urllib import request
 
 import numpy as np
 import torch
@@ -33,7 +33,7 @@ class DataSource(base.DataSource):
         """Download the Purchase100 dataset."""
         logging.info("Downloading the Purchase100 dataset...")
         filename = "https://www.comp.nus.edu.sg/~reza/files/dataset_purchase.tgz"
-        urllib.request.urlretrieve(
+        request.urlretrieve(
             filename, os.path.join(root_path, "tmp_purchase.tgz")
         )
         logging.info("Dataset downloaded.")

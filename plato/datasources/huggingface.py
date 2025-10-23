@@ -16,8 +16,8 @@ from transformers import (
     HfArgumentParser,
     TrainingArguments,
     testing_utils,
-    utils,
 )
+from transformers.utils import logging as hf_logging
 
 from plato.config import Config
 from plato.datasources import base
@@ -75,9 +75,7 @@ class DataSource(base.DataSource):
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_name, config=self.config, **tokenizer_kwargs
         )
-        self.tok_logger = utils.logging.get_logger(
-            "transformers.tokenization_utils_base"
-        )
+        self.tok_logger = hf_logging.get_logger("transformers.tokenization_utils_base")
 
         self.block_size = 128
 

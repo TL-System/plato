@@ -20,7 +20,7 @@ global model proximity.
 """
 
 import copy
-from typing import Optional
+from typing import Any, Callable, Optional, cast
 
 import torch
 import torch.nn as nn
@@ -489,7 +489,7 @@ class FedMosStepStrategy(TrainingStepStrategy):
         optimizer: Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -519,22 +519,24 @@ class FedMosStepStrategy(TrainingStepStrategy):
         loss.backward(create_graph=self.create_graph, retain_graph=self.retain_graph)
 
         # FedMos-specific: Update momentum before step
-        if hasattr(optimizer, "update_momentum"):
-            optimizer.update_momentum()
+        update_momentum = getattr(optimizer, "update_momentum", None)
+        if callable(update_momentum):
+            update_momentum()
 
         # Optimizer step - pass global model if available
         global_model = context.state.get("fedmos_global_model")
+        step_fn = getattr(optimizer, "step")
+        step_callable = cast(Callable[..., Any], step_fn)
         if global_model is not None and hasattr(optimizer, "step"):
             # Check if step accepts global_model_params argument
             import inspect
 
-            sig = inspect.signature(optimizer.step)
+            sig = inspect.signature(step_fn)
             if "global_model_params" in sig.parameters:
-                optimizer.step(global_model_params=global_model)
+                step_callable(global_model_params=global_model)
             else:
-                # Fallback for older optimizer signature
-                optimizer.step(global_model)
+                step_callable()
         else:
-            optimizer.step()
+            step_callable()
 
         return loss

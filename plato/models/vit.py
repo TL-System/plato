@@ -9,6 +9,9 @@ https://github.com/zhoudaquan/dvit_repo
 
 """
 
+import importlib
+from typing import Any, cast
+
 import torch
 from torch import nn
 from transformers import AutoConfig, AutoModelForImageClassification
@@ -21,7 +24,7 @@ class ResolutionAdjustedModel(nn.Module):
     Transforms the image resolution to the assigned resolution of a pretrained model.
     """
 
-    def __init__(self, model_name, config) -> nn.Module:
+    def __init__(self, model_name, config) -> None:
         super().__init__()
 
         if (
@@ -63,13 +66,17 @@ class ResolutionAdjustedModel(nn.Module):
 class T2TVIT(nn.Module):
     """Wrapper for the T2T-ViT model."""
 
-    def __init__(self, name) -> nn.Module:
+    def __init__(self, name) -> None:
         super().__init__()
-        # pylint:disable=import-outside-toplevel
-        from plato.models import t2tvit
-        from plato.models.t2tvit.models import t2t_vit
+        try:
+            t2t_module = importlib.import_module("plato.models.t2tvit.models.t2t_vit")
+            t2t_utils = cast(Any, importlib.import_module("plato.models.t2tvit.utils"))
+        except ImportError as exc:  # pragma: no cover
+            raise ImportError(
+                "T2T-ViT models are optional. Install the dependencies to use them."
+            ) from exc
 
-        model_name = getattr(t2t_vit, name)
+        model_name = getattr(t2t_module, name)
         t2t = model_name(num_classes=Config().trainer.num_classes)
 
         if (
@@ -77,7 +84,7 @@ class T2TVIT(nn.Module):
             and hasattr(Config().parameters.model, "pretrained")
             and Config().parameters.model.pretrained
         ):
-            t2tvit.utils.load_for_transfer_learning(
+            t2t_utils.load_for_transfer_learning(
                 t2t,
                 Config().parameters.model.pretrain_path,
                 use_ema=True,
@@ -99,14 +106,18 @@ class T2TVIT(nn.Module):
 class DeepViT(nn.Module):
     """Wrapper for the DeepViT model."""
 
-    def __init__(self, name) -> nn.Module:
+    def __init__(self, name) -> None:
         super().__init__()
-        # pylint:disable=import-outside-toplevel
-        from plato.models.dvit.models import deep_vision_transformer
+        try:
+            dvit_module = importlib.import_module("plato.models.dvit.models.deep_vision_transformer")
+        except ImportError as exc:  # pragma: no cover
+            raise ImportError(
+                "DeepViT models are optional. Install the dependencies to use them."
+            ) from exc
 
-        model_name = getattr(deep_vision_transformer, name)
+        model_name = getattr(dvit_module, name)
         deepvit = model_name(
-            pretrained=False, num_classes=Config.trainer.num_classes, in_chans=3
+            pretrained=False, num_classes=Config().trainer.num_classes, in_chans=3
         )
         if (
             hasattr(Config().parameters, "model")
@@ -143,10 +154,14 @@ class Model:
     @staticmethod
     def get(model_name=None, **kwargs):  # pylint: disable=unused-argument
         """Returns a named model from HuggingFace."""
-        if "t2t" in model_name:
+        if not isinstance(model_name, str) or not model_name:
+            raise ValueError("A valid ViT model name must be provided.")
+
+        lower_name = model_name.lower()
+        if "t2t" in lower_name:
             return T2TVIT(model_name)
 
-        if "deepvit" in model_name:
+        if "deepvit" in lower_name:
             return DeepViT(model_name)
 
         config_kwargs = {

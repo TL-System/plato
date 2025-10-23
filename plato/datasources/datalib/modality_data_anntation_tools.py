@@ -5,13 +5,40 @@ The class in this file is supported by the mmaction/tools/data/build_file_list
 """
 
 import glob
+import importlib
 import json
 import os
 
-from mmaction.tools.data.anno_txt2json import lines2dictlist
-from mmaction.tools.data.parse_file_list import parse_directory
-
 from plato.datasources.datalib.parse_datasets import build_list, obtain_data_splits_info
+
+_LINES2DICTLIST = None
+_PARSE_DIRECTORY = None
+
+
+def _get_lines2dictlist():
+    global _LINES2DICTLIST
+    if _LINES2DICTLIST is None:
+        try:
+            module = importlib.import_module("mmaction.tools.data.anno_txt2json")
+            _LINES2DICTLIST = getattr(module, "lines2dictlist")
+        except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
+            raise ImportError(
+                "mmaction is required to generate modality annotations."
+            ) from exc
+    return _LINES2DICTLIST
+
+
+def _get_parse_directory():
+    global _PARSE_DIRECTORY
+    if _PARSE_DIRECTORY is None:
+        try:
+            module = importlib.import_module("mmaction.tools.data.parse_file_list")
+            _PARSE_DIRECTORY = getattr(module, "parse_directory")
+        except (ImportError, AttributeError) as exc:  # pragma: no cover - optional dependency
+            raise ImportError(
+                "mmaction is required to parse dataset directories."
+            ) from exc
+    return _PARSE_DIRECTORY
 
 
 class GenerateMDataAnnotation(object):
@@ -86,6 +113,7 @@ class GenerateMDataAnnotation(object):
         )
         frame_info = None
         if self.data_format == "rawframes":
+            parse_directory = _get_parse_directory()
             frame_info = parse_directory(
                 split_format_data_src_dir,
                 rgb_prefix=self.rgb_prefix,
@@ -98,6 +126,7 @@ class GenerateMDataAnnotation(object):
         elif self.data_format in ["audio_features", "audios"]:
             # the audio anno list should be consistent with that of rawframes
             rawframes_src_path = os.path.join(self.data_src_dir, split, "rawframes")
+            parse_directory = _get_parse_directory()
             frame_info = parse_directory(
                 rawframes_src_path,
                 rgb_prefix=self.rgb_prefix,
@@ -143,6 +172,7 @@ class GenerateMDataAnnotation(object):
             with open(output_file_path, "w") as anno_file:
                 anno_file.writelines(split_built_list[0])
         elif self.output_format == "json":
+            lines2dictlist = _get_lines2dictlist()
             data_list = lines2dictlist(split_built_list[0], data_format)
             if self.data_format in ["audios", "audio_features"]:
 

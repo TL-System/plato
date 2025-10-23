@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from types import SimpleNamespace
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
@@ -55,8 +55,13 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         """Fallback delta aggregation using weighted averaging."""
         total_samples = sum(update.report.num_samples for update in updates)
 
+        trainer = getattr(context, "trainer", None)
+        if trainer is None or not hasattr(trainer, "zeros"):
+            raise AttributeError("FedAsync requires the trainer to provide a 'zeros' method.")
+        zeros_fn = trainer.zeros
+
         avg_update = {
-            name: context.trainer.zeros(delta.shape)
+            name: zeros_fn(delta.shape)
             for name, delta in deltas_received[0].items()
         }
 
@@ -88,7 +93,13 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         if self.adaptive_mixing:
             mixing *= self._staleness_function(client_staleness)
 
-        return await context.algorithm.aggregate_weights(
+        algorithm = getattr(context, "algorithm", None)
+        if algorithm is None or not hasattr(algorithm, "aggregate_weights"):
+            raise AttributeError("FedAsync requires an algorithm with 'aggregate_weights'.")
+
+        algorithm = cast(Any, algorithm)
+
+        return await algorithm.aggregate_weights(
             baseline_weights, weights_received, mixing=mixing
         )
 

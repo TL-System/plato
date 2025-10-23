@@ -5,10 +5,13 @@ This module provides default and common LR scheduler strategies for
 the composable trainer architecture.
 """
 
-from typing import Optional
+from __future__ import annotations
+
+from typing import Callable, Optional
 
 import torch
 import torch.nn as nn
+from torch.optim.lr_scheduler import LRScheduler
 
 from plato.config import Config
 from plato.trainers import lr_schedulers as lr_scheduler_registry
@@ -30,13 +33,18 @@ class DefaultLRSchedulerStrategy(LRSchedulerStrategy):
         >>> trainer = ComposableTrainer(lr_scheduler_strategy=strategy)
     """
 
-    def __init__(self, scheduler_fn: Optional[callable] = None):
+    def __init__(
+        self,
+        scheduler_fn: Optional[
+            Callable[[torch.optim.Optimizer], LRScheduler]
+        ] = None,
+    ):
         """Initialize with optional custom scheduler factory."""
         self.scheduler_fn = scheduler_fn
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> Optional[LRScheduler]:
         """Create scheduler using registry or custom function."""
         if self.scheduler_fn is None:
             # Use framework's registry
@@ -71,7 +79,7 @@ class NoSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> Optional[LRScheduler]:
         """Return None for no scheduling."""
         return None
 
@@ -98,7 +106,7 @@ class StepLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create step LR scheduler."""
         return torch.optim.lr_scheduler.StepLR(
             optimizer,
@@ -133,7 +141,7 @@ class MultiStepLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create multi-step LR scheduler."""
         return torch.optim.lr_scheduler.MultiStepLR(
             optimizer,
@@ -163,7 +171,7 @@ class ExponentialLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create exponential LR scheduler."""
         return torch.optim.lr_scheduler.ExponentialLR(
             optimizer, gamma=self.gamma, last_epoch=self.last_epoch
@@ -192,7 +200,7 @@ class CosineAnnealingLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create cosine annealing LR scheduler."""
         return torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer,
@@ -235,7 +243,7 @@ class CosineAnnealingWarmRestartsSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create cosine annealing warm restarts scheduler."""
         return torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer,
@@ -294,7 +302,7 @@ class ReduceLROnPlateauSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create reduce on plateau scheduler."""
         return torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
@@ -310,7 +318,7 @@ class ReduceLROnPlateauSchedulerStrategy(LRSchedulerStrategy):
 
     def step(
         self,
-        scheduler: Optional[torch.optim.lr_scheduler._LRScheduler],
+        scheduler: Optional[LRScheduler],
         context: TrainingContext,
     ) -> None:
         """
@@ -360,7 +368,7 @@ class LinearLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create linear LR scheduler."""
         return torch.optim.lr_scheduler.LinearLR(
             optimizer,
@@ -396,7 +404,7 @@ class PolynomialLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> torch.optim.lr_scheduler._LRScheduler:
+    ) -> LRScheduler:
         """Create polynomial LR scheduler."""
         return torch.optim.lr_scheduler.PolynomialLR(
             optimizer,
@@ -446,7 +454,7 @@ class WarmupSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> Optional[LRScheduler]:
         """
         Create warmup scheduler.
 
@@ -477,7 +485,7 @@ class WarmupSchedulerStrategy(LRSchedulerStrategy):
 
     def step(
         self,
-        scheduler: Optional[torch.optim.lr_scheduler._LRScheduler],
+        scheduler: Optional[LRScheduler],
         context: TrainingContext,
     ) -> None:
         """Step the appropriate scheduler based on current epoch."""
@@ -537,7 +545,7 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> Optional[LRScheduler]:
         """
         Create timm scheduler using configuration.
 
@@ -573,7 +581,7 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
 
     def step(
         self,
-        scheduler: Optional[torch.optim.lr_scheduler._LRScheduler],
+        scheduler: Optional[LRScheduler],
         context: TrainingContext,
     ) -> None:
         """

@@ -5,7 +5,7 @@ The Texas100 dataset.
 import logging
 import os
 import tarfile
-import urllib
+from urllib import request
 
 import numpy as np
 import torch
@@ -34,7 +34,7 @@ class DataSource(base.DataSource):
         """Download the Texas100 dataset."""
         logging.info("Downloading the Texas100 dataset...")
         filename = "https://www.comp.nus.edu.sg/~reza/files/dataset_texas.tgz"
-        urllib.request.urlretrieve(filename, os.path.join(root_path, "tmp_texas.tgz"))
+        request.urlretrieve(filename, os.path.join(root_path, "tmp_texas.tgz"))
         logging.info("Dataset downloaded.")
         tar = tarfile.open(os.path.join(root_path, "tmp_texas.tgz"))
         tar.extractall(path=root_path)

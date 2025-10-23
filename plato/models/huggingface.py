@@ -47,10 +47,18 @@ class Model:
             "use_auth_token": None,
         }
 
-        config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+        resolved_model_name = (
+            model_name
+            if isinstance(model_name, str) and model_name
+            else getattr(getattr(Config(), "trainer", None), "model_name", None)
+        )
+        if not isinstance(resolved_model_name, str) or not resolved_model_name:
+            raise ValueError("A valid HuggingFace model name must be provided.")
+
+        config = AutoConfig.from_pretrained(resolved_model_name, **config_kwargs)
 
         model = AutoModelForCausalLM.from_pretrained(
-            model_name,
+            resolved_model_name,
             config=config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
@@ -70,6 +78,6 @@ class Model:
             model.print_trainable_parameters()
 
         if hasattr(model, "loss_type"):
-            model.loss_type = "ForCausalLM"
+            setattr(model, "loss_type", "ForCausalLM")
 
         return model

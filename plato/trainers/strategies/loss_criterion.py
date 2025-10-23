@@ -5,7 +5,7 @@ This module provides default and common loss criterion strategies for
 the composable trainer architecture.
 """
 
-from typing import Optional
+from typing import Callable, Optional
 
 import torch
 import torch.nn as nn
@@ -29,7 +29,10 @@ class DefaultLossCriterionStrategy(LossCriterionStrategy):
         >>> trainer = ComposableTrainer(loss_strategy=strategy)
     """
 
-    def __init__(self, loss_fn: Optional[callable] = None):
+    def __init__(
+        self,
+        loss_fn: Optional[Callable[[torch.Tensor, torch.Tensor], torch.Tensor]] = None,
+    ):
         """Initialize with optional custom loss function."""
         self.loss_fn = loss_fn
         self._criterion = None
@@ -292,7 +295,11 @@ class L2RegularizationStrategy(LossCriterionStrategy):
         """Compute L2 regularization term."""
         l2_loss = torch.tensor(0.0, device=outputs.device)
 
-        for param in context.model.parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for L2 regularization.")
+
+        for param in model.parameters():
             l2_loss = l2_loss + torch.sum(param**2)
 
         return self.weight * l2_loss

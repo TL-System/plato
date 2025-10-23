@@ -5,20 +5,21 @@ Starting point for a Plato federated learning client.
 import asyncio
 import logging
 import os
+from typing import Any, Callable, Optional
 
 from plato.clients import registry as client_registry
 from plato.config import Config
 
 
 def run(
-    client_id,
-    port,
-    client=None,
-    edge_server=None,
-    edge_client=None,
-    trainer=None,
-    client_kwargs=None,
-):
+    client_id: int,
+    port: Optional[int],
+    client: Any = None,
+    edge_server: Optional[Callable[..., Any]] = None,
+    edge_client: Optional[Callable[..., Any]] = None,
+    trainer: Optional[Callable[[], Any]] = None,
+    client_kwargs: Optional[dict[str, Any]] = None,
+) -> None:
     """Starting a client to connect to the server."""
     Config().args.id = client_id
     if port is not None:
@@ -42,6 +43,8 @@ def run(
                 server = edge_server(trainer=trainer())
             else:
                 server = edge_server()
+            if edge_client is None:
+                raise ValueError("edge_client must be provided when edge_server is set.")
             client = edge_client(server=server)
 
         server.configure()

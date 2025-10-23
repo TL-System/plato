@@ -16,6 +16,7 @@ not be used to compare with the accuracy in supervised learning methods.
 
 import logging
 from collections import UserList
+from typing import Callable
 
 import torch
 from lightly.data.multi_view_collate import MultiViewCollate
@@ -293,7 +294,7 @@ class SSLTrainingStepStrategy(TrainingStepStrategy):
         optimizer,
         examples,
         labels,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step based on current phase."""

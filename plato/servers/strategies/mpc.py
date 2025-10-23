@@ -129,13 +129,16 @@ class MPCShamirAggregationStrategy(MPCBaseAggregationStrategy):
         self.threshold = threshold
 
     def _recover_secret(self, xs: np.ndarray, ys: np.ndarray, threshold: int) -> float:
+        xs_int = [int(round(val)) for val in xs[:threshold]]
+        ys_int = [int(round(val)) for val in ys[:threshold]]
+
         accumulator = _Fraction(0, 1)
         for i in range(threshold):
-            term = _Fraction(ys[i], 1)
+            term = _Fraction(ys_int[i], 1)
             for j in range(threshold):
                 if i == j:
                     continue
-                term = term.multiply(_Fraction(-xs[j], xs[i] - xs[j]))
+                term = term.multiply(_Fraction(-xs_int[j], xs_int[i] - xs_int[j]))
             accumulator = accumulator.add(term)
         return (accumulator.num / accumulator.den) / self.SCALING_FACTOR
 

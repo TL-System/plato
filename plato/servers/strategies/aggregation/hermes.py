@@ -5,7 +5,7 @@ Hermes aggregation strategy.
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import Dict, List
+from typing import Any, Dict, List, cast
 
 import numpy as np
 import torch
@@ -44,16 +44,24 @@ class HermesAggregationStrategy(AggregationStrategy):
         weights_received: List[Dict],
         context: ServerContext,
     ) -> Dict:
-        server = context.server
-        trainer = context.trainer
-        algorithm = context.algorithm
+        server_obj = getattr(context, "server", None)
+        trainer_obj = getattr(context, "trainer", None)
+        algorithm_obj = getattr(context, "algorithm", None)
+        if server_obj is None or trainer_obj is None or algorithm_obj is None:
+            raise AttributeError(
+                "Hermes aggregation requires server, trainer, and algorithm contexts."
+            )
+
+        server = cast(Any, server_obj)
+        trainer = cast(Any, trainer_obj)
+        algorithm = cast(Any, algorithm_obj)
 
         total_samples = sum(update.report.num_samples for update in updates)
         server.total_samples = total_samples
 
         masks_received = getattr(server, "masks_received", None)
         if not masks_received:
-            return None
+            return dict(baseline_weights)
 
         weights_numpy: List[Dict[str, np.ndarray]] = []
         for weight_dict in weights_received:
@@ -65,6 +73,9 @@ class HermesAggregationStrategy(AggregationStrategy):
             )
 
         masked_layers = []
+        if not hasattr(trainer, "model") or trainer.model is None:
+            raise AttributeError("Trainer must expose a model for Hermes aggregation.")
+
         for name, layer in trainer.model.named_parameters():
             if isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
                 masked_layers.append(f"{name}.weight")
@@ -129,8 +140,12 @@ class HermesAggregationStrategy(AggregationStrategy):
                 }
             )
 
+        if not hasattr(server, "update_client_model"):
+            raise AttributeError("Server must implement 'update_client_model'.")
         server.update_client_model(aggregated_weights, updates)
 
+        if not hasattr(algorithm, "compute_weight_deltas"):
+            raise AttributeError("Algorithm must implement 'compute_weight_deltas'.")
         deltas_received = algorithm.compute_weight_deltas(
             baseline_weights, aggregated_weights
         )
@@ -139,5 +154,7 @@ class HermesAggregationStrategy(AggregationStrategy):
             updates, deltas_received, context
         )
 
+        if not hasattr(algorithm, "update_weights"):
+            raise AttributeError("Algorithm must implement 'update_weights'.")
         updated_weights = algorithm.update_weights(avg_deltas)
         return updated_weights

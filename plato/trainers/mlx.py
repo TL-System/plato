@@ -29,6 +29,7 @@ from typing import (
     Sequence,
     Tuple,
     Union,
+    cast,
 )
 
 import numpy as np
@@ -47,10 +48,10 @@ try:  # pragma: no cover - import guard for optional dependency
     import mlx.optimizers as mx_optim
     from mlx.nn import utils as nn_utils
 except ImportError as err:  # pragma: no cover - handled lazily
-    mx = None
-    mx_nn = None
-    mx_optim = None
-    nn_utils = None
+    mx = cast(Any, None)
+    mx_nn = cast(Any, None)
+    mx_optim = cast(Any, None)
+    nn_utils = cast(Any, None)
     _MLX_IMPORT_ERROR = err
 else:  # pragma: no cover - executed only when MLX is available
     _MLX_IMPORT_ERROR = None
@@ -58,7 +59,7 @@ else:  # pragma: no cover - executed only when MLX is available
 try:  # pragma: no cover - optional dependency
     import torch
 except ImportError:  # pragma: no cover
-    torch = None
+    torch = cast(Any, None)
 
 
 class MLXNotAvailableError(ImportError):
@@ -400,12 +401,16 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
     """Default optimizer strategy using MLX's optimizer registry."""
 
     _REGISTERED_OPTIMIZERS: Dict[str, Callable[..., "mx_optim.Optimizer"]] = {
-        "adam": getattr(mx_optim, "Adam", None),
-        "adamw": getattr(mx_optim, "AdamW", None),
-        "sgd": getattr(mx_optim, "SGD", None),
-        "momentum": getattr(mx_optim, "Momentum", None),
-        "rmsprop": getattr(mx_optim, "RMSProp", None),
-        "lion": getattr(mx_optim, "Lion", None),
+        name: optimizer
+        for name, optimizer in {
+            "adam": getattr(mx_optim, "Adam", None),
+            "adamw": getattr(mx_optim, "AdamW", None),
+            "sgd": getattr(mx_optim, "SGD", None),
+            "momentum": getattr(mx_optim, "Momentum", None),
+            "rmsprop": getattr(mx_optim, "RMSProp", None),
+            "lion": getattr(mx_optim, "Lion", None),
+        }.items()
+        if optimizer is not None
     }
 
     def __init__(self, optimizer_name: Optional[str] = None, **optimizer_kwargs: Any):
@@ -631,7 +636,16 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
             logits = model(examples)
             predicted = mx.argmax(logits, axis=-1)
             matches = predicted == labels
-            correct_predictions += int(mx.sum(matches).item())
+            to_numpy = getattr(matches, "to_numpy", None)
+            to_host = getattr(matches, "to_host", None)
+            if callable(to_numpy):
+                matches_array = to_numpy()
+            elif callable(to_host):
+                matches_array = to_host()
+            else:
+                matches_array = np.asarray(matches)
+            correct_predictions += int(np.sum(matches_array))
+
             if hasattr(labels, "shape"):
                 total_samples += int(labels.shape[0])
             else:
@@ -707,9 +721,9 @@ class SimpleDataLoader(Iterable[Tuple[Any, Any]]):
         if items[0] is None:
             return None
         if mx is not None and isinstance(items[0], mx.array):
-            return mx.stack(items, axis=0)
+            return mx.stack(list(items), axis=0)
         if torch is not None and isinstance(items[0], torch.Tensor):
-            stacked = torch.stack(items)
+            stacked = torch.stack(list(items))
             return stacked.detach().cpu().numpy()
         if hasattr(items[0], "stack") and callable(getattr(items[0], "stack")):
             return items[0].stack(items, axis=0)
@@ -886,16 +900,20 @@ class ComposableMLXTrainer(base.Trainer):
             hasattr(Config().clients, "sleep_simulation")
             and Config().clients.sleep_simulation
         ):
-            sleep_seconds = Config().client_sleep_times[self.client_id - 1]
-            sleep_seconds = max(0, sleep_seconds)
+            sleep_times = Config().client_sleep_times
+            if sleep_times is None:
+                sleep_times = Config.simulate_client_speed()
+            index = max(self.client_id - 1, 0)
+            if index < len(sleep_times):
+                sleep_seconds = max(0.0, float(sleep_times[index]))
 
-            if sleep_seconds > 0:
-                logging.info(
-                    "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
-                    self.client_id,
-                    sleep_seconds,
-                )
-                time.sleep(sleep_seconds)
+                if sleep_seconds > 0:
+                    logging.info(
+                        "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
+                        self.client_id,
+                        sleep_seconds,
+                    )
+                    time.sleep(sleep_seconds)
 
     def _capture_model_state(self) -> Any:
         parameters = self.model.parameters()

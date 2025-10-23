@@ -15,10 +15,11 @@ Example:
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 import torch
 import torch.nn as nn
+from torch.optim.lr_scheduler import LRScheduler
 
 
 class TrainingContext:
@@ -246,7 +247,7 @@ class TrainingStepStrategy(Strategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -309,7 +310,7 @@ class LRSchedulerStrategy(Strategy):
     @abstractmethod
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> Optional[LRScheduler]:
         """
         Create and return learning rate scheduler.
 
@@ -327,7 +328,7 @@ class LRSchedulerStrategy(Strategy):
 
     def step(
         self,
-        scheduler: Optional[torch.optim.lr_scheduler._LRScheduler],
+        scheduler: Optional[LRScheduler],
         context: TrainingContext,
     ) -> None:
         """

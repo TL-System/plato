@@ -6,6 +6,7 @@ to implement meta-learning style training with dual learning rates.
 """
 
 import copy
+from typing import Callable
 
 import torch
 
@@ -41,7 +42,7 @@ class PerFedAvgTrainingStepStrategy(TrainingStepStrategy):
         optimizer,
         examples,
         labels,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform Per-FedAvg training step based on current phase."""
