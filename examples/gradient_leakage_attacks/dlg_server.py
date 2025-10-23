@@ -228,22 +228,33 @@ class Server(fedavg.Server):
                 update.payload[1].to(Config().device()),
                 update.payload[2].to(Config().device()),
             )
-            # Mean and std of data
-            if Config().data.datasource == "CIFAR10":
-                data_mean = consts.cifar10_mean
-                data_std = consts.cifar10_std
-            elif Config().data.datasource == "CIFAR100":
-                data_mean = consts.cifar100_mean
-                data_std = consts.cifar100_std
-            elif Config().data.datasource == "TinyImageNet":
-                data_mean = consts.imagenet_mean
-                data_std = consts.imagenet_std
-            elif Config().data.datasource == "MNIST":
-                data_mean = consts.mnist_mean
-                data_std = consts.mnist_std
-            elif Config().data.datasource == "EMNIST":
-                data_mean = consts.emnist_mean
-                data_std = consts.emnist_std
+            stats_map = {
+                "CIFAR10": (consts.cifar10_mean, consts.cifar10_std),
+                "CIFAR100": (consts.cifar100_mean, consts.cifar100_std),
+                "TinyImageNet": (consts.imagenet_mean, consts.imagenet_std),
+                "MNIST": (consts.mnist_mean, consts.mnist_std),
+                "EMNIST": (consts.emnist_mean, consts.emnist_std),
+            }
+            dataset_name = getattr(Config().data, "dataset_name", None)
+            datasource = getattr(Config().data, "datasource", None)
+
+            data_mean, data_std = None, None
+            for identifier in (dataset_name, datasource):
+                if identifier in stats_map:
+                    data_mean, data_std = stats_map[identifier]
+                    break
+
+            if data_mean is None or data_std is None:
+                logging.warning(
+                    "No mean/std constants found for dataset '%s' (datasource '%s'), "
+                    "defaulting to zero mean and unit variance.",
+                    dataset_name,
+                    datasource,
+                )
+                channels = int(self.gt_data.shape[1])
+                data_mean = [0.0] * channels
+                data_std = [1.0] * channels
+
             self.dm = torch.as_tensor(
                 data_mean, device=Config().device(), dtype=torch.float
             )[:, None, None]
