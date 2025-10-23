@@ -429,7 +429,9 @@ class Config:
     @staticmethod
     def is_edge_server() -> bool:
         """Returns whether the current instance is an edge server in cross-silo FL."""
-        return Config().args.port is not None
+        return Config().args.port is not None and bool(
+            getattr(Config().algorithm, "cross_silo", False)
+        )
 
     @staticmethod
     def is_central_server() -> bool:
