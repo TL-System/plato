@@ -22,7 +22,12 @@ class Processor(model.Processor):
         self.mask = mask
 
         para_nums = {}
-        extract_model = self.trainer.model.cpu().state_dict()
+        trainer = getattr(self, "trainer", None)
+        if trainer is None or getattr(trainer, "model", None) is None:
+            raise RuntimeError(
+                "ModelEncrypt processor requires an attached trainer with a model."
+            )
+        extract_model = trainer.model.cpu().state_dict()
         for key in extract_model.keys():
             para_nums[key] = torch.numel(extract_model[key])
         self.para_nums = para_nums

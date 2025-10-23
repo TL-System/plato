@@ -35,7 +35,7 @@ activations_func = {
 
 # pylint: disable=too-many-locals
 def build_mlp_from_config(
-    mlp_configs: Dict[str, Any],
+    mlp_configs: dict[str, Any],
     layer_name_prefix: str = "layer",
 ):
     """
@@ -136,7 +136,7 @@ class Model:
         model_name: str,
         input_dim: int,
         output_dim: int,
-        **kwargs: Dict[str, Any],
+        **kwargs: dict[str, Any],
     ):
         # pylint:disable=too-many-return-statements
         """Get the desired MLP model with required hyper-parameters (input_dim)."""

@@ -19,9 +19,14 @@ class Processor(model.Processor):
         super().__init__(**kwargs)
 
         self.context = homo_enc.get_ckks_context()
+        trainer = getattr(self, "trainer", None)
+        if trainer is None or getattr(trainer, "model", None) is None:
+            raise RuntimeError(
+                "ModelDecrypt processor requires an attached trainer with a model."
+            )
         weight_shapes = {}
         para_nums = {}
-        extract_model = self.trainer.model.cpu().state_dict()
+        extract_model = trainer.model.cpu().state_dict()
 
         for key in extract_model.keys():
             weight_shapes[key] = extract_model[key].size()

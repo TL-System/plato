@@ -41,11 +41,11 @@ class MPCBaseAggregationStrategy(FedAvgAggregationStrategy):
 
     async def _aggregate_scaled_weights(
         self,
-        scaled_weights: List[Dict[str, torch.Tensor]],
+        scaled_weights: list[dict[str, torch.Tensor]],
         updates,
         baseline_weights,
         context,
-    ) -> Dict[str, torch.Tensor]:
+    ) -> dict[str, torch.Tensor]:
         total_samples = sum(update.report.num_samples for update in updates)
         if total_samples == 0:
             LOGGER.warning(
@@ -53,7 +53,7 @@ class MPCBaseAggregationStrategy(FedAvgAggregationStrategy):
             )
             return baseline_weights
 
-        aggregated: Dict[str, torch.Tensor] = {}
+        aggregated: dict[str, torch.Tensor] = {}
         for weight_dict in scaled_weights:
             for name, tensor in weight_dict.items():
                 if name not in aggregated:
@@ -100,12 +100,12 @@ class _Fraction:
             self.num = int(self.num / gcd)
             self.den = int(self.den / gcd)
 
-    def multiply(self, other: "_Fraction") -> "_Fraction":
+    def multiply(self, other: _Fraction) -> _Fraction:
         result = _Fraction(self.num * other.num, self.den * other.den)
         result.reduce()
         return result
 
-    def add(self, other: "_Fraction") -> "_Fraction":
+    def add(self, other: _Fraction) -> _Fraction:
         result = _Fraction(
             self.num * other.den + self.den * other.num,
             self.den * other.den,
@@ -191,7 +191,7 @@ class MPCShamirAggregationStrategy(MPCBaseAggregationStrategy):
             if idx is None:
                 raise RuntimeError(f"Client {target} not present in MPC round state.")
 
-            reconstructed: Dict[str, torch.Tensor] = {}
+            reconstructed: dict[str, torch.Tensor] = {}
             for name, tensor in weights.items():
                 tensor_size = list(tensor.size())
                 tensor_size.insert(0, len(selected))

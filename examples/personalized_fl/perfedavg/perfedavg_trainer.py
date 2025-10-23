@@ -6,7 +6,7 @@ to implement meta-learning style training with dual learning rates.
 """
 
 import copy
-from typing import Callable
+from collections.abc import Callable
 
 import torch
 

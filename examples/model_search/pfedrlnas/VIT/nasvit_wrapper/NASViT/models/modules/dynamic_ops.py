@@ -24,7 +24,7 @@ class DynamicSeparableConv2d(nn.Module):
         dilation=1,
         channels_per_group=1,
     ):
-        super(DynamicSeparableConv2d, self).__init__()
+        super().__init__()
 
         self.max_in_channels = max_in_channels
         self.channels_per_group = channels_per_group
@@ -121,7 +121,7 @@ class DynamicPointConv2d(nn.Module):
     def __init__(
         self, max_in_channels, max_out_channels, kernel_size=1, stride=1, dilation=1
     ):
-        super(DynamicPointConv2d, self).__init__()
+        super().__init__()
 
         self.max_in_channels = max_in_channels
         self.max_out_channels = max_out_channels
@@ -152,7 +152,7 @@ class DynamicPointConv2d(nn.Module):
 
 class DynamicLinear(nn.Module):
     def __init__(self, max_in_features, max_out_features, bias=True):
-        super(DynamicLinear, self).__init__()
+        super().__init__()
 
         self.max_in_features = max_in_features
         self.max_out_features = max_out_features
@@ -200,7 +200,7 @@ class DynamicBatchNorm2d(nn.Module):
     # SET_RUNNING_STATISTICS = False
 
     def __init__(self, max_feature_dim):
-        super(DynamicBatchNorm2d, self).__init__()
+        super().__init__()
 
         self.max_feature_dim = max_feature_dim
         self.bn = nn.BatchNorm2d(self.max_feature_dim)
@@ -274,7 +274,7 @@ class DynamicBatchNorm2d(nn.Module):
 
 class DynamicSE(SELayer):
     def __init__(self, max_channel):
-        super(DynamicSE, self).__init__(max_channel)
+        super().__init__(max_channel)
 
     def forward(self, x):
         in_channel = x.size(1)

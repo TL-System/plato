@@ -70,7 +70,7 @@ def slicing(dy_dx: list, sensitivity: list, slices_num: int):
     """Slice gradients."""
     layer_dims_pool = []
     for layer_gradient in dy_dx:
-        layer_dims = list((_ for _ in layer_gradient.shape))
+        layer_dims = list(_ for _ in layer_gradient.shape)
         layer_dims_pool.append(layer_dims)
 
     layer_params_num_pool, layer_params_num_gcd = compute_atom_size(layer_dims_pool)

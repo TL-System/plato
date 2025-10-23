@@ -5,7 +5,8 @@ Starting point for a Plato federated learning client.
 import asyncio
 import logging
 import os
-from typing import Any, Callable, Optional
+from typing import Any, Optional
+from collections.abc import Callable
 
 from plato.clients import registry as client_registry
 from plato.config import Config
@@ -13,12 +14,12 @@ from plato.config import Config
 
 def run(
     client_id: int,
-    port: Optional[int],
+    port: int | None,
     client: Any = None,
-    edge_server: Optional[Callable[..., Any]] = None,
-    edge_client: Optional[Callable[..., Any]] = None,
-    trainer: Optional[Callable[[], Any]] = None,
-    client_kwargs: Optional[dict[str, Any]] = None,
+    edge_server: Callable[..., Any] | None = None,
+    edge_client: Callable[..., Any] | None = None,
+    trainer: Callable[[], Any] | None = None,
+    client_kwargs: dict[str, Any] | None = None,
 ) -> None:
     """Starting a client to connect to the server."""
     Config().args.id = client_id

@@ -12,7 +12,7 @@ class Processor(base.Processor):
     Pipelining a list of Processors from the configuration file.
     """
 
-    def __init__(self, processors: List[base.Processor], *args, **kwargs) -> None:
+    def __init__(self, processors: list[base.Processor], *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.processors = processors
 

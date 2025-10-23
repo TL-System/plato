@@ -68,8 +68,8 @@ class FedPerUpdateStrategy(ModelUpdateStrategy):
 
     def __init__(
         self,
-        global_layer_names: List[str],
-        personalization_rounds: Optional[int] = None,
+        global_layer_names: list[str],
+        personalization_rounds: int | None = None,
     ):
         """
         Initialize FedPer update strategy.
@@ -237,8 +237,8 @@ class FedRepUpdateStrategy(ModelUpdateStrategy):
 
     def __init__(
         self,
-        global_layer_names: List[str],
-        local_layer_names: List[str],
+        global_layer_names: list[str],
+        local_layer_names: list[str],
         local_epochs: int = 1,
     ):
         """

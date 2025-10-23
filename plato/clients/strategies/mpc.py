@@ -17,7 +17,7 @@ from plato.mpc import RoundInfoStore
 class MPCLifecycleStrategy(DefaultLifecycleStrategy):
     """Lifecycle strategy wiring the MPC round store into processor kwargs."""
 
-    def _build_processor_kwargs(self, context) -> Dict[str, Dict[str, Any]]:
+    def _build_processor_kwargs(self, context) -> dict[str, dict[str, Any]]:
         processor_kwargs = getattr(context, "processor_kwargs", {}) or {}
         if not isinstance(processor_kwargs, dict):
             processor_kwargs = {}

@@ -27,6 +27,6 @@ def get(state_dim, action_space):
     if policy_name in registered_policies:
         registered_policy = registered_policies[policy_name](state_dim, action_space)
     else:
-        raise ValueError("No such policy: {}".format(policy_name))
+        raise ValueError(f"No such policy: {policy_name}")
 
     return registered_policy

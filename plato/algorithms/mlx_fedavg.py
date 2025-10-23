@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import importlib
 from types import ModuleType
-from typing import TYPE_CHECKING, Any, Callable, Iterable, cast
+from typing import TYPE_CHECKING, Any, cast
+from collections.abc import Callable, Iterable
 
 import numpy as np
 

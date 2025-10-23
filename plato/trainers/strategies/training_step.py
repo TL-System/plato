@@ -7,7 +7,8 @@ the composable trainer architecture.
 
 from __future__ import annotations
 
-from typing import Callable, List, Optional
+from typing import List, Optional
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn
@@ -16,7 +17,7 @@ from plato.trainers.strategies.base import TrainingContext, TrainingStepStrategy
 
 LossFn = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
 BackwardHook = Callable[[nn.Module, torch.Tensor, TrainingContext], None]
-AggregateFn = Callable[[List[torch.Tensor]], torch.Tensor]
+AggregateFn = Callable[[list[torch.Tensor]], torch.Tensor]
 
 
 class DefaultTrainingStepStrategy(TrainingStepStrategy):
@@ -148,7 +149,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
         >>> trainer = ComposableTrainer(training_step_strategy=strategy)
     """
 
-    def __init__(self, enabled: Optional[bool] = None, create_graph: bool = False):
+    def __init__(self, enabled: bool | None = None, create_graph: bool = False):
         """Initialize mixed precision parameters."""
         self.enabled = enabled
         self.create_graph = create_graph
@@ -335,7 +336,7 @@ class MultipleForwardPassStepStrategy(TrainingStepStrategy):
     def __init__(
         self,
         num_passes: int = 2,
-        aggregate_fn: Optional[AggregateFn] = None,
+        aggregate_fn: AggregateFn | None = None,
         create_graph: bool = False,
     ):
         """Initialize multiple forward pass parameters."""
@@ -344,7 +345,7 @@ class MultipleForwardPassStepStrategy(TrainingStepStrategy):
         self.create_graph = create_graph
 
     @staticmethod
-    def _default_aggregate(losses: List[torch.Tensor]) -> torch.Tensor:
+    def _default_aggregate(losses: list[torch.Tensor]) -> torch.Tensor:
         """Default aggregation: mean of losses."""
         if not losses:
             raise ValueError("At least one loss tensor is required for aggregation.")
@@ -365,7 +366,7 @@ class MultipleForwardPassStepStrategy(TrainingStepStrategy):
         """Perform training step with multiple forward passes."""
         optimizer.zero_grad()
 
-        losses: List[torch.Tensor] = []
+        losses: list[torch.Tensor] = []
         for _ in range(self.num_passes):
             # Forward pass
             outputs = model(examples)
@@ -414,7 +415,7 @@ class ValidateBeforeStepStrategy(TrainingStepStrategy):
         check_outputs: bool = True,
         check_gradients: bool = True,
         raise_on_error: bool = False,
-        base_strategy: Optional[TrainingStepStrategy] = None,
+        base_strategy: TrainingStepStrategy | None = None,
     ):
         """Initialize validation parameters."""
         self.check_inputs = check_inputs

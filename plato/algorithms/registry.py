@@ -21,7 +21,7 @@ from plato.algorithms import (
 from plato.algorithms.base import Algorithm as AlgorithmBase
 from plato.config import Config
 
-registered_algorithms: Dict[str, Type[AlgorithmBase]] = {
+registered_algorithms: dict[str, type[AlgorithmBase]] = {
     "fedavg": fedavg.Algorithm,
     "fedavg_gan": fedavg_gan.Algorithm,
     "fedavg_personalized": fedavg_personalized.Algorithm,
@@ -33,10 +33,10 @@ registered_algorithms: Dict[str, Type[AlgorithmBase]] = {
 
 def _resolve_algorithm_type(algorithm_config: Any) -> str:
     """Resolve algorithm type supporting framework shortcuts."""
-    algo_type_obj: Optional[Any] = getattr(algorithm_config, "type", None)
+    algo_type_obj: Any | None = getattr(algorithm_config, "type", None)
     algo_type = algo_type_obj if isinstance(algo_type_obj, str) else None
 
-    framework_obj: Optional[Any] = getattr(algorithm_config, "framework", "")
+    framework_obj: Any | None = getattr(algorithm_config, "framework", "")
     framework = framework_obj if isinstance(framework_obj, str) else ""
 
     if not algo_type and framework:

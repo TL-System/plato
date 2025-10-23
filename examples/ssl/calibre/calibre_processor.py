@@ -4,7 +4,7 @@ An outbound prossor for Calibre algorithm to save the divergence on the client l
 
 import logging
 import os
-from typing import OrderedDict
+from collections import OrderedDict
 
 import torch
 

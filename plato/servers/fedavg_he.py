@@ -1,10 +1,20 @@
 """Server for homomorphic-encrypted FedAvg aggregation."""
 
+from typing import Protocol, cast
+
 import torch
 
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgHEAggregationStrategy
 from plato.utils import homo_enc
+
+
+class ZeroCapableTrainer(Protocol):
+    """Protocol for trainers that expose a zeros factory method."""
+
+    model: torch.nn.Module
+
+    def zeros(self, shape): ...
 
 
 class Server(fedavg.Server):
@@ -45,8 +55,8 @@ class Server(fedavg.Server):
     def configure(self) -> None:
         """Configure the model information like weight shapes and parameter numbers."""
         super().configure()
-
-        extract_model = self.trainer.model.cpu().state_dict()
+        trainer = cast(ZeroCapableTrainer, self.require_trainer())
+        extract_model = trainer.model.cpu().state_dict()
 
         for key in extract_model.keys():
             self.weight_shapes[key] = extract_model[key].size()
@@ -62,6 +72,7 @@ class Server(fedavg.Server):
 
     def _fedavg_hybrid(self, updates, weights_received):
         """Aggregate the model updates in the hybrid form of encrypted and unencrypted weights."""
+        trainer = cast(ZeroCapableTrainer, self.require_trainer())
         deserialized = [
             homo_enc.deserialize_weights(payload, self.he_context)
             for payload in weights_received
@@ -82,7 +93,7 @@ class Server(fedavg.Server):
         self.total_samples = sum(update.report.num_samples for update in updates)
 
         # Perform weighted averaging on unencrypted and encrypted weights
-        unencrypted_avg_update = self.trainer.zeros(unencrypted_weights[0].size)
+        unencrypted_avg_update = trainer.zeros(unencrypted_weights[0].size)
         encrypted_avg_update = None
 
         for i, (unenc_w, enc_w) in enumerate(

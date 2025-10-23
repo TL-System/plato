@@ -21,7 +21,8 @@ from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
+from collections.abc import Iterable, Sequence
 
 import torch
 import torch.nn as nn
@@ -31,15 +32,15 @@ from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
 
-def _get_float_parameter_names(state_dict: Dict[str, torch.Tensor]) -> List[str]:
+def _get_float_parameter_names(state_dict: dict[str, torch.Tensor]) -> list[str]:
     """Return parameter names whose tensors are floating point."""
     return [name for name, tensor in state_dict.items() if tensor.is_floating_point()]
 
 
 def _stack_state_dicts(
-    deltas: Sequence[Dict[str, torch.Tensor]],
-    allowed_names: Optional[Iterable[str]] = None,
-) -> Dict[str, torch.Tensor]:
+    deltas: Sequence[dict[str, torch.Tensor]],
+    allowed_names: Iterable[str] | None = None,
+) -> dict[str, torch.Tensor]:
     """
     Stack state dicts into 2-D matrices of shape (num_features, num_clients).
 
@@ -56,7 +57,7 @@ def _stack_state_dicts(
         allowed_set = set(allowed_names)
         float_names = [name for name in float_names if name in allowed_set]
 
-    stacked: Dict[str, torch.Tensor] = {}
+    stacked: dict[str, torch.Tensor] = {}
     for name in float_names:
         values = [delta[name].detach().cpu() for delta in deltas]
         param_stack = torch.stack(values, dim=-1)
@@ -64,14 +65,14 @@ def _stack_state_dicts(
     return stacked
 
 
-def _net2vec(components: Dict[str, torch.Tensor]) -> torch.Tensor:
+def _net2vec(components: dict[str, torch.Tensor]) -> torch.Tensor:
     """
     Concatenate matrices (num_components, num_clients) across parameters.
 
     The result mirrors the behaviour of utils.convert_pca.net2vec in the
     reference repository, yielding a tensor of shape (total_components, num_clients).
     """
-    stacked_components: List[torch.Tensor] = []
+    stacked_components: list[torch.Tensor] = []
     for name in components:
         stacked_components.append(components[name])
     if not stacked_components:
@@ -80,8 +81,8 @@ def _net2vec(components: Dict[str, torch.Tensor]) -> torch.Tensor:
 
 
 def _apply_weights_to_state_dicts(
-    deltas: Sequence[Dict[str, torch.Tensor]], weights: torch.Tensor
-) -> Dict[str, torch.Tensor]:
+    deltas: Sequence[dict[str, torch.Tensor]], weights: torch.Tensor
+) -> dict[str, torch.Tensor]:
     """
     Apply scalar weights to each client's delta and sum the result.
 
@@ -93,7 +94,7 @@ def _apply_weights_to_state_dicts(
             f"Number of deltas ({len(deltas)}) and weights ({len(weights)}) must match."
         )
 
-    result: Dict[str, torch.Tensor] = {}
+    result: dict[str, torch.Tensor] = {}
     float_names = _get_float_parameter_names(deltas[0])
 
     for name, tensor in deltas[0].items():
@@ -113,7 +114,7 @@ def _apply_weights_to_state_dicts(
 
 def _svd_with_fallback(
     matrix: torch.Tensor,
-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Run SVD with a fallback path for numerical issues."""
     try:
         # torch.linalg.svd returns U, S, Vh
@@ -153,16 +154,16 @@ def _pca(matrix: torch.Tensor, n_components: int) -> torch.Tensor:
 
 
 def _apply_pca_to_state_dict(
-    stacked: Dict[str, torch.Tensor], n_components: int
-) -> Dict[str, torch.Tensor]:
+    stacked: dict[str, torch.Tensor], n_components: int
+) -> dict[str, torch.Tensor]:
     """Apply PCA to each stacked parameter matrix."""
-    projected: Dict[str, torch.Tensor] = {}
+    projected: dict[str, torch.Tensor] = {}
     for name, matrix in stacked.items():
         projected[name] = _pca(matrix, n_components)
     return projected
 
 
-def _flatten_grad_dict(grad_dict: Dict[str, torch.Tensor]) -> torch.Tensor:
+def _flatten_grad_dict(grad_dict: dict[str, torch.Tensor]) -> torch.Tensor:
     """Flatten and concatenate gradient tensors in a deterministic order."""
     if not grad_dict:
         return torch.tensor([])
@@ -211,7 +212,7 @@ class _Affinity(nn.Module):
 
     def forward(
         self, query: torch.Tensor, key: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         q_out = F.normalize(self.query_conv(query), dim=1)
         k_out = F.normalize(self.key_conv(key), dim=1)
         scores = torch.bmm(q_out.transpose(1, 2), k_out) * self.scale
@@ -243,7 +244,7 @@ class _AttentionConv(nn.Module):
 
     def forward(
         self, query: torch.Tensor, key: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         weights, value = self.affinity(query, key)
         # Einstein summation emulates the projection in the reference code.
         output = torch.einsum("bqi,bji->bjq", weights, value)
@@ -295,7 +296,7 @@ class _AttentionLoop(nn.Module):
         return weights
 
 
-def _load_attention_state_dict(model_path: Path) -> Optional[Dict[str, torch.Tensor]]:
+def _load_attention_state_dict(model_path: Path) -> dict[str, torch.Tensor] | None:
     if not model_path.exists():
         logging.warning(
             "Attack-adaptive attention model not found at '%s'. "
@@ -321,13 +322,13 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
     def __init__(
         self,
         *,
-        attention_model_path: Optional[str] = None,
-        pca_components: Optional[int] = None,
-        epsilon: Optional[float] = None,
-        scaling_factor: Optional[float] = None,
+        attention_model_path: str | None = None,
+        pca_components: int | None = None,
+        epsilon: float | None = None,
+        scaling_factor: float | None = None,
         attention_hidden: int = 32,
         attention_loops: int = 5,
-        dataset_capture_dir: Optional[str] = None,
+        dataset_capture_dir: str | None = None,
     ):
         super().__init__()
         self.attention_model_path = attention_model_path
@@ -337,15 +338,15 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         self.attention_hidden = attention_hidden
         self.attention_loops = attention_loops
         self._requested_capture_dir = dataset_capture_dir
-        self.dataset_capture_dir: Optional[Path] = None
+        self.dataset_capture_dir: Path | None = None
 
-        self._cached_state_dict: Optional[Dict[str, torch.Tensor]] = None
-        self._attention_model_path: Optional[Path] = (
+        self._cached_state_dict: dict[str, torch.Tensor] | None = None
+        self._attention_model_path: Path | None = (
             Path(attention_model_path) if attention_model_path else None
         )
-        self._capture_run_dir: Optional[Path] = None
+        self._capture_run_dir: Path | None = None
         self._capture_metadata_written = False
-        self._local_angles: Dict[int, float] = {}
+        self._local_angles: dict[int, float] = {}
 
     def setup(self, context: ServerContext) -> None:
         """Load configuration defaults and the cached attention weights."""
@@ -382,7 +383,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         if hasattr(algorithm_cfg, "attention_hidden"):
             self.attention_hidden = algorithm_cfg.attention_hidden
 
-        capture_dir_setting: Optional[Union[str, Path]] = self._requested_capture_dir
+        capture_dir_setting: str | Path | None = self._requested_capture_dir
         if capture_dir_setting is None and algorithm_cfg is not None:
             if hasattr(algorithm_cfg, "dataset_capture_dir"):
                 capture_dir_setting = algorithm_cfg.dataset_capture_dir
@@ -412,10 +413,10 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """This method is intentionally not implemented."""
         raise NotImplementedError(
             "Attack-adaptive aggregation operates on model weights directly."
@@ -423,11 +424,11 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict[str, torch.Tensor],
-        weights_received: List[Dict[str, torch.Tensor]],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict[str, torch.Tensor],
+        weights_received: list[dict[str, torch.Tensor]],
         context: ServerContext,
-    ) -> Optional[Dict[str, torch.Tensor]]:
+    ) -> dict[str, torch.Tensor] | None:
         """Aggregate client weights with the attack-adaptive attention mechanism."""
         deltas = self._compute_deltas(baseline_weights, weights_received)
         num_samples = [update.report.num_samples for update in updates]
@@ -505,7 +506,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             client_ids=[update.client_id for update in updates],
         )
 
-        updated_weights: Dict[str, torch.Tensor] = OrderedDict()
+        updated_weights: dict[str, torch.Tensor] = OrderedDict()
         for name, baseline in baseline_weights.items():
             updated_weights[name] = baseline + aggregated_delta.get(
                 name, torch.zeros_like(baseline)
@@ -515,11 +516,11 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
 
     @staticmethod
     def _compute_deltas(
-        baseline_weights: Dict[str, torch.Tensor],
-        weights_received: Sequence[Dict[str, torch.Tensor]],
-    ) -> List[Dict[str, torch.Tensor]]:
+        baseline_weights: dict[str, torch.Tensor],
+        weights_received: Sequence[dict[str, torch.Tensor]],
+    ) -> list[dict[str, torch.Tensor]]:
         """Compute client deltas relative to the baseline weights."""
-        deltas: List[Dict[str, torch.Tensor]] = []
+        deltas: list[dict[str, torch.Tensor]] = []
         for weights in weights_received:
             delta = OrderedDict()
             for name, baseline in baseline_weights.items():
@@ -528,7 +529,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         return deltas
 
     @staticmethod
-    def _get_trainable_parameter_names(context: ServerContext) -> Optional[List[str]]:
+    def _get_trainable_parameter_names(context: ServerContext) -> list[str] | None:
         """Return names of trainable parameters from the server's trainer, if available."""
         trainer = getattr(context, "trainer", None)
         model = getattr(trainer, "model", None) if trainer is not None else None
@@ -545,7 +546,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
     def _compute_reference_weights(
         self,
         *,
-        deltas: Sequence[Dict[str, torch.Tensor]],
+        deltas: Sequence[dict[str, torch.Tensor]],
         num_samples: Sequence[int],
         updates: Sequence[SimpleNamespace],
         context: ServerContext,
@@ -559,7 +560,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             return torch.full((len(deltas),), 1.0 / len(deltas), dtype=torch.float32)
 
         names = sorted(deltas[0].keys(), key=str.lower)
-        global_grad_dict: Dict[str, torch.Tensor] = {}
+        global_grad_dict: dict[str, torch.Tensor] = {}
         for name in names:
             accumulator = torch.zeros_like(deltas[0][name])
             for idx, delta in enumerate(deltas):
@@ -571,7 +572,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
         current_round = max(context.current_round, 1)
         alpha = Config().algorithm.alpha if hasattr(Config().algorithm, "alpha") else 5
 
-        contribs: List[float] = []
+        contribs: list[float] = []
         global_norm = torch.norm(global_vec)
 
         for idx, delta in enumerate(deltas):
@@ -650,7 +651,7 @@ class AttackAdaptiveAggregationStrategy(AggregationStrategy):
             self._capture_metadata_written = True
 
     @staticmethod
-    def _resolve_capture_dir(path_like: Optional[Union[str, Path]]) -> Optional[Path]:
+    def _resolve_capture_dir(path_like: str | Path | None) -> Path | None:
         """Resolve the capture directory relative to the runtime base path."""
         if path_like is None:
             return None

@@ -16,10 +16,30 @@ https://arxiv.org/pdf/2112.01637.pdf
 
 import logging
 import time
+from typing import Any, Protocol, Tuple, cast
 
 from plato.algorithms import fedavg
 from plato.config import Config
 from plato.datasources import feature_dataset
+
+
+class SplitLearningTrainerProtocol(Protocol):
+    """Protocol capturing the trainer interface required by split learning."""
+
+    device: Any
+    client_id: int
+
+    def get_train_samples(self, batch_size: int, dataset, sampler): ...
+
+    def forward_to_intermediate_feature(self, inputs, targets) -> tuple[Any, Any]: ...
+
+    def retrieve_train_samples(self): ...
+
+    def load_gradients(self, gradients) -> None: ...
+
+    def update_weights_before_cut(self, current_weights, weights): ...
+
+    def train(self, trainset, sampler): ...
 
 
 class Algorithm(fedavg.Algorithm):
@@ -29,19 +49,22 @@ class Algorithm(fedavg.Algorithm):
 
     def extract_features(self, dataset, sampler):
         """Extracting features using layers before the cut_layer."""
-        self.model.to(self.trainer.device)
-        self.model.eval()
+        model = self.require_model()
+        trainer = cast(SplitLearningTrainerProtocol, self.require_trainer())
+
+        model.to(trainer.device)
+        model.eval()
 
         tic = time.perf_counter()
 
         features_dataset = []
 
-        inputs, targets = self.trainer.get_train_samples(
+        inputs, targets = trainer.get_train_samples(
             Config().trainer.batch_size, dataset, sampler
         )
-        inputs = inputs.to(self.trainer.device)
-        targets = targets.to(self.trainer.device)
-        outputs, targets = self.trainer.forward_to_intermediate_feature(inputs, targets)
+        inputs = inputs.to(trainer.device)
+        targets = targets.to(trainer.device)
+        outputs, targets = trainer.forward_to_intermediate_feature(inputs, targets)
         features_dataset.append((outputs, targets))
 
         toc = time.perf_counter()
@@ -59,10 +82,11 @@ class Algorithm(fedavg.Algorithm):
         from the server.
         """
         tic = time.perf_counter()
+        trainer = cast(SplitLearningTrainerProtocol, self.require_trainer())
 
         # Retrieve the training samples and let trainer do the training
-        samples, sampler = self.trainer.retrieve_train_samples()
-        self.trainer.load_gradients(gradients)
+        samples, sampler = trainer.retrieve_train_samples()
+        trainer.load_gradients(gradients)
         self.train(samples, sampler)
 
         toc = time.perf_counter()
@@ -76,6 +100,7 @@ class Algorithm(fedavg.Algorithm):
 
     def train(self, trainset, sampler):
         """General training method that trains model with provided trainset and sampler."""
+        trainer = cast(SplitLearningTrainerProtocol, self.require_trainer())
         if len(trainset.feature_dataset) > 0:
             sample = trainset.feature_dataset[0]
             sample_len = len(sample) if hasattr(sample, "__len__") else "N/A"
@@ -84,14 +109,11 @@ class Algorithm(fedavg.Algorithm):
                 type(sample),
                 sample_len,
             )
-        self.trainer.train(
-            feature_dataset.FeatureDataset(trainset.feature_dataset), sampler
-        )
+        trainer.train(feature_dataset.FeatureDataset(trainset.feature_dataset), sampler)
 
     def update_weights_before_cut(self, weights):
         """Update the weights before cut layer, called when testing accuracy."""
+        trainer = cast(SplitLearningTrainerProtocol, self.require_trainer())
         current_weights = self.extract_weights()
-        current_weights = self.trainer.update_weights_before_cut(
-            current_weights, weights
-        )
+        current_weights = trainer.update_weights_before_cut(current_weights, weights)
         self.load_weights(current_weights)

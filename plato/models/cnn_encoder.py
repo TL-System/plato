@@ -46,7 +46,7 @@ class Model:
 
     # pylint:disable=too-few-public-methods
     @staticmethod
-    def get(model_name: Optional[str] = None, **kwargs: Dict[str, str]):  # pylint: disable=unused-argument
+    def get(model_name: str | None = None, **kwargs: dict[str, str]):  # pylint: disable=unused-argument
         """Returns an encoder that is a fully CNN block."""
 
         # as the final fully-connected layer will be removed

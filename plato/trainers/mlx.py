@@ -20,17 +20,14 @@ from collections.abc import Iterable as ABCIterable
 from dataclasses import dataclass, field
 from typing import (
     Any,
-    Callable,
     Dict,
-    Iterable,
-    Iterator,
     List,
     Optional,
-    Sequence,
     Tuple,
     Union,
     cast,
 )
+from collections.abc import Callable, Iterable, Iterator, Sequence
 
 import numpy as np
 
@@ -165,7 +162,7 @@ def _ensure_nhwc_layout(array: Any) -> Any:
     return array
 
 
-def _resolve_device(device_hint: Optional[str]) -> Optional[Any]:
+def _resolve_device(device_hint: str | None) -> Any | None:
     """Resolve a device string from configuration into an MLX device."""
     if mx is None:
         return None
@@ -198,13 +195,13 @@ class MLXTrainingContext:
         state: Mutable dictionary for strategy coordination.
     """
 
-    model: Optional["mx_nn.Module"] = None
-    device: Optional[Any] = None
+    model: mx_nn.Module | None = None
+    device: Any | None = None
     client_id: int = 0
     current_epoch: int = 0
     current_round: int = 0
-    config: Dict[str, Any] = field(default_factory=dict)
-    state: Dict[str, Any] = field(default_factory=dict)
+    config: dict[str, Any] = field(default_factory=dict)
+    state: dict[str, Any] = field(default_factory=dict)
 
     def __repr__(self) -> str:
         return (
@@ -229,10 +226,10 @@ class MLXLossCriterionStrategy(MLXStrategy):
     @abstractmethod
     def compute_loss(
         self,
-        outputs: "mx.array",
-        labels: Optional["mx.array"],
+        outputs: mx.array,
+        labels: mx.array | None,
         context: MLXTrainingContext,
-    ) -> "mx.array":
+    ) -> mx.array:
         """Compute scalar loss tensor."""
 
 
@@ -241,12 +238,12 @@ class MLXOptimizerStrategy(MLXStrategy):
 
     @abstractmethod
     def create_optimizer(
-        self, model: "mx_nn.Module", context: MLXTrainingContext
-    ) -> "mx_optim.Optimizer":
+        self, model: mx_nn.Module, context: MLXTrainingContext
+    ) -> mx_optim.Optimizer:
         """Instantiate an optimizer for the provided model."""
 
     def on_optimizer_step(
-        self, optimizer: "mx_optim.Optimizer", context: MLXTrainingContext
+        self, optimizer: mx_optim.Optimizer, context: MLXTrainingContext
     ) -> None:
         """Hook called after each optimizer step."""
 
@@ -257,21 +254,21 @@ class MLXTrainingStepStrategy(MLXStrategy):
     @abstractmethod
     def training_step(
         self,
-        model: "mx_nn.Module",
-        optimizer: "mx_optim.Optimizer",
-        examples: "mx.array",
-        labels: Optional["mx.array"],
-        loss_criterion: Callable[["mx.array", Optional["mx.array"]], "mx.array"],
+        model: mx_nn.Module,
+        optimizer: mx_optim.Optimizer,
+        examples: mx.array,
+        labels: mx.array | None,
+        loss_criterion: Callable[[mx.array, mx.array | None], mx.array],
         context: MLXTrainingContext,
-    ) -> "mx.array":
+    ) -> mx.array:
         """Execute a single training step and return the loss."""
 
     def finalize(
         self,
-        model: "mx_nn.Module",
-        optimizer: "mx_optim.Optimizer",
+        model: mx_nn.Module,
+        optimizer: mx_optim.Optimizer,
         context: MLXTrainingContext,
-    ) -> Optional["mx.array"]:
+    ) -> mx.array | None:
         """Optional hook to flush delayed optimizer updates."""
         return None
 
@@ -280,12 +277,12 @@ class MLXLRSchedulerStrategy(MLXStrategy):
     """Strategy interface for MLX learning rate schedulers."""
 
     def create_scheduler(
-        self, optimizer: "mx_optim.Optimizer", context: MLXTrainingContext
-    ) -> Optional[Any]:
+        self, optimizer: mx_optim.Optimizer, context: MLXTrainingContext
+    ) -> Any | None:
         """Return an MLX-compatible LR scheduler if configured."""
         return None
 
-    def step(self, scheduler: Optional[Any], context: MLXTrainingContext) -> None:
+    def step(self, scheduler: Any | None, context: MLXTrainingContext) -> None:
         """Advance the learning rate scheduler if one is active."""
         if scheduler is None:
             return
@@ -310,7 +307,7 @@ class MLXModelUpdateStrategy(MLXStrategy):
     def on_train_end(self, context: MLXTrainingContext) -> None:
         """Hook executed when training concludes."""
 
-    def get_update_payload(self, context: MLXTrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: MLXTrainingContext) -> dict[str, Any]:
         """Return additional payload to attach to model updates."""
         return {}
 
@@ -325,7 +322,7 @@ class MLXDataLoaderStrategy(MLXStrategy):
         sampler: Any,
         batch_size: int,
         context: MLXTrainingContext,
-    ) -> Iterable[Tuple[Any, Any]]:
+    ) -> Iterable[tuple[Any, Any]]:
         """Return an iterable over training batches."""
 
     def create_test_loader(
@@ -334,7 +331,7 @@ class MLXDataLoaderStrategy(MLXStrategy):
         sampler: Any,
         batch_size: int,
         context: MLXTrainingContext,
-    ) -> Iterable[Tuple[Any, Any]]:
+    ) -> Iterable[tuple[Any, Any]]:
         """Return an iterable over evaluation batches."""
         return self.create_train_loader(testset, sampler, batch_size, context)
 
@@ -345,8 +342,8 @@ class MLXTestingStrategy(MLXStrategy):
     @abstractmethod
     def test_model(
         self,
-        model: "mx_nn.Module",
-        config: Dict[str, Any],
+        model: mx_nn.Module,
+        config: dict[str, Any],
         testset: Any,
         sampler: Any,
         context: MLXTrainingContext,
@@ -359,7 +356,7 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
 
     def __init__(
         self,
-        loss_fn: Optional[Callable[["mx.array", "mx.array"], "mx.array"]] = None,
+        loss_fn: Callable[[mx.array, mx.array], mx.array] | None = None,
         reduction: str = "mean",
     ):
         self.loss_fn = loss_fn
@@ -379,17 +376,27 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
                     "MLX installation does not provide a softmax/cross entropy loss."
                 )
 
+    def _require_loss_fn(
+        self,
+    ) -> Callable[[mx.array, mx.array], mx.array]:
+        if self.loss_fn is None:
+            raise RuntimeError(
+                "Loss function has not been initialised for MLX loss strategy."
+            )
+        return self.loss_fn
+
     def compute_loss(
         self,
-        outputs: "mx.array",
-        labels: Optional["mx.array"],
+        outputs: mx.array,
+        labels: mx.array | None,
         context: MLXTrainingContext,
-    ) -> "mx.array":
+    ) -> mx.array:
         _ensure_mlx_available()
         if labels is None:
             raise ValueError("Labels are required for the default MLX loss strategy.")
 
-        losses = self.loss_fn(outputs, labels)
+        loss_fn = self._require_loss_fn()
+        losses = loss_fn(outputs, labels)
         if self.reduction == "mean":
             return mx.mean(losses)
         if self.reduction == "sum":
@@ -400,7 +407,7 @@ class DefaultMLXLossStrategy(MLXLossCriterionStrategy):
 class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
     """Default optimizer strategy using MLX's optimizer registry."""
 
-    _REGISTERED_OPTIMIZERS: Dict[str, Callable[..., "mx_optim.Optimizer"]] = {
+    _REGISTERED_OPTIMIZERS: dict[str, Callable[..., mx_optim.Optimizer]] = {
         name: optimizer
         for name, optimizer in {
             "adam": getattr(mx_optim, "Adam", None),
@@ -413,7 +420,7 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
         if optimizer is not None
     }
 
-    def __init__(self, optimizer_name: Optional[str] = None, **optimizer_kwargs: Any):
+    def __init__(self, optimizer_name: str | None = None, **optimizer_kwargs: Any):
         self.optimizer_name = optimizer_name
         self.optimizer_kwargs = optimizer_kwargs
 
@@ -422,8 +429,8 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
             self.optimizer_name = getattr(Config().trainer, "optimizer", "adam")
 
     def create_optimizer(
-        self, model: "mx_nn.Module", context: MLXTrainingContext
-    ) -> "mx_optim.Optimizer":
+        self, model: mx_nn.Module, context: MLXTrainingContext
+    ) -> mx_optim.Optimizer:
         _ensure_mlx_available()
 
         name = (self.optimizer_name or "adam").lower()
@@ -447,7 +454,7 @@ class DefaultMLXOptimizerStrategy(MLXOptimizerStrategy):
 class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
     """Default SGD-style training step using value-and-grad."""
 
-    def __init__(self, jit: bool = False, clip_grad_norm: Optional[float] = None):
+    def __init__(self, jit: bool = False, clip_grad_norm: float | None = None):
         self.jit = jit
         self.clip_grad_norm = clip_grad_norm
         self._value_and_grad = None
@@ -456,15 +463,22 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
         _ensure_mlx_available()
         self._value_and_grad = nn_utils.value_and_grad
 
+    def _require_value_and_grad(self):
+        if self._value_and_grad is None:
+            raise RuntimeError(
+                "Value-and-grad function has not been initialised for MLX training strategy."
+            )
+        return self._value_and_grad
+
     def training_step(
         self,
-        model: "mx_nn.Module",
-        optimizer: "mx_optim.Optimizer",
-        examples: "mx.array",
-        labels: Optional["mx.array"],
-        loss_criterion: Callable[["mx.array", Optional["mx.array"]], "mx.array"],
+        model: mx_nn.Module,
+        optimizer: mx_optim.Optimizer,
+        examples: mx.array,
+        labels: mx.array | None,
+        loss_criterion: Callable[[mx.array, mx.array | None], mx.array],
         context: MLXTrainingContext,
-    ) -> "mx.array":
+    ) -> mx.array:
         _ensure_mlx_available()
 
         if labels is None:
@@ -473,14 +487,16 @@ class DefaultMLXTrainingStepStrategy(MLXTrainingStepStrategy):
                 outputs = model(examples_inner)
                 return loss_criterion(outputs, None)
 
-            loss, grads = self._value_and_grad(model, inner_loss)(examples)
+            value_and_grad = self._require_value_and_grad()
+            loss, grads = value_and_grad(model, inner_loss)(examples)
         else:
 
             def inner_loss(examples_inner, labels_inner):
                 outputs = model(examples_inner)
                 return loss_criterion(outputs, labels_inner)
 
-            loss, grads = self._value_and_grad(model, inner_loss)(examples, labels)
+            value_and_grad = self._require_value_and_grad()
+            loss, grads = value_and_grad(model, inner_loss)(examples, labels)
 
         if self.clip_grad_norm is not None:
             logging.warning(
@@ -540,7 +556,7 @@ class DefaultMLXDataLoaderStrategy(MLXDataLoaderStrategy):
         batch_size: int,
         shuffle: bool,
         drop_last: bool,
-    ) -> "SimpleDataLoader":
+    ) -> SimpleDataLoader:
         return SimpleDataLoader(
             dataset,
             indices,
@@ -555,7 +571,7 @@ class DefaultMLXDataLoaderStrategy(MLXDataLoaderStrategy):
         sampler: Any,
         batch_size: int,
         context: MLXTrainingContext,
-    ) -> Iterable[Tuple[Any, Any]]:
+    ) -> Iterable[tuple[Any, Any]]:
         indices = self._resolve_indices(trainset, sampler)
         shuffle = self.shuffle
         if sampler is not None and not isinstance(sampler, Sequence):
@@ -568,7 +584,7 @@ class DefaultMLXDataLoaderStrategy(MLXDataLoaderStrategy):
         sampler: Any,
         batch_size: int,
         context: MLXTrainingContext,
-    ) -> Iterable[Tuple[Any, Any]]:
+    ) -> Iterable[tuple[Any, Any]]:
         if sampler is not None:
             indices = self._resolve_indices(testset, sampler)
         else:
@@ -585,14 +601,14 @@ class DefaultMLXDataLoaderStrategy(MLXDataLoaderStrategy):
 class DefaultMLXTestingStrategy(MLXTestingStrategy):
     """Compute classification accuracy using MLX ops."""
 
-    def __init__(self, batch_size: Optional[int] = None):
+    def __init__(self, batch_size: int | None = None):
         self.batch_size = batch_size
         self.data_loader_strategy = DefaultMLXDataLoaderStrategy(shuffle=False)
 
     def test_model(
         self,
-        model: "mx_nn.Module",
-        config: Dict[str, Any],
+        model: mx_nn.Module,
+        config: dict[str, Any],
         testset: Any,
         sampler: Any,
         context: MLXTrainingContext,
@@ -657,7 +673,7 @@ class DefaultMLXTestingStrategy(MLXTestingStrategy):
         return correct_predictions / total_samples
 
 
-class SimpleDataLoader(Iterable[Tuple[Any, Any]]):
+class SimpleDataLoader(Iterable[tuple[Any, Any]]):
     """Minimal iterable data loader supporting indexable datasets."""
 
     def __init__(
@@ -674,13 +690,13 @@ class SimpleDataLoader(Iterable[Tuple[Any, Any]]):
         self.shuffle = shuffle
         self.drop_last = drop_last
 
-    def __iter__(self) -> Iterator[Tuple[Any, Any]]:
+    def __iter__(self) -> Iterator[tuple[Any, Any]]:
         indices = list(self.indices)
         if self.shuffle:
             random.shuffle(indices)
 
-        batch_examples: List[Any] = []
-        batch_labels: List[Any] = []
+        batch_examples: list[Any] = []
+        batch_labels: list[Any] = []
 
         for idx in indices:
             item = self.dataset[idx]
@@ -737,15 +753,15 @@ class ComposableMLXTrainer(base.Trainer):
 
     def __init__(
         self,
-        model: Optional[Union["mx_nn.Module", Callable[[], "mx_nn.Module"]]] = None,
-        callbacks: Optional[List[Any]] = None,
-        loss_strategy: Optional[MLXLossCriterionStrategy] = None,
-        optimizer_strategy: Optional[MLXOptimizerStrategy] = None,
-        training_step_strategy: Optional[MLXTrainingStepStrategy] = None,
-        lr_scheduler_strategy: Optional[MLXLRSchedulerStrategy] = None,
-        model_update_strategy: Optional[MLXModelUpdateStrategy] = None,
-        data_loader_strategy: Optional[MLXDataLoaderStrategy] = None,
-        testing_strategy: Optional[MLXTestingStrategy] = None,
+        model: mx_nn.Module | Callable[[], mx_nn.Module] | None = None,
+        callbacks: list[Any] | None = None,
+        loss_strategy: MLXLossCriterionStrategy | None = None,
+        optimizer_strategy: MLXOptimizerStrategy | None = None,
+        training_step_strategy: MLXTrainingStepStrategy | None = None,
+        lr_scheduler_strategy: MLXLRSchedulerStrategy | None = None,
+        model_update_strategy: MLXModelUpdateStrategy | None = None,
+        data_loader_strategy: MLXDataLoaderStrategy | None = None,
+        testing_strategy: MLXTestingStrategy | None = None,
     ):
         _ensure_mlx_available()
 
@@ -798,6 +814,11 @@ class ComposableMLXTrainer(base.Trainer):
         self.training_start_time = time.time()
         self.model_state_tree = None
 
+    def _require_model(self) -> mx_nn.Module:
+        if not isinstance(self.model, mx_nn.Module):
+            raise RuntimeError("MLX model has not been initialised correctly.")
+        return self.model
+
     def _setup_strategies(self) -> None:
         for strategy in [
             self.loss_strategy,
@@ -828,7 +849,7 @@ class ComposableMLXTrainer(base.Trainer):
         super().set_client_id(client_id)
         self.context.client_id = client_id
 
-    def zeros(self, shape: Union[int, Sequence[int]]) -> "mx.array":
+    def zeros(self, shape: int | Sequence[int]) -> mx.array:
         _ensure_mlx_available()
         assert self.client_id == 0
         return mx.zeros(shape)
@@ -839,8 +860,8 @@ class ComposableMLXTrainer(base.Trainer):
 
     def save_model(
         self,
-        filename: Optional[str] = None,
-        location: Optional[str] = None,
+        filename: str | None = None,
+        location: str | None = None,
     ) -> None:
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
@@ -865,8 +886,8 @@ class ComposableMLXTrainer(base.Trainer):
 
     def load_model(
         self,
-        filename: Optional[str] = None,
-        location: Optional[str] = None,
+        filename: str | None = None,
+        location: str | None = None,
     ) -> None:
         model_path = Config().params["model_path"] if location is None else location
         model_name = Config().trainer.model_name
@@ -916,13 +937,15 @@ class ComposableMLXTrainer(base.Trainer):
                     time.sleep(sleep_seconds)
 
     def _capture_model_state(self) -> Any:
-        parameters = self.model.parameters()
+        model = self._require_model()
+        parameters = model.parameters()
         return _tree_map(_to_host_array, parameters)
 
     def _apply_model_state(self, state_tree: Any) -> None:
         restored = _tree_map(_to_mx_array, state_tree)
-        if hasattr(self.model, "update"):
-            self.model.update(restored)
+        model = self._require_model()
+        if hasattr(model, "update"):
+            model.update(restored)
         else:
             raise RuntimeError(
                 "The configured MLX model does not support parameter updates."
@@ -930,7 +953,7 @@ class ComposableMLXTrainer(base.Trainer):
         if mx is not None:
             leaves = [
                 leaf
-                for leaf in _tree_leaves(self.model.parameters())
+                for leaf in _tree_leaves(model.parameters())
                 if isinstance(leaf, mx.array)
             ]
             if leaves:

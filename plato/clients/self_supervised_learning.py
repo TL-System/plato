@@ -42,10 +42,12 @@ class Client(simple.Client):
 
         # Get the personalized datasource
         if self.personalized_datasource is None:
-            personalized_datasource = datasources_registry.get()
+            self.personalized_datasource = datasources_registry.get()
 
         # Set the train and the test set for the trainer
-        self.trainer.set_personalized_datasets(
+        trainer = self.require_trainer()
+        personalized_datasource = self.personalized_datasource
+        trainer.set_personalized_datasets(
             personalized_datasource.get_train_set(),
             personalized_datasource.get_test_set(),
         )

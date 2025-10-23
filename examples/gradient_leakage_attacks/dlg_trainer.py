@@ -127,7 +127,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
                     create_graph=True,
                     only_inputs=True,
                 )
-                self.list_grad.append(list((_.detach().clone() for _ in grad)))
+                self.list_grad.append(list(_.detach().clone() for _ in grad))
             loss = torch.mean(step_losses)
         else:
             if (
@@ -146,7 +146,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
                 create_graph=True,
                 only_inputs=True,
             )
-            self.list_grad = list((_.detach().clone() for _ in grad))
+            self.list_grad = list(_.detach().clone() for _ in grad)
 
         # Store in context for use by callbacks
         context.state["examples"] = self.examples
@@ -307,11 +307,11 @@ class DLGTrainingCallbacks(TrainerCallback):
                 self.target_grad = [
                     sum(x)
                     for x in zip(
-                        list((_.detach().clone() for _ in grad)), self.target_grad
+                        list(_.detach().clone() for _ in grad), self.target_grad
                     )
                 ]
             except:
-                self.target_grad = list((_.detach().clone() for _ in grad))
+                self.target_grad = list(_.detach().clone() for _ in grad)
 
     def on_train_run_end(self, trainer, config, **kwargs):
         """Method called at the end of a training run."""

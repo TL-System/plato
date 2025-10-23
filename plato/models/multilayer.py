@@ -5,6 +5,7 @@ Reference: https://www.comp.nus.edu.sg/~reza/files/Shokri-SP2019.pdf
 """
 
 import collections
+from typing import Any, cast
 
 import torch.nn as nn
 
@@ -38,8 +39,8 @@ class Model(nn.Module):
 
         # Preparing named layers so that the model can be split and straddle
         # across the client and the server
-        self.layers = []
-        self.layerdict = collections.OrderedDict()
+        self.layers = cast(Any, [])
+        self.layerdict = cast(Any, collections.OrderedDict())
         self.layerdict["fc1"] = self.fc1
         self.layerdict["fc2"] = self.fc2
         self.layerdict["fc3"] = self.fc3

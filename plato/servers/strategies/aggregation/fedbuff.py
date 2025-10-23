@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import asyncio
 from types import SimpleNamespace
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, cast
+from collections.abc import Callable
 
 import numpy as np
 
@@ -20,10 +21,10 @@ class FedBuffAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         if not deltas_received:
             return {}
 
@@ -31,7 +32,7 @@ class FedBuffAggregationStrategy(AggregationStrategy):
         weight = 1.0 / total_updates if total_updates > 0 else 0.0
 
         trainer = getattr(context, "trainer", None)
-        zeros_fn: Optional[Callable[[Any], Any]] = (
+        zeros_fn: Callable[[Any], Any] | None = (
             cast(Callable[[Any], Any], trainer.zeros)
             if trainer is not None and hasattr(trainer, "zeros")
             else None

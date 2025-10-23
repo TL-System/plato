@@ -65,7 +65,7 @@ def get_sentence_data(parse_file_path):
                         phrase_id - an identifier for this phrase
                         phrase_type - a list of the coarse categories this phrase belongs to
     """
-    with open(parse_file_path, "r") as opened_file:
+    with open(parse_file_path) as opened_file:
         sentences = opened_file.read().split("\n")
 
     annotations = []
@@ -120,7 +120,7 @@ def get_sentence_data(parse_file_path):
     return annotations
 
 
-def get_annotations(parse_file_path: str) -> Dict[str, Any]:
+def get_annotations(parse_file_path: str) -> dict[str, Any]:
     """Parses the xml files in the Flickr30K Entities dataset.
     Args:
         parse_file_path - full file path to the annotations file to parse
@@ -135,10 +135,10 @@ def get_annotations(parse_file_path: str) -> Dict[str, Any]:
     """
     tree = ET.parse(parse_file_path)
     root = tree.getroot()
-    boxes: Dict[str, List[List[int]]] = {}
-    scene: List[str] = []
-    nobox: List[str] = []
-    anno_info: Dict[str, Any] = {"boxes": boxes, "scene": scene, "nobox": nobox}
+    boxes: dict[str, list[list[int]]] = {}
+    scene: list[str] = []
+    nobox: list[str] = []
+    anno_info: dict[str, Any] = {"boxes": boxes, "scene": scene, "nobox": nobox}
 
     size_container = root.findall("size")
     if size_container:
@@ -159,7 +159,7 @@ def get_annotations(parse_file_path: str) -> Dict[str, Any]:
             box_container = object_container.findall("bndbox")
             if box_container:
                 bbox = box_container[0]
-                coords: List[int] = []
+                coords: list[int] = []
                 for tag in ("xmin", "ymin", "xmax", "ymax"):
                     element = bbox.find(tag)
                     if element is None or element.text is None:

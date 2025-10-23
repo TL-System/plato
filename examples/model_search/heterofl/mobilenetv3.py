@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 """
 MobileNetV3 From <Searching for MobileNetV3>, arXiv:1905.02244.
 Ref: https://github.com/d-li14/mobilenetv3.pytorch/blob/master/mobilenetv3.py

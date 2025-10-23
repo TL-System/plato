@@ -127,12 +127,12 @@ class TreeMetadata:
     """Metadata describing the structure of a flattened tree."""
 
     type: str
-    children: List[str] | None = None
+    children: list[str] | None = None
     container: str | None = None  # distinguish tuple vs list
     backend: str | None = None
 
 
-def flatten_tree(tree: Any) -> Tuple[Dict[str, np.ndarray], Dict[str, TreeMetadata]]:
+def flatten_tree(tree: Any) -> tuple[dict[str, np.ndarray], dict[str, TreeMetadata]]:
     """
     Flatten a nested tree into a dict of numpy arrays keyed by path segments.
 
@@ -140,8 +140,8 @@ def flatten_tree(tree: Any) -> Tuple[Dict[str, np.ndarray], Dict[str, TreeMetada
         tuple(dict, dict): (flat leaf map, metadata describing the tree)
     """
 
-    flat: Dict[str, np.ndarray] = {}
-    metadata: Dict[str, TreeMetadata] = {}
+    flat: dict[str, np.ndarray] = {}
+    metadata: dict[str, TreeMetadata] = {}
 
     def recurse(node: Any, path: str) -> None:
         if isinstance(node, dict):
@@ -174,7 +174,7 @@ def flatten_tree(tree: Any) -> Tuple[Dict[str, np.ndarray], Dict[str, TreeMetada
 
 
 def unflatten_tree(
-    flat: Dict[str, np.ndarray], metadata: Dict[str, TreeMetadata]
+    flat: dict[str, np.ndarray], metadata: dict[str, TreeMetadata]
 ) -> Any:
     """Rebuild a nested tree from flattened leaves and metadata."""
 

@@ -12,7 +12,7 @@ import logging
 from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
-from typing import Callable
+from collections.abc import Callable
 
 import socketio
 import torch

@@ -53,8 +53,8 @@ class ServerContext:
         self.current_round: int = 0
         self.total_clients: int = 0
         self.clients_per_round: int = 0
-        self.updates: List[SimpleNamespace] = []
-        self.state: Dict[str, Any] = {}
+        self.updates: list[SimpleNamespace] = []
+        self.state: dict[str, Any] = {}
 
     def __repr__(self) -> str:
         """Return string representation of context."""
@@ -131,10 +131,10 @@ class AggregationStrategy(ServerStrategy):
     @abstractmethod
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """
         Aggregate weight deltas from clients.
 
@@ -170,11 +170,11 @@ class AggregationStrategy(ServerStrategy):
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Optional: Aggregate model weights directly instead of deltas.
 
@@ -229,10 +229,10 @@ class ClientSelectionStrategy(ServerStrategy):
     @abstractmethod
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         """
         Select a subset of clients for the current round.
 
@@ -262,7 +262,7 @@ class ClientSelectionStrategy(ServerStrategy):
         pass
 
     def on_clients_selected(
-        self, selected_clients: List[int], context: ServerContext
+        self, selected_clients: list[int], context: ServerContext
     ) -> None:
         """
         Hook called after clients are selected.
@@ -279,7 +279,7 @@ class ClientSelectionStrategy(ServerStrategy):
         pass
 
     def on_reports_received(
-        self, updates: List[SimpleNamespace], context: ServerContext
+        self, updates: list[SimpleNamespace], context: ServerContext
     ) -> None:
         """
         Hook called after client reports are received and aggregated.

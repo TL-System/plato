@@ -57,7 +57,7 @@ class EdgeTrainingStrategy(TrainingStrategy):
             raise RuntimeError("EdgeTrainingStrategy requires an owning client.")
         owner.server.algorithm.load_weights(server_payload)
 
-    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> tuple[Any, Any]:
         owner = context.owner
         if owner is None:
             raise RuntimeError("EdgeTrainingStrategy requires an owning client.")

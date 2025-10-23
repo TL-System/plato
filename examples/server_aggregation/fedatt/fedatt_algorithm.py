@@ -5,7 +5,7 @@ FedAtt-specific algorithm helpers encapsulating PyTorch operations.
 from __future__ import annotations
 
 from collections import OrderedDict
-from typing import Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 
 import torch
 import torch.nn.functional as F

@@ -19,7 +19,7 @@ class Algorithm(fedavg.Algorithm):
     """FedAvg variant that exchanges only LoRA adapter weights."""
 
     @staticmethod
-    def _peft_base(model) -> Optional[object]:
+    def _peft_base(model) -> object | None:
         """Return the underlying base model that stores LoRA adapters."""
         if model is None:
             return None

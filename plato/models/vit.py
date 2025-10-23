@@ -49,7 +49,7 @@ class ResolutionAdjustedModel(nn.Module):
             and not Config().parameters.model.pretrained
         ):
             self.model.init_weights()
-        self.resolution = config.image_size
+        self.resolution = cast(Any, config.image_size)
 
     def forward(self, image):
         """
@@ -92,7 +92,7 @@ class T2TVIT(nn.Module):
                 num_classes=Config().trainer.num_classes,
             )
         self.model = t2t
-        self.resolution = 224
+        self.resolution = cast(Any, 224)
 
     def forward(self, feature):
         """The forward pass."""
@@ -133,7 +133,7 @@ class DeepViT(nn.Module):
             del state_dict["head.bias"]
             deepvit.load_state_dict(state_dict)
         self.model = deepvit
-        self.resolution = 224
+        self.resolution = cast(Any, 224)
 
     def forward(self, feature):
         """The forward pass."""

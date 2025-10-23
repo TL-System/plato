@@ -7,7 +7,8 @@ Implements the FedNova normalization to handle heterogeneous local epochs.
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, cast
+from collections.abc import Callable
 
 import numpy as np
 
@@ -19,15 +20,15 @@ class FedNovaAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         total_samples = sum(update.report.num_samples for update in updates)
         local_epochs = [update.report.epochs for update in updates]
 
         trainer = getattr(context, "trainer", None)
-        zeros_fn: Optional[Callable[[Any], Any]] = (
+        zeros_fn: Callable[[Any], Any] | None = (
             cast(Callable[[Any], Any], trainer.zeros)
             if trainer is not None and hasattr(trainer, "zeros")
             else None

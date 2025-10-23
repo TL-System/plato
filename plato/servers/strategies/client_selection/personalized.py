@@ -27,7 +27,7 @@ class PersonalizedRatioSelectionStrategy(ClientSelectionStrategy):
         self,
         ratio: float,
         personalization_rounds: int,
-        base_strategy: Optional[ClientSelectionStrategy] = None,
+        base_strategy: ClientSelectionStrategy | None = None,
     ):
         self.ratio = max(0.0, min(1.0, ratio))
         self.personalization_rounds = personalization_rounds
@@ -38,10 +38,10 @@ class PersonalizedRatioSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         candidates = clients_pool
 
         if context.current_round <= self.personalization_rounds:
@@ -55,7 +55,7 @@ class PersonalizedRatioSelectionStrategy(ClientSelectionStrategy):
         return self.base_strategy.select_clients(candidates, clients_count, context)
 
     def on_clients_selected(
-        self, selected_clients: List[int], context: ServerContext
+        self, selected_clients: list[int], context: ServerContext
     ) -> None:
         self.base_strategy.on_clients_selected(selected_clients, context)
 

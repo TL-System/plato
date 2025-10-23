@@ -23,7 +23,7 @@ class ExtractControlVariatesProcessor(base.Processor):
         self.client_id = client_id
         self.trainer = trainer
 
-    def process(self, data: List) -> List:
+    def process(self, data: list) -> list:
         if len(data) > 1:
             self.trainer.additional_data = data[1]
 
@@ -46,7 +46,7 @@ class SendControlVariateProcessor(base.Processor):
         self.client_id = client_id
         self.trainer = trainer
 
-    def process(self, data: Any) -> List:
+    def process(self, data: Any) -> list:
         delta = getattr(self.trainer, "client_control_variate_delta", None)
         data = [data, delta]
 

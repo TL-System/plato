@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 from torch.autograd import Variable
 
 
-class AvgrageMeter(object):
+class AvgrageMeter:
     def __init__(self):
         self.reset()
 
@@ -41,7 +41,7 @@ def accuracy(output, target, topk=(1,)):
     return res
 
 
-class Cutout(object):
+class Cutout:
     def __init__(self, length):
         self.length = length
 
@@ -128,7 +128,7 @@ def drop_path(x, drop_prob):
 def create_exp_dir(path, scripts_to_save=None):
     if not os.path.exists(path):
         os.mkdir(path)
-    print("Experiment dir : {}".format(path))
+    print(f"Experiment dir : {path}")
 
     if scripts_to_save is not None:
         os.mkdir(os.path.join(path, "scripts"))

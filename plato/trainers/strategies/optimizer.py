@@ -7,7 +7,8 @@ the composable trainer architecture.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn
@@ -17,8 +18,8 @@ from plato.trainers import optimizers as optimizer_registry
 from plato.trainers.strategies.base import OptimizerStrategy, TrainingContext
 
 OptimizerFactory = Callable[[nn.Module], torch.optim.Optimizer]
-ParameterGroupsFn = Callable[[nn.Module], List[Dict[str, Any]]]
-OptimizerClass = Type[torch.optim.Optimizer]
+ParameterGroupsFn = Callable[[nn.Module], list[dict[str, Any]]]
+OptimizerClass = type[torch.optim.Optimizer]
 
 
 class DefaultOptimizerStrategy(OptimizerStrategy):
@@ -36,7 +37,7 @@ class DefaultOptimizerStrategy(OptimizerStrategy):
         >>> trainer = ComposableTrainer(optimizer_strategy=strategy)
     """
 
-    def __init__(self, optimizer_fn: Optional[OptimizerFactory] = None):
+    def __init__(self, optimizer_fn: OptimizerFactory | None = None):
         """Initialize with optional custom optimizer factory."""
         self.optimizer_fn = optimizer_fn
 
@@ -69,7 +70,7 @@ class SGDOptimizerStrategy(OptimizerStrategy):
 
     def __init__(
         self,
-        lr: Optional[float] = None,
+        lr: float | None = None,
         momentum: float = 0.0,
         weight_decay: float = 0.0,
         dampening: float = 0.0,
@@ -85,7 +86,20 @@ class SGDOptimizerStrategy(OptimizerStrategy):
     def setup(self, context: TrainingContext) -> None:
         """Get learning rate from config if not specified."""
         if self.lr is None:
-            self.lr = Config().trainer.lr
+            config_lr = getattr(Config().trainer, "lr", None)
+            if config_lr is None:
+                raise RuntimeError(
+                    "Trainer configuration must define `lr` when SGDOptimizerStrategy "
+                    "is initialised without an explicit learning rate."
+                )
+            self.lr = float(config_lr)
+
+    def _resolve_lr(self) -> float:
+        if self.lr is None:
+            raise RuntimeError(
+                "Learning rate has not been initialised for SGDOptimizerStrategy."
+            )
+        return float(self.lr)
 
     def create_optimizer(
         self, model: nn.Module, context: TrainingContext
@@ -93,7 +107,7 @@ class SGDOptimizerStrategy(OptimizerStrategy):
         """Create SGD optimizer."""
         return torch.optim.SGD(
             model.parameters(),
-            lr=self.lr,
+            lr=self._resolve_lr(),
             momentum=self.momentum,
             weight_decay=self.weight_decay,
             dampening=self.dampening,
@@ -119,7 +133,7 @@ class AdamOptimizerStrategy(OptimizerStrategy):
 
     def __init__(
         self,
-        lr: Optional[float] = None,
+        lr: float | None = None,
         betas: tuple = (0.9, 0.999),
         eps: float = 1e-8,
         weight_decay: float = 0.0,
@@ -135,7 +149,20 @@ class AdamOptimizerStrategy(OptimizerStrategy):
     def setup(self, context: TrainingContext) -> None:
         """Get learning rate from config if not specified."""
         if self.lr is None:
-            self.lr = Config().trainer.lr
+            config_lr = getattr(Config().trainer, "lr", None)
+            if config_lr is None:
+                raise RuntimeError(
+                    "Trainer configuration must define `lr` when AdamOptimizerStrategy "
+                    "is initialised without an explicit learning rate."
+                )
+            self.lr = float(config_lr)
+
+    def _resolve_lr(self) -> float:
+        if self.lr is None:
+            raise RuntimeError(
+                "Learning rate has not been initialised for AdamOptimizerStrategy."
+            )
+        return float(self.lr)
 
     def create_optimizer(
         self, model: nn.Module, context: TrainingContext
@@ -143,7 +170,7 @@ class AdamOptimizerStrategy(OptimizerStrategy):
         """Create Adam optimizer."""
         return torch.optim.Adam(
             model.parameters(),
-            lr=self.lr,
+            lr=self._resolve_lr(),
             betas=self.betas,
             eps=self.eps,
             weight_decay=self.weight_decay,
@@ -171,7 +198,7 @@ class AdamWOptimizerStrategy(OptimizerStrategy):
 
     def __init__(
         self,
-        lr: Optional[float] = None,
+        lr: float | None = None,
         betas: tuple = (0.9, 0.999),
         eps: float = 1e-8,
         weight_decay: float = 0.01,
@@ -187,7 +214,20 @@ class AdamWOptimizerStrategy(OptimizerStrategy):
     def setup(self, context: TrainingContext) -> None:
         """Get learning rate from config if not specified."""
         if self.lr is None:
-            self.lr = Config().trainer.lr
+            config_lr = getattr(Config().trainer, "lr", None)
+            if config_lr is None:
+                raise RuntimeError(
+                    "Trainer configuration must define `lr` when AdamWOptimizerStrategy "
+                    "is initialised without an explicit learning rate."
+                )
+            self.lr = float(config_lr)
+
+    def _resolve_lr(self) -> float:
+        if self.lr is None:
+            raise RuntimeError(
+                "Learning rate has not been initialised for AdamWOptimizerStrategy."
+            )
+        return float(self.lr)
 
     def create_optimizer(
         self, model: nn.Module, context: TrainingContext
@@ -195,7 +235,7 @@ class AdamWOptimizerStrategy(OptimizerStrategy):
         """Create AdamW optimizer."""
         return torch.optim.AdamW(
             model.parameters(),
-            lr=self.lr,
+            lr=self._resolve_lr(),
             betas=self.betas,
             eps=self.eps,
             weight_decay=self.weight_decay,
@@ -222,7 +262,7 @@ class RMSpropOptimizerStrategy(OptimizerStrategy):
 
     def __init__(
         self,
-        lr: Optional[float] = None,
+        lr: float | None = None,
         alpha: float = 0.99,
         eps: float = 1e-8,
         weight_decay: float = 0.0,
@@ -240,7 +280,21 @@ class RMSpropOptimizerStrategy(OptimizerStrategy):
     def setup(self, context: TrainingContext) -> None:
         """Get learning rate from config if not specified."""
         if self.lr is None:
-            self.lr = Config().trainer.lr
+            config_lr = getattr(Config().trainer, "lr", None)
+            if config_lr is None:
+                raise RuntimeError(
+                    "Trainer configuration must define `lr` when "
+                    "RMSpropOptimizerStrategy is initialised without an explicit "
+                    "learning rate."
+                )
+            self.lr = float(config_lr)
+
+    def _resolve_lr(self) -> float:
+        if self.lr is None:
+            raise RuntimeError(
+                "Learning rate has not been initialised for RMSpropOptimizerStrategy."
+            )
+        return float(self.lr)
 
     def create_optimizer(
         self, model: nn.Module, context: TrainingContext
@@ -248,7 +302,7 @@ class RMSpropOptimizerStrategy(OptimizerStrategy):
         """Create RMSprop optimizer."""
         return torch.optim.RMSprop(
             model.parameters(),
-            lr=self.lr,
+            lr=self._resolve_lr(),
             alpha=self.alpha,
             eps=self.eps,
             weight_decay=self.weight_decay,
@@ -287,7 +341,7 @@ class ParameterGroupOptimizerStrategy(OptimizerStrategy):
         self,
         optimizer_class: OptimizerClass,
         parameter_groups_fn: ParameterGroupsFn,
-        default_lr: Optional[float] = None,
+        default_lr: float | None = None,
         **optimizer_kwargs,
     ):
         """Initialize parameter group optimizer strategy."""

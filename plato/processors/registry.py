@@ -78,7 +78,7 @@ def register_he_processors():
 
 def get(
     user: str, processor_kwargs=None, **kwargs
-) -> Tuple[pipeline.Processor, pipeline.Processor]:
+) -> tuple[pipeline.Processor, pipeline.Processor]:
     """Get an instance of the processor."""
     outbound_processors = []
     inbound_processors = []

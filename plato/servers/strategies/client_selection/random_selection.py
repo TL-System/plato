@@ -16,10 +16,10 @@ class RandomSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         assert clients_count <= len(clients_pool), (
             f"Cannot select {clients_count} clients from pool of {len(clients_pool)}"
         )

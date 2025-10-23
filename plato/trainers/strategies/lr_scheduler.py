@@ -7,7 +7,8 @@ the composable trainer architecture.
 
 from __future__ import annotations
 
-from typing import Callable, Optional
+from typing import Literal, Optional
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn
@@ -35,14 +36,14 @@ class DefaultLRSchedulerStrategy(LRSchedulerStrategy):
 
     def __init__(
         self,
-        scheduler_fn: Optional[Callable[[torch.optim.Optimizer], LRScheduler]] = None,
+        scheduler_fn: Callable[[torch.optim.Optimizer], LRScheduler] | None = None,
     ):
         """Initialize with optional custom scheduler factory."""
         self.scheduler_fn = scheduler_fn
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[LRScheduler]:
+    ) -> LRScheduler | None:
         """Create scheduler using registry or custom function."""
         if self.scheduler_fn is None:
             # Use framework's registry
@@ -77,7 +78,7 @@ class NoSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[LRScheduler]:
+    ) -> LRScheduler | None:
         """Return None for no scheduling."""
         return None
 
@@ -279,21 +280,21 @@ class ReduceLROnPlateauSchedulerStrategy(LRSchedulerStrategy):
 
     def __init__(
         self,
-        mode: str = "min",
+        mode: Literal["min", "max"] = "min",
         factor: float = 0.1,
         patience: int = 10,
         threshold: float = 1e-4,
-        threshold_mode: str = "rel",
+        threshold_mode: Literal["rel", "abs"] = "rel",
         cooldown: int = 0,
         min_lr: float = 0.0,
         eps: float = 1e-8,
     ):
         """Initialize reduce on plateau scheduler parameters."""
-        self.mode = mode
+        self.mode: Literal["min", "max"] = mode
         self.factor = factor
         self.patience = patience
         self.threshold = threshold
-        self.threshold_mode = threshold_mode
+        self.threshold_mode: Literal["rel", "abs"] = threshold_mode
         self.cooldown = cooldown
         self.min_lr = min_lr
         self.eps = eps
@@ -316,7 +317,7 @@ class ReduceLROnPlateauSchedulerStrategy(LRSchedulerStrategy):
 
     def step(
         self,
-        scheduler: Optional[LRScheduler],
+        scheduler: LRScheduler | None,
         context: TrainingContext,
     ) -> None:
         """
@@ -435,7 +436,7 @@ class WarmupSchedulerStrategy(LRSchedulerStrategy):
         self,
         warmup_epochs: int,
         warmup_start_lr: float,
-        base_scheduler: Optional[LRSchedulerStrategy] = None,
+        base_scheduler: LRSchedulerStrategy | None = None,
     ):
         """Initialize warmup scheduler parameters."""
         self.warmup_epochs = warmup_epochs
@@ -452,7 +453,7 @@ class WarmupSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[LRScheduler]:
+    ) -> LRScheduler | None:
         """
         Create warmup scheduler.
 
@@ -483,7 +484,7 @@ class WarmupSchedulerStrategy(LRSchedulerStrategy):
 
     def step(
         self,
-        scheduler: Optional[LRScheduler],
+        scheduler: LRScheduler | None,
         context: TrainingContext,
     ) -> None:
         """Step the appropriate scheduler based on current epoch."""
@@ -543,7 +544,7 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[LRScheduler]:
+    ) -> LRScheduler | None:
         """
         Create timm scheduler using configuration.
 
@@ -579,7 +580,7 @@ class TimmLRSchedulerStrategy(LRSchedulerStrategy):
 
     def step(
         self,
-        scheduler: Optional[LRScheduler],
+        scheduler: LRScheduler | None,
         context: TrainingContext,
     ) -> None:
         """

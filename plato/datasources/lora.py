@@ -42,7 +42,7 @@ class DataSource(base.DataSource):
 
         logging.info("Dataset: %s", dataset_name)
 
-        dataset_kwargs: Dict[str, Any] = {}
+        dataset_kwargs: dict[str, Any] = {}
         if dataset_config is not None:
             dataset_kwargs["name"] = dataset_config
 
@@ -56,7 +56,7 @@ class DataSource(base.DataSource):
         column_names_raw = getattr(train_split_dataset, "column_names", None)
         if not isinstance(column_names_raw, list):
             raise AttributeError("Training split must expose 'column_names'.")
-        column_names: List[str] = [str(name) for name in column_names_raw]
+        column_names: list[str] = [str(name) for name in column_names_raw]
 
         model_name = Config().trainer.model_name
         if "llama" in model_name.lower():
@@ -68,7 +68,7 @@ class DataSource(base.DataSource):
             tokenizer.pad_token = tokenizer.eos_token
         tokenizer.padding_side = "left"
 
-        def tokenize_function(examples: Dict[str, List[str]]):
+        def tokenize_function(examples: dict[str, list[str]]):
             return tokenizer(
                 examples[text_field],
                 max_length=max_length,
@@ -88,7 +88,7 @@ class DataSource(base.DataSource):
         if not callable(shuffle_fn):
             raise AttributeError("Training split does not support shuffling.")
         train_data = shuffle_fn(seed=shuffle_seed)
-        val_data: Optional[Any] = None
+        val_data: Any | None = None
         if val_split in tokenized_datasets:
             val_tokenized = tokenized_datasets[val_split]
             shuffle_val = getattr(val_tokenized, "shuffle", None)
@@ -101,13 +101,14 @@ class DataSource(base.DataSource):
         self.testset = val_data
 
     def num_train_examples(self):
-        return len(self.trainset)
+        return len(self.require_trainset())
 
     def num_test_examples(self):
-        return len(self.testset) if self.testset is not None else 0
+        testset = self.testset
+        return len(testset) if testset is not None else 0
 
     def get_train_set(self):
-        return self.trainset
+        return self.require_trainset()
 
     def get_test_set(self):
         return self.testset

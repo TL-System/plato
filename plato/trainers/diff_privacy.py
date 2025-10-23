@@ -8,10 +8,13 @@ trainer pattern with custom strategies and callbacks instead of inheritance.
 import logging
 import time
 from collections.abc import Iterable
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 import torch
+import torch.nn as nn
 from opacus import GradSampleModule
+from opacus.optimizers import DPOptimizer
 from opacus.privacy_engine import PrivacyEngine
 from opacus.utils.batch_memory_manager import BatchMemoryManager
 from opacus.validators import ModuleValidator
@@ -208,17 +211,21 @@ class DPOptimizerStrategy(OptimizerStrategy):
         self.privacy_engine = PrivacyEngine(accountant="rdp", secure_mode=False)
 
         # Make model, optimizer, and data loader private
-        private_model, private_optimizer, private_train_loader = (
-            self.privacy_engine.make_private_with_epsilon(
-                module=model,
-                optimizer=optimizer,
-                data_loader=train_loader,
-                target_epsilon=target_epsilon,
-                target_delta=target_delta,
-                epochs=epochs,
-                max_grad_norm=max_grad_norm,
-            )
+        private_result = self.privacy_engine.make_private_with_epsilon(
+            module=model,
+            optimizer=optimizer,
+            data_loader=train_loader,
+            target_epsilon=target_epsilon,
+            target_delta=target_delta,
+            epochs=epochs,
+            max_grad_norm=max_grad_norm,
         )
+        if not isinstance(private_result, (list, tuple)) or len(private_result) < 3:
+            raise RuntimeError(
+                "PrivacyEngine.make_private_with_epsilon returned an unexpected result."
+            )
+        private_model, private_optimizer, private_train_loader = private_result[:3]
+        context.state["privacy_engine_metadata"] = private_result[3:]
 
         # Update context with private train loader
         context.state["train_loader"] = private_train_loader
@@ -339,10 +346,12 @@ class Trainer(ComposableTrainer):
 
     def make_model_private(self):
         """Make the model private for use with the differential privacy engine."""
-        errors = ModuleValidator.validate(self.model, strict=False)
+        model = self._require_model()
+        errors = ModuleValidator.validate(model, strict=False)
         if len(errors) > 0:
-            self.model = ModuleValidator.fix(self.model)
-            errors = ModuleValidator.validate(self.model, strict=False)
+            fixed_model = ModuleValidator.fix(model)
+            self.model = fixed_model
+            errors = ModuleValidator.validate(fixed_model, strict=False)
             assert len(errors) == 0
             logging.info("Model validated and fixed for differential privacy.")
 
@@ -398,16 +407,20 @@ class Trainer(ComposableTrainer):
 
         # Create optimizer using strategy (wraps with PrivacyEngine)
         # This also updates train_loader with poisson sampling
-        self.optimizer = self.optimizer_strategy.create_optimizer(
-            self.model, self.context
-        )
+        model = self._require_model()
+        self.optimizer = self.optimizer_strategy.create_optimizer(model, self.context)
 
         # Get the updated train loader with poisson sampling
         train_loader = self.context.state["train_loader"]
         max_physical_batch_size = self.context.state["max_physical_batch_size"]
 
         # Update model reference (it's now wrapped by privacy engine)
+        if not isinstance(self.context.model, nn.Module):
+            raise RuntimeError(
+                "Differential privacy optimizer did not return a valid model instance."
+            )
         self.model = self.context.model
+        model = self.context.model
 
         # Create LR scheduler using strategy
         self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
@@ -415,8 +428,8 @@ class Trainer(ComposableTrainer):
         )
 
         # Move model to device
-        self.model.to(self.device)
-        self.model.train()
+        model.to(self.device)
+        model.train()
 
         # Training epochs
         total_epochs = config["epochs"]
@@ -426,6 +439,10 @@ class Trainer(ComposableTrainer):
             self.context.current_epoch = self.current_epoch
 
             # Wrap with BatchMemoryManager for DP
+            if not isinstance(self.optimizer, DPOptimizer):
+                raise RuntimeError(
+                    "Differential privacy training requires a DPOptimizer instance."
+                )
             with BatchMemoryManager(
                 data_loader=train_loader,
                 max_physical_batch_size=max_physical_batch_size,
@@ -461,7 +478,7 @@ class Trainer(ComposableTrainer):
 
                     # Perform training step using strategy
                     loss = self.training_step_strategy.training_step(
-                        model=self.model,
+                        model=model,
                         optimizer=self.optimizer,
                         examples=examples,
                         labels=labels,
@@ -493,7 +510,9 @@ class Trainer(ComposableTrainer):
 
             # Handle optimizer params state update if needed
             if hasattr(self.optimizer, "params_state_update"):
-                self.optimizer.params_state_update()
+                update_fn = getattr(self.optimizer, "params_state_update")
+                if callable(update_fn):
+                    update_fn()
 
             # Simulate client's speed
             if (
@@ -508,13 +527,13 @@ class Trainer(ComposableTrainer):
                 hasattr(Config().server, "request_update")
                 and Config().server.request_update
             ):
-                self.model.cpu()
+                model.cpu()
                 training_time = time.perf_counter() - tic
                 filename = (
                     f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
                 )
                 self.save_model(filename)
-                self.model.to(self.device)
+                model.to(self.device)
 
             # Update metrics
             self.run_history.update_metric("train_loss", self._loss_tracker.average)

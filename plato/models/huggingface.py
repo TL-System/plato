@@ -18,7 +18,7 @@ except ImportError:  # pragma: no cover - handled at runtime with friendly messa
     get_peft_model = None  # type: ignore
 
 
-def _lora_config_dict(lora_config: Any) -> Dict[str, Any]:
+def _lora_config_dict(lora_config: Any) -> dict[str, Any]:
     """Convert various config objects (namedtuple, SimpleNamespace, dict)."""
     if lora_config is None:
         return {}

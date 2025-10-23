@@ -47,7 +47,9 @@ class DataSource(base.DataSource):
         else:
             # Download and save the dataset
             self.dataset = load_dataset(dataset_name, dataset_config)
-            self.dataset.save_to_disk(saved_data_path)
+            save_to_disk = getattr(self.dataset, "save_to_disk", None)
+            if callable(save_to_disk):
+                save_to_disk(saved_data_path)
 
         parser = HfArgumentParser(TrainingArguments)
         (self.training_args,) = parser.parse_args_into_dataclasses(
@@ -85,16 +87,16 @@ class DataSource(base.DataSource):
         self.testset = self.preprocess_data(self.dataset["validation"])
 
     def num_train_examples(self):
-        return len(self.trainset)
+        return len(self.require_trainset())
 
     def num_test_examples(self):
-        return len(self.testset)
+        return len(self.require_testset())
 
     def get_train_set(self):
-        return self.trainset
+        return self.require_trainset()
 
     def get_test_set(self):
-        return self.testset
+        return self.require_testset()
 
     @staticmethod
     def input_shape():

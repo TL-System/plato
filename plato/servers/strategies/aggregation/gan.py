@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import asyncio
 from types import SimpleNamespace
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
+from collections.abc import Callable
 
 import numpy as np
 
@@ -16,10 +17,10 @@ class FedAvgGanAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Tuple[Dict, Dict]],
+        updates: list[SimpleNamespace],
+        deltas_received: list[tuple[dict, dict]],
         context: ServerContext,
-    ) -> Tuple[Dict, Dict]:
+    ) -> tuple[dict, dict]:
         """Aggregate generator and discriminator deltas with sample weighting."""
 
         total_samples = sum(update.report.num_samples for update in updates)
@@ -30,7 +31,7 @@ class FedAvgGanAggregationStrategy(AggregationStrategy):
         server.total_samples = total_samples
 
         trainer_obj = getattr(context, "trainer", None)
-        zeros_fn: Optional[Callable[[Any], Any]] = (
+        zeros_fn: Callable[[Any], Any] | None = (
             cast(Callable[[Any], Any], trainer_obj.zeros)
             if trainer_obj is not None and hasattr(trainer_obj, "zeros")
             else None

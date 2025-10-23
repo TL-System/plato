@@ -299,7 +299,7 @@ def afa(updates, baseline_weights, weights_attacked):
 
     bad_set = []
     remove_set = [1]
-    pvalue: Dict[int, float] = {}
+    pvalue: dict[int, float] = {}
     epsilon = 2
     delta_ep = 0.5
 
@@ -476,10 +476,10 @@ class WeightsOnlyAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         raise NotImplementedError(
             "This aggregation strategy aggregates weights directly."
         )
@@ -488,77 +488,77 @@ class WeightsOnlyAggregationStrategy(AggregationStrategy):
 class MedianAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return median(updates, baseline_weights, weights_received)
 
 
 class BulyanAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return bulyan(updates, baseline_weights, weights_received)
 
 
 class KrumAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return krum(updates, baseline_weights, weights_received)
 
 
 class MultiKrumAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return multi_krum(updates, baseline_weights, weights_received)
 
 
 class TrimmedMeanAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return trimmed_mean(updates, baseline_weights, weights_received)
 
 
 class AfaAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return afa(updates, baseline_weights, weights_received)
 
 
 class FLTrustAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return fl_trust(updates, baseline_weights, weights_received)
 
 

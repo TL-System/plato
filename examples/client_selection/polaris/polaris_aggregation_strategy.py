@@ -31,8 +31,8 @@ class PolarisAggregationStrategy(FedAvgAggregationStrategy):
         self.initial_gradient_bound = initial_gradient_bound
         self.initial_staleness = initial_staleness
         self.total_clients = 0
-        self.squared_deltas_current_round: Optional[np.ndarray] = None
-        self.unexplored_clients: Optional[Set[int]] = None
+        self.squared_deltas_current_round: np.ndarray | None = None
+        self.unexplored_clients: set[int] | None = None
 
     def setup(self, context: ServerContext) -> None:
         super().setup(context)
@@ -61,10 +61,10 @@ class PolarisAggregationStrategy(FedAvgAggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         avg_update = await super().aggregate_deltas(updates, deltas_received, context)
 
         if not updates or not deltas_received:

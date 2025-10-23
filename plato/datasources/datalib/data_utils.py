@@ -116,10 +116,10 @@ def read_anno_file(anno_file_path):
     file_type = tail.split(".")[-1]
 
     if file_type == "json":
-        with open(anno_file_path, "r") as anno_file:
+        with open(anno_file_path) as anno_file:
             annos_list = json.load(anno_file)
     else:
-        with open(anno_file_path, "r") as anno_file:
+        with open(anno_file_path) as anno_file:
             annos_list = anno_file.readlines()
 
     return annos_list

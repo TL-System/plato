@@ -34,7 +34,7 @@ class Processor(model.Processor):
         self.debug_artifacts = debug_artifacts
 
     @staticmethod
-    def _split_tensor(tensor, num_shares: int) -> List[Any]:
+    def _split_tensor(tensor, num_shares: int) -> list[Any]:
         """Randomly decomposes ``tensor`` into ``num_shares`` additive shares."""
         if num_shares == 1:
             return [tensor]
@@ -47,7 +47,7 @@ class Processor(model.Processor):
         return shares
 
     def _write_debug_artifact(
-        self, round_number: int, label: str, payload: Dict[str, Any]
+        self, round_number: int, label: str, payload: dict[str, Any]
     ) -> None:
         if self.debug_artifacts and not self.round_store.uses_s3:
             path = os.path.join(
@@ -60,7 +60,7 @@ class Processor(model.Processor):
             except OSError:
                 logging.debug("Unable to persist MPC debug artefact at %s.", path)
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         state = self.round_store.load_state()
         if self.client_id not in state.selected_clients:
             raise RuntimeError(

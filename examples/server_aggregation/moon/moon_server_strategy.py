@@ -27,7 +27,7 @@ class MoonAggregationStrategy(AggregationStrategy):
     def __init__(self, history_size: int = 5):
         super().__init__()
         self.history_size = history_size
-        self.global_history: Deque[Dict[str, torch.Tensor]] = deque(maxlen=history_size)
+        self.global_history: Deque[dict[str, torch.Tensor]] = deque(maxlen=history_size)
 
     def setup(self, context: ServerContext) -> None:
         """Initialise server-side memory."""
@@ -35,10 +35,10 @@ class MoonAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict[str, torch.Tensor]],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict[str, torch.Tensor]],
         context: ServerContext,
-    ) -> Dict[str, torch.Tensor]:
+    ) -> dict[str, torch.Tensor]:
         """Apply sample-weighted averaging of client updates."""
         # Cache current global weights before updating.
         if context.algorithm is not None:

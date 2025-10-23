@@ -115,11 +115,10 @@ class Server(base.Server):
             elif self.datasource is None and self.custom_datasource is not None:
                 self.datasource = self.custom_datasource()
 
-            self.testset = self.datasource.get_test_set()
+            datasource = self.require_datasource()
+            self.testset = datasource.get_test_set()
             if hasattr(Config().data, "testset_size"):
-                self.testset_sampler = all_inclusive.Sampler(
-                    self.datasource, testing=True
-                )
+                self.testset_sampler = all_inclusive.Sampler(datasource, testing=True)
 
         # Initialize the test accuracy csv file if clients compute locally
         if (
@@ -160,14 +159,6 @@ class Server(base.Server):
         This method now delegates to the aggregation_strategy for extensibility.
         Subclasses can still override this method for backward compatibility.
         """
-        # Check if subclass overrode this method (backward compatibility)
-        if type(self).aggregate_deltas is not Server.aggregate_deltas:
-            # Legacy path: use superclass implementation when available
-            base_method = getattr(super(Server, self), "aggregate_deltas", None)
-            if base_method is not None:
-                return await base_method(updates, deltas_received)
-            # Fall through and delegate to the strategy if no superclass implementation exists.
-
         # Delegate to aggregation strategy
         self.context.updates = updates
         self.context.current_round = self.current_round
@@ -194,7 +185,8 @@ class Server(base.Server):
         self.client_selection_strategy.on_reports_received(self.updates, self.context)
 
         # Extract the current model weights as the baseline
-        baseline_weights = self.algorithm.extract_weights()
+        algorithm = self.require_algorithm()
+        baseline_weights = algorithm.extract_weights()
 
         # Check if we should aggregate weights directly or use deltas
         # Try strategy's aggregate_weights first, fall back to aggregate_deltas
@@ -204,6 +196,8 @@ class Server(base.Server):
                 self.updates, baseline_weights, weights_received, self.context
             )
 
+        aggregate_weights_fn = getattr(self, "aggregate_weights", None)
+
         if strategy_weights is not None:
             # Strategy provided weight aggregation
             logging.info(
@@ -212,23 +206,23 @@ class Server(base.Server):
             )
             updated_weights = strategy_weights
             # Loads the new model weights
-            self.algorithm.load_weights(updated_weights)
-        elif hasattr(self, "aggregate_weights"):
+            algorithm.load_weights(updated_weights)
+        elif callable(aggregate_weights_fn):
             # Backward compatibility: subclass overrode aggregate_weights
             logging.info(
                 "[Server #%d] Aggregating model weights directly rather than weight deltas.",
                 os.getpid(),
             )
-            updated_weights = await self.aggregate_weights(
+            updated_weights = await aggregate_weights_fn(
                 self.updates, baseline_weights, weights_received
             )
             # Loads the new model weights
-            self.algorithm.load_weights(updated_weights)
+            algorithm.load_weights(updated_weights)
         else:
             # Use delta aggregation (default path)
             # Computes the weight deltas by comparing the weights received with
             # the current global model weights
-            deltas_received = self.algorithm.compute_weight_deltas(
+            deltas_received = algorithm.compute_weight_deltas(
                 baseline_weights, weights_received
             )
             # Runs a framework-agnostic server aggregation algorithm, such as
@@ -236,9 +230,9 @@ class Server(base.Server):
             logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
             deltas = await self.aggregate_deltas(self.updates, deltas_received)
             # Updates the existing model weights from the provided deltas
-            updated_weights = self.algorithm.update_weights(deltas)
+            updated_weights = algorithm.update_weights(deltas)
             # Loads the new model weights
-            self.algorithm.load_weights(updated_weights)
+            algorithm.load_weights(updated_weights)
 
         # The model weights have already been aggregated, now calls the
         # corresponding hook and callback
@@ -255,7 +249,8 @@ class Server(base.Server):
         else:
             # Testing the updated model directly at the server
             logging.info("[%s] Started model testing.", self)
-            self.accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            trainer = self.require_trainer()
+            self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info(

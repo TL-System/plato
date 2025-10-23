@@ -37,14 +37,14 @@ class OortSelectionStrategy(ClientSelectionStrategy):
         self.blacklist_num = blacklist_num
 
         # Runtime state initialised in setup()
-        self.blacklist: List[int] = []
-        self.client_utilities: Dict[int, float] = {}
-        self.client_durations: Dict[int, float] = {}
-        self.client_last_rounds: Dict[int, int] = {}
-        self.client_selected_times: Dict[int, int] = {}
-        self.explored_clients: List[int] = []
-        self.unexplored_clients: List[int] = []
-        self.util_history: List[float] = []
+        self.blacklist: list[int] = []
+        self.client_utilities: dict[int, float] = {}
+        self.client_durations: dict[int, float] = {}
+        self.client_last_rounds: dict[int, int] = {}
+        self.client_selected_times: dict[int, int] = {}
+        self.explored_clients: list[int] = []
+        self.unexplored_clients: list[int] = []
+        self.util_history: list[float] = []
         self.pacer_step = desired_duration
 
     def setup(self, context: ServerContext) -> None:
@@ -94,14 +94,14 @@ class OortSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         """Select clients using the Oort algorithm."""
         assert clients_count <= len(clients_pool)
 
-        selected_clients: List[int] = []
+        selected_clients: list[int] = []
         current_round = context.current_round
 
         prng_state = context.state.get("prng_state")
@@ -235,7 +235,7 @@ class OortSelectionStrategy(ClientSelectionStrategy):
         return selected_clients
 
     def on_reports_received(
-        self, updates: List[SimpleNamespace], context: ServerContext
+        self, updates: list[SimpleNamespace], context: ServerContext
     ) -> None:
         """Update utility statistics after each round."""
         current_round = context.current_round

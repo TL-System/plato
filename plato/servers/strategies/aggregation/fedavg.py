@@ -11,7 +11,8 @@ import asyncio
 import numbers
 from collections.abc import Mapping
 from types import SimpleNamespace
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, cast
+from collections.abc import Callable
 
 import numpy as np
 
@@ -33,10 +34,10 @@ class FedAvgAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """Aggregate using weighted average by sample count."""
         eligible = [
             (update, deltas_received[idx])
@@ -67,11 +68,11 @@ class FedAvgAggregationStrategy(AggregationStrategy):
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Aggregate weights directly when possible."""
         eligible = [
             (update, weights_received[idx])
@@ -108,7 +109,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
     ) -> Any:
         """Accumulate weighted values into the target structure and return it."""
         trainer = getattr(context, "trainer", None)
-        zeros_fn: Optional[Callable[[Any], Any]] = (
+        zeros_fn: Callable[[Any], Any] | None = (
             cast(Callable[[Any], Any], trainer.zeros)
             if trainer is not None and hasattr(trainer, "zeros")
             else None
@@ -230,7 +231,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         return data
 
     @staticmethod
-    def _cast_tensor_like(tensor: "torch.Tensor", reference: "torch.Tensor"):
+    def _cast_tensor_like(tensor: torch.Tensor, reference: torch.Tensor):
         """Cast a tensor to match the dtype of the reference tensor."""
         if tensor.dtype == reference.dtype:
             return tensor

@@ -6,7 +6,7 @@ and attach it to the payload.
 import logging
 import os
 import pickle
-from typing import OrderedDict
+from collections import OrderedDict
 
 from plato.config import Config
 from plato.processors import base

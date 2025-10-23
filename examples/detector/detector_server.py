@@ -6,7 +6,7 @@ import csv
 import logging
 import os
 from collections import OrderedDict
-from typing import Mapping
+from collections.abc import Mapping
 
 import attacks as attack_registry
 import defences

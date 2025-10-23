@@ -8,6 +8,7 @@ import glob
 import importlib
 import json
 import os
+from typing import Any, Dict, Optional
 
 from plato.datasources.datalib.parse_datasets import build_list, obtain_data_splits_info
 
@@ -47,7 +48,7 @@ def _get_parse_directory():
     return _PARSE_DIRECTORY
 
 
-class GenerateMDataAnnotation(object):
+class GenerateMDataAnnotation:
     """Generate the annotation file for the existing data modality"""
 
     def __init__(
@@ -76,7 +77,7 @@ class GenerateMDataAnnotation(object):
 
         self.output_format = output_format
 
-        self.data_splits_info = None
+        self.data_splits_info: dict[str, Any] | None = None
         self.frame_info = None
 
     def read_data_splits_csv_info(self):
@@ -158,6 +159,12 @@ class GenerateMDataAnnotation(object):
     def generate_data_splits_info_file(self, split_name):
         """Generate the data split information and write the info to file"""
         self.parse_dir_files(split_name)
+
+        if self.data_splits_info is None:
+            raise RuntimeError(
+                "Data split information has not been loaded. "
+                "Call `read_data_splits_csv_info()` first."
+            )
 
         split_info = self.data_splits_info[split_name]
 

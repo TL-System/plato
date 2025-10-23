@@ -4,7 +4,7 @@ import torch
 class FedMosOptimizer(torch.optim.Optimizer):
     def __init__(self, params, lr, a=1.0, mu=0.0):
         defaults = dict(lr=lr, a=a, mu=mu)
-        super(FedMosOptimizer, self).__init__(params, defaults)
+        super().__init__(params, defaults)
 
     def clone_grad(self):
         for group in self.param_groups:

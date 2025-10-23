@@ -10,7 +10,7 @@ from torch import nn
 from plato.config import Config
 
 
-def get(**kwargs: Union[str, dict]):
+def get(**kwargs: str | dict):
     """Get a loss function with its name from the configuration file."""
     registered_loss_criterion = {
         "L1Loss": nn.L1Loss,

@@ -5,7 +5,8 @@ Returns a learning rate scheduler according to the configuration.
 import bisect
 import sys
 from types import SimpleNamespace
-from typing import Any, Callable, Union, cast
+from typing import Any, Union, cast
+from collections.abc import Callable
 
 import numpy as np
 from timm import scheduler
@@ -15,7 +16,7 @@ from plato.config import Config
 
 
 def get(
-    optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: Union[str, dict]
+    optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: str | dict
 ):
     """Returns a learning rate scheduler according to the configuration."""
 
@@ -191,17 +192,17 @@ class Step:
         if "ep" in s and "it" in s:
             ep = int(s.split("ep")[0])
             it = int(s.split("ep")[1].split("it")[0])
-            if s != "{}ep{}it".format(ep, it):
+            if s != f"{ep}ep{it}it":
                 raise ValueError(f"Malformed string step: {s}")
             return Step.from_epoch(ep, it, iterations_per_epoch)
         elif "ep" in s:
             ep = int(s.split("ep")[0])
-            if s != "{}ep".format(ep):
+            if s != f"{ep}ep":
                 raise ValueError(f"Malformed string step: {s}")
             return Step.from_epoch(ep, 0, iterations_per_epoch)
         elif "it" in s:
             it = int(s.split("it")[0])
-            if s != "{}it".format(it):
+            if s != f"{it}it":
                 raise ValueError(f"Malformed string step: {s}")
             return Step.from_iteration(it, iterations_per_epoch)
         else:

@@ -29,20 +29,20 @@ class ClientContext:
     """
 
     def __init__(self) -> None:
-        self.owner: Optional[Any] = None
+        self.owner: Any | None = None
         self.client_id: int = 0
         self.current_round: int = 0
 
         # Data and learning stack
         self.datasource: Any = None
-        self.custom_datasource: Optional[Any] = None
+        self.custom_datasource: Any | None = None
         self.trainer: Any = None
-        self.custom_trainer: Optional[Any] = None
-        self.trainer_callbacks: Optional[Any] = None
+        self.custom_trainer: Any | None = None
+        self.trainer_callbacks: Any | None = None
         self.algorithm: Any = None
-        self.custom_algorithm: Optional[Any] = None
+        self.custom_algorithm: Any | None = None
         self.model: Any = None
-        self.custom_model: Optional[Any] = None
+        self.custom_model: Any | None = None
 
         # Dataset partitions
         self.trainset: Any = None
@@ -54,8 +54,8 @@ class ClientContext:
         self.outbound_processor: Any = None
         self.inbound_processor: Any = None
         self.callback_handler: Any = None
-        self.reporting_callback: Optional[Any] = None
-        self.report_customizer: Optional[Any] = None
+        self.reporting_callback: Any | None = None
+        self.report_customizer: Any | None = None
 
         # Communication artefacts
         self.comm_simulation: bool = True
@@ -69,9 +69,12 @@ class ClientContext:
         self.latest_report: Any = None
 
         # Shared dictionaries for strategies
-        self.state: Dict[str, Any] = {}
-        self.metadata: Dict[str, Any] = {}
-        self.timers: Dict[str, float] = {}
+        self.state: dict[str, Any] = {}
+        self.metadata: dict[str, Any] = {}
+        self.timers: dict[str, float] = {}
+        self.processor_kwargs: dict[str, Any] = {}
+        self.round_store: Any = None
+        self.debug_artifacts: bool = False
 
     def __repr__(self) -> str:
         """Return a readable identifier for logging/debugging."""
@@ -100,7 +103,7 @@ class LifecycleStrategy(ClientStrategy):
 
     @abstractmethod
     def process_server_response(
-        self, context: ClientContext, server_response: Dict[str, Any]
+        self, context: ClientContext, server_response: dict[str, Any]
     ) -> None:
         """Apply client-specific processing to a server response."""
 
@@ -155,7 +158,7 @@ class PayloadStrategy(ClientStrategy):
         context: ClientContext,
         client_id: int,
         *,
-        s3_key: Optional[str] = None,
+        s3_key: str | None = None,
     ) -> Any:
         """
         Complete inbound payload assembly, returning the reconstructed payload.
@@ -167,9 +170,9 @@ class PayloadStrategy(ClientStrategy):
         context: ClientContext,
         server_payload: Any,
         *,
-        training: "TrainingStrategy",
-        reporting: "ReportingStrategy",
-        communication: "CommunicationStrategy",
+        training: TrainingStrategy,
+        reporting: ReportingStrategy,
+        communication: CommunicationStrategy,
     ) -> None:
         """Full inbound processing pipeline ending with outbound transmission."""
 
@@ -182,7 +185,7 @@ class TrainingStrategy(ClientStrategy):
         """Load processed server payload onto the client."""
 
     @abstractmethod
-    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> tuple[Any, Any]:
         """Run local training and return (report, outbound_payload)."""
 
 
@@ -196,7 +199,7 @@ class ReportingStrategy(ClientStrategy):
     @abstractmethod
     async def obtain_model_at_time(
         self, context: ClientContext, client_id: int, requested_time: float
-    ) -> Tuple[Any, Any]:
+    ) -> tuple[Any, Any]:
         """Return (report, payload) for asynchronous update requests."""
 
 

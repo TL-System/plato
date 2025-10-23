@@ -26,8 +26,8 @@ class MoonLossStrategy(LossCriterionStrategy):
     """Compute the combined cross-entropy and contrastive loss used by MOON."""
 
     def __init__(self) -> None:
-        self.classification_loss: Optional[nn.Module] = None
-        self.contrastive_loss: Optional[nn.Module] = None
+        self.classification_loss: nn.Module | None = None
+        self.contrastive_loss: nn.Module | None = None
         self.mu: float = 1.0
         self.temperature: float = 0.5
 
@@ -64,7 +64,7 @@ class MoonLossStrategy(LossCriterionStrategy):
         logits = outputs["logits"]
         local_projection = outputs["local_projection"]
         global_projection = outputs["global_projection"]
-        prev_projections: List[torch.Tensor] = outputs.get("prev_projections", [])
+        prev_projections: list[torch.Tensor] = outputs.get("prev_projections", [])
 
         cls_loss = self.classification_loss(logits, labels)
 
@@ -132,7 +132,7 @@ class MoonTrainingStepStrategy(TrainingStepStrategy):
 
         # Historic models provide negative pairs
         prev_models = context.state.get("moon_prev_models", [])
-        prev_projections: List[torch.Tensor] = []
+        prev_projections: list[torch.Tensor] = []
         for prev_model in prev_models:
             prev_model.eval()
             with torch.no_grad():

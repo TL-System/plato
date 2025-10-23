@@ -23,7 +23,7 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         mixing_hyperparameter: float = 0.9,
         adaptive_mixing: bool = False,
         staleness_func_type: str = "constant",
-        staleness_func_params: Optional[Dict] = None,
+        staleness_func_params: dict | None = None,
     ):
         super().__init__()
         self.mixing_hyperparam = mixing_hyperparameter
@@ -48,10 +48,10 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """Fallback delta aggregation using weighted averaging."""
         total_samples = sum(update.report.num_samples for update in updates)
 
@@ -79,11 +79,11 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """Aggregate weights directly with staleness-aware mixing."""
         if not updates:
             return baseline_weights

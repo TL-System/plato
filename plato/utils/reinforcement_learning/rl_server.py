@@ -5,8 +5,15 @@ A federated learning server with RL Agent.
 import asyncio
 import logging
 from abc import abstractmethod
+from typing import Protocol, cast
 
 from plato.servers import fedavg
+
+
+class RLTrainerProtocol(Protocol):
+    """Protocol describing the trainer capabilities required by RLServer."""
+
+    def zeros(self, shape): ...
 
 
 class RLServer(fedavg.Server):
@@ -29,6 +36,7 @@ class RLServer(fedavg.Server):
             callbacks=callbacks,
         )
         self.agent = agent
+        self.smart_weighting = []
 
     def reset(self):
         """Resetting the model, trainer, and algorithm on the server."""
@@ -52,8 +60,9 @@ class RLServer(fedavg.Server):
         self.total_samples = sum(num_samples)
 
         # Perform weighted averaging
+        trainer = cast(RLTrainerProtocol, self.require_trainer())
         avg_update = {
-            name: self.trainer.zeros(weights.shape)
+            name: trainer.zeros(weights.shape)
             for name, weights in deltas_received[0].items()
         }
 

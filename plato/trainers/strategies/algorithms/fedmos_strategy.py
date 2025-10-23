@@ -20,7 +20,8 @@ global model proximity.
 """
 
 import copy
-from typing import Any, Callable, Optional, cast
+from typing import Any, Optional, cast
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn
@@ -92,7 +93,7 @@ class FedMosOptimizer(Optimizer):
             raise ValueError(f"Invalid weight_decay value: {weight_decay}")
 
         defaults = dict(lr=lr, a=a, mu=mu, weight_decay=weight_decay)
-        super(FedMosOptimizer, self).__init__(params, defaults)
+        super().__init__(params, defaults)
 
         # Initialize state for momentum
         for group in self.param_groups:
@@ -328,7 +329,7 @@ class FedMosUpdateStrategy(ModelUpdateStrategy):
 
     def __init__(self):
         """Initialize FedMos update strategy."""
-        self.global_model = None
+        self.global_model: nn.Module | None = None
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -338,7 +339,10 @@ class FedMosUpdateStrategy(ModelUpdateStrategy):
             context: Training context with model
         """
         # Save a copy of the global model
-        self.global_model = copy.deepcopy(context.model)
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedMos.")
+        self.global_model = copy.deepcopy(model)
         self.global_model.to(context.device)
 
         # Store in context for potential use by other strategies
@@ -365,8 +369,9 @@ class FedMosUpdateStrategy(ModelUpdateStrategy):
             context: Training context
         """
         # Move global model to CPU to free GPU memory
-        if self.global_model is not None:
-            self.global_model.to(torch.device("cpu"))
+        global_model = self.global_model
+        if global_model is not None:
+            global_model.to(torch.device("cpu"))
 
     def teardown(self, context: TrainingContext) -> None:
         """

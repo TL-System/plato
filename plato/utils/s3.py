@@ -19,10 +19,10 @@ class S3:
 
     def __init__(
         self,
-        endpoint: Optional[str] = None,
-        access_key: Optional[str] = None,
-        secret_key: Optional[str] = None,
-        bucket: Optional[str] = None,
+        endpoint: str | None = None,
+        access_key: str | None = None,
+        secret_key: str | None = None,
+        bucket: str | None = None,
     ):
         """All S3-related credentials, such as the access key and the secret key,
         are either to be stored in ~/.aws/credentials by using the 'aws configure'

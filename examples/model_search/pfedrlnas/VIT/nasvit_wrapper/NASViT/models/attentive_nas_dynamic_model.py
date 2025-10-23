@@ -28,7 +28,7 @@ from .modules.transformer import (
 
 class AttentiveNasDynamicModel(MyNetwork):
     def __init__(self, supernet, n_classes=1000, bn_param=(0.0, 1e-5)):
-        super(AttentiveNasDynamicModel, self).__init__()
+        super().__init__()
 
         self.supernet = supernet
         self.n_classes = n_classes

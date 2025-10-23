@@ -7,7 +7,7 @@ import argparse
 import os
 import shutil
 from pathlib import Path
-from typing import Iterable
+from collections.abc import Iterable
 
 RUNTIME_NAME = "runtime"
 PYCACHE_NAME = "__pycache__"

@@ -5,7 +5,7 @@ Trainer callbacks used by AFL that rely on PyTorch operations.
 from __future__ import annotations
 
 import logging
-from typing import Iterable
+from collections.abc import Iterable
 
 import torch
 

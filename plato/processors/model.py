@@ -6,7 +6,7 @@ import logging
 import pickle
 import sys
 from collections import OrderedDict
-from typing import MutableMapping
+from collections.abc import MutableMapping
 
 import torch
 

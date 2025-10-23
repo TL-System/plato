@@ -55,7 +55,7 @@ class REFER:
 
         # load annotations from data/dataset/instances.json
         instances_file = osp.join(self.DATA_DIR, "instances.json")
-        instances = json.load(open(instances_file, "r"))
+        instances = json.load(open(instances_file))
         self.data["images"] = instances["images"]
         self.data["annotations"] = instances["annotations"]
         self.data["categories"] = instances["categories"]
@@ -186,7 +186,7 @@ class REFER:
             ann_ids = [ann["id"] for ann in anns]
             if not len(ref_ids) == 0:
                 ids = set(ann_ids).intersection(
-                    set([self.Refs[ref_id]["ann_id"] for ref_id in ref_ids])
+                    {self.Refs[ref_id]["ann_id"] for ref_id in ref_ids}
                 )
         return ann_ids
 
@@ -194,7 +194,7 @@ class REFER:
         ref_ids = ref_ids if type(ref_ids) == list else [ref_ids]
 
         if not len(ref_ids) == 0:
-            image_ids = list(set([self.Refs[ref_id]["image_id"] for ref_id in ref_ids]))
+            image_ids = list({self.Refs[ref_id]["image_id"] for ref_id in ref_ids})
         else:
             image_ids = self.Imgs.keys()
         return image_ids

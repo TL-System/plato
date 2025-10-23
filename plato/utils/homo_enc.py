@@ -9,7 +9,8 @@ import pickle
 import zlib
 from collections import OrderedDict
 from collections.abc import Mapping
-from typing import Any, Dict, Iterable, Tuple
+from typing import Any, Dict, Tuple
+from collections.abc import Iterable
 
 import numpy as np
 import tenseal as ts

@@ -65,7 +65,7 @@ class RoundDataset(Dataset):
     def __len__(self) -> int:
         return len(self.files)
 
-    def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
         payload = torch.load(self.files[index], map_location="cpu")
         projection = payload["projection"].float()
         reference = payload.get("reference_weights")
@@ -82,7 +82,7 @@ class RoundDataset(Dataset):
 def _split_dataset(
     dataset: Dataset,
     val_ratio: float,
-) -> Tuple[Dataset, Dataset]:
+) -> tuple[Dataset, Dataset]:
     if val_ratio <= 0 or len(dataset) == 1:
         return dataset, dataset
 
@@ -132,7 +132,7 @@ def _evaluate(
     return total_loss / len(loader.dataset)
 
 
-def parse_args(argv: List[str]) -> argparse.Namespace:
+def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Pretrain attack-adaptive attention.")
     parser.add_argument(
         "--dataset-dir",
@@ -163,7 +163,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: List[str]) -> None:
+def main(argv: list[str]) -> None:
     args = parse_args(argv)
     device = torch.device(args.device)
 

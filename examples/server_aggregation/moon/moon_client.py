@@ -24,7 +24,7 @@ class MoonTrainingStrategy(DefaultTrainingStrategy):
     def __init__(self, buffer_size: int = 1):
         super().__init__()
         self.buffer_size = buffer_size
-        self.history: List = []
+        self.history: list = []
 
     async def train(self, context):
         trainer = context.trainer
@@ -64,7 +64,7 @@ class MoonTrainingStrategy(DefaultTrainingStrategy):
         return report, weights
 
 
-def _resolve_history_size(history_size: Optional[int]) -> int:
+def _resolve_history_size(history_size: int | None) -> int:
     if history_size is not None:
         return history_size
 
@@ -80,7 +80,7 @@ def create_client(
     trainer=None,
     callbacks=None,
     trainer_callbacks=None,
-    history_size: Optional[int] = None,
+    history_size: int | None = None,
 ):
     """Build a MOON client with the contrastive training strategy."""
     model = model or MoonModel

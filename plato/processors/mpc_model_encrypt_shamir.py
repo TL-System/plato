@@ -39,7 +39,7 @@ class Processor(model.Processor):
         self.debug_artifacts = debug_artifacts
 
     def _write_debug_artifact(
-        self, round_number: int, label: str, payload: Dict[str, Any]
+        self, round_number: int, label: str, payload: dict[str, Any]
     ) -> None:
         if self.debug_artifacts and not self.round_store.uses_s3:
             path = os.path.join(
@@ -108,7 +108,7 @@ class Processor(model.Processor):
         encrypted_size.append(2)
         return coords.view(encrypted_size)
 
-    def process(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def process(self, data: dict[str, Any]) -> dict[str, Any]:
         state = self.round_store.load_state()
         if self.client_id not in state.selected_clients:
             raise RuntimeError(
@@ -127,7 +127,7 @@ class Processor(model.Processor):
         num_clients = len(selected_clients)
         threshold = self.threshold or max(num_clients - 2, 1)
 
-        data_shares: List[Dict[str, Any]] = [
+        data_shares: list[dict[str, Any]] = [
             copy.deepcopy(data) for _ in range(num_clients)
         ]
 

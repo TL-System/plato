@@ -92,7 +92,7 @@ class StaticTrainingStrategy(TrainingStrategy):
     Useful for testing client lifecycles without running real training loops.
     """
 
-    def __init__(self, payload_template: Optional[Dict[str, torch.Tensor]] = None):
+    def __init__(self, payload_template: dict[str, torch.Tensor] | None = None):
         self._payload_template = payload_template or {"weights": torch.zeros(1)}
 
     def load_payload(self, context: ClientContext, server_payload) -> None:
@@ -200,7 +200,7 @@ class WeightedAverageAggregation(AggregationStrategy):
         if total_weight == 0:
             total_weight = len(deltas_received)
 
-        aggregated: Dict[str, torch.Tensor] = {}
+        aggregated: dict[str, torch.Tensor] = {}
         for name in deltas_received[0]:
             aggregated[name] = torch.zeros_like(deltas_received[0][name])
 
@@ -264,7 +264,7 @@ class RecordingPayloadStrategy(PayloadStrategy):
         context: ClientContext,
         client_id: int,
         *,
-        s3_key: Optional[str] = None,
+        s3_key: str | None = None,
     ):
         self.events.append("finalise")
         context.state.setdefault("event_log", []).append("finalise")

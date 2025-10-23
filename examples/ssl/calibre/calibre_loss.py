@@ -39,9 +39,9 @@ class CalibreLoss(nn.Module):
         self,
         main_loss: str,
         main_loss_params: dict,
-        auxiliary_losses: List[str] = None,
-        auxiliary_loss_params: List[dict] = None,
-        losses_weight: List[float] = None,
+        auxiliary_losses: list[str] = None,
+        auxiliary_loss_params: list[dict] = None,
+        losses_weight: list[float] = None,
         device: str = "cpu",
     ):
         super().__init__()

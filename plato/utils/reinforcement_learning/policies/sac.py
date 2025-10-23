@@ -5,6 +5,7 @@ https://github.com/pranz24/pytorch-soft-actor-critic
 """
 
 import math
+from typing import Tuple, Union
 
 import numpy as np
 import torch
@@ -58,7 +59,7 @@ def weights_init_(m):
 
 class ValueNetwork(nn.Module):
     def __init__(self, num_inputs, hidden_dim):
-        super(ValueNetwork, self).__init__()
+        super().__init__()
 
         self.linear1 = nn.Linear(num_inputs, hidden_dim)
         self.linear2 = nn.Linear(hidden_dim, hidden_dim)
@@ -75,7 +76,7 @@ class ValueNetwork(nn.Module):
 
 class QNetwork(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_dim):
-        super(QNetwork, self).__init__()
+        super().__init__()
 
         # Q1 architecture
         self.linear1 = nn.Linear(num_inputs + num_actions, hidden_dim)
@@ -105,7 +106,7 @@ class QNetwork(nn.Module):
 
 class GaussianPolicy(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_dim, action_space=None):
-        super(GaussianPolicy, self).__init__()
+        super().__init__()
 
         self.linear1 = nn.Linear(num_inputs, hidden_dim)
         self.linear2 = nn.Linear(hidden_dim, hidden_dim)
@@ -117,15 +118,17 @@ class GaussianPolicy(nn.Module):
 
         # action rescaling
         if action_space is None:
-            self.action_scale = torch.tensor(1.0)
-            self.action_bias = torch.tensor(0.0)
+            action_scale = torch.tensor(1.0)
+            action_bias = torch.tensor(0.0)
         else:
-            self.action_scale = torch.FloatTensor(
-                (action_space.high - action_space.low) / 2.0
+            action_scale = torch.as_tensor(
+                (action_space.high - action_space.low) / 2.0, dtype=torch.float32
             )
-            self.action_bias = torch.FloatTensor(
-                (action_space.high + action_space.low) / 2.0
+            action_bias = torch.as_tensor(
+                (action_space.high + action_space.low) / 2.0, dtype=torch.float32
             )
+        self.register_buffer("action_scale", action_scale)
+        self.register_buffer("action_bias", action_bias)
 
     def forward(self, state):
         x = F.relu(self.linear1(state))
@@ -135,7 +138,7 @@ class GaussianPolicy(nn.Module):
         log_std = torch.clamp(log_std, min=LOG_SIG_MIN, max=LOG_SIG_MAX)
         return mean, log_std
 
-    def sample(self, state):
+    def sample(self, state) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         mean, log_std = self.forward(state)
         std = log_std.exp()
         normal = Normal(mean, std)
@@ -151,34 +154,31 @@ class GaussianPolicy(nn.Module):
         mean = torch.tanh(mean) * self.action_scale + self.action_bias
         return action, log_prob, mean
 
-    def to(self, device):
-        self.action_scale = self.action_scale.to(device)
-        self.action_bias = self.action_bias.to(device)
-        return super(GaussianPolicy, self).to(device)
-
 
 class DeterministicPolicy(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_dim, action_space=None):
-        super(DeterministicPolicy, self).__init__()
+        super().__init__()
         self.linear1 = nn.Linear(num_inputs, hidden_dim)
         self.linear2 = nn.Linear(hidden_dim, hidden_dim)
 
         self.mean = nn.Linear(hidden_dim, num_actions)
-        self.noise = torch.Tensor(num_actions)
+        self.register_buffer("noise", torch.zeros(num_actions))
 
         self.apply(weights_init_)
 
         # action rescaling
         if action_space is None:
-            self.action_scale = 1.0
-            self.action_bias = 0.0
+            action_scale = torch.tensor(1.0)
+            action_bias = torch.tensor(0.0)
         else:
-            self.action_scale = torch.FloatTensor(
-                (action_space.high - action_space.low) / 2.0
+            action_scale = torch.as_tensor(
+                (action_space.high - action_space.low) / 2.0, dtype=torch.float32
             )
-            self.action_bias = torch.FloatTensor(
-                (action_space.high + action_space.low) / 2.0
+            action_bias = torch.as_tensor(
+                (action_space.high + action_space.low) / 2.0, dtype=torch.float32
             )
+        self.register_buffer("action_scale", action_scale)
+        self.register_buffer("action_bias", action_bias)
 
     def forward(self, state):
         x = F.relu(self.linear1(state))
@@ -186,18 +186,13 @@ class DeterministicPolicy(nn.Module):
         mean = torch.tanh(self.mean(x)) * self.action_scale + self.action_bias
         return mean
 
-    def sample(self, state):
+    def sample(self, state) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         mean = self.forward(state)
-        noise = self.noise.normal_(0.0, std=0.1)
+        noise = torch.randn_like(mean) * 0.1
         noise = noise.clamp(-0.25, 0.25)
         action = mean + noise
-        return action, torch.tensor(0.0), mean
-
-    def to(self, device):
-        self.action_scale = self.action_scale.to(device)
-        self.action_bias = self.action_bias.to(device)
-        self.noise = self.noise.to(device)
-        return super(DeterministicPolicy, self).to(device)
+        zeros = torch.zeros(mean.size(0), 1, device=mean.device)
+        return action, zeros, mean
 
 
 class Policy(base.Policy):
@@ -216,6 +211,9 @@ class Policy(base.Policy):
             state_dim, action_space.shape[0], Config().algorithm.hidden_size
         ).to(self.device)
         hard_update(self.critic_target, self.critic)
+
+        self.actor: GaussianPolicy | DeterministicPolicy
+        self.automatic_entropy_tuning = Config().algorithm.automatic_entropy_tuning
 
         if Config().algorithm.deterministic:
             self.alpha = 0
@@ -257,7 +255,8 @@ class Policy(base.Policy):
             Config().algorithm.replay_seed,
         )
         self.alpha = Config().algorithm.alpha
-        self.automatic_entropy_tuning = Config().algorithm.automatic_entropy_tuning
+        if not Config().algorithm.deterministic:
+            self.automatic_entropy_tuning = Config().algorithm.automatic_entropy_tuning
 
     def select_action(self, state, test=False):
         state = torch.FloatTensor(state).to(self.device).unsqueeze(0)

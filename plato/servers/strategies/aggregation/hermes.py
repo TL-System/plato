@@ -31,19 +31,19 @@ class HermesAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return await self._fedavg.aggregate_deltas(updates, deltas_received, context)
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         server_obj = getattr(context, "server", None)
         trainer_obj = getattr(context, "trainer", None)
         algorithm_obj = getattr(context, "algorithm", None)
@@ -63,7 +63,7 @@ class HermesAggregationStrategy(AggregationStrategy):
         if not masks_received:
             return dict(baseline_weights)
 
-        weights_numpy: List[Dict[str, np.ndarray]] = []
+        weights_numpy: list[dict[str, np.ndarray]] = []
         for weight_dict in weights_received:
             weights_numpy.append(
                 {
@@ -128,7 +128,7 @@ class HermesAggregationStrategy(AggregationStrategy):
                 for index in range(num_clients):
                     weights_numpy[index][layer_name] = reshaped.copy()
 
-        aggregated_weights: List[Dict[str, torch.Tensor]] = []
+        aggregated_weights: list[dict[str, torch.Tensor]] = []
         for weight_dict in weights_numpy:
             aggregated_weights.append(
                 {

@@ -48,10 +48,10 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         """Select clients using AFL's valuation-based policy."""
         assert clients_count <= len(clients_pool)
 
@@ -72,7 +72,7 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
         ]
         num_weighted = min(num_weighted, len(weighted_candidates))
 
-        subset_weighted: List[int] = []
+        subset_weighted: list[int] = []
         if num_weighted > 0:
             probs = np.array(
                 [self.local_values[cid]["prob"] for cid in weighted_candidates],
@@ -101,7 +101,7 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
         return selected_clients
 
     def on_reports_received(
-        self, updates: List[SimpleNamespace], context: ServerContext
+        self, updates: list[SimpleNamespace], context: ServerContext
     ) -> None:
         """Update stored valuations from client reports."""
         for update in updates:
@@ -118,7 +118,7 @@ class AFLSelectionStrategy(ClientSelectionStrategy):
                     update.report.valuation,
                 )
 
-    def _calc_sample_distribution(self, clients_pool: List[int]) -> None:
+    def _calc_sample_distribution(self, clients_pool: list[int]) -> None:
         """Calculate sampling probabilities for the current pool."""
         num_smallest = int(self.alpha1 * len(clients_pool))
         sorted_clients = sorted(

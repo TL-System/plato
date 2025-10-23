@@ -30,7 +30,7 @@ class ConfigNode(Munch):
             return [cls.from_object(item) for item in obj]
         return obj
 
-    def _replace(self, **updates: Any) -> "ConfigNode":
+    def _replace(self, **updates: Any) -> ConfigNode:
         """Return a new instance with the provided fields updated."""
         data = dict(self)
         for key, value in updates.items():
@@ -159,7 +159,7 @@ class Config:
     general: Any
     parameters: Any
     params: dict[str, Any]
-    client_sleep_times: Optional[np.ndarray] = None
+    client_sleep_times: np.ndarray | None = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -263,7 +263,7 @@ class Config:
             root_logger = logging.getLogger()
             root_logger.setLevel(numeric_level)
 
-            cls._instance = super(Config, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
 
             if "config_file" in os.environ:
                 filename = os.environ["config_file"]

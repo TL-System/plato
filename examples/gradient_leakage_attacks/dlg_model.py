@@ -14,7 +14,7 @@ from nn import (
 from plato.config import Config
 
 
-def get(**kwargs: Union[str, dict]):
+def get(**kwargs: str | dict):
     """Get the model with the provided name."""
     model_name = (
         kwargs["model_name"] if "model_name" in kwargs else Config().trainer.model_name

@@ -28,7 +28,7 @@ class FedAvgHEAggregationStrategy(AggregationStrategy):
         baseline_weights,
         weights_received,
         context: ServerContext,
-    ) -> Dict | None:
+    ) -> dict | None:
         if not weights_received:
             return None
 

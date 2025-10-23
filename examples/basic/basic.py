@@ -6,7 +6,7 @@ be customized in Plato.
 
 from functools import partial
 from pathlib import Path
-from typing import Callable
+from collections.abc import Callable
 
 import torch
 from torch import nn

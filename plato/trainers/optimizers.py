@@ -11,7 +11,7 @@ from torch import optim
 from plato.config import Config
 
 
-def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
+def get(model, **kwargs: str | dict) -> optim.Optimizer:
     """Get an optimizer with its name and parameters obtained from the configuration file."""
     registered_optimizers = {
         "Adam": optim.Adam,

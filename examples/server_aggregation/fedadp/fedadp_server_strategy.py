@@ -25,7 +25,7 @@ class FedADPAggregationStrategy(AggregationStrategy):
     def __init__(self, alpha: float = 5):
         super().__init__()
         self.alpha = alpha
-        self.local_angles: Dict[int, float] = {}
+        self.local_angles: dict[int, float] = {}
         self.last_global_grads = None
         self.global_grads = None
         self.adaptive_weighting = None
@@ -37,10 +37,10 @@ class FedADPAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """Aggregate client updates using the FedADP adaptive weighting scheme."""
         num_samples = [update.report.num_samples for update in updates]
         total_samples = sum(num_samples)
@@ -76,9 +76,9 @@ class FedADPAggregationStrategy(AggregationStrategy):
 
     def calc_adaptive_weighting(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
-        num_samples: List[int],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
+        num_samples: list[int],
         context: ServerContext,
     ):
         """Compute aggregation weights considering node contribution and data size."""
@@ -103,8 +103,8 @@ class FedADPAggregationStrategy(AggregationStrategy):
 
     def calc_contribution(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
     ):
         """Calculate node contribution based on the angle between local and global gradients."""

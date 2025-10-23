@@ -3,7 +3,7 @@ Keeping a history of metrics during the training run.
 """
 
 from collections import defaultdict
-from typing import Iterable
+from collections.abc import Iterable
 
 
 class RunHistory:

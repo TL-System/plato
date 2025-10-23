@@ -8,7 +8,8 @@ https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 import logging
 import math
 import os
-from typing import Callable, Optional, cast
+from typing import Optional, cast
+from collections.abc import Callable
 
 import numpy as np
 import scipy
@@ -440,8 +441,9 @@ class Trainer(ComposableTrainer):
         )
 
         # GAN-specific attributes
-        self.generator = self.model.generator
-        self.discriminator = self.model.discriminator
+        model_instance = self._require_model()
+        self.generator = getattr(model_instance, "generator")
+        self.discriminator = getattr(model_instance, "discriminator")
 
     def save_model(self, filename=None, location=None):
         """

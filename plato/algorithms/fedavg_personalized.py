@@ -22,6 +22,7 @@ class Algorithm(fedavg.Algorithm):
         Loads local layers included in `local_layer_names` to the received weights which
         will be loaded to the model
         """
+        trainer = self.require_trainer()
         if hasattr(Config().algorithm, "local_layer_names"):
             # Get the filename of the previous saved local layer
             model_path = Config().params["model_path"]
@@ -46,10 +47,11 @@ class Algorithm(fedavg.Algorithm):
 
                 logging.info(
                     "[Client #%d] Replaced portions of the global model with local layers.",
-                    self.trainer.client_id,
+                    trainer.client_id,
                 )
 
-        self.model.load_state_dict(weights, strict=True)
+        model = self.require_model()
+        model.load_state_dict(weights, strict=True)
 
     def save_local_layers(self, local_layers, filename):
         """

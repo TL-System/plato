@@ -22,7 +22,8 @@ This allows clients to learn personalized representations while still benefiting
 from shared global features.
 """
 
-from typing import Callable, List, Optional
+from typing import List, Optional
+from collections.abc import Callable
 
 import torch
 import torch.nn as nn
@@ -81,8 +82,8 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
 
     def __init__(
         self,
-        global_layer_names: List[str],
-        local_layer_names: List[str],
+        global_layer_names: list[str],
+        local_layer_names: list[str],
         train_local_first: bool = True,
     ):
         """
@@ -103,7 +104,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
         self.train_local_first = train_local_first
 
     def _set_requires_grad(
-        self, model: nn.Module, layer_names: List[str], requires_grad: bool
+        self, model: nn.Module, layer_names: list[str], requires_grad: bool
     ) -> None:
         """
         Enable or disable gradients for specific layers.
@@ -122,7 +123,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
             if any(layer_name in name for layer_name in layer_names):
                 param.requires_grad = requires_grad
 
-    def _freeze_layers(self, model: nn.Module, layer_names: List[str]) -> None:
+    def _freeze_layers(self, model: nn.Module, layer_names: list[str]) -> None:
         """
         Freeze specific layers (disable gradients).
 
@@ -132,7 +133,7 @@ class LGFedAvgStepStrategy(TrainingStepStrategy):
         """
         self._set_requires_grad(model, layer_names, False)
 
-    def _activate_layers(self, model: nn.Module, layer_names: List[str]) -> None:
+    def _activate_layers(self, model: nn.Module, layer_names: list[str]) -> None:
         """
         Activate specific layers (enable gradients).
 
