@@ -22,8 +22,8 @@ This allows clients to learn personalized representations while still benefiting
 from shared global features.
 """
 
-from typing import List, Optional
 from collections.abc import Callable
+from typing import List, Optional
 
 import torch
 import torch.nn as nn

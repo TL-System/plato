@@ -4,8 +4,8 @@ LeNet-5 implementation using Apple's MLX framework.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from collections.abc import Callable
+from dataclasses import dataclass
 
 import numpy as np
 

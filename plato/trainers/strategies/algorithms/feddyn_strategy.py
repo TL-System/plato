@@ -31,8 +31,8 @@ FedDyn different from FedProx and other methods.
 import copy
 import logging
 import os
-from typing import Any, Dict, Optional, cast
 from collections.abc import Callable
+from typing import Any, Dict, Optional, cast
 
 import torch
 import torch.nn as nn
@@ -95,9 +95,8 @@ class FedDynLossStrategy(LossCriterionStrategy):
     def __init__(
         self,
         alpha: float = 0.01,
-        base_loss_fn: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
-        ) = None,
+        base_loss_fn: None
+        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
         adaptive_alpha: bool = True,
     ):
         """
@@ -116,8 +115,8 @@ class FedDynLossStrategy(LossCriterionStrategy):
         self.adaptive_alpha = adaptive_alpha
         self.global_model_weights: dict[str, torch.Tensor] | None = None
         self.cumulative_grad_vector: dict[str, torch.Tensor] | None = None
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -512,9 +511,8 @@ class FedDynLossStrategyFromConfig(FedDynLossStrategy):
 
     def __init__(
         self,
-        base_loss_fn: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
-        ) = None,
+        base_loss_fn: None
+        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
         adaptive_alpha: bool = True,
     ):
         """

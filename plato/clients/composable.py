@@ -13,8 +13,8 @@ import logging
 import os
 import pickle
 import sys
-from typing import Any, Optional
 from collections.abc import Iterable, Sequence
+from typing import Any, Optional
 
 import socketio
 

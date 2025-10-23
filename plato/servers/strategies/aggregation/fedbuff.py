@@ -7,9 +7,9 @@ Applies uniform averaging to buffered asynchronous updates.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, cast
-from collections.abc import Callable
 
 import numpy as np
 

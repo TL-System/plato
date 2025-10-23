@@ -7,9 +7,8 @@ trainer pattern with custom strategies and callbacks instead of inheritance.
 
 import logging
 import time
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from typing import Optional
-from collections.abc import Callable
 
 import torch
 import torch.nn as nn

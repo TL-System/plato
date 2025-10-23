@@ -29,8 +29,8 @@ The update rules:
 
 import logging
 import os
-from typing import Any, Dict, Optional
 from collections.abc import Callable
+from typing import Any, Dict, Optional
 
 import numpy as np
 import torch

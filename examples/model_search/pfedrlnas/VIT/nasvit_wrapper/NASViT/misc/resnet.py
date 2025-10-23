@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any, List, Optional, Type, Union
 from collections.abc import Callable
+from typing import Any, List, Optional, Type, Union
 
 import torch
 import torch.nn as nn

@@ -8,9 +8,9 @@ allowing MLX trainers to participate in the same algorithm orchestration.
 from __future__ import annotations
 
 import importlib
+from collections.abc import Callable, Iterable
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, cast
-from collections.abc import Callable, Iterable
 
 import numpy as np
 

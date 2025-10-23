@@ -10,8 +10,8 @@ HuggingFace data handling through strategy objects instead of overriding
 import logging
 import math
 import os
-from typing import Any, Dict, Optional, Tuple, Union
 from collections.abc import Iterable, Sequence
+from typing import Any, Dict, Optional, Tuple, Union
 
 import torch
 import torch.nn.functional as F

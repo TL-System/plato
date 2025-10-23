@@ -26,8 +26,8 @@ import pickle
 import re
 import time
 from collections import OrderedDict
-from typing import Any, List, Optional, Union, cast
 from collections.abc import Callable
+from typing import Any, List, Optional, Union, cast
 
 import torch
 import torch.nn as nn

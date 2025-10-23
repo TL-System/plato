@@ -2,8 +2,8 @@
 Implements a generalized Processor for applying operations onto PyTorch features.
 """
 
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 import torch
 

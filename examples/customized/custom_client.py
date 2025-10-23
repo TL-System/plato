@@ -9,10 +9,10 @@ uv run custom_client.py -c client.toml -i <client_id>
 
 import asyncio
 import logging
+from collections.abc import Callable
 from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
-from collections.abc import Callable
 
 import socketio
 import torch

@@ -9,10 +9,9 @@ from __future__ import annotations
 
 import asyncio
 import numbers
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, cast
-from collections.abc import Callable
 
 import numpy as np
 

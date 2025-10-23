@@ -4,9 +4,9 @@ Returns a learning rate scheduler according to the configuration.
 
 import bisect
 import sys
+from collections.abc import Callable
 from types import SimpleNamespace
 from typing import Any, Union, cast
-from collections.abc import Callable
 
 import numpy as np
 from timm import scheduler
@@ -15,9 +15,7 @@ from torch import optim
 from plato.config import Config
 
 
-def get(
-    optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: str | dict
-):
+def get(optimizer: optim.Optimizer, iterations_per_epoch: int, **kwargs: str | dict):
     """Returns a learning rate scheduler according to the configuration."""
 
     registered_schedulers = {

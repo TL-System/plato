@@ -7,8 +7,8 @@ the composable trainer architecture.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Type
 from collections.abc import Callable
+from typing import Any, Dict, List, Optional, Type
 
 import torch
 import torch.nn as nn

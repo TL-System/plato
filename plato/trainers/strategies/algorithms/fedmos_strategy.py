@@ -20,8 +20,8 @@ global model proximity.
 """
 
 import copy
-from typing import Any, Optional, cast
 from collections.abc import Callable
+from typing import Any, Optional, cast
 
 import torch
 import torch.nn as nn

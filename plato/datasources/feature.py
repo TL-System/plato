@@ -2,8 +2,8 @@
 The feature dataset server received from clients.
 """
 
-from typing import Any
 from collections.abc import Iterable
+from typing import Any
 
 import torch
 

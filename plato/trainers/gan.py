@@ -8,8 +8,8 @@ https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 import logging
 import math
 import os
-from typing import Optional, cast
 from collections.abc import Callable
+from typing import Optional, cast
 
 import numpy as np
 import scipy

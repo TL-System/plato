@@ -6,9 +6,9 @@ Implements the FedNova normalization to handle heterogeneous local epochs.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional, cast
-from collections.abc import Callable
 
 import numpy as np
 

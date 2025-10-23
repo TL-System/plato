@@ -5,8 +5,8 @@ This module provides default and common loss criterion strategies for
 the composable trainer architecture.
 """
 
-from typing import Optional
 from collections.abc import Callable
+from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -36,8 +36,8 @@ class DefaultLossCriterionStrategy(LossCriterionStrategy):
     ):
         """Initialize with optional custom loss function."""
         self.loss_fn = loss_fn
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -91,8 +91,8 @@ class CrossEntropyLossStrategy(LossCriterionStrategy):
         self.label_smoothing = label_smoothing
         self.reduction = reduction
         self.ignore_index = ignore_index
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -135,8 +135,8 @@ class MSELossStrategy(LossCriterionStrategy):
     def __init__(self, reduction: str = "mean"):
         """Initialize MSE loss parameters."""
         self.reduction = reduction
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -183,8 +183,8 @@ class BCEWithLogitsLossStrategy(LossCriterionStrategy):
         self.weight = weight
         self.reduction = reduction
         self.pos_weight = pos_weight
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -237,8 +237,8 @@ class NLLLossStrategy(LossCriterionStrategy):
         self.weight = weight
         self.reduction = reduction
         self.ignore_index = ignore_index
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:

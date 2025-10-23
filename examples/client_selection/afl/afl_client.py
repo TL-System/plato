@@ -12,8 +12,8 @@ https://arxiv.org/pdf/1909.12641.pdf
 
 import logging
 import math
-from typing import List, Optional
 from collections.abc import Iterable
+from typing import List, Optional
 
 from afl_callbacks import AFLPreTrainingLossCallback
 

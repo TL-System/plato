@@ -16,6 +16,7 @@ import random
 import time
 import types
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from collections.abc import Iterable as ABCIterable
 from dataclasses import dataclass, field
 from typing import (
@@ -27,7 +28,6 @@ from typing import (
     Union,
     cast,
 )
-from collections.abc import Callable, Iterable, Iterator, Sequence
 
 import numpy as np
 

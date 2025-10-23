@@ -89,9 +89,7 @@ class DataSource:
                     file.write(chunk)
                     file.flush()
                     if total_size:
-                        sys.stdout.write(
-                            f"\r{100 * downloaded_size / total_size:.1f}%"
-                        )
+                        sys.stdout.write(f"\r{100 * downloaded_size / total_size:.1f}%")
                         sys.stdout.flush()
                 if total_size:
                     sys.stdout.write("\n")

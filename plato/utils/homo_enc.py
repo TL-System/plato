@@ -8,9 +8,8 @@ import os
 import pickle
 import zlib
 from collections import OrderedDict
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import Any, Dict, Tuple
-from collections.abc import Iterable
 
 import numpy as np
 import tenseal as ts

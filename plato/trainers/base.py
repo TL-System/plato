@@ -31,6 +31,7 @@ class Trainer(ABC):
         """Return the model instance, ensuring it is available."""
         if self.model is None:
             raise RuntimeError("Trainer model has not been initialised.")
+
         return self.model
 
     @abstractmethod

@@ -440,9 +440,7 @@ class DataSource(base.DataSource):
         return None, None
 
     @staticmethod
-    def _normalize_split_value(
-        split_parameter: str | None, value: Any, default: Any
-    ):
+    def _normalize_split_value(split_parameter: str | None, value: Any, default: Any):
         """Normalise split configuration values to the expected types."""
         if split_parameter is None:
             return None

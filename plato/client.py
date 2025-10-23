@@ -5,8 +5,8 @@ Starting point for a Plato federated learning client.
 import asyncio
 import logging
 import os
-from typing import Any, Optional
 from collections.abc import Callable
+from typing import Any, Optional
 
 from plato.clients import registry as client_registry
 from plato.config import Config

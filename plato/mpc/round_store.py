@@ -13,9 +13,9 @@ import contextlib
 import logging
 import os
 import pickle
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
-from collections.abc import Iterable
 
 from plato.config import Config
 

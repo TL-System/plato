@@ -25,8 +25,8 @@ Note: This implementation uses the L2 norm (not squared) for backward compatibil
 with the original Plato implementation, although the paper formula shows ||w - w^t||^2.
 """
 
-from typing import Dict, Optional
 from collections.abc import Callable
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -86,9 +86,8 @@ class FedProxLossStrategy(LossCriterionStrategy):
     def __init__(
         self,
         mu: float = 0.01,
-        base_loss_fn: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
-        ) = None,
+        base_loss_fn: None
+        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
         norm_type: str = "l2",
     ):
         """
@@ -109,8 +108,8 @@ class FedProxLossStrategy(LossCriterionStrategy):
         self.base_loss_fn = base_loss_fn
         self.norm_type = norm_type
         self.global_weights: dict[str, torch.Tensor] | None = None
-        self._criterion: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
         ) = None
 
     def setup(self, context: TrainingContext) -> None:
@@ -255,9 +254,8 @@ class FedProxLossStrategyFromConfig(FedProxLossStrategy):
 
     def __init__(
         self,
-        base_loss_fn: None | (
-            Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
-        ) = None,
+        base_loss_fn: None
+        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
         norm_type: str = "l2",
     ):
         """

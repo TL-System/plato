@@ -9,8 +9,8 @@ import re
 import sys
 import uuid
 from abc import abstractmethod
-from typing import Any, Optional
 from collections.abc import Iterable
+from typing import Any, Optional
 
 import numpy as np
 

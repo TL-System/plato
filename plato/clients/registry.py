@@ -12,8 +12,8 @@ from __future__ import annotations
 import importlib
 import inspect
 import logging
-from typing import Any, Dict, Optional, Type
 from collections.abc import Callable
+from typing import Any, Dict, Optional, Type
 
 from plato.clients import (
     edge,

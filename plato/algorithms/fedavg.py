@@ -3,8 +3,8 @@ The federated averaging algorithm for PyTorch.
 """
 
 from collections import OrderedDict
-from typing import Any, Optional
 from collections.abc import MutableMapping
+from typing import Any, Optional
 
 from torch.nn import Module
 

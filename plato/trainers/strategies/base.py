@@ -15,8 +15,8 @@ Example:
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
 from collections.abc import Callable
+from typing import Any, Dict, Optional
 
 import torch
 import torch.nn as nn

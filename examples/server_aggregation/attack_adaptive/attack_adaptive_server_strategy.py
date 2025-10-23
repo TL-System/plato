@@ -18,11 +18,11 @@ from __future__ import annotations
 import json
 import logging
 from collections import OrderedDict
+from collections.abc import Iterable, Sequence
 from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Dict, List, Optional, Tuple, Union
-from collections.abc import Iterable, Sequence
 
 import torch
 import torch.nn as nn

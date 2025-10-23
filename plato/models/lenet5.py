@@ -7,8 +7,8 @@ document recognition." Proceedings of the IEEE, November 1998.
 """
 
 import collections
-from typing import Any, cast
 from collections import OrderedDict
+from typing import Any, cast
 
 import torch.nn.functional as F
 from torch import nn
