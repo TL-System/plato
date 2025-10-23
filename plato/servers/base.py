@@ -13,6 +13,7 @@ import sys
 import time
 from abc import abstractmethod
 from types import SimpleNamespace
+from typing import Any, cast
 
 import numpy as np
 import socketio
@@ -356,9 +357,10 @@ class Server:
         if hasattr(Config().server, "s3_endpoint_url"):
             self.s3_client = s3.S3()
 
-        app = web.Application()
+        web_module = cast(Any, web)
+        app = web_module.Application()
         self.sio.attach(app)
-        web.run_app(
+        web_module.run_app(
             app,
             host=Config().server.address,
             port=port,

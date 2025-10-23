@@ -147,6 +147,18 @@ class Config:
 
     _instance = None
     _cli_overrides: dict[str, bool] = {}
+    args: argparse.Namespace
+    config_path: Path
+    config: ConfigNode
+    clients: Any
+    server: Any
+    data: Any
+    trainer: Any
+    algorithm: Any
+    results: Any
+    general: Any
+    parameters: Any
+    params: dict[str, Any]
 
     def __new__(cls):
         if cls._instance is None:
@@ -382,6 +394,13 @@ class Config:
                 Config.parameters = config.parameters
 
         return cls._instance
+
+    def __getattr__(self, name: str) -> Any:
+        """Expose dynamically assigned class attributes via instances."""
+        try:
+            return getattr(type(self), name)
+        except AttributeError as exc:
+            raise AttributeError(f"{type(self).__name__!s} has no attribute {name!r}") from exc
 
     @staticmethod
     def node_from_dict(obj: Any) -> Any:
