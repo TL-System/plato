@@ -54,6 +54,26 @@ registered_processors = {
 
 def register_he_processors():
     """Register homomorphic encryption processors if needed."""
+    if (
+        "model_encrypt" in registered_processors
+        and "model_decrypt" in registered_processors
+    ):
+        return
+
+    try:
+        from plato.processors import model_decrypt, model_encrypt
+    except (ModuleNotFoundError, ImportError) as exc:
+        logging.error(
+            "Homomorphic encryption processors requested but unavailable: %s", exc
+        )
+        raise
+
+    registered_processors.update(
+        {
+            "model_encrypt": model_encrypt.Processor,
+            "model_decrypt": model_decrypt.Processor,
+        }
+    )
 
 
 def get(
@@ -82,8 +102,19 @@ def get(
 
     if not outbound_processors:
         outbound_processors = ["safetensor_encode"]
+    elif (
+        "model_encrypt" in outbound_processors
+        and "safetensor_encode" not in outbound_processors
+    ):
+        outbound_processors = [*outbound_processors, "safetensor_encode"]
+
     if not inbound_processors:
         inbound_processors = ["safetensor_decode"]
+    elif (
+        "model_decrypt" in inbound_processors
+        and "safetensor_decode" not in inbound_processors
+    ):
+        inbound_processors = ["safetensor_decode", *inbound_processors]
 
     for processor in outbound_processors:
         logging.info("%s: Using Processor for sending payload: %s", user, processor)
@@ -91,18 +122,16 @@ def get(
         logging.info("%s: Using Processor for receiving payload: %s", user, processor)
 
     # Check if HE processors are needed based on server configuration
-    if hasattr(config, "type") and config.type == "fedavg_he":
+    server_type = getattr(Config().server, "type", None)
+    he_requested = (
+        "model_encrypt" in outbound_processors
+        or "model_decrypt" in inbound_processors
+        or server_type == "fedavg_he"
+    )
+    if he_requested:
         # FedAvg server with homomorphic encryption needs to import tenseal,
         # which is not available on all platforms such as macOS
-        from plato.processors import model_decrypt, model_encrypt
-
-        registered_processors.update(
-            {
-                "model_encrypt": model_encrypt.Processor,
-                "model_decrypt": model_decrypt.Processor,
-            }
-        )
-
+        register_he_processors()
         logging.info("%s: Using homomorphic encryption processors.", user)
 
     def map_f(name):
