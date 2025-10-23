@@ -36,11 +36,21 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         context: ServerContext,
     ) -> Dict:
         """Aggregate using weighted average by sample count."""
-        total_samples = sum(update.report.num_samples for update in updates)
+        eligible = [
+            (update, deltas_received[idx])
+            for idx, update in enumerate(updates)
+            if getattr(update.report, "type", "weights") != "features"
+        ]
+        if not eligible:
+            return None
+
+        total_samples = sum(update.report.num_samples for update, _ in eligible)
+        if total_samples == 0:
+            return None
 
         avg_update: Any = None
-        for i, delta in enumerate(deltas_received):
-            num_samples = updates[i].report.num_samples
+        for update, delta in eligible:
+            num_samples = update.report.num_samples
             weight = num_samples / total_samples if total_samples > 0 else 0.0
 
             avg_update = self._accumulate_weighted(avg_update, delta, weight, context)
@@ -57,10 +67,21 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         context: ServerContext,
     ) -> Dict:
         """Aggregate weights directly when possible."""
-        total_samples = sum(update.report.num_samples for update in updates)
+        eligible = [
+            (update, weights_received[idx])
+            for idx, update in enumerate(updates)
+            if getattr(update.report, "type", "weights") != "features"
+        ]
+        if not eligible:
+            return None
+
+        total_samples = sum(update.report.num_samples for update, _ in eligible)
+        if total_samples == 0:
+            return None
+
         avg_weights: Any = None
-        for i, weights in enumerate(weights_received):
-            num_samples = updates[i].report.num_samples
+        for update, weights in eligible:
+            num_samples = update.report.num_samples
             weight = num_samples / total_samples if total_samples > 0 else 0.0
             avg_weights = self._accumulate_weighted(
                 avg_weights, weights, weight, context
@@ -87,6 +108,23 @@ class FedAvgAggregationStrategy(AggregationStrategy):
                     base.get(key), item, weight, context
                 )
             return base
+
+        if isinstance(value, (list, tuple)):
+            is_tuple = isinstance(value, tuple)
+            length = len(value)
+            if (
+                target is not None
+                and isinstance(target, (list, tuple))
+                and len(target) == length
+            ):
+                base_seq = list(target)
+            else:
+                base_seq = [None] * length
+            for idx, item in enumerate(value):
+                base_seq[idx] = self._accumulate_weighted(
+                    base_seq[idx], item, weight, context
+                )
+            return tuple(base_seq) if is_tuple else base_seq
 
         if isinstance(value, np.ndarray):
             base = target if isinstance(target, np.ndarray) else np.zeros_like(value)

@@ -36,3 +36,24 @@ def test_fedavg_aggregation_weighted_mean(temp_config):
 
     assert torch.allclose(aggregated["weight"], expected_weight)
     assert torch.allclose(aggregated["bias"], expected_bias)
+
+
+def test_fedavg_aggregation_skips_feature_payloads(temp_config):
+    """Feature updates should be ignored by the FedAvg aggregator."""
+    trainer = ComposableTrainer(model=lambda: torch.nn.Linear(2, 1))
+    trainer.set_client_id(0)
+
+    context = ServerContext()
+    context.trainer = trainer
+
+    updates = [
+        SimpleNamespace(report=SimpleNamespace(num_samples=10, type="features")),
+    ]
+
+    aggregated = asyncio.run(
+        FedAvgAggregationStrategy().aggregate_weights(
+            updates, trainer.model.state_dict(), [["feature_batch"]], context
+        )
+    )
+
+    assert aggregated is None

@@ -39,6 +39,12 @@ def _index_path(prefix: str, index: int) -> str:
 
 def _ensure_numpy(value: Any) -> np.ndarray:
     """Convert backend tensors to numpy arrays."""
+    if value is None:
+        return np.zeros(0, dtype=np.uint8)
+    if isinstance(value, str):
+        return np.frombuffer(value.encode("utf-8"), dtype=np.uint8)
+    if isinstance(value, (bytes, bytearray)):
+        return np.frombuffer(bytes(value), dtype=np.uint8)
     if isinstance(value, np.ndarray):
         return value
     if torch is not None and isinstance(value, torch.Tensor):
@@ -59,6 +65,12 @@ def _ensure_numpy(value: Any) -> np.ndarray:
 
 
 def _detect_backend(value: Any) -> str:
+    if value is None:
+        return "none"
+    if isinstance(value, str):
+        return "string"
+    if isinstance(value, (bytes, bytearray)):
+        return "bytes"
     if torch is not None and isinstance(value, torch.Tensor):
         return "torch"
     if mx is not None and isinstance(value, mx.array):
@@ -69,6 +81,12 @@ def _detect_backend(value: Any) -> str:
 
 
 def _restore_backend(array: np.ndarray, backend: str | None) -> Any:
+    if backend == "none":
+        return None
+    if backend == "string":
+        return array.tobytes().decode("utf-8")
+    if backend == "bytes":
+        return array.tobytes()
     if backend == "torch":
         if torch is None:
             raise ImportError("Torch is required to restore torch tensors.")

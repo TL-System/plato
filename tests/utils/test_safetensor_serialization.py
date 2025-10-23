@@ -48,6 +48,16 @@ def _assert_trees_allclose(actual, expected) -> None:
         for left, right in zip(actual, expected):
             _assert_trees_allclose(left, right)
         return
+    if expected is None:
+        assert actual is None
+        return
+    if isinstance(expected, str):
+        assert actual == expected
+        return
+    if isinstance(expected, bytes):
+        assert isinstance(actual, bytes)
+        assert actual == expected
+        return
 
     np.testing.assert_allclose(actual, expected)
     assert actual.dtype == expected.dtype
@@ -76,3 +86,16 @@ def test_processors_encode_decode_roundtrip(buffer_type):
     decoded = decoder.process(buffer)
 
     _assert_trees_allclose(decoded, tree)
+
+
+def test_serialize_tree_handles_strings_and_none():
+    tree = (
+        None,
+        "prompt",
+        {"meta": b"bytes", "values": [np.array(1.0, dtype=np.float32)]},
+    )
+
+    blob = serialize_tree(tree)
+    restored = deserialize_tree(blob)
+
+    _assert_trees_allclose(restored, tree)
