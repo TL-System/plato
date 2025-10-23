@@ -198,9 +198,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         if isinstance(reference, Mapping) and isinstance(data, Mapping):
             for key, item in list(data.items()):
                 if key in reference:
-                    data[key] = self._match_reference_structure(
-                        item, reference[key]
-                    )
+                    data[key] = self._match_reference_structure(item, reference[key])
             return data
 
         if isinstance(reference, (list, tuple)) and isinstance(data, (list, tuple)):
