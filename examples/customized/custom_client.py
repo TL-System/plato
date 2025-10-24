@@ -13,6 +13,7 @@ from collections.abc import Callable
 from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
+from unittest.mock import patch
 
 import socketio
 import torch
@@ -212,13 +213,12 @@ def _graceful_socketio_session():
             if exc.code not in (0, None):
                 raise
 
-    socketio.AsyncClient = _NoReconnectAsyncClient
-    ComposableClientEvents.on_disconnect = _on_disconnect_no_exit
-    try:
+    with patch.object(socketio, "AsyncClient", _NoReconnectAsyncClient), patch.object(
+        ComposableClientEvents,
+        "on_disconnect",
+        _on_disconnect_no_exit,
+    ):
         yield
-    finally:
-        socketio.AsyncClient = original_async_client_cls
-        ComposableClientEvents.on_disconnect = original_on_disconnect
 
 
 def main():

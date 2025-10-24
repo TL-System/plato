@@ -58,7 +58,10 @@ class Server(fedavg.Server):
     def _perform_mia(self):
         """Train and test attack model."""
         batch_size = Config().trainer.batch_size
-        trainset = self.datasource.get_train_set()
+        datasource = self.datasource
+        if datasource is None:
+            raise RuntimeError("MIA requires an initialized datasource.")
+        trainset = datasource.get_train_set()
 
         learned_indices = []
         unlearned_indices = []
@@ -90,7 +93,7 @@ class Server(fedavg.Server):
         )
 
         # Non-member data, i.e., test dataset
-        out_dataset = self.datasource.get_test_set()
+        out_dataset = datasource.get_test_set()
         out_dataloader = torch.utils.data.DataLoader(
             out_dataset, batch_size=batch_size, shuffle=False
         )
@@ -106,8 +109,20 @@ class Server(fedavg.Server):
 
     def get_shadow_model(self):
         """Load the shadow model, which is the current global model in this case."""
-        return copy.deepcopy(self.trainer.model)
+        trainer = self.trainer
+        if trainer is None:
+            raise RuntimeError("Trainer must be initialized before performing MIA.")
+        model = getattr(trainer, "model", None)
+        if model is None:
+            raise RuntimeError("Trainer must expose a model before performing MIA.")
+        return copy.deepcopy(model)
 
     def get_target_model(self):
         """Load the target model, which is the global model after unlearning."""
-        return copy.deepcopy(self.trainer.model)
+        trainer = self.trainer
+        if trainer is None:
+            raise RuntimeError("Trainer must be initialized before performing MIA.")
+        model = getattr(trainer, "model", None)
+        if model is None:
+            raise RuntimeError("Trainer must expose a model before performing MIA.")
+        return copy.deepcopy(model)

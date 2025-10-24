@@ -5,7 +5,7 @@ Customize the list of inbound and outbound processors for scaffold clients throu
 import logging
 import os
 import pickle
-from typing import Any, List
+from typing import Any, List, Optional
 
 from plato.callbacks.client import ClientCallback
 from plato.processors import base
@@ -21,11 +21,11 @@ class ExtractControlVariatesProcessor(base.Processor):
         super().__init__(**kwargs)
 
         self.client_id = client_id
-        self.trainer = trainer
+        self.trainer: Optional[Any] = trainer
 
-    def process(self, data: list) -> list:
-        if len(data) > 1:
-            self.trainer.additional_data = data[1]
+    def process(self, data: List[Any]) -> Any:
+        if len(data) > 1 and self.trainer is not None:
+            setattr(self.trainer, "additional_data", data[1])
 
             logging.info(
                 "[Client #%d] Control variates extracted from the payload.",
@@ -46,7 +46,7 @@ class SendControlVariateProcessor(base.Processor):
         self.client_id = client_id
         self.trainer = trainer
 
-    def process(self, data: Any) -> list:
+    def process(self, data: Any) -> List[Any]:
         delta = getattr(self.trainer, "client_control_variate_delta", None)
         data = [data, delta]
 

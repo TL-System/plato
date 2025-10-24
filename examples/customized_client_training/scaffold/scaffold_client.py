@@ -69,7 +69,7 @@ def create_client(
         trainer=trainer,
         callbacks=callbacks,
     )
-    client.client_control_variate = None
+    setattr(client, "client_control_variate", None)
 
     payload_strategy = client.payload_strategy
     training_strategy = client.training_strategy

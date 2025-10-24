@@ -10,6 +10,8 @@ https://arxiv.org/pdf/1910.06378.pdf
 """
 
 from collections import OrderedDict
+from collections.abc import Sequence
+from typing import Any, List, Optional
 
 from plato.config import Config
 from plato.servers import fedavg
@@ -28,14 +30,16 @@ class Server(fedavg.Server):
             trainer=trainer,
             callbacks=callbacks,
         )
-        self.server_control_variate = None
-        self.received_client_control_variates = None
+        self.server_control_variate: Optional[OrderedDict[str, Any]] = None
+        self.received_client_control_variates: Optional[
+            List[Optional[OrderedDict[str, Any]]]
+        ] = None
 
-    def weights_received(self, weights_received):
+    def weights_received(self, weights_received: List[Sequence[Any]]) -> List[Any]:
         """Compute control variates from clients' updated weights."""
         # Each weight is [model_weights, Δc_i]. Save Δc_i for Eq. (5) update.
         self.received_client_control_variates = [
-            weight[1] for weight in weights_received
+            weight[1] if len(weight) > 1 else None for weight in weights_received
         ]
         return [weight[0] for weight in weights_received]
 
@@ -44,19 +48,45 @@ class Server(fedavg.Server):
         Update server control variate per SCAFFOLD Eq. (5):
         c ← c + (1/m) ∑ Δc_i over participating clients.
         """
-        deltas = [d for d in self.received_client_control_variates if d is not None]
+        variates = self.received_client_control_variates
+        if not variates:
+            return
+
+        deltas = [d for d in variates if d is not None]
         if not deltas:
             return
+
+        server_control_variate = self.server_control_variate
+        if server_control_variate is None:
+            raise RuntimeError(
+                "Server control variate must be initialized before aggregation."
+            )
+
         N = Config().clients.total_clients
-        for name in self.server_control_variate:
+        for name in server_control_variate:
             incr = sum(d[name].cpu() for d in deltas) * (1.0 / N)
-            self.server_control_variate[name] += incr
+            server_control_variate[name] += incr
 
     def customize_server_payload(self, payload):
         "Add the server control variate into the server payload."
-        if self.server_control_variate is None:
-            self.server_control_variate = OrderedDict()
-            for name, weight in self.algorithm.extract_weights().items():
-                self.server_control_variate[name] = self.trainer.zeros(weight.shape)
+        server_control_variate = self.server_control_variate
 
-        return [payload, self.server_control_variate]
+        if server_control_variate is None:
+            algorithm = self.algorithm
+            if algorithm is None or not hasattr(algorithm, "extract_weights"):
+                raise RuntimeError(
+                    "SCAFFOLD requires an algorithm with an extract_weights method."
+                )
+            weights = algorithm.extract_weights()
+            trainer = self.trainer
+            if trainer is None or not hasattr(trainer, "zeros"):
+                raise RuntimeError(
+                    "SCAFFOLD requires a trainer that provides a zeros factory method."
+                )
+
+            server_control_variate = OrderedDict()
+            for name, weight in weights.items():
+                server_control_variate[name] = trainer.zeros(weight.shape)
+            self.server_control_variate = server_control_variate
+
+        return [payload, server_control_variate]
