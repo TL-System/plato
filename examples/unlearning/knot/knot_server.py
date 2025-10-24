@@ -18,7 +18,91 @@ from cvxopt import matrix
 from numpy.linalg import norm
 
 from plato.config import Config
+from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
 from plato.utils import fonts
+
+
+class KnotAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy ensuring server-level clustered logic executes."""
+
+    async def aggregate_weights(
+        self,
+        updates,
+        baseline_weights,
+        weights_received,
+        context,
+    ):
+        """
+        Run Knot's cluster-aware aggregation instead of the default FedAvg implementation.
+        """
+        server = getattr(context, "server", None)
+        if server is None:
+            return await super().aggregate_weights(
+                updates, baseline_weights, weights_received, context
+            )
+
+        logging.info("[%s] The server is currently aggregating model weights.", server)
+
+        if (
+            server.current_round == 1
+            and getattr(Config().server, "do_optimized_clustering", False)
+            and server.initialize_optimization
+        ):
+            deltas_received = server.algorithm.compute_weight_deltas(
+                baseline_weights, weights_received, cluster_id=None
+            )
+            logging.info("[%s] Aggregating model weight deltas.", server)
+            deltas = await server.aggregate_deltas(updates, deltas_received)
+            updated_weights = server.algorithm.update_weights(deltas)
+            return updated_weights
+
+        if (
+            server.current_round == 2
+            and getattr(Config().server, "do_optimized_clustering", False)
+            and server.initialize_optimization
+        ):
+            server._optimize_clustering(updates)
+            return baseline_weights
+
+        clustered_updates = {}
+        data_deletion_round = Config().clients.data_deletion_round
+
+        for client_update in updates:
+            client_id = client_update.client_id
+            cluster_id = server.clusters[client_id]
+
+            include_update = True
+            if server.clustered_retraining[cluster_id]:
+                include_update = (
+                    abs(client_update.staleness)
+                    <= server.current_round - data_deletion_round - 1
+                )
+
+            if not include_update:
+                continue
+
+            clustered_updates.setdefault(cluster_id, []).append(client_update)
+
+        server.clustered_updates = clustered_updates
+
+        for cluster_id, cluster_updates in clustered_updates.items():
+            if not cluster_updates:
+                continue
+
+            cluster_weights = [update.payload for update in cluster_updates]
+            deltas_received = server.algorithm.compute_weight_deltas(
+                baseline_weights,
+                cluster_weights,
+                cluster_id=cluster_id,
+            )
+            deltas = await server.aggregate_deltas(cluster_updates, deltas_received)
+            updated_weights = server.algorithm.update_weights(
+                deltas, cluster_id=cluster_id
+            )
+
+            server.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
+
+        return baseline_weights
 
 
 class Server(fedunlearning_server.Server):
@@ -41,6 +125,7 @@ class Server(fedunlearning_server.Server):
             datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
+            aggregation_strategy=KnotAggregationStrategy(),
         )
 
         # A dictionary that maps client IDs to the cluster IDs
@@ -136,82 +221,6 @@ class Server(fedunlearning_server.Server):
             for client_id in selected_clients:
                 if client_id not in self.round_first_selected:
                     self.round_first_selected[client_id] = self.current_round
-
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """
-        Aggregate the reported weight updates from the selected clients,
-        according to each client's clustering assignment, using the
-        federated averaging algorithm.
-
-        Only clients belonging to the same cluster will be aggregated.
-        """
-        if (
-            self.current_round == 1
-            and (
-                hasattr(Config().server, "do_optimized_clustering")
-                and Config().server.do_optimized_clustering
-            )
-            and self.initialize_optimization
-        ):
-            # Perform normal server aggregation by first computing weight deltas
-            deltas_received = self.algorithm.compute_weight_deltas(
-                baseline_weights, weights_received, cluster_id=None
-            )
-            # and then run a framework-agnostic server aggregation algorithm, such as
-            # the federated averaging algorithm
-            logging.info("[%s] Aggregating model weight deltas.", self)
-            deltas = await self.aggregate_deltas(self.updates, deltas_received)
-            # Updates the existing model weights from the provided deltas
-            updated_weights = self.algorithm.update_weights(deltas)
-            return updated_weights
-
-        if (
-            self.current_round == 2
-            and hasattr(Config().server, "do_optimized_clustering")
-            and Config().server.do_optimized_clustering
-            and self.initialize_optimization
-        ):
-            # Compute client clustering using optimization
-            self._optimize_clustering(updates)
-            return baseline_weights
-
-        self.clustered_updates = {}
-        data_deletion_round = Config().clients.data_deletion_round
-
-        for client_update in updates:
-            client_id = client_update.client_id
-            cluster_id = self.clusters[client_id]
-
-            include_update = True
-            if self.clustered_retraining[cluster_id]:
-                include_update = (
-                    abs(client_update.staleness)
-                    <= self.current_round - data_deletion_round - 1
-                )
-
-            if not include_update:
-                continue
-
-            self.clustered_updates.setdefault(cluster_id, []).append(client_update)
-
-        for cluster_id, cluster_updates in self.clustered_updates.items():
-            if not cluster_updates:
-                continue
-
-            weights_received = [update.payload for update in cluster_updates]
-            deltas_received = self.algorithm.compute_weight_deltas(
-                baseline_weights,
-                weights_received,
-                cluster_id=cluster_id,
-            )
-            deltas = await self.aggregate_deltas(cluster_updates, deltas_received)
-            updated_weights = self.algorithm.update_weights(
-                deltas, cluster_id=cluster_id
-            )
-
-            self.algorithm.load_weights(updated_weights, cluster_id=cluster_id)
-
-        return baseline_weights
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""

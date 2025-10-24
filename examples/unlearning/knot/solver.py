@@ -6,12 +6,16 @@ The similarity matrix is a R * P matrix, where R is the number of reviewers, and
 the number of papers
 """
 
+try:
+    import mosek  # type: ignore
+except ImportError:  # pragma: no cover - optional dependency
+    mosek = None
+
 from cvxopt import matrix, solvers, sparse, spmatrix
 
-# from mosek import iparam
-
-# Suppress extensive logging
-# solvers.options['MOSEK'] = {mosek.iparam.log: 0}
+if mosek is not None:  # pragma: no branch - optional configuration
+    # Suppress extensive logging from MOSEK unless explicitly overridden.
+    solvers.options["MOSEK"] = {mosek.iparam.log: 0}
 
 
 def solve(
@@ -100,8 +104,13 @@ def solve(
 
     # Run the LP solver.
     print("Starting the LP solver.")
-    sol = solvers.lp(c, G, h, A, b, solver="mosek")
-    # sol = solvers.lp(c, G, h, A, b)
+    if mosek is None:
+        print(
+            "MOSEK solver is unavailable; falling back to cvxopt's default solver."
+        )
+        sol = solvers.lp(c, G, h, A, b)
+    else:
+        sol = solvers.lp(c, G, h, A, b, solver="mosek")
 
     # Convert the solutions to a two-dimensional array,
     # with TPC members as rows, and papers as columns.
