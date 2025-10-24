@@ -222,22 +222,44 @@ class Server(fedunlearning_server.Server):
             and not self.initialize_optimization
         ):
             # First, obtain the set of cluster IDs that have been aggregated
-            updated_cluster_ids = {
-                self.clusters[update.client_id] for update in self.updates
-            }
+            updated_cluster_ids = set()
+            for update in self.updates:
+                cluster_id = self.clusters.get(update.client_id)
+                if cluster_id is None:
+                    logging.debug(
+                        "[%s] Skipping clustered test for client %s with no cluster assignment.",
+                        self,
+                        update.client_id,
+                    )
+                    continue
+                if cluster_id not in self.algorithm.models:
+                    logging.debug(
+                        "[%s] Skipping clustered test for cluster %s without aggregated model.",
+                        self,
+                        cluster_id,
+                    )
+                    continue
+                updated_cluster_ids.add(cluster_id)
 
-            test_accuracy_per_cluster = (
-                self.trainer.testing_strategy.test_clustered_models(
-                    self.testset,
-                    self.testset_sampler,
-                    self.trainer.context,
-                    self.algorithm.models,
-                    updated_cluster_ids,
+            if not updated_cluster_ids:
+                logging.debug(
+                    "[%s] No clustered models available for server-side testing this round.",
+                    self,
                 )
-            )
+            else:
+                test_accuracy_per_cluster = (
+                    self.trainer.testing_strategy.test_clustered_models(
+                        self.testset,
+                        self.testset_sampler,
+                        self.trainer.context,
+                        self.algorithm.models,
+                        updated_cluster_ids,
+                    )
+                )
 
-            # Second, update the test accuracy for clusters that have just been tested
-            self.clustered_test_accuracy.update(test_accuracy_per_cluster)
+                # Second, update the test accuracy for clusters that have just been tested
+                self.clustered_test_accuracy.update(test_accuracy_per_cluster)
+
 
         if hasattr(Config().server, "do_test") and Config().server.do_test:
             # Retrieve the model from the cluster with the highest accuracy
