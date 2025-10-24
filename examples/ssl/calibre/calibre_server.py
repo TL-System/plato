@@ -65,7 +65,32 @@ class Server(personalized_server.Server):
 
     def weights_received(self, weights_received):
         """Get the divergence rates from clients."""
-        self.divergence_rates_received = 1 / torch.stack(
-            [weight[1] for weight in weights_received], dim=0
+        processed_weights = []
+        divergence_values = []
+
+        for weight_entry in weights_received:
+            if isinstance(weight_entry, dict):
+                if "divergence_rate" not in weight_entry:
+                    raise KeyError("Missing 'divergence_rate' in client payload.")
+                divergence_values.append(weight_entry["divergence_rate"])
+                state_cls = type(weight_entry)
+                filtered_state = state_cls(
+                    (key, value)
+                    for key, value in weight_entry.items()
+                    if key != "divergence_rate"
+                )
+                processed_weights.append(filtered_state)
+            elif isinstance(weight_entry, (list, tuple)) and len(weight_entry) == 2:
+                processed_weights.append(weight_entry[0])
+                divergence_values.append(weight_entry[1])
+            else:
+                raise TypeError(
+                    "Unexpected weight entry format received from client: "
+                    f"{type(weight_entry)!r}"
+                )
+
+        divergence_tensor = torch.stack(
+            [torch.as_tensor(value) for value in divergence_values], dim=0
         )
-        return [weight[0] for weight in weights_received]
+        self.divergence_rates_received = 1 / divergence_tensor
+        return processed_weights

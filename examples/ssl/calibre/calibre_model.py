@@ -3,6 +3,7 @@ Implementation of Net used in calibre.
 """
 
 from collections.abc import Sequence
+from typing import Any, cast
 
 import torch
 from lightly.models.modules.heads import SimCLRProjectionHead
@@ -14,14 +15,17 @@ from plato.models.cnn_encoder import Model as encoder_registry
 class CalibreNet(torch.nn.Module):
     """The model structure of Calibre."""
 
-    def __init__(self, encoder=None):
+    def __init__(self, encoder: torch.nn.Module | None = None) -> None:
         super().__init__()
 
         # extract hyper-parameters
         encoder_name = Config().trainer.encoder_name
-        encoder_params = (
-            Config().params.encoder if hasattr(Config().params, "encoder") else {}
-        )
+        params: dict[str, Any] = Config().params
+        encoder_params_obj = params.get("encoder")
+        if isinstance(encoder_params_obj, dict):
+            encoder_params: dict[str, Any] = dict(encoder_params_obj)
+        else:
+            encoder_params = {}
 
         # define the encoder based on the model_name in config
         self.encoder = (
@@ -30,8 +34,10 @@ class CalibreNet(torch.nn.Module):
             else encoder_registry.get(model_name=encoder_name, **encoder_params)
         )
 
+        encoding_dim = cast(int, getattr(self.encoder, "encoding_dim"))
+
         self.projector = SimCLRProjectionHead(
-            self.encoder.encoding_dim,
+            encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )

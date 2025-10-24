@@ -3,6 +3,7 @@ The model for the SMoG algorithm.
 """
 
 import copy
+from typing import Any, cast
 
 import torch
 from lightly.models.modules.heads import (
@@ -21,22 +22,22 @@ from plato.models.cnn_encoder import Model as encoder_registry
 class SMoG(nn.Module):
     """The structure of the SMoG model."""
 
-    def __init__(self, encoder=None):
+    def __init__(self, encoder: nn.Module | None = None) -> None:
         super().__init__()
-        self.temperature = (
+        temperature = (
             Config().trainer.smog_temperature
             if hasattr(Config().trainer, "smog_temperature")
             else 0.1
         )
+        object.__setattr__(self, "_temperature", float(temperature))
 
-        encoder_params = (
-            Config().params.encoder if hasattr(Config().params, "encoder") else {}
-        )
-        # Define the encoder.
         encoder_name = Config().trainer.encoder_name
-        encoder_params = (
-            Config().params.encoder if hasattr(Config().params, "encoder") else {}
-        )
+        params: dict[str, Any] = Config().params
+        encoder_params_obj = params.get("encoder")
+        if isinstance(encoder_params_obj, dict):
+            encoder_params: dict[str, Any] = dict(encoder_params_obj)
+        else:
+            encoder_params = {}
 
         # Define the encoder based on the model_name in config.
         if encoder is not None:
@@ -46,9 +47,11 @@ class SMoG(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
+        encoding_dim = cast(int, getattr(self.encoder, "encoding_dim"))
+
         # Define the projector.
         self.projector = SMoGProjectionHead(
-            self.encoder.encoding_dim,
+            encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )
@@ -67,23 +70,25 @@ class SMoG(nn.Module):
         deactivate_requires_grad(self.projector_momentum)
 
         # Set the necessary hyper-parameter for SMoG
-        self.n_groups = Config().trainer.n_groups
+        object.__setattr__(self, "_n_groups", int(Config().trainer.n_groups))
         n_prototypes = Config().trainer.n_prototypes
         beta = Config().trainer.smog_beta
 
         # Define the prototypes
+        group_count = cast(int, self._n_groups)
         self.smog = SMoGPrototypes(
-            group_features=torch.rand(self.n_groups, n_prototypes), beta=beta
+            group_features=torch.rand(group_count, n_prototypes), beta=beta
         )
 
         # Current iteration.
-        self.n_iteration = 0
+        object.__setattr__(self, "_n_iteration", 0)
 
     def _cluster_features(self, features: torch.Tensor) -> torch.Tensor:
         """Cluster the features using sklearn."""
         # Cluster the features using sklearn
         features = features.cpu().numpy()
-        kmeans = KMeans(self.n_groups).fit(features)
+        group_count = cast(int, self._n_groups)
+        kmeans = KMeans(group_count).fit(features)
         clustered = torch.from_numpy(kmeans.cluster_centers_).float()
         clustered = torch.nn.functional.normalize(clustered, dim=1)
         return clustered
@@ -135,3 +140,21 @@ class SMoG(nn.Module):
         self.smog.set_group_features(group_features)
 
         return logits, assignments
+
+    @property
+    def temperature(self) -> float:
+        """Temperature hyperparameter used in SMoG logits."""
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value: float) -> None:
+        object.__setattr__(self, "_temperature", float(value))
+
+    @property
+    def n_iteration(self) -> int:
+        """Current training iteration for SMoG model."""
+        return self._n_iteration
+
+    @n_iteration.setter
+    def n_iteration(self, value: int) -> None:
+        object.__setattr__(self, "_n_iteration", int(value))

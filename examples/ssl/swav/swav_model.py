@@ -2,6 +2,8 @@
 A model for the SwAV algorithm.
 """
 
+from typing import Any, cast
+
 from lightly.models.modules import SwaVProjectionHead, SwaVPrototypes
 from torch import nn
 
@@ -12,14 +14,17 @@ from plato.models.cnn_encoder import Model as encoder_registry
 class SwaV(nn.Module):
     """The structure of the SwAV Model."""
 
-    def __init__(self, encoder=None):
+    def __init__(self, encoder: nn.Module | None = None) -> None:
         super().__init__()
 
         # Define the encoder
         encoder_name = Config().trainer.encoder_name
-        encoder_params = (
-            Config().params.encoder if hasattr(Config().params, "encoder") else {}
-        )
+        params: dict[str, Any] = Config().params
+        encoder_params_obj = params.get("encoder")
+        if isinstance(encoder_params_obj, dict):
+            encoder_params: dict[str, Any] = dict(encoder_params_obj)
+        else:
+            encoder_params = {}
 
         # Define the encoder
         if encoder is not None:
@@ -30,8 +35,10 @@ class SwaV(nn.Module):
             )
 
         # Define the projector
+        encoding_dim = cast(int, getattr(self.encoder, "encoding_dim"))
+
         self.projector = SwaVProjectionHead(
-            self.encoder.encoding_dim,
+            encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )

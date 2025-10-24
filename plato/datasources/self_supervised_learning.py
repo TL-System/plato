@@ -54,15 +54,42 @@ def get_transforms():
     """Obtain train/test transforms for the corresponding data."""
 
     # Get the transforms details set in the config file
-    transforms_config = Config().algorithm.data_transforms._asdict()
+    transforms_node = Config().algorithm.data_transforms
+    if hasattr(transforms_node, "_asdict"):
+        transforms_config = transforms_node._asdict()
+    elif isinstance(transforms_node, dict):
+        transforms_config = dict(transforms_node)
+    else:
+        raise TypeError(
+            "algorithm.data_transforms must be a mapping-like object "
+            "with an '_asdict' method or behave as a dict."
+        )
 
     # Set the data transform, which will be used as parameters to define the
     # SSL transform in registered_transforms
     data_transforms = {}
     if "train_transform" in transforms_config:
-        transform_config = transforms_config["train_transform"]._asdict()
+        raw_transform = transforms_config["train_transform"]
+        if hasattr(raw_transform, "_asdict"):
+            transform_config = raw_transform._asdict()
+        elif isinstance(raw_transform, dict):
+            transform_config = dict(raw_transform)
+        else:
+            raise TypeError(
+                "train_transform configuration must provide an '_asdict' method "
+                "or behave as a dict."
+            )
         transform_name = transform_config["name"]
-        transform_params = transform_config["parameters"]._asdict()
+        raw_params = transform_config.get("parameters", {})
+        if hasattr(raw_params, "_asdict"):
+            transform_params = raw_params._asdict()
+        elif isinstance(raw_params, dict):
+            transform_params = dict(raw_params)
+        else:
+            raise TypeError(
+                "train_transform.parameters must provide an '_asdict' method "
+                "or behave as a dict."
+            )
 
         # Get the data normalization for the datasource
         datasource_name = Config().data.datasource
