@@ -83,18 +83,30 @@ class Server(fedavg.Server):
             callbacks=callbacks,
             aggregation_strategy=resolved_aggregation_strategy,
         )
-        self.attacker_list = None
+        self.attacker_list: list[int] = []
         self.attack_type = None
         self.blacklist = []
         self.pre_blacklist = []
+
+    def _require_algorithm(self):
+        """Return the configured algorithm or raise an error if missing."""
+        if self.algorithm is None:
+            raise RuntimeError("Server algorithm is not configured.")
+        return self.algorithm
 
     def configure(self):
         """Initialize defence related parameter"""
         super().configure()
 
-        self.attacker_list = [
-            int(value) for value in Config().clients.attacker_ids.split(",")
-        ]
+        attacker_ids_config = getattr(Config().clients, "attacker_ids", "")
+        if isinstance(attacker_ids_config, str):
+            self.attacker_list = [
+                int(value)
+                for value in attacker_ids_config.split(",")
+                if value.strip()
+            ]
+        else:
+            self.attacker_list = [int(value) for value in attacker_ids_config]
         self.attack_type = (
             Config().clients.attack_type
             if hasattr(Config().clients, "attack_type")
@@ -144,8 +156,10 @@ class Server(fedavg.Server):
                 attacker_weights.append(weight)
 
         # Extract model updates
-        baseline_weights = self.algorithm.extract_weights()
-        deltas_received = self.algorithm.compute_weight_deltas(
+        algorithm = self._require_algorithm()
+
+        baseline_weights = algorithm.extract_weights()
+        deltas_received = algorithm.compute_weight_deltas(
             baseline_weights, attacker_weights
         )
         # Get attackers selected at this round
@@ -157,7 +171,7 @@ class Server(fedavg.Server):
             attack = attack_registry.get()
             weights_attacked = attack(
                 baseline_weights, attacker_weights, deltas_received, num_attackers
-            )  # weights and updates are different, think about which is more convenient?
+            )
 
             # Put poisoned model back to weights received for further aggregation
             counter = 0
@@ -200,8 +214,10 @@ class Server(fedavg.Server):
             return weights_attacked
 
         # Extract the current model updates (deltas)
-        baseline_weights = self.algorithm.extract_weights()
-        deltas_attacked = self.algorithm.compute_weight_deltas(
+        algorithm = self._require_algorithm()
+
+        baseline_weights = algorithm.extract_weights()
+        deltas_attacked = algorithm.compute_weight_deltas(
             baseline_weights, weights_attacked
         )
         received_ids = [update.client_id for update in self.updates]
