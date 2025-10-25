@@ -104,7 +104,8 @@ def test_cli_arguments_override_config_values(tmp_path: Path, monkeypatch):
 
     assert config.server.port == 9100
     assert Config.server.port == 9100
-    assert Config.args.port == 9100
+    assert Config._cli_overrides["port"] is True
+    assert Config.args.port is None
     assert Config.params["base_path"] == str(cli_base)
     assert cli_base.is_dir()
 
