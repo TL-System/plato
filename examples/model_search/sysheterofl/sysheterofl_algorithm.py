@@ -17,7 +17,7 @@ from torch.nn import Module
 from plato.algorithms import fedavg
 from plato.config import Config
 
-from .resnet import ResnetWrapper
+from resnet import ResnetWrapper
 
 SysHeteroConfig = tuple[list[int], list[float]]
 
