@@ -157,7 +157,7 @@ To fix all linter errors automatically, run:
 uvx ruff check --fix
 ```
 
-# Type Checking
+## Type Checking
 
 It is also strongly recommended that new additions and revisions of the code base to pass Astral's [ty](https://docs.astral.sh/ty/) type checker cleanly. To install `ty` globally using `uv`, run:
 

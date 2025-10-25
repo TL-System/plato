@@ -50,15 +50,18 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
     def load_payload(self, context: ClientContext, server_payload: Any) -> None:
         """Store inbound payload or delegate weight loading based on the round."""
         state = self._state(context)
+        owner = getattr(context, "owner", None)
 
         if context.current_round % 2 != 0:
             state["final_mask"] = None
-            context.owner.final_mask = None
+            if owner is not None and hasattr(owner, "final_mask"):
+                setattr(owner, "final_mask", None)
             super().load_payload(context, server_payload)
             return
 
         state["final_mask"] = server_payload
-        context.owner.final_mask = server_payload
+        if owner is not None and hasattr(owner, "final_mask"):
+            setattr(owner, "final_mask", server_payload)
 
     async def train(self, context: ClientContext) -> tuple[Any, Any]:
         """Alternate between mask proposal computation and weight submission."""
@@ -136,12 +139,17 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
 class MaskCryptClientProxy(simple.Client):
     """Client variant exposing MaskCrypt state via a convenient property."""
 
+    encrypt_ratio: float
+    random_mask: bool
+    attack_prep_dir: str
+    checkpoint_path: str
+
     @property
-    def final_mask(self):
+    def final_mask(self) -> Any | None:
         return self._context.state.get("maskcrypt", {}).get("final_mask")
 
     @final_mask.setter
-    def final_mask(self, value):
+    def final_mask(self, value: Any | None) -> None:
         self._context.state.setdefault("maskcrypt", {})["final_mask"] = value
 
 

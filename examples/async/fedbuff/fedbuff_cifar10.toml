@@ -17,7 +17,7 @@ speed_simulation = true
 max_sleep_time = 30
 
 # Should clients really go to sleep, or should we just simulate the sleep times?
-sleep_simulation = false
+sleep_simulation = true 
 
 # If we are simulating client training times, what is the average training time?
 avg_training_time = 20

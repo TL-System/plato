@@ -42,7 +42,15 @@ class CuriousServer(split_learning_server.Server):
         """
         self.attack_started = True
         intermediate_features, labels = update[0]
-        evaluation_metrics = self.trainer.attack(intermediate_features, labels)
+        trainer = self.trainer
+        if trainer is None or not hasattr(trainer, "attack"):
+            raise AttributeError(
+                "Trainer must define an `attack` method for curious server attacks."
+            )
+        attack_fn = getattr(trainer, "attack")
+        if not callable(attack_fn):
+            raise TypeError("Trainer attack must be callable.")
+        evaluation_metrics = attack_fn(intermediate_features, labels)
         rouge_metrics = evaluation_metrics["ROUGE"]
         self.rouge["rouge1_fm"] = rouge_metrics["rouge1_fmeasure"].item()
         self.rouge["rouge1_p"] = rouge_metrics["rouge1_precision"].item()

@@ -84,7 +84,9 @@ class FedSawTrainingStrategy(DefaultTrainingStrategy):
         if pruning_amount is None:
             state = FedSawClientLifecycleStrategy._state(context)
             stored_amount = state.get("pruning_amount", 0)
-            pruning_amount = stored_amount if isinstance(stored_amount, (int, float)) else 0
+            pruning_amount = (
+                stored_amount if isinstance(stored_amount, (int, float)) else 0
+            )
 
         return algorithm.prune_weight_updates(
             updates, amount=pruning_amount, method=pruning_method

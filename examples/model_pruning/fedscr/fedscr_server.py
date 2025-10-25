@@ -4,7 +4,7 @@ aggregates them and adds them to the global model from the previous round.
 """
 
 import os
-from typing import Dict, Optional, TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Dict, Optional, cast
 
 import numpy as np
 
@@ -58,11 +58,7 @@ class Server(fedavg.Server):
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wraps up generating the server response with any additional information."""
         trainer = cast(Optional["FedSCRTrainer"], self.trainer)
-        if (
-            trainer is not None
-            and trainer.use_adaptive
-            and self.current_round > 1
-        ):
+        if trainer is not None and trainer.use_adaptive and self.current_round > 1:
             self.calc_threshold()
             server_response["update_thresholds"] = self.update_thresholds
         return server_response
@@ -101,9 +97,7 @@ class Server(fedavg.Server):
                 float(np.var([update.report.loss for update in updates]))
             )
             if self.current_round > 3:
-                self.mean_variance = sum(self.loss_variances) / (
-                    self.current_round - 2
-                )
+                self.mean_variance = sum(self.loss_variances) / (self.current_round - 2)
             else:
                 self.mean_variance = 0.0
 

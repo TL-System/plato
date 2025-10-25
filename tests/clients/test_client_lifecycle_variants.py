@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import asyncio
 import pickle
-from typing import cast
 from types import SimpleNamespace
+from typing import cast
 from unittest.mock import AsyncMock
 
 import pytest

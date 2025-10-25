@@ -6,7 +6,7 @@ and callbacks to handle HuggingFace transformers in a split learning setting.
 """
 
 from collections import OrderedDict
-from typing import Optional
+from typing import Any, Optional, Sized, cast
 
 import evaluate
 from torch import Tensor, reshape
@@ -40,13 +40,14 @@ def preprocess_logits_for_metrics(logits, labels):
 
 def compute_metrics(eval_preds):
     """Calculate the accuracy for evaluation stage."""
-    metric = evaluate.load("accuracy")
+    metric: Any = evaluate.load("accuracy")
     preds, labels = eval_preds
     # preds have the same shape as the labels, after the argmax(-1) has been calculated
     # by preprocess_logits_for_metrics but we need to shift the labels
     labels = labels.reshape(-1)
     preds = preds.reshape(-1)
-    return metric.compute(predictions=preds, references=labels)
+    compute_fn = getattr(metric, "compute")
+    return compute_fn(predictions=preds, references=labels)
 
 
 # ============================================================================
@@ -88,7 +89,10 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
     def _get_train_sampler(self) -> Sampler | None:
         """Get training sampler."""
         if self.sampler is None:
-            return RandomSampler(self.train_dataset)
+            if self.train_dataset is None:
+                raise ValueError("Training dataset is not initialized.")
+            dataset = cast(Sized, self.train_dataset)
+            return RandomSampler(dataset)
         return self.sampler
 
     def _get_eval_sampler(self, eval_dataset) -> Sampler | None:
@@ -334,6 +338,8 @@ class Trainer(split_learning.Trainer):
         inputs, labels = batch
         batch_size = inputs.size(0)
         inputs = inputs.detach().requires_grad_(True)
+        if self.model is None or not hasattr(self.model, "forward_from"):
+            raise AttributeError("Model must provide a `forward_from` method.")
         outputs = self.model.forward_from(inputs, labels)
         loss = outputs.loss
         loss.backward()

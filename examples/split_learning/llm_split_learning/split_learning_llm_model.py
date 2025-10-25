@@ -1,6 +1,8 @@
 """
-Obtain LLM models from HuggingFace, specifically designed for split learning
+Obtain LLM models from HuggingFace, specifically designed for split learning.
 """
+
+from typing import Any, Union, cast
 
 import torch
 from peft import LoraConfig, get_peft_model
@@ -17,7 +19,7 @@ def get_lora_model(model):
     return model
 
 
-def get_module(start_module: torch.nn.Module, module_names):
+def get_module(start_module: torch.nn.Module, module_names) -> torch.nn.Module:
     """
     Recursively get a PyTorch module starting from the start module with
     a given list of module names.
@@ -26,6 +28,9 @@ def get_module(start_module: torch.nn.Module, module_names):
     for module_name in module_names:
         module = getattr(module, module_name)
     return module
+
+
+TransformerSequence = Union[torch.nn.Sequential, torch.nn.ModuleList]
 
 
 class BaseModel(torch.nn.Module):
@@ -47,14 +52,16 @@ class BaseModel(torch.nn.Module):
 
         self.config = AutoConfig.from_pretrained(self.model_name, **config_kwargs)
 
-        self.base_model = AutoModelForCausalLM.from_pretrained(
+        base_model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
             token=use_auth_token,
         )
-        if hasattr(self.base_model, "loss_type"):
-            self.base_model.loss_type = "ForCausalLM"
+        base_model_for_loss = cast(Any, base_model)
+        if hasattr(base_model_for_loss, "loss_type"):
+            base_model_for_loss.loss_type = "ForCausalLM"
+        self.base_model = base_model
         self.cut_layer = Config().parameters.model.cut_layer
 
     def get_input_embeddings(self):
@@ -79,9 +86,11 @@ class ClientModel(BaseModel):
         super().__init__(*args, **kwargs)
         # replace the layers in the base model
         # which should be on the cloud with Identity layers()
-        transformer_module = self.base_model
-        for module_name in Config().parameters.model.transformer_module_name.split("."):
-            transformer_module = getattr(transformer_module, module_name)
+        transformer_module_raw = get_module(
+            self.base_model,
+            Config().parameters.model.transformer_module_name.split("."),
+        )
+        transformer_module = cast(TransformerSequence, transformer_module_raw)
         client_layers = transformer_module[: self.cut_layer]
         client_module_names = Config().parameters.model.transformer_module_name.split(
             "."
@@ -126,18 +135,21 @@ class ServerModel(BaseModel):
         # The first copy of the model is the whole model which is used for test.
         # The second copy of the model only contains the layers on the server
         # used for training.
-        self.server_model = AutoModelForCausalLM.from_pretrained(
+        server_model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
             config=self.config,
             cache_dir=Config().params["model_path"] + "/huggingface",
         )
-        if hasattr(self.server_model, "loss_type"):
-            self.server_model.loss_type = "ForCausalLM"
+        server_model_for_loss = cast(Any, server_model)
+        if hasattr(server_model_for_loss, "loss_type"):
+            server_model_for_loss.loss_type = "ForCausalLM"
+        self.server_model = server_model
         transformer_module = get_module(
             self.base_model,
             Config().parameters.model.transformer_module_name.split("."),
         )
-        server_layers = transformer_module[self.cut_layer :]
+        transformer_sequence = cast(TransformerSequence, transformer_module)
+        server_layers = transformer_sequence[self.cut_layer :]
         server_module_names = Config().parameters.model.transformer_module_name.split(
             "."
         )
@@ -159,9 +171,8 @@ class ServerModel(BaseModel):
         base_model_weights = self.base_model.state_dict()
         server_model_weights = self.server_model.state_dict()
 
-        transformer_module = self.base_model
-        for module_name in basic_name.split("."):
-            transformer_module = getattr(transformer_module, module_name)
+        transformer_module_raw = get_module(self.base_model, basic_name.split("."))
+        transformer_module = cast(TransformerSequence, transformer_module_raw)
         layer_names = [
             basic_name + "." + str(index)
             for index in range(

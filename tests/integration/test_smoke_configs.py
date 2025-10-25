@@ -13,7 +13,6 @@ import torch
 from torch.utils.data import TensorDataset
 
 from plato.mpc.round_store import RoundInfoStore
-
 from tests.integration.utils import (
     async_run,
     build_minimal_config,
@@ -78,9 +77,7 @@ def test_fedavg_lenet5_smoke(monkeypatch):
         assert trainer is not None
         model = trainer.model
         assert model is not None
-        weights = {
-            name: tensor.clone() for name, tensor in model.state_dict().items()
-        }
+        weights = {name: tensor.clone() for name, tensor in model.state_dict().items()}
         update = SimpleNamespace(
             client_id=1,
             report=SimpleNamespace(
