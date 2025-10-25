@@ -156,3 +156,17 @@ To fix all linter errors automatically, run:
 ```bash
 uvx ruff check --fix
 ```
+
+# Type Checking
+
+It is also strongly recommended that new additions and revisions of the code base to pass Astral's [ty](https://docs.astral.sh/ty/) type checker cleanly. To install `ty` globally using `uv`, run:
+
+```bash
+uv tool install ty@latest
+```
+
+To check the codebase on any sub-directory in Plato, such as `plato`, run:
+
+```bash
+ty check plato
+```
