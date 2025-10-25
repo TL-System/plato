@@ -473,14 +473,19 @@ class Config:
     @staticmethod
     def is_edge_server() -> bool:
         """Returns whether the current instance is an edge server in cross-silo FL."""
-        return Config().args.port is not None and bool(
-            getattr(Config().algorithm, "cross_silo", False)
-        )
+        if not bool(getattr(Config().algorithm, "cross_silo", False)):
+            return False
+
+        args = Config().args
+        return args.port is not None and args.id is not None
 
     @staticmethod
     def is_central_server() -> bool:
         """Returns whether the current instance is a central server in cross-silo FL."""
-        return hasattr(Config().algorithm, "cross_silo") and Config().args.port is None
+        if not bool(getattr(Config().algorithm, "cross_silo", False)):
+            return False
+
+        return Config().args.id is None
 
     @staticmethod
     def gpu_count() -> int:

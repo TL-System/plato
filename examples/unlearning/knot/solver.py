@@ -6,10 +6,12 @@ The similarity matrix is a R * P matrix, where R is the number of reviewers, and
 the number of papers
 """
 
+from typing import Any, cast
+
 try:
     import mosek  # type: ignore
 except ImportError:  # pragma: no cover - optional dependency
-    mosek = None
+    mosek = cast(Any, None)
 
 from cvxopt import matrix, solvers, sparse, spmatrix
 

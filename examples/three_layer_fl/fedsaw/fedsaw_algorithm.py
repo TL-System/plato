@@ -47,7 +47,11 @@ class Algorithm(fedavg.Algorithm):
         )
 
         # Clone the reference model to host update tensors for pruning.
-        delta_model = copy.deepcopy(self.model.cpu())
+        model = self.model
+        if model is None:
+            raise RuntimeError("Model must be initialised before pruning updates.")
+
+        delta_model = copy.deepcopy(model).cpu()
         cpu_updates: MutableMapping[str, torch.Tensor] = OrderedDict(
             (name, tensor.detach().cpu()) for name, tensor in updates.items()
         )

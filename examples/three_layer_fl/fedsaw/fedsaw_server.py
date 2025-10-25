@@ -3,6 +3,8 @@ A cross-silo federated learning server using FedSaw,
 as either central or edge servers.
 """
 
+from __future__ import annotations
+
 import math
 import statistics
 
@@ -20,7 +22,7 @@ class Server(fedavg_cs.Server):
         super().__init__(model=model, algorithm=selected_algorithm, trainer=trainer)
 
         # The central server uses a list to store each edge server's clients' pruning amount
-        self.pruning_amount_list = None
+        self.pruning_amount_list: dict[int, float] | None = None
 
         if Config().is_central_server():
             init_pruning_amount = (
@@ -36,8 +38,9 @@ class Server(fedavg_cs.Server):
                 )
             }
 
+        self.edge_pruning_amount: float = 0.0
         if Config().is_edge_server():
-            self.edge_pruning_amount = 0
+            self.edge_pruning_amount = 0.0
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Wraps up generating the server response with any additional information."""
@@ -55,7 +58,8 @@ class Server(fedavg_cs.Server):
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregates the reported weight updates from the selected clients."""
         deltas = await self.aggregate_deltas(updates, weights_received)
-        updated_weights = self.algorithm.update_weights(deltas)
+        algorithm = self.require_algorithm()
+        updated_weights = algorithm.update_weights(deltas)
         return updated_weights
 
     def update_pruning_amount_list(self):
@@ -63,6 +67,11 @@ class Server(fedavg_cs.Server):
         weights_diff_dict, weights_diff_list = self.get_weights_differences()
 
         median = statistics.median(weights_diff_list)
+
+        if self.pruning_amount_list is None:
+            raise RuntimeError(
+                "Pruning amount list is unavailable on this server instance."
+            )
 
         for client_id in weights_diff_dict:
             if weights_diff_dict[client_id]:
@@ -84,13 +93,14 @@ class Server(fedavg_cs.Server):
         }
 
         weights_diff_list = []
+        algorithm = self.require_algorithm()
 
         for update in self.updates:
             client_id = update.report.client_id
             num_samples = update.report.num_samples
             received_updates = update.payload
 
-            weights_diff = self.algorithm.compute_weight_difference(
+            weights_diff = algorithm.compute_weight_difference(
                 received_updates,
                 num_samples=num_samples,
                 total_samples=self.total_samples,

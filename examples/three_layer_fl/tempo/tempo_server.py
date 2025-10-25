@@ -3,6 +3,8 @@ A cross-silo federated learning server that tunes
 clients' local epoch numbers of each edge server (institution).
 """
 
+from __future__ import annotations
+
 import math
 
 import torch
@@ -21,7 +23,7 @@ class Server(fedavg_cs.Server):
         super().__init__()
 
         # The central server uses a list to store each edge server's clients' local epoch numbers
-        self.local_epoch_list = None
+        self.local_epoch_list: list[int] | None = None
         if Config().is_central_server():
             self.local_epoch_list = [
                 Config().trainer.epochs for i in range(Config().algorithm.total_silos)
@@ -111,10 +113,11 @@ class Server(fedavg_cs.Server):
         Computes the weight difference of an edge server's aggregated model
         and the global model.
         """
-        weights_diff = 0
+        weights_diff = 0.0
 
         # Extract global model weights
-        global_weights = self.algorithm.extract_weights()
+        algorithm = self.require_algorithm()
+        global_weights = algorithm.extract_weights()
 
         for name, local_weight in local_weights.items():
             global_weight = global_weights[name]
