@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from types import SimpleNamespace
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
@@ -32,19 +32,65 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         self.staleness_func_params = staleness_func_params or {}
 
     def setup(self, context: ServerContext) -> None:
-        try:
-            if hasattr(Config().server, "mixing_hyperparameter"):
-                self.mixing_hyperparam = Config().server.mixing_hyperparameter
-            if hasattr(Config().server, "adaptive_mixing"):
-                self.adaptive_mixing = Config().server.adaptive_mixing
-        except ValueError:
-            pass
+        server_config = getattr(Config(), "server", None)
 
-        logging.info(
-            "FedAsync: Mixing hyperparameter set to %s (adaptive=%s)",
-            self.mixing_hyperparam,
-            self.adaptive_mixing,
-        )
+        if server_config is None:
+            logging.warning(
+                "FedAsync: No server configuration found; using default hyperparameters."
+            )
+            return
+
+        mixing_value = getattr(server_config, "mixing_hyperparameter", None)
+        if mixing_value is None:
+            logging.warning(
+                "FedAsync: Variable mixing hyperparameter is required for the FedAsync server."
+            )
+        else:
+            try:
+                mixing_value = float(mixing_value)
+            except (TypeError, ValueError):
+                logging.warning(
+                    "FedAsync: Invalid mixing hyperparameter. Unable to cast %s to float.",
+                    mixing_value,
+                )
+            else:
+                if 0 < mixing_value < 1:
+                    self.mixing_hyperparam = mixing_value
+                    logging.info(
+                        "FedAsync: Mixing hyperparameter is set to %s.",
+                        self.mixing_hyperparam,
+                    )
+                else:
+                    logging.warning(
+                        "FedAsync: Invalid mixing hyperparameter. "
+                        "The hyperparameter needs to be between 0 and 1 (exclusive)."
+                    )
+
+        adaptive_value = getattr(server_config, "adaptive_mixing", None)
+        if adaptive_value is not None:
+            self.adaptive_mixing = bool(adaptive_value)
+
+        staleness_config = getattr(server_config, "staleness_weighting_function", None)
+        if staleness_config is not None:
+            func_type = getattr(staleness_config, "type", "constant")
+            staleness_type = str(func_type).lower()
+            params: dict[str, float] = {}
+
+            if staleness_type == "polynomial":
+                params["a"] = float(getattr(staleness_config, "a", 1.0))
+            elif staleness_type == "hinge":
+                params["a"] = float(getattr(staleness_config, "a", 1.0))
+                params["b"] = float(getattr(staleness_config, "b", 10))
+            elif staleness_type != "constant":
+                logging.warning(
+                    "FedAsync: Unknown staleness weighting function type '%s'. "
+                    "Falling back to constant.",
+                    staleness_type,
+                )
+                staleness_type = "constant"
+
+            self.staleness_func_type = staleness_type
+            self.staleness_func_params = params
 
     async def aggregate_deltas(
         self,

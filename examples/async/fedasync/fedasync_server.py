@@ -13,6 +13,7 @@ import logging
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies import FedAsyncAggregationStrategy
 
 
 class Server(fedavg.Server):
@@ -26,19 +27,16 @@ class Server(fedavg.Server):
         trainer=None,
         callbacks=None,
     ):
+        aggregation_strategy = FedAsyncAggregationStrategy()
+
         super().__init__(
             model=model,
             datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            aggregation_strategy=aggregation_strategy,
         )
-
-        # The hyperparameter of FedAsync with a range of (0, 1)
-        self.mixing_hyperparam = 1
-
-        # Whether adjust mixing hyperparameter after each round
-        self.adaptive_mixing = False
 
     def configure(self) -> None:
         """Configure the mixing hyperparameter for the server, as well as
@@ -46,79 +44,28 @@ class Server(fedavg.Server):
         """
         super().configure()
 
-        # Configuring the mixing hyperparameter for FedAsync
-        self.adaptive_mixing = (
-            hasattr(Config().server, "adaptive_mixing")
-            and Config().server.adaptive_mixing
-        )
-
         if not hasattr(Config().server, "mixing_hyperparameter"):
             logging.warning(
                 "FedAsync: Variable mixing hyperparameter is required for the FedAsync server."
             )
         else:
-            self.mixing_hyperparam = Config().server.mixing_hyperparameter
+            try:
+                mixing_hyperparam = float(Config().server.mixing_hyperparameter)
+            except (TypeError, ValueError):
+                logging.warning(
+                    "FedAsync: Invalid mixing hyperparameter. "
+                    "Unable to cast %s to float.",
+                    Config().server.mixing_hyperparameter,
+                )
+                return
 
-            if 0 < self.mixing_hyperparam < 1:
+            if 0 < mixing_hyperparam < 1:
                 logging.info(
                     "FedAsync: Mixing hyperparameter is set to %s.",
-                    self.mixing_hyperparam,
+                    mixing_hyperparam,
                 )
             else:
                 logging.warning(
                     "FedAsync: Invalid mixing hyperparameter. "
                     "The hyperparameter needs to be between 0 and 1 (exclusive)."
                 )
-
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
-        """Process the client reports by aggregating their weights."""
-        # Calculate the new mixing hyperparameter with client's staleness
-        client_staleness = updates[0].staleness
-
-        if self.adaptive_mixing:
-            self.mixing_hyperparam *= self._staleness_function(client_staleness)
-
-        return await self.algorithm.aggregate_weights(
-            baseline_weights, weights_received, mixing=self.mixing_hyperparam
-        )
-
-    @staticmethod
-    def _staleness_function(staleness) -> float:
-        """Staleness function used to adjust the mixing hyperparameter"""
-        if hasattr(Config().server, "staleness_weighting_function"):
-            staleness_func_param = Config().server.staleness_weighting_function
-            func_type = staleness_func_param.type.lower()
-            if func_type == "constant":
-                return Server._constant_function()
-            elif func_type == "polynomial":
-                a = staleness_func_param.a
-                return Server._polynomial_function(staleness, a)
-            elif func_type == "hinge":
-                a = staleness_func_param.a
-                b = staleness_func_param.b
-                return Server._hinge_function(staleness, a, b)
-            else:
-                logging.warning(
-                    "FedAsync: Unknown staleness weighting function type. "
-                    "Type needs to be constant, polynomial, or hinge."
-                )
-        else:
-            return Server.constant_function()
-
-    @staticmethod
-    def _constant_function() -> float:
-        """Constant staleness function as proposed in Sec. 5.2, Evaluation Setup."""
-        return 1
-
-    @staticmethod
-    def _polynomial_function(staleness, a) -> float:
-        """Polynomial staleness function as proposed in Sec. 5.2, Evaluation Setup."""
-        return (staleness + 1) ** -a
-
-    @staticmethod
-    def _hinge_function(staleness, a, b) -> float:
-        """Hinge staleness function as proposed in Sec. 5.2, Evaluation Setup."""
-        if staleness <= b:
-            return 1
-        else:
-            return 1 / (a * (staleness - b) + 1)

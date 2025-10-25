@@ -7,6 +7,7 @@ import logging
 import os
 import pickle
 from collections import OrderedDict
+from typing import Any, Optional
 
 import numpy as np
 import torch
@@ -76,26 +77,26 @@ class Trainer(ComposableTrainer):
 
     def __init__(self, model=None, callbacks=None):
         """Initializes the trainer with the provided model."""
+        clients_config = Config().clients
+
         # The threshold for determining whether an update is significant or not
-        self.update_threshold = (
-            Config().clients.update_threshold
-            if hasattr(Config().clients, "update_threshold")
-            else 0.3
+        self.update_threshold: float = float(
+            getattr(clients_config, "update_threshold", 0.3)
         )
 
         # The overall weight updates applied to the model in a single round
-        self.total_grad = OrderedDict()
+        self.total_grad: OrderedDict[str, torch.Tensor] = OrderedDict()
 
         # The accumulated gradients for a client throughout the FL session
-        self._acc_grads = []
+        self._acc_grads: list[Any] = []
 
         # Should the clients use the adaptive algorithm?
         self.use_adaptive = bool(
-            hasattr(Config().clients, "adaptive") and Config().clients.adaptive
+            hasattr(clients_config, "adaptive") and clients_config.adaptive
         )
-        self.avg_update = None
-        self.div_from_global = None
-        self.orig_weights = None
+        self.avg_update: Optional[float] = None
+        self.div_from_global: Optional[float] = None
+        self.orig_weights: Optional[torch.nn.Module] = None
 
         # Create callbacks for FedSCR
         fedscr_callbacks = [FedSCRCallback]
@@ -112,10 +113,17 @@ class Trainer(ComposableTrainer):
         """Prunes the weight update by setting some parameters in update to 0."""
         self._acc_grads = self.load_acc_grads()
 
-        conv_updates = OrderedDict()
+        orig_weights = self.orig_weights
+        model = self.model
+        if orig_weights is None or model is None:
+            raise RuntimeError(
+                "FedSCR pruning requires both the original and current model weights."
+            )
+
+        conv_updates: OrderedDict[str, np.ndarray] = OrderedDict()
         i = 0
         for (orig_name, orig_module), (__, trained_module) in zip(
-            self.orig_weights.named_modules(), self.model.named_modules()
+            orig_weights.named_modules(), model.named_modules()
         ):
             if isinstance(
                 trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
@@ -136,12 +144,12 @@ class Trainer(ComposableTrainer):
                 conv_updates[delta_name] = delta
                 i += 1
 
-        for orig_key, trained_key in zip(
-            self.orig_weights.state_dict(), self.model.state_dict()
-        ):
+        orig_state_dict = orig_weights.state_dict()
+        trained_state_dict = model.state_dict()
+        for orig_key, trained_key in zip(orig_state_dict, trained_state_dict):
             if orig_key not in conv_updates:
-                orig_tensor = self.orig_weights.state_dict()[orig_key]
-                trained_tensor = self.model.state_dict()[trained_key]
+                orig_tensor = orig_state_dict[orig_key]
+                trained_tensor = trained_state_dict[trained_key]
                 delta = trained_tensor - orig_tensor
                 self.total_grad[orig_key] = delta
             else:
@@ -223,8 +231,13 @@ class Trainer(ComposableTrainer):
             with open(grad_path, "rb") as payload_file:
                 return pickle.load(payload_file)
         else:
+            model = self.model
+            if model is None:
+                raise RuntimeError(
+                    "FedSCR trainer requires a model to determine gradient slots."
+                )
             count = 0
-            for module in self.model.modules():
+            for module in model.modules():
                 if isinstance(
                     module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
                 ):
@@ -246,9 +259,16 @@ class Trainer(ComposableTrainer):
 
     def compute_weight_divergence(self):
         """Calculates the divergence of the locally trained model from the global model."""
+        orig_weights = self.orig_weights
+        model = self.model
+        if orig_weights is None or model is None:
+            raise RuntimeError(
+                "FedSCR trainer requires model references to compute divergence."
+            )
+
         div_from_global = 0
         for (__, orig_module), (__, trained_module) in zip(
-            self.orig_weights.named_modules(), self.model.named_modules()
+            orig_weights.named_modules(), model.named_modules()
         ):
             if isinstance(
                 trained_module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)
@@ -267,12 +287,17 @@ class Trainer(ComposableTrainer):
         delta = 0
         total = 0
 
+        model = self.model
+        if model is None:
+            raise RuntimeError(
+                "FedSCR trainer requires a model to compute local update significance."
+            )
+
         for key in sorted(self.total_grad.keys()):
             tensor = self.total_grad[key].cpu()
             delta += torch.sum(tensor).numpy()
 
-        model = self.model.named_modules()
-        for __, module in model:
+        for __, module in model.named_modules():
             if isinstance(module, (torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d)):
                 tensor = module.weight.data.cpu()
                 total += torch.sum(tensor).numpy()

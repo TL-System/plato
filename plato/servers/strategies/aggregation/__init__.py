@@ -11,12 +11,14 @@ from plato.servers.strategies.aggregation.fednova import FedNovaAggregationStrat
 from plato.servers.strategies.aggregation.gan import FedAvgGanAggregationStrategy
 from plato.servers.strategies.aggregation.he import FedAvgHEAggregationStrategy
 from plato.servers.strategies.aggregation.hermes import HermesAggregationStrategy
+from plato.servers.strategies.aggregation.port import PortAggregationStrategy
 
 __all__ = [
     "FedAvgAggregationStrategy",
     "FedBuffAggregationStrategy",
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
+    "PortAggregationStrategy",
     "HermesAggregationStrategy",
     "FedAvgGanAggregationStrategy",
     "FedAvgHEAggregationStrategy",

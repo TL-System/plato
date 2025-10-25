@@ -3,9 +3,14 @@ Reuse code from the authors' sourcecode
 https://github.com/MMorafah/Sub-FedAvg/blob/main/src/pruning/unstructured.py
 """
 
+from typing import Any
+
 import numpy as np
+import numpy.typing as npt
 import torch
 from scipy.spatial import distance
+
+MaskArray = npt.NDArray[Any]
 
 
 def make_init_mask(model, is_print=False):
@@ -17,20 +22,14 @@ def make_init_mask(model, is_print=False):
     :param model: a pytorch model
     :return mask: a list of pruning masks
     """
-    step = 0
-    for name, param in model.named_parameters():
-        if "weight" in name:
-            step = step + 1
-    mask = [None] * step
-
-    step = 0
+    mask: list[MaskArray] = []
     for name, param in model.named_parameters():
         if "weight" in name:
             tensor = param.data.cpu().numpy()
-            mask[step] = np.ones_like(tensor)
+            new_mask = np.ones_like(tensor)
+            mask.append(new_mask)
             if is_print:
-                print(f"step {step}, shape: {mask[step].shape}")
-            step = step + 1
+                print(f"step {len(mask) - 1}, shape: {new_mask.shape}")
 
     return mask
 

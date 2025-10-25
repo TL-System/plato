@@ -24,6 +24,7 @@ from plato.servers.strategies.aggregation import (
     FedAvgAggregationStrategy,
     FedBuffAggregationStrategy,
     FedNovaAggregationStrategy,
+    PortAggregationStrategy,
 )
 from plato.servers.strategies.base import (
     AggregationStrategy,
@@ -51,6 +52,7 @@ __all__ = [
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
     "FedBuffAggregationStrategy",
+    "PortAggregationStrategy",
     "MPCAdditiveAggregationStrategy",
     "MPCShamirAggregationStrategy",
     # Client selection strategies

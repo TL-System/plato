@@ -145,9 +145,16 @@ class PruningCallback(TrainerCallback):
         accuracy = -1
 
         try:
+            dataset = self.testset
+            if dataset is None:
+                raise RuntimeError(
+                    "Sub-FedAvg evaluation requires a test dataset, but none is set."
+                )
             if self.testset_sampler is None:
                 test_loader = torch.utils.data.DataLoader(
-                    self.testset, batch_size=Config().trainer.batch_size, shuffle=False
+                    dataset,
+                    batch_size=Config().trainer.batch_size,
+                    shuffle=False,
                 )
             # Use a testing set following the same distribution as the training set
             else:
@@ -164,7 +171,7 @@ class PruningCallback(TrainerCallback):
                     sampler_obj = self.testset_sampler
 
                 test_loader = torch.utils.data.DataLoader(
-                    self.testset,
+                    dataset,
                     batch_size=Config().trainer.batch_size,
                     shuffle=False,
                     sampler=sampler_obj,
