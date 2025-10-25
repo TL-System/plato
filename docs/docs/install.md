@@ -32,7 +32,7 @@ In order to run any of the examples, first run the following command to include 
 uv sync
 ```
 
-In case you need extra dependencies (including homormorphic encryption, differential privacy, reinforcement learning, secure multi-party computation, self-supervised learning, HuggingFace transformers and PEFT, or the MLX framework), you should run:
+In case you need extra dependencies (including differential privacy, reinforcement learning, secure multi-party computation, and the MLX framework), you should run:
 
 ```bash
 uv sync --all-extras

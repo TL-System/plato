@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "plato-learn"
-version = "1.4.2"
+version = "1.4.3"
 description = "Plato: a research framework for federated learning"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -20,29 +20,26 @@ dependencies = [
     "lightly",
     "munch",
     "numpy",
+    "peft",
     "python-socketio",
     "requests",
     "safetensors",
+    "scipy",
+    "tenseal",
     "timm",
     "torch",
     "torch-optimizer",
     "torchvision",
+    "transformers",
     "zstd",
 ]
 
 [project.optional-dependencies]
-huggingface = [
-    "transformers",
-    "peft",
-]
 mpc = [
     "kazoo"
 ]
 rl = [
     "gymnasium"
-]
-he = [
-    "tenseal"
 ]
 dp = [
     "opacus"
