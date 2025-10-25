@@ -8,6 +8,7 @@ algorithms.
 from __future__ import annotations
 
 import asyncio
+import copy
 import numbers
 from collections.abc import Callable, Mapping
 from types import SimpleNamespace
@@ -44,10 +45,16 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             if getattr(update.report, "type", "weights") != "features"
         ]
         if not eligible:
+            zero_delta = self._zero_delta(context)
+            if zero_delta is not None:
+                return zero_delta
             return {}
 
         total_samples = sum(update.report.num_samples for update, _ in eligible)
         if total_samples == 0:
+            zero_delta = self._zero_delta(context, eligible[0][1])
+            if zero_delta is not None:
+                return zero_delta
             return {}
 
         reference_update = eligible[0][1]
@@ -61,6 +68,9 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             await asyncio.sleep(0)
 
         if avg_update is None:
+            zero_delta = self._zero_delta(context, reference_update)
+            if zero_delta is not None:
+                return zero_delta
             return {}
 
         return self._match_reference_structure(avg_update, reference_update)
@@ -73,6 +83,9 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         context: ServerContext,
     ) -> dict | None:
         """Aggregate weights directly when possible."""
+        if not weights_received:
+            return copy.deepcopy(baseline_weights)
+
         eligible = [
             (update, weights_received[idx])
             for idx, update in enumerate(updates)
@@ -98,6 +111,26 @@ class FedAvgAggregationStrategy(AggregationStrategy):
             return None
 
         return self._match_reference_structure(avg_weights, baseline_weights)
+
+    def _zero_delta(
+        self, context: ServerContext, reference_update: Any | None = None
+    ) -> dict | None:
+        """Construct a zero delta matching the global model structure."""
+        algorithm = getattr(context, "algorithm", None)
+        if algorithm is None or not hasattr(algorithm, "extract_weights"):
+            return None
+
+        baseline_weights = algorithm.extract_weights()
+        zero_deltas = algorithm.compute_weight_deltas(
+            baseline_weights, [baseline_weights]
+        )
+        if not zero_deltas:
+            return None
+
+        zero_delta = zero_deltas[0]
+        if reference_update is not None:
+            return self._match_reference_structure(zero_delta, reference_update)
+        return zero_delta
 
     def _accumulate_weighted(
         self,

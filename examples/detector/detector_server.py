@@ -251,4 +251,21 @@ class Server(fedavg.Server):
         # Analyze detection performance.
         # self.detect_analysis(ids, received_ids)
 
+        malicious_set = set(malicious_ids)
+        keep_indices = [
+            index for index in range(len(weights_attacked)) if index not in malicious_set
+        ]
+
+        if keep_indices:
+            if len(weights_approved) != len(keep_indices):
+                weights_approved = [weights_attacked[index] for index in keep_indices]
+            self.updates = [self.updates[index] for index in keep_indices]
+        else:
+            self.updates = []
+            weights_approved = []
+            logging.info(
+                "[%s] All client updates were filtered. Keeping previous global weights.",
+                self,
+            )
+
         return weights_approved
