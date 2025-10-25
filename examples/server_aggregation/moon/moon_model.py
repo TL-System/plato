@@ -66,7 +66,7 @@ class Model(nn.Module):
 
     def forward_with_projection(
         self, x: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Return the hidden representation, projection, and logits.
 

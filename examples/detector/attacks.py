@@ -9,6 +9,7 @@ import logging
 import os
 import pickle
 from collections import OrderedDict
+from typing import Mapping, Sequence
 
 import numpy as np
 import torch
@@ -16,6 +17,8 @@ import torch.nn.functional as F
 from scipy.stats import norm
 
 from plato.config import Config
+
+WeightMapping = Mapping[str, torch.Tensor]
 
 
 def get():
@@ -75,35 +78,23 @@ def perform_model_poisoning(weights_received, poison_value):
     return weights_received
 
 
-def flatten_weight(weight):
-    flattened_weight = []
-    for name in weight.keys():
-        flattened_weight = (
-            weight[name].view(-1)
-            if not len(flattened_weight)
-            else torch.cat((flattened_weight, weight[name].view(-1)))
-        )
-    return flattened_weight
+def _flatten_single_weight(weight: WeightMapping) -> torch.Tensor:
+    """Flatten a single weight mapping into a 1-D tensor."""
+    flattened_parts = [param.reshape(-1) for param in weight.values()]
+    if not flattened_parts:
+        raise ValueError("Cannot flatten empty weight mapping.")
+    return torch.cat(flattened_parts)
 
 
-def flatten_weights(weights):
-    flattened_weights = []
+def flatten_weight(weight: WeightMapping) -> torch.Tensor:
+    return _flatten_single_weight(weight)
 
-    for weight in weights:
-        flattened_weight = []
-        for name in weight.keys():
-            flattened_weight = (
-                weight[name].view(-1)
-                if not len(flattened_weight)
-                else torch.cat((flattened_weight, weight[name].view(-1)))
-            )
 
-        flattened_weights = (
-            flattened_weight[None, :]
-            if not len(flattened_weights)
-            else torch.cat((flattened_weights, flattened_weight[None, :]), 0)
-        )
-    return flattened_weights
+def flatten_weights(weights: Sequence[WeightMapping]) -> torch.Tensor:
+    flattened_rows = [_flatten_single_weight(weight) for weight in weights]
+    if not flattened_rows:
+        return torch.empty((0, 0))
+    return torch.stack(flattened_rows)
 
 
 def compute_sali_indicator():
@@ -520,31 +511,26 @@ def oblivion_min_sum_attack(weights_received, dev_type="unit_vec"):
 
 def compute_lambda(attacker_weights, global_model_last_round, num_attackers):
     """Compute the lambda value for fang's attack."""
-    distances = []
-    num_benign_clients, d = (
-        attacker_weights.shape
-    )  # impractical, not sure how many benign clients are included.
+    distance_rows = [
+        torch.norm(attacker_weights - weight, dim=1) for weight in attacker_weights
+    ]
+    distances = torch.stack(distance_rows)
 
-    for weight in attacker_weights:
-        distance = torch.norm((attacker_weights - weight), dim=1)
-        distances = (
-            distance[None, :]
-            if not len(distances)
-            else torch.cat((distances, distance[None, :]), 0)
-        )
+    num_benign_clients, d = attacker_weights.shape
 
-    distances[distances == 0] = 10000
-    distances = torch.sort(distances, dim=1)[0]
+    distances = torch.where(
+        distances == 0, torch.full_like(distances, 10000), distances
+    )
+    distances, _ = torch.sort(distances, dim=1)
     scores = torch.sum(distances[:, : num_benign_clients - 2 - num_attackers], dim=1)
     score_min = torch.min(scores)
 
     # Calculate lambda
-    term_1 = score_min / (
-        (num_benign_clients - num_attackers - 1) * torch.sqrt(torch.Tensor([d]))[0]
-    )
+    sqrt_dim = torch.sqrt(attacker_weights.new_tensor(float(d)))
+    term_1 = score_min / ((num_benign_clients - num_attackers - 1) * sqrt_dim)
     max_wre_dist = (
         torch.max(torch.norm((attacker_weights - global_model_last_round), dim=1))
-        / (torch.sqrt(torch.Tensor([d]))[0])
+        / sqrt_dim
     )
     lambda_value = term_1 + max_wre_dist
 
@@ -553,40 +539,38 @@ def compute_lambda(attacker_weights, global_model_last_round, num_attackers):
 
 def multi_krum(attacker_weights, num_attackers, multi_k=False):
     """multi krum defence method in secure server aggregation"""
-    candidates = []
+    candidates: list[torch.Tensor] = []
     candidate_indices = []
     remaining_updates = attacker_weights
     all_indices = np.arange(len(attacker_weights))
 
     while len(remaining_updates) > 2 * num_attackers + 2:
-        distances = []
-        for update in remaining_updates:
-            distance = torch.norm((remaining_updates - update), dim=1) ** 2
-            distances = (
-                distance[None, :]
-                if not len(distances)
-                else torch.cat((distances, distance[None, :]), 0)
-            )
-
-        distances = torch.sort(distances, dim=1)[0]
+        distance_rows = [
+            torch.norm((remaining_updates - update), dim=1) ** 2
+            for update in remaining_updates
+        ]
+        distances = torch.stack(distance_rows)
+        distances, _ = torch.sort(distances, dim=1)
         scores = torch.sum(
             distances[:, : len(remaining_updates) - 2 - num_attackers], dim=1
         )
         indices = torch.argsort(scores)[: len(remaining_updates) - 2 - num_attackers]
 
-        candidate_indices.append(all_indices[indices[0].cpu().numpy()])
-        all_indices = np.delete(all_indices, indices[0].cpu().numpy())
-        candidates = (
-            remaining_updates[indices[0]][None, :]
-            if not len(candidates)
-            else torch.cat((candidates, remaining_updates[indices[0]][None, :]), 0)
-        )
+        selected_index = int(indices[0].item())
+        candidate_indices.append(all_indices[selected_index])
+        all_indices = np.delete(all_indices, selected_index)
+        candidates.append(remaining_updates[selected_index])
         remaining_updates = torch.cat(
-            (remaining_updates[: indices[0]], remaining_updates[indices[0] + 1 :]), 0
+            (
+                remaining_updates[:selected_index],
+                remaining_updates[selected_index + 1 :],
+            ),
+            0,
         )
         if not multi_k:
             break
-    weights_avg = torch.mean(candidates, dim=0)
+    candidates_tensor = torch.stack(candidates)
+    weights_avg = torch.mean(candidates_tensor, dim=0)
     return weights_avg, np.array(candidate_indices)
 
 

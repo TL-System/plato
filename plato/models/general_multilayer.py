@@ -21,7 +21,7 @@ some cases, since intuitively BN provides similar regularization benefits as Dro
 """
 
 from collections import OrderedDict
-from typing import Dict, List, Union
+from typing import Any, Dict, List
 
 from torch import nn
 
@@ -35,7 +35,7 @@ activations_func = {
 
 # pylint: disable=too-many-locals
 def build_mlp_from_config(
-    mlp_configs: Dict[str, Union[int, List[Union[str, None, dict]]]],
+    mlp_configs: dict[str, Any],
     layer_name_prefix: str = "layer",
 ):
     """
@@ -55,16 +55,23 @@ def build_mlp_from_config(
     input_dim = mlp_configs["input_dim"]
     output_dim = mlp_configs["output_dim"]
 
-    hidden_layers_dim = mlp_configs["hidden_layers_dim"]
+    hidden_layers_dim_raw = mlp_configs["hidden_layers_dim"]
+    if not isinstance(hidden_layers_dim_raw, list):
+        raise TypeError("hidden_layers_dim must be provided as a list of integers.")
+    hidden_layers_dim = list(hidden_layers_dim_raw)
     hidden_n = len(hidden_layers_dim)
 
     batch_norms = mlp_configs["batch_norms"]
     activations = mlp_configs["activations"]
-    dropout_porbs = (
-        mlp_configs["dropout_ratios"]
-        if isinstance(mlp_configs["dropout_ratios"], list)
-        else [mlp_configs["dropout_ratios"]]
-    )
+    dropout_porbs_raw = mlp_configs["dropout_ratios"]
+
+    if not isinstance(batch_norms, list) or not isinstance(activations, list):
+        raise TypeError("batch_norms and activations must be provided as lists.")
+
+    if isinstance(dropout_porbs_raw, list):
+        dropout_porbs = dropout_porbs_raw
+    else:
+        dropout_porbs = [float(dropout_porbs_raw)]
 
     assert len(batch_norms) == len(activations) == len(dropout_porbs)
     assert hidden_n == len(batch_norms) - 1
@@ -129,7 +136,7 @@ class Model:
         model_name: str,
         input_dim: int,
         output_dim: int,
-        **kwargs: Dict[str, Union[int, List[Union[str, None, dict]]]],
+        **kwargs: dict[str, Any],
     ):
         # pylint:disable=too-many-return-statements
         """Get the desired MLP model with required hyper-parameters (input_dim)."""

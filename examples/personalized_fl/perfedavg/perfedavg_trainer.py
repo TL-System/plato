@@ -6,6 +6,8 @@ to implement meta-learning style training with dual learning rates.
 """
 
 import copy
+from collections.abc import Callable, Iterable, Iterator
+from typing import Optional, Tuple, cast
 
 import torch
 
@@ -33,7 +35,9 @@ class PerFedAvgTrainingStepStrategy(TrainingStepStrategy):
 
     def __init__(self):
         """Initialize the Per-FedAvg training step strategy."""
-        self.iter_trainloader = None
+        self.iter_trainloader: Optional[Iterator[Tuple[torch.Tensor, torch.Tensor]]] = (
+            None
+        )
 
     def training_step(
         self,
@@ -41,7 +45,7 @@ class PerFedAvgTrainingStepStrategy(TrainingStepStrategy):
         optimizer,
         examples,
         labels,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform Per-FedAvg training step based on current phase."""
@@ -79,15 +83,33 @@ class PerFedAvgTrainingStepStrategy(TrainingStepStrategy):
 
             # Get next batch from train loader
             train_loader = context.state.get("train_loader")
-            if self.iter_trainloader is None and train_loader is not None:
-                self.iter_trainloader = iter(train_loader)
+            if train_loader is None:
+                raise RuntimeError(
+                    "Per-FedAvg requires a train_loader in the context state."
+                )
+            if not isinstance(train_loader, Iterable):
+                raise RuntimeError(
+                    "train_loader must be iterable for Per-FedAvg training."
+                )
+            iterable_loader = cast(
+                Iterable[Tuple[torch.Tensor, torch.Tensor]], train_loader
+            )
+
+            if self.iter_trainloader is None:
+                self.iter_trainloader = iter(iterable_loader)
 
             try:
-                examples, labels = next(self.iter_trainloader)
+                iterator = self.iter_trainloader
+                if iterator is None:
+                    raise RuntimeError("Training iterator failed to initialize.")
+                examples, labels = next(iterator)
             except StopIteration:
                 # Restart iterator if we've exhausted the dataset
-                self.iter_trainloader = iter(train_loader)
-                examples, labels = next(self.iter_trainloader)
+                self.iter_trainloader = iter(iterable_loader)
+                iterator = self.iter_trainloader
+                if iterator is None:
+                    raise RuntimeError("Training iterator failed to initialize.")
+                examples, labels = next(iterator)
 
             examples, labels = examples.to(context.device), labels.to(context.device)
             logits = model(examples)
@@ -113,8 +135,17 @@ class PerFedAvgCallback(TrainerCallback):
         """Reset the data loader iterator at the start of each epoch."""
         if hasattr(trainer.training_step_strategy, "iter_trainloader"):
             train_loader = trainer.context.state.get("train_loader")
-            if train_loader is not None:
-                trainer.training_step_strategy.iter_trainloader = iter(train_loader)
+            if train_loader is None:
+                trainer.training_step_strategy.iter_trainloader = None
+                return
+            if not isinstance(train_loader, Iterable):
+                raise RuntimeError(
+                    "train_loader must be iterable for Per-FedAvg training."
+                )
+            iterable_loader = cast(
+                Iterable[Tuple[torch.Tensor, torch.Tensor]], train_loader
+            )
+            trainer.training_step_strategy.iter_trainloader = iter(iterable_loader)
 
 
 class Trainer(basic.Trainer):

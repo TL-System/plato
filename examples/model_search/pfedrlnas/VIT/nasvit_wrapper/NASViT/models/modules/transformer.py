@@ -34,7 +34,7 @@ from .static_layers import (
 
 class DynamicMlp(MyModule):
     def __init__(self, hidden_features_list, out_features, bias=True, act_layer=None):
-        super(DynamicMlp, self).__init__()
+        super().__init__()
         self.hidden_features_list = int2list(hidden_features_list)
         self.out_features = out_features
         self.in_features = out_features
@@ -158,7 +158,7 @@ class OutlookAttention(MyModule):
         act_layer="relu6",
         downsample=1,
     ):
-        super(OutlookAttention, self).__init__()
+        super().__init__()
         self.dim_list = dim_list
         self.head_dim = 8
         head_dim = self.head_dim
@@ -267,7 +267,7 @@ class DynamicWindowAttention(MyModule):
         act_layer="relu6",
         downsample=1,
     ):
-        super(DynamicWindowAttention, self).__init__()
+        super().__init__()
 
         self.dim_list = dim_list
         # self.head_dim = max(dim_list) // num_heads
@@ -499,7 +499,7 @@ class DynamicSwinTransformerBlock(MyModule):
         rescale=1.0,
         shift=False,
     ):
-        super(DynamicSwinTransformerBlock, self).__init__()
+        super().__init__()
         self.dim_list = dim_list
         self.dim = max(dim_list)
         self.rescale = rescale
@@ -674,7 +674,7 @@ class DynamicPatchMerging(nn.Module):
     """
 
     def __init__(self, dim, out_dim, norm_layer=nn.LayerNorm):
-        super(DynamicPatchMerging, self).__init__()
+        super().__init__()
         self.dim = dim
         self.reduction = DynamicLinear(4 * dim, out_dim, bias=False)
         self.norm = norm_layer(4 * dim)

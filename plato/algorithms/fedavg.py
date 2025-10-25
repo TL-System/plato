@@ -3,6 +3,10 @@ The federated averaging algorithm for PyTorch.
 """
 
 from collections import OrderedDict
+from collections.abc import MutableMapping
+from typing import Any, Optional
+
+from torch.nn import Module
 
 from plato.algorithms import base
 
@@ -10,7 +14,11 @@ from plato.algorithms import base
 class Algorithm(base.Algorithm):
     """PyTorch-based federated averaging algorithm, used by both the client and the server."""
 
-    def compute_weight_deltas(self, baseline_weights, weights_received):
+    def compute_weight_deltas(
+        self,
+        baseline_weights: MutableMapping[str, Any],
+        weights_received,
+    ):
         """Compute the deltas between baseline weights and weights received."""
         # Calculate updates from the received weights
         deltas = []
@@ -36,13 +44,16 @@ class Algorithm(base.Algorithm):
 
         return updated_weights
 
-    def extract_weights(self, model=None):
+    def extract_weights(self, model: Module | None = None):
         """Extracts weights from the model."""
+        target_model: Module
         if model is None:
-            return self.model.cpu().state_dict()
+            target_model = self.require_model()
         else:
-            return model.cpu().state_dict()
+            target_model = model
+        return target_model.cpu().state_dict()
 
     def load_weights(self, weights):
         """Loads the model weights passed in as a parameter."""
-        self.model.load_state_dict(weights, strict=True)
+        model: Module = self.require_model()
+        model.load_state_dict(weights, strict=True)

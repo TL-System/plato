@@ -30,7 +30,7 @@ import logging
 import os
 import pickle
 from collections import OrderedDict
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 import torch
 
@@ -87,7 +87,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         3. Update server control variate: c += (1/K) * Σ Δc_i
     """
 
-    def __init__(self, save_path: Optional[str] = None):
+    def __init__(self, save_path: str | None = None):
         """
         Initialize SCAFFOLD update strategy.
 
@@ -95,12 +95,12 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
             save_path: Optional custom path for saving client control variates
         """
         self.save_path = save_path
-        self.server_control_variate = None
-        self.client_control_variate = None
-        self.global_model_weights = None
+        self.server_control_variate: OrderedDict[str, torch.Tensor] | None = None
+        self.client_control_variate: OrderedDict[str, torch.Tensor] | None = None
+        self.global_model_weights: OrderedDict[str, torch.Tensor] | None = None
         self.local_steps = 0
-        self.learning_rate = None
-        self.client_control_variate_path = None
+        self.learning_rate: float | None = None
+        self.client_control_variate_path: str | None = None
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -156,6 +156,10 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         # Receive server control variate from context
         self.server_control_variate = context.state.get("server_control_variate")
 
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+
         if self.server_control_variate is None:
             logging.warning(
                 "[Client #%d] No server_control_variate found in context. "
@@ -164,7 +168,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
             )
             # Initialize server control variate with zeros
             self.server_control_variate = OrderedDict()
-            for name, param in context.model.named_parameters():
+            for name, param in model.named_parameters():
                 self.server_control_variate[name] = torch.zeros_like(param)
 
         # Initialize client control variate if first time
@@ -174,11 +178,13 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
                 context.client_id,
             )
             self.client_control_variate = OrderedDict()
-            for name, param in context.model.named_parameters():
+            for name, param in model.named_parameters():
                 self.client_control_variate[name] = torch.zeros_like(param)
 
         # Save global model weights for Option 2 in the paper
-        self.global_model_weights = copy.deepcopy(context.model.state_dict())
+        self.global_model_weights = cast(
+            OrderedDict[str, torch.Tensor], copy.deepcopy(model.state_dict())
+        )
 
         # Reset local step counter
         self.local_steps = 0
@@ -212,17 +218,27 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         else:
             lr = Config().trainer.lr if hasattr(Config().trainer, "lr") else 0.01
 
+        server_control_variate = self.server_control_variate
+        client_control_variate = self.client_control_variate
+        if server_control_variate is None or client_control_variate is None:
+            raise RuntimeError(
+                "SCAFFOLD control variates have not been initialised before after_step."
+            )
+
         # Apply control variate correction: w += lr * (c - c_i)
         # Only apply to weight and bias parameters (matching original implementation)
         with torch.no_grad():
-            for name, param in context.model.named_parameters():
+            model = context.model
+            if model is None:
+                raise ValueError("Training context must provide a model for SCAFFOLD.")
+            for name, param in model.named_parameters():
                 if (
                     ("weight" in name or "bias" in name)
-                    and name in self.server_control_variate
-                    and name in self.client_control_variate
+                    and name in server_control_variate
+                    and name in client_control_variate
                 ):
-                    server_cv = self.server_control_variate[name].to(param.device)
-                    client_cv = self.client_control_variate[name].to(param.device)
+                    server_cv = server_control_variate[name].to(param.device)
+                    client_cv = client_control_variate[name].to(param.device)
 
                     # Correction term
                     correction = server_cv - client_cv
@@ -298,18 +314,33 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         new_client_cv = OrderedDict()
         delta_cv = OrderedDict()
 
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+        global_model_weights = self.global_model_weights
+        client_control_variate = self.client_control_variate
+        server_control_variate = self.server_control_variate
+        if (
+            global_model_weights is None
+            or client_control_variate is None
+            or server_control_variate is None
+        ):
+            raise RuntimeError(
+                "SCAFFOLD control variates have not been initialised before train end."
+            )
+
+        for name, param in model.named_parameters():
             # Current local model parameter
             x_local = param.data
 
             # Initial global model parameter
-            x_global = self.global_model_weights[name]
+            x_global = global_model_weights[name]
 
             # Old client control variate
-            c_i_old = self.client_control_variate[name]
+            c_i_old = client_control_variate[name]
 
             # Server control variate
-            c = self.server_control_variate[name].to(param.device)
+            c = server_control_variate[name].to(param.device)
 
             # Compute new client control variate
             # c_i^new = c - (1/(η*τ)) * (x_local - x_global)
@@ -326,13 +357,19 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         self.client_control_variate = new_client_cv
 
         # Save client control variate to disk
+        client_control_variate_path = self.client_control_variate_path
+        if client_control_variate_path is None:
+            raise RuntimeError(
+                "SCAFFOLD client control variate path has not been initialised."
+            )
+
         try:
-            with open(self.client_control_variate_path, "wb") as f:
+            with open(client_control_variate_path, "wb") as f:
                 pickle.dump(self.client_control_variate, f)
             logging.info(
                 "[Client #%d] Saved SCAFFOLD control variate to %s",
                 context.client_id,
-                self.client_control_variate_path,
+                client_control_variate_path,
             )
         except Exception as e:
             logging.error(
@@ -344,7 +381,7 @@ class SCAFFOLDUpdateStrategy(ModelUpdateStrategy):
         # Store delta in context for server
         context.state["client_control_variate_delta"] = delta_cv
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """
         Return control variate delta to send to server.
 
@@ -390,10 +427,10 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         ... )
     """
 
-    def __init__(self, save_path: Optional[str] = None):
+    def __init__(self, save_path: str | None = None):
         """Initialize SCAFFOLD V2 strategy."""
         super().__init__(save_path=save_path)
-        self.accumulated_updates = None
+        self.accumulated_updates: OrderedDict[str, torch.Tensor] | None = None
 
     def on_train_start(self, context: TrainingContext) -> None:
         """Initialize update accumulator."""
@@ -401,7 +438,10 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
 
         # Initialize accumulator for Option 1
         self.accumulated_updates = OrderedDict()
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+        for name, param in model.named_parameters():
             self.accumulated_updates[name] = torch.zeros_like(param)
 
     def before_step(self, context: TrainingContext) -> None:
@@ -409,7 +449,10 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         if not hasattr(self, "_weights_before_step"):
             self._weights_before_step = OrderedDict()
 
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for SCAFFOLD.")
+        for name, param in model.named_parameters():
             self._weights_before_step[name] = param.data.clone()
 
     def after_step(self, context: TrainingContext) -> None:
@@ -421,11 +464,19 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         """
         # First accumulate the update for Option 1
         if hasattr(self, "_weights_before_step"):
-            for name, param in context.model.named_parameters():
+            model = context.model
+            if model is None:
+                raise ValueError("Training context must provide a model for SCAFFOLD.")
+            accumulated_updates = self.accumulated_updates
+            if accumulated_updates is None:
+                raise RuntimeError(
+                    "SCAFFOLD accumulated updates have not been initialised before after_step."
+                )
+            for name, param in model.named_parameters():
                 w_before = self._weights_before_step[name]
                 w_after = param.data
                 update = w_before - w_after
-                self.accumulated_updates[name] += update.cpu()
+                accumulated_updates[name] += update.cpu()
 
         # Then apply the standard SCAFFOLD correction
         super().after_step(context)
@@ -451,17 +502,24 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         # Number of local steps
         tau = max(1, self.local_steps)
 
+        accumulated_updates = self.accumulated_updates
+        client_control_variate = self.client_control_variate
+        if accumulated_updates is None or client_control_variate is None:
+            raise RuntimeError(
+                "SCAFFOLD accumulated updates or client control variate is missing."
+            )
+
         # Compute new client control variate using Option 1
         new_client_cv = OrderedDict()
         delta_cv = OrderedDict()
 
-        for name in self.accumulated_updates:
+        for name in accumulated_updates:
             # Old client control variate
-            c_i_old = self.client_control_variate[name]
+            c_i_old = client_control_variate[name]
 
             # Compute new client control variate using accumulated updates
             # c_i^new = (1/(τ*η)) * Σ (w_t - w_{t+1})
-            c_i_new = self.accumulated_updates[name] / (tau * eta)
+            c_i_new = accumulated_updates[name] / (tau * eta)
 
             # Compute delta
             delta = c_i_new - c_i_old
@@ -474,13 +532,19 @@ class SCAFFOLDUpdateStrategyV2(SCAFFOLDUpdateStrategy):
         self.client_control_variate = new_client_cv
 
         # Save to disk
+        client_control_variate_path = self.client_control_variate_path
+        if client_control_variate_path is None:
+            raise RuntimeError(
+                "SCAFFOLD client control variate path has not been initialised."
+            )
+
         try:
-            with open(self.client_control_variate_path, "wb") as f:
+            with open(client_control_variate_path, "wb") as f:
                 pickle.dump(self.client_control_variate, f)
             logging.info(
                 "[Client #%d] Saved SCAFFOLD control variate to %s",
                 context.client_id,
-                self.client_control_variate_path,
+                client_control_variate_path,
             )
         except Exception as e:
             logging.error(

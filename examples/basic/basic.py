@@ -4,9 +4,9 @@ the training and validation datasets, as well as the training and testing loops 
 be customized in Plato.
 """
 
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
-from typing import Callable
 
 import torch
 from torch import nn

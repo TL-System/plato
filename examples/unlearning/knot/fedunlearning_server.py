@@ -34,12 +34,20 @@ class Server(fedavg.Server):
     in the configuration.
     """
 
-    def __init__(self, model=None, datasource=None, algorithm=None, trainer=None):
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        **kwargs,
+    ):
         super().__init__(
             model=model,
             datasource=datasource,
             algorithm=algorithm,
             trainer=trainer,
+            **kwargs,
         )
 
         self.retraining = False
@@ -141,7 +149,12 @@ class Server(fedavg.Server):
                     else "custom"
                 )
                 filename = f"checkpoint_{model_name}_{self.current_round}.pth"
-                self.trainer.load_model(filename, checkpoint_path)
+                trainer = self.trainer
+                if trainer is None or not hasattr(trainer, "load_model"):
+                    raise RuntimeError(
+                        "Trainer with a load_model method is required for retraining."
+                    )
+                trainer.load_model(filename, checkpoint_path)
 
                 logging.info(
                     "[Server #%d] Model used for the retraining phase loaded from %s.",

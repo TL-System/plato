@@ -24,7 +24,7 @@ from plato.models import (
 try:  # pragma: no cover - optional MLX models
     from plato.models.mlx import lenet5 as mlx_lenet5
 except ImportError:  # pragma: no cover
-    mlx_lenet5 = None
+    mlx_lenet5 = cast(Any, None)
 
 registered_models = {
     "lenet5": lenet5.Model,
@@ -50,7 +50,7 @@ if mlx_lenet5 is not None:
 class ModelKwargs(TypedDict, total=False):
     model_name: str
     model_type: str
-    model_params: Dict[str, Any]
+    model_params: dict[str, Any]
 
 
 def get(**kwargs: Any) -> Any:
@@ -97,9 +97,9 @@ def get(**kwargs: Any) -> Any:
         model_type = model_name.split("_")[0]
 
     # Get model parameters
-    model_params: Dict[str, Any] = {}
+    model_params: dict[str, Any] = {}
     if "model_params" in kwargs:
-        model_params = cast(Dict[str, Any], kwargs["model_params"])
+        model_params = cast(dict[str, Any], kwargs["model_params"])
     elif hasattr(config, "parameters"):
         parameters = getattr(config, "parameters")
         if hasattr(parameters, "model"):

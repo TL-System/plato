@@ -5,12 +5,19 @@ This module provides default and common training step strategies for
 the composable trainer architecture.
 """
 
-from typing import Optional
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import List, Optional
 
 import torch
 import torch.nn as nn
 
 from plato.trainers.strategies.base import TrainingContext, TrainingStepStrategy
+
+LossFn = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
+BackwardHook = Callable[[nn.Module, torch.Tensor, TrainingContext], None]
+AggregateFn = Callable[[list[torch.Tensor]], torch.Tensor]
 
 
 class DefaultTrainingStepStrategy(TrainingStepStrategy):
@@ -44,7 +51,7 @@ class DefaultTrainingStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform standard training step."""
@@ -98,7 +105,7 @@ class GradientAccumulationStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with gradient accumulation."""
@@ -142,7 +149,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
         >>> trainer = ComposableTrainer(training_step_strategy=strategy)
     """
 
-    def __init__(self, enabled: Optional[bool] = None, create_graph: bool = False):
+    def __init__(self, enabled: bool | None = None, create_graph: bool = False):
         """Initialize mixed precision parameters."""
         self.enabled = enabled
         self.create_graph = create_graph
@@ -163,7 +170,7 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with mixed precision."""
@@ -222,7 +229,7 @@ class GradientClippingStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with gradient clipping."""
@@ -271,7 +278,7 @@ class CustomBackwardStepStrategy(TrainingStepStrategy):
         >>> trainer = ComposableTrainer(training_step_strategy=strategy)
     """
 
-    def __init__(self, backward_hook: callable, create_graph: bool = False):
+    def __init__(self, backward_hook: BackwardHook, create_graph: bool = False):
         """Initialize custom backward step parameters."""
         self.backward_hook = backward_hook
         self.create_graph = create_graph
@@ -282,7 +289,7 @@ class CustomBackwardStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with custom backward."""
@@ -329,7 +336,7 @@ class MultipleForwardPassStepStrategy(TrainingStepStrategy):
     def __init__(
         self,
         num_passes: int = 2,
-        aggregate_fn: Optional[callable] = None,
+        aggregate_fn: AggregateFn | None = None,
         create_graph: bool = False,
     ):
         """Initialize multiple forward pass parameters."""
@@ -338,9 +345,14 @@ class MultipleForwardPassStepStrategy(TrainingStepStrategy):
         self.create_graph = create_graph
 
     @staticmethod
-    def _default_aggregate(losses):
+    def _default_aggregate(losses: list[torch.Tensor]) -> torch.Tensor:
         """Default aggregation: mean of losses."""
-        return sum(losses) / len(losses)
+        if not losses:
+            raise ValueError("At least one loss tensor is required for aggregation.")
+        total = losses[0]
+        for loss in losses[1:]:
+            total = total + loss
+        return total / len(losses)
 
     def training_step(
         self,
@@ -348,13 +360,13 @@ class MultipleForwardPassStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step with multiple forward passes."""
         optimizer.zero_grad()
 
-        losses = []
+        losses: list[torch.Tensor] = []
         for _ in range(self.num_passes):
             # Forward pass
             outputs = model(examples)
@@ -403,7 +415,7 @@ class ValidateBeforeStepStrategy(TrainingStepStrategy):
         check_outputs: bool = True,
         check_gradients: bool = True,
         raise_on_error: bool = False,
-        base_strategy: Optional[TrainingStepStrategy] = None,
+        base_strategy: TrainingStepStrategy | None = None,
     ):
         """Initialize validation parameters."""
         self.check_inputs = check_inputs
@@ -440,7 +452,7 @@ class ValidateBeforeStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: LossFn,
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform validated training step."""

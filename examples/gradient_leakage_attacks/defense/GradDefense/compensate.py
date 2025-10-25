@@ -54,7 +54,7 @@ def denoise(gradients: list, scale: float, q: float):
     """Denoise gradients."""
     layer_dims_pool = []
     for layer in gradients:
-        layer_dims = list((_ for _ in layer.shape))
+        layer_dims = list(_ for _ in layer.shape)
         layer_dims_pool.append(layer_dims)
 
     layer_params_num_pool = []

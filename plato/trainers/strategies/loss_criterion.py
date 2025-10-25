@@ -5,6 +5,7 @@ This module provides default and common loss criterion strategies for
 the composable trainer architecture.
 """
 
+from collections.abc import Callable
 from typing import Optional
 
 import torch
@@ -29,10 +30,15 @@ class DefaultLossCriterionStrategy(LossCriterionStrategy):
         >>> trainer = ComposableTrainer(loss_strategy=strategy)
     """
 
-    def __init__(self, loss_fn: Optional[callable] = None):
+    def __init__(
+        self,
+        loss_fn: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None = None,
+    ):
         """Initialize with optional custom loss function."""
         self.loss_fn = loss_fn
-        self._criterion = None
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize the loss criterion."""
@@ -42,11 +48,20 @@ class DefaultLossCriterionStrategy(LossCriterionStrategy):
         else:
             self._criterion = self.loss_fn
 
+    def _get_criterion(
+        self,
+    ) -> Callable[[torch.Tensor, torch.Tensor], torch.Tensor]:
+        if self._criterion is None:
+            raise RuntimeError(
+                "Loss criterion has not been initialised. Did you forget to call setup()?"
+            )
+        return self._criterion
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """Compute loss using the configured criterion."""
-        return self._criterion(outputs, labels)
+        return self._get_criterion()(outputs, labels)
 
 
 class CrossEntropyLossStrategy(LossCriterionStrategy):
@@ -66,7 +81,7 @@ class CrossEntropyLossStrategy(LossCriterionStrategy):
 
     def __init__(
         self,
-        weight: Optional[torch.Tensor] = None,
+        weight: torch.Tensor | None = None,
         label_smoothing: float = 0.0,
         reduction: str = "mean",
         ignore_index: int = -100,
@@ -76,7 +91,9 @@ class CrossEntropyLossStrategy(LossCriterionStrategy):
         self.label_smoothing = label_smoothing
         self.reduction = reduction
         self.ignore_index = ignore_index
-        self._criterion = None
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize the cross-entropy loss criterion."""
@@ -87,11 +104,20 @@ class CrossEntropyLossStrategy(LossCriterionStrategy):
             label_smoothing=self.label_smoothing,
         )
 
+    def _get_criterion(
+        self,
+    ) -> Callable[[torch.Tensor, torch.Tensor], torch.Tensor]:
+        if self._criterion is None:
+            raise RuntimeError(
+                "CrossEntropyLossStrategy must be initialised via setup() before use."
+            )
+        return self._criterion
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """Compute cross-entropy loss."""
-        return self._criterion(outputs, labels)
+        return self._get_criterion()(outputs, labels)
 
 
 class MSELossStrategy(LossCriterionStrategy):
@@ -109,17 +135,28 @@ class MSELossStrategy(LossCriterionStrategy):
     def __init__(self, reduction: str = "mean"):
         """Initialize MSE loss parameters."""
         self.reduction = reduction
-        self._criterion = None
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize the MSE loss criterion."""
         self._criterion = nn.MSELoss(reduction=self.reduction)
 
+    def _get_criterion(
+        self,
+    ) -> Callable[[torch.Tensor, torch.Tensor], torch.Tensor]:
+        if self._criterion is None:
+            raise RuntimeError(
+                "MSELossStrategy must be initialised via setup() before use."
+            )
+        return self._criterion
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """Compute MSE loss."""
-        return self._criterion(outputs, labels)
+        return self._get_criterion()(outputs, labels)
 
 
 class BCEWithLogitsLossStrategy(LossCriterionStrategy):
@@ -138,15 +175,17 @@ class BCEWithLogitsLossStrategy(LossCriterionStrategy):
 
     def __init__(
         self,
-        weight: Optional[torch.Tensor] = None,
+        weight: torch.Tensor | None = None,
         reduction: str = "mean",
-        pos_weight: Optional[torch.Tensor] = None,
+        pos_weight: torch.Tensor | None = None,
     ):
         """Initialize BCE with logits loss parameters."""
         self.weight = weight
         self.reduction = reduction
         self.pos_weight = pos_weight
-        self._criterion = None
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize the BCE with logits loss criterion."""
@@ -156,11 +195,20 @@ class BCEWithLogitsLossStrategy(LossCriterionStrategy):
             pos_weight=self.pos_weight,
         )
 
+    def _get_criterion(
+        self,
+    ) -> Callable[[torch.Tensor, torch.Tensor], torch.Tensor]:
+        if self._criterion is None:
+            raise RuntimeError(
+                "BCEWithLogitsLossStrategy must be initialised via setup() before use."
+            )
+        return self._criterion
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """Compute BCE with logits loss."""
-        return self._criterion(outputs, labels)
+        return self._get_criterion()(outputs, labels)
 
 
 class NLLLossStrategy(LossCriterionStrategy):
@@ -181,7 +229,7 @@ class NLLLossStrategy(LossCriterionStrategy):
 
     def __init__(
         self,
-        weight: Optional[torch.Tensor] = None,
+        weight: torch.Tensor | None = None,
         reduction: str = "mean",
         ignore_index: int = -100,
     ):
@@ -189,7 +237,9 @@ class NLLLossStrategy(LossCriterionStrategy):
         self.weight = weight
         self.reduction = reduction
         self.ignore_index = ignore_index
-        self._criterion = None
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize the NLL loss criterion."""
@@ -199,11 +249,20 @@ class NLLLossStrategy(LossCriterionStrategy):
             reduction=self.reduction,
         )
 
+    def _get_criterion(
+        self,
+    ) -> Callable[[torch.Tensor, torch.Tensor], torch.Tensor]:
+        if self._criterion is None:
+            raise RuntimeError(
+                "NLLLossStrategy must be initialised via setup() before use."
+            )
+        return self._criterion
+
     def compute_loss(
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """Compute NLL loss."""
-        return self._criterion(outputs, labels)
+        return self._get_criterion()(outputs, labels)
 
 
 class CompositeLossStrategy(LossCriterionStrategy):
@@ -292,7 +351,13 @@ class L2RegularizationStrategy(LossCriterionStrategy):
         """Compute L2 regularization term."""
         l2_loss = torch.tensor(0.0, device=outputs.device)
 
-        for param in context.model.parameters():
+        model = context.model
+        if model is None:
+            raise ValueError(
+                "Training context must provide a model for L2 regularization."
+            )
+
+        for param in model.parameters():
             l2_loss = l2_loss + torch.sum(param**2)
 
         return self.weight * l2_loss

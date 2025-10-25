@@ -16,6 +16,7 @@ not be used to compare with the accuracy in supervised learning methods.
 
 import logging
 from collections import UserList
+from collections.abc import Callable
 
 import torch
 from lightly.data.multi_view_collate import MultiViewCollate
@@ -172,6 +173,8 @@ class SSLLossCriterionStrategy(LossCriterionStrategy):
         # SSL training phase
         else:
             # Handle different output types
+            if self._ssl_criterion is None:
+                raise RuntimeError("SSL loss criterion has not been initialised.")
             if isinstance(outputs, (list, tuple)):
                 return self._ssl_criterion(*outputs)
             return self._ssl_criterion(outputs)
@@ -293,7 +296,7 @@ class SSLTrainingStepStrategy(TrainingStepStrategy):
         optimizer,
         examples,
         labels,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform training step based on current phase."""
@@ -306,6 +309,8 @@ class SSLTrainingStepStrategy(TrainingStepStrategy):
             # Extract features using frozen encoder
             features = model.encoder(examples)
             # Train local layers
+            if self.local_layers is None:
+                raise RuntimeError("Local personalization layers are not initialised.")
             outputs = self.local_layers(features)
 
             loss = loss_criterion(outputs, labels)
@@ -406,6 +411,8 @@ class SSLTestingStrategy(TestingStrategy):
 
     def _test_with_local_layers(self, model, testset, sampler, batch_size, context):
         """Test using trained local layers."""
+        if self.local_layers is None:
+            raise RuntimeError("Local personalization layers are not initialised.")
         self.local_layers.eval()
         self.local_layers.to(context.device)
 
@@ -430,6 +437,10 @@ class SSLTestingStrategy(TestingStrategy):
                 )
 
                 features = model.encoder(examples)
+                if self.local_layers is None:
+                    raise RuntimeError(
+                        "Local personalization layers are not initialised."
+                    )
                 outputs = self.local_layers(features)
 
                 _, predicted = torch.max(outputs.data, 1)
@@ -447,6 +458,8 @@ class SSLTestingStrategy(TestingStrategy):
         sampler_obj = self._convert_sampler(sampler)
 
         # Get the training loader and test loader
+        if self.personalized_trainset is None:
+            raise RuntimeError("Personalized trainset is not available.")
         train_loader = torch.utils.data.DataLoader(
             dataset=self.personalized_trainset,
             shuffle=False,
@@ -613,8 +626,8 @@ class Trainer(BasicTrainer):
 
         # Update the data loader strategy with new personalized trainset
         if hasattr(self, "data_loader_strategy"):
-            self.data_loader_strategy.personalized_trainset = trainset
+            setattr(self.data_loader_strategy, "personalized_trainset", trainset)
 
         # Update the testing strategy with new personalized trainset
         if hasattr(self, "testing_strategy"):
-            self.testing_strategy.personalized_trainset = trainset
+            setattr(self.testing_strategy, "personalized_trainset", trainset)

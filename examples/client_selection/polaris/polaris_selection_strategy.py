@@ -69,10 +69,10 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         """Sample clients according to the optimised probability distribution."""
         self._ensure_solver_available()
 
@@ -106,7 +106,7 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
         return selected_clients
 
     def on_reports_received(
-        self, updates: List[SimpleNamespace], context: ServerContext
+        self, updates: list[SimpleNamespace], context: ServerContext
     ) -> None:
         """Update staleness and aggregation weights from received reports."""
         if not updates:
@@ -144,7 +144,7 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
         ):
             raise ImportError("PolarisSelectionStrategy requires 'mosek' and 'cvxopt'.")
 
-    def _calculate_selection_probability(self, clients_pool: List[int]) -> np.ndarray:
+    def _calculate_selection_probability(self, clients_pool: list[int]) -> np.ndarray:
         """Solve the geometric program defining Polaris sampling probabilities."""
         zero_indexed = [client_id - 1 for client_id in clients_pool]
         num_clients = len(zero_indexed)

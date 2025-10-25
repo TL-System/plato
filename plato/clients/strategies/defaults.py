@@ -41,7 +41,7 @@ class DefaultLifecycleStrategy(LifecycleStrategy):
     """Legacy lifecycle implementation copied from `simple.Client`."""
 
     def process_server_response(
-        self, context: ClientContext, server_response: Dict[str, Any]
+        self, context: ClientContext, server_response: dict[str, Any]
     ) -> None:
         """
         Default implementation mirrors legacy behaviour (no-op).
@@ -191,7 +191,7 @@ class DefaultPayloadStrategy(PayloadStrategy):
         context: ClientContext,
         client_id: int,
         *,
-        s3_key: Optional[str] = None,
+        s3_key: str | None = None,
     ) -> Any:
         """Reconstruct inbound payload and log payload statistics."""
         if client_id != context.client_id:
@@ -291,7 +291,7 @@ class DefaultTrainingStrategy(TrainingStrategy):
             raise RuntimeError("Algorithm is required before loading payload.")
         context.algorithm.load_weights(server_payload)
 
-    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> tuple[Any, Any]:
         LOGGER.info(
             fonts.colourize(
                 f"[{context}] Started training in communication "
@@ -348,7 +348,11 @@ class DefaultTrainingStrategy(TrainingStrategy):
             hasattr(Config().clients, "sleep_simulation")
             and Config().clients.sleep_simulation
         ):
-            sleep_seconds = Config().client_sleep_times[context.client_id - 1]
+            sleep_times = Config().client_sleep_times
+            if sleep_times is None:
+                sleep_times = Config.simulate_client_speed()
+            index = max(context.client_id - 1, 0)
+            sleep_seconds = float(sleep_times[index])
             avg_training_time = Config().clients.avg_training_time
             training_time = (
                 avg_training_time + sleep_seconds
@@ -405,7 +409,7 @@ class DefaultReportingStrategy(ReportingStrategy):
 
     async def obtain_model_at_time(
         self, context: ClientContext, client_id: int, requested_time: float
-    ) -> Tuple[Any, Any]:
+    ) -> tuple[Any, Any]:
         if context.trainer is None or context.algorithm is None:
             raise RuntimeError("Trainer and algorithm are required.")
 
@@ -466,7 +470,7 @@ class DefaultCommunicationStrategy(CommunicationStrategy):
         if context.sio is None:
             raise RuntimeError("Socket client not initialised.")
 
-        metadata: Dict[str, Any] = {"id": context.client_id}
+        metadata: dict[str, Any] = {"id": context.client_id}
 
         if context.s3_client is not None:
             unique_key = uuid.uuid4().hex[:6].upper()

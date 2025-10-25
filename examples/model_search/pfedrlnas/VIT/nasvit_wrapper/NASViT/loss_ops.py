@@ -248,7 +248,7 @@ class TopkLossSoft(torch.nn.modules.loss._Loss):
 
 
 class KLLossSoft(torch.nn.modules.loss._Loss):
-    """inplace distillation for image classification
+    r"""inplace distillation for image classification
     output: output logits of the student network
     target: output logits of the teacher network
     T: temperature
@@ -278,7 +278,7 @@ class KLLossSoft(torch.nn.modules.loss._Loss):
 
 
 class ReverseKLLossSoft(torch.nn.modules.loss._Loss):
-    """inplace distillation for image classification
+    r"""inplace distillation for image classification
     output: output logits of the student network
     target: output logits of the teacher network
     T: temperature
@@ -300,7 +300,7 @@ class ReverseKLLossSoft(torch.nn.modules.loss._Loss):
 
 class AdaptiveLossSoft(torch.nn.modules.loss._Loss):
     def __init__(self, alpha_min, alpha_max, iw_clip=5):
-        super(AdaptiveLossSoft, self).__init__()
+        super().__init__()
         self.alpha_min = alpha_min
         self.alpha_max = alpha_max
         self.iw_clip = iw_clip
@@ -365,7 +365,7 @@ class AdaptiveLossSoft(torch.nn.modules.loss._Loss):
 
 
 class AlphaDivergenceLossSoft(torch.nn.modules.loss._Loss):
-    """alpha divergence
+    r"""alpha divergence
     output: output logits of the student network
     target: output logits of the teacher network
     T: temperature
@@ -410,7 +410,7 @@ class EntropyAlphaDivergence(torch.nn.modules.loss._Loss):
 
 class JSDLossSoft(torch.nn.modules.loss._Loss):
     def __init__(self):
-        super(JSDLossSoft, self).__init__()
+        super().__init__()
 
     # {{\rm {JSD}}}(P\parallel Q)={\frac  {1}{2}}D(P\parallel M)+{\frac  {1}{2}}D(Q\parallel M)
     def forward(self, output, target):
@@ -432,7 +432,7 @@ class JSDLossSoft(torch.nn.modules.loss._Loss):
 
 class JSDLossSmooth(torch.nn.modules.loss._Loss):
     def __init__(self, label_smoothing=0.1):
-        super(JSDLossSmooth, self).__init__()
+        super().__init__()
         self.eps = label_smoothing
 
     # {{\rm {JSD}}}(P\parallel Q)={\frac  {1}{2}}D(P\parallel M)+{\frac  {1}{2}}D(Q\parallel M)
@@ -457,7 +457,7 @@ class JSDLossSmooth(torch.nn.modules.loss._Loss):
 
 class CrossEntropyLossSmooth(torch.nn.modules.loss._Loss):
     def __init__(self, label_smoothing=0.1):
-        super(CrossEntropyLossSmooth, self).__init__()
+        super().__init__()
         self.eps = label_smoothing
 
     """ label smooth """
@@ -482,7 +482,7 @@ class CrossEntropyLossSmooth(torch.nn.modules.loss._Loss):
 
 class CrossEntropyEma(torch.nn.modules.loss._Loss):
     def __init__(self, label_smoothing=0.1):
-        super(CrossEntropyEma, self).__init__()
+        super().__init__()
         self.eps = label_smoothing
 
     def _forward(self, output, target):

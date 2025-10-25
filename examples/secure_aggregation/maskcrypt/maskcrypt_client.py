@@ -60,7 +60,7 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
         state["final_mask"] = server_payload
         context.owner.final_mask = server_payload
 
-    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> tuple[Any, Any]:
         """Alternate between mask proposal computation and weight submission."""
         if context.current_round % 2 != 0:
             report, weights = await super().train(context)
@@ -86,7 +86,7 @@ class MaskCryptTrainingStrategy(DefaultTrainingStrategy):
     # ------------------------------------------------------------------ #
     # Internal helpers
     # ------------------------------------------------------------------ #
-    def _state(self, context: ClientContext) -> Dict[str, Any]:
+    def _state(self, context: ClientContext) -> dict[str, Any]:
         return context.state.setdefault(self._STATE_KEY, {})
 
     def _get_estimate_path(self, client_id: int) -> str:

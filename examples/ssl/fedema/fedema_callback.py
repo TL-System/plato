@@ -21,4 +21,4 @@ class FedEMACallback(ClientCallback):
             trainer=client.trainer,
             name="GlobalLocalDivergenceProcessor",
         )
-        inbound_processor.processors.insert(0, extract_payload_processor)
+        inbound_processor.processors.append(extract_payload_processor)

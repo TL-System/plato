@@ -9,7 +9,8 @@ import re
 import sys
 import uuid
 from abc import abstractmethod
-from typing import Iterable, Optional
+from collections.abc import Iterable
+from typing import Any, Optional
 
 import numpy as np
 
@@ -65,11 +66,40 @@ class Client:
         self._context.server_payload = self.server_payload
         self._context.processing_time = self.processing_time
 
-        self._composable = None
+        self._composable: ComposableClient | None = None
         self._composable_configured = False
 
     def __repr__(self):
         return f"Client #{self.client_id}"
+
+    def __getattr__(self, name: str) -> Any:
+        """Allow dynamic attributes injected by client strategies."""
+        raise AttributeError(f"{type(self).__name__} has no attribute {name!r}.")
+
+    def _require_composable(self) -> ComposableClient:
+        """Return the composable runtime, ensuring it is configured."""
+        if self._composable is None:
+            raise RuntimeError(
+                "Composable client runtime has not been configured. "
+                "Call `_configure_composable` before invoking this operation."
+            )
+        return self._composable
+
+    def _require_sio(self):
+        """Return the socket.io client, ensuring it is available."""
+        if self.sio is None:
+            raise RuntimeError("Socket.io client is not initialised for this client.")
+        return self.sio
+
+    def require_trainer(self) -> Any:
+        """Return the trainer instance, ensuring it is configured."""
+        trainer = getattr(self, "trainer", None)
+        if trainer is None:
+            raise RuntimeError(
+                "Trainer has not been configured for this client. "
+                "Ensure `configure()` has been called successfully."
+            )
+        return trainer
 
     def _configure_composable(
         self,
@@ -114,21 +144,24 @@ class Client:
         )
         self._composable_configured = True
 
-    def _sync_to_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+    def _sync_to_context(self, attrs: Iterable[str] | None = None) -> None:
         """Propagate selected owner attributes to the shared context."""
+        composable = self._require_composable()
         if attrs is None:
-            attrs = self._composable._SYNC_ATTRS
-        self._composable._sync_context_from_owner(attrs)
+            attrs = composable._SYNC_ATTRS
+        composable._sync_context_from_owner(attrs)
 
-    def _sync_from_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+    def _sync_from_context(self, attrs: Iterable[str] | None = None) -> None:
         """Propagate selected context attributes back to the owner."""
+        composable = self._require_composable()
         if attrs is None:
-            attrs = self._composable._SYNC_ATTRS
-        self._composable._sync_owner_from_context(attrs)
+            attrs = composable._SYNC_ATTRS
+        composable._sync_owner_from_context(attrs)
 
     async def start_client(self) -> None:
         """Startup function for a client."""
-        await self._composable.start_client()
+        composable = self._require_composable()
+        await composable.start_client()
 
     def get_edge_server_id(self):
         """Returns the edge server id of the client in cross-silo FL."""
@@ -158,11 +191,11 @@ class Client:
 
     async def _payload_to_arrive(self, response) -> None:
         """Upon receiving a response from the server."""
-        await self._composable.on_payload_to_arrive(response)
+        await self._require_composable().on_payload_to_arrive(response)
 
     async def _handle_payload(self, inbound_payload):
         """Handles the inbound payload upon receiving it from the server."""
-        await self._composable.handle_server_payload(inbound_payload)
+        await self._require_composable().handle_server_payload(inbound_payload)
 
     def inbound_received(self, inbound_processor):
         """
@@ -186,19 +219,19 @@ class Client:
 
     async def _chunk_arrived(self, data) -> None:
         """Upon receiving a chunk of data from the server."""
-        await self._composable.on_chunk(data)
+        await self._require_composable().on_chunk(data)
 
     async def _request_update(self, data) -> None:
         """Upon receiving a request for an urgent model update."""
-        await self._composable.on_request_update(data)
+        await self._require_composable().on_request_update(data)
 
     async def _payload_arrived(self, client_id) -> None:
         """Upon receiving a portion of the new payload from the server."""
-        await self._composable.on_payload_arrived(client_id)
+        await self._require_composable().on_payload_arrived(client_id)
 
     async def _payload_done(self, client_id, s3_key=None) -> None:
         """Upon receiving all the new payload from the server."""
-        await self._composable.on_payload_done(client_id, s3_key=s3_key)
+        await self._require_composable().on_payload_done(client_id, s3_key=s3_key)
 
     async def _start_training(self, inbound_payload):
         """Complete one round of training on this client."""
@@ -220,10 +253,11 @@ class Client:
         step = 1024**2
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
 
+        sio_client = self._require_sio()
         for chunk in chunks:
-            await self.sio.emit("chunk", {"data": chunk})
+            await sio_client.emit("chunk", {"data": chunk})
 
-        await self.sio.emit("client_payload", {"id": self.client_id})
+        await sio_client.emit("client_payload", {"id": self.client_id})
 
     async def _send(self, payload) -> None:
         """Sending the client payload to the server using simulation, S3 or socket.io."""
@@ -276,7 +310,7 @@ class Client:
                     await self._send_in_chunks(_data)
                     data_size = sys.getsizeof(_data)
 
-            await self.sio.emit("client_payload_done", metadata)
+            await self._require_sio().emit("client_payload_done", metadata)
 
             logging.info(
                 "[%s] Sent %.2f MB of payload data to the server.",

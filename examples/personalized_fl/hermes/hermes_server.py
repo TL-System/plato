@@ -2,6 +2,9 @@
 A federated learning server using Hermes.
 """
 
+from collections import OrderedDict
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
 import hermes_pruning as pruning
 
 from plato.servers import fedavg_personalized as personalized_server
@@ -31,18 +34,22 @@ class Server(personalized_server.Server):
             callbacks=callbacks,
             aggregation_strategy=aggregation_strategy,
         )
-        self.masks_received = []
-        self.aggregated_clients_model = {}
+        self.masks_received: List[Optional[OrderedDict[Any, Any]]] = []
+        self.aggregated_clients_model: Dict[Any, Any] = {}
         self.total_samples = 0
 
-    def update_client_model(self, aggregated_clients_models, updates):
+    def update_client_model(
+        self,
+        aggregated_clients_models: Sequence[Any],
+        updates: Sequence[Any],
+    ) -> None:
         """Update clients' models."""
         for client_model, update in zip(aggregated_clients_models, updates):
-            received_client_id = update.client_id
+            received_client_id = getattr(update, "client_id", None)
             if received_client_id in self.aggregated_clients_model:
                 self.aggregated_clients_model[received_client_id] = client_model
 
-    def customize_server_payload(self, payload):
+    def customize_server_payload(self, payload: Any) -> Any:
         """Customizes the server payload before sending to the client."""
 
         # If the client has already begun training a personalized model
@@ -55,14 +62,23 @@ class Server(personalized_server.Server):
 
         return payload
 
-    def weights_received(self, weights_received):
+    def weights_received(
+        self, weights_received: Sequence[Tuple[Any, Optional[OrderedDict[Any, Any]]]]
+    ) -> List[Any]:
         """Event called after the updated weights have been received."""
+        trainer = self.trainer
+        if trainer is None or not hasattr(trainer, "model"):
+            raise RuntimeError(
+                "Hermes server requires a trainer with an initialized model."
+            )
+        model = trainer.model
+
         # Extract the model weight updates from client updates along with the masks
         self.masks_received = [payload[1] for payload in weights_received]
         weights = [payload[0] for payload in weights_received]
         for step, mask in enumerate(self.masks_received):
             if mask is None:
-                mask = pruning.make_init_mask(self.trainer.model)
-                self.masks_received[step] = mask
+                new_mask = pruning.make_init_mask(model)
+                self.masks_received[step] = new_mask
 
-        return weights
+        return list(weights)

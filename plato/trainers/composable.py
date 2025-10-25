@@ -26,7 +26,8 @@ import pickle
 import re
 import time
 from collections import OrderedDict
-from typing import Any, Callable, List, Optional, Union
+from collections.abc import Callable
+from typing import Any, List, Optional, Union, cast
 
 import torch
 import torch.nn as nn
@@ -90,37 +91,42 @@ class ComposableTrainer(base.Trainer):
 
     def __init__(
         self,
-        model: Optional[Union[nn.Module, Callable[[], nn.Module]]] = None,
-        callbacks: Optional[List[Any]] = None,
-        loss_strategy: Optional[LossCriterionStrategy] = None,
-        optimizer_strategy: Optional[OptimizerStrategy] = None,
-        training_step_strategy: Optional[TrainingStepStrategy] = None,
-        lr_scheduler_strategy: Optional[LRSchedulerStrategy] = None,
-        model_update_strategy: Optional[ModelUpdateStrategy] = None,
-        data_loader_strategy: Optional[DataLoaderStrategy] = None,
-        testing_strategy: Optional[TestingStrategy] = None,
+        model: nn.Module | Callable[[], nn.Module] | None = None,
+        callbacks: list[Any] | None = None,
+        loss_strategy: LossCriterionStrategy | None = None,
+        optimizer_strategy: OptimizerStrategy | None = None,
+        training_step_strategy: TrainingStepStrategy | None = None,
+        lr_scheduler_strategy: LRSchedulerStrategy | None = None,
+        model_update_strategy: ModelUpdateStrategy | None = None,
+        data_loader_strategy: DataLoaderStrategy | None = None,
+        testing_strategy: TestingStrategy | None = None,
     ):
         """Initialize composable trainer with strategies."""
         super().__init__()
 
         # Initialize training context
         self.context = TrainingContext()
-        self.context.device = self.device
+        device = getattr(self, "device", None)
+        if isinstance(device, str):
+            device = torch.device(device)
+        self.context.device = device
         self.context.client_id = self.client_id
 
         # Initialize model
         if model is None:
-            self.model = models_registry.get()
+            module: Any = models_registry.get()
         elif isinstance(model, nn.Module):
             # Model instance passed directly
-            self.model = model
+            module = model
         elif callable(model):
             # Model factory/constructor passed
-            self.model = model()
+            module = model()
         else:
-            self.model = model
+            module = model
 
-        self.context.model = self.model
+        self.model = module
+        self._has_torch_model = isinstance(module, nn.Module)
+        self.context.model = module
 
         # Initialize strategies with defaults
         self.loss_strategy = loss_strategy or DefaultLossCriterionStrategy()
@@ -155,9 +161,16 @@ class ComposableTrainer(base.Trainer):
         self.optimizer = None
         self.lr_scheduler = None
         self.current_epoch = 0
-        self.current_round = 0
         self.training_start_time = time.time()
         self.model_state_dict = None
+
+    def _require_model(self) -> nn.Module:
+        """Return the underlying model, ensuring it is available."""
+        if not getattr(self, "_has_torch_model", False):
+            raise RuntimeError(
+                "ComposableTrainer model has not been initialised correctly."
+            )
+        return cast(nn.Module, self.model)
 
     def _setup_strategies(self):
         """Setup all strategies."""
@@ -217,10 +230,11 @@ class ComposableTrainer(base.Trainer):
         else:
             model_path = f"{model_path}/{model_name}.safetensors"
 
+        model = self._require_model()
         state_dict = (
             self.model_state_dict
             if self.model_state_dict is not None
-            else self.model.state_dict()
+            else model.state_dict()
         )
 
         history_payload = pickle.dumps(self.run_history)
@@ -266,7 +280,8 @@ class ComposableTrainer(base.Trainer):
         if not isinstance(state_dict_raw, dict):
             raise TypeError("Deserialised state dict is not a mapping.")
         state_dict = OrderedDict(state_dict_raw.items())
-        self.model.load_state_dict(state_dict, strict=True)
+        model = self._require_model()
+        model.load_state_dict(state_dict, strict=True)
 
         logging.info("[Client #%d] Model loaded from %s.", self.client_id, model_path)
 
@@ -276,21 +291,36 @@ class ComposableTrainer(base.Trainer):
                 self.run_history = pickle.load(history_file)
 
     def simulate_sleep_time(self):
-        """Simulate client's speed variation."""
-        if (
-            hasattr(Config().clients, "sleep_simulation")
-            and Config().clients.sleep_simulation
+        """Simulate or enforce wall-clock sleep for straggler emulation."""
+        if not (
+            hasattr(Config().clients, "speed_simulation")
+            and Config().clients.speed_simulation
         ):
-            sleep_seconds = Config.client_sleep_times[self.client_id - 1]
-            sleep_seconds = max(0, sleep_seconds)
+            return
 
-            if sleep_seconds > 0:
-                logging.info(
-                    "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
-                    self.client_id,
-                    sleep_seconds,
-                )
-                time.sleep(sleep_seconds)
+        sleep_times = Config.client_sleep_times
+        if sleep_times is None:
+            sleep_times = Config.simulate_client_speed()
+
+        index = max(self.client_id - 1, 0)
+        if index >= len(sleep_times):
+            return
+
+        sleep_seconds = max(0.0, float(sleep_times[index]))
+        if sleep_seconds <= 0:
+            return
+
+        simulate_only = getattr(Config().clients, "sleep_simulation", False)
+        if simulate_only:
+            # Legacy behaviour: do not block execution, just account for the time.
+            return
+
+        logging.info(
+            "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
+            self.client_id,
+            sleep_seconds,
+        )
+        time.sleep(sleep_seconds)
 
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
@@ -312,14 +342,14 @@ class ComposableTrainer(base.Trainer):
         if self.training_step_strategy is not None:
             if hasattr(self.training_step_strategy, "create_graph"):
                 create_graph = config.get("create_graph")
-                if create_graph is not None:
-                    self.training_step_strategy.create_graph = create_graph
+                if isinstance(create_graph, bool):
+                    setattr(self.training_step_strategy, "create_graph", create_graph)
             if hasattr(self.training_step_strategy, "retain_graph"):
                 retain_graph = config.get("retain_graph")
                 if retain_graph is None and config.get("create_graph"):
                     retain_graph = True
-                if retain_graph is not None:
-                    self.training_step_strategy.retain_graph = retain_graph
+                if isinstance(retain_graph, bool):
+                    setattr(self.training_step_strategy, "retain_graph", retain_graph)
 
         if trainset is None:
             logging.warning(
@@ -387,9 +417,8 @@ class ComposableTrainer(base.Trainer):
         self.context.state["grad_accum_loss_count"] = 0
 
         # Create optimizer using strategy
-        self.optimizer = self.optimizer_strategy.create_optimizer(
-            self.model, self.context
-        )
+        model = self._require_model()
+        self.optimizer = self.optimizer_strategy.create_optimizer(model, self.context)
 
         # Create LR scheduler using strategy
         self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
@@ -397,8 +426,9 @@ class ComposableTrainer(base.Trainer):
         )
 
         # Move model to device
-        self.model.to(self.device)
-        self.model.train()
+        model = self._require_model()
+        model.to(self.device)
+        model.train()
 
         # Training epochs
         total_epochs = config["epochs"]
@@ -420,6 +450,7 @@ class ComposableTrainer(base.Trainer):
             # Training steps
             batches_seen = False
             last_batch_id = -1
+            model = self._require_model()
             for batch_id, (examples, labels) in enumerate(self.train_loader):
                 # Store current batch in context
                 self.context.state["current_batch"] = batch_id
@@ -451,7 +482,7 @@ class ComposableTrainer(base.Trainer):
 
                 # Perform training step using strategy
                 loss = self.training_step_strategy.training_step(
-                    model=self.model,
+                    model=model,
                     optimizer=self.optimizer,
                     examples=examples,
                     labels=labels,
@@ -512,7 +543,7 @@ class ComposableTrainer(base.Trainer):
             finalize_callable = getattr(self.training_step_strategy, "finalize", None)
             if batches_seen and callable(finalize_callable):
                 finalize_loss = finalize_callable(
-                    model=self.model,
+                    model=model,
                     optimizer=self.optimizer,
                     context=self.context,
                 )
@@ -567,7 +598,9 @@ class ComposableTrainer(base.Trainer):
 
             # Handle optimizer params state update if needed
             if hasattr(self.optimizer, "params_state_update"):
-                self.optimizer.params_state_update()
+                update_fn = getattr(self.optimizer, "params_state_update")
+                if callable(update_fn):
+                    update_fn()
 
             # Simulate client's speed
             if (
@@ -582,13 +615,14 @@ class ComposableTrainer(base.Trainer):
                 hasattr(Config().server, "request_update")
                 and Config().server.request_update
             ):
-                self.model.cpu()
+                model = self._require_model()
+                model.cpu()
                 training_time = time.perf_counter() - tic
                 filename = (
                     f"{self.client_id}_{self.current_epoch}_{training_time}.safetensors"
                 )
                 self.save_model(filename)
-                self.model.to(self.device)
+                model.to(self.device)
 
             # Update metrics
             self.run_history.update_metric("train_loss", self._loss_tracker.average)
@@ -706,7 +740,8 @@ class ComposableTrainer(base.Trainer):
         config["run_id"] = Config().params["run_id"]
 
         if "max_concurrency" in config:
-            self.model.cpu()
+            model = self._require_model()
+            model.cpu()
 
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
@@ -748,8 +783,9 @@ class ComposableTrainer(base.Trainer):
             Test accuracy or other metric as float
         """
         # Use testing strategy to perform evaluation
+        model = self._require_model()
         accuracy = self.testing_strategy.test_model(
-            self.model, config, testset, sampler, self.context
+            model, config, testset, sampler, self.context
         )
 
         # Store accuracy for compatibility with existing code
@@ -767,7 +803,8 @@ class ComposableTrainer(base.Trainer):
         self.train_model(config, trainset, sampler)
 
         # Get model weights
-        model_update = copy.deepcopy(self.model.state_dict())
+        model = self._require_model()
+        model_update = copy.deepcopy(model.state_dict())
 
         # Get additional payload from model update strategy
         additional_payload = self.model_update_strategy.get_update_payload(self.context)

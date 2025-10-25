@@ -119,7 +119,7 @@ class SequentialIterator:
         return self.defined_compound_loader.process_batch(batch)
 
     def __len__(self):
-        return len(self.target_loader)
+        return len(self.defined_compound_loader)
 
 
 class SequentialDataLoader:

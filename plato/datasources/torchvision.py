@@ -20,7 +20,7 @@ from plato.config import Config
 from plato.datasources import base
 
 
-def _to_plain_dict(value: Any) -> Dict[str, Any]:
+def _to_plain_dict(value: Any) -> dict[str, Any]:
     """Convert config-provided structures into regular dictionaries."""
     if value is None:
         return {}
@@ -39,7 +39,7 @@ def _to_plain_dict(value: Any) -> Dict[str, Any]:
     )
 
 
-def _to_plain_list(value: Any) -> List[Any]:
+def _to_plain_list(value: Any) -> list[Any]:
     """Convert config-provided list-like data into a Python list."""
     if value is None:
         return []
@@ -102,7 +102,7 @@ def _celeba_target_transform(label):
     return label
 
 
-def _dataset_defaults(dataset_name: str, data_cfg) -> Dict[str, Any]:
+def _dataset_defaults(dataset_name: str, data_cfg) -> dict[str, Any]:
     """Per-dataset defaults mirroring legacy torchvision-backed datasources."""
 
     name = dataset_name.lower()
@@ -175,7 +175,7 @@ def _dataset_defaults(dataset_name: str, data_cfg) -> Dict[str, Any]:
         }
 
     if name == "celeba":
-        target_types: List[str] = []
+        target_types: list[str] = []
         if data_cfg is not None and hasattr(data_cfg, "celeba_targets"):
             targets_cfg = data_cfg.celeba_targets
             if getattr(targets_cfg, "attr", False):
@@ -198,7 +198,7 @@ def _dataset_defaults(dataset_name: str, data_cfg) -> Dict[str, Any]:
             ]
         )
 
-        defaults: Dict[str, Any] = {
+        defaults: dict[str, Any] = {
             "train_transform": transform,
             "test_transform": transform,
             "dataset_kwargs": {"target_type": target_types},
@@ -414,7 +414,7 @@ class DataSource(base.DataSource):
         raise ValueError(f"Dataset {dataset_name} not found in torchvision.datasets.")
 
     @staticmethod
-    def _determine_split_parameter(signature, data_cfg) -> Optional[str]:
+    def _determine_split_parameter(signature, data_cfg) -> str | None:
         """Determine which constructor parameter controls data splits."""
         if hasattr(data_cfg, "split_parameter"):
             requested = data_cfg.split_parameter
@@ -431,7 +431,7 @@ class DataSource(base.DataSource):
         return None
 
     @staticmethod
-    def _default_split_values(split_parameter: Optional[str]):
+    def _default_split_values(split_parameter: str | None):
         """Provide default split values based on the parameter type."""
         if split_parameter == "train":
             return True, False
@@ -440,9 +440,7 @@ class DataSource(base.DataSource):
         return None, None
 
     @staticmethod
-    def _normalize_split_value(
-        split_parameter: Optional[str], value: Any, default: Any
-    ):
+    def _normalize_split_value(split_parameter: str | None, value: Any, default: Any):
         """Normalise split configuration values to the expected types."""
         if split_parameter is None:
             return None
@@ -466,13 +464,13 @@ class DataSource(base.DataSource):
     def _instantiate_dataset(
         self,
         dataset_cls,
-        shared_args: List[Any],
-        extra_args: List[Any],
-        shared_kwargs: Dict[str, Any],
-        extra_kwargs: Dict[str, Any],
-        split_parameter: Optional[str],
+        shared_args: list[Any],
+        extra_args: list[Any],
+        shared_kwargs: dict[str, Any],
+        extra_kwargs: dict[str, Any],
+        split_parameter: str | None,
         split_value: Any,
-        download: Optional[bool],
+        download: bool | None,
         transform: Any,
         target_transform: Any,
     ):

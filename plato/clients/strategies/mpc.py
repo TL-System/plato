@@ -4,7 +4,7 @@ MPC-specific client strategies layered on top of the default pipeline.
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Any, Dict, cast
 
 from plato.clients.strategies.defaults import (
     DefaultLifecycleStrategy,
@@ -17,11 +17,14 @@ from plato.mpc import RoundInfoStore
 class MPCLifecycleStrategy(DefaultLifecycleStrategy):
     """Lifecycle strategy wiring the MPC round store into processor kwargs."""
 
-    def _build_processor_kwargs(self, context) -> Dict[str, Dict]:
+    def _build_processor_kwargs(self, context) -> dict[str, dict[str, Any]]:
         processor_kwargs = getattr(context, "processor_kwargs", {}) or {}
-        round_store: RoundInfoStore = getattr(context, "round_store", None)
-        if round_store is None:
+        if not isinstance(processor_kwargs, dict):
+            processor_kwargs = {}
+        round_store_obj = getattr(context, "round_store", None)
+        if round_store_obj is None:
             raise RuntimeError("round_store must be available in the client context.")
+        round_store = cast(RoundInfoStore, round_store_obj)
 
         outbound_processors = getattr(Config().clients, "outbound_processors", [])
         debug_artifacts = getattr(context, "debug_artifacts", False)

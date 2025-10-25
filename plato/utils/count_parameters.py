@@ -1,8 +1,24 @@
+import importlib
+from typing import Any
+
 import torch
-from prettytable import PrettyTable
 
 
-def count_parameters(model):
+def _load_prettytable() -> Any:
+    try:
+        module = importlib.import_module("prettytable")
+        return getattr(module, "PrettyTable")
+    except (ImportError, AttributeError):
+        return None
+
+
+PrettyTable = _load_prettytable()
+
+
+def count_parameters(model: torch.nn.Module) -> int:
+    if PrettyTable is None:
+        raise ImportError("prettytable is required to format parameter counts.")
+
     table = PrettyTable(["Modules", "Parameters"])
     total_params = 0
     for name, parameter in model.named_parameters():

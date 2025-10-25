@@ -45,7 +45,7 @@ class DynamicMBConvLayer(MyModule):
         use_se=False,
         channels_per_group=1,
     ):
-        super(DynamicMBConvLayer, self).__init__()
+        super().__init__()
 
         self.in_channel_list = int2list(in_channel_list)
         self.out_channel_list = int2list(out_channel_list)
@@ -303,7 +303,7 @@ class DynamicConvBnActLayer(MyModule):
         use_bn=True,
         act_func="relu6",
     ):
-        super(DynamicConvBnActLayer, self).__init__()
+        super().__init__()
 
         self.in_channel_list = int2list(in_channel_list)
         self.out_channel_list = int2list(out_channel_list)
@@ -389,7 +389,7 @@ class DynamicConvBnActLayer(MyModule):
 
 class DynamicLinearLayer(MyModule):
     def __init__(self, in_features_list, out_features, bias=True):
-        super(DynamicLinearLayer, self).__init__()
+        super().__init__()
 
         self.in_features_list = int2list(in_features_list)
         self.out_features = out_features
@@ -447,7 +447,7 @@ class DynamicLinearLayer(MyModule):
 
 class DynamicShortcutLayer(MyModule):
     def __init__(self, in_channel_list, out_channel_list, reduction=1):
-        super(DynamicShortcutLayer, self).__init__()
+        super().__init__()
 
         self.in_channel_list = int2list(in_channel_list)
         self.out_channel_list = int2list(out_channel_list)

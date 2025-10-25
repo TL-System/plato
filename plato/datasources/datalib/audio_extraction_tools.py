@@ -4,12 +4,22 @@ Tools for extracting information from the audio
 """
 
 import glob
+import importlib
 import os
 from multiprocessing import Pool
-
-from mmaction.tools.data import build_audio_features
+from typing import Any
 
 from plato.datasources.datalib import modality_extraction_base
+
+
+def _build_audio_features_module() -> Any:
+    try:
+        return importlib.import_module("mmaction.tools.data.build_audio_features")
+    except ImportError as exc:  # pragma: no cover - optional dependency
+        raise ImportError(
+            "mmaction is required for audio feature extraction. "
+            "Install mmaction2 to enable this functionality."
+        ) from exc
 
 
 def obtain_audio_dest_dir(out_dir, audio_path, dir_level):
@@ -96,7 +106,8 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
         part="1/1",
     ):
         """Obtain the feature from the audio"""
-        audio_tools = build_audio_features.AudioTools(
+        module = _build_audio_features_module()
+        audio_tools = module.AudioTools(
             frame_rate=frame_rate,
             sample_rate=sample_rate,
             num_mels=num_mels,
@@ -129,7 +140,7 @@ class VideoAudioExtractor(modality_extraction_base.VideoExtractorBase):
                 os.makedirs(out_full_path)
 
             extractor_pool.apply_async(
-                build_audio_features.extract_audio_feature,
+                module.extract_audio_feature,
                 args=(file, audio_tools, out_full_path),
             )
         extractor_pool.close()

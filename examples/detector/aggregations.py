@@ -11,7 +11,7 @@ import os
 import pickle
 from collections import OrderedDict
 from types import SimpleNamespace
-from typing import Dict, List
+from typing import Mapping, Sequence
 
 import numpy as np
 import torch
@@ -20,28 +20,27 @@ from scipy.stats import norm
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
+WeightMapping = Mapping[str, torch.Tensor]
 
-def flatten_weights(weights):
+
+def _flatten_single_weight(weight: WeightMapping) -> torch.Tensor:
+    """Flatten a single model weight dictionary into a 1-D tensor."""
+    flattened_parts = [param.reshape(-1) for param in weight.values()]
+    if not flattened_parts:
+        raise ValueError("Cannot flatten empty weight mapping.")
+    return torch.cat(flattened_parts)
+
+
+def flatten_weights(weights: Sequence[WeightMapping]) -> torch.Tensor:
     """
     Flatten model weights into a 2D tensor where each row corresponds to a client.
     """
-    flattened_weights = []
+    flattened_rows = [_flatten_single_weight(weight) for weight in weights]
 
-    for weight in weights:
-        flattened_weight = []
-        for name in weight.keys():
-            flattened_weight = (
-                weight[name].view(-1)
-                if not len(flattened_weight)
-                else torch.cat((flattened_weight, weight[name].view(-1)))
-            )
+    if not flattened_rows:
+        return torch.empty((0, 0))
 
-        flattened_weights = (
-            flattened_weight[None, :]
-            if not len(flattened_weights)
-            else torch.cat((flattened_weights, flattened_weight[None, :]), 0)
-        )
-    return flattened_weights
+    return torch.stack(flattened_rows)
 
 
 def reconstruct_weight(flattened_weight, reference):
@@ -96,7 +95,7 @@ def bulyan(updates, baseline_weights, weights_attacked):
     num_attackers = configured_attacker_count()
 
     remaining_weights = flatten_weights(weights_attacked)
-    bulyan_cluster = []
+    bulyan_cluster: list[torch.Tensor] = []
 
     # Search for Bulyan cluster based on distances
     while len(remaining_weights) > 0 and (
@@ -105,16 +104,12 @@ def bulyan(updates, baseline_weights, weights_attacked):
         if len(remaining_weights) - 2 - num_attackers <= 0:
             break
 
-        distances = []
-        for weight in remaining_weights:
-            distance = torch.norm((remaining_weights - weight), dim=1) ** 2
-            distances = (
-                distance[None, :]
-                if not len(distances)
-                else torch.cat((distances, distance[None, :]), 0)
-            )
-
-        distances = torch.sort(distances, dim=1)[0]
+        distance_rows = [
+            torch.norm((remaining_weights - weight), dim=1) ** 2
+            for weight in remaining_weights
+        ]
+        distances = torch.stack(distance_rows)
+        distances, _ = torch.sort(distances, dim=1)
 
         scores = torch.sum(
             distances[:, : len(remaining_weights) - 2 - num_attackers], dim=1
@@ -124,11 +119,7 @@ def bulyan(updates, baseline_weights, weights_attacked):
             break
 
         # Add candidates into Bulyan cluster
-        bulyan_cluster = (
-            remaining_weights[indices[0]][None, :]
-            if not len(bulyan_cluster)
-            else torch.cat((bulyan_cluster, remaining_weights[indices[0]][None, :]), 0)
-        )
+        bulyan_cluster.append(remaining_weights[indices[0]])
 
         # Remove candidate from remaining weights
         remaining_weights = torch.cat(
@@ -142,16 +133,17 @@ def bulyan(updates, baseline_weights, weights_attacked):
         if remaining_weights.shape[0] <= 2 * num_attackers + 2:
             break
 
-    if not len(bulyan_cluster):
+    if not bulyan_cluster:
         logging.info("Bulyan cluster is empty, falling back to median aggregation.")
         return median(updates, baseline_weights, weights_attacked)
 
     # Perform sorting
-    n, d = bulyan_cluster.shape
+    bulyan_tensor = torch.stack(bulyan_cluster)
+    n, d = bulyan_tensor.shape
     trimmed = max(n - 2 * num_attackers, 1)
-    median_weights = torch.median(bulyan_cluster, dim=0)[0]
-    sort_idx = torch.argsort(torch.abs(bulyan_cluster - median_weights), dim=0)
-    sorted_weights = bulyan_cluster[sort_idx, torch.arange(d)[None, :]]
+    median_weights = torch.median(bulyan_tensor, dim=0)[0]
+    sort_idx = torch.argsort(torch.abs(bulyan_tensor - median_weights), dim=0)
+    sorted_weights = bulyan_tensor[sort_idx, torch.arange(d)[None, :]]
 
     # Average over sorted Bulyan cluster
     mean_weights = torch.mean(sorted_weights[:trimmed], dim=0)
@@ -170,20 +162,18 @@ def krum(updates, baseline_weights, weights_attacked):
 
     remaining_weights = flatten_weights(weights_attacked)
 
-    if len(remaining_weights.shape) == 1:
-        selected_weight = remaining_weights
+    if remaining_weights.ndim == 1 or remaining_weights.shape[0] == 1:
+        selected_weight = (
+            remaining_weights if remaining_weights.ndim == 1 else remaining_weights[0]
+        )
     else:
         num_attackers_selected = 2
-        distances = []
-        for weight in remaining_weights:
-            distance = torch.norm((remaining_weights - weight), dim=1) ** 2
-            distances = (
-                distance[None, :]
-                if not len(distances)
-                else torch.cat((distances, distance[None, :]), 0)
-            )
-
-        distances = torch.sort(distances, dim=1)[0]
+        distance_rows = [
+            torch.norm((remaining_weights - weight), dim=1) ** 2
+            for weight in remaining_weights
+        ]
+        distances = torch.stack(distance_rows)
+        distances, _ = torch.sort(distances, dim=1)
         scores = torch.sum(
             distances[:, : len(remaining_weights) - 2 - num_attackers_selected], dim=1
         )
@@ -205,20 +195,16 @@ def multi_krum(updates, baseline_weights, weights_attacked):
     remaining_weights = flatten_weights(weights_attacked)
 
     num_attackers_selected = 2
-    candidates = []
+    candidates: list[torch.Tensor] = []
 
     # Search for candidates based on distance
     while len(remaining_weights) > 2 * num_attackers_selected + 2:
-        distances = []
-        for weight in remaining_weights:
-            distance = torch.norm((remaining_weights - weight), dim=1) ** 2
-            distances = (
-                distance[None, :]
-                if not len(distances)
-                else torch.cat((distances, distance[None, :]), 0)
-            )
-
-        distances = torch.sort(distances, dim=1)[0]
+        distance_rows = [
+            torch.norm((remaining_weights - weight), dim=1) ** 2
+            for weight in remaining_weights
+        ]
+        distances = torch.stack(distance_rows)
+        distances, _ = torch.sort(distances, dim=1)
 
         scores = torch.sum(
             distances[:, : len(remaining_weights) - 2 - num_attackers_selected],
@@ -228,11 +214,7 @@ def multi_krum(updates, baseline_weights, weights_attacked):
         if len(indices) == 0:
             break
 
-        candidates = (
-            remaining_weights[indices[0]][None, :]
-            if not len(candidates)
-            else torch.cat((candidates, remaining_weights[indices[0]][None, :]), 0)
-        )
+        candidates.append(remaining_weights[indices[0]])
 
         # Remove candidate from remaining weights
         remaining_weights = torch.cat(
@@ -243,11 +225,12 @@ def multi_krum(updates, baseline_weights, weights_attacked):
             0,
         )
 
-    if not len(candidates):
+    if not candidates:
         logging.info("No candidates selected for Multi-Krum; falling back to Krum.")
         return krum(updates, baseline_weights, weights_attacked)
 
-    mean_weights = torch.mean(candidates, dim=0)
+    candidates_tensor = torch.stack(candidates)
+    mean_weights = torch.mean(candidates_tensor, dim=0)
     mkrum_update = reconstruct_weight(mean_weights, weights_attacked[0])
 
     logging.info("Finished Multi-Krum server aggregation.")
@@ -291,7 +274,7 @@ def afa(updates, baseline_weights, weights_attacked):
         return OrderedDict(baseline_weights)
 
     flattened_weights = flatten_weights(weights_attacked)
-    if isinstance(flattened_weights, list) or flattened_weights.numel() == 0:
+    if flattened_weights.numel() == 0:
         return OrderedDict(baseline_weights)
 
     clients_id = [update.client_id for update in updates]
@@ -299,7 +282,7 @@ def afa(updates, baseline_weights, weights_attacked):
 
     bad_set = []
     remove_set = [1]
-    pvalue: Dict[int, float] = {}
+    pvalue: dict[int, float] = {}
     epsilon = 2
     delta_ep = 0.5
 
@@ -332,24 +315,21 @@ def afa(updates, baseline_weights, weights_attacked):
     while len(remove_set):
         remove_set = []
 
-        cos_sims = []
+        cos_sims_list = []
         for weight in flattened_weights:
-            cos_sim = (
-                torch.dot(weight.squeeze(), final_update.squeeze())
-                / (torch.norm(final_update.squeeze()) + 1e-9)
-                / (torch.norm(weight.squeeze()) + 1e-9)
+            numerator = torch.dot(weight, final_update)
+            denominator = (torch.norm(final_update) + 1e-9) * (
+                torch.norm(weight) + 1e-9
             )
-            cos_sims = (
-                cos_sim.unsqueeze(0)
-                if not len(cos_sims)
-                else torch.cat((cos_sims, cos_sim.unsqueeze(0)))
-            )
+            cos_sims_list.append(numerator / denominator)
 
-        model_mean = torch.mean(cos_sims, dim=0).squeeze()
-        model_median = torch.median(cos_sims, dim=0)[0].squeeze()
-        model_std = torch.std(cos_sims, dim=0).squeeze()
+        cos_sims = torch.stack(cos_sims_list)
 
-        flattened_weights_copy = copy.deepcopy(flattened_weights)
+        model_mean = torch.mean(cos_sims)
+        model_median = torch.median(cos_sims)
+        model_std = torch.std(cos_sims)
+
+        flattened_weights_copy = flattened_weights.clone()
 
         if model_mean < model_median:
             for counter, weight in enumerate(flattened_weights):
@@ -384,7 +364,7 @@ def afa(updates, baseline_weights, weights_attacked):
                     bad_set.append(remove_id)
 
         epsilon += delta_ep
-        flattened_weights = copy.deepcopy(flattened_weights_copy)
+        flattened_weights = flattened_weights_copy.clone()
 
     # Update histories
     good_set = copy.deepcopy(clients_id)
@@ -403,7 +383,7 @@ def afa(updates, baseline_weights, weights_attacked):
 
     # Perform aggregation
     p_sum = 0
-    final_update = torch.zeros(flattened_weights[0].shape)
+    final_update = torch.zeros_like(flattened_weights[0])
 
     for counter, weight in enumerate(flattened_weights):
         tmp = afa_index_finder(weight, retrive_flattened_weights[counter:])
@@ -433,37 +413,31 @@ def fl_trust(updates, baseline, weights_attacked):
     num_clients, _ = flattened_weights.shape
 
     model_re = torch.mean(flattened_weights, dim=0).squeeze()
-    cos_sims = []
-    candidates = []
+    cos_sims_list = []
+    final_model_norm = torch.norm(model_re) + 1e-9
 
     for weight in flattened_weights:
-        cos_sim = (
-            torch.dot(weight.squeeze(), model_re)
-            / (torch.norm(model_re) + 1e-9)
-            / (torch.norm(weight.squeeze()) + 1e-9)
+        cos_sim = torch.dot(weight, model_re) / (
+            final_model_norm * (torch.norm(weight) + 1e-9)
         )
-        cos_sims = (
-            cos_sim.unsqueeze(0)
-            if not len(cos_sims)
-            else torch.cat((cos_sims, cos_sim.unsqueeze(0)))
-        )
+        cos_sims_list.append(cos_sim)
 
-    cos_sims = torch.maximum(cos_sims, torch.tensor(0))
+    cos_sims = torch.stack(cos_sims_list)
+    cos_sims = torch.clamp(cos_sims, min=0.0)
     normalized_weights = cos_sims / (torch.sum(cos_sims) + 1e-9)
 
+    candidate_rows = []
     for i in range(num_clients):
+        weight = flattened_weights[i]
         candidate = (
-            flattened_weights[i]
+            weight
             * normalized_weights[i]
-            / (torch.norm(flattened_weights[i] + 1e-9))
-            * torch.norm(model_re)
+            / (torch.norm(weight) + 1e-9)
+            * final_model_norm
         )
-        candidates = (
-            candidate.unsqueeze(0)
-            if not len(candidates)
-            else torch.cat((candidates, candidate.unsqueeze(0)))
-        )
+        candidate_rows.append(candidate)
 
+    candidates = torch.stack(candidate_rows)
     mean_weights = torch.sum(candidates, dim=0)
     avg_update = reconstruct_weight(mean_weights, weights_attacked[0])
 
@@ -476,10 +450,10 @@ class WeightsOnlyAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         raise NotImplementedError(
             "This aggregation strategy aggregates weights directly."
         )
@@ -488,77 +462,77 @@ class WeightsOnlyAggregationStrategy(AggregationStrategy):
 class MedianAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return median(updates, baseline_weights, weights_received)
 
 
 class BulyanAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return bulyan(updates, baseline_weights, weights_received)
 
 
 class KrumAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return krum(updates, baseline_weights, weights_received)
 
 
 class MultiKrumAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return multi_krum(updates, baseline_weights, weights_received)
 
 
 class TrimmedMeanAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return trimmed_mean(updates, baseline_weights, weights_received)
 
 
 class AfaAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return afa(updates, baseline_weights, weights_received)
 
 
 class FLTrustAggregationStrategy(WeightsOnlyAggregationStrategy):
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         return fl_trust(updates, baseline_weights, weights_received)
 
 

@@ -13,7 +13,7 @@ import sys
 import time
 from abc import abstractmethod
 from types import SimpleNamespace
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import socketio
@@ -26,6 +26,10 @@ from plato.config import Config
 from plato.servers.strategies.base import ServerContext
 from plato.servers.strategies.client_selection import RandomSelectionStrategy
 from plato.utils import fonts, s3
+
+if TYPE_CHECKING:
+    from plato.algorithms.base import Algorithm
+    from plato.trainers.base import Trainer
 
 
 # pylint: disable=unused-argument, protected-access
@@ -82,7 +86,7 @@ class Server:
         # The client ids are stored for client selection
         self.clients_pool = []
         self.clients_per_round = 0
-        self.selected_clients = None
+        self.selected_clients: list[int] = []
         self.selected_client_id = 0
         self.selected_sids = []
         self.current_round = 0
@@ -193,6 +197,42 @@ class Server:
 
     def __repr__(self):
         return f"Server #{os.getpid()}"
+
+    def __getattr__(self, name: str) -> Any:
+        """Allow subclasses to inject dynamic attributes at runtime."""
+        raise AttributeError(f"{type(self).__name__} has no attribute {name!r}.")
+
+    def _require_sio(self) -> socketio.AsyncServer:
+        """Return the socket.io server, ensuring it is configured."""
+        if self.sio is None:
+            raise RuntimeError(
+                "Socket.IO server has not been initialised for this server instance."
+            )
+        return self.sio
+
+    def require_trainer(self) -> "Trainer":
+        """Return the trainer instance, ensuring it is available."""
+        if self.trainer is None:
+            raise RuntimeError(
+                "Trainer has not been initialised on the server; "
+                "call `init_trainer` before continuing."
+            )
+        return self.trainer
+
+    def require_algorithm(self) -> "Algorithm":
+        """Return the algorithm instance, ensuring it is available."""
+        if self.algorithm is None:
+            raise RuntimeError(
+                "Algorithm has not been initialised on the server; "
+                "call `get_algorithm` before continuing."
+            )
+        return self.algorithm
+
+    def require_datasource(self) -> Any:
+        """Return the datasource instance, ensuring it is available."""
+        if self.datasource is None:
+            raise RuntimeError("Datasource has not been initialised on the server.")
+        return self.datasource
 
     def __str__(self):
         return f"Server #{os.getpid()}"
@@ -480,7 +520,7 @@ class Server:
         """Closes all socket.io connections after training completes."""
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
-            await self.sio.emit("disconnect", room=client["sid"])
+            await self._require_sio().emit("disconnect", room=client["sid"])
 
     async def _select_clients(self, for_next_batch=False):
         """Selects a subset of the clients and send messages to them to start training."""
@@ -512,11 +552,11 @@ class Server:
             # server has aggregated all reporting clients already
             if (
                 self.asynchronous_mode
-                and self.selected_clients is not None
+                and self.selected_clients
                 and len(self.reported_clients) > 0
                 and len(self.reported_clients) < self.clients_per_round
             ):
-                # If self.selected_clients is None, it implies that it is the first iteration;
+                # If there are no previously selected clients, it implies that it is the first iteration;
                 # If len(self.reported_clients) == self.clients_per_round, it implies that
                 # all selected clients have already reported.
 
@@ -566,7 +606,7 @@ class Server:
             if not self.simulate_wall_time:
                 self.reported_clients = []
 
-        if len(self.selected_clients) > 0:
+        if self.selected_clients:
             self.selected_sids = []
 
             # If max_concurrency is specified, run selected clients batch by batch,
@@ -657,7 +697,8 @@ class Server:
                     server_response, client_id=self.selected_client_id
                 )
 
-                payload = self.algorithm.extract_weights()
+                algorithm = self.require_algorithm()
+                payload = algorithm.extract_weights()
                 payload = self.customize_server_payload(payload)
 
                 if self.comm_simulation:
@@ -668,7 +709,8 @@ class Server:
                     )
 
                     # First apply outbound processors, if any
-                    payload = self.outbound_processor.process(payload)
+                    if self.outbound_processor is not None:
+                        payload = self.outbound_processor.process(payload)
 
                     model_name = (
                         Config().trainer.model_name
@@ -706,7 +748,7 @@ class Server:
                     )
 
                 # Send the server response as metadata to the clients (payload to follow)
-                await self.sio.emit(
+                await self._require_sio().emit(
                     "payload_to_arrive", {"response": server_response}, room=sid
                 )
 
@@ -815,14 +857,15 @@ class Server:
         chunks = [data[i : i + step] for i in range(0, len(data), step)]
 
         for chunk in chunks:
-            await self.sio.emit("chunk", {"data": chunk}, room=sid)
+            await self._require_sio().emit("chunk", {"data": chunk}, room=sid)
 
-        await self.sio.emit("payload", {"id": client_id}, room=sid)
+        await self._require_sio().emit("payload", {"id": client_id}, room=sid)
 
     async def _send(self, sid, payload, client_id) -> None:
         """Sends a new data payload to the client using either S3 or socket.io."""
         # First apply outbound processors, if any
-        payload = self.outbound_processor.process(payload)
+        if self.outbound_processor is not None:
+            payload = self.outbound_processor.process(payload)
 
         metadata = {"id": client_id}
 
@@ -845,7 +888,7 @@ class Server:
                 await self._send_in_chunks(_data, sid, client_id)
                 data_size = sys.getsizeof(_data)
 
-        await self.sio.emit("payload_done", metadata, room=sid)
+        await self._require_sio().emit("payload_done", metadata, room=sid)
 
         logging.info(
             "[%s] Sent %.2f MB of payload data to client #%d.",
@@ -926,7 +969,16 @@ class Server:
             else:
                 payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
         else:
-            self.client_payload[sid] = self.s3_client.receive_from_s3(s3_key)
+            if self.s3_client is None:
+                raise RuntimeError(
+                    "S3 client is not configured but an S3 payload key was received."
+                )
+            receive_from_s3 = getattr(self.s3_client, "receive_from_s3", None)
+            if not callable(receive_from_s3):
+                raise RuntimeError(
+                    "Configured S3 client does not support receive_from_s3()."
+                )
+            self.client_payload[sid] = receive_from_s3(s3_key)
             payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
 
         logging.info(
@@ -943,9 +995,10 @@ class Server:
     async def process_client_info(self, client_id, sid):
         """Processes the received metadata information from a reporting client."""
         # First pass through the inbound_processor(s), if any
-        self.client_payload[sid] = self.inbound_processor.process(
-            self.client_payload[sid]
-        )
+        if self.inbound_processor is not None:
+            self.client_payload[sid] = self.inbound_processor.process(
+                self.client_payload[sid]
+            )
 
         if self.comm_simulation:
             if (
@@ -1072,7 +1125,7 @@ class Server:
 
                         self.training_sids.append(sid)
 
-                        await self.sio.emit(
+                        await self._require_sio().emit(
                             "request_update",
                             {
                                 "client_id": client_id,
@@ -1317,7 +1370,8 @@ class Server:
             checkpoint_path,
             filename,
         )
-        self.trainer.save_model(filename, checkpoint_path)
+        trainer = self.require_trainer()
+        trainer.save_model(filename, checkpoint_path)
         self._save_random_states(self.current_round, checkpoint_path)
 
         # Saving the current round in the server for resuming its session later on
@@ -1346,7 +1400,8 @@ class Server:
             else "custom"
         )
         filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
-        self.trainer.load_model(filename, checkpoint_path)
+        trainer = self.require_trainer()
+        trainer.load_model(filename, checkpoint_path)
 
     def _save_random_states(self, round_to_save, checkpoint_path):
         """Saves the random states in the server for resuming its session later on."""
@@ -1411,7 +1466,8 @@ class Server:
     async def _close(self):
         """Closes the server."""
         logging.info("[%s] Training concluded.", self)
-        self.trainer.save_model()
+        trainer = self.require_trainer()
+        trainer.save_model()
 
         self.server_will_close()
         self.callback_handler.call_event("on_server_will_close", self)

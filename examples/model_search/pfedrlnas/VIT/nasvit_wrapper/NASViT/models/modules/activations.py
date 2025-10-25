@@ -28,7 +28,7 @@ class MemoryEfficientSwish(nn.Module):
 
 class Hswish(nn.Module):
     def __init__(self, inplace=True):
-        super(Hswish, self).__init__()
+        super().__init__()
         self.inplace = inplace
 
     def forward(self, x):
@@ -46,7 +46,7 @@ class Hswish(nn.Module):
 
 class Hsigmoid(nn.Module):
     def __init__(self, inplace=True):
-        super(Hsigmoid, self).__init__()
+        super().__init__()
         self.inplace = inplace
 
     def forward(self, x):

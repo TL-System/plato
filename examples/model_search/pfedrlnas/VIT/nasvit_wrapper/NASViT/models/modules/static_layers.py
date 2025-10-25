@@ -30,7 +30,7 @@ class SELayer(nn.Module):
     REDUCTION = 4
 
     def __init__(self, channel):
-        super(SELayer, self).__init__()
+        super().__init__()
 
         self.channel = channel
         self.reduction = SELayer.REDUCTION
@@ -68,7 +68,7 @@ class ConvBnActLayer(MyModule):
         use_bn=True,
         act_func="relu",
     ):
-        super(ConvBnActLayer, self).__init__()
+        super().__init__()
         # default normal 3x3_Conv with bn and relu
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -149,7 +149,7 @@ class IdentityLayer(MyModule):
     def __init__(
         self,
     ):
-        super(IdentityLayer, self).__init__()
+        super().__init__()
 
     def forward(self, x):
         return x
@@ -171,7 +171,7 @@ class IdentityLayer(MyModule):
 
 class LinearLayer(MyModule):
     def __init__(self, in_features, out_features, bias=True):
-        super(LinearLayer, self).__init__()
+        super().__init__()
 
         self.in_features = in_features
         self.out_features = out_features
@@ -211,7 +211,7 @@ class LinearLayer(MyModule):
 
 class ShortcutLayer(MyModule):
     def __init__(self, in_channels, out_channels, reduction=1):
-        super(ShortcutLayer, self).__init__()
+        super().__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -270,7 +270,7 @@ class MBInvertedConvLayer(MyModule):
         use_se=False,
         channels_per_group=1,
     ):
-        super(MBInvertedConvLayer, self).__init__()
+        super().__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -391,7 +391,7 @@ class MBInvertedConvLayer(MyModule):
 
 class MobileInvertedResidualBlock(MyModule):
     def __init__(self, mobile_inverted_conv, shortcut, drop_connect_rate=0):
-        super(MobileInvertedResidualBlock, self).__init__()
+        super().__init__()
 
         self.mobile_inverted_conv = mobile_inverted_conv
         self.shortcut = shortcut
@@ -419,7 +419,7 @@ class MobileInvertedResidualBlock(MyModule):
 
     @property
     def module_str(self):
-        return "(%s, %s)" % (
+        return "({}, {})".format(
             self.mobile_inverted_conv.module_str
             if self.mobile_inverted_conv is not None
             else None,

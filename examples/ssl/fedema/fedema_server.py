@@ -5,7 +5,7 @@ Implementation of the server for the FedEMA.
 import logging
 import os
 
-import utils
+from utils import extract_encoder, get_parameters_diff
 
 from plato.config import Config
 from plato.servers import fedavg_personalized as personalized_server
@@ -67,6 +67,11 @@ class Server(personalized_server.Server):
 
             logging.info("[Server #%d] Computing divergence scales.", os.getpid())
 
+            algorithm_model = getattr(self.algorithm, "model", None)
+            if algorithm_model is None:
+                raise RuntimeError("FedEMA server requires an algorithm model.")
+            aggregated_state = algorithm_model.state_dict()
+
             for client_update in updates:
                 client_parameters = client_update.payload
                 client_id = client_update.report.client_id
@@ -74,18 +79,18 @@ class Server(personalized_server.Server):
                 if client_id not in clients_id:
                     continue
 
-                aggregated_encoder = utils.extract_encoder(
-                    self.algorithm.model.state_dict(), encoder_layer_names
+                aggregated_encoder = extract_encoder(
+                    aggregated_state, encoder_layer_names
                 )
 
-                client_encoder = utils.extract_encoder(
+                client_encoder = extract_encoder(
                     model_layers=client_parameters,
                     encoder_layer_names=encoder_layer_names,
                 )
 
                 # Compute L2 norm between the aggregated encoder
                 # and client encoder
-                l2_distance = utils.get_parameters_diff(
+                l2_distance = get_parameters_diff(
                     parameter_a=aggregated_encoder,
                     parameter_b=client_encoder,
                 )

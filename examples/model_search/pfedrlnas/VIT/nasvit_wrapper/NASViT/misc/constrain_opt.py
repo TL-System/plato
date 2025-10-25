@@ -17,7 +17,7 @@ class Constraint(torch.optim.Optimizer):
         self, params, base_optimizer, g_star=0.05, alpha=1.0, beta=1.0, **kwargs
     ):
         defaults = dict(g_star=g_star, **kwargs)
-        super(Constraint, self).__init__(params, defaults)
+        super().__init__(params, defaults)
 
         self.base_optimizer = base_optimizer(self.param_groups, **kwargs)
         self.param_groups = self.base_optimizer.param_groups

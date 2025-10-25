@@ -5,6 +5,8 @@ This trainer uses the composable trainer architecture with a custom loss strateg
 to implement SimSiam-specific functionality (dual loss computation).
 """
 
+from collections.abc import Callable
+
 import torch
 
 from plato.config import Config
@@ -21,10 +23,12 @@ class SimSiamLossCriterionStrategy(LossCriterionStrategy):
     the model outputs are tuples/lists (dual views).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the SimSiam loss strategy."""
-        self._ssl_criterion = None
-        self._personalization_criterion = None
+        self._ssl_criterion: Callable[..., torch.Tensor] | None = None
+        self._personalization_criterion: (
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize loss criterion."""
@@ -49,18 +53,22 @@ class SimSiamLossCriterionStrategy(LossCriterionStrategy):
                     loss_criterion=loss_criterion_type,
                     loss_criterion_params=loss_criterion_params,
                 )
-            return self._personalization_criterion(outputs, labels)
+            personalization_criterion = self._personalization_criterion
+            if personalization_criterion is None:
+                raise RuntimeError("Personalization loss criterion is unavailable.")
+            return personalization_criterion(outputs, labels)
 
         # SSL training phase - use SimSiam dual loss
         else:
+            criterion = self._ssl_criterion
+            if criterion is None:
+                raise RuntimeError("SSL loss criterion is unavailable.")
             if isinstance(outputs, (list, tuple)):
                 # SimSiam: average of two losses
-                loss = 0.5 * (
-                    self._ssl_criterion(*outputs[0]) + self._ssl_criterion(*outputs[1])
-                )
+                loss = 0.5 * (criterion(*outputs[0]) + criterion(*outputs[1]))
                 return loss
             else:
-                return self._ssl_criterion(outputs)
+                return criterion(outputs)
 
 
 class Trainer(ssl_trainer.Trainer):

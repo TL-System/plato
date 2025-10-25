@@ -7,8 +7,11 @@ Applies uniform averaging to buffered asynchronous updates.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from types import SimpleNamespace
-from typing import Dict, List
+from typing import Any, Dict, List, Optional, cast
+
+import numpy as np
 
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
 
@@ -18,18 +21,27 @@ class FedBuffAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         if not deltas_received:
             return {}
 
         total_updates = len(deltas_received)
         weight = 1.0 / total_updates if total_updates > 0 else 0.0
 
+        trainer = getattr(context, "trainer", None)
+        zeros_fn: Callable[[Any], Any] | None = (
+            cast(Callable[[Any], Any], trainer.zeros)
+            if trainer is not None and hasattr(trainer, "zeros")
+            else None
+        )
+
         avg_update = {
-            name: context.trainer.zeros(delta.shape)
+            name: zeros_fn(delta.shape)
+            if zeros_fn is not None
+            else np.zeros_like(delta)
             for name, delta in deltas_received[0].items()
         }
 

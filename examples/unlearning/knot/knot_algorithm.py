@@ -1,5 +1,6 @@
 import copy
 from collections import OrderedDict
+from typing import Any, Dict, Optional
 
 from plato.algorithms import fedavg
 
@@ -11,10 +12,10 @@ class Algorithm(fedavg.Algorithm):
         super().__init__(trainer)
 
         # A dictionary that maps cluster IDs to their respective models
-        self.models = {}
+        self.models: Dict[int, Any] = {}
 
         # A dictionary that maps client IDs to the cluster IDs
-        self.clusters = None
+        self.clusters: Optional[Dict[int, int]] = None
 
     def init_clusters(self, clusters):
         """Initialize the dictionary that maps cluster IDs to client IDs."""
@@ -25,15 +26,26 @@ class Algorithm(fedavg.Algorithm):
         if client_id is None:
             return super().extract_weights(model=model)
         else:
-            cluster_id = self.clusters[client_id]
+            clusters = self.clusters
+            if clusters is None:
+                raise RuntimeError(
+                    "Clusters must be initialized before extracting weights."
+                )
+            if client_id not in clusters:
+                raise KeyError(f"Client {client_id} is not registered in any cluster.")
+            cluster_id = clusters[client_id]
 
             if model is None:
+                trainer_model = getattr(self, "model", None)
+                if trainer_model is None:
+                    raise RuntimeError(
+                        "Server model must be initialized before extracting weights."
+                    )
                 if cluster_id in self.models:
-                    return self.models[cluster_id].cpu().state_dict()
-                else:
-                    return self.model.cpu().state_dict()
-            else:
-                return model.cpu().state_dict()
+                    cluster_model = self.models[cluster_id]
+                    return cluster_model.cpu().state_dict()
+                return trainer_model.cpu().state_dict()
+            return model.cpu().state_dict()
 
     def load_weights(self, weights, cluster_id=None):
         """Load the model weights passed in as a parameter."""
@@ -42,7 +54,17 @@ class Algorithm(fedavg.Algorithm):
         else:
             # Load into a particular cluster on the server
             if cluster_id not in self.models:
-                self.models[cluster_id] = copy.deepcopy(self.trainer.model)
+                trainer = self.trainer
+                if trainer is None:
+                    raise RuntimeError(
+                        "Trainer must be initialized before loading cluster weights."
+                    )
+                base_model = getattr(trainer, "model", None)
+                if base_model is None:
+                    raise RuntimeError(
+                        "Trainer must expose a model before loading cluster weights."
+                    )
+                self.models[cluster_id] = copy.deepcopy(base_model)
 
             self.models[cluster_id].load_state_dict(weights, strict=True)
 
@@ -64,9 +86,15 @@ class Algorithm(fedavg.Algorithm):
 
     def get_client_id(self, cluster_id):
         """Retrieving the corresponding client ID for a particular cluster ID."""
-        for client_id, cluster in self.clusters.items():
+        clusters = self.clusters
+        if clusters is None:
+            raise RuntimeError(
+                "Clusters must be initialized before retrieving client IDs."
+            )
+        for client_id, cluster in clusters.items():
             if cluster == cluster_id:
                 return client_id
+        raise KeyError(f"Cluster {cluster_id} is not associated with any client.")
 
     def compute_weight_deltas(
         self, baseline_weights, weights_received, cluster_id=None

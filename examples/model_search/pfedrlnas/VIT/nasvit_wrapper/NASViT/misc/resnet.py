@@ -1,5 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any, Callable, List, Optional, Type, Union
+from collections.abc import Callable
+from typing import Any, List, Optional, Type, Union
 
 import torch
 import torch.nn as nn
@@ -65,13 +66,13 @@ class BasicBlock(nn.Module):
         inplanes: int,
         planes: int,
         stride: int = 1,
-        downsample: Optional[nn.Module] = None,
+        downsample: nn.Module | None = None,
         groups: int = 1,
         base_width: int = 64,
         dilation: int = 1,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+        norm_layer: Callable[..., nn.Module] | None = None,
     ) -> None:
-        super(BasicBlock, self).__init__()
+        super().__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         if groups != 1 or base_width != 64:
@@ -120,14 +121,14 @@ class Bottleneck(nn.Module):
         inplanes: int,
         planes: int,
         stride: int = 1,
-        downsample: Optional[nn.Module] = None,
+        downsample: nn.Module | None = None,
         groups: int = 1,
         base_width: int = 64,
         dilation: int = 1,
         is_last: bool = False,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+        norm_layer: Callable[..., nn.Module] | None = None,
     ) -> None:
-        super(Bottleneck, self).__init__()
+        super().__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         width = int(planes * (base_width / 64.0)) * groups
@@ -174,16 +175,16 @@ class Bottleneck(nn.Module):
 class ResNet(nn.Module):
     def __init__(
         self,
-        block: Type[Union[BasicBlock, Bottleneck]],
-        layers: List[int],
+        block: type[BasicBlock | Bottleneck],
+        layers: list[int],
         num_classes: int = 1000,
         zero_init_residual: bool = False,
         groups: int = 1,
         width_per_group: int = 64,
-        replace_stride_with_dilation: Optional[List[bool]] = None,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+        replace_stride_with_dilation: list[bool] | None = None,
+        norm_layer: Callable[..., nn.Module] | None = None,
     ) -> None:
-        super(ResNet, self).__init__()
+        super().__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
@@ -239,7 +240,7 @@ class ResNet(nn.Module):
 
     def _make_layer(
         self,
-        block: Type[Union[BasicBlock, Bottleneck]],
+        block: type[BasicBlock | Bottleneck],
         planes: int,
         blocks: int,
         stride: int = 1,
@@ -321,8 +322,8 @@ class ResNet(nn.Module):
 
 def _resnet(
     arch: str,
-    block: Type[Union[BasicBlock, Bottleneck]],
-    layers: List[int],
+    block: type[BasicBlock | Bottleneck],
+    layers: list[int],
     pretrained: bool,
     progress: bool,
     **kwargs: Any,

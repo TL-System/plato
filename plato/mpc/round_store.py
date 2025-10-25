@@ -13,8 +13,9 @@ import contextlib
 import logging
 import os
 import pickle
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from plato.config import Config
 
@@ -44,10 +45,10 @@ class RoundInfoState:
     """
 
     round_number: int
-    selected_clients: List[int] = field(default_factory=list)
-    client_samples: Dict[int, Optional[int]] = field(default_factory=dict)
-    additive_shares: Dict[int, Optional[Dict[str, Any]]] = field(default_factory=dict)
-    pairwise_shares: Dict[Tuple[int, int], Optional[Dict[str, Any]]] = field(
+    selected_clients: list[int] = field(default_factory=list)
+    client_samples: dict[int, int | None] = field(default_factory=dict)
+    additive_shares: dict[int, dict[str, Any] | None] = field(default_factory=dict)
+    pairwise_shares: dict[tuple[int, int], dict[str, Any] | None] = field(
         default_factory=dict
     )
 
@@ -78,7 +79,7 @@ class RoundInfoStore:
         self,
         *,
         lock=None,
-        storage_dir: Optional[str] = None,
+        storage_dir: str | None = None,
         use_s3: bool = False,
         s3_key_prefix: str = "mpc",
     ):
@@ -113,7 +114,7 @@ class RoundInfoStore:
             os.makedirs(self._storage_dir, exist_ok=True)
 
     @classmethod
-    def from_config(cls, lock=None) -> "RoundInfoStore":
+    def from_config(cls, lock=None) -> RoundInfoStore:
         """
         Factory building a store from the active configuration.
 
@@ -163,7 +164,7 @@ class RoundInfoStore:
                 if self._lock is not None:
                     self._lock.release()
 
-    def _load_state(self) -> Optional[RoundInfoState]:
+    def _load_state(self) -> RoundInfoState | None:
         """Load the current round state from the configured backend."""
         if self._use_s3:
             assert self._s3_client is not None
@@ -242,7 +243,7 @@ class RoundInfoStore:
             return state
 
     def append_additive_share(
-        self, target_client: int, share_payload: Dict[str, Any]
+        self, target_client: int, share_payload: dict[str, Any]
     ) -> RoundInfoState:
         """Accumulate additive-share payloads destined for ``target_client``."""
         with self._acquire():
@@ -257,7 +258,7 @@ class RoundInfoStore:
             return state
 
     def store_pairwise_share(
-        self, target_client: int, from_client: int, share_payload: Dict[str, Any]
+        self, target_client: int, from_client: int, share_payload: dict[str, Any]
     ) -> RoundInfoState:
         """Store a pairwise share (used by Shamir secret sharing)."""
         with self._acquire():

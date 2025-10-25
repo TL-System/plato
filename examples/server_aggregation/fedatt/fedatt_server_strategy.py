@@ -22,10 +22,10 @@ class FedAttAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """This method is not used; FedAtt aggregates weights directly."""
         raise NotImplementedError(
             "FedAtt uses aggregate_weights instead of aggregate_deltas"
@@ -33,11 +33,11 @@ class FedAttAggregationStrategy(AggregationStrategy):
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Perform attentive aggregation by delegating to the algorithm."""
         algorithm = getattr(context, "algorithm", None)
         if algorithm is None:

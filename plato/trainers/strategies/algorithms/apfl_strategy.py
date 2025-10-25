@@ -29,6 +29,7 @@ The update rules:
 
 import logging
 import os
+from collections.abc import Callable
 from typing import Any, Dict, Optional
 
 import numpy as np
@@ -94,8 +95,8 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         self,
         alpha: float = 0.5,
         adaptive_alpha: bool = True,
-        model_fn: Optional[callable] = None,
-        save_path: Optional[str] = None,
+        model_fn: Callable[[], nn.Module] | None = None,
+        save_path: str | None = None,
     ):
         """
         Initialize APFL update strategy.
@@ -113,8 +114,8 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         self.adaptive_alpha = adaptive_alpha
         self.model_fn = model_fn
         self.save_path = save_path
-        self.personalized_model = None
-        self.personalized_optimizer = None
+        self.personalized_model: nn.Module | None = None
+        self.personalized_optimizer: torch.optim.Optimizer | None = None
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -172,9 +173,12 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
                 )
 
         # Load personalized model if it exists
+        personalized_model = self.personalized_model
+        if personalized_model is None:
+            raise RuntimeError("APFL personalized model has not been initialised.")
         if os.path.exists(self.personalized_model_path):
             try:
-                self.personalized_model.load_state_dict(
+                personalized_model.load_state_dict(
                     torch.load(
                         self.personalized_model_path,
                         map_location=torch.device("cpu"),
@@ -193,8 +197,8 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
                 )
 
         # Move personalized model to device and set to training mode
-        self.personalized_model.to(context.device)
-        self.personalized_model.train()
+        personalized_model.to(context.device)
+        personalized_model.train()
 
         # Store in context for APFLStepStrategy
         context.state["apfl_personalized_model"] = self.personalized_model
@@ -224,10 +228,16 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
             )
 
         # Save personalized model
-        try:
-            torch.save(
-                self.personalized_model.state_dict(), self.personalized_model_path
+        personalized_model = self.personalized_model
+        if personalized_model is None:
+            logging.warning(
+                "[Client #%d] No personalized model available to save.",
+                context.client_id,
             )
+            return
+
+        try:
+            torch.save(personalized_model.state_dict(), self.personalized_model_path)
             logging.info(
                 "[Client #%d] Saved APFL personalized model", context.client_id
             )
@@ -239,9 +249,9 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
             )
 
         # Move to CPU to free GPU memory
-        self.personalized_model.to(torch.device("cpu"))
+        personalized_model.to(torch.device("cpu"))
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """
         Return empty payload (APFL only sends global model weights).
 
@@ -308,7 +318,7 @@ class APFLStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -400,7 +410,7 @@ class APFLStepStrategy(TrainingStepStrategy):
         alpha_lr: float,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
     ) -> float:
         """
         Update mixing parameter α based on gradient.
@@ -478,7 +488,7 @@ class APFLUpdateStrategyFromConfig(APFLUpdateStrategy):
         ... )
     """
 
-    def __init__(self, model_fn: Optional[callable] = None):
+    def __init__(self, model_fn: Callable[[], nn.Module] | None = None):
         """
         Initialize APFL strategy from config.
 

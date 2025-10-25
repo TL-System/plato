@@ -9,7 +9,7 @@ import sys
 from .utils import is_master_process
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _cached_log_stream(filename):
     io = open(filename, "a", buffering=8192)
     atexit.register(io.close)

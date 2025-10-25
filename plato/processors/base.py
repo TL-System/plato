@@ -15,7 +15,7 @@ class Processor:
 
     def __init__(self, name=None, trainer=None, **kwargs) -> None:
         """Constructor for Processor."""
-        self.name = name
+        self.name: str = name if isinstance(name, str) else type(self).__name__
         self.trainer = trainer
 
     @abstractmethod

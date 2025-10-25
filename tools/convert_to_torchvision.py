@@ -29,7 +29,8 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Sequence
+from typing import List
+from collections.abc import Iterable, Sequence
 
 
 @dataclass(frozen=True)
@@ -76,7 +77,7 @@ def _line_ending(line: str) -> str:
     return ""
 
 
-def _build_insert_lines(spec: DatasetSpec, indent: str, newline: str) -> List[str]:
+def _build_insert_lines(spec: DatasetSpec, indent: str, newline: str) -> list[str]:
     """Construct the lines that must appear after the datasource entry."""
     terminator = newline or "\n"
     insert_lines = [f'{indent}dataset_name = "{spec.dataset_name}"{terminator}']
@@ -87,7 +88,7 @@ def _build_insert_lines(spec: DatasetSpec, indent: str, newline: str) -> List[st
     return insert_lines
 
 
-def transform_lines(lines: List[str]) -> tuple[List[str], bool]:
+def transform_lines(lines: list[str]) -> tuple[list[str], bool]:
     """Apply datasource rewrites to the provided list of lines."""
     changed = False
     i = 0

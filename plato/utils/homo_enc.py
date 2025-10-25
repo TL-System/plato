@@ -1,11 +1,15 @@
 """
-Utility functions for homomorphric encryption with TenSEAL.
+Utility functions for homomorphic encryption with TenSEAL.
 """
+
+from __future__ import annotations
 
 import os
 import pickle
 import zlib
-from typing import OrderedDict
+from collections import OrderedDict
+from collections.abc import Iterable, Mapping
+from typing import Any, Dict, Tuple
 
 import numpy as np
 import tenseal as ts
@@ -84,7 +88,9 @@ def _encrypt(data_vector, context, serialize=True):
         return ts.ckks_vector(context, data_vector)
 
 
-def deserialize_weights(serialized_weights, context):
+def deserialize_weights(
+    serialized_weights: Mapping[str, Any], context: ts.Context
+) -> OrderedDict:
     """Deserialize the encrypted weights (not decrypted yet)."""
     deserialized_weights = OrderedDict()
     for name, weight in serialized_weights.items():
@@ -98,8 +104,15 @@ def deserialize_weights(serialized_weights, context):
     return deserialized_weights
 
 
-def decrypt_weights(data, weight_shapes=None, para_nums=None):
+def decrypt_weights(
+    data: Mapping[str, Any],
+    weight_shapes: Mapping[str, Any] | None = None,
+    para_nums: Mapping[str, int] | None = None,
+) -> OrderedDict:
     """Decrypt the vector and restore model weights according to the shapes."""
+    if weight_shapes is None or para_nums is None:
+        raise ValueError("weight_shapes and para_nums must be provided for decryption.")
+
     vector_length = []
     for para_num in para_nums.values():
         vector_length.append(para_num)

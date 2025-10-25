@@ -85,13 +85,13 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
         )
         self.sampler = sampler
 
-    def _get_train_sampler(self) -> Optional[Sampler]:
+    def _get_train_sampler(self) -> Sampler | None:
         """Get training sampler."""
         if self.sampler is None:
             return RandomSampler(self.train_dataset)
         return self.sampler
 
-    def _get_eval_sampler(self, eval_dataset) -> Optional[Sampler]:
+    def _get_eval_sampler(self, eval_dataset) -> Sampler | None:
         """Get evaluation sampler."""
         if self.sampler is None:
             return super()._get_eval_sampler(eval_dataset)

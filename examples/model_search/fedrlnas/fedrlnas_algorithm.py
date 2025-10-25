@@ -8,6 +8,11 @@ Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedi
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
 
+from __future__ import annotations
+
+from typing import Protocol, cast
+
+import torch
 from Darts.model_search_local import MaskedNetwork
 from fedrlnas_tools import (
     client_weight_param,
@@ -15,9 +20,23 @@ from fedrlnas_tools import (
     fuse_weight_gradient,
     sample_mask,
 )
+from torch import Tensor
+from torch.nn import Module
 
 from plato.algorithms import fedavg
 from plato.config import Config
+
+
+class SupernetProtocol(Protocol):
+    """Protocol describing the supernet interface used by FedRLNAS."""
+
+    model: Module
+    alphas_normal: Tensor
+    alphas_reduce: Tensor
+
+    def step(self, accuracy_list, epoch_index_normal, epoch_index_reduce) -> None: ...
+
+    def genotype(self): ...
 
 
 class FedNASAlgorithm(fedavg.Algorithm):
@@ -42,18 +61,30 @@ class ServerAlgorithm(FedNASAlgorithm):
     def __init__(self, trainer=None):
         super().__init__(trainer)
 
-        self.mask_normal = None
-        self.mask_reduce = None
+        self.mask_normal: Tensor | None = None
+        self.mask_reduce: Tensor | None = None
+
+    def _require_supernet(self) -> SupernetProtocol:
+        """Return the attached supernet, ensuring it is available."""
+        if self.model is not None:
+            return cast(SupernetProtocol, self.model)
+        trainer = self.require_trainer()
+        supernet = getattr(trainer, "model", None)
+        if supernet is None:
+            raise RuntimeError("Supernet model is not attached to the trainer.")
+        self.model = supernet
+        return cast(SupernetProtocol, supernet)
 
     def extract_weights(self, model=None):
         """Extract weights from the supernet and assign different models to clients."""
-        if model is None:
-            model = self.model
-
+        supernet = self._require_supernet()
         mask_normal = self.mask_normal
         mask_reduce = self.mask_reduce
+        if mask_normal is None or mask_reduce is None:
+            raise RuntimeError("Masks have not been sampled before extracting weights.")
+
         client_model = self.generate_client_model(mask_normal, mask_reduce)
-        client_weight_param(model.model, client_model)
+        client_weight_param(supernet.model, client_model)
         return client_model.cpu().state_dict()
 
     def load_weights(self, weights):
@@ -61,8 +92,9 @@ class ServerAlgorithm(FedNASAlgorithm):
 
     def sample_mask(self, epsilon):
         """Sample mask to generate a subnet."""
-        mask_normal = sample_mask(self.model.alphas_normal, epsilon)
-        mask_reduce = sample_mask(self.model.alphas_reduce, epsilon)
+        supernet = self._require_supernet()
+        mask_normal = sample_mask(supernet.alphas_normal, epsilon)
+        mask_reduce = sample_mask(supernet.alphas_reduce, epsilon)
         self.mask_normal = mask_normal
         self.mask_reduce = mask_reduce
         return mask_normal, mask_reduce
@@ -71,6 +103,7 @@ class ServerAlgorithm(FedNASAlgorithm):
         self, masks_normal, masks_reduce, weights_received, num_samples
     ):
         """Weight aggregation in NAS."""
+        supernet = self._require_supernet()
         client_models = []
 
         for i, payload in enumerate(weights_received):
@@ -80,7 +113,7 @@ class ServerAlgorithm(FedNASAlgorithm):
             client_model.load_state_dict(payload, strict=True)
             client_models.append(client_model)
         fuse_weight_gradient(
-            self.model.model,
+            supernet.model,
             client_models,
             num_samples,
         )
@@ -96,13 +129,17 @@ class ClientAlgorithm(FedNASAlgorithm):
     def __init__(self, trainer=None):
         super().__init__(trainer)
 
-        self.mask_normal = None
-        self.mask_reduce = None
+        self.mask_normal: Tensor | None = None
+        self.mask_reduce: Tensor | None = None
 
     def extract_weights(self, model=None):
-        if model is None:
-            model = self.model
-        return model.cpu().state_dict()
+        target_model: Module
+        if model is not None:
+            target_model = model
+        else:
+            target_model = cast(Module, self.require_model())
+        return target_model.cpu().state_dict()
 
     def load_weights(self, weights):
-        self.model.load_state_dict(weights, strict=True)
+        model = cast(Module, self.require_model())
+        model.load_state_dict(weights, strict=True)

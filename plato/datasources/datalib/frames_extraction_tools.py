@@ -6,12 +6,30 @@ Tools for extracting and processing the frames
 """
 
 import glob
+import importlib
 import os
 from multiprocessing import Pool
 
-from mmaction.tools.misc.flow_extraction import extract_dense_flow
-
 from plato.datasources.datalib import modality_extraction_base
+
+_EXTRACT_DENSE_FLOW = None
+
+
+def _get_extract_dense_flow():
+    global _EXTRACT_DENSE_FLOW
+    if _EXTRACT_DENSE_FLOW is None:
+        try:
+            module = importlib.import_module("mmaction.tools.misc.flow_extraction")
+            _EXTRACT_DENSE_FLOW = getattr(module, "extract_dense_flow")
+        except (
+            ImportError,
+            AttributeError,
+        ) as exc:  # pragma: no cover - optional dependency
+            raise ImportError(
+                "mmaction is required for optical flow extraction. "
+                "Install mmaction2 to enable this functionality."
+            ) from exc
+    return _EXTRACT_DENSE_FLOW
 
 
 def obtain_video_dest_dir(out_dir, video_path, is_classname_contained=True):
@@ -46,6 +64,7 @@ def extract_dense_flow_wrapper(items):
         dest_dir, input_video_path, is_classname_contained=is_classname_contained
     )
 
+    extract_dense_flow = _get_extract_dense_flow()
     extract_dense_flow(
         input_video_path,
         out_full_path,

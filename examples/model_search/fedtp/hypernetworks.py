@@ -4,9 +4,12 @@ Hypernetworks used in FedTP.
 Modified based on https://github.com/zhyczy/FedTP/blob/main/models/Hypernetworks.py.
 """
 
-from collections import OrderedDict
+from __future__ import annotations
 
-from torch import nn
+from collections import OrderedDict
+from typing import OrderedDict as OrderedDictType
+
+from torch import Tensor, nn
 from torch.nn.utils import spectral_norm
 
 from plato.config import Config
@@ -16,6 +19,11 @@ class ViTHyper(nn.Module):
     """
     The HyerNetwork for generating Vision Transformer (ViT)'s attention maps.
     """
+
+    dim: int
+    inner_dim: int
+    depth: int
+    client_sample: int
 
     def __init__(
         self,
@@ -32,10 +40,10 @@ class ViTHyper(nn.Module):
     ):
         # pylint:disable=too-many-arguments
         super().__init__()
-        self.dim = dim
-        self.inner_dim = dim_head * heads
-        self.depth = depth
-        self.client_sample = client_sample
+        object.__setattr__(self, "dim", int(dim))
+        object.__setattr__(self, "inner_dim", int(dim_head * heads))
+        object.__setattr__(self, "depth", int(depth))
+        object.__setattr__(self, "client_sample", int(client_sample))
         # embedding layer
         self.embeddings = nn.Embedding(
             num_embeddings=n_nodes, embedding_dim=embedding_dim
@@ -66,12 +74,11 @@ class ViTHyper(nn.Module):
                 to_qkv_value = nn.Linear(hidden_dim, self.dim * self.inner_dim * 3)
             self.to_qkv_value_list.append(to_qkv_value)
 
-    def forward(self, idx):
+    def forward(self, idx) -> OrderedDictType[str, Tensor]:
         "The forward pass of hypernetwork."
-        weights = 0
         emd = self.embeddings(idx)
         features = self.mlp(emd)
-        weights = OrderedDict()
+        weights: OrderedDictType[str, Tensor] = OrderedDict()
         for dep in range(self.depth):
             layer_d_qkv_value_hyper = self.to_qkv_value_list[dep]
             attention_map = Config().parameters.hypernet.attention.split(",")
@@ -102,6 +109,11 @@ class ShakesHyper(nn.Module):
     HyperNetwork for transformer.
     """
 
+    dim: int
+    inner_dim: int
+    depth: int
+    client_sample: int
+
     # pylint:disable=too-many-instance-attributes
     def __init__(
         self,
@@ -120,10 +132,10 @@ class ShakesHyper(nn.Module):
         # pylint:disable=too-many-locals
 
         super().__init__()
-        self.dim = dim
-        self.inner_dim = dim_head * heads
-        self.depth = depth
-        self.client_sample = client_sample
+        object.__setattr__(self, "dim", int(dim))
+        object.__setattr__(self, "inner_dim", int(dim_head * heads))
+        object.__setattr__(self, "depth", int(depth))
+        object.__setattr__(self, "client_sample", int(client_sample))
         # embedding layer
         self.embeddings = nn.Embedding(
             num_embeddings=n_nodes, embedding_dim=embedding_dim

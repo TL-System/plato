@@ -15,10 +15,12 @@ Example:
 """
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from typing import Any, Dict, Optional
 
 import torch
 import torch.nn as nn
+from torch.optim.lr_scheduler import LRScheduler
 
 
 class TrainingContext:
@@ -48,13 +50,13 @@ class TrainingContext:
 
     def __init__(self):
         """Initialize training context with default values."""
-        self.model: Optional[nn.Module] = None
-        self.device: Optional[torch.device] = None
+        self.model: nn.Module | None = None
+        self.device: torch.device | None = None
         self.client_id: int = 0
         self.current_epoch: int = 0
         self.current_round: int = 0
-        self.config: Dict[str, Any] = {}
-        self.state: Dict[str, Any] = {}
+        self.config: dict[str, Any] = {}
+        self.state: dict[str, Any] = {}
 
     def __repr__(self) -> str:
         """Return string representation of context."""
@@ -246,7 +248,7 @@ class TrainingStepStrategy(Strategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -309,7 +311,7 @@ class LRSchedulerStrategy(Strategy):
     @abstractmethod
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> LRScheduler | None:
         """
         Create and return learning rate scheduler.
 
@@ -327,7 +329,7 @@ class LRSchedulerStrategy(Strategy):
 
     def step(
         self,
-        scheduler: Optional[torch.optim.lr_scheduler._LRScheduler],
+        scheduler: LRScheduler | None,
         context: TrainingContext,
     ) -> None:
         """
@@ -431,7 +433,7 @@ class ModelUpdateStrategy(Strategy):
         """
         pass
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """
         Return additional data to send to server with model update.
 
@@ -529,7 +531,7 @@ class TestingStrategy(Strategy):
     def test_model(
         self,
         model: nn.Module,
-        config: Dict[str, Any],
+        config: dict[str, Any],
         testset,
         sampler,
         context: TrainingContext,

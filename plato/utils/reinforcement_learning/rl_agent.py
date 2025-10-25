@@ -5,6 +5,7 @@ A basic RL environment for FL server using Gym for RL control.
 import asyncio
 import logging
 from abc import abstractmethod
+from typing import Any, Optional
 
 import numpy as np
 from gymnasium import spaces
@@ -12,7 +13,7 @@ from gymnasium import spaces
 from plato.config import Config
 
 
-class RLAgent(object):
+class RLAgent:
     """A basic RL environment for the FL server, using Gym for RL control."""
 
     def __init__(self):
@@ -33,6 +34,7 @@ class RLAgent(object):
             low=-np.inf, high=np.inf, shape=(self.n_states,), dtype=np.float32
         )
 
+        self.policy: Any | None = None
         self.state = None
         self.next_state = None
         self.new_state = None
@@ -75,6 +77,8 @@ class RLAgent(object):
     def prep_action(self):
         """Get action from RL policy."""
         logging.info("[RL Agent] Selecting action...")
+        if self.policy is None:
+            raise RuntimeError("RL policy has not been initialised.")
         self.action = self.policy.select_action(self.state)
 
     def get_state(self):

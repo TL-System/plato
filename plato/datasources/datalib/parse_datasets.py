@@ -4,18 +4,22 @@ tools/data/build_file_lists.py provided by the mmaction
 """
 
 import csv
+import importlib
 import random
 
-from mmaction.tools.data.parse_file_list import (
-    parse_diving48_splits,
-    parse_hmdb51_split,
-    parse_jester_splits,
-    parse_mit_splits,
-    parse_mmit_splits,
-    parse_sthv1_splits,
-    parse_sthv2_splits,
-    parse_ucf101_splits,
-)
+_PARSE_FILE_LIST_MODULE = None
+
+
+def _get_parse_file_list_module():
+    global _PARSE_FILE_LIST_MODULE
+    if _PARSE_FILE_LIST_MODULE is None:
+        try:
+            _PARSE_FILE_LIST_MODULE = importlib.import_module(
+                "mmaction.tools.data.parse_file_list"
+            )
+        except ImportError as exc:  # pragma: no cover - optional dependency
+            raise ImportError("mmaction is required to parse dataset splits.") from exc
+    return _PARSE_FILE_LIST_MODULE
 
 
 def build_list(split, frame_info, shuffle=False):
@@ -181,27 +185,32 @@ def obtain_data_splits_info(
     data_name="kinetics700",
 ):
     """Parse the raw data file to obtain different splits info"""
+    module = _get_parse_file_list_module()
     if data_name == "ucf101":
-        splits = parse_ucf101_splits(data_fir_level)
+        splits = module.parse_ucf101_splits(data_fir_level)
     elif data_name == "sthv1":
-        splits = parse_sthv1_splits(data_fir_level)
+        splits = module.parse_sthv1_splits(data_fir_level)
     elif data_name == "sthv2":
-        splits = parse_sthv2_splits(data_fir_level)
+        splits = module.parse_sthv2_splits(data_fir_level)
     elif data_name == "mit":
-        splits = parse_mit_splits()
+        splits = module.parse_mit_splits()
     elif data_name == "mmit":
-        splits = parse_mmit_splits()
+        splits = module.parse_mmit_splits()
     elif data_name in ["kinetics400", "kinetics600", "kinetics700"]:
         kinetics_anntation_files_info = data_annos_files_info
         splits = parse_kinetics_splits(
             kinetics_anntation_files_info, data_fir_level, data_name
         )
     elif data_name == "hmdb51":
-        splits = parse_hmdb51_split(data_fir_level)
+        splits = module.parse_hmdb51_split(data_fir_level)
     elif data_name == "jester":
-        splits = parse_jester_splits(data_fir_level)
+        splits = module.parse_jester_splits(data_fir_level)
     elif data_name == "diving48":
-        splits = parse_diving48_splits()
+        parse_diving48 = module.parse_diving48_splits
+        try:
+            splits = parse_diving48(data_fir_level)
+        except TypeError:
+            splits = parse_diving48()
     else:
         raise ValueError(
             f"Supported datasets are 'ucf101, sthv1, sthv2', 'jester', "

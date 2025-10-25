@@ -12,15 +12,29 @@ event_root = f'{data_root}/events'
 
 """
 
+import importlib
 import os
 import os.path as osp
 import subprocess
 
-import mmcv
+_MMCV_MODULE = None
+
+
+def _get_mmcv():
+    global _MMCV_MODULE
+    if _MMCV_MODULE is None:
+        try:
+            _MMCV_MODULE = importlib.import_module("mmcv")
+        except ImportError as exc:  # pragma: no cover - optional dependency
+            raise ImportError(
+                "mmcv is required for gym dataset trimming utilities."
+            ) from exc
+    return _MMCV_MODULE
 
 
 def trim_event(video_root, anno_file, event_anno_file, event_root):
     """Trim the videos into many events"""
+    mmcv = _get_mmcv()
     videos = os.listdir(video_root)
     videos = set(videos)
     annotation = mmcv.load(anno_file)
@@ -86,6 +100,7 @@ def trim_event(video_root, anno_file, event_anno_file, event_root):
 
 def trim_subsection(event_anno_file, event_root, subaction_root):
     """Further trim the event into several subsections"""
+    mmcv = _get_mmcv()
     events = os.listdir(event_root)
     events = set(events)
     annotation = mmcv.load(event_anno_file)

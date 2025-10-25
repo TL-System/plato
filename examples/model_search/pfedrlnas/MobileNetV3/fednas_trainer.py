@@ -6,16 +6,20 @@ in federated learning, including memory-aware batch size adjustment and subnet
 configuration management.
 """
 
+from __future__ import annotations
+
 import logging
 import os
 import pickle
 import random
 import re
+from typing import cast
 
 import fednas_specific
 import fedtools
 import torch
 from model.mobilenetv3_supernet import NasDynamicModel
+from torch.nn import Module
 
 from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
@@ -102,14 +106,16 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
 
     def __init__(self):
         """Initialize the strategy."""
-        self.batch_size = None
-        self.unavailable_batch = 1024
+        self.batch_size: int | None = None
+        self.unavailable_batch: int = 1024
 
     def create_train_loader(self, trainset, sampler, batch_size, context):
         """Create training data loader with potentially adjusted batch size."""
         # Use adjusted batch size if set, otherwise use config batch size
         if self.batch_size is None:
-            self.batch_size = batch_size
+            self.batch_size = int(batch_size)
+
+        current_batch_size = self.batch_size
 
         # Handle different sampler types properly
         if sampler is not None:
@@ -131,19 +137,25 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
         return torch.utils.data.DataLoader(
             dataset=trainset,
             shuffle=False,
-            batch_size=self.batch_size,
+            batch_size=current_batch_size,
             sampler=sampler_obj,
         )
 
     def adjust_batch_size_down(self):
         """Decrease the batch size after memory overflow."""
-        self.unavailable_batch = min(self.unavailable_batch, self.batch_size)
-        self.batch_size = max(self.batch_size // 2, 1)
+        if self.batch_size is None:
+            raise RuntimeError("Batch size has not been initialised.")
+        current_batch = self.batch_size
+        self.unavailable_batch = min(self.unavailable_batch, current_batch)
+        self.batch_size = max(current_batch // 2, 1)
 
     def adjust_batch_size_up(self, config):
         """Increase the batch size if memory allows."""
-        if self.batch_size * 2 <= self.unavailable_batch:
-            self.batch_size *= 2
+        if self.batch_size is None:
+            raise RuntimeError("Batch size has not been initialised.")
+        current_batch = self.batch_size
+        if current_batch * 2 <= self.unavailable_batch:
+            self.batch_size = current_batch * 2
 
 
 # ============================================================================
@@ -156,18 +168,22 @@ class MemorySimulationCallback(TrainerCallback):
 
     def __init__(self):
         """Initialize the callback."""
-        self.sim_mem = None
-        self.max_mem = None
-        self.min_mem = None
+        self.sim_mem: float | None = None
+        self.max_mem: float | None = None
+        self.min_mem: float | None = None
         self.exceed_memory = False
 
         if hasattr(Config().parameters, "simulate"):
-            self.max_mem = Config().parameters.simulate.max_mem
-            self.min_mem = Config().parameters.simulate.min_mem
+            self.max_mem = float(Config().parameters.simulate.max_mem)
+            self.min_mem = float(Config().parameters.simulate.min_mem)
 
     def on_train_run_start(self, trainer, config, **kwargs):
         """Initialize simulated memory at the start of training."""
         if hasattr(Config().parameters, "simulate"):
+            if self.max_mem is None or self.min_mem is None:
+                raise RuntimeError(
+                    "Simulation bounds are undefined despite configuration."
+                )
             self.sim_mem = (
                 random.random() * (self.max_mem - self.min_mem) + self.min_mem
             )
@@ -186,6 +202,9 @@ class MemorySimulationCallback(TrainerCallback):
         if not isinstance(
             trainer.training_step_strategy, MemoryTrackingTrainingStepStrategy
         ):
+            return
+
+        if self.sim_mem is None:
             return
 
         max_mem_allocated = trainer.training_step_strategy.max_mem_allocated
@@ -368,11 +387,21 @@ class TrainerAsync(ComposableTrainer):
         self.memory_tracking_strategy = training_step_strategy
         self.dynamic_batch_strategy = data_loader_strategy
 
+    def _require_module(self) -> Module:
+        """Return the underlying torch module, ensuring it exists."""
+        model = getattr(self, "model", None)
+        if not isinstance(model, Module):
+            raise RuntimeError(
+                "Trainer model is not a torch.nn.Module instance for this FedNAS trainer."
+            )
+        return model
+
     def train_process(self, config, trainset, sampler, **kwargs):
         """Training process with retry logic for memory overflow."""
         while True:
             try:
-                self.train_model(config, trainset, sampler.get(), **kwargs)
+                sampler_value = sampler.get() if sampler is not None else None
+                self.train_model(config, trainset, sampler_value, **kwargs)
                 break
             except SimuRuntimeError:
                 # Adjust batch size and retry
@@ -388,9 +417,10 @@ class TrainerAsync(ComposableTrainer):
 
         # Save model after successful training
         if "max_concurrency" in config:
-            self.model.cpu()
+            model = self._require_module()
+            model.cpu()
             model_name = config["model_name"]
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
             self.save_model(filename)
 
     def obtain_model_at_time(self, client_id, requested_time):
@@ -404,7 +434,7 @@ class TrainerAsync(ComposableTrainer):
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).safetensors$",
                 filename,
             )
 
@@ -430,14 +460,7 @@ class TrainerAsync(ComposableTrainer):
 
             if model_training_time < requested_time:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
-
-                pretrained = None
-                if torch.cuda.is_available():
-                    pretrained = torch.load(model_path)
-                else:
-                    pretrained = torch.load(
-                        model_path, map_location=torch.device("cpu")
-                    )
+                pretrained = fedtools.load_safetensor_state_dict(model_path)
 
                 # Create NAS model with subnet configuration
                 model = fedtools.sample_subnet_w_config(
@@ -457,13 +480,7 @@ class TrainerAsync(ComposableTrainer):
 
         # If no matching epoch found, return the last available model
         model_path = f"{Config().params['model_path']}/{model_checkpoint}"
-
-        pretrained = None
-        if torch.cuda.is_available():
-            pretrained = torch.load(model_path)
-        else:
-            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
-
+        pretrained = fedtools.load_safetensor_state_dict(model_path)
         model = fedtools.sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
         model.load_state_dict(pretrained, strict=True)
 

@@ -34,8 +34,13 @@ class Processor(model.Processor):
         """
         Proceesses global unstructured pruning on model weights.
         """
+        trainer = getattr(self, "trainer", None)
+        if trainer is None or getattr(trainer, "model", None) is None:
+            raise RuntimeError(
+                "UnstructuredPruning processor requires an attached trainer with a model."
+            )
 
-        self.model = self.trainer.model
+        self.model = trainer.model
 
         if self.parameters_to_prune is None:
             self.parameters_to_prune = []

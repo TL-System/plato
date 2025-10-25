@@ -3,6 +3,9 @@ The federated averaging algorithm for GAN model.
 """
 
 from collections import OrderedDict
+from typing import Any, Optional
+
+from torch.nn import Module
 
 from plato.algorithms import fedavg
 from plato.trainers.base import Trainer
@@ -13,8 +16,9 @@ class Algorithm(fedavg.Algorithm):
 
     def __init__(self, trainer: Trainer):
         super().__init__(trainer=trainer)
-        self.generator = self.model.generator
-        self.discriminator = self.model.discriminator
+        model: Any = self.require_model()
+        self.generator: Module = getattr(model, "generator")
+        self.discriminator: Module = getattr(model, "discriminator")
 
     def compute_weight_deltas(self, baseline_weights, weights_received):
         """Extract the weights received from a client and compute the updates."""
@@ -55,13 +59,13 @@ class Algorithm(fedavg.Algorithm):
 
         return updated_weights_gen, updated_weights_disc
 
-    def extract_weights(self, model=None):
+    def extract_weights(self, model: Any | None = None):
         """Extract weights from the model."""
-        generator = self.generator
-        discriminator = self.discriminator
+        generator: Module = self.generator
+        discriminator: Module = self.discriminator
         if model is not None:
-            generator = model.generator
-            discriminator = model.discriminator
+            generator = getattr(model, "generator")
+            discriminator = getattr(model, "discriminator")
 
         gen_weight = generator.cpu().state_dict()
         disc_weight = discriminator.cpu().state_dict()

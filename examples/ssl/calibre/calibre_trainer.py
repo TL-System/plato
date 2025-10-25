@@ -4,6 +4,7 @@ A self-supervised federated learning trainer with Calibre.
 
 import logging
 import os
+from collections.abc import Callable
 
 import torch
 from calibre_dataloader_strategy import CalibreDataLoaderStrategy
@@ -29,8 +30,10 @@ class CalibreLossStrategy(LossCriterionStrategy):
 
     def __init__(self):
         """Initialize the Calibre loss strategy."""
-        self._calibre_loss = None
-        self._personalization_loss = None
+        self._calibre_loss: CalibreLoss | None = None
+        self._personalization_loss: (
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None
+        ) = None
 
     def setup(self, context: TrainingContext):
         """Initialize the Calibre loss criterion."""
@@ -106,13 +109,22 @@ class CalibreLossStrategy(LossCriterionStrategy):
                 raise RuntimeError(
                     "Local personalization layers are not available in context."
                 )
+            if not callable(local_layers):
+                raise TypeError("Local personalization layers must be callable.")
             logits = local_layers(outputs)
-            return self._personalization_loss(logits, labels)
 
+            personalization_loss = self._personalization_loss
+            if personalization_loss is None:
+                raise RuntimeError("Personalization loss criterion is unavailable.")
+            return personalization_loss(logits, labels)
+
+        calibre_loss = self._calibre_loss
+        if calibre_loss is None:
+            raise RuntimeError("Calibre loss criterion is not initialized.")
         if isinstance(outputs, (list, tuple)):
-            return self._calibre_loss(*outputs, labels=labels)
+            return calibre_loss(*outputs, labels=labels)
         else:
-            return self._calibre_loss(outputs, labels=labels)
+            return calibre_loss(outputs, labels=labels)
 
 
 class CalibreDivergenceStrategy(ModelUpdateStrategy):
@@ -169,10 +181,18 @@ class CalibreDivergenceStrategy(ModelUpdateStrategy):
 
         sample_encodings = None
 
+        device = context.device or torch.device("cpu")
+        model = context.model
+        if model is None:
+            raise RuntimeError("Training context does not provide a model.")
+        encoder_module = getattr(model, "encoder", None)
+        if not callable(encoder_module):
+            raise AttributeError("Context model does not expose a callable encoder.")
+
         with torch.no_grad():
             for examples, _ in personalized_train_loader:
-                examples = examples.to(context.device)
-                features = context.model.encoder(examples)
+                examples = examples.to(device)
+                features = encoder_module(examples)
 
                 sample_encodings = (
                     features
@@ -180,7 +200,14 @@ class CalibreDivergenceStrategy(ModelUpdateStrategy):
                     else torch.cat((sample_encodings, features), dim=0)
                 )
 
-        divergence_rate = self.compute_divergence_rate(sample_encodings, context.device)
+        if sample_encodings is None:
+            logging.warning(
+                "[Client #%d] Unable to compute divergence rate; no samples available.",
+                context.client_id,
+            )
+            return
+
+        divergence_rate = self.compute_divergence_rate(sample_encodings, device)
 
         # Save the divergence
         model_path = Config().params["model_path"]
@@ -239,15 +266,24 @@ class Trainer(ComposableTrainer):
 
     def collect_encodings(self, data_loader):
         """Collect encodings of the data by using self.model encoder."""
+        if self.model is None or self.device is None:
+            raise RuntimeError("Trainer model and device must be initialized.")
+
+        model = self.model
+        device = self.device
+        encoder_module = getattr(model, "encoder", None)
+        if not callable(encoder_module):
+            raise AttributeError("Trainer model does not expose a callable encoder.")
+
         samples_encoding = None
         samples_label = None
-        self.model.eval()
-        self.model.to(self.device)
+        model.eval()
+        model.to(device)
 
         for examples, labels in data_loader:
-            examples, labels = examples.to(self.device), labels.to(self.device)
+            examples, labels = examples.to(device), labels.to(device)
             with torch.no_grad():
-                features = self.model.encoder(examples)
+                features = encoder_module(examples)
                 if samples_encoding is None:
                     samples_encoding = features
                 else:
@@ -287,6 +323,13 @@ class Trainer(ComposableTrainer):
                 self.accuracy = 0.0
                 return 0.0
 
+            if self.model is None or self.device is None:
+                raise RuntimeError("Trainer model and device must be initialized.")
+            if not hasattr(self.model, "encoder") or not callable(self.model.encoder):
+                raise AttributeError(
+                    "Trainer model does not expose a callable encoder."
+                )
+
             self.local_layers.eval()
             self.local_layers.to(self.device)
 
@@ -321,6 +364,16 @@ class Trainer(ComposableTrainer):
             # to use KNN as a classifier to evaluate the extracted features.
 
             logging.info("[Client #%d] Testing the model with KNN.", self.client_id)
+
+            if self.personalized_trainset is None:
+                logging.warning(
+                    "[Client #%d] No personalized trainset for KNN evaluation.",
+                    self.client_id,
+                )
+                self.accuracy = 0.0
+                return 0.0
+            if self.model is None or self.device is None:
+                raise RuntimeError("Trainer model and device must be initialized.")
 
             # Get the training loader and test loader
             train_loader = torch.utils.data.DataLoader(

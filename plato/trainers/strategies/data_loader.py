@@ -5,13 +5,19 @@ This module provides default and common data loader strategies for
 the composable trainer architecture.
 """
 
+from __future__ import annotations
+
 import logging
-from typing import Optional
+from collections.abc import Callable
+from typing import Any, Optional
 
 import torch
 import torch.utils.data
 
 from plato.trainers.strategies.base import DataLoaderStrategy, TrainingContext
+
+CollateFn = Callable[[list[Any]], Any]
+AdjustFn = Callable[[TrainingContext], int]
 
 
 def _context_uses_cuda(context: TrainingContext) -> bool:
@@ -24,7 +30,7 @@ def _context_uses_cuda(context: TrainingContext) -> bool:
     return str(device).startswith("cuda")
 
 
-def _resolve_pin_memory(setting: Optional[bool], context: TrainingContext) -> bool:
+def _resolve_pin_memory(setting: bool | None, context: TrainingContext) -> bool:
     """Resolve the pin_memory flag for a given context."""
     if setting is False:
         return False
@@ -55,7 +61,7 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
     def __init__(
         self,
         num_workers: int = 0,
-        pin_memory: Optional[bool] = False,
+        pin_memory: bool | None = False,
         drop_last: bool = False,
         shuffle: bool = False,
         persistent_workers: bool = False,
@@ -66,6 +72,7 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
         self.drop_last = drop_last
         self.shuffle = shuffle
         self.persistent_workers = persistent_workers
+        self.personalized_trainset = None
 
     def create_train_loader(
         self, trainset, sampler, batch_size: int, context: TrainingContext
@@ -137,9 +144,9 @@ class CustomCollateFnDataLoaderStrategy(DataLoaderStrategy):
 
     def __init__(
         self,
-        collate_fn: callable,
+        collate_fn: CollateFn,
         num_workers: int = 0,
-        pin_memory: Optional[bool] = False,
+        pin_memory: bool | None = False,
         drop_last: bool = False,
     ):
         """Initialize custom collate data loader parameters."""
@@ -204,7 +211,7 @@ class PrefetchDataLoaderStrategy(DataLoaderStrategy):
         self,
         prefetch_factor: int = 2,
         num_workers: int = 2,
-        pin_memory: Optional[bool] = False,
+        pin_memory: bool | None = False,
         drop_last: bool = False,
     ):
         """Initialize prefetch data loader parameters."""
@@ -274,9 +281,9 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
         self,
         initial_batch_size: int = 32,
         max_batch_size: int = 128,
-        adjust_fn: Optional[callable] = None,
+        adjust_fn: AdjustFn | None = None,
         num_workers: int = 0,
-        pin_memory: Optional[bool] = False,
+        pin_memory: bool | None = False,
     ):
         """Initialize dynamic batch size data loader parameters."""
         self.initial_batch_size = initial_batch_size
@@ -291,8 +298,10 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
         """Create data loader with dynamic batch size."""
         # Determine actual batch size
         if self.adjust_fn is not None:
-            actual_batch_size = self.adjust_fn(context)
-            actual_batch_size = min(actual_batch_size, self.max_batch_size)
+            proposed_batch = self.adjust_fn(context)
+            if not isinstance(proposed_batch, int):
+                raise TypeError("adjust_fn must return an integer batch size.")
+            actual_batch_size = min(proposed_batch, self.max_batch_size)
         else:
             actual_batch_size = batch_size
 
@@ -341,7 +350,7 @@ class ShuffleDataLoaderStrategy(DataLoaderStrategy):
     def __init__(
         self,
         num_workers: int = 0,
-        pin_memory: Optional[bool] = False,
+        pin_memory: bool | None = False,
         drop_last: bool = False,
     ):
         """Initialize shuffle data loader parameters."""

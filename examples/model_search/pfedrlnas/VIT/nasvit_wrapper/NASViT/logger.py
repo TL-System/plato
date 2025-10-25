@@ -14,7 +14,7 @@ import sys
 from termcolor import colored
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def create_logger(output_dir, dist_rank=0, name=""):
     # create logger
     logger = logging.getLogger(name)

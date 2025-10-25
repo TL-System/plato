@@ -6,9 +6,9 @@ by composing them with the server.
 """
 
 import sys
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
-from typing import Callable
 
 import torch
 from torch import nn

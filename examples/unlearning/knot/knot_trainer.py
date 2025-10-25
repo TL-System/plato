@@ -5,6 +5,8 @@ This trainer uses the composable trainer architecture with the strategy pattern,
 implementing custom testing strategy for clustered model evaluation.
 """
 
+import logging
+
 import torch
 
 from plato.config import Config
@@ -59,7 +61,13 @@ class ClusteredTestingStrategy(DefaultTestingStrategy):
             )
 
         for cluster_id in updated_cluster_ids:
-            cluster_model = clustered_models[cluster_id]
+            cluster_model = clustered_models.get(cluster_id)
+            if cluster_model is None:
+                logging.debug(
+                    "Skipping clustered test for cluster %s without a model instance.",
+                    cluster_id,
+                )
+                continue
 
             cluster_model.to(context.device)
             cluster_model.eval()

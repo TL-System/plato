@@ -6,6 +6,8 @@ and loss strategy to implement BYOL-specific functionality (dual loss computatio
 and momentum updates).
 """
 
+from collections.abc import Callable
+
 import torch
 from lightly.models.utils import update_momentum
 from lightly.utils.scheduler import cosine_schedule
@@ -25,10 +27,12 @@ class BYOLLossCriterionStrategy(LossCriterionStrategy):
     the model outputs are tuples/lists (dual views).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the BYOL loss strategy."""
-        self._ssl_criterion = None
-        self._personalization_criterion = None
+        self._ssl_criterion: Callable[..., torch.Tensor] | None = None
+        self._personalization_criterion: (
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize loss criterion."""
@@ -53,18 +57,22 @@ class BYOLLossCriterionStrategy(LossCriterionStrategy):
                     loss_criterion=loss_criterion_type,
                     loss_criterion_params=loss_criterion_params,
                 )
-            return self._personalization_criterion(outputs, labels)
+            personalization_criterion = self._personalization_criterion
+            if personalization_criterion is None:
+                raise RuntimeError("Personalization loss criterion is unavailable.")
+            return personalization_criterion(outputs, labels)
 
         # SSL training phase - use BYOL dual loss
         else:
+            criterion = self._ssl_criterion
+            if criterion is None:
+                raise RuntimeError("SSL loss criterion is unavailable.")
             if isinstance(outputs, (list, tuple)):
                 # BYOL: average of two losses
-                loss = 0.5 * (
-                    self._ssl_criterion(*outputs[0]) + self._ssl_criterion(*outputs[1])
-                )
+                loss = 0.5 * (criterion(*outputs[0]) + criterion(*outputs[1]))
                 return loss
             else:
-                return self._ssl_criterion(outputs)
+                return criterion(outputs)
 
 
 class BYOLCallback(TrainerCallback):

@@ -12,6 +12,7 @@ import tarfile
 import time
 import zipfile
 from pathlib import Path
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 import requests
@@ -24,8 +25,8 @@ class DataSource:
     """
 
     def __init__(self):
-        self.trainset = None
-        self.testset = None
+        self.trainset: Any | None = None
+        self.testset: Any | None = None
 
     @staticmethod
     @contextlib.contextmanager
@@ -88,9 +89,7 @@ class DataSource:
                     file.write(chunk)
                     file.flush()
                     if total_size:
-                        sys.stdout.write(
-                            "\r{:.1f}%".format(100 * downloaded_size / total_size)
-                        )
+                        sys.stdout.write(f"\r{100 * downloaded_size / total_size:.1f}%")
                         sys.stdout.flush()
                 if total_size:
                     sys.stdout.write("\n")
@@ -125,25 +124,51 @@ class DataSource:
 
     def num_train_examples(self) -> int:
         """Obtains the number of training examples."""
-        return len(self.trainset)
+        trainset = self.require_trainset()
+        return len(trainset)
 
     def num_test_examples(self) -> int:
         """Obtains the number of testing examples."""
-        return len(self.testset)
+        testset = self.require_testset()
+        return len(testset)
 
     def classes(self):
         """Obtains a list of class names in the dataset."""
-        return list(self.trainset.classes)
+        trainset = self.require_trainset()
+        classes = getattr(trainset, "classes", None)
+        if classes is None:
+            raise AttributeError(
+                "Training dataset does not expose `classes` attribute."
+            )
+        return list(classes)
 
     def targets(self):
         """Obtains a list of targets (labels) for all the examples
         in the dataset."""
-        return self.trainset.targets
+        trainset = self.require_trainset()
+        targets = getattr(trainset, "targets", None)
+        if targets is None:
+            raise AttributeError(
+                "Training dataset does not expose `targets` attribute."
+            )
+        return targets
 
     def get_train_set(self):
         """Obtains the training dataset."""
-        return self.trainset
+        return self.require_trainset()
 
     def get_test_set(self):
         """Obtains the validation dataset."""
+        return self.require_testset()
+
+    def require_trainset(self):
+        """Return the training dataset, ensuring it is available."""
+        if self.trainset is None:
+            raise RuntimeError("Training dataset has not been loaded yet.")
+        return self.trainset
+
+    def require_testset(self):
+        """Return the test dataset, ensuring it is available."""
+        if self.testset is None:
+            raise RuntimeError("Test dataset has not been loaded yet.")
         return self.testset

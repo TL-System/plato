@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 """
 MobileNetV3 From <Searching for MobileNetV3>, arXiv:1905.02244.
 Ref: https://github.com/d-li14/mobilenetv3.pytorch/blob/master/mobilenetv3.py
@@ -33,9 +31,11 @@ class Scaler(nn.Module):
     Scaler module in HeteroFL
     """
 
+    rate: float
+
     def __init__(self, rate):
         super().__init__()
-        self.rate = rate
+        object.__setattr__(self, "rate", float(rate))
 
     def forward(self, feature):
         "Forward function."
@@ -49,9 +49,11 @@ class H_sigmoid(nn.Module):
     Hard sigmoid.
     """
 
+    inplace: bool
+
     def __init__(self, inplace=True):
         super().__init__()
-        self.inplace = inplace
+        object.__setattr__(self, "inplace", bool(inplace))
 
     def forward(self, feature):
         "Forward function."
@@ -63,9 +65,11 @@ class H_swish(nn.Module):
     Hard swish.
     """
 
+    inplace: bool
+
     def __init__(self, inplace=True):
         super().__init__()
-        self.inplace = inplace
+        object.__setattr__(self, "inplace", bool(inplace))
 
     def forward(self, feature):
         "Forward function."
@@ -325,6 +329,9 @@ class MobileNetV3(nn.Module):
     MobilenetV3 network.
     """
 
+    rate: float
+    tracking_stat: bool
+
     # pylint:disable=too-many-arguments
     # pylint:disable=too-many-locals
     def __init__(
@@ -347,8 +354,8 @@ class MobileNetV3(nn.Module):
 
         mode = mode.lower()
         assert mode in ["large", "small"]
-        self.rate = model_rate
-        self.tracking_stat = track
+        object.__setattr__(self, "rate", float(model_rate))
+        object.__setattr__(self, "tracking_stat", bool(track))
 
         s = 2
         if input_size in [32, 56]:
@@ -393,8 +400,10 @@ class MobileNetV3(nn.Module):
                 [5, 576, 96, True, "HS", 1, False],
             ]
         for index, config in enumerate(configs):
-            configs[index][1] = max(int(self.rate * config[1]), 1)
-            configs[index][2] = max(int(self.rate * config[2]), 1)
+            exp_size_val = int(config[1])
+            out_channels_val = int(config[2])
+            configs[index][1] = max(int(self.rate * float(exp_size_val)), 1)
+            configs[index][2] = max(int(self.rate * float(out_channels_val)), 1)
 
         first_channels_num = int(16 * self.rate)
 
@@ -442,9 +451,11 @@ class MobileNetV3(nn.Module):
             first,
         ) in configs:
             output_channels_num = _ensure_divisible(
-                out_channels_num * width_multiplier, divisor
+                int(float(out_channels_num) * float(width_multiplier)), divisor
             )
-            exp_size = _ensure_divisible(exp_size * width_multiplier, divisor)
+            exp_size = _ensure_divisible(
+                int(float(exp_size) * float(width_multiplier)), divisor
+            )
             feature_extraction_layers.append(
                 Bottleneck(
                     input_channels_num,
@@ -539,5 +550,5 @@ class MobileNetV3(nn.Module):
                     nn.init.constant_(m.bias, 0)
         if zero_gamma:
             for m in self.modules():
-                if hasattr(m, "lastBN"):
+                if hasattr(m, "lastBN") and isinstance(m.lastBN, nn.BatchNorm2d):
                     nn.init.constant_(m.lastBN.weight, 0.0)

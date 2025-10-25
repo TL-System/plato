@@ -6,7 +6,7 @@ import csv
 import logging
 import os
 from collections import OrderedDict
-from typing import Mapping
+from collections.abc import Mapping
 
 import attacks as attack_registry
 import defences
@@ -83,18 +83,28 @@ class Server(fedavg.Server):
             callbacks=callbacks,
             aggregation_strategy=resolved_aggregation_strategy,
         )
-        self.attacker_list = None
+        self.attacker_list: list[int] = []
         self.attack_type = None
         self.blacklist = []
         self.pre_blacklist = []
+
+    def _require_algorithm(self):
+        """Return the configured algorithm or raise an error if missing."""
+        if self.algorithm is None:
+            raise RuntimeError("Server algorithm is not configured.")
+        return self.algorithm
 
     def configure(self):
         """Initialize defence related parameter"""
         super().configure()
 
-        self.attacker_list = [
-            int(value) for value in Config().clients.attacker_ids.split(",")
-        ]
+        attacker_ids_config = getattr(Config().clients, "attacker_ids", "")
+        if isinstance(attacker_ids_config, str):
+            self.attacker_list = [
+                int(value) for value in attacker_ids_config.split(",") if value.strip()
+            ]
+        else:
+            self.attacker_list = [int(value) for value in attacker_ids_config]
         self.attack_type = (
             Config().clients.attack_type
             if hasattr(Config().clients, "attack_type")
@@ -144,8 +154,10 @@ class Server(fedavg.Server):
                 attacker_weights.append(weight)
 
         # Extract model updates
-        baseline_weights = self.algorithm.extract_weights()
-        deltas_received = self.algorithm.compute_weight_deltas(
+        algorithm = self._require_algorithm()
+
+        baseline_weights = algorithm.extract_weights()
+        deltas_received = algorithm.compute_weight_deltas(
             baseline_weights, attacker_weights
         )
         # Get attackers selected at this round
@@ -157,7 +169,7 @@ class Server(fedavg.Server):
             attack = attack_registry.get()
             weights_attacked = attack(
                 baseline_weights, attacker_weights, deltas_received, num_attackers
-            )  # weights and updates are different, think about which is more convenient?
+            )
 
             # Put poisoned model back to weights received for further aggregation
             counter = 0
@@ -200,8 +212,10 @@ class Server(fedavg.Server):
             return weights_attacked
 
         # Extract the current model updates (deltas)
-        baseline_weights = self.algorithm.extract_weights()
-        deltas_attacked = self.algorithm.compute_weight_deltas(
+        algorithm = self._require_algorithm()
+
+        baseline_weights = algorithm.extract_weights()
+        deltas_attacked = algorithm.compute_weight_deltas(
             baseline_weights, weights_attacked
         )
         received_ids = [update.client_id for update in self.updates]
@@ -234,5 +248,24 @@ class Server(fedavg.Server):
         """
         # Analyze detection performance.
         # self.detect_analysis(ids, received_ids)
+
+        malicious_set = set(malicious_ids)
+        keep_indices = [
+            index
+            for index in range(len(weights_attacked))
+            if index not in malicious_set
+        ]
+
+        if keep_indices:
+            if len(weights_approved) != len(keep_indices):
+                weights_approved = [weights_attacked[index] for index in keep_indices]
+            self.updates = [self.updates[index] for index in keep_indices]
+        else:
+            self.updates = []
+            weights_approved = []
+            logging.info(
+                "[%s] All client updates were filtered. Keeping previous global weights.",
+                self,
+            )
 
         return weights_approved

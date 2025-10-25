@@ -155,8 +155,11 @@ class LogProgressCallback(TrainerCallback):
         log_interval = 10
 
         loss_value = self._extract_scalar(loss)
+        should_log = (
+            isinstance(batch, int) and log_interval > 0 and batch % log_interval == 0
+        )
 
-        if batch % log_interval == 0:
+        if should_log:
             total_batches = self._total_batches(trainer)
             if trainer.client_id == 0:
                 logging.info(

@@ -2,6 +2,8 @@
 The model of the SimSiam method.
 """
 
+from typing import Any, cast
+
 from lightly.models.modules import SimSiamPredictionHead, SimSiamProjectionHead
 from torch import nn
 
@@ -12,13 +14,16 @@ from plato.models.cnn_encoder import Model as encoder_registry
 class SimSiam(nn.Module):
     """A SimSiam model."""
 
-    def __init__(self, encoder=None):
+    def __init__(self, encoder: nn.Module | None = None) -> None:
         super().__init__()
 
         encoder_name = Config().trainer.encoder_name
-        encoder_params = (
-            Config().params.encoder if hasattr(Config().params, "encoder") else {}
-        )
+        params: dict[str, Any] = Config().params
+        encoder_params_obj = params.get("encoder")
+        if isinstance(encoder_params_obj, dict):
+            encoder_params: dict[str, Any] = dict(encoder_params_obj)
+        else:
+            encoder_params = {}
         # Define the encoder based on the model_name in config.
         if encoder is not None:
             self.encoder = encoder
@@ -27,8 +32,10 @@ class SimSiam(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
         # A projector projects higher dimension encodings to projections
+        encoding_dim = cast(int, getattr(self.encoder, "encoding_dim"))
+
         self.projector = SimSiamProjectionHead(
-            self.encoder.encoding_dim,
+            encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )

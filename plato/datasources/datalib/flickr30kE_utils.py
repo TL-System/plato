@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import xml.etree.ElementTree as ET
+from typing import Any, Dict, List
 
 from plato.datasources.datalib import data_utils
 
@@ -64,7 +65,7 @@ def get_sentence_data(parse_file_path):
                         phrase_id - an identifier for this phrase
                         phrase_type - a list of the coarse categories this phrase belongs to
     """
-    with open(parse_file_path, "r") as opened_file:
+    with open(parse_file_path) as opened_file:
         sentences = opened_file.read().split("\n")
 
     annotations = []
@@ -119,7 +120,7 @@ def get_sentence_data(parse_file_path):
     return annotations
 
 
-def get_annotations(parse_file_path):
+def get_annotations(parse_file_path: str) -> dict[str, Any]:
     """Parses the xml files in the Flickr30K Entities dataset.
     Args:
         parse_file_path - full file path to the annotations file to parse
@@ -134,31 +135,62 @@ def get_annotations(parse_file_path):
     """
     tree = ET.parse(parse_file_path)
     root = tree.getroot()
-    size_container = root.findall("size")[0]
-    anno_info = {"boxes": {}, "scene": [], "nobox": []}
-    for size_element in size_container:
-        anno_info[size_element.tag] = int(size_element.text)
+    boxes: dict[str, list[list[int]]] = {}
+    scene: list[str] = []
+    nobox: list[str] = []
+    anno_info: dict[str, Any] = {"boxes": boxes, "scene": scene, "nobox": nobox}
+
+    size_container = root.findall("size")
+    if size_container:
+        for size_element in size_container[0]:
+            if size_element.text is None:
+                continue
+            try:
+                anno_info[size_element.tag] = int(size_element.text)
+            except ValueError:
+                logging.debug("Invalid integer for size attribute %s", size_element.tag)
 
     for object_container in root.findall("object"):
         for names in object_container.findall("name"):
-            box_id = names.text
-            box_container = object_container.findall("bndbox")
-            if len(box_container) > 0:
-                if box_id not in anno_info["boxes"]:
-                    anno_info["boxes"][box_id] = []
-                xmin = int(box_container[0].findall("xmin")[0].text) - 1
-                ymin = int(box_container[0].findall("ymin")[0].text) - 1
-                xmax = int(box_container[0].findall("xmax")[0].text) - 1
-                ymax = int(box_container[0].findall("ymax")[0].text) - 1
-                anno_info["boxes"][box_id].append([xmin, ymin, xmax, ymax])
-            else:
-                nobndbox = int(object_container.findall("nobndbox")[0].text)
-                if nobndbox > 0:
-                    anno_info["nobox"].append(box_id)
+            box_id_text = names.text
+            if not box_id_text:
+                continue
 
-                scene = int(object_container.findall("scene")[0].text)
-                if scene > 0:
-                    anno_info["scene"].append(box_id)
+            box_container = object_container.findall("bndbox")
+            if box_container:
+                bbox = box_container[0]
+                coords: list[int] = []
+                for tag in ("xmin", "ymin", "xmax", "ymax"):
+                    element = bbox.find(tag)
+                    if element is None or element.text is None:
+                        coords = []
+                        break
+                    try:
+                        coords.append(int(element.text) - 1)
+                    except ValueError:
+                        coords = []
+                        break
+                if coords:
+                    boxes.setdefault(box_id_text, []).append(coords)
+                continue
+
+            nobndbox_element = object_container.find("nobndbox")
+            if nobndbox_element is not None and nobndbox_element.text:
+                try:
+                    nobndbox_value = int(nobndbox_element.text)
+                except ValueError:
+                    nobndbox_value = 0
+                if nobndbox_value > 0:
+                    nobox.append(box_id_text)
+
+            scene_element = object_container.find("scene")
+            if scene_element is not None and scene_element.text:
+                try:
+                    scene_value = int(scene_element.text)
+                except ValueError:
+                    scene_value = 0
+                if scene_value > 0:
+                    scene.append(box_id_text)
 
     return anno_info
 

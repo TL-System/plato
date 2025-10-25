@@ -2,13 +2,18 @@
 Customized Server for PerFedRLNAS.
 """
 
+from __future__ import annotations
+
+import copy
 import logging
 import os
 import pickle
 import sys
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
+import fednas_algorithm
 import fedtools
 import numpy as np
 
@@ -18,7 +23,46 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.utils import csv_processor
+
+if TYPE_CHECKING:
+    from fednas_algorithm import SupernetProtocol
+    from torch.nn import Module
+
+
+class PerFedRlnasSyncAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the synchronous PerFedRLNAS server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights_sync"):
+            return None
+        result = await server._aggregate_weights_sync(
+            updates, baseline_weights, weights_received
+        )
+        if result is not None:
+            return result
+        return server._current_global_weights()
+
+
+class PerFedRlnasAsyncAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the asynchronous PerFedRLNAS server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights_async"):
+            return None
+        result = await server._aggregate_weights_async(
+            updates, baseline_weights, weights_received
+        )
+        if result is not None:
+            return result
+        return server._current_global_weights()
 
 
 class FendasServerCallback(ServerCallback):
@@ -59,31 +103,54 @@ class ServerSync(fedavg.Server):
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(model, datasource, algorithm, trainer, callbacks)
+        super().__init__(
+            model,
+            datasource,
+            algorithm,
+            trainer,
+            callbacks,
+            aggregation_strategy=PerFedRlnasSyncAggregationStrategy(),
+        )
         self.subnets_config = [None for i in range(Config().clients.total_clients)]
-        self.neg_ratio = None
-        self.process_begin = None
-        self.process_end = None
+        self.neg_ratio: np.ndarray | None = None
+        self.process_begin: float = 0.0
+        self.process_end: float = 0.0
         self.model_size = np.zeros(Config().clients.total_clients)
 
+    def _fednas_algorithm(self) -> fednas_algorithm.ServerAlgorithmSync:
+        algorithm = self.require_algorithm()
+        if not isinstance(algorithm, fednas_algorithm.ServerAlgorithmSync):
+            raise TypeError(
+                "PerFedRLNAS server requires the MobileNetV3 FedNAS algorithm."
+            )
+        return cast(fednas_algorithm.ServerAlgorithmSync, algorithm)
+
+    def _supernet(self) -> SupernetProtocol:
+        return self._fednas_algorithm().get_supernet()
+
     def customize_server_response(self, server_response: dict, client_id) -> dict:
-        subnet_config = self.algorithm.sample_config(server_response)
+        algorithm = self._fednas_algorithm()
+        subnet_config = algorithm.sample_config(server_response)
         self.subnets_config[server_response["id"] - 1] = subnet_config
         server_response["subnet_config"] = subnet_config
 
         return server_response
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def _aggregate_weights_sync(
+        self, updates, baseline_weights, weights_received
+    ):
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
         num_samples = [update.report.num_samples for update in self.updates]
-        self.neg_ratio = self.algorithm.nas_aggregation(
+        algorithm = self._fednas_algorithm()
+        self.neg_ratio = algorithm.nas_aggregation(
             self.subnets_config, weights_received, client_id_list, num_samples
         )
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
+        return self._current_global_weights()
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
@@ -99,14 +166,16 @@ class ServerSync(fedavg.Server):
             subnet_config = self.subnets_config[client_id]
             subnet_configs.append(subnet_config)
 
-        epoch_index = self.algorithm.model.extract_index(subnet_configs)
-        self.algorithm.model.step(
+        supernet = self._supernet()
+        epoch_index = supernet.extract_index(subnet_configs)
+        supernet.step(
             [accuracy_list, round_time_list, self.neg_ratio],
             epoch_index,
             client_id_list,
         )
 
-        self.trainer.model = self.algorithm.model
+        trainer = self.require_trainer()
+        trainer.model = supernet
         self.process_end = time.time()
 
     def server_will_close(self):
@@ -136,20 +205,29 @@ class ServerSync(fedavg.Server):
         with open(save_config, "wb") as file:
             pickle.dump(self.subnets_config, file)
         save_config = model_dir / "baselines.pickle"
+        supernet = self._supernet()
         with open(save_config, "wb") as file:
-            pickle.dump(self.algorithm.model.baseline, file)
+            pickle.dump(supernet.baseline, file)
         return super().save_to_checkpoint()
 
     def get_logged_items(self) -> dict:
         logged_items = super().get_logged_items()
-        acc_info = self.algorithm.get_baseline_accuracy_info()
+        algorithm = self._fednas_algorithm()
+        acc_info = algorithm.get_baseline_accuracy_info()
         logged_items["clients_accuracy_mean"] = acc_info["mean"]
         logged_items["clients_accuracy_std"] = acc_info["std"]
         logged_items["clients_accuracy_max"] = acc_info["max"]
         logged_items["clients_accuracy_min"] = acc_info["min"]
-        logged_items["server_overhead"] = self.process_end - self.process_begin
+        logged_items["server_overhead"] = max(self.process_end - self.process_begin, 0)
         logged_items["model_size"] = np.mean(self.model_size)
         return logged_items
+
+    def _current_global_weights(self):
+        """Return a copy of the current global model weights."""
+        algorithm = self._fednas_algorithm()
+        supernet = algorithm.get_supernet()
+        base_model = supernet.model
+        return copy.deepcopy(base_model.state_dict())
 
 
 # pylint:disable=too-many-instance-attributes
@@ -169,14 +247,18 @@ class ServerAsync(ServerSync):
         )
         self.subnets_config = [None for _ in range(Config().clients.total_clients)]
         self.neg_ratio = None
-        self.process_begin = None
-        self.process_end = None
+        self.process_begin = 0.0
+        self.process_end = 0.0
         self.total_samples = 0
         self.model_size = np.zeros(Config().clients.total_clients)
         if self.datasource is None:
             self.datasource = datasource
+        self.aggregation_strategy = PerFedRlnasAsyncAggregationStrategy()
+        self.aggregation_strategy.setup(self.context)
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
+    async def _aggregate_weights_async(
+        self, updates, baseline_weights, weights_received
+    ):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
@@ -184,23 +266,27 @@ class ServerAsync(ServerSync):
         self.total_samples = sum(num_samples)
         deltas = await self.compute_weight_deltas(weights_received, client_id_list)
         aggregation_weights = await self.calculate_aggregation_weight(updates, deltas)
-        self.neg_ratio = self.algorithm.nas_aggregation_async(
+        algorithm = self._fednas_algorithm()
+        self.neg_ratio = algorithm.nas_aggregation_async(
             aggregation_weights, self.subnets_config, weights_received, client_id_list
         )
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
+        return self._current_global_weights()
 
     async def compute_weight_deltas(self, weights_received, client_id_list):
         """The calculation of deltas in NAS is different."""
-        baseline_weights = self.algorithm.model.model.state_dict()
+        algorithm = self._fednas_algorithm()
+        supernet = algorithm.get_supernet()
+        baseline_weights = supernet.model.state_dict()
         client_models = []
         subnet_configs = []
         for i, client_id_ in enumerate(client_id_list):
             client_id = client_id_ - 1
             subnet_config = self.subnets_config[client_id]
             client_model = fedtools.sample_subnet_w_config(
-                self.algorithm.model.model, subnet_config, False
+                supernet.model, subnet_config, False
             )
             client_model.load_state_dict(weights_received[i], strict=True)
             client_models.append(client_model)
@@ -211,7 +297,7 @@ class ServerAsync(ServerSync):
         proxy_supernets_weights = [
             proxy_supernet.state_dict() for proxy_supernet in proxy_supernets
         ]
-        return self.algorithm.compute_weight_deltas(
+        return algorithm.compute_weight_deltas(
             baseline_weights, proxy_supernets_weights
         )
 
@@ -219,8 +305,9 @@ class ServerAsync(ServerSync):
         """After weight aggregation, update the architecture parameter alpha."""
         super().weights_aggregated(updates)
         # Save the current model for later retrieval when cosine similarity needs to be computed
-        filename = f"model_{self.current_round}.pth"
-        self.trainer.save_model(filename)
+        filename = f"model_{self.current_round}.safetensors"
+        trainer = self.require_trainer()
+        trainer.save_model(filename)
 
     # pylint:disable=attribute-defined-outside-init
     def configure(self) -> None:
@@ -261,11 +348,10 @@ class ServerAsync(ServerSync):
                 self.datasource = datasources_registry.get(client_id=0)
             elif self.datasource is None and self.custom_datasource is not None:
                 self.datasource = self.custom_datasource()
-            self.testset = self.datasource.get_test_set()
+            datasource = self.require_datasource()
+            self.testset = datasource.get_test_set()
             if hasattr(Config().data, "testset_size"):
-                self.testset_sampler = all_inclusive.Sampler(
-                    self.datasource, testing=True
-                )
+                self.testset_sampler = all_inclusive.Sampler(datasource, testing=True)
         # Initialize the test accuracy csv file if clients compute locally
         if hasattr(Config().clients, "do_test") and Config().clients.do_test:
             accuracy_csv_file = (
@@ -344,13 +430,13 @@ class ServerAsync(ServerSync):
         """Compute the cosine similarity of the received updates and the difference
         between the current and a previous model according to client staleness."""
         # Loading the global model from a previous round according to staleness
-        filename = f"model_{self.current_round - 2}.pth"
+        filename = f"model_{self.current_round - 2}.safetensors"
         model_path = Config().params["model_path"]
         model_path = f"{model_path}/{filename}"
 
-        return fedtools.calculate_similarity(
-            model_path, self.trainer.model, update, staleness
-        )
+        trainer = self.require_trainer()
+        model = cast(Module, trainer.model)
+        return fedtools.calculate_similarity(model_path, model, update, staleness)
 
     @staticmethod
     def staleness_function(staleness):

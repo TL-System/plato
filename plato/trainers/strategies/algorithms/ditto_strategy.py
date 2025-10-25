@@ -32,6 +32,7 @@ Training procedure:
 import copy
 import logging
 import os
+from collections.abc import Callable
 from typing import Any, Dict, Optional
 
 import torch
@@ -95,8 +96,8 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
         self,
         ditto_lambda: float = 0.1,
         personalization_epochs: int = 5,
-        model_fn: Optional[callable] = None,
-        save_path: Optional[str] = None,
+        model_fn: Callable[[], nn.Module] | None = None,
+        save_path: str | None = None,
     ):
         """
         Initialize Ditto update strategy.
@@ -119,9 +120,9 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
         self.personalization_epochs = personalization_epochs
         self.model_fn = model_fn
         self.save_path = save_path
-        self.personalized_model = None
-        self.initial_global_weights = None
-        self.personalized_model_path = None
+        self.personalized_model: nn.Module | None = None
+        self.initial_global_weights: dict[str, torch.Tensor] | None = None
+        self.personalized_model_path: str | None = None
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -160,14 +161,26 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
             context: Training context with model
         """
         # Save initial global model weights (w^t in the paper)
-        self.initial_global_weights = copy.deepcopy(context.model.cpu().state_dict())
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for Ditto.")
+        self.initial_global_weights = copy.deepcopy(model.cpu().state_dict())
 
         # Load existing personalized model if available
-        if os.path.exists(self.personalized_model_path):
+        personalized_model = self.personalized_model
+        if personalized_model is None:
+            raise RuntimeError("Ditto personalized model has not been initialised.")
+        personalized_model_path = self.personalized_model_path
+        if personalized_model_path is None:
+            raise RuntimeError(
+                "Ditto personalized model path has not been initialised."
+            )
+
+        if os.path.exists(personalized_model_path):
             try:
-                self.personalized_model.load_state_dict(
+                personalized_model.load_state_dict(
                     torch.load(
-                        self.personalized_model_path,
+                        personalized_model_path,
                         map_location=torch.device("cpu"),
                     )
                 )
@@ -184,7 +197,7 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
 
         # Store in context
         context.state["ditto_initial_global_weights"] = self.initial_global_weights
-        context.state["ditto_personalized_model"] = self.personalized_model
+        context.state["ditto_personalized_model"] = personalized_model
 
     def on_train_end(self, context: TrainingContext) -> None:
         """
@@ -211,15 +224,22 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
             )
             return
 
+        personalized_model = self.personalized_model
+        if personalized_model is None:
+            raise RuntimeError("Ditto personalized model has not been initialised.")
+        initial_global_weights = self.initial_global_weights
+        if initial_global_weights is None:
+            raise RuntimeError(
+                "Ditto initial global weights have not been captured at train start."
+            )
+
         # Create optimizer for personalized model
         lr = (
             Config().trainer.lr
             if hasattr(Config(), "trainer") and hasattr(Config().trainer, "lr")
             else 0.01
         )
-        personalized_optimizer = torch.optim.SGD(
-            self.personalized_model.parameters(), lr=lr
-        )
+        personalized_optimizer = torch.optim.SGD(personalized_model.parameters(), lr=lr)
 
         # Create learning rate scheduler
         personalized_scheduler = torch.optim.lr_scheduler.StepLR(
@@ -235,8 +255,8 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
         epoch_loss_meter = tracking.LossTracker()
 
         # Move personalized model to device and set to training mode
-        self.personalized_model.to(context.device)
-        self.personalized_model.train()
+        personalized_model.to(context.device)
+        personalized_model.train()
 
         # Train personalized model for specified epochs
         for epoch in range(1, self.personalization_epochs + 1):
@@ -251,7 +271,7 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
                 personalized_optimizer.zero_grad()
 
                 # Forward pass
-                outputs = self.personalized_model(examples)
+                outputs = personalized_model(examples)
                 loss = loss_criterion_fn(outputs, labels)
 
                 # Backward pass
@@ -263,10 +283,8 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
                 # Apply Ditto regularization: v -= ηλ(v - w^t)
                 current_lr = personalized_optimizer.param_groups[0]["lr"]
                 with torch.no_grad():
-                    for v_name, v_param in self.personalized_model.named_parameters():
-                        w_global = self.initial_global_weights[v_name].to(
-                            context.device
-                        )
+                    for v_name, v_param in personalized_model.named_parameters():
+                        w_global = initial_global_weights[v_name].to(context.device)
                         # Regularization: v -= ηλ(v - w^t)
                         v_param.data = v_param.data - current_lr * self.ditto_lambda * (
                             v_param.data - w_global
@@ -287,17 +305,20 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
             )
 
         # Move personalized model back to CPU
-        self.personalized_model.to(torch.device("cpu"))
+        personalized_model.to(torch.device("cpu"))
 
         # Save personalized model
-        try:
-            torch.save(
-                self.personalized_model.state_dict(), self.personalized_model_path
+        personalized_model_path = self.personalized_model_path
+        if personalized_model_path is None:
+            raise RuntimeError(
+                "Ditto personalized model path has not been initialised."
             )
+        try:
+            torch.save(personalized_model.state_dict(), personalized_model_path)
             logging.info(
                 "[Client #%d] Saved Ditto personalized model to %s",
                 context.client_id,
-                self.personalized_model_path,
+                personalized_model_path,
             )
         except Exception as e:
             logging.error(
@@ -320,9 +341,12 @@ class DittoUpdateStrategy(ModelUpdateStrategy):
                 context.client_id,
             )
             # Copy personalized model weights to main model
-            context.model.load_state_dict(self.personalized_model.state_dict())
+            model = context.model
+            if model is None:
+                raise ValueError("Training context must provide a model for Ditto.")
+            model.load_state_dict(personalized_model.state_dict())
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """
         Return empty payload (Ditto only sends global model weights).
 
@@ -370,7 +394,7 @@ class DittoUpdateStrategyFromConfig(DittoUpdateStrategy):
         ... )
     """
 
-    def __init__(self, model_fn: Optional[callable] = None):
+    def __init__(self, model_fn: Callable[[], nn.Module] | None = None):
         """
         Initialize Ditto strategy from config.
 

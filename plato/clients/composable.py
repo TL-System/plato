@@ -13,7 +13,8 @@ import logging
 import os
 import pickle
 import sys
-from typing import Any, Iterable, Optional, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any, Optional
 
 import socketio
 
@@ -34,7 +35,7 @@ LOGGER = logging.getLogger(__name__)
 class ComposableClientEvents(socketio.AsyncClientNamespace):
     """Socket.IO namespace that forwards events to the composable core."""
 
-    def __init__(self, namespace: str, core: "ComposableClient") -> None:
+    def __init__(self, namespace: str, core: ComposableClient) -> None:
         super().__init__(namespace)
         self.core = core
 
@@ -155,7 +156,7 @@ class ComposableClient:
         self,
         *,
         owner: Any,
-        context: Optional[ClientContext] = None,
+        context: ClientContext | None = None,
         lifecycle_strategy: LifecycleStrategy,
         payload_strategy: PayloadStrategy,
         training_strategy: TrainingStrategy,
@@ -182,14 +183,14 @@ class ComposableClient:
 
         self._disconnect_lock = asyncio.Lock()
         self._disconnect_handled = False
-        self._disconnect_reason: Optional[str] = None
+        self._disconnect_reason: str | None = None
 
         self._sync_context_from_owner()
 
         for strategy in self._strategies:
             strategy.setup(self.context)
 
-    def _sync_context_from_owner(self, attrs: Optional[Iterable[str]] = None) -> None:
+    def _sync_context_from_owner(self, attrs: Iterable[str] | None = None) -> None:
         """Copy selected attributes from the owner to the shared context."""
         fields = attrs or self._SYNC_ATTRS
         for attr in fields:
@@ -199,7 +200,7 @@ class ComposableClient:
             if hasattr(self.owner, attr):
                 setattr(self.context, attr, getattr(self.owner, attr))
 
-    def _sync_owner_from_context(self, attrs: Optional[Iterable[str]] = None) -> None:
+    def _sync_owner_from_context(self, attrs: Iterable[str] | None = None) -> None:
         """Copy selected attributes from the shared context back to the owner."""
         fields = attrs or self._SYNC_ATTRS
         for attr in fields:
@@ -208,9 +209,9 @@ class ComposableClient:
 
     async def reserve_disconnect(
         self, reason: Any | None = None
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """Ensure disconnect handling runs exactly once and capture the reason."""
-        normalized_reason: Optional[str] = None
+        normalized_reason: str | None = None
         if reason not in (None, ""):
             candidate = str(reason).strip()
             if candidate:
@@ -354,7 +355,7 @@ class ComposableClient:
         self._sync_owner_from_context(("server_payload", "chunks"))
 
     async def on_payload_done(
-        self, client_id: int, *, s3_key: Optional[str] = None
+        self, client_id: int, *, s3_key: str | None = None
     ) -> None:
         """Handle completion of the payload transfer."""
         payload = await self.payload_strategy.finalise_inbound_payload(

@@ -24,7 +24,7 @@ class PiscesAggregationStrategy(AggregationStrategy):
         super().__init__()
         self.staleness_factor = staleness_factor
         self.history_window = history_window
-        self.client_staleness: Dict[int, List[float]] = {}
+        self.client_staleness: dict[int, list[float]] = {}
 
     def setup(self, context: ServerContext) -> None:
         try:
@@ -43,10 +43,10 @@ class PiscesAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         if not updates or not deltas_received:
             return {}
 

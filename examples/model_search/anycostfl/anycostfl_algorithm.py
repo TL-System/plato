@@ -2,14 +2,18 @@
 AnyCostfl algorithm.
 """
 
+from __future__ import annotations
+
 import copy
 import pickle
 import random
 import sys
+from typing import Callable, cast
 
 import numpy as np
 import ptflops
 import torch
+from torch.nn import Module
 
 from plato.algorithms import fedavg
 from plato.config import Config
@@ -20,16 +24,37 @@ class Algorithm(fedavg.Algorithm):
 
     def __init__(self, trainer=None):
         super().__init__(trainer)
-        self.current_rate = 1
-        self.model_class = None
-        self.rates = [1.0, 0.5, 0.25, 0.125, 0.0625]
+        self.current_rate: float = 1.0
+        self.model_class: Callable[..., Module] | None = None
+        self.rates: tuple[float, ...] = (1.0, 0.5, 0.25, 0.125, 0.0625)
 
-    def extract_weights(self, model=None):
-        self.model = self.model.cpu()
-        payload = self.get_local_parameters()
-        return payload
+    def _require_model(self) -> Module:
+        """Return the currently attached model ensuring it is available."""
+        model = self.model
+        if model is None:
+            raise RuntimeError("Model is not attached to the AnyCostFL algorithm.")
+        return cast(Module, model)
 
-    def choose_rate(self, limitation, model_class):
+    def _require_model_class(self) -> Callable[..., Module]:
+        """Return the model factory ensuring it has been initialised."""
+        if self.model_class is None:
+            raise RuntimeError("Model class has not been set via `choose_rate`.")
+        return self.model_class
+
+    def extract_weights(self, model: Module | None = None):
+        model_to_use: Module
+        if model is not None:
+            model_to_use = model
+        else:
+            model_to_use = self._require_model()
+        self.model = model_to_use.cpu()
+        return self.get_local_parameters()
+
+    def choose_rate(
+        self,
+        limitation: tuple[float, float],
+        model_class: Callable[..., Module],
+    ) -> float:
         """
         Choose a compression rate based on current limitation.
         Update the sub model for the client.
@@ -42,20 +67,19 @@ class Algorithm(fedavg.Algorithm):
         ):
             smallest = 0.5
             biggest = 1.0
-            last = 0
+            last = 0.0
             while True:
                 rate = (smallest + biggest) / 2
-                if (abs(last - rate)) < 0.01:
+                if abs(last - rate) < 0.01:
                     break
                 pre_model = model_class(
                     model_rate=rate, **Config().parameters.client_model._asdict()
                 )
                 payload = pre_model.state_dict()
                 size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
-                if hasattr(Config().parameters.client_model, "channels"):
-                    in_channel = 1
-                else:
-                    in_channel = 3
+                in_channel = (
+                    1 if hasattr(Config().parameters.client_model, "channels") else 3
+                )
                 macs, _ = ptflops.get_model_complexity_info(
                     pre_model,
                     (in_channel, 32, 32),
@@ -63,8 +87,12 @@ class Algorithm(fedavg.Algorithm):
                     print_per_layer_stat=False,
                     verbose=False,
                 )
-                macs /= 1024**2
-                if macs <= limitation[1] and size <= limitation[0]:
+                if macs is None:
+                    raise RuntimeError(
+                        "Unable to compute model complexity for AnyCostFL."
+                    )
+                macs_value = float(macs) / 1024**2
+                if macs_value <= limitation[1] and size <= limitation[0]:
                     smallest = rate
                 else:
                     biggest = rate
@@ -72,7 +100,7 @@ class Algorithm(fedavg.Algorithm):
             self.current_rate = rate
         else:
             # In the original implementation, the rate are uniformly sampled
-            rate = random.choice(self.rates)
+            rate = float(random.choice(self.rates))
             self.current_rate = rate
         return self.current_rate
 
@@ -80,12 +108,14 @@ class Algorithm(fedavg.Algorithm):
         """
         Get the parameters of local models from the global model.
         """
+        model = self._require_model()
+        model_class = self._require_model_class()
         current_rate = self.current_rate
-        pre_model = self.model_class(
+        pre_model = model_class(
             model_rate=current_rate, **Config().parameters.client_model._asdict()
         )
         local_parameters = pre_model.state_dict()
-        for key, value in self.model.state_dict().items():
+        for key, value in model.state_dict().items():
             if "weight" in key or "bias" in key:
                 if value.dim() == 4 or value.dim() == 2:
                     local_parameters[key] = copy.deepcopy(
@@ -114,11 +144,12 @@ class Algorithm(fedavg.Algorithm):
         """
         Aggregate weights of different complexities.
         """
-        global_parameters = copy.deepcopy(self.model.state_dict())
-        for key, value in self.model.state_dict().items():
+        model = self._require_model()
+        global_parameters = copy.deepcopy(model.state_dict())
+        for key, value in model.state_dict().items():
             if "weight" in key or "bias" in key:
                 count = torch.zeros(value.shape)
-                for _, local_weights in enumerate(weights_received):
+                for local_weights in weights_received:
                     if value.dim() == 4:
                         global_parameters[key][
                             : local_weights[key].shape[0],
@@ -168,9 +199,10 @@ class Algorithm(fedavg.Algorithm):
     # pylint:disable=too-many-branches
     def sort_channels(self):
         "Sort channels according to L2 norms."
+        model = self._require_model()
         argindex = None
         shortcut_index_in = None
-        parameters = self.model.state_dict()
+        parameters = model.state_dict()
         # pylint:disable=too-many-nested-blocks
         for key, value in parameters.items():
             # Sort the input channels according to the sequence of last output channels
@@ -203,4 +235,4 @@ class Algorithm(fedavg.Algorithm):
                     l2_norm = torch.norm(value, p=2, dim=dims)
                     argindex = torch.argsort(l2_norm, descending=True)
                     parameters[key] = copy.deepcopy(parameters[key][argindex])
-        self.model.load_state_dict(parameters)
+        model.load_state_dict(parameters)

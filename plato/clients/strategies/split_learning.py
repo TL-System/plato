@@ -38,7 +38,7 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
         """Store inbound payload for later processing."""
         self._state(context)["incoming_payload"] = server_payload
 
-    async def train(self, context: ClientContext) -> Tuple[Any, Any]:
+    async def train(self, context: ClientContext) -> tuple[Any, Any]:
         """Handle split learning training steps."""
         state = self._state(context)
         inbound = state.pop("incoming_payload", None)
@@ -59,11 +59,11 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
     # Internal helpers
     # ---------------------------------------------------------------------
 
-    def _state(self, context: ClientContext) -> Dict[str, Any]:
+    def _state(self, context: ClientContext) -> dict[str, Any]:
         """Return the mutable state dictionary for split learning."""
         return context.state.setdefault(self._STATE_KEY, {})
 
-    def _load_context(self, context: ClientContext, state: Dict[str, Any]) -> None:
+    def _load_context(self, context: ClientContext, state: dict[str, Any]) -> None:
         """Restore model weights and samplers for the current client."""
         client_id = context.client_id
         contexts = state["contexts"]
@@ -85,7 +85,7 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
         else:
             state["static_sampler"] = sampler
 
-    def _save_context(self, context: ClientContext, state: Dict[str, Any]) -> None:
+    def _save_context(self, context: ClientContext, state: dict[str, Any]) -> None:
         """Persist model weights and sampler for the current client."""
         sampler = state["static_sampler"]
         contexts = state["contexts"]
@@ -95,8 +95,8 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
         )
 
     def _extract_features(
-        self, context: ClientContext, state: Dict[str, Any]
-    ) -> Tuple[Any, Any]:
+        self, context: ClientContext, state: dict[str, Any]
+    ) -> tuple[Any, Any]:
         """Run feature extraction until the cut layer."""
         iterations = state["iterations"]
         iter_left = state["iter_left"]
@@ -129,8 +129,8 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
         return report, features
 
     def _handle_prompt(
-        self, context: ClientContext, state: Dict[str, Any]
-    ) -> Tuple[Any, Any]:
+        self, context: ClientContext, state: dict[str, Any]
+    ) -> tuple[Any, Any]:
         """Respond to a prompt by performing feature extraction."""
         self._load_context(context, state)
         report, features = self._extract_features(context, state)
@@ -139,9 +139,9 @@ class SplitLearningTrainingStrategy(TrainingStrategy):
     def _handle_gradients(
         self,
         context: ClientContext,
-        state: Dict[str, Any],
+        state: dict[str, Any],
         gradients: Any,
-    ) -> Tuple[Any, Any]:
+    ) -> tuple[Any, Any]:
         """Apply gradients and optionally continue feature extraction."""
         training_time = context.algorithm.complete_train(gradients)
         weights = context.algorithm.extract_weights()

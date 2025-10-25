@@ -170,7 +170,7 @@ class Server(mia_server.Server):
                     if hasattr(Config().trainer, "model_name")
                     else "custom"
                 )
-                filename = f"checkpoint_{model_name}_{self.current_round}.pth"
+                filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
                 self.trainer.load_model(filename, checkpoint_path)
 
                 logging.info(

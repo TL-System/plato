@@ -11,7 +11,7 @@ from torch import optim
 from plato.config import Config
 
 
-def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
+def get(model, **kwargs: str | dict) -> optim.Optimizer:
     """Get an optimizer with its name and parameters obtained from the configuration file."""
     registered_optimizers = {
         "Adam": optim.Adam,
@@ -28,8 +28,12 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
         "RMSprop": optim.RMSprop,
         "Rprop": optim.Rprop,
         "SGD": optim.SGD,
-        "LARS": timm_optim.lars.Lars,
     }
+
+    lars_module = getattr(timm_optim, "lars", None)
+    lars_cls = getattr(lars_module, "Lars", None) if lars_module is not None else None
+    if lars_cls is not None:
+        registered_optimizers["LARS"] = lars_cls
 
     optimizer_name = (
         kwargs["optimizer_name"]
@@ -41,6 +45,11 @@ def get(model, **kwargs: Union[str, dict]) -> optim.Optimizer:
     else:
         params_section = getattr(Config().parameters, "optimizer", None)
         optimizer_params = params_section._asdict() if params_section else {}
+
+    if not isinstance(optimizer_params, dict):
+        raise TypeError(
+            "optimizer_params must be provided as a mapping of keyword arguments."
+        )
 
     # Ensure eps is a float
     if "eps" in optimizer_params:

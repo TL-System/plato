@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from types import SimpleNamespace
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from plato.config import Config
 from plato.servers.strategies.base import AggregationStrategy, ServerContext
@@ -23,7 +23,7 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         mixing_hyperparameter: float = 0.9,
         adaptive_mixing: bool = False,
         staleness_func_type: str = "constant",
-        staleness_func_params: Optional[Dict] = None,
+        staleness_func_params: dict | None = None,
     ):
         super().__init__()
         self.mixing_hyperparam = mixing_hyperparameter
@@ -48,16 +48,22 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
 
     async def aggregate_deltas(
         self,
-        updates: List[SimpleNamespace],
-        deltas_received: List[Dict],
+        updates: list[SimpleNamespace],
+        deltas_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """Fallback delta aggregation using weighted averaging."""
         total_samples = sum(update.report.num_samples for update in updates)
 
+        trainer = getattr(context, "trainer", None)
+        if trainer is None or not hasattr(trainer, "zeros"):
+            raise AttributeError(
+                "FedAsync requires the trainer to provide a 'zeros' method."
+            )
+        zeros_fn = trainer.zeros
+
         avg_update = {
-            name: context.trainer.zeros(delta.shape)
-            for name, delta in deltas_received[0].items()
+            name: zeros_fn(delta.shape) for name, delta in deltas_received[0].items()
         }
 
         for i, delta in enumerate(deltas_received):
@@ -73,11 +79,11 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
 
     async def aggregate_weights(
         self,
-        updates: List[SimpleNamespace],
-        baseline_weights: Dict,
-        weights_received: List[Dict],
+        updates: list[SimpleNamespace],
+        baseline_weights: dict,
+        weights_received: list[dict],
         context: ServerContext,
-    ) -> Dict:
+    ) -> dict:
         """Aggregate weights directly with staleness-aware mixing."""
         if not updates:
             return baseline_weights
@@ -88,7 +94,15 @@ class FedAsyncAggregationStrategy(AggregationStrategy):
         if self.adaptive_mixing:
             mixing *= self._staleness_function(client_staleness)
 
-        return await context.algorithm.aggregate_weights(
+        algorithm = getattr(context, "algorithm", None)
+        if algorithm is None or not hasattr(algorithm, "aggregate_weights"):
+            raise AttributeError(
+                "FedAsync requires an algorithm with 'aggregate_weights'."
+            )
+
+        algorithm = cast(Any, algorithm)
+
+        return await algorithm.aggregate_weights(
             baseline_weights, weights_received, mixing=mixing
         )
 

@@ -9,6 +9,7 @@ on Cognitive Communications and Networking (TCCN), 2021.
 https://ieeexplore.ieee.org/abstract/document/9442814
 """
 
+from fedadp_algorithm import Algorithm as FedAdpAlgorithm
 from fedadp_server_strategy import FedADPAggregationStrategy
 
 from plato.config import Config
@@ -37,7 +38,7 @@ class Server(fedavg.Server):
         super().__init__(
             model=model,
             datasource=datasource,
-            algorithm=algorithm,
+            algorithm=algorithm or FedAdpAlgorithm,
             trainer=trainer,
             callbacks=callbacks,
             aggregation_strategy=aggregation_strategy,

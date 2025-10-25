@@ -130,12 +130,12 @@ class DataSource(base.DataSource):
     @staticmethod
     def read_data(file_path):
         """Reading the dataset specific to a client_id."""
-        with open(file_path, "r", encoding="utf-8") as fin:
+        with open(file_path, encoding="utf-8") as fin:
             loaded_data = json.load(fin)
         return loaded_data
 
     def num_train_examples(self):
-        return len(self.trainset)
+        return len(self.require_trainset())
 
     def num_test_examples(self):
-        return len(self.testset)
+        return len(self.require_testset())

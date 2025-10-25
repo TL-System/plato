@@ -14,7 +14,7 @@ from safetensors.numpy import load, save
 from plato.utils.tree import TreeMetadata, flatten_tree, unflatten_tree
 
 
-def _metadata_to_json(metadata: Dict[str, TreeMetadata]) -> str:
+def _metadata_to_json(metadata: dict[str, TreeMetadata]) -> str:
     serialisable = {
         path: {
             "type": value.type,
@@ -27,7 +27,7 @@ def _metadata_to_json(metadata: Dict[str, TreeMetadata]) -> str:
     return json.dumps(serialisable)
 
 
-def _metadata_from_json(payload: str) -> Dict[str, TreeMetadata]:
+def _metadata_from_json(payload: str) -> dict[str, TreeMetadata]:
     data = json.loads(payload)
     return {
         path: TreeMetadata(

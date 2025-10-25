@@ -3,6 +3,7 @@ Model used in BYOL algorithm.
 """
 
 import copy
+from typing import Any, cast
 
 from lightly.models.modules import BYOLPredictionHead, BYOLProjectionHead
 from lightly.models.utils import deactivate_requires_grad
@@ -15,15 +16,19 @@ from plato.models.cnn_encoder import Model as encoder_registry
 class BYOLModel(nn.Module):
     """The model structure of BYOL."""
 
-    def __init__(self, encoder=None):
+    def __init__(self, encoder: nn.Module | None = None) -> None:
         super().__init__()
 
         # Define the encoder.
         # An encoder encode a sample to a higher dimension
         encoder_name = Config().trainer.encoder_name
-        encoder_params = (
-            Config().params.encoder if hasattr(Config().params, "encoder") else {}
-        )
+        params: dict[str, Any] = Config().params
+        encoder_params_obj = params.get("encoder")
+        encoder_params: dict[str, Any]
+        if isinstance(encoder_params_obj, dict):
+            encoder_params = dict(encoder_params_obj)
+        else:
+            encoder_params = {}
         if encoder is not None:
             self.encoder = encoder
         else:
@@ -31,9 +36,11 @@ class BYOLModel(nn.Module):
                 model_name=encoder_name, **encoder_params
             )
 
+        encoding_dim = cast(int, getattr(self.encoder, "encoding_dim"))
+
         # A projector projects higher dimension features to output dimensions
         self.projector = BYOLProjectionHead(
-            self.encoder.encoding_dim,
+            encoding_dim,
             Config().trainer.projection_hidden_dim,
             Config().trainer.projection_out_dim,
         )

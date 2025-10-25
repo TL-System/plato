@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 from collections import OrderedDict
+from typing import Mapping, Sequence, cast
 
 import numpy as np
 import torch
@@ -9,6 +10,8 @@ import torch.nn.functional as F
 from sklearn.cluster import AgglomerativeClustering, KMeans
 
 from plato.config import Config
+
+WeightMapping = Mapping[str, torch.Tensor]
 
 
 def get():
@@ -30,35 +33,23 @@ def get():
     raise ValueError(f"No such defence: {detector_type}")
 
 
-def flatten_weights(weights):
-    flattened_weights = []
-
-    for weight in weights:
-        flattened_weight = []
-        for name in weight.keys():
-            flattened_weight = (
-                weight[name].view(-1)
-                if not len(flattened_weight)
-                else torch.cat((flattened_weight, weight[name].view(-1)))
-            )
-
-        flattened_weights = (
-            flattened_weight[None, :]
-            if not len(flattened_weights)
-            else torch.cat((flattened_weights, flattened_weight[None, :]), 0)
-        )
-    return flattened_weights
+def _flatten_single_weight(weight: WeightMapping) -> torch.Tensor:
+    """Flatten a single model weight dictionary into a 1-D tensor."""
+    flattened_parts = [param.reshape(-1) for param in weight.values()]
+    if not flattened_parts:
+        raise ValueError("Cannot flatten empty weight mapping.")
+    return torch.cat(flattened_parts)
 
 
-def flatten_weight(weight):
-    flattened_weight = []
-    for name in weight.keys():
-        flattened_weight = (
-            weight[name].view(-1)
-            if not len(flattened_weight)
-            else torch.cat((flattened_weight, weight[name].view(-1)))
-        )
-    return flattened_weight
+def flatten_weights(weights: Sequence[WeightMapping]) -> torch.Tensor:
+    flattened_rows = [_flatten_single_weight(weight) for weight in weights]
+    if not flattened_rows:
+        return torch.empty((0, 0))
+    return torch.stack(flattened_rows)
+
+
+def flatten_weight(weight: WeightMapping) -> torch.Tensor:
+    return _flatten_single_weight(weight)
 
 
 def lbfgs(weights_attacked, global_weights_record, gradients_record, last_weights):
@@ -114,10 +105,19 @@ def gap_statistics(score):
     for i, k in enumerate(ks):
         estimator = KMeans(n_clusters=k)
         estimator.fit(score.reshape(-1, 1))
-        label_pred = estimator.labels_
+        labels = estimator.labels_
+        if labels is None:
+            raise RuntimeError("KMeans labels are unavailable.")
         center = estimator.cluster_centers_
+        if center is None:
+            raise RuntimeError("KMeans cluster centers are unavailable.")
+        center_array = cast(np.ndarray, center)
+        label_array = cast(np.ndarray, labels)
         Wk = np.sum(
-            [np.square(score[m] - center[label_pred[m]]) for m in range(len(score))]
+            [
+                np.square(score[m] - center_array[label_array[m]])
+                for m in range(len(score))
+            ]
         )
 
         WkRef = np.zeros(nrefs)
@@ -125,10 +125,19 @@ def gap_statistics(score):
             rand = np.random.uniform(0, 1, len(score))
             estimator = KMeans(n_clusters=k)
             estimator.fit(rand.reshape(-1, 1))
-            label_pred = estimator.labels_
+            labels = estimator.labels_
+            if labels is None:
+                raise RuntimeError("KMeans labels are unavailable.")
             center = estimator.cluster_centers_
+            if center is None:
+                raise RuntimeError("KMeans cluster centers are unavailable.")
+            center_array = cast(np.ndarray, center)
+            label_array = cast(np.ndarray, labels)
             WkRef[j] = np.sum(
-                [np.square(rand[m] - center[label_pred[m]]) for m in range(len(rand))]
+                [
+                    np.square(rand[m] - center_array[label_array[m]])
+                    for m in range(len(rand))
+                ]
             )
         gaps[i] = np.log(np.mean(WkRef)) - np.log(Wk)
         sdk[i] = np.sqrt((1.0 + nrefs) / nrefs) * np.std(np.log(WkRef))
@@ -152,18 +161,21 @@ def gap_statistics(score):
 def detection(score):
     estimator = KMeans(n_clusters=2)
     estimator.fit(score.reshape(-1, 1))
-    label_pred = estimator.labels_
+    labels = estimator.labels_
+    if labels is None:
+        raise RuntimeError("KMeans labels are unavailable.")
+    label_array = cast(np.ndarray, labels)
     # Print the members in each cluster
-    for cluster in np.unique(label_pred):
-        cluster_members = score[label_pred == cluster]
+    for cluster in np.unique(label_array):
+        cluster_members = score[label_array == cluster]
         logging.info(f"Cluster {cluster + 1} members: %s", cluster_members)
-    if np.mean(score[label_pred == 0]) < np.mean(score[label_pred == 1]):
+    if np.mean(score[label_array == 0]) < np.mean(score[label_array == 1]):
         # cluster with smaller mean value is clean clients
-        clean_ids = np.where(label_pred == 0)[0]
-        malicious_ids = np.where(label_pred == 1)[0]
+        clean_ids = np.where(label_array == 0)[0]
+        malicious_ids = np.where(label_array == 1)[0]
     else:
-        clean_ids = np.where(label_pred == 1)[0]
-        malicious_ids = np.where(label_pred == 0)[0]
+        clean_ids = np.where(label_array == 1)[0]
+        malicious_ids = np.where(label_array == 0)[0]
     # logging.info(f"clean_ids: %s", clean_ids)
     return malicious_ids, clean_ids
 
@@ -171,31 +183,34 @@ def detection(score):
 def detection_cos(score):
     estimator = KMeans(n_clusters=3)
     estimator.fit(score.reshape(-1, 1))
-    label_pred = estimator.labels_
+    labels = estimator.labels_
+    if labels is None:
+        raise RuntimeError("KMeans labels are unavailable.")
+    label_array = cast(np.ndarray, labels)
     # Print the members in each cluster
-    for cluster in np.unique(label_pred):
-        cluster_members = score[label_pred == cluster]
+    for cluster in np.unique(label_array):
+        cluster_members = score[label_array == cluster]
         logging.info(f"Cluster {cluster + 1} members: %s", cluster_members)
-    if (np.mean(score[label_pred == 0]) > np.mean(score[label_pred == 1])) and (
-        np.mean(score[label_pred == 0]) > np.mean(score[label_pred == 2])
+    if (np.mean(score[label_array == 0]) > np.mean(score[label_array == 1])) and (
+        np.mean(score[label_array == 0]) > np.mean(score[label_array == 2])
     ):
         # cluster with larger value is attacker
         clean_ids = np.concatenate(
-            (np.where(label_pred == 1)[0], np.where(label_pred == 2)[0])
+            (np.where(label_array == 1)[0], np.where(label_array == 2)[0])
         )
-        malicious_ids = np.where(label_pred == 0)[0]
-    elif (np.mean(score[label_pred == 1]) > np.mean(score[label_pred == 0])) and (
-        np.mean(score[label_pred == 1]) > np.mean(score[label_pred == 2])
+        malicious_ids = np.where(label_array == 0)[0]
+    elif (np.mean(score[label_array == 1]) > np.mean(score[label_array == 0])) and (
+        np.mean(score[label_array == 1]) > np.mean(score[label_array == 2])
     ):
         clean_ids = np.concatenate(
-            (np.where(label_pred == 0)[0], np.where(label_pred == 2)[0])
+            (np.where(label_array == 0)[0], np.where(label_array == 2)[0])
         )
-        malicious_ids = np.where(label_pred == 1)[0]
+        malicious_ids = np.where(label_array == 1)[0]
     else:
         clean_ids = np.concatenate(
-            (np.where(label_pred == 1)[0], np.where(label_pred == 0)[0])
+            (np.where(label_array == 1)[0], np.where(label_array == 0)[0])
         )
-        malicious_ids = np.where(label_pred == 2)[0]
+        malicious_ids = np.where(label_array == 2)[0]
 
     return malicious_ids, clean_ids
 
@@ -208,8 +223,6 @@ def pre_data_for_visualization(deltas_attacked, received_staleness):
     received_staleness = torch.tensor(received_staleness)
 
     model_path = Config().params["model_path"]
-    model_name = Config().trainer.model_name
-
     try:
         if not os.path.exists(model_path):
             os.makedirs(model_path)
@@ -217,23 +230,17 @@ def pre_data_for_visualization(deltas_attacked, received_staleness):
         pass
 
     try:
-        # List all files and directories in the given folder
         items = os.listdir(model_path)
-
-        # Count the number of files (ignoring directories)
         file_count = sum(
             1 for item in items if os.path.isfile(os.path.join(model_path, item))
         )
+    except OSError:
+        file_count = 0
 
-        file_count = str(
-            file_count + 1
-        )  # plus one so can be directly used in the following code when create folder for each communication round
-
-    except Exception as e:
-        pass
+    round_name = str(file_count + 1)
+    file_path = os.path.join(model_path, f"{round_name}.pkl")
 
     # logging.info(f"saving reveived deltas...")
-    file_path = f"{model_path}/" + file_count + ".pkl"
     with open(file_path, "wb") as file:
         pickle.dump(flattened_deltas_attacked, file)
         pickle.dump(received_staleness, file)
@@ -242,7 +249,7 @@ def pre_data_for_visualization(deltas_attacked, received_staleness):
         "[Server #%d] Model saved to %s at round %s.",
         os.getpid(),
         file_path,
-        file_count,
+        round_name,
     )
 
 
@@ -257,6 +264,9 @@ def async_filter(
     staleness_bound = Config().server.staleness_bound
     flattened_weights_attacked = flatten_weights(weights_attacked)
 
+    if len(flattened_weights_attacked) == 0:
+        return [], list(weights_attacked)
+
     # only for visualization
     # pre_data_for_visualization(deltas_attacked, received_staleness)
 
@@ -270,6 +280,7 @@ def async_filter(
         global_weights_record = []
         global_num_record = []
 
+    reference_weight = flattened_weights_attacked[0]
     weight_groups = {i: [] for i in range(20)}
     id_groups = {i: [] for i in range(20)}
     for i, (staleness, weights) in enumerate(
@@ -280,7 +291,7 @@ def async_filter(
 
     # calcuate cos_similarity within a group and identify statistical outliers
     all_mali_ids = []
-    avg_current = torch.zeros_like(torch.mean(weights, dim=0))
+    avg_current = torch.zeros_like(reference_weight)
     num_current = 0
     for staleness, weights in weight_groups.items():
         if len(weights) >= 3:

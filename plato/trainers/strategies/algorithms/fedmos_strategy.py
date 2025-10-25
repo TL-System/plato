@@ -20,7 +20,8 @@ global model proximity.
 """
 
 import copy
-from typing import Optional
+from collections.abc import Callable
+from typing import Any, Optional, cast
 
 import torch
 import torch.nn as nn
@@ -92,7 +93,7 @@ class FedMosOptimizer(Optimizer):
             raise ValueError(f"Invalid weight_decay value: {weight_decay}")
 
         defaults = dict(lr=lr, a=a, mu=mu, weight_decay=weight_decay)
-        super(FedMosOptimizer, self).__init__(params, defaults)
+        super().__init__(params, defaults)
 
         # Initialize state for momentum
         for group in self.param_groups:
@@ -328,7 +329,7 @@ class FedMosUpdateStrategy(ModelUpdateStrategy):
 
     def __init__(self):
         """Initialize FedMos update strategy."""
-        self.global_model = None
+        self.global_model: nn.Module | None = None
 
     def on_train_start(self, context: TrainingContext) -> None:
         """
@@ -338,7 +339,10 @@ class FedMosUpdateStrategy(ModelUpdateStrategy):
             context: Training context with model
         """
         # Save a copy of the global model
-        self.global_model = copy.deepcopy(context.model)
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedMos.")
+        self.global_model = copy.deepcopy(model)
         self.global_model.to(context.device)
 
         # Store in context for potential use by other strategies
@@ -365,8 +369,9 @@ class FedMosUpdateStrategy(ModelUpdateStrategy):
             context: Training context
         """
         # Move global model to CPU to free GPU memory
-        if self.global_model is not None:
-            self.global_model.to(torch.device("cpu"))
+        global_model = self.global_model
+        if global_model is not None:
+            global_model.to(torch.device("cpu"))
 
     def teardown(self, context: TrainingContext) -> None:
         """
@@ -489,7 +494,7 @@ class FedMosStepStrategy(TrainingStepStrategy):
         optimizer: Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -519,22 +524,24 @@ class FedMosStepStrategy(TrainingStepStrategy):
         loss.backward(create_graph=self.create_graph, retain_graph=self.retain_graph)
 
         # FedMos-specific: Update momentum before step
-        if hasattr(optimizer, "update_momentum"):
-            optimizer.update_momentum()
+        update_momentum = getattr(optimizer, "update_momentum", None)
+        if callable(update_momentum):
+            update_momentum()
 
         # Optimizer step - pass global model if available
         global_model = context.state.get("fedmos_global_model")
+        step_fn = getattr(optimizer, "step")
+        step_callable = cast(Callable[..., Any], step_fn)
         if global_model is not None and hasattr(optimizer, "step"):
             # Check if step accepts global_model_params argument
             import inspect
 
-            sig = inspect.signature(optimizer.step)
+            sig = inspect.signature(step_fn)
             if "global_model_params" in sig.parameters:
-                optimizer.step(global_model_params=global_model)
+                step_callable(global_model_params=global_model)
             else:
-                # Fallback for older optimizer signature
-                optimizer.step(global_model)
+                step_callable()
         else:
-            optimizer.step()
+            step_callable()
 
         return loss

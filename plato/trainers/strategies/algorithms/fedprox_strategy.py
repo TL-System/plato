@@ -25,7 +25,8 @@ Note: This implementation uses the L2 norm (not squared) for backward compatibil
 with the original Plato implementation, although the paper formula shows ||w - w^t||^2.
 """
 
-from typing import Optional
+from collections.abc import Callable
+from typing import Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -85,7 +86,8 @@ class FedProxLossStrategy(LossCriterionStrategy):
     def __init__(
         self,
         mu: float = 0.01,
-        base_loss_fn: Optional[callable] = None,
+        base_loss_fn: None
+        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
         norm_type: str = "l2",
     ):
         """
@@ -105,8 +107,10 @@ class FedProxLossStrategy(LossCriterionStrategy):
         self.mu = mu
         self.base_loss_fn = base_loss_fn
         self.norm_type = norm_type
-        self.global_weights = None
-        self._criterion = None
+        self.global_weights: dict[str, torch.Tensor] | None = None
+        self._criterion: (
+            None | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor])
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -132,7 +136,11 @@ class FedProxLossStrategy(LossCriterionStrategy):
         # Capture global model weights at start of training
         # These represent w^t in the FedProx formulation
         self.global_weights = {}
-        for name, param in context.model.named_parameters():
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedProx.")
+
+        for name, param in model.named_parameters():
             self.global_weights[name] = param.clone().detach()
 
     def compute_loss(
@@ -159,15 +167,28 @@ class FedProxLossStrategy(LossCriterionStrategy):
             the behavior of the original Plato implementation.
         """
         # Compute base loss (e.g., cross-entropy)
-        base_loss = self._criterion(outputs, labels)
+        criterion = self._criterion
+        if criterion is None:
+            raise RuntimeError("FedProx loss criterion has not been initialised.")
+        base_loss = criterion(outputs, labels)
 
         # Compute proximal term: (mu/2) * ||w - w_global||
         # Note: We use L2 norm (not squared) for backward compatibility
         squared_diff_sum = torch.tensor(0.0, device=outputs.device)
 
-        for name, param in context.model.named_parameters():
-            if param.requires_grad and name in self.global_weights:
-                global_param = self.global_weights[name].to(param.device)
+        model = context.model
+        if model is None:
+            raise ValueError("Training context must provide a model for FedProx.")
+
+        global_weights = self.global_weights
+        if global_weights is None:
+            raise RuntimeError(
+                "FedProx global weights have not been initialised at train start."
+            )
+
+        for name, param in model.named_parameters():
+            if param.requires_grad and name in global_weights:
+                global_param = global_weights[name].to(param.device)
 
                 if self.norm_type == "l2":
                     # Sum of squared differences for L2 norm computation
@@ -231,7 +252,12 @@ class FedProxLossStrategyFromConfig(FedProxLossStrategy):
         ... )
     """
 
-    def __init__(self, base_loss_fn: Optional[callable] = None, norm_type: str = "l2"):
+    def __init__(
+        self,
+        base_loss_fn: None
+        | (Callable[[torch.Tensor, torch.Tensor], torch.Tensor]) = None,
+        norm_type: str = "l2",
+    ):
         """
         Initialize FedProx loss strategy with config-based mu.
 

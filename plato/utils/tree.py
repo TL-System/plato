@@ -9,20 +9,30 @@ transport or persistence, and restore them back when needed.
 
 from __future__ import annotations
 
+import importlib
 from dataclasses import dataclass
-from typing import Any, Dict, List, Tuple
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, cast
 
 import numpy as np
 
-try:  # pragma: no cover - optional dependency
-    import torch
-except ImportError:  # pragma: no cover
-    torch = None
-
-try:  # pragma: no cover - optional dependency
+if TYPE_CHECKING:  # pragma: no cover
     import mlx.core as mx
-except ImportError:  # pragma: no cover
-    mx = None
+    import torch
+else:  # pragma: no cover - optional dependency
+    try:
+        torch = cast(ModuleType, importlib.import_module("torch"))
+    except ImportError:
+        torch = None
+
+    try:
+        mx = cast(ModuleType, importlib.import_module("mlx.core"))
+    except ImportError:
+        mx = None
+
+
+_TORCH_TENSOR_TYPE = getattr(torch, "Tensor", None) if torch is not None else None
+_MX_ARRAY_TYPE = getattr(mx, "array", None) if mx is not None else None
 
 
 def _join_path(prefix: str, suffix: str) -> str:
@@ -47,15 +57,26 @@ def _ensure_numpy(value: Any) -> np.ndarray:
         return np.frombuffer(bytes(value), dtype=np.uint8)
     if isinstance(value, np.ndarray):
         return value
-    if torch is not None and isinstance(value, torch.Tensor):
-        return value.detach().cpu().numpy()
-    if mx is not None and isinstance(value, mx.array):
-        if hasattr(mx, "to_numpy"):
-            return mx.to_numpy(value)
-        if hasattr(value, "to_numpy"):
-            return value.to_numpy()
-        if hasattr(value, "to_host"):
-            return value.to_host()
+    if _TORCH_TENSOR_TYPE is not None and isinstance(value, _TORCH_TENSOR_TYPE):
+        tensor = value
+        detach_fn = getattr(tensor, "detach", None)
+        if callable(detach_fn):
+            tensor = detach_fn()
+        cpu_fn = getattr(tensor, "cpu", None)
+        if callable(cpu_fn):
+            tensor = cpu_fn()
+        numpy_fn = getattr(tensor, "numpy", None)
+        if callable(numpy_fn):
+            return numpy_fn()
+        return np.asarray(tensor)
+    if _MX_ARRAY_TYPE is not None and isinstance(value, _MX_ARRAY_TYPE):
+        to_numpy_fn = getattr(mx, "to_numpy", None) if mx is not None else None
+        if callable(to_numpy_fn):
+            return to_numpy_fn(value)
+        for attr in ("to_numpy", "to_host"):
+            candidate = getattr(value, attr, None)
+            if callable(candidate):
+                return candidate()
         return np.array(value)
     if hasattr(value, "to_host"):
         return value.to_host()
@@ -71,9 +92,9 @@ def _detect_backend(value: Any) -> str:
         return "string"
     if isinstance(value, (bytes, bytearray)):
         return "bytes"
-    if torch is not None and isinstance(value, torch.Tensor):
+    if _TORCH_TENSOR_TYPE is not None and isinstance(value, _TORCH_TENSOR_TYPE):
         return "torch"
-    if mx is not None and isinstance(value, mx.array):
+    if _MX_ARRAY_TYPE is not None and isinstance(value, _MX_ARRAY_TYPE):
         return "mlx"
     if isinstance(value, np.ndarray):
         return "numpy"
@@ -90,7 +111,12 @@ def _restore_backend(array: np.ndarray, backend: str | None) -> Any:
     if backend == "torch":
         if torch is None:
             raise ImportError("Torch is required to restore torch tensors.")
-        return torch.from_numpy(array).clone()
+        from_numpy_fn = getattr(torch, "from_numpy", None)
+        if not callable(from_numpy_fn):
+            raise AttributeError("torch.from_numpy is unavailable.")
+        tensor = from_numpy_fn(array)
+        clone_fn = getattr(tensor, "clone", None)
+        return clone_fn() if callable(clone_fn) else tensor
     if backend == "mlx":
         return array
     return array
@@ -101,12 +127,12 @@ class TreeMetadata:
     """Metadata describing the structure of a flattened tree."""
 
     type: str
-    children: List[str] | None = None
+    children: list[str] | None = None
     container: str | None = None  # distinguish tuple vs list
     backend: str | None = None
 
 
-def flatten_tree(tree: Any) -> Tuple[Dict[str, np.ndarray], Dict[str, TreeMetadata]]:
+def flatten_tree(tree: Any) -> tuple[dict[str, np.ndarray], dict[str, TreeMetadata]]:
     """
     Flatten a nested tree into a dict of numpy arrays keyed by path segments.
 
@@ -114,8 +140,8 @@ def flatten_tree(tree: Any) -> Tuple[Dict[str, np.ndarray], Dict[str, TreeMetada
         tuple(dict, dict): (flat leaf map, metadata describing the tree)
     """
 
-    flat: Dict[str, np.ndarray] = {}
-    metadata: Dict[str, TreeMetadata] = {}
+    flat: dict[str, np.ndarray] = {}
+    metadata: dict[str, TreeMetadata] = {}
 
     def recurse(node: Any, path: str) -> None:
         if isinstance(node, dict):
@@ -148,7 +174,7 @@ def flatten_tree(tree: Any) -> Tuple[Dict[str, np.ndarray], Dict[str, TreeMetada
 
 
 def unflatten_tree(
-    flat: Dict[str, np.ndarray], metadata: Dict[str, TreeMetadata]
+    flat: dict[str, np.ndarray], metadata: dict[str, TreeMetadata]
 ) -> Any:
     """Rebuild a nested tree from flattened leaves and metadata."""
 

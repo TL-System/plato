@@ -22,7 +22,7 @@ class Client(simple.Client):
     def __init__(
         self,
         *,
-        round_store_lock: Optional[object] = None,
+        round_store_lock: object | None = None,
         debug_artifacts: bool = False,
         **kwargs,
     ):

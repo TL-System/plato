@@ -8,7 +8,8 @@ https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 import logging
 import math
 import os
-from typing import Optional
+from collections.abc import Callable
+from typing import Optional, cast
 
 import numpy as np
 import scipy
@@ -84,7 +85,7 @@ class GANTrainingStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: callable,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """
@@ -122,27 +123,47 @@ class GANTrainingStepStrategy(TrainingStepStrategy):
         optimizer_disc.zero_grad()
 
         # Forward pass real batch through D
-        output = model.discriminator(examples).view(-1)
+        discriminator = getattr(model, "discriminator", None)
+        generator = getattr(model, "generator", None)
+        loss_fn = getattr(model, "loss_criterion", loss_criterion)
+        latent_dim = getattr(model, "nz", None)
+
+        if not callable(discriminator) or not callable(generator):
+            raise TypeError(
+                "GAN models must define callable 'discriminator' and 'generator'."
+            )
+        if not callable(loss_fn):
+            raise TypeError("GAN model must provide a callable 'loss_criterion'.")
+        if latent_dim is None:
+            raise AttributeError("GAN model must expose 'nz' latent dimension.")
+
+        discriminator_fn = cast(Callable[[torch.Tensor], torch.Tensor], discriminator)
+        generator_fn = cast(Callable[[torch.Tensor], torch.Tensor], generator)
+        loss_callable = cast(
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor], loss_fn
+        )
+
+        output = discriminator_fn(examples).view(-1)
 
         # Calculate loss on all-real batch
-        err_disc_real = model.loss_criterion(output, label)
+        err_disc_real = loss_callable(output, label)
 
         # Calculate gradients for D in backward pass
         err_disc_real.backward()
 
         # Train with all-fake batch
         # Generate batch of latent vectors
-        noise = torch.randn(cur_batch_size, model.nz, 1, 1, device=device)
+        noise = torch.randn(cur_batch_size, int(latent_dim), 1, 1, device=device)
 
         # Generate fake image batch with G
-        fake = model.generator(noise)
+        fake = generator_fn(noise)
         label.fill_(fake_label)
 
         # Classify all fake batch with D
-        output = model.discriminator(fake.detach()).view(-1)
+        output = discriminator_fn(fake.detach()).view(-1)
 
         # Calculate D's loss on the all-fake batch
-        err_disc_fake = model.loss_criterion(output, label)
+        err_disc_fake = loss_callable(output, label)
 
         # Calculate the gradients for this batch, accumulated (summed)
         # with previous gradients
@@ -161,10 +182,10 @@ class GANTrainingStepStrategy(TrainingStepStrategy):
         label.fill_(real_label)  # fake labels are real for generator cost
 
         # Since we just updated D, perform another forward pass of all-fake batch through D
-        output = model.discriminator(fake).view(-1)
+        output = discriminator_fn(fake).view(-1)
 
         # Calculate G's loss based on this output
-        err_gen = model.loss_criterion(output, label)
+        err_gen = loss_callable(output, label)
 
         # Calculate gradients for G
         err_gen.backward()
@@ -212,7 +233,7 @@ class GANLoggingCallback(TrainerCallback):
         """Log generator and discriminator losses."""
         log_interval = 10
 
-        if batch % log_interval == 0:
+        if isinstance(batch, int) and log_interval > 0 and batch % log_interval == 0:
             # Retrieve GAN-specific losses from context
             gen_loss = trainer.context.state.get("last_gen_loss", 0.0)
             disc_loss = trainer.context.state.get("last_disc_loss", 0.0)
@@ -420,8 +441,9 @@ class Trainer(ComposableTrainer):
         )
 
         # GAN-specific attributes
-        self.generator = self.model.generator
-        self.discriminator = self.model.discriminator
+        model_instance = self._require_model()
+        self.generator = getattr(model_instance, "generator")
+        self.discriminator = getattr(model_instance, "discriminator")
 
     def save_model(self, filename=None, location=None):
         """

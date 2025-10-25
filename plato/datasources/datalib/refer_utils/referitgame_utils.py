@@ -1,3 +1,4 @@
+import importlib
 import itertools
 import json
 import logging
@@ -8,7 +9,20 @@ import time
 from pprint import pprint
 
 import numpy as np
-import skimage.io as io
+
+_SKIMAGE_IO = None
+
+
+def _get_skimage_io():
+    global _SKIMAGE_IO
+    if _SKIMAGE_IO is None:
+        try:
+            _SKIMAGE_IO = importlib.import_module("skimage.io")
+        except ImportError as exc:  # pragma: no cover - optional dependency
+            raise ImportError(
+                "scikit-image is required to load image data for REFER utilities."
+            ) from exc
+    return _SKIMAGE_IO
 
 
 class REFER:
@@ -41,7 +55,7 @@ class REFER:
 
         # load annotations from data/dataset/instances.json
         instances_file = osp.join(self.DATA_DIR, "instances.json")
-        instances = json.load(open(instances_file, "r"))
+        instances = json.load(open(instances_file))
         self.data["images"] = instances["images"]
         self.data["annotations"] = instances["annotations"]
         self.data["categories"] = instances["categories"]
@@ -132,8 +146,9 @@ class REFER:
                 refs = [ref for ref in refs if ref["ref_id"] in ref_ids]
             if not len(split) == 0:
                 if split in ["testA", "testB", "testC"]:
+                    suffix = split[-1:]
                     refs = [
-                        ref for ref in refs if split[-1] in ref["split"]
+                        ref for ref in refs if suffix and suffix in ref["split"]
                     ]  # we also consider testAB, testBC, ...
                 elif split in ["testAB", "testBC", "testAC"]:
                     refs = [
@@ -171,7 +186,7 @@ class REFER:
             ann_ids = [ann["id"] for ann in anns]
             if not len(ref_ids) == 0:
                 ids = set(ann_ids).intersection(
-                    set([self.Refs[ref_id]["ann_id"] for ref_id in ref_ids])
+                    {self.Refs[ref_id]["ann_id"] for ref_id in ref_ids}
                 )
         return ann_ids
 
@@ -179,7 +194,7 @@ class REFER:
         ref_ids = ref_ids if type(ref_ids) == list else [ref_ids]
 
         if not len(ref_ids) == 0:
-            image_ids = list(set([self.Refs[ref_id]["image_id"] for ref_id in ref_ids]))
+            image_ids = list({self.Refs[ref_id]["image_id"] for ref_id in ref_ids})
         else:
             image_ids = self.Imgs.keys()
         return image_ids
@@ -194,10 +209,11 @@ class REFER:
             return [self.Refs[ref_ids]]
 
     def loadAnns(self, ann_ids=[]):
-        if type(ann_ids) == list:
+        if isinstance(ann_ids, list):
             return [self.Anns[ann_id] for ann_id in ann_ids]
-        elif type(ann_ids) == int or type(ann_ids) == unicode:
+        if isinstance(ann_ids, (int, str)):
             return [self.Anns[ann_ids]]
+        raise TypeError("ann_ids must be an int, str, or list of ids.")
 
     def loadImgs(self, image_ids=[]):
         if type(image_ids) == list:
@@ -215,15 +231,22 @@ class REFER:
             return [osp.join(self.IMAGE_DIR, self.Imgs[image_ids]["file_name"])]
 
     def loadImgsData(self, image_ids=[]):  # the image_ids is obtained from refs
-        if type(image_ids) == list:
+        if isinstance(image_ids, list):
+            io_module = _get_skimage_io()
             return [
-                io.imread(osp.join(self.IMAGE_DIR, self.Imgs[image_id]["file_name"]))
+                io_module.imread(
+                    osp.join(self.IMAGE_DIR, self.Imgs[image_id]["file_name"])
+                )
                 for image_id in image_ids
             ]
-        elif type(image_ids) == int:
+        if isinstance(image_ids, int):
+            io_module = _get_skimage_io()
             return [
-                io.imread(osp.join(self.IMAGE_DIR, self.Imgs[image_ids]["file_name"]))
+                io_module.imread(
+                    osp.join(self.IMAGE_DIR, self.Imgs[image_ids]["file_name"])
+                )
             ]
+        raise TypeError("image_ids must be an int or list of ints.")
 
     def loadCats(self, cat_ids=[]):
         if type(cat_ids) == list:

@@ -4,6 +4,7 @@ Base class for trainers.
 
 import os
 from abc import ABC, abstractmethod
+from typing import Any, Optional
 
 from plato.config import Config
 
@@ -14,10 +15,24 @@ class Trainer(ABC):
     def __init__(self):
         self.device = Config().device()
         self.client_id = 0
+        self.current_round = 0
+        # Subclasses populate the actual model instance during initialization.
+        self.model: Any | None = None
+
+    def __getattr__(self, name: str) -> Any:
+        """Allow dynamic trainer attributes for runtime-extended implementations."""
+        raise AttributeError(f"{type(self).__name__} has no attribute {name!r}.")
 
     def set_client_id(self, client_id):
         """Setting the client ID."""
         self.client_id = client_id
+
+    def require_model(self) -> Any:
+        """Return the model instance, ensuring it is available."""
+        if self.model is None:
+            raise RuntimeError("Trainer model has not been initialised.")
+
+        return self.model
 
     @abstractmethod
     def save_model(self, filename=None, location=None):
@@ -57,7 +72,7 @@ class Trainer(ABC):
         else:
             accuracy_path = f"{model_path}/{model_name}.acc"
 
-        with open(accuracy_path, "r", encoding="utf-8") as file:
+        with open(accuracy_path, encoding="utf-8") as file:
             accuracy = float(file.read())
 
         return accuracy

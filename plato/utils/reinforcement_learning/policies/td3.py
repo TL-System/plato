@@ -6,6 +6,7 @@ https://github.com/AntoineTheb/RNN-RL
 
 import copy
 import random
+from typing import cast
 
 import numpy as np
 import torch
@@ -113,7 +114,7 @@ class TD3Actor(base.Actor):
 
 class TD3Critic(nn.Module):
     def __init__(self, state_dim, action_dim):
-        super(TD3Critic, self).__init__()
+        super().__init__()
 
         # Q1 architecture
         self.l1 = nn.Linear(state_dim + action_dim, 400)
@@ -145,7 +146,7 @@ class TD3Critic(nn.Module):
 
 class RNNActor(nn.Module):
     def __init__(self, state_dim, action_dim, hidden_size, max_action):
-        super(RNNActor, self).__init__()
+        super().__init__()
         self.action_dim = action_dim
         self.max_action = max_action
 
@@ -206,7 +207,7 @@ class RNNActor(nn.Module):
 
 class RNNCritic(nn.Module):
     def __init__(self, state_dim, action_dim, hidden_size):
-        super(RNNCritic, self).__init__()
+        super().__init__()
         self.action_dim = action_dim
 
         # Q1 architecture
@@ -355,15 +356,21 @@ class Policy(base.Policy):
     def get_initial_states(self):
         h_0, c_0 = None, None
         if Config().algorithm.recurrent_actor:
+            num_layers = int(getattr(self.actor.l1, "num_layers", 1))
+            hidden_size = int(getattr(self.actor.l1, "hidden_size", 1))
             h_0 = torch.zeros(
-                (self.actor.l1.num_layers, 1, self.actor.l1.hidden_size),
-                dtype=torch.float,
+                num_layers,
+                1,
+                hidden_size,
+                dtype=torch.float32,
             )
             # h_0 = h_0.to(self.device)
 
             c_0 = torch.zeros(
-                (self.actor.l1.num_layers, 1, self.actor.l1.hidden_size),
-                dtype=torch.float,
+                num_layers,
+                1,
+                hidden_size,
+                dtype=torch.float32,
             )
             # c_0 = c_0.to(self.device)
         return (h_0, c_0)
@@ -453,11 +460,12 @@ class Policy(base.Policy):
         if self.total_it % Config().algorithm.policy_freq == 0:
             # Compute actor loss
             if Config().algorithm.recurrent_actor:
-                actor_loss = -self.critic.Q1(
-                    state, self.actor(state, hidden)[0], hidden
-                ).mean()
+                critic_module = cast(RNNCritic, self.critic)
+                actor_output, _ = self.actor(state, hidden)
+                actor_loss = -critic_module.Q1(state, actor_output, hidden).mean()
             else:
-                actor_loss = -self.critic.Q1(
+                critic_module = cast(TD3Critic, self.critic)
+                actor_loss = -critic_module.Q1(
                     state, self.actor(state, hidden), hidden
                 ).mean()
 

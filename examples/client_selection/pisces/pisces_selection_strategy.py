@@ -45,12 +45,12 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         self.history_window = history_window
 
         self.client_utilities: dict[int, float] = {}
-        self.client_staleness: dict[int, List[float]] = {}
-        self.explored_clients: List[int] = []
-        self.unexplored_clients: List[int] = []
+        self.client_staleness: dict[int, list[float]] = {}
+        self.explored_clients: list[int] = []
+        self.unexplored_clients: list[int] = []
         self.reliability_credit_record: dict[int, int] = {}
-        self.detected_corrupted_clients: List[int] = []
-        self.model_versions_clients_dict: dict[int, List[Tuple[int, float]]] = {}
+        self.detected_corrupted_clients: list[int] = []
+        self.model_versions_clients_dict: dict[int, list[tuple[int, float]]] = {}
         self.client_last_latency: dict[int, float] = {}
         self.per_round = 0
 
@@ -105,10 +105,10 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         """Select clients using Pisces exploration/exploitation policy."""
         assert clients_count <= len(clients_pool)
 
@@ -134,7 +134,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
             logging.warning("PiscesSelection: no available clients to select.")
             return []
 
-        selected_clients: List[int] = []
+        selected_clients: list[int] = []
         current_round = context.current_round
 
         score_dict = self._compute_scores(available_clients, effective_count)
@@ -219,7 +219,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
         return selected_clients
 
     def on_reports_received(
-        self, updates: List[SimpleNamespace], context: ServerContext
+        self, updates: list[SimpleNamespace], context: ServerContext
     ) -> None:
         """Update client utilities and detect outliers if robustness enabled."""
         if not updates:
@@ -256,7 +256,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                         self._maybe_detect_outliers(start_round)
 
     def _compute_scores(
-        self, available_clients: List[int], selection_count: int
+        self, available_clients: list[int], selection_count: int
     ) -> dict[int, float]:
         """Compute combined utility scores including speed and staleness penalties."""
         if self.per_round > 0:
@@ -284,7 +284,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
 
     def _maybe_detect_outliers(self, start_version: int) -> None:
         """Pool recent utilities and trigger anomaly detection if enough data."""
-        tuples: List[Tuple[int, float]] = []
+        tuples: list[tuple[int, float]] = []
         already_existing_clients = set()
 
         for offset in range(self.augmented_factor):
@@ -314,7 +314,7 @@ class PiscesSelectionStrategy(ClientSelectionStrategy):
                 len(tuples),
             )
 
-    def _detect_outliers(self, tuples: List[tuple]) -> None:
+    def _detect_outliers(self, tuples: list[tuple]) -> None:
         """Detect outliers via DBSCAN and update reliability credits."""
         if not tuples:
             return

@@ -27,7 +27,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
 
     def create_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> torch.optim.lr_scheduler._LRScheduler | None:
         """
         Create LR scheduler based on the current training phase.
 
@@ -48,7 +48,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
 
     def _create_ssl_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> torch.optim.lr_scheduler._LRScheduler | None:
         """
         Create LR scheduler for SSL training phase.
 
@@ -76,7 +76,7 @@ class CalibreLRSchedulerStrategy(LRSchedulerStrategy):
 
     def _create_personalization_scheduler(
         self, optimizer: torch.optim.Optimizer, context: TrainingContext
-    ) -> Optional[torch.optim.lr_scheduler._LRScheduler]:
+    ) -> torch.optim.lr_scheduler._LRScheduler | None:
         """
         Create LR scheduler for personalization phase.
 

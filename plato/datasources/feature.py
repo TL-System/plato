@@ -2,7 +2,8 @@
 The feature dataset server received from clients.
 """
 
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 import torch
 
@@ -24,10 +25,10 @@ class DataSource(base.DataSource):
         self.testset = []
 
     def __len__(self):
-        return len(self.trainset)
+        return len(self.feature_dataset)
 
     def __getitem__(self, item):
-        return self.trainset[item]
+        return self.feature_dataset[item]
 
     def _append_feature(self, item: Any) -> None:
         """

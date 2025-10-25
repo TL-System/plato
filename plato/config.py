@@ -10,7 +10,7 @@ import logging
 import os
 import tomllib
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 _CLI_ARG_NOT_SUPPLIED = object()
 
@@ -30,7 +30,7 @@ class ConfigNode(Munch):
             return [cls.from_object(item) for item in obj]
         return obj
 
-    def _replace(self, **updates: Any) -> "ConfigNode":
+    def _replace(self, **updates: Any) -> ConfigNode:
         """Return a new instance with the provided fields updated."""
         data = dict(self)
         for key, value in updates.items():
@@ -159,6 +159,7 @@ class Config:
     general: Any
     parameters: Any
     params: dict[str, Any]
+    client_sleep_times: np.ndarray | None = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -262,7 +263,7 @@ class Config:
             root_logger = logging.getLogger()
             root_logger.setLevel(numeric_level)
 
-            cls._instance = super(Config, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
 
             if "config_file" in os.environ:
                 filename = os.environ["config_file"]
@@ -291,9 +292,18 @@ class Config:
 
             if Config._cli_overrides.get("port") and Config.args.port is not None:
                 Config.server.port = Config.args.port
+                if not Config._cli_overrides.get("id", False):
+                    Config.args.port = None
 
             if Config.args.server is not None:
-                address, port = args.server.split(":")
+                server_spec = Config.args.server
+                if not isinstance(server_spec, str):
+                    raise ValueError("Server specification must be a string.")
+                if ":" not in server_spec:
+                    raise ValueError(
+                        "Server specification must be in 'host:port' format."
+                    )
+                address, port = server_spec.split(":", 1)
                 Config.server.address = address
                 Config.server.port = int(port)
 
@@ -315,10 +325,9 @@ class Config:
             if hasattr(config, "general"):
                 Config.general = config.general
 
-                if (
-                    hasattr(Config.general, "base_path")
-                    and not Config._cli_overrides.get("base", False)
-                ):
+                if hasattr(
+                    Config.general, "base_path"
+                ) and not Config._cli_overrides.get("base", False):
                     Config.params["base_path"] = Config.general.base_path
 
             os.makedirs(Config.params["base_path"], exist_ok=True)
@@ -400,7 +409,9 @@ class Config:
         try:
             return getattr(type(self), name)
         except AttributeError as exc:
-            raise AttributeError(f"{type(self).__name__!s} has no attribute {name!r}") from exc
+            raise AttributeError(
+                f"{type(self).__name__!s} has no attribute {name!r}"
+            ) from exc
 
     @staticmethod
     def node_from_dict(obj: Any) -> Any:
@@ -410,7 +421,7 @@ class Config:
     namedtuple_from_dict = node_from_dict
 
     @staticmethod
-    def simulate_client_speed() -> float:
+    def simulate_client_speed() -> np.ndarray:
         """Randomly generate a sleep time (in seconds per epoch) for each of the clients."""
         # a random seed must be supplied to make sure that all the clients generate
         # the same set of sleep times per epoch across the board
@@ -424,26 +435,42 @@ class Config:
         if hasattr(Config.clients, "max_sleep_time"):
             max_sleep_time = Config.clients.max_sleep_time
 
-        dist = Config.clients.simulation_distribution
-        total_clients = Config.clients.total_clients
-        sleep_times = []
+        total_clients = int(getattr(Config.clients, "total_clients", 0))
+        if total_clients <= 0:
+            raise ValueError(
+                "total_clients must be a positive integer for speed simulation."
+            )
 
-        if hasattr(Config.clients, "simulation_distribution"):
-            if dist.distribution.lower() == "normal":
-                sleep_times = np.random.normal(dist.mean, dist.sd, size=total_clients)
-            if dist.distribution.lower() == "pareto":
-                sleep_times = np.random.pareto(dist.alpha, size=total_clients)
-            if dist.distribution.lower() == "zipf":
-                sleep_times = np.random.zipf(dist.s, size=total_clients)
-            if dist.distribution.lower() == "uniform":
-                sleep_times = np.random.uniform(dist.low, dist.high, size=total_clients)
-        else:
+        distribution = getattr(Config.clients, "simulation_distribution", None)
+        sleep_times: np.ndarray
+
+        if distribution is None:
             # By default, use Pareto distribution with a parameter of 1.0
             sleep_times = np.random.pareto(1.0, size=total_clients)
+        else:
+            dist_name = getattr(distribution, "distribution", "")
+            dist_name = dist_name.lower() if isinstance(dist_name, str) else ""
+            if dist_name == "normal":
+                mean = getattr(distribution, "mean", 0.0)
+                sd = getattr(distribution, "sd", 1.0)
+                sleep_times = np.random.normal(mean, sd, size=total_clients)
+            elif dist_name == "pareto":
+                alpha = getattr(distribution, "alpha", 1.0)
+                sleep_times = np.random.pareto(alpha, size=total_clients)
+            elif dist_name == "zipf":
+                exponent = getattr(distribution, "s", 2.0)
+                sleep_times = np.random.zipf(exponent, size=total_clients)
+            elif dist_name == "uniform":
+                low = getattr(distribution, "low", 0.0)
+                high = getattr(distribution, "high", max_sleep_time)
+                sleep_times = np.random.uniform(low, high, size=total_clients)
+            else:
+                sleep_times = np.random.pareto(1.0, size=total_clients)
 
         Config.client_sleep_times = np.minimum(
             sleep_times, np.repeat(max_sleep_time, total_clients)
         )
+        return Config.client_sleep_times
 
     @staticmethod
     def is_edge_server() -> bool:

@@ -60,7 +60,12 @@ class RLServer(rl_server.RLServer):
         self.corr = [None] * len(weights_received)
 
         # Update the baseline model weights
-        curr_global_grads = self.process_grad(self.algorithm.extract_weights())
+        algorithm = self.algorithm
+        if algorithm is None or not hasattr(algorithm, "extract_weights"):
+            raise RuntimeError(
+                "FEI server requires an algorithm with an extract_weights method."
+            )
+        curr_global_grads = self.process_grad(algorithm.extract_weights())
 
         if self.last_global_grads is None:
             self.last_global_grads = np.zeros(len(curr_global_grads))

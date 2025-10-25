@@ -30,7 +30,12 @@ class Processor(model.Processor):
         """
         Processes structured pruning of model weights layer by layer.
         """
-        self.model = self.trainer.model
+        trainer = getattr(self, "trainer", None)
+        if trainer is None or getattr(trainer, "model", None) is None:
+            raise RuntimeError(
+                "StructuredPruning processor requires an attached trainer with a model."
+            )
+        self.model = trainer.model
 
         for _, module in self.model.named_modules():
             if isinstance(module, torch.nn.Conv2d) or isinstance(

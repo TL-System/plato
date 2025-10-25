@@ -4,7 +4,7 @@ An outbound prossor for Calibre algorithm to save the divergence on the client l
 
 import logging
 import os
-from typing import OrderedDict
+from collections import OrderedDict
 
 import torch
 
@@ -30,8 +30,7 @@ class AddDivergenceRateProcessor(base.Processor):
         save_path = os.path.join(model_path, filename)
 
         divergence_rate = torch.load(save_path)
-
-        data = [data, divergence_rate]
+        data["divergence_rate"] = divergence_rate
 
         logging.info(
             "[Client #%d] Divergence Rate attached to payload.", self.client_id

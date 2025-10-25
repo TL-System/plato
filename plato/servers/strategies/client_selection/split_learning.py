@@ -32,10 +32,10 @@ class SplitLearningSequentialSelectionStrategy(ClientSelectionStrategy):
 
     def select_clients(
         self,
-        clients_pool: List[int],
+        clients_pool: list[int],
         clients_count: int,
         context: ServerContext,
-    ) -> List[int]:
+    ) -> list[int]:
         assert clients_count == 1, (
             "Split learning supports only one client per round. "
             f"Requested clients_per_round={clients_count}"
@@ -75,7 +75,7 @@ class SplitLearningSequentialSelectionStrategy(ClientSelectionStrategy):
             state["current_client"] = None
 
     @staticmethod
-    def _shuffle_clients(clients_pool: List[int], context: ServerContext) -> List[int]:
+    def _shuffle_clients(clients_pool: list[int], context: ServerContext) -> list[int]:
         """Shuffle clients reproducibly using shared PRNG state."""
         prng_state = context.state.get("prng_state")
         if prng_state:

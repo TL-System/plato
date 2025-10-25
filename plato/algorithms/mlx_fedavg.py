@@ -7,16 +7,22 @@ allowing MLX trainers to participate in the same algorithm orchestration.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Iterable
+import importlib
+from collections.abc import Callable, Iterable
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
 from plato.algorithms import base
 
-try:  # pragma: no cover - optional dependency
-    import mlx.core as mx
-except ImportError:  # pragma: no cover
-    mx = None
+if TYPE_CHECKING:
+    import mlx.core as mx  # pragma: no cover
+else:  # pragma: no cover - optional dependency
+    try:
+        mx = cast(ModuleType, importlib.import_module("mlx.core"))
+    except ImportError:
+        mx = None
 
 from plato.trainers import mlx as mlx_trainer
 
@@ -38,14 +44,16 @@ def _tree_binary_map(
     return func(tree_a, tree_b)
 
 
-def _to_numpy(value: Any) -> np.ndarray:
+def _to_numpy(value: Any) -> np.ndarray | None:
     """Ensure leaves are numpy arrays for transport."""
     if value is None:
         return None
     if isinstance(value, np.ndarray):
         return value
-    if mx is not None and isinstance(value, mx.array):
-        return np.array(value)
+    if mx is not None:
+        array_type = getattr(mx, "array", None)
+        if array_type is not None and isinstance(value, array_type):
+            return np.array(value)
     if hasattr(value, "__array__"):
         return np.asarray(value)
     return np.array(value)
@@ -73,7 +81,7 @@ class Algorithm(base.Algorithm):
         def difference(current, baseline):
             current_np = _to_numpy(current)
             baseline_np = _to_numpy(baseline)
-            if current_np is None:
+            if current_np is None or baseline_np is None:
                 return None
             return current_np - baseline_np
 
@@ -89,7 +97,7 @@ class Algorithm(base.Algorithm):
         def add_delta(baseline_leaf, delta_leaf):
             baseline_np = _to_numpy(baseline_leaf)
             delta_np = _to_numpy(delta_leaf)
-            if baseline_np is None:
+            if baseline_np is None or delta_np is None:
                 return None
             return baseline_np + delta_np
 
@@ -98,15 +106,19 @@ class Algorithm(base.Algorithm):
 
     def extract_weights(self, model=None):
         """Extract MLX model parameters as numpy-backed trees."""
-        if model is None:
-            params = self.model.parameters()
-        else:
-            params = model.parameters()
+        source_model = model or self.model
+        if source_model is None:
+            raise RuntimeError("MLX algorithm requires an initialized model.")
+        if not hasattr(source_model, "parameters"):
+            raise AttributeError("The provided model does not expose 'parameters'.")
+        params = source_model.parameters()
         return mlx_trainer._tree_map(mlx_trainer._to_host_array, params)
 
     def load_weights(self, weights):
         """Load weights into the MLX model."""
         restored = mlx_trainer._tree_map(mlx_trainer._to_mx_array, weights)
+        if self.model is None:
+            raise RuntimeError("MLX algorithm requires an initialized model.")
         if hasattr(self.model, "update"):
             self.model.update(restored)
         else:

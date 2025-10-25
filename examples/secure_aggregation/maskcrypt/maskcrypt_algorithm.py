@@ -6,7 +6,8 @@ from __future__ import annotations
 
 import os
 import pickle
-from typing import Iterable, List, Mapping, Optional, Sequence
+from collections.abc import Iterable, Mapping, Sequence
+from typing import List, Optional
 
 import torch
 
@@ -19,12 +20,12 @@ class Algorithm(fedavg.Algorithm):
     @staticmethod
     def build_consensus_mask(
         proposals: Sequence[Sequence[int]],
-    ) -> List[int]:
+    ) -> list[int]:
         """Interleave client proposals and return a de-duplicated mask."""
         if not proposals:
             return []
 
-        interleaved: List[int] = []
+        interleaved: list[int] = []
         max_length = max((len(proposal) for proposal in proposals), default=0)
 
         for index in range(max_length):
@@ -33,7 +34,7 @@ class Algorithm(fedavg.Algorithm):
                     interleaved.append(int(proposal[index]))
 
         seen = set()
-        mask: List[int] = []
+        mask: list[int] = []
         for value in interleaved:
             if value not in seen:
                 seen.add(value)
@@ -61,7 +62,7 @@ class Algorithm(fedavg.Algorithm):
 
     @staticmethod
     def prepare_exposed_weights(
-        estimate: Optional[Sequence[float]],
+        estimate: Sequence[float] | None,
         reference: torch.Tensor,
     ) -> torch.Tensor:
         """Convert stored estimates into a tensor aligned with the latest weights."""

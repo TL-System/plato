@@ -6,7 +6,8 @@ and attach it to the payload.
 import logging
 import os
 import pickle
-from typing import OrderedDict
+from collections import OrderedDict
+from typing import Any, List, Optional
 
 from plato.config import Config
 from plato.processors import base
@@ -23,7 +24,7 @@ class SendMaskProcessor(base.Processor):
 
         self.client_id = client_id
 
-    def process(self, data: OrderedDict):
+    def process(self, data: OrderedDict[Any, Any]) -> List[Any]:
         model_name = (
             Config().trainer.model_name
             if hasattr(Config().trainer, "model_name")
@@ -32,20 +33,24 @@ class SendMaskProcessor(base.Processor):
         model_path = Config().params["model_path"]
 
         mask_filename = f"{model_path}/{model_name}_client{self.client_id}_mask.pth"
+        client_mask: Optional[OrderedDict[Any, Any]] = None
         if os.path.exists(mask_filename):
             with open(mask_filename, "rb") as payload_file:
                 client_mask = pickle.load(payload_file)
-                data = [data, client_mask]
-        else:
-            data = [data, None]
 
-        if data[1] is not None:
+        payload_with_mask: List[Any] = [data, client_mask]
+
+        if payload_with_mask[1] is not None:
             if self.client_id is None:
-                logging.info(
-                    "[Server #%d] Pruning mask attached to payload.", self.server_id
-                )
+                server_id = getattr(self, "server_id", None)
+                if server_id is not None:
+                    logging.info(
+                        "[Server #%d] Pruning mask attached to payload.", server_id
+                    )
+                else:
+                    logging.info("[Server] Pruning mask attached to payload.")
             else:
                 logging.info(
                     "[Client #%d] Pruning mask attached to payload.", self.client_id
                 )
-        return data
+        return payload_with_mask

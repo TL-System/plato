@@ -12,7 +12,8 @@ https://arxiv.org/pdf/1909.12641.pdf
 
 import logging
 import math
-from typing import Iterable, List, Optional
+from collections.abc import Iterable
+from typing import List, Optional
 
 from afl_callbacks import AFLPreTrainingLossCallback
 
@@ -48,7 +49,7 @@ class AFLReportingStrategy(DefaultReportingStrategy):
         return valuation
 
     @staticmethod
-    def _get_pre_training_loss(context: ClientContext) -> Optional[float]:
+    def _get_pre_training_loss(context: ClientContext) -> float | None:
         """Retrieve the loss captured before local training, with safe fallbacks."""
         trainer = context.trainer
         if trainer is None:
@@ -78,8 +79,8 @@ class AFLReportingStrategy(DefaultReportingStrategy):
 
 
 def _ensure_pretraining_callback(
-    trainer_callbacks: Optional[Iterable],
-) -> List:
+    trainer_callbacks: Iterable | None,
+) -> list:
     """Ensure AFL's pre-training loss callback is present once."""
     callbacks_list = list(trainer_callbacks) if trainer_callbacks else []
     if not any(
@@ -98,7 +99,7 @@ def create_client(
     algorithm=None,
     trainer=None,
     callbacks=None,
-    trainer_callbacks: Optional[Iterable] = None,
+    trainer_callbacks: Iterable | None = None,
 ):
     """Build an AFL client configured with valuation hooks."""
     callbacks_list = _ensure_pretraining_callback(trainer_callbacks)

@@ -13,7 +13,7 @@ from plato.serialization.safetensor import deserialize_tree
 class Processor(base.Processor):
     """Decode Safetensors bytes into numpy-backed payloads."""
 
-    def process(self, data: Union[bytes, bytearray, memoryview, Any]) -> Any:
+    def process(self, data: bytes | bytearray | memoryview | Any) -> Any:
         if data in (None, b"", bytearray()):
             return None
         if isinstance(data, (bytes, bytearray, memoryview)):

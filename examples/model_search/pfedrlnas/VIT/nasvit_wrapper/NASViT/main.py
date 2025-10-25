@@ -346,7 +346,7 @@ def main_worker(gpu, ngpus_per_node, config):
         print("inner", optimizer.grad_inner)
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
-    logger.info("Training time {}".format(total_time_str))
+    logger.info(f"Training time {total_time_str}")
 
 
 def train_one_epoch(

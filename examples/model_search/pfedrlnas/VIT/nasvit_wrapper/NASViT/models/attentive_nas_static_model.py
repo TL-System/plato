@@ -26,7 +26,7 @@ class AttentiveNasStaticModel(MyNetwork):
     def __init__(
         self, first_conv, blocks, last_conv, classifier, resolution, use_v3_head=True
     ):
-        super(AttentiveNasStaticModel, self).__init__()
+        super().__init__()
 
         self.first_conv = first_conv
         self.blocks = nn.ModuleList(blocks)

@@ -401,10 +401,16 @@ class Trainer(ComposableTrainer):
                 - grad: the gradients over the intermediate feature
                 - batch_size: the batch size of the current sample
         """
+        model = self._require_model()
         inputs, target = batch
         batch_size = inputs.size(0)
         inputs = inputs.detach().requires_grad_(True)
-        outputs = self.model.forward_from(inputs)
+        forward_from = getattr(model, "forward_from", None)
+        if not callable(forward_from):
+            raise RuntimeError(
+                "Model does not implement forward_from for split learning."
+            )
+        outputs = forward_from(inputs)
 
         # Get loss criterion from strategy
         loss = self.loss_strategy.compute_loss(outputs, target, self.context)
@@ -426,11 +432,21 @@ class Trainer(ComposableTrainer):
         Returns:
             Updated current weights of the model
         """
-        cut_layer_idx = self.model.layers.index(self.model.cut_layer)
+        model = self._require_model()
+        layers = getattr(model, "layers", None)
+        cut_layer = getattr(model, "cut_layer", None)
+        if layers is None or cut_layer is None:
+            raise RuntimeError(
+                "Split learning model must expose layers and cut_layer attributes."
+            )
+        if not hasattr(layers, "index"):
+            raise RuntimeError("Model layers attribute must support index().")
+        cut_layer_idx = layers.index(cut_layer)
 
         for i in range(0, cut_layer_idx):
-            weight_name = f"{self.model.layers[i]}.weight"
-            bias_name = f"{self.model.layers[i]}.bias"
+            layer_name = layers[i]
+            weight_name = f"{layer_name}.weight"
+            bias_name = f"{layer_name}.bias"
 
             if weight_name in current_weights:
                 current_weights[weight_name] = weights[weight_name]
@@ -454,7 +470,13 @@ class Trainer(ComposableTrainer):
                 - targets: the targets to get of the whole model
         """
         with torch.no_grad():
-            logits = self.model.forward_to(inputs)
+            model = self._require_model()
+            forward_to = getattr(model, "forward_to", None)
+            if not callable(forward_to):
+                raise RuntimeError(
+                    "Model does not implement forward_to for split learning."
+                )
+            logits = forward_to(inputs)
 
         outputs = logits.detach().cpu()
         targets = targets.detach().cpu()

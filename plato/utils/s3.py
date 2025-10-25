@@ -3,11 +3,11 @@ Utilities to transmit Python objects to and from an S3-compatible object storage
 """
 
 import pickle
-from typing import Any
+from typing import Any, Optional
 
 import boto3
-import botocore
 import requests
+from botocore.exceptions import ClientError, ParamValidationError
 
 from plato.config import Config
 
@@ -17,7 +17,13 @@ class S3:
     object storage service.
     """
 
-    def __init__(self, endpoint=None, access_key=None, secret_key=None, bucket=None):
+    def __init__(
+        self,
+        endpoint: str | None = None,
+        access_key: str | None = None,
+        secret_key: str | None = None,
+        bucket: str | None = None,
+    ):
         """All S3-related credentials, such as the access key and the secret key,
         are either to be stored in ~/.aws/credentials by using the 'aws configure'
         command, passed into the constructor as parameters, or specified in the
@@ -65,10 +71,10 @@ class S3:
         # Does the bucket exist?
         try:
             self.s3_client.head_bucket(Bucket=self.bucket)
-        except botocore.exceptions.ClientError:
+        except ClientError:
             try:
                 self.s3_client.create_bucket(Bucket=self.bucket)
-            except botocore.exceptions.ClientError as s3_exception:
+            except ClientError as s3_exception:
                 raise ValueError("Fail to create a bucket.") from s3_exception
 
     def send_to_s3(self, object_key, object_to_send) -> None:
@@ -77,7 +83,7 @@ class S3:
         try:
             # Does the object key exist already in S3?
             self.s3_client.head_object(Bucket=self.bucket, Key=object_key)
-        except botocore.exceptions.ClientError:
+        except ClientError:
             self.put_to_s3(object_key, object_to_send)
 
     def receive_from_s3(self, object_key) -> Any:
@@ -121,10 +127,10 @@ class S3:
                     f"Error occurred sending data: status code = {response.status_code}"
                 ) from None
 
-        except botocore.exceptions.ClientError as error:
+        except ClientError as error:
             raise ValueError(f"Error occurred sending data to S3: {error}") from error
 
-        except botocore.exceptions.ParamValidationError as error:
+        except ParamValidationError as error:
             raise ValueError(f"Incorrect parameters: {error}") from error
 
     def delete_from_s3(self, object_key):

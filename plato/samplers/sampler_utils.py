@@ -95,6 +95,8 @@ def assign_sub_classes(
     classes_assigned_count = {cls_i: 0 for cls_i in dataset_classes}
     clients_contain_classes = {cli_i: [] for cli_i in range(num_clients)}
 
+    anchor_classes = list(anchor_classes or [])
+
     for client_id in range(num_clients):
         if consistent_clients is not None and client_id in consistent_clients:
             current_assigned_cls = anchor_classes

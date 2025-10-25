@@ -48,8 +48,8 @@ def _average_fuse(global_iter, client_iters, num_samples, avg_last=True):
         while True:
             global_name, global_param = next(global_iter)
             if (not avg_last) and ("classifier" in global_name):
-                for client_iter in enumerate(client_iters):
-                    _, client_param = next(client_iter)
+                for client_iter in client_iters:
+                    next(client_iter)
                 continue
             baseline = copy.deepcopy(global_param.data)
             deltas = torch.zeros(baseline.size())

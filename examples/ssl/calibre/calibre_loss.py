@@ -19,7 +19,8 @@ structure but only computes clustering loss with ground truth labels.
 """
 
 from collections import OrderedDict
-from typing import List
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import torch
 from clustering import kmeans_clustering
@@ -30,6 +31,19 @@ from torch import nn
 from plato.trainers import loss_criterion
 
 
+def _to_dict(source: Any) -> dict[str, Any]:
+    """Convert configuration-like objects into plain dictionaries."""
+    if source is None:
+        return {}
+    if isinstance(source, Mapping):
+        return {str(key): value for key, value in source.items()}
+    if hasattr(source, "_asdict"):
+        as_dict = source._asdict()
+        if isinstance(as_dict, Mapping):
+            return {str(key): value for key, value in as_dict.items()}
+    raise TypeError(f"Unsupported configuration type: {type(source)!r}")
+
+
 class CalibreLoss(nn.Module):
     """
     The contrastive adaptation losses for Calibre.
@@ -38,62 +52,73 @@ class CalibreLoss(nn.Module):
     def __init__(
         self,
         main_loss: str,
-        main_loss_params: dict,
-        auxiliary_losses: List[str] = None,
-        auxiliary_loss_params: List[dict] = None,
-        losses_weight: List[float] = None,
-        device: str = "cpu",
-    ):
+        main_loss_params: Mapping[str, Any] | None,
+        auxiliary_losses: Sequence[str] | None = None,
+        auxiliary_loss_params: Mapping[str, Any] | None = None,
+        losses_weight: Mapping[str, Any] | None = None,
+        device: torch.device | str = "cpu",
+    ) -> None:
         super().__init__()
 
-        self.device = device
+        object.__setattr__(self, "_device", device)
+        object.__setattr__(self, "_main_loss", main_loss)
 
-        # The main loss and the corresponding parameters
-        self.main_loss = main_loss
-        self.main_loss_params = main_loss_params
+        main_loss_parameters = (
+            dict(main_loss_params) if main_loss_params is not None else {}
+        )
+        object.__setattr__(self, "_main_loss_params", main_loss_parameters)
 
-        # The auxiliary losses and the corresponding parameters
-        if auxiliary_losses is None:
-            auxiliary_losses = []
-        if auxiliary_loss_params is None:
-            auxiliary_loss_params = []
-        assert len(auxiliary_losses) == len(auxiliary_loss_params)
+        auxiliary_losses_list = list(auxiliary_losses or [])
 
-        # The weights of these losses set in the config file
-        losses_weight = losses_weight._asdict()
+        try:
+            auxiliary_loss_params_dict = _to_dict(auxiliary_loss_params)
+        except TypeError:
+            auxiliary_loss_params_dict = {}
+        normalized_aux_params: dict[str, dict[str, Any]] = {}
+        for key, value in auxiliary_loss_params_dict.items():
+            if isinstance(value, Mapping):
+                normalized_aux_params[key] = dict(value)
+            elif hasattr(value, "_asdict"):
+                normalized_aux_params[key] = _to_dict(value)
+            else:
+                normalized_aux_params[key] = {}
 
-        self.loss_weights_params = OrderedDict()
-        self.loss_functions = OrderedDict()
+        try:
+            losses_weight_dict = _to_dict(losses_weight)
+        except TypeError:
+            losses_weight_dict = {}
 
-        if main_loss not in losses_weight:
-            weight = 1.0
-        else:
-            weight = losses_weight[main_loss]
+        self.loss_weights_params: OrderedDict[str, dict[str, Any]] = OrderedDict()
+        self.loss_functions: OrderedDict[str, Any] = OrderedDict()
+
+        weight = losses_weight_dict.get(main_loss, 1.0)
         self.loss_weights_params[main_loss] = {
-            "params": main_loss_params,
+            "params": main_loss_parameters,
             "weight": weight,
         }
-        for loss in auxiliary_losses:
-            if loss in losses_weight:
-                self.loss_weights_params[loss] = {
-                    "params": auxiliary_loss_params[loss]._asdict(),
-                    "weight": losses_weight[loss],
-                }
+
+        for loss in auxiliary_losses_list:
+            if loss not in losses_weight_dict:
+                continue
+            params_for_loss = normalized_aux_params.get(loss, {})
+            if hasattr(params_for_loss, "_asdict"):
+                params_for_loss = _to_dict(params_for_loss)
+            self.loss_weights_params[loss] = {
+                "params": params_for_loss,
+                "weight": losses_weight_dict[loss],
+            }
 
         # Align the loss name with its corresponding function
-        # There are two types of functions:
-        # the one from the existing package of SSL
-        # another one from the membership functions of this class
         for loss_name in self.loss_weights_params:
             if hasattr(self, loss_name):
-                loss_functions = getattr(self, loss_name)
+                loss_fn = getattr(self, loss_name)
             else:
-                loss_functions = loss_criterion.get(
+                loss_fn = loss_criterion.get(
                     loss_criterion=loss_name,
                     loss_criterion_params=self.loss_weights_params[loss_name]["params"],
                 )
 
-            self.loss_functions[loss_name] = loss_functions
+            self.loss_functions[loss_name] = loss_fn
 
     def prototype_regularizers(self, encodings, projections, **kwargs):
         """Compute the L_p and L_n losses mentioned the paper."""
@@ -110,7 +135,7 @@ class CalibreLoss(nn.Module):
 
         # Perform the K-means clustering to get the prototypes
         # shape: [2*batch_size, feature_dim]
-        full_encodings = torch.cat((encodings_a, encodings_b), axis=0)
+        full_encodings = torch.cat((encodings_a, encodings_b), dim=0)
         # Get cluster assignment for the input encodings,
         # clusters_assignment shape, [2*batch_size]
         clusters_assignment, _ = kmeans_clustering(

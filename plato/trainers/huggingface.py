@@ -10,7 +10,8 @@ HuggingFace data handling through strategy objects instead of overriding
 import logging
 import math
 import os
-from typing import Iterable, Optional, Sequence, Tuple, Union
+from collections.abc import Iterable, Sequence
+from typing import Any, Dict, Optional, Tuple, Union
 
 import torch
 import torch.nn.functional as F
@@ -58,8 +59,8 @@ class HuggingFaceCollateWrapper:
 
     def __call__(
         self, examples: Iterable[dict]
-    ) -> Tuple[HuggingFaceBatch, Optional[torch.Tensor]]:
-        batch = default_data_collator(examples)
+    ) -> tuple[HuggingFaceBatch, torch.Tensor | None]:
+        batch = default_data_collator(list(examples))
         labels = batch.pop("labels", None)
         if labels is None:
             input_ids = batch.get("input_ids")
@@ -157,7 +158,7 @@ def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
 class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
     """Performs forward/backward steps with optional gradient accumulation."""
 
-    def __init__(self, gradient_accumulation_steps: Optional[int] = None):
+    def __init__(self, gradient_accumulation_steps: int | None = None):
         self.gradient_accumulation_steps = (
             int(gradient_accumulation_steps) if gradient_accumulation_steps else 1
         )
@@ -361,8 +362,8 @@ class HuggingFaceTestingStrategy(TestingStrategy):
 
 
 def _split_callback_types(
-    callbacks: Optional[Sequence[Union[type, object]]],
-) -> Tuple[Sequence[Union[type, object]], Sequence[Union[type, object]]]:
+    callbacks: Sequence[type | object] | None,
+) -> tuple[Sequence[type | object], Sequence[type | object]]:
     """Separate HuggingFace callbacks from Plato trainer callbacks."""
     if not callbacks:
         return [], []
@@ -418,11 +419,11 @@ class Trainer(ComposableTrainer):
     def __init__(self, model=None, callbacks=None):
         hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
 
-        self._hf_callbacks: list[TrainerCallback] = []
-        self._hf_bridge: Optional[HuggingFaceCallbackBridge] = None
+        self._hf_callbacks: list[HFTrainerCallback] = []
+        self._hf_bridge: HuggingFaceCallbackBridge | None = None
         self._hf_state = TrainerState()
         self._hf_control = TrainerControl()
-        self._hf_steps_per_epoch: Optional[int] = None
+        self._hf_steps_per_epoch: int | None = None
 
         parser = HfArgumentParser(TrainingArguments)
         (self.training_args,) = parser.parse_args_into_dataclasses(
@@ -440,20 +441,49 @@ class Trainer(ComposableTrainer):
         }
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
-        tokenizer_kwargs = {
-            "cache_dir": None,
-            "use_fast": True,
-            "revision": "main",
-            "use_auth_token": None,
-        }
+        cache_dir = Config().params["data_path"]
+        use_fast_tokenizer = True
+        revision = "main"
+        auth_token = getattr(
+            getattr(Config(), "parameters", None), "huggingface_token", None
+        )
+
         if "llama" in model_name:
-            self.tokenizer = LlamaTokenizer.from_pretrained(
-                model_name, config=self.config, **tokenizer_kwargs
-            )
+            if isinstance(auth_token, str) and auth_token:
+                self.tokenizer = LlamaTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                    use_auth_token=auth_token,
+                )
+            else:
+                self.tokenizer = LlamaTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                )
         else:
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                model_name, config=self.config, **tokenizer_kwargs
-            )
+            if isinstance(auth_token, str) and auth_token:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                    use_auth_token=auth_token,
+                )
+            else:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    config=self.config,
+                    cache_dir=cache_dir,
+                    use_fast=use_fast_tokenizer,
+                    revision=revision,
+                )
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -466,9 +496,11 @@ class Trainer(ComposableTrainer):
             self._gradient_accumulation_steps
         )
 
+        plato_callbacks_list = list(plato_callbacks)
+
         super().__init__(
             model=model,
-            callbacks=plato_callbacks,
+            callbacks=plato_callbacks_list,
             loss_strategy=None,
             optimizer_strategy=None,
             training_step_strategy=HuggingFaceTrainingStepStrategy(
@@ -487,8 +519,9 @@ class Trainer(ComposableTrainer):
         if hf_callbacks:
             self.add_callbacks(hf_callbacks)
 
-        if hasattr(self.model, "loss_type"):
-            self.model.loss_type = "ForCausalLM"
+        model_instance = self._require_model()
+        if hasattr(model_instance, "loss_type"):
+            setattr(model_instance, "loss_type", "ForCausalLM")
 
         # Ensure model checkpoints can be saved when model names include slashes.
         params = Config().params
@@ -513,7 +546,7 @@ class Trainer(ComposableTrainer):
         self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
         self._hf_pending_log_data = None
 
-    def add_callbacks(self, callbacks: Sequence[Union[type, object]]):
+    def add_callbacks(self, callbacks: Sequence[type | object]):
         """
         Add callbacks to the HuggingFace trainer.
 
@@ -558,7 +591,11 @@ class Trainer(ComposableTrainer):
         self.training_args.gradient_accumulation_steps = accum_steps
         self._gradient_accumulation_steps = accum_steps
         if hasattr(self.training_step_strategy, "gradient_accumulation_steps"):
-            self.training_step_strategy.gradient_accumulation_steps = accum_steps
+            setattr(
+                self.training_step_strategy,
+                "gradient_accumulation_steps",
+                accum_steps,
+            )
         self.context.state["grad_accum_counter"] = 0
         self.context.state["grad_accum_loss_total"] = 0.0
         self.context.state["grad_accum_loss_count"] = 0
@@ -588,7 +625,7 @@ class Trainer(ComposableTrainer):
         """Save checkpoint and inform HuggingFace callbacks."""
         super().save_model(filename=filename, location=location)
         if self._hf_callbacks:
-            self._hf_call_callbacks("on_save", model=self.model)
+            self._hf_call_callbacks("on_save", model=self._require_model())
             self._hf_handle_control_flags()
 
     # --- HuggingFace callback integration helpers ---
@@ -610,17 +647,19 @@ class Trainer(ComposableTrainer):
         self._hf_state.epoch = 0
         self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
         self._hf_pending_log_data = None
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_train_begin",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             train_dataloader=self.train_loader,
         )
 
     def _hf_on_train_end(self):
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_train_end",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             train_dataloader=self.train_loader,
         )
@@ -635,11 +674,13 @@ class Trainer(ComposableTrainer):
             except TypeError:
                 steps = None
             if steps:
-                accum_steps = self.training_step_strategy.get_accumulation_steps(
-                    self.context
+                get_steps = getattr(
+                    self.training_step_strategy, "get_accumulation_steps", None
                 )
-                if accum_steps > 0:
-                    steps = math.ceil(steps / accum_steps)
+                if callable(get_steps):
+                    accum_steps = get_steps(self.context)
+                    if accum_steps > 0:
+                        steps = math.ceil(steps / accum_steps)
                 self._hf_steps_per_epoch = steps
                 self._hf_state.max_steps = steps * self._hf_state.num_train_epochs
                 batch_size = getattr(self.train_loader, "batch_size", None)
@@ -650,9 +691,10 @@ class Trainer(ComposableTrainer):
         self._hf_update_training_metadata()
         current_epoch = max(self.current_epoch - 1, 0)
         self._hf_state.epoch = float(current_epoch)
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_epoch_begin",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
@@ -662,9 +704,10 @@ class Trainer(ComposableTrainer):
 
     def _hf_on_epoch_end(self):
         self._hf_state.epoch = float(self.current_epoch)
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_epoch_end",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
@@ -674,9 +717,10 @@ class Trainer(ComposableTrainer):
 
     def _hf_on_step_begin(self, batch_index: int):
         self._hf_control._new_step()
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_step_begin",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
@@ -686,24 +730,27 @@ class Trainer(ComposableTrainer):
         self._hf_handle_control_flags()
 
     def _hf_on_pre_optimizer_step(self):
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_pre_optimizer_step",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
         )
 
     def _hf_on_optimizer_step(self):
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_optimizer_step",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
         )
 
     def _hf_on_step_end(self, batch_index: int, loss: torch.Tensor):
+        model = self._require_model()
         if self._hf_steps_per_epoch:
             step_index = self.context.state.get("hf_optimizer_step_index")
             if step_index is None:
@@ -726,11 +773,16 @@ class Trainer(ComposableTrainer):
         current_lr = self._get_current_lr()
         if current_lr is not None:
             log_entry["learning_rate"] = current_lr
-        self._hf_state.log_history.append(log_entry)
+        sanitized_entry = {
+            key: float(value)
+            for key, value in log_entry.items()
+            if isinstance(value, (int, float))
+        }
+        self._hf_state.log_history.append(sanitized_entry)
         self._hf_pending_log_data = log_entry
         self._hf_call_callbacks(
             "on_step_end",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             optimizer=self.optimizer,
             lr_scheduler=self.lr_scheduler,
@@ -739,9 +791,10 @@ class Trainer(ComposableTrainer):
         )
 
     def _hf_on_evaluate(self, metrics):
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_evaluate",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             metrics=metrics,
             eval_dataloader=self.context.state.get("eval_loader"),
@@ -791,8 +844,9 @@ class Trainer(ComposableTrainer):
         try:
             datasource = datasources_registry.get(client_id=self.client_id)
             testset = datasource.get_test_set()
+            model = self._require_model()
             metrics_value = self.testing_strategy.test_model(
-                self.model,
+                model,
                 self.context.config,
                 testset,
                 None,
@@ -823,9 +877,10 @@ class Trainer(ComposableTrainer):
             if current_lr is not None:
                 logs["learning_rate"] = current_lr
 
+        model = self._require_model()
         self._hf_call_callbacks(
             "on_log",
-            model=self.model,
+            model=model,
             tokenizer=self.tokenizer,
             logs=logs,
         )

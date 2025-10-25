@@ -39,7 +39,7 @@ class NoOpUpdateStrategy(ModelUpdateStrategy):
         """No-op: called after each training step."""
         pass
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """No-op: return empty payload."""
         return {}
 
@@ -78,7 +78,7 @@ class StateTrackingUpdateStrategy(ModelUpdateStrategy):
         self.total_steps += 1
         self.epoch_steps += 1
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """Return step statistics."""
         return {
             "total_steps": self.total_steps,
@@ -133,7 +133,7 @@ class CompositeUpdateStrategy(ModelUpdateStrategy):
         for strategy in self.strategies:
             strategy.after_step(context)
 
-    def get_update_payload(self, context: TrainingContext) -> Dict[str, Any]:
+    def get_update_payload(self, context: TrainingContext) -> dict[str, Any]:
         """Merge payloads from all strategies."""
         merged_payload = {}
         for strategy in self.strategies:

@@ -62,28 +62,32 @@ class Server(fedavg.Server):
             self.datasource = datasources_registry.get(client_id=0)
         elif self.datasource is None and self.custom_datasource is not None:
             self.datasource = self.custom_datasource()
-        self.testset = self.datasource.get_test_set()
-        self.testset_sampler = all_inclusive.Sampler(self.datasource, testing=True)
+        datasource = self.require_datasource()
+        self.testset = datasource.get_test_set()
+        self.testset_sampler = all_inclusive.Sampler(datasource, testing=True)
 
     def customize_server_payload(self, payload):
         """Wrap up generating the server payload with any additional information."""
+        trainer = self.require_trainer()
         if self.phase == "prompt":
             # Split learning server doesn't send weights to client
             return (None, "prompt")
-        return (self.trainer.get_gradients(), "gradients")
+        return (trainer.get_gradients(), "gradients")
 
     # pylint: disable=unused-argument
     async def aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregate weight updates from the clients or train the model."""
         update = updates[0]
         report = update.report
+        algorithm = self.require_algorithm()
+        trainer = self.require_trainer()
         if report.type == "features":
             logging.warning("[%s] Features received, compute gradients.", self)
             feature_dataset = feature.DataSource([update.payload])
 
             # Training the model using all the features received from the client
             sampler = all_inclusive.Sampler(feature_dataset)
-            self.algorithm.train(feature_dataset, sampler)
+            algorithm.train(feature_dataset, sampler)
 
             self.phase = "gradient"
         elif report.type == "weights":
@@ -91,9 +95,9 @@ class Server(fedavg.Server):
             weights = update.payload
 
             # The weights after cut layer are not trained by clients
-            self.algorithm.update_weights_before_cut(weights)
+            algorithm.update_weights_before_cut(weights)
 
-            self.test_accuracy = self.trainer.test(self.testset, self.testset_sampler)
+            self.test_accuracy = trainer.test(self.testset, self.testset_sampler)
 
             logging.warning(
                 fonts.colourize(
@@ -103,10 +107,13 @@ class Server(fedavg.Server):
             self.phase = "prompt"
             # Change client in next round
             self.next_client = True
-            if hasattr(self.client_selection_strategy, "release_current_client"):
-                self.client_selection_strategy.release_current_client(self.context)
+            release_client = getattr(
+                self.client_selection_strategy, "release_current_client", None
+            )
+            if callable(release_client):
+                release_client(self.context)
 
-        updated_weights = self.algorithm.extract_weights()
+        updated_weights = algorithm.extract_weights()
         return updated_weights
 
     def clients_processed(self):

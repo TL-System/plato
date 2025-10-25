@@ -4,6 +4,7 @@ Server orchestration for MOON using the new aggregation strategy API.
 
 from __future__ import annotations
 
+from moon_algorithm import Algorithm as MoonAlgorithm
 from moon_server_strategy import MoonAggregationStrategy
 
 from plato.servers import fedavg
@@ -27,7 +28,7 @@ class Server(fedavg.Server):
         super().__init__(
             model=model,
             datasource=datasource,
-            algorithm=algorithm,
+            algorithm=algorithm or MoonAlgorithm,
             trainer=trainer,
             callbacks=callbacks,
             aggregation_strategy=aggregation_strategy,

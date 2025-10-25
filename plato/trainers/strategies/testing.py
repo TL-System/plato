@@ -20,6 +20,9 @@ class DefaultTestingStrategy(TestingStrategy):
     Uses standard accuracy computation with argmax over logits.
     """
 
+    def __init__(self):
+        self.personalized_trainset = None
+
     def test_model(self, model, config, testset, sampler, context):
         """
         Test the model using standard classification accuracy.

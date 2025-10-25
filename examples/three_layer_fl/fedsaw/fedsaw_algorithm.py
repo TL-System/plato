@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import copy
 from collections import OrderedDict
-from typing import Mapping, MutableMapping
+from collections.abc import Mapping, MutableMapping
 
 import torch
 from torch import nn
@@ -24,7 +24,7 @@ class Algorithm(fedavg.Algorithm):
         new_weights: Mapping[str, torch.Tensor],
     ) -> OrderedDict[str, torch.Tensor]:
         """Compute the weight deltas between two model snapshots."""
-        deltas: "OrderedDict[str, torch.Tensor]" = OrderedDict()
+        deltas: OrderedDict[str, torch.Tensor] = OrderedDict()
         for name, new_weight in new_weights.items():
             deltas[name] = new_weight - previous_weights[name]
         return deltas
@@ -47,7 +47,11 @@ class Algorithm(fedavg.Algorithm):
         )
 
         # Clone the reference model to host update tensors for pruning.
-        delta_model = copy.deepcopy(self.model.cpu())
+        model = self.model
+        if model is None:
+            raise RuntimeError("Model must be initialised before pruning updates.")
+
+        delta_model = copy.deepcopy(model).cpu()
         cpu_updates: MutableMapping[str, torch.Tensor] = OrderedDict(
             (name, tensor.detach().cpu()) for name, tensor in updates.items()
         )

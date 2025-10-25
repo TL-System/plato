@@ -7,6 +7,7 @@ import math
 import os
 from collections import deque
 from statistics import mean, stdev
+from typing import Any
 
 import numpy as np
 
@@ -22,14 +23,22 @@ class RLAgent(rl_agent.RLAgent):
     def __init__(self):
         super().__init__()
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            self.policy = policies_registry.get(
+            self.policy: Any = policies_registry.get(
                 Config().algorithm.n_features, self.n_actions
             )
         else:
             self.policy = policies_registry.get(self.n_states, self.n_actions)
 
+        if self.policy is None:
+            raise RuntimeError("Failed to initialize RL policy.")
+
         if Config().algorithm.recurrent_actor:
-            self.h, self.c = self.policy.get_initial_states()
+            get_initial_states = getattr(self.policy, "get_initial_states", None)
+            if get_initial_states is None:
+                raise RuntimeError(
+                    "Recurrent actor requires the policy to provide get_initial_states()."
+                )
+            self.h, self.c = get_initial_states()
             self.nh, self.nc = self.h, self.c
 
         if (
@@ -79,14 +88,20 @@ class RLAgent(rl_agent.RLAgent):
 
     def get_state(self):
         """Get state for agent."""
+        if self.new_state is None:
+            raise RuntimeError("State has not been initialised.")
+        state_array = np.asarray(self.new_state)
         if hasattr(Config().server, "synchronous") and not Config().server.synchronous:
-            return self.new_state
+            return state_array
         else:
-            return np.squeeze(self.new_state.reshape(1, -1))
+            return np.squeeze(state_array.reshape(1, -1))
 
     def prep_action(self):
         """Get action from RL policy."""
         logging.info("[RL Agent] Selecting action...")
+        policy = self.policy
+        if policy is None:
+            raise RuntimeError("RL policy has not been initialised.")
         if Config().algorithm.mode == "train":
             if self.total_steps <= Config().algorithm.start_steps:
                 # random action
@@ -108,7 +123,10 @@ class RLAgent(rl_agent.RLAgent):
             else:
                 # Sample action from policy
                 if Config().algorithm.recurrent_actor:
-                    self.action, (self.nh, self.nc) = self.policy.select_action(
+                    select_action = getattr(policy, "select_action", None)
+                    if select_action is None:
+                        raise RuntimeError("Policy must implement select_action().")
+                    self.action, (self.nh, self.nc) = select_action(
                         self.state, (self.h, self.c)
                     )
                     if (
@@ -117,18 +135,21 @@ class RLAgent(rl_agent.RLAgent):
                     ):
                         self.action = np.reshape(np.array(self.action), (-1, 1))
                 else:
-                    self.action = self.policy.select_action(self.state)
+                    self.action = policy.select_action(self.state)
         else:
             if Config().algorithm.recurrent_actor:
                 # don't pass hidden states
-                self.action, __ = self.policy.select_action(self.state)
+                select_action = getattr(policy, "select_action", None)
+                if select_action is None:
+                    raise RuntimeError("Policy must implement select_action().")
+                self.action, __ = select_action(self.state)
                 if (
                     hasattr(Config().server, "synchronous")
                     and not Config().server.synchronous
                 ):
                     self.action = np.reshape(np.array(self.action), (-1, 1))
             else:
-                self.action = self.policy.select_action(self.state)
+                self.action = policy.select_action(self.state)
 
     def get_reward(self):
         """Get reward for agent."""
@@ -160,12 +181,14 @@ class RLAgent(rl_agent.RLAgent):
                 "result_path"
             ]
             step_result_csv_file = f"{result_path}/{os.getpid()}_step_result.csv"
+            action_array = np.squeeze(np.asarray(self.action))
+            state_list = np.asarray(self.state).tolist()
             csv_processor.write_csv(
                 step_result_csv_file,
                 [self.current_episode, self.current_step]
                 + [self.client_ids]
-                + [list(np.squeeze(self.action))]
-                + list(self.state),
+                + [list(action_array)]
+                + state_list,
             )
 
         if Config().algorithm.recurrent_actor:
@@ -174,9 +197,18 @@ class RLAgent(rl_agent.RLAgent):
     def update_policy(self):
         """Update agent if needed in training mode."""
         logging.info("[RL Agent] Updating the policy.")
-        if len(self.policy.replay_buffer) > Config().algorithm.batch_size:
+        policy = self.policy
+        if policy is None:
+            raise RuntimeError("RL policy has not been initialised.")
+        replay_buffer = getattr(policy, "replay_buffer", None)
+        if replay_buffer is None:
+            raise RuntimeError("Policy must expose a replay_buffer for updating.")
+        if len(replay_buffer) > Config().algorithm.batch_size:
             # TD3-LSTM
-            critic_loss, actor_loss = self.policy.update()
+            update_fn = getattr(policy, "update", None)
+            if update_fn is None:
+                raise RuntimeError("Policy must implement update().")
+            critic_loss, actor_loss = update_fn()
 
             new_row = []
             for item in self.recorded_rl_items:
@@ -210,13 +242,24 @@ class RLAgent(rl_agent.RLAgent):
             self.pre_acc.append(0)
 
         if self.current_episode % Config().algorithm.log_interval == 0:
-            self.policy.save_model(self.current_episode)
+            save_model = getattr(policy, "save_model", None)
+            if save_model is None:
+                raise RuntimeError("Policy must implement save_model().")
+            save_model(self.current_episode)
 
     def process_experience(self):
         """Process step experience if needed in training mode."""
         logging.info("[RL Agent] Saving the experience into the replay buffer.")
+        policy = self.policy
+        if policy is None:
+            raise RuntimeError("RL policy has not been initialised.")
+        replay_buffer = getattr(policy, "replay_buffer", None)
+        if replay_buffer is None:
+            raise RuntimeError(
+                "Policy must expose a replay_buffer for experience replay."
+            )
         if Config().algorithm.recurrent_actor:
-            self.policy.replay_buffer.push(
+            replay_buffer.push(
                 (
                     self.state,
                     self.action,
@@ -230,7 +273,7 @@ class RLAgent(rl_agent.RLAgent):
                 )
             )
         else:
-            self.policy.replay_buffer.push(
+            replay_buffer.push(
                 (
                     self.state,
                     self.action,

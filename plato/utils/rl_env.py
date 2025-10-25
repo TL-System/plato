@@ -28,7 +28,7 @@ class RLEnv(gym.Env):
 
         self.rl_agent = rl_agent
         self.time_step = 0
-        self.state = None
+        self.state: np.ndarray = np.zeros(1, dtype=np.float32)
         self.is_episode_done = False
 
         # An RL env waits for the event that it gets the current state from RL agent
@@ -53,7 +53,7 @@ class RLEnv(gym.Env):
             low=-1, high=1, shape=(self.n_states,), dtype="float32"
         )
 
-        self.state = [0 for i in range(self.n_states)]
+        self.state = np.zeros(self.n_states, dtype=np.float32)
 
     def reset(self):
         if self.rl_agent.rl_episode >= Config().algorithm.rl_episodes:
@@ -71,12 +71,12 @@ class RLEnv(gym.Env):
 
         self.rl_agent.new_episode_begin.set()
 
-        self.state = [0 for i in range(self.n_states)]
-        return np.array(self.state)
+        self.state = np.zeros(self.n_states, dtype=np.float32)
+        return self.state.copy()
 
     def step(self, action):
         """One step of reinforcement learning."""
-        assert self.action_space.contains(action), "%r (%s) invalid" % (
+        assert self.action_space.contains(action), "{!r} ({}) invalid".format(
             action,
             type(action),
         )
@@ -117,7 +117,12 @@ class RLEnv(gym.Env):
         # Signal the RL agent to start next time step (next round of FL)
         self.step_done.set()
 
-        return np.array([self.state]), reward, self.is_episode_done, info
+        return (
+            np.array([self.state], dtype=np.float32),
+            reward,
+            self.is_episode_done,
+            info,
+        )
 
     async def wait_for_state(self):
         """Wait for getting the current state."""
@@ -130,7 +135,7 @@ class RLEnv(gym.Env):
         Get transitted state from RL agent.
         This function is called by RL agent.
         """
-        self.state = state
+        self.state = np.asarray(state, dtype=np.float32)
         self.is_episode_done = is_episode_done
         # Signal the RL env that it gets the current state
         self.state_got.set()
@@ -143,10 +148,9 @@ class RLEnv(gym.Env):
 
     def get_reward(self):
         """Get reward based on the state."""
-        accuracy = self.state
+        accuracy = float(np.mean(self.state))
         # Use accuracy as reward for now.
-        reward = accuracy
-        return reward
+        return accuracy
 
     def render(self, mode="rl"):
         pass

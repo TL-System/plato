@@ -12,7 +12,8 @@ from __future__ import annotations
 import importlib
 import inspect
 import logging
-from typing import Any, Callable, Dict, Optional, Type
+from collections.abc import Callable
+from typing import Any, Dict, Optional, Type
 
 from plato.clients import (
     edge,
@@ -28,7 +29,7 @@ from plato.config import Config
 ClientFactory = Callable[..., Client]
 
 
-def _instantiate_with_signature(cls: Type[Client], **kwargs) -> Client:
+def _instantiate_with_signature(cls: type[Client], **kwargs) -> Client:
     """Instantiate a client class using only parameters supported by its signature."""
     signature = inspect.signature(cls.__init__)
     supported_kwargs = {
@@ -49,7 +50,7 @@ def _verify_strategy_configuration(instance: Client) -> Client:
     )
 
 
-def _simple_like_factory(cls: Type[Client]) -> ClientFactory:
+def _simple_like_factory(cls: type[Client]) -> ClientFactory:
     """Factory wrapper for clients following the simple client signature."""
 
     def factory(
@@ -80,7 +81,7 @@ def _edge_factory() -> ClientFactory:
     """Factory for edge clients requiring a server instance."""
 
     def factory(
-        server: Optional[Any] = None,
+        server: Any | None = None,
         **kwargs,
     ) -> Client:
         if server is None:
@@ -92,7 +93,7 @@ def _edge_factory() -> ClientFactory:
     return factory
 
 
-def _generic_factory(cls: Type[Client]) -> ClientFactory:
+def _generic_factory(cls: type[Client]) -> ClientFactory:
     """Factory for custom client subclasses."""
 
     def factory(**kwargs) -> Client:
@@ -102,7 +103,7 @@ def _generic_factory(cls: Type[Client]) -> ClientFactory:
     return factory
 
 
-registered_clients: Dict[str, ClientFactory] = {
+registered_clients: dict[str, ClientFactory] = {
     "simple": _simple_like_factory(simple.Client),
     "fedavg_personalized": _simple_like_factory(fedavg_personalized.Client),
     "mpc": _simple_like_factory(mpc.Client),
@@ -112,7 +113,7 @@ registered_clients: Dict[str, ClientFactory] = {
 }
 
 
-def _resolve_external_class(path: str) -> Type[Client]:
+def _resolve_external_class(path: str) -> type[Client]:
     """Resolve a dotted-path client class for custom configurations."""
     module_path, _, class_name = path.rpartition(".")
     if not module_path:
