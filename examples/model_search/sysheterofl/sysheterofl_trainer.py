@@ -68,3 +68,12 @@ class ServerTrainer(basic.Trainer):
         if model is not None:
             self.model = model(**Config().parameters.model._asdict())
         self.biggest_net_config = None
+
+    def test(self, testset, sampler=None, **kwargs):  # pylint: disable=unused-argument
+        """Run server-side evaluation without spawning subprocesses."""
+        logging.info(
+            "[SysHeteroFL] Running in-process evaluation to avoid shared memory limits."
+        )
+        config = Config().trainer._asdict()
+        config["run_id"] = Config().params["run_id"]
+        return self.test_model(config, testset, sampler=sampler, **kwargs)
