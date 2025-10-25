@@ -25,10 +25,12 @@ from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.utils import csv_processor
 
+import fednas_algorithm
+
 if TYPE_CHECKING:
     from torch.nn import Module
 
-    from .fednas_algorithm import ServerAlgorithmSync, SupernetProtocol
+    from fednas_algorithm import SupernetProtocol
 
 
 class PerFedRlnasSyncAggregationStrategy(FedAvgAggregationStrategy):
@@ -117,13 +119,13 @@ class ServerSync(fedavg.Server):
         self.process_end: float = 0.0
         self.model_size = np.zeros(Config().clients.total_clients)
 
-    def _fednas_algorithm(self) -> ServerAlgorithmSync:
+    def _fednas_algorithm(self) -> fednas_algorithm.ServerAlgorithmSync:
         algorithm = self.require_algorithm()
-        if not isinstance(algorithm, ServerAlgorithmSync):
+        if not isinstance(algorithm, fednas_algorithm.ServerAlgorithmSync):
             raise TypeError(
                 "PerFedRLNAS server requires the MobileNetV3 FedNAS algorithm."
             )
-        return algorithm
+        return cast(fednas_algorithm.ServerAlgorithmSync, algorithm)
 
     def _supernet(self) -> SupernetProtocol:
         return self._fednas_algorithm().get_supernet()

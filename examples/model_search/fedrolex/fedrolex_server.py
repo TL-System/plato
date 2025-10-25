@@ -13,7 +13,7 @@ from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 
-from .fedrolex_algorithm import Algorithm as FedRolexAlgorithm
+from fedrolex_algorithm import Algorithm as FedRolexAlgorithm
 
 
 class FedRolexAggregationStrategy(FedAvgAggregationStrategy):

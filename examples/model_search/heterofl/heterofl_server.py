@@ -18,7 +18,7 @@ from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 
-from .heterofl_algorithm import Algorithm as HeteroAlgorithm
+from heterofl_algorithm import Algorithm as HeteroAlgorithm
 
 
 class HeteroFLAggregationStrategy(FedAvgAggregationStrategy):

@@ -13,7 +13,7 @@ from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 
-from .anycostfl_algorithm import Algorithm as AnyCostAlgorithm
+from anycostfl_algorithm import Algorithm as AnyCostAlgorithm
 
 
 class AnyCostAggregationStrategy(FedAvgAggregationStrategy):
