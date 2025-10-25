@@ -291,27 +291,36 @@ class ComposableTrainer(base.Trainer):
                 self.run_history = pickle.load(history_file)
 
     def simulate_sleep_time(self):
-        """Simulate client's speed variation."""
-        if (
-            hasattr(Config().clients, "sleep_simulation")
-            and Config().clients.sleep_simulation
+        """Simulate or enforce wall-clock sleep for straggler emulation."""
+        if not (
+            hasattr(Config().clients, "speed_simulation")
+            and Config().clients.speed_simulation
         ):
-            sleep_times = Config.client_sleep_times
-            if sleep_times is None:
-                sleep_times = Config.simulate_client_speed()
-            index = max(self.client_id - 1, 0)
-            if index >= len(sleep_times):
-                return
+            return
 
-            sleep_seconds = max(0.0, float(sleep_times[index]))
+        sleep_times = Config.client_sleep_times
+        if sleep_times is None:
+            sleep_times = Config.simulate_client_speed()
 
-            if sleep_seconds > 0:
-                logging.info(
-                    "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
-                    self.client_id,
-                    sleep_seconds,
-                )
-                time.sleep(sleep_seconds)
+        index = max(self.client_id - 1, 0)
+        if index >= len(sleep_times):
+            return
+
+        sleep_seconds = max(0.0, float(sleep_times[index]))
+        if sleep_seconds <= 0:
+            return
+
+        simulate_only = getattr(Config().clients, "sleep_simulation", False)
+        if simulate_only:
+            # Legacy behaviour: do not block execution, just account for the time.
+            return
+
+        logging.info(
+            "[Client #%d] Simulating stragglers by sleeping for %.2f seconds.",
+            self.client_id,
+            sleep_seconds,
+        )
+        time.sleep(sleep_seconds)
 
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
