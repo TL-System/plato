@@ -97,7 +97,7 @@ def test_cli_arguments_override_config_values(tmp_path: Path, monkeypatch):
 
     Config._instance = None
     if hasattr(Config, "args"):
-        Config.args = None
+        delattr(Config, "args")
     Config._cli_overrides = {}
 
     config = Config()
@@ -110,7 +110,7 @@ def test_cli_arguments_override_config_values(tmp_path: Path, monkeypatch):
 
     Config._instance = None
     if hasattr(Config, "args"):
-        Config.args = None
+        delattr(Config, "args")
     Config._cli_overrides = {}
 
 
@@ -142,7 +142,7 @@ def test_config_base_path_used_without_cli_override(tmp_path: Path, monkeypatch)
 
     Config._instance = None
     if hasattr(Config, "args"):
-        Config.args = None
+        delattr(Config, "args")
     Config._cli_overrides = {}
 
     config = Config()
@@ -154,5 +154,5 @@ def test_config_base_path_used_without_cli_override(tmp_path: Path, monkeypatch)
 
     Config._instance = None
     if hasattr(Config, "args"):
-        Config.args = None
+        delattr(Config, "args")
     Config._cli_overrides = {}

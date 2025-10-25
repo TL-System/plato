@@ -30,11 +30,15 @@ def test_split_learning_reuses_client_until_release():
 
     first_selection = strategy.select_clients(clients_pool, 1, context)
     assert len(first_selection) == 1
-    assert context.server.next_client is False
+    server = context.server
+    assert server is not None
+    assert server.next_client is False
 
     second_selection = strategy.select_clients(clients_pool, 1, context)
     assert second_selection == first_selection
-    assert context.server.next_client is False
+    server = context.server
+    assert server is not None
+    assert server.next_client is False
 
 
 def test_split_learning_cycles_through_clients():
@@ -52,7 +56,9 @@ def test_split_learning_cycles_through_clients():
 
     # Release twice to collect the remaining clients.
     for _ in range(2):
-        context.server.next_client = True
+        server = context.server
+        assert server is not None
+        server.next_client = True
         strategy.release_current_client(context)
         selection = strategy.select_clients(clients_pool, 1, context)
         selected_clients.append(selection[0])
@@ -61,7 +67,9 @@ def test_split_learning_cycles_through_clients():
     assert len(selected_clients) == len(clients_pool)
 
     # After all clients have been used, releasing again should regenerate order.
-    context.server.next_client = True
+    server = context.server
+    assert server is not None
+    server.next_client = True
     strategy.release_current_client(context)
     new_selection = strategy.select_clients(clients_pool, 1, context)
     assert new_selection[0] in clients_pool

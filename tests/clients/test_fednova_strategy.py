@@ -4,6 +4,7 @@ import asyncio
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any, cast
 from unittest.mock import AsyncMock, patch
 
 from plato.config import Config
@@ -19,9 +20,14 @@ _FEDNOVA_CLIENT_PATH = (
 _FEDNOVA_SPEC = importlib.util.spec_from_file_location(
     "fednova_client_module", _FEDNOVA_CLIENT_PATH
 )
-fednova_client = importlib.util.module_from_spec(_FEDNOVA_SPEC)
-assert _FEDNOVA_SPEC.loader is not None
-_FEDNOVA_SPEC.loader.exec_module(fednova_client)
+if _FEDNOVA_SPEC is None:
+    raise RuntimeError(f"Unable to load spec for {_FEDNOVA_CLIENT_PATH}")
+
+fednova_client = cast(Any, importlib.util.module_from_spec(_FEDNOVA_SPEC))
+loader = _FEDNOVA_SPEC.loader
+if loader is None:
+    raise RuntimeError(f"Loader missing for {_FEDNOVA_CLIENT_PATH}")
+loader.exec_module(fednova_client)
 
 
 def test_report_contains_epochs_for_constant_pattern(temp_config):

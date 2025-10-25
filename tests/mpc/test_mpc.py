@@ -38,7 +38,9 @@ def test_round_info_store_local(tmp_path):
 
     loaded = store.load_state()
     assert loaded.client_samples[1] == 10
-    assert torch.equal(loaded.additive_shares[1]["w"], torch.tensor(1.0))
+    additive_share = loaded.additive_shares[1]
+    assert additive_share is not None
+    assert torch.equal(additive_share["w"], torch.tensor(1.0))
     assert (1, 2) in loaded.pairwise_shares
 
 

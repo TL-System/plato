@@ -50,9 +50,11 @@ def test_fedavg_aggregation_skips_feature_payloads(temp_config):
         SimpleNamespace(report=SimpleNamespace(num_samples=10, type="features")),
     ]
 
+    model = trainer.model
+    assert model is not None
     aggregated = asyncio.run(
         FedAvgAggregationStrategy().aggregate_weights(
-            updates, trainer.model.state_dict(), [["feature_batch"]], context
+            updates, model.state_dict(), [{}], context
         )
     )
 

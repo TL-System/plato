@@ -24,9 +24,8 @@ def test_lenet5_split_forward_matches_full():
     torch.manual_seed(0)
     full_model = lenet5.Model()
 
-    client_model = lenet5.Model()
+    client_model = lenet5.Model(cut_layer="relu1")
     client_model.load_state_dict(full_model.state_dict())
-    client_model.cut_layer = "relu1"
 
     server_model = lenet5.Model(cut_layer="relu1")
     server_model.load_state_dict(full_model.state_dict())

@@ -107,16 +107,19 @@ def test_torchvision_datasource_supports_named_splits(monkeypatch, tmp_path):
         train_transform="train_tx", test_transform="test_tx"
     )
 
+    assert datasource.trainset is not None
     assert datasource.trainset.split == "train"
     assert datasource.trainset.transform == "train_tx"
     assert datasource.trainset.download is False
     assert datasource.trainset.targets == [0, 1]
 
+    assert datasource.testset is not None
     assert datasource.testset.split == "test"
     assert datasource.testset.transform == "test_tx"
     assert datasource.testset.download is False
 
     unlabeled = datasource.get_unlabeled_set()
+    assert unlabeled is not None
     assert unlabeled.split == "unlabeled"
     assert unlabeled.transform == "train_tx"
 
@@ -171,10 +174,12 @@ def test_torchvision_datasource_supports_boolean_splits_and_kwargs(
 
     datasource = torchvision_ds.DataSource()
 
+    assert datasource.trainset is not None
     assert datasource.trainset.train is True
     assert datasource.trainset.download is True
     assert datasource.trainset.sample_rate == 0.5
 
+    assert datasource.testset is not None
     assert datasource.testset.train is False
     assert datasource.testset.download is False
     assert datasource.testset.sample_rate == 0.25
@@ -204,6 +209,8 @@ def test_torchvision_datasource_celeba_defaults(monkeypatch, tmp_path):
 
     datasource = torchvision_ds.DataSource()
 
+    assert datasource.trainset is not None
+    assert datasource.testset is not None
     assert datasource.trainset.target_type == ["attr", "identity"]
     assert isinstance(datasource.trainset.transform, tv_transforms.Compose)
     resize = datasource.trainset.transform.transforms[0]
@@ -244,6 +251,7 @@ def test_torchvision_datasource_celeba_respects_config(monkeypatch, tmp_path):
 
     datasource = torchvision_ds.DataSource()
 
+    assert datasource.trainset is not None
     assert datasource.trainset.target_type == ["attr"]
     resize = datasource.trainset.transform.transforms[0]
     assert isinstance(resize, tv_transforms.Resize)
@@ -277,6 +285,7 @@ def test_torchvision_datasource_celeba_identity_only(monkeypatch, tmp_path):
 
     datasource = torchvision_ds.DataSource()
 
+    assert datasource.trainset is not None
     _, label = datasource.trainset[2]
     assert isinstance(label, int)
     assert label == 2

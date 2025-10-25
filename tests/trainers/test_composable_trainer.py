@@ -360,8 +360,10 @@ class TestComposableTrainerModelOperations:
         trainer = ComposableTrainer(model=simple_model)
 
         # Create some dummy weights
+        model = trainer.model
+        assert model is not None
         with torch.no_grad():
-            for param in trainer.model.parameters():
+            for param in model.parameters():
                 param.fill_(1.0)
 
         # Save model
@@ -372,7 +374,9 @@ class TestComposableTrainerModelOperations:
         trainer2.load_model(filename="test_model.safetensors", location=str(tmp_path))
 
         # Check that weights match
-        for p1, p2 in zip(trainer.model.parameters(), trainer2.model.parameters()):
+        model2 = trainer2.model
+        assert model2 is not None
+        for p1, p2 in zip(model.parameters(), model2.parameters()):
             assert torch.allclose(p1, p2)
 
 
@@ -457,8 +461,10 @@ class TestComposableTrainerComparison:
         trainer = ComposableTrainer(model=simple_model)
 
         # Save initial parameters (move to same device as they'll be after training)
+        model = trainer.model
+        assert model is not None
         initial_params = [
-            p.clone().to(trainer.context.device) for p in trainer.model.parameters()
+            p.clone().to(trainer.context.device) for p in model.parameters()
         ]
 
         sampler = list(range(len(simple_dataset)))
@@ -466,7 +472,7 @@ class TestComposableTrainerComparison:
 
         # Check that at least some parameters changed
         params_changed = False
-        for initial, final in zip(initial_params, trainer.model.parameters()):
+        for initial, final in zip(initial_params, model.parameters()):
             if not torch.allclose(initial, final):
                 params_changed = True
                 break

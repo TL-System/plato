@@ -6,10 +6,13 @@ from __future__ import annotations
 
 from importlib import import_module
 from types import SimpleNamespace
+from typing import cast
 
 import pytest
 import torch
 from torch.utils.data import TensorDataset
+
+from plato.mpc.round_store import RoundInfoStore
 
 from tests.integration.utils import (
     async_run,
@@ -72,8 +75,11 @@ def test_fedavg_lenet5_smoke(monkeypatch):
 
         # Build fake updates to trigger aggregation without real clients.
         trainer = server.trainer
+        assert trainer is not None
+        model = trainer.model
+        assert model is not None
         weights = {
-            name: tensor.clone() for name, tensor in trainer.model.state_dict().items()
+            name: tensor.clone() for name, tensor in model.state_dict().items()
         }
         update = SimpleNamespace(
             client_id=1,
@@ -137,8 +143,9 @@ def test_mpc_training_smoke(monkeypatch):
                 round_store_calls.append((client_id, num_samples))
 
         dummy_store = DummyRoundStore()
+        round_store = cast(RoundInfoStore, dummy_store)
         strategy_mod = import_module("plato.clients.strategies.mpc")
-        strategy = strategy_mod.MPCTrainingStrategy(dummy_store)
+        strategy = strategy_mod.MPCTrainingStrategy(round_store)
 
         async def fake_train(self, context):
             report = SimpleNamespace(num_samples=3)

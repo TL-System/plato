@@ -3,6 +3,7 @@
 import asyncio
 from collections import OrderedDict
 from types import SimpleNamespace
+from typing import cast
 
 import numpy as np
 import torch
@@ -30,8 +31,9 @@ class DummyServer:
         self.encrypted_model = None
 
     def _fedavg_hybrid(self, updates, weights_received):
+        context = cast(homo_enc.ts.Context, self.he_context)
         deserialized = [
-            homo_enc.deserialize_weights(payload, self.he_context)
+            homo_enc.deserialize_weights(payload, context)
             for payload in weights_received
         ]
 
@@ -116,6 +118,8 @@ def test_he_aggregation_strategy_weighted_average_without_encryption():
     aggregated = asyncio.run(
         strategy.aggregate_weights(updates, {}, weights_received, context)
     )
+
+    assert aggregated is not None
 
     expected = torch.tensor([5.0 / 3.0, 8.0 / 3.0], dtype=aggregated["layer"].dtype)
     assert torch.allclose(aggregated["layer"], expected)

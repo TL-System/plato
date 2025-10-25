@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import pickle
+from typing import cast
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
@@ -17,6 +18,7 @@ from plato.clients import base, mpc, split_learning
 from plato.clients.strategies.defaults import DefaultTrainingStrategy
 from plato.clients.strategies.mpc import MPCTrainingStrategy
 from plato.config import Config
+from plato.mpc.round_store import RoundInfoStore
 from tests.test_utils.fakes import (
     IdentityLifecycleStrategy,
     InMemoryReportingStrategy,
@@ -307,8 +309,9 @@ def test_split_learning_client_state_management(temp_config):
     clients_dict["do_test"] = False
     new_clients = Config.namedtuple_from_dict(clients_dict)
     Config.clients = new_clients
-    if getattr(Config, "_instance", None) is not None:
-        Config._instance.clients = new_clients
+    instance = getattr(Config, "_instance", None)
+    if instance is not None:
+        instance.clients = new_clients
 
     try:
         client = split_learning.Client()
@@ -331,8 +334,9 @@ def test_split_learning_client_state_management(temp_config):
         assert client.static_sampler.name == "sampler"
     finally:
         Config.clients = original_clients
-        if getattr(Config, "_instance", None) is not None:
-            Config._instance.clients = original_clients
+        instance = getattr(Config, "_instance", None)
+        if instance is not None:
+            instance.clients = original_clients
 
 
 def test_mpc_client_round_store_configuration(temp_config, tmp_path):
@@ -341,8 +345,9 @@ def test_mpc_client_round_store_configuration(temp_config, tmp_path):
     clients_dict["outbound_processors"] = ["mpc_model_encrypt_aes"]
     new_clients = Config.namedtuple_from_dict(clients_dict)
     Config.clients = new_clients
-    if getattr(Config, "_instance", None) is not None:
-        Config._instance.clients = new_clients
+    instance = getattr(Config, "_instance", None)
+    if instance is not None:
+        instance.clients = new_clients
 
     original_mpc_path = Config.params.get("mpc_data_path")
     Config.params["mpc_data_path"] = str(tmp_path / "mpc_data")
@@ -361,8 +366,9 @@ def test_mpc_client_round_store_configuration(temp_config, tmp_path):
         assert encrypt_settings["debug_artifacts"] is True
     finally:
         Config.clients = original_clients
-        if getattr(Config, "_instance", None) is not None:
-            Config._instance.clients = original_clients
+        instance = getattr(Config, "_instance", None)
+        if instance is not None:
+            instance.clients = original_clients
         if original_mpc_path is None:
             Config.params.pop("mpc_data_path", None)
         else:
@@ -372,13 +378,13 @@ def test_mpc_client_round_store_configuration(temp_config, tmp_path):
 def test_mpc_training_strategy_records_samples(temp_config, monkeypatch):
     class DummyRoundStore:
         def __init__(self):
-            self.calls = []
+            self.calls: list[tuple[int, int]] = []
 
-        def record_client_samples(self, client_id, num_samples):
+        def record_client_samples(self, client_id: int, num_samples: int) -> None:
             self.calls.append((client_id, num_samples))
 
     round_store = DummyRoundStore()
-    strategy = MPCTrainingStrategy(round_store)
+    strategy = MPCTrainingStrategy(cast(RoundInfoStore, round_store))
     context = SimpleNamespace(client_id=7)
 
     async_mock = AsyncMock(
