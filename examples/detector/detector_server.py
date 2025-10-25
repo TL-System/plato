@@ -101,9 +101,7 @@ class Server(fedavg.Server):
         attacker_ids_config = getattr(Config().clients, "attacker_ids", "")
         if isinstance(attacker_ids_config, str):
             self.attacker_list = [
-                int(value)
-                for value in attacker_ids_config.split(",")
-                if value.strip()
+                int(value) for value in attacker_ids_config.split(",") if value.strip()
             ]
         else:
             self.attacker_list = [int(value) for value in attacker_ids_config]
@@ -253,7 +251,9 @@ class Server(fedavg.Server):
 
         malicious_set = set(malicious_ids)
         keep_indices = [
-            index for index in range(len(weights_attacked)) if index not in malicious_set
+            index
+            for index in range(len(weights_attacked))
+            if index not in malicious_set
         ]
 
         if keep_indices:

@@ -1,7 +1,7 @@
 """
 The trainer for system-heterogenous federated learning through architecture search.
 
-This trainer uses the composable trainer architecture with a custom callback to reinitialize the 
+This trainer uses the composable trainer architecture with a custom callback to reinitialize the
 model after parent initialization.
 
 Reference: D. Yao, "Exploring System-Heterogeneous Federated Learning with Dynamic Model Selection,"

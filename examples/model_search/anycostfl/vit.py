@@ -75,14 +75,17 @@ class Attention(nn.Module):
     MHS module.
     """
 
+    heads: int
+    scale: float
+
     # pylint:disable=too-many-arguments
     def __init__(self, dim, heads=8, dim_head=64, dropout=0.0, model_rate=1.0):
         super().__init__()
         inner_dim = dim_head * heads
         project_out = not (heads == 1 and dim_head == dim)
 
-        self.heads = heads
-        self.scale = dim_head**-0.5
+        object.__setattr__(self, "_heads", int(heads))
+        object.__setattr__(self, "_scale", float(dim_head**-0.5))
 
         self.attend = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
@@ -101,9 +104,11 @@ class Attention(nn.Module):
         Forward function.
         """
         qkv = self.scaler(self.to_qkv(x)).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=self.heads), qkv)
+        q, k, v = map(
+            lambda t: rearrange(t, "b n (h d) -> b h n d", h=self._heads), qkv
+        )
 
-        dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
+        dots = torch.matmul(q, k.transpose(-1, -2)) * self._scale
 
         attn = self.attend(dots)
         attn = self.dropout(attn)
@@ -165,6 +170,9 @@ class ViT(nn.Module):
     Vision image transformer.
     """
 
+    channel: int
+    pool: str
+
     # pylint:disable=too-many-locals
     def __init__(
         self,
@@ -190,7 +198,6 @@ class ViT(nn.Module):
         if configs is not None:
             depth = configs[0]
             model_rate = configs[1]
-        self.channel = channels
         dim = int(model_rate * dim)
         mlp_dim = int(mlp_dim * model_rate)
         dim_head = int(model_rate * dim_head)
@@ -225,7 +232,7 @@ class ViT(nn.Module):
             dim, depth, heads, dim_head, mlp_dim, dropout, model_rate
         )
 
-        self.pool = pool
+        object.__setattr__(self, "_pool", pool)
         self.to_latent = nn.Identity()
 
         self.mlp_head = nn.Sequential(nn.LayerNorm(dim), nn.Linear(dim, num_classes))
@@ -246,7 +253,7 @@ class ViT(nn.Module):
 
         x = self.transformer(x)
 
-        x = x.mean(dim=1) if self.pool == "mean" else x[:, 0]
+        x = x.mean(dim=1) if self._pool == "mean" else x[:, 0]
 
         x = self.to_latent(x)
         return self.mlp_head(x)

@@ -61,7 +61,9 @@ class GlobalLocalDivergenceProcessor(base.Processor):
 
         trainer = getattr(self, "trainer", None)
         if trainer is None or trainer.model is None:
-            raise RuntimeError("Trainer with a model is required for FedEMA processing.")
+            raise RuntimeError(
+                "Trainer with a model is required for FedEMA processing."
+            )
 
         local_layers = trainer.model.cpu().state_dict()
         global_layers = dict(weights_payload)
@@ -70,9 +72,7 @@ class GlobalLocalDivergenceProcessor(base.Processor):
 
         # Get encoder layers of the local and global models
         local_encoder_layers = extract_encoder(local_layers, encoder_layer_names)
-        global_encoder_layers = extract_encoder(
-            global_layers, encoder_layer_names
-        )
+        global_encoder_layers = extract_encoder(global_layers, encoder_layer_names)
 
         logging.info(
             "[Client #%d] Computing global and local divergence.",

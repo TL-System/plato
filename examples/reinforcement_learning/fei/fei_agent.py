@@ -255,7 +255,9 @@ class RLAgent(rl_agent.RLAgent):
             raise RuntimeError("RL policy has not been initialised.")
         replay_buffer = getattr(policy, "replay_buffer", None)
         if replay_buffer is None:
-            raise RuntimeError("Policy must expose a replay_buffer for experience replay.")
+            raise RuntimeError(
+                "Policy must expose a replay_buffer for experience replay."
+            )
         if Config().algorithm.recurrent_actor:
             replay_buffer.push(
                 (

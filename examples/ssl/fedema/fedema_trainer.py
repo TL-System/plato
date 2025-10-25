@@ -30,9 +30,9 @@ class FedEMALossCriterionStrategy(LossCriterionStrategy):
     def __init__(self) -> None:
         """Initialize the FedEMA loss strategy."""
         self._ssl_criterion: Callable[..., torch.Tensor] | None = None
-        self._personalization_criterion: Callable[
-            [torch.Tensor, torch.Tensor], torch.Tensor
-        ] | None = None
+        self._personalization_criterion: (
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None
+        ) = None
 
     def setup(self, context: TrainingContext) -> None:
         """Initialize loss criterion."""
@@ -69,9 +69,7 @@ class FedEMALossCriterionStrategy(LossCriterionStrategy):
                 raise RuntimeError("SSL loss criterion is unavailable.")
             if isinstance(outputs, (list, tuple)):
                 # FedEMA: average of two losses
-                loss = 0.5 * (
-                    criterion(*outputs[0]) + criterion(*outputs[1])
-                )
+                loss = 0.5 * (criterion(*outputs[0]) + criterion(*outputs[1]))
                 return loss
             else:
                 return criterion(outputs)

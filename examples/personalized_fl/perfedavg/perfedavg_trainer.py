@@ -35,9 +35,9 @@ class PerFedAvgTrainingStepStrategy(TrainingStepStrategy):
 
     def __init__(self):
         """Initialize the Per-FedAvg training step strategy."""
-        self.iter_trainloader: Optional[
-            Iterator[Tuple[torch.Tensor, torch.Tensor]]
-        ] = None
+        self.iter_trainloader: Optional[Iterator[Tuple[torch.Tensor, torch.Tensor]]] = (
+            None
+        )
 
     def training_step(
         self,
@@ -84,10 +84,16 @@ class PerFedAvgTrainingStepStrategy(TrainingStepStrategy):
             # Get next batch from train loader
             train_loader = context.state.get("train_loader")
             if train_loader is None:
-                raise RuntimeError("Per-FedAvg requires a train_loader in the context state.")
+                raise RuntimeError(
+                    "Per-FedAvg requires a train_loader in the context state."
+                )
             if not isinstance(train_loader, Iterable):
-                raise RuntimeError("train_loader must be iterable for Per-FedAvg training.")
-            iterable_loader = cast(Iterable[Tuple[torch.Tensor, torch.Tensor]], train_loader)
+                raise RuntimeError(
+                    "train_loader must be iterable for Per-FedAvg training."
+                )
+            iterable_loader = cast(
+                Iterable[Tuple[torch.Tensor, torch.Tensor]], train_loader
+            )
 
             if self.iter_trainloader is None:
                 self.iter_trainloader = iter(iterable_loader)
@@ -133,8 +139,12 @@ class PerFedAvgCallback(TrainerCallback):
                 trainer.training_step_strategy.iter_trainloader = None
                 return
             if not isinstance(train_loader, Iterable):
-                raise RuntimeError("train_loader must be iterable for Per-FedAvg training.")
-            iterable_loader = cast(Iterable[Tuple[torch.Tensor, torch.Tensor]], train_loader)
+                raise RuntimeError(
+                    "train_loader must be iterable for Per-FedAvg training."
+                )
+            iterable_loader = cast(
+                Iterable[Tuple[torch.Tensor, torch.Tensor]], train_loader
+            )
             trainer.training_step_strategy.iter_trainloader = iter(iterable_loader)
 
 

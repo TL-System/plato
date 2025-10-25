@@ -278,6 +278,10 @@ class ResnetWrapper(nn.Module):
     A resnet wrapper for architecture search.
     """
 
+    smallest: list[int]
+    biggest: list[int]
+    channel_rate_lists: list[list[float]]
+
     def __init__(
         self,
         configs=None,
@@ -285,14 +289,18 @@ class ResnetWrapper(nn.Module):
         model_rate=1,
     ) -> None:
         super().__init__()
-        self.smallest = [2, 2, 2, 2]
-        self.biggest = [3, 8, 63, 3]
-        self.channel_rate_lists = [
-            [1],
-            [1],
-            [1],
-            [1],
-        ]
+        object.__setattr__(self, "smallest", [2, 2, 2, 2])
+        object.__setattr__(self, "biggest", [3, 8, 63, 3])
+        object.__setattr__(
+            self,
+            "channel_rate_lists",
+            [
+                [1],
+                [1],
+                [1],
+                [1],
+            ],
+        )
         hidden_size_rates = (
             [model_rate for _ in range(4)] if configs is None else configs[1]
         )

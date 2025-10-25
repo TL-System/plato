@@ -31,9 +31,9 @@ class CalibreLossStrategy(LossCriterionStrategy):
     def __init__(self):
         """Initialize the Calibre loss strategy."""
         self._calibre_loss: CalibreLoss | None = None
-        self._personalization_loss: Callable[
-            [torch.Tensor, torch.Tensor], torch.Tensor
-        ] | None = None
+        self._personalization_loss: (
+            Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None
+        ) = None
 
     def setup(self, context: TrainingContext):
         """Initialize the Calibre loss criterion."""
@@ -326,7 +326,9 @@ class Trainer(ComposableTrainer):
             if self.model is None or self.device is None:
                 raise RuntimeError("Trainer model and device must be initialized.")
             if not hasattr(self.model, "encoder") or not callable(self.model.encoder):
-                raise AttributeError("Trainer model does not expose a callable encoder.")
+                raise AttributeError(
+                    "Trainer model does not expose a callable encoder."
+                )
 
             self.local_layers.eval()
             self.local_layers.to(self.device)

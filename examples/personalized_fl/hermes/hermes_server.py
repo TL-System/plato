@@ -68,7 +68,9 @@ class Server(personalized_server.Server):
         """Event called after the updated weights have been received."""
         trainer = self.trainer
         if trainer is None or not hasattr(trainer, "model"):
-            raise RuntimeError("Hermes server requires a trainer with an initialized model.")
+            raise RuntimeError(
+                "Hermes server requires a trainer with an initialized model."
+            )
         model = trainer.model
 
         # Extract the model weight updates from client updates along with the masks

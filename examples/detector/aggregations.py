@@ -318,9 +318,9 @@ def afa(updates, baseline_weights, weights_attacked):
         cos_sims_list = []
         for weight in flattened_weights:
             numerator = torch.dot(weight, final_update)
-            denominator = (
-                torch.norm(final_update) + 1e-9
-            ) * (torch.norm(weight) + 1e-9)
+            denominator = (torch.norm(final_update) + 1e-9) * (
+                torch.norm(weight) + 1e-9
+            )
             cos_sims_list.append(numerator / denominator)
 
         cos_sims = torch.stack(cos_sims_list)

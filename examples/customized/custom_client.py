@@ -213,10 +213,13 @@ def _graceful_socketio_session():
             if exc.code not in (0, None):
                 raise
 
-    with patch.object(socketio, "AsyncClient", _NoReconnectAsyncClient), patch.object(
-        ComposableClientEvents,
-        "on_disconnect",
-        _on_disconnect_no_exit,
+    with (
+        patch.object(socketio, "AsyncClient", _NoReconnectAsyncClient),
+        patch.object(
+            ComposableClientEvents,
+            "on_disconnect",
+            _on_disconnect_no_exit,
+        ),
     ):
         yield
 

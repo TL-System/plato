@@ -28,7 +28,9 @@ class Algorithm(fedavg.Algorithm):
         else:
             clusters = self.clusters
             if clusters is None:
-                raise RuntimeError("Clusters must be initialized before extracting weights.")
+                raise RuntimeError(
+                    "Clusters must be initialized before extracting weights."
+                )
             if client_id not in clusters:
                 raise KeyError(f"Client {client_id} is not registered in any cluster.")
             cluster_id = clusters[client_id]
@@ -36,7 +38,9 @@ class Algorithm(fedavg.Algorithm):
             if model is None:
                 trainer_model = getattr(self, "model", None)
                 if trainer_model is None:
-                    raise RuntimeError("Server model must be initialized before extracting weights.")
+                    raise RuntimeError(
+                        "Server model must be initialized before extracting weights."
+                    )
                 if cluster_id in self.models:
                     cluster_model = self.models[cluster_id]
                     return cluster_model.cpu().state_dict()
@@ -52,10 +56,14 @@ class Algorithm(fedavg.Algorithm):
             if cluster_id not in self.models:
                 trainer = self.trainer
                 if trainer is None:
-                    raise RuntimeError("Trainer must be initialized before loading cluster weights.")
+                    raise RuntimeError(
+                        "Trainer must be initialized before loading cluster weights."
+                    )
                 base_model = getattr(trainer, "model", None)
                 if base_model is None:
-                    raise RuntimeError("Trainer must expose a model before loading cluster weights.")
+                    raise RuntimeError(
+                        "Trainer must expose a model before loading cluster weights."
+                    )
                 self.models[cluster_id] = copy.deepcopy(base_model)
 
             self.models[cluster_id].load_state_dict(weights, strict=True)
@@ -80,7 +88,9 @@ class Algorithm(fedavg.Algorithm):
         """Retrieving the corresponding client ID for a particular cluster ID."""
         clusters = self.clusters
         if clusters is None:
-            raise RuntimeError("Clusters must be initialized before retrieving client IDs.")
+            raise RuntimeError(
+                "Clusters must be initialized before retrieving client IDs."
+            )
         for client_id, cluster in clusters.items():
             if cluster == cluster_id:
                 return client_id

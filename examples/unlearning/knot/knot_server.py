@@ -269,7 +269,6 @@ class Server(fedunlearning_server.Server):
                 # Second, update the test accuracy for clusters that have just been tested
                 self.clustered_test_accuracy.update(test_accuracy_per_cluster)
 
-
         if hasattr(Config().server, "do_test") and Config().server.do_test:
             # Retrieve the model from the cluster with the highest accuracy
             self.trainer.model.load_state_dict(self._aggregate_models(), strict=True)

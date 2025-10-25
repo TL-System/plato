@@ -41,6 +41,8 @@ class NASVITLossCriterionStrategy(LossCriterionStrategy):
         self, outputs: torch.Tensor, labels: torch.Tensor, context: TrainingContext
     ) -> torch.Tensor:
         """Compute loss using NASVIT-specific criterion."""
+        if self._loss_criterion is None:
+            raise RuntimeError("NASVIT loss criterion has not been initialised.")
         return self._loss_criterion(outputs, labels)
 
 

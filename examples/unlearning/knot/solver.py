@@ -105,9 +105,7 @@ def solve(
     # Run the LP solver.
     print("Starting the LP solver.")
     if mosek is None:
-        print(
-            "MOSEK solver is unavailable; falling back to cvxopt's default solver."
-        )
+        print("MOSEK solver is unavailable; falling back to cvxopt's default solver.")
         sol = solvers.lp(c, G, h, A, b)
     else:
         sol = solvers.lp(c, G, h, A, b, solver="mosek")

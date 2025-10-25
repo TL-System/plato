@@ -8,12 +8,17 @@ Yao et al., "Federated Model Search via Reinforcement Learning", in the Proceedi
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9546522
 """
 
+from __future__ import annotations
+
 import copy
 import logging
+from typing import Optional, cast
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+
+from .fedrlnas_algorithm import ServerAlgorithm, SupernetProtocol
 
 
 class FedRLNASAggregationStrategy(FedAvgAggregationStrategy):
@@ -63,7 +68,8 @@ class Server(fedavg.Server):
         else:
             epsilon = 0
 
-        mask_normal, mask_reduce = self.algorithm.sample_mask(epsilon)
+        algorithm = cast(ServerAlgorithm, self.require_algorithm())
+        mask_normal, mask_reduce = algorithm.sample_mask(epsilon)
         server_response["mask_normal"] = mask_normal
         server_response["mask_reduce"] = mask_reduce
 
@@ -72,21 +78,25 @@ class Server(fedavg.Server):
     async def wrap_up(self) -> None:
         await super().wrap_up()
 
-        logging.info("[%s] geneotypes: %s\n", self, self.trainer.model.genotype())
+        algorithm = cast(ServerAlgorithm, self.require_algorithm())
+        supernet = algorithm._require_supernet()
+        logging.info("[%s] geneotypes: %s", self, supernet.genotype())
 
     async def _aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
+        algorithm = cast(ServerAlgorithm, self.require_algorithm())
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
         num_samples = [update.report.num_samples for update in updates]
 
-        self.algorithm.nas_aggregation(
+        algorithm.nas_aggregation(
             masks_normal, masks_reduce, weights_received, num_samples
         )
         return self._current_global_weights()
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
+        algorithm = cast(ServerAlgorithm, self.require_algorithm())
         accuracy_list = [update.report.accuracy for update in updates]
         mask_normals = [update.report.mask_normal for update in updates]
         mask_reduces = [update.report.mask_reduce for update in updates]
@@ -97,17 +107,20 @@ class Server(fedavg.Server):
         for i in range(len(updates)):
             mask_normal = mask_normals[i]
             mask_reduce = mask_reduces[i]
-            index_normal = self.algorithm.extract_index(mask_normal)
-            index_reduce = self.algorithm.extract_index(mask_reduce)
+            index_normal = algorithm.extract_index(mask_normal)
+            index_reduce = algorithm.extract_index(mask_reduce)
             epoch_index_normal.append(index_normal)
             epoch_index_reduce.append(index_reduce)
 
-        self.algorithm.model.step(accuracy_list, epoch_index_normal, epoch_index_reduce)
-        self.trainer.model = self.algorithm.model
+        supernet = algorithm._require_supernet()
+        supernet.step(accuracy_list, epoch_index_normal, epoch_index_reduce)
+        trainer = self.require_trainer()
+        trainer.model = supernet
 
     def _current_global_weights(self):
         """Return a copy of the current global model weights."""
-        model = getattr(self.algorithm, "model", None)
+        algorithm = cast(ServerAlgorithm, self.require_algorithm())
+        model: Optional[SupernetProtocol] = getattr(algorithm, "model", None)
         if model is None:
             return None
         if hasattr(model, "state_dict"):

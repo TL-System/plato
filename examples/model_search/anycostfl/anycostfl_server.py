@@ -2,17 +2,26 @@
 AnyCostFL algorithm trainer.
 """
 
+from __future__ import annotations
+
+from typing import Callable, cast
+
 import numpy as np
+from torch.nn import Module
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 
+from .anycostfl_algorithm import Algorithm as AnyCostAlgorithm
+
 
 class AnyCostAggregationStrategy(FedAvgAggregationStrategy):
     """Aggregation strategy that defers to the AnyCostFL algorithm for merging weights."""
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received, context):  # pylint: disable=unused-argument
+    async def aggregate_weights(  # pylint: disable=unused-argument
+        self, updates, baseline_weights, weights_received, context
+    ):
         algorithm = getattr(context, "algorithm", None)
         if algorithm is None or not hasattr(algorithm, "aggregation"):
             return None
@@ -42,7 +51,8 @@ class Server(fedavg.Server):
             (Config().trainer.rounds, Config().clients.total_clients, 2)
         )
         if (
-            hasattr(Config().parameters.limitation, "activated")
+            hasattr(Config().parameters, "limitation")
+            and hasattr(Config().parameters.limitation, "activated")
             and Config().parameters.limitation.activated
         ):
             limitation = Config().parameters.limitation
@@ -58,8 +68,14 @@ class Server(fedavg.Server):
             )
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
-        rate = self.algorithm.choose_rate(
-            self.limitation[self.current_round - 1, client_id - 1], self.model
+        algorithm = cast(AnyCostAlgorithm, self.require_algorithm())
+        limitation = self.limitation[self.current_round - 1, client_id - 1]
+        model_factory = self.model
+        if model_factory is None:
+            raise RuntimeError("Server model factory is not configured.")
+        rate = algorithm.choose_rate(
+            (float(limitation[0]), float(limitation[1])),
+            cast(Callable[..., Module], model_factory),
         )
         server_response["rate"] = rate
         self.rates[client_id - 1] = rate
@@ -67,4 +83,5 @@ class Server(fedavg.Server):
 
     def weights_aggregated(self, updates):
         super().weights_aggregated(updates)
-        self.algorithm.sort_channels()
+        algorithm = cast(AnyCostAlgorithm, self.require_algorithm())
+        algorithm.sort_channels()

@@ -84,7 +84,9 @@ class ScaffoldCallback(ClientCallback):
         Insert an ExtractPayloadProcessor to the list of inbound processors.
         """
         processors = inbound_processor.processors
-        if any(isinstance(proc, ExtractControlVariatesProcessor) for proc in processors):
+        if any(
+            isinstance(proc, ExtractControlVariatesProcessor) for proc in processors
+        ):
             return
 
         extract_payload_processor = ExtractControlVariatesProcessor(

@@ -518,16 +518,16 @@ def compute_lambda(attacker_weights, global_model_last_round, num_attackers):
 
     num_benign_clients, d = attacker_weights.shape
 
-    distances = torch.where(distances == 0, torch.full_like(distances, 10000), distances)
+    distances = torch.where(
+        distances == 0, torch.full_like(distances, 10000), distances
+    )
     distances, _ = torch.sort(distances, dim=1)
     scores = torch.sum(distances[:, : num_benign_clients - 2 - num_attackers], dim=1)
     score_min = torch.min(scores)
 
     # Calculate lambda
     sqrt_dim = torch.sqrt(attacker_weights.new_tensor(float(d)))
-    term_1 = score_min / (
-        (num_benign_clients - num_attackers - 1) * sqrt_dim
-    )
+    term_1 = score_min / ((num_benign_clients - num_attackers - 1) * sqrt_dim)
     max_wre_dist = (
         torch.max(torch.norm((attacker_weights - global_model_last_round), dim=1))
         / sqrt_dim
