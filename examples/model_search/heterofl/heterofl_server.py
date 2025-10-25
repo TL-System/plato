@@ -12,6 +12,19 @@ import torch
 from plato.config import Config
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+
+
+class HeteroFLAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the HeteroFL algorithm."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context  # pylint: disable=unused-argument
+    ):
+        algorithm = getattr(context, "algorithm", None)
+        if algorithm is None or not hasattr(algorithm, "aggregation"):
+            return None
+        return algorithm.aggregation(weights_received)
 
 
 class Server(fedavg.Server):
@@ -25,7 +38,13 @@ class Server(fedavg.Server):
         trainer=None,
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(model, datasource, algorithm, trainer)
+        super().__init__(
+            model,
+            datasource,
+            algorithm,
+            trainer,
+            aggregation_strategy=HeteroFLAggregationStrategy(),
+        )
         self.rates = [None for _ in range(Config().clients.total_clients)]
         self.limitation = np.zeros(
             (Config().trainer.rounds, Config().clients.total_clients, 2)
@@ -52,10 +71,6 @@ class Server(fedavg.Server):
             self.limitation[self.current_round - 1, client_id - 1], self.model
         )
         return super().customize_server_response(server_response, client_id)
-
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
-        """Aggregates weights of models with different architectures."""
-        return self.algorithm.aggregation(weights_received)
 
     def weights_aggregated(self, updates):
         super().weights_aggregated(updates)

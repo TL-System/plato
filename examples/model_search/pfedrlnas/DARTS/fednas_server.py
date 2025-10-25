@@ -2,16 +2,52 @@
 Implement new algorithm: personalized federarted NAS.
 """
 
+import copy
 import logging
 import pickle
 from pathlib import Path
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+
+
+class PerFedRlnasAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the PerFedRLNAS server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights"):
+            return None
+        result = await server._aggregate_weights(
+            updates, baseline_weights, weights_received
+        )
+        if result is not None:
+            return result
+        return server._current_global_weights()
 
 
 class Server(fedavg.Server):
     """The FedRLNAS server assigns and aggregates global models with different architectures."""
+
+    def __init__(
+        self,
+        model=None,
+        datasource=None,
+        algorithm=None,
+        trainer=None,
+        callbacks=None,
+    ):
+        super().__init__(
+            model,
+            datasource,
+            algorithm,
+            trainer,
+            callbacks,
+            aggregation_strategy=PerFedRlnasAggregationStrategy(),
+        )
 
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         mask_normal, mask_reduce = self.algorithm.sample_mask(client_id)
@@ -20,7 +56,7 @@ class Server(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
+    async def _aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         masks_normal = [update.report.mask_normal for update in updates]
         masks_reduce = [update.report.mask_reduce for update in updates]
@@ -29,6 +65,7 @@ class Server(fedavg.Server):
         self.algorithm.nas_aggregation(
             masks_normal, masks_reduce, weights_received, num_samples
         )
+        return self._current_global_weights()
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
@@ -102,3 +139,15 @@ class Server(fedavg.Server):
         with open(save_config, "wb") as file:
             pickle.dump(self.algorithm.model.baseline, file)
         return super().save_to_checkpoint()
+
+    def _current_global_weights(self):
+        """Return a copy of the current global model weights."""
+        model = getattr(self.algorithm, "model", None)
+        if model is None:
+            return None
+        if hasattr(model, "state_dict"):
+            return copy.deepcopy(model.state_dict())
+        inner = getattr(model, "model", None)
+        if inner is not None and hasattr(inner, "state_dict"):
+            return copy.deepcopy(inner.state_dict())
+        return None

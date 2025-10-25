@@ -2,6 +2,7 @@
 Customized Server for PerFedRLNAS.
 """
 
+import copy
 import pickle
 import sys
 import time
@@ -10,6 +11,24 @@ import numpy as np
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+
+
+class PerFedRlnasAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the PerFedRLNAS VIT server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights"):
+            return None
+        result = await server._aggregate_weights(
+            updates, baseline_weights, weights_received
+        )
+        if result is not None:
+            return result
+        return server._current_global_weights()
 
 
 class Server(fedavg.Server):
@@ -23,7 +42,13 @@ class Server(fedavg.Server):
         trainer=None,
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(model, datasource, algorithm, trainer)
+        super().__init__(
+            model,
+            datasource,
+            algorithm,
+            trainer,
+            aggregation_strategy=PerFedRlnasAggregationStrategy(),
+        )
         self.subnets_config = [None for i in range(Config().clients.total_clients)]
         self.neg_ratio = None
         self.process_begin = None
@@ -37,7 +62,7 @@ class Server(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
+    async def _aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
@@ -48,6 +73,7 @@ class Server(fedavg.Server):
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
+        return self._current_global_weights()
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
@@ -92,3 +118,15 @@ class Server(fedavg.Server):
         logged_items["server_overhead"] = self.process_end - self.process_begin
         logged_items["model_size"] = np.mean(self.model_size)
         return logged_items
+
+    def _current_global_weights(self):
+        """Return a copy of the current global model weights."""
+        model = getattr(self.algorithm, "model", None)
+        if model is None:
+            return None
+        if hasattr(model, "state_dict"):
+            return copy.deepcopy(model.state_dict())
+        inner = getattr(model, "model", None)
+        if inner is not None and hasattr(inner, "state_dict"):
+            return copy.deepcopy(inner.state_dict())
+        return None

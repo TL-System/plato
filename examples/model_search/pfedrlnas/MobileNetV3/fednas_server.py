@@ -2,6 +2,7 @@
 Customized Server for PerFedRLNAS.
 """
 
+import copy
 import logging
 import os
 import pickle
@@ -18,7 +19,42 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.utils import csv_processor
+
+
+class PerFedRlnasSyncAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the synchronous PerFedRLNAS server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights_sync"):
+            return None
+        result = await server._aggregate_weights_sync(
+            updates, baseline_weights, weights_received
+        )
+        if result is not None:
+            return result
+        return server._current_global_weights()
+
+
+class PerFedRlnasAsyncAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the asynchronous PerFedRLNAS server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights_async"):
+            return None
+        result = await server._aggregate_weights_async(
+            updates, baseline_weights, weights_received
+        )
+        if result is not None:
+            return result
+        return server._current_global_weights()
 
 
 class FendasServerCallback(ServerCallback):
@@ -59,7 +95,14 @@ class ServerSync(fedavg.Server):
         self, model=None, datasource=None, algorithm=None, trainer=None, callbacks=None
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(model, datasource, algorithm, trainer, callbacks)
+        super().__init__(
+            model,
+            datasource,
+            algorithm,
+            trainer,
+            callbacks,
+            aggregation_strategy=PerFedRlnasSyncAggregationStrategy(),
+        )
         self.subnets_config = [None for i in range(Config().clients.total_clients)]
         self.neg_ratio = None
         self.process_begin = None
@@ -73,7 +116,7 @@ class ServerSync(fedavg.Server):
 
         return server_response
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def _aggregate_weights_sync(self, updates, baseline_weights, weights_received):
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
@@ -84,6 +127,7 @@ class ServerSync(fedavg.Server):
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
+        return self._current_global_weights()
 
     def weights_aggregated(self, updates):
         """After weight aggregation, update the architecture parameter alpha."""
@@ -151,6 +195,18 @@ class ServerSync(fedavg.Server):
         logged_items["model_size"] = np.mean(self.model_size)
         return logged_items
 
+    def _current_global_weights(self):
+        """Return a copy of the current global model weights."""
+        model = getattr(self.algorithm, "model", None)
+        if model is None:
+            return None
+        if hasattr(model, "state_dict"):
+            return copy.deepcopy(model.state_dict())
+        inner = getattr(model, "model", None)
+        if inner is not None and hasattr(inner, "state_dict"):
+            return copy.deepcopy(inner.state_dict())
+        return None
+
 
 # pylint:disable=too-many-instance-attributes
 class ServerAsync(ServerSync):
@@ -162,7 +218,7 @@ class ServerAsync(ServerSync):
         datasource=None,
         algorithm=None,
         trainer=None,
-    ):
+        ):
         # pylint:disable=too-many-arguments
         super().__init__(
             model, datasource, algorithm, trainer, callbacks=[FendasServerCallback]
@@ -175,8 +231,10 @@ class ServerAsync(ServerSync):
         self.model_size = np.zeros(Config().clients.total_clients)
         if self.datasource is None:
             self.datasource = datasource
+        self.aggregation_strategy = PerFedRlnasAsyncAggregationStrategy()
+        self.aggregation_strategy.setup(self.context)
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
+    async def _aggregate_weights_async(self, updates, baseline_weights, weights_received):  # pylint: disable=unused-argument
         """Aggregates weights of models with different architectures."""
         self.process_begin = time.time()
         client_id_list = [update.client_id for update in self.updates]
@@ -190,6 +248,7 @@ class ServerAsync(ServerSync):
         for payload, client_id in zip(weights_received, client_id_list):
             payload_size = sys.getsizeof(pickle.dumps(payload)) / 1024**2
             self.model_size[client_id - 1] = payload_size
+        return self._current_global_weights()
 
     async def compute_weight_deltas(self, weights_received, client_id_list):
         """The calculation of deltas in NAS is different."""

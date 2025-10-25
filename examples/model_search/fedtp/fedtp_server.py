@@ -17,6 +17,21 @@ import hypernetworks
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
+
+
+class FedTPAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that delegates to the FedTP server logic."""
+
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
+        server = getattr(context, "server", None)
+        if server is None or not hasattr(server, "_aggregate_weights"):
+            return None
+        return await server._aggregate_weights(
+            updates, baseline_weights, weights_received
+        )
 
 
 class Server(fedavg.Server):
@@ -31,7 +46,14 @@ class Server(fedavg.Server):
         callbacks=None,
     ):
         # pylint:disable=too-many-arguments
-        super().__init__(model, datasource, algorithm, trainer, callbacks)
+        super().__init__(
+            model,
+            datasource,
+            algorithm,
+            trainer,
+            callbacks,
+            aggregation_strategy=FedTPAggregationStrategy(),
+        )
         self.hnet = hypernetworks.ViTHyper(
             Config().clients.total_clients,
             Config().parameters.hypernet.embed_dim,
@@ -70,7 +92,7 @@ class Server(fedavg.Server):
             payload[weight_name].copy_(self.current_attention[weight_name])
         return payload
 
-    async def aggregate_weights(self, updates, baseline_weights, weights_received):
+    async def _aggregate_weights(self, updates, baseline_weights, weights_received):
         """Aggregation of weights in FedTP."""
 
         # pylint:disable=too-many-locals
@@ -111,5 +133,8 @@ class Server(fedavg.Server):
             param.grad = grad  # .copy_(grad)
         self.hnet_optimizer.step()
 
-        avg_update = await super().aggregate_deltas(updates, deltas_recieved)
-        return avg_update
+        aggregated_deltas = await super().aggregate_deltas(updates, deltas_recieved)
+        aggregated_weights = OrderedDict()
+        for name, weight in baseline_weights.items():
+            aggregated_weights[name] = weight + aggregated_deltas[name]
+        return aggregated_weights
