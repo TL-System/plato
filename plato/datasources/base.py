@@ -62,14 +62,13 @@ class DataSource:
     @staticmethod
     def download(url, data_path):
         """Download a dataset from a URL if it is not already available."""
+        url_parse = urlparse(url)
+        file_name = os.path.join(data_path, url_parse.path.split("/")[-1])
         os.makedirs(data_path, exist_ok=True)
-        sentinel = Path(data_path) / ".download_complete"
+        sentinel = Path(f"{file_name}.complete")
 
         if sentinel.exists():
             return
-
-        url_parse = urlparse(url)
-        file_name = os.path.join(data_path, url_parse.path.split("/")[-1])
 
         with DataSource._download_guard(data_path):
             if sentinel.exists():
@@ -77,7 +76,7 @@ class DataSource:
 
             logging.info("Downloading %s.", url)
 
-            res = requests.get(url, verify=False, stream=True)
+            res = requests.get(url, stream=True, timeout=60)
             total_size = int(res.headers.get("Content-Length", 0))
             downloaded_size = 0
 

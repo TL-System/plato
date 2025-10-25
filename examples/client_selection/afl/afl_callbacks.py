@@ -5,7 +5,8 @@ Trainer callbacks used by AFL that rely on PyTorch operations.
 from __future__ import annotations
 
 import logging
-from collections.abc import Iterable
+from collections.abc import Iterable, Sized
+from typing import Any
 
 import torch
 
@@ -86,12 +87,11 @@ class AFLPreTrainingLossCallback(TrainerCallback):
         self._recorded = True
 
     @staticmethod
-    def _has_batches(loader: Iterable) -> bool:
+    def _has_batches(loader: Iterable[Any] | Sized) -> bool:
         """Best-effort check that the data loader yields at least one batch."""
-        length = None
-        if hasattr(loader, "__len__"):
+        if isinstance(loader, Sized):
             try:
-                length = len(loader)
+                return len(loader) > 0
             except TypeError:
-                length = None
-        return bool(length) if length is not None else True
+                return True
+        return True

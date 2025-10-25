@@ -8,26 +8,29 @@ Guided Participant Selection," in USENIX Symposium on Operating Systems Design a
 (OSDI 2021), July 2021.
 """
 
+from __future__ import annotations
+
 import numpy as np
 import torch
 from torch import nn
 
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import LossCriterionStrategy
+from plato.trainers.tracking import RunHistory
 
 
 class OortLossStrategy(LossCriterionStrategy):
     """Loss strategy for Oort that tracks sum of squared per-sample losses."""
 
     def __init__(self):
-        self._criterion = None
-        self._run_history = None
+        self._criterion: nn.CrossEntropyLoss | None = None
+        self._run_history: RunHistory | None = None
 
     def setup(self, context):
         """Initialize the loss criterion."""
         self._criterion = nn.CrossEntropyLoss(reduction="none")
 
-    def attach_run_history(self, run_history):
+    def attach_run_history(self, run_history: RunHistory) -> None:
         """Attach run history for metric tracking."""
         self._run_history = run_history
 
@@ -38,6 +41,11 @@ class OortLossStrategy(LossCriterionStrategy):
         This computes per-sample losses, tracks the sum of squares
         (used by Oort for client selection), and returns the mean loss.
         """
+        if self._criterion is None:
+            raise RuntimeError(
+                "OortLossStrategy has not been initialised. Did you call setup()?"
+            )
+
         per_sample_loss = self._criterion(outputs, labels)
 
         if self._run_history is not None:
@@ -71,5 +79,6 @@ class Trainer(ComposableTrainer):
             loss_strategy=loss_strategy,
         )
 
-        if hasattr(self.loss_strategy, "attach_run_history"):
-            self.loss_strategy.attach_run_history(self.run_history)
+        attach_run_history = getattr(self.loss_strategy, "attach_run_history", None)
+        if callable(attach_run_history):
+            attach_run_history(self.run_history)

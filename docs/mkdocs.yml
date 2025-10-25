@@ -8,7 +8,7 @@ theme:
     repo: fontawesome/brands/github
   font:
     text: Inter
-    code: IBM Plex Mono
+    code: Google Sans Code 
   palette:
     # Light mode
     - scheme: astral-light

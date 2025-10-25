@@ -7,7 +7,7 @@ from __future__ import annotations
 import logging
 import random
 from types import SimpleNamespace
-from typing import List
+from typing import Any, Callable, cast
 
 import numpy as np
 
@@ -146,6 +146,21 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
 
     def _calculate_selection_probability(self, clients_pool: list[int]) -> np.ndarray:
         """Solve the geometric program defining Polaris sampling probabilities."""
+        if (
+            self.aggregation_weights is None
+            or self.local_gradient_bounds is None
+            or self.local_stalenesses is None
+        ):
+            raise RuntimeError("PolarisSelection: state arrays must be initialised.")
+
+        if matrix is None or sparse is None or log is None or solvers is None:
+            raise RuntimeError("PolarisSelectionStrategy requires 'cvxopt'.")
+
+        matrix_fn = cast(Callable[..., Any], matrix)
+        sparse_fn = cast(Callable[..., Any], sparse)
+        log_fn = cast(Callable[..., Any], log)
+        solvers_module = cast(Any, solvers)
+
         zero_indexed = [client_id - 1 for client_id in clients_pool]
         num_clients = len(zero_indexed)
 
@@ -156,34 +171,34 @@ class PolarisSelectionStrategy(ClientSelectionStrategy):
         agg_weight_square = np.square(agg_weights)
         gradient_bound_square = np.square(gradient_bounds)
 
-        f1_params = matrix(
+        f1_params = matrix_fn(
             self.beta * np.multiply(agg_weight_square, gradient_bound_square)
         )
 
         f2_temp = np.multiply(staleness, gradient_bounds)
-        f2_params = matrix(
+        f2_params = matrix_fn(
             self.staleness_weight * np.multiply(agg_weight_square, f2_temp)
         )
 
-        f1 = matrix(-1.0 * np.eye(num_clients))
-        f2 = matrix(np.eye(num_clients))
-        F = sparse([[f1, f2]])
+        f1 = matrix_fn(-1.0 * np.eye(num_clients))
+        f2 = matrix_fn(np.eye(num_clients))
+        F = sparse_fn([[f1, f2]])
 
-        g = log(matrix(sparse([[f1_params, f2_params]])))
+        g = log_fn(matrix_fn(sparse_fn([[f1_params, f2_params]])))
 
         K = [2 * num_clients]
-        G = matrix(-1.0 * np.eye(num_clients))
-        h = matrix(np.zeros((num_clients, 1)))
+        G = matrix_fn(-1.0 * np.eye(num_clients))
+        h = matrix_fn(np.zeros((num_clients, 1)))
 
-        A = matrix([[1.0]])
+        A = matrix_fn([[1.0]])
         if num_clients > 1:
-            A1 = matrix([[1.0]])
+            A1 = matrix_fn([[1.0]])
             for _ in range(num_clients - 1):
-                A = sparse([[A], [A1]])
-        b = matrix([1.0])
+                A = sparse_fn([[A], [A1]])
+        b = matrix_fn([1.0])
 
-        solvers.options["maxiters"] = 500
-        solution = solvers.gp(
+        solvers_module.options["maxiters"] = 500
+        solution = solvers_module.gp(
             K, F, g, G, h, A, b, solver="mosek" if mosek is not None else None
         )["x"]
 

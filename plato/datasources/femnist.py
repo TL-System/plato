@@ -77,14 +77,14 @@ class DataSource(base.DataSource):
             # If we are on the federated learning server
             data_dir = os.path.join(root_path, "test")
             data_url = (
-                "http://iqua.ece.toronto.edu/baochun/FEMNIST/test/"
+                "https://iqua.ece.toronto.edu/baochun/FEMNIST/test/"
                 + str(client_id)
                 + ".zip"
             )
         else:
             data_dir = os.path.join(root_path, "train")
             data_url = (
-                "http://iqua.ece.toronto.edu/baochun/FEMNIST/train/"
+                "https://iqua.ece.toronto.edu/baochun/FEMNIST/train/"
                 + str(client_id)
                 + ".zip"
             )

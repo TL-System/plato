@@ -11,13 +11,13 @@ https://arxiv.org/pdf/1909.12641.pdf
 """
 
 import afl_client
-import afl_server_strategy
+import afl_server
 
 
 def main():
     """A Plato federated learning training session using AFL strategy."""
     client = afl_client.create_client()
-    server = afl_server_strategy.Server()
+    server = afl_server.Server()
     server.run(client)
 
 

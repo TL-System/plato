@@ -9,23 +9,31 @@ Training," in Proceedings of ACM Symposium on Cloud Computing (SoCC), 2022.
 URL: https://arxiv.org/abs/2206.09264
 """
 
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any
+
+import torch
+
 from plato.trainers import loss_criterion
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import LossCriterionStrategy
+from plato.trainers.tracking import RunHistory
 
 
 class PiscesLossStrategy(LossCriterionStrategy):
     """Loss strategy for Pisces that tracks per-batch loss values."""
 
     def __init__(self):
-        self._criterion = None
-        self._run_history = None
+        self._criterion: Callable[[Any, Any], torch.Tensor] | None = None
+        self._run_history: RunHistory | None = None
 
     def setup(self, context):
         """Initialize the loss criterion."""
         self._criterion = loss_criterion.get()
 
-    def attach_run_history(self, run_history):
+    def attach_run_history(self, run_history: RunHistory) -> None:
         """Attach run history for metric tracking."""
         self._run_history = run_history
 
@@ -36,6 +44,11 @@ class PiscesLossStrategy(LossCriterionStrategy):
         This computes the batch loss and stores it in run_history
         for Pisces client selection algorithm.
         """
+        if self._criterion is None:
+            raise RuntimeError(
+                "PiscesLossStrategy has not been initialised. Did you call setup()?"
+            )
+
         per_batch_loss = self._criterion(outputs, labels)
 
         current_epoch = getattr(context, "current_epoch", 1)
@@ -67,5 +80,6 @@ class Trainer(ComposableTrainer):
             loss_strategy=loss_strategy,
         )
 
-        if hasattr(self.loss_strategy, "attach_run_history"):
-            self.loss_strategy.attach_run_history(self.run_history)
+        attach_run_history = getattr(self.loss_strategy, "attach_run_history", None)
+        if callable(attach_run_history):
+            attach_run_history(self.run_history)

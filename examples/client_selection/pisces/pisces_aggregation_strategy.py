@@ -9,8 +9,6 @@ from __future__ import annotations
 import asyncio
 import logging
 from types import SimpleNamespace
-from typing import Dict, List
-
 import numpy as np
 
 from plato.config import Config
@@ -52,10 +50,22 @@ class PiscesAggregationStrategy(AggregationStrategy):
 
         total_samples = sum(update.report.num_samples for update in updates)
 
-        avg_update = {
-            name: context.trainer.zeros(delta.shape)
-            for name, delta in deltas_received[0].items()
-        }
+        trainer = getattr(context, "trainer", None)
+        zeros_fn = getattr(trainer, "zeros", None) if trainer is not None else None
+
+        avg_update = {}
+        for name, delta in deltas_received[0].items():
+            if callable(zeros_fn):
+                avg_update[name] = zeros_fn(delta.shape)
+            elif hasattr(delta, "clone") and callable(getattr(delta, "clone")):
+                cloned = delta.clone()
+                if hasattr(cloned, "zero_") and callable(getattr(cloned, "zero_")):
+                    cloned.zero_()
+                    avg_update[name] = cloned
+                else:
+                    avg_update[name] = delta * 0
+            else:
+                avg_update[name] = np.zeros_like(delta)
 
         for i, delta in enumerate(deltas_received):
             client_id = updates[i].client_id
