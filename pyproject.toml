@@ -103,6 +103,15 @@ dev = [
 # ty (type checker) configuration
 [tool.ty]
 
+[tool.ty.src]
+# Remove `build` from the excluded directories.
+exclude = [
+    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper", 
+    "examples/model_search/pfedrlnas/DARTS/Darts",
+    "examples/model_search/pfedrlnas/MobileNetV3/model",
+    "examples/model_search/fedrlnas/Darts/",
+]
+
 [tool.ty.rules]
 "unresolved-import" = "ignore"
 
