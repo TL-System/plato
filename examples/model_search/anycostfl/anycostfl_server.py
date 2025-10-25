@@ -7,13 +7,12 @@ from __future__ import annotations
 from typing import Callable, cast
 
 import numpy as np
+from anycostfl_algorithm import Algorithm as AnyCostAlgorithm
 from torch.nn import Module
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
-
-from anycostfl_algorithm import Algorithm as AnyCostAlgorithm
 
 
 class AnyCostAggregationStrategy(FedAvgAggregationStrategy):

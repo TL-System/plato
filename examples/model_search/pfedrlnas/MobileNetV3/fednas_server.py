@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
+import fednas_algorithm
 import fedtools
 import numpy as np
 
@@ -25,12 +26,9 @@ from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.utils import csv_processor
 
-import fednas_algorithm
-
 if TYPE_CHECKING:
-    from torch.nn import Module
-
     from fednas_algorithm import SupernetProtocol
+    from torch.nn import Module
 
 
 class PerFedRlnasSyncAggregationStrategy(FedAvgAggregationStrategy):

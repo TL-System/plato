@@ -11,14 +11,13 @@ from typing import Callable, cast
 
 import numpy as np
 import torch
+from heterofl_algorithm import Algorithm as HeteroAlgorithm
 from torch.nn import Module
 
 from plato.config import Config
 from plato.samplers import all_inclusive
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
-
-from heterofl_algorithm import Algorithm as HeteroAlgorithm
 
 
 class HeteroFLAggregationStrategy(FedAvgAggregationStrategy):

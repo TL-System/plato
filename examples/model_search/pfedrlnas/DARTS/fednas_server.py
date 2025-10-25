@@ -10,11 +10,11 @@ import pickle
 from pathlib import Path
 from typing import Optional, cast
 
+from fednas_algorithm import ServerAlgorithm, SupernetProtocol
+
 from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
-
-from fednas_algorithm import ServerAlgorithm, SupernetProtocol
 
 
 class PerFedRlnasAggregationStrategy(FedAvgAggregationStrategy):

@@ -14,11 +14,11 @@ import copy
 import logging
 from typing import Optional, cast
 
+from fedrlnas_algorithm import ServerAlgorithm, SupernetProtocol
+
 from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
-
-from fedrlnas_algorithm import ServerAlgorithm, SupernetProtocol
 
 
 class FedRLNASAggregationStrategy(FedAvgAggregationStrategy):

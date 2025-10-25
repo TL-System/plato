@@ -12,12 +12,11 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, cast
 
 import ptflops
 import torch
+from resnet import ResnetWrapper
 from torch.nn import Module
 
 from plato.algorithms import fedavg
 from plato.config import Config
-
-from resnet import ResnetWrapper
 
 SysHeteroConfig = tuple[list[int], list[float]]
 

@@ -10,15 +10,14 @@ from __future__ import annotations
 from typing import Callable, cast
 
 import numpy as np
+from resnet import ResnetWrapper
+from sysheterofl_algorithm import Algorithm as SysHeteroAlgorithm
+from sysheterofl_trainer import ServerTrainer
 from torch.nn import Module
 
 from plato.config import Config
 from plato.servers import fedavg
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
-
-from resnet import ResnetWrapper
-from sysheterofl_algorithm import Algorithm as SysHeteroAlgorithm
-from sysheterofl_trainer import ServerTrainer
 
 
 class SysHeteroFLAggregationStrategy(FedAvgAggregationStrategy):
