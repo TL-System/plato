@@ -278,7 +278,7 @@ class ServerAsync(ServerSync):
         """After weight aggregation, update the architecture parameter alpha."""
         super().weights_aggregated(updates)
         # Save the current model for later retrieval when cosine similarity needs to be computed
-        filename = f"model_{self.current_round}.pth"
+        filename = f"model_{self.current_round}.safetensors"
         self.trainer.save_model(filename)
 
     # pylint:disable=attribute-defined-outside-init
@@ -403,7 +403,7 @@ class ServerAsync(ServerSync):
         """Compute the cosine similarity of the received updates and the difference
         between the current and a previous model according to client staleness."""
         # Loading the global model from a previous round according to staleness
-        filename = f"model_{self.current_round - 2}.pth"
+        filename = f"model_{self.current_round - 2}.safetensors"
         model_path = Config().params["model_path"]
         model_path = f"{model_path}/{filename}"
 

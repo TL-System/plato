@@ -390,7 +390,7 @@ class TrainerAsync(ComposableTrainer):
         if "max_concurrency" in config:
             self.model.cpu()
             model_name = config["model_name"]
-            filename = f"{model_name}_{self.client_id}_{config['run_id']}.pth"
+            filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
             self.save_model(filename)
 
     def obtain_model_at_time(self, client_id, requested_time):
@@ -404,7 +404,7 @@ class TrainerAsync(ComposableTrainer):
 
         for filename in os.listdir(Config().params["model_path"]):
             split = re.match(
-                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).pth$",
+                r"(?P<client_id>\d+)_(?P<epoch>\d+)_(?P<training_time>\d+.\d+).safetensors$",
                 filename,
             )
 
@@ -430,14 +430,7 @@ class TrainerAsync(ComposableTrainer):
 
             if model_training_time < requested_time:
                 model_path = f"{Config().params['model_path']}/{model_checkpoint}"
-
-                pretrained = None
-                if torch.cuda.is_available():
-                    pretrained = torch.load(model_path)
-                else:
-                    pretrained = torch.load(
-                        model_path, map_location=torch.device("cpu")
-                    )
+                pretrained = fedtools.load_safetensor_state_dict(model_path)
 
                 # Create NAS model with subnet configuration
                 model = fedtools.sample_subnet_w_config(
@@ -457,13 +450,7 @@ class TrainerAsync(ComposableTrainer):
 
         # If no matching epoch found, return the last available model
         model_path = f"{Config().params['model_path']}/{model_checkpoint}"
-
-        pretrained = None
-        if torch.cuda.is_available():
-            pretrained = torch.load(model_path)
-        else:
-            pretrained = torch.load(model_path, map_location=torch.device("cpu"))
-
+        pretrained = fedtools.load_safetensor_state_dict(model_path)
         model = fedtools.sample_subnet_w_config(NasDynamicModel(), subnet_config, False)
         model.load_state_dict(pretrained, strict=True)
 

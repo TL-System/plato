@@ -5,11 +5,13 @@ Helped functions used by trainer and algorithm in PerFedRLNAS.
 import copy
 import logging
 import os
+from collections import OrderedDict
 
 import numpy as np
 import torch
 import torch.nn.functional as F
 from model.mobilenetv3_supernet import NasDynamicModel
+from plato.serialization.safetensor import deserialize_tree
 
 
 def set_active_subnet(model, cfg):
@@ -121,12 +123,24 @@ def generate_proxy_supernets(subnets, cfgs):
     return proxy_supernets
 
 
+def load_safetensor_state_dict(model_path):
+    """Load a state dict saved as safetensors."""
+    with open(model_path, "rb") as model_file:
+        serialized = model_file.read()
+
+    state_dict_raw = deserialize_tree(serialized)
+    if not isinstance(state_dict_raw, dict):
+        raise TypeError("Safetensor payload does not contain a mapping.")
+
+    return OrderedDict(state_dict_raw.items())
+
+
 def calculate_similarity(model_path, model, update, staleness):
     """Calculate the model similarity"""
     similarity = 1
     if staleness > 1 and os.path.exists(model_path):
         previous_model = copy.deepcopy(model)
-        previous_model.load_state_dict(torch.load(model_path))
+        previous_model.load_state_dict(load_safetensor_state_dict(model_path))
 
         previous = torch.zeros(0)
         for __, weight in previous_model.cpu().state_dict().items():

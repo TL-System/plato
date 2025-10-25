@@ -1,5 +1,8 @@
 """
 The client for system-heterogeneous federated learning through architecture search.
+
+Reference: D. Yao, "Exploring System-Heterogeneous Federated Learning with Dynamic Model Selection,"
+https://arxiv.org/abs/2409.08858.
 """
 
 from plato.clients import simple
