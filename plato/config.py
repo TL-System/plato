@@ -292,6 +292,8 @@ class Config:
 
             if Config._cli_overrides.get("port") and Config.args.port is not None:
                 Config.server.port = Config.args.port
+                if not Config._cli_overrides.get("id", False):
+                    Config.args.port = None
 
             if Config.args.server is not None:
                 server_spec = Config.args.server
@@ -473,19 +475,14 @@ class Config:
     @staticmethod
     def is_edge_server() -> bool:
         """Returns whether the current instance is an edge server in cross-silo FL."""
-        if not bool(getattr(Config().algorithm, "cross_silo", False)):
-            return False
-
-        args = Config().args
-        return args.port is not None and args.id is not None
+        return Config().args.port is not None and bool(
+            getattr(Config().algorithm, "cross_silo", False)
+        )
 
     @staticmethod
     def is_central_server() -> bool:
         """Returns whether the current instance is a central server in cross-silo FL."""
-        if not bool(getattr(Config().algorithm, "cross_silo", False)):
-            return False
-
-        return Config().args.id is None
+        return hasattr(Config().algorithm, "cross_silo") and Config().args.port is None
 
     @staticmethod
     def gpu_count() -> int:
