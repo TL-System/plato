@@ -10,50 +10,46 @@ from plato.callbacks.client import ClientCallback
 
 
 class CustomizeProcessorCallback(ClientCallback):
-    """
-    A client callback that dynamically inserts a dummy processor to the list of inbound processors.
-    """
+    """Insert a dummy processor into inbound and outbound pipelines before they run."""
 
-    def on_inbound_process(self, client, inbound_processor):
-        """
-        Insert a dummy processor to the list of inbound processors.
-        """
+    def _insert_dummy(self, client, processor_pipeline, direction: str) -> None:
+        """Prepend the dummy processor if a processor pipeline is available."""
+        if processor_pipeline is None or not hasattr(processor_pipeline, "processors"):
+            logging.warning(
+                "[%s] No %s processor pipeline available; skip customization.",
+                client,
+                direction,
+            )
+            return
+
         logging.info(
-            "[%s] Current list of inbound processors: %s.",
+            "[%s] Current list of %s processors: %s.",
             client,
-            inbound_processor.processors,
+            direction,
+            processor_pipeline.processors,
         )
         customized_processor = DummyProcessor(
             client_id=client.client_id,
             current_round=client.current_round,
             name="DummyProcessor",
         )
-        inbound_processor.processors.insert(0, customized_processor)
+        processor_pipeline.processors.insert(0, customized_processor)
 
         logging.info(
-            "[%s] List of inbound processors after modification: %s.",
+            "[%s] List of %s processors after modification: %s.",
             client,
-            inbound_processor.processors,
+            direction,
+            processor_pipeline.processors,
         )
 
-    def on_outbound_process(self, client, outbound_processor):
+    def on_inbound_received(self, client, inbound_processor):
         """
-        Insert a dummy processor to the list of outbound processors.
+        Insert a dummy processor before inbound processors start to run.
         """
-        logging.info(
-            "[%s] Current list of outbound processors: %s.",
-            client,
-            outbound_processor.processors,
-        )
-        customized_processor = DummyProcessor(
-            client_id=client.client_id,
-            current_round=client.current_round,
-            name="DummyProcessor",
-        )
-        outbound_processor.processors.insert(0, customized_processor)
+        self._insert_dummy(client, inbound_processor, "inbound")
 
-        logging.info(
-            "[%s] List of outbound processors after modification: %s.",
-            client,
-            outbound_processor.processors,
-        )
+    def on_outbound_ready(self, client, report, outbound_processor):
+        """
+        Insert a dummy processor before outbound processors start to run.
+        """
+        self._insert_dummy(client, outbound_processor, "outbound")
