@@ -141,7 +141,8 @@ class PortAggregationStrategy(AggregationStrategy):
             for _, delta in update_delta.items():
                 deltas = torch.cat((deltas, delta.view(-1)))
 
-            similarity = F.cosine_similarity(current - previous, deltas, dim=0)
+            cosine_similarity = F.cosine_similarity(current - previous, deltas, dim=0)
+            similarity = float(cosine_similarity)
 
         return similarity
 

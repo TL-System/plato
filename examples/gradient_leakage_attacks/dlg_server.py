@@ -1053,13 +1053,12 @@ class Server(fedavg.Server):
             inner = gridspec.GridSpecFromSubplotSpec(
                 1, num_images, subplot_spec=outer[i]
             )
-            outerplot = plt.Subplot(fig, outer[i])
+            outerplot = fig.add_subplot(outer[i])
             outerplot.set_title("Iter=%d" % (i * log_interval))
             outerplot.axis("off")
-            fig.add_subplot(outerplot)
 
             for j in range(num_images):
-                innerplot = plt.Subplot(fig, inner[j])
+                innerplot = fig.add_subplot(inner[j])
                 innerplot.imshow(
                     history[i][j][0]
                     .detach()
@@ -1071,5 +1070,4 @@ class Server(fedavg.Server):
                     .cpu()
                 )
                 innerplot.axis("off")
-                fig.add_subplot(innerplot)
         fig.savefig(reconstructed_result_path)

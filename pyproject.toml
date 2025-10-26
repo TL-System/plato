@@ -103,6 +103,7 @@ dev = [
 [tool.ty.src]
 # Remove `build` from the excluded directories.
 exclude = [
+    "examples/outdated",
     "examples/model_search/pfedrlnas/VIT/nasvit_wrapper", 
     "examples/model_search/pfedrlnas/DARTS/Darts",
     "examples/model_search/pfedrlnas/MobileNetV3/model",
