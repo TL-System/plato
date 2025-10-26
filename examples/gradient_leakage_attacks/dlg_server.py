@@ -18,7 +18,6 @@ in Proceedings of the 39th International Conference on Machine Learning (ICML), 
 https://proceedings.mlr.press/v162/wen22a/wen22a.pdf
 """
 
-import asyncio
 import logging
 import math
 import os
@@ -49,6 +48,7 @@ from utils.modules import PatchedModule
 from plato.algorithms.base import Algorithm as BaseAlgorithm
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
 from plato.utils import csv_processor
 
 cross_entropy = torch.nn.CrossEntropyLoss(reduce="mean")
@@ -72,6 +72,57 @@ dlg_result_headers = [
 ]
 
 
+class DlgAggregationStrategy(FedAvgAggregationStrategy):
+    """FedAvg aggregation with optional GradDefense compensation for DLG server."""
+
+    async def aggregate_deltas(self, updates, deltas_received, context):
+        avg_update = await super().aggregate_deltas(updates, deltas_received, context)
+
+        server = getattr(context, "server", None)
+        if server is None:
+            return avg_update
+
+        if getattr(server, "defense_method", "no") != "GradDefense":
+            return avg_update
+
+        eligible = [
+            update
+            for update in updates
+            if getattr(update.report, "type", "weights") != "features"
+        ]
+        if not eligible or not avg_update:
+            return avg_update
+
+        total_samples = sum(update.report.num_samples for update in eligible)
+        if total_samples == 0:
+            return avg_update
+
+        scale_accumulator = 0.0
+        for update in eligible:
+            weight = update.report.num_samples / total_samples
+            scale_accumulator += (
+                len(deltas_received)
+                * Config().algorithm.perturb_slices_num
+                / Config().algorithm.slices_num
+                * (Config().algorithm.scale ** 2)
+                * weight
+            )
+
+        if scale_accumulator <= 0:
+            return avg_update
+
+        update_compensated = denoise(
+            gradients=list(avg_update.values()),
+            scale=math.sqrt(scale_accumulator),
+            q=Config().algorithm.Q,
+        )
+
+        for name, compensated in zip(avg_update.keys(), update_compensated):
+            avg_update[name] = compensated
+
+        return avg_update
+
+
 class Server(fedavg.Server):
     """An honest-but-curious federated learning server with gradient leakage attack."""
 
@@ -84,6 +135,7 @@ class Server(fedavg.Server):
             algorithm=algorithm,
             trainer=trainer,
             callbacks=callbacks,
+            aggregation_strategy=DlgAggregationStrategy(),
         )
         self.attack_method = None
         self.share_gradients = True
@@ -174,57 +226,6 @@ class Server(fedavg.Server):
             self._deep_leakage_from_gradients(weights_received)
 
         return weights_received
-
-    async def aggregate_deltas(self, updates, deltas_received):
-        """
-        Aggregate weight updates from the clients using
-        federated averaging with optional compensation.
-        """
-        # Extract the total number of samples
-        self.total_samples = sum([update.report.num_samples for update in updates])
-
-        trainer = self._require_trainer()
-
-        # Perform weighted averaging
-        avg_update = {
-            name: trainer.zeros(weights.shape)
-            for name, weights in deltas_received[0].items()
-        }
-
-        _scale = 0
-        for i, update in enumerate(deltas_received):
-            report = updates[i].report
-            num_samples = report.num_samples
-
-            for name, delta in update.items():
-                # Use weighted average by the number of samples
-                avg_update[name] += delta * (num_samples / self.total_samples)
-
-            if self.defense_method == "GradDefense":
-                _scale += (
-                    len(deltas_received)
-                    * Config().algorithm.perturb_slices_num
-                    / Config().algorithm.slices_num
-                    * (Config().algorithm.scale ** 2)
-                    * (num_samples / self.total_samples)
-                )
-
-            # Yield to other tasks in the server
-            await asyncio.sleep(0)
-
-        if self.defense_method == "GradDefense":
-            update_perturbed = []
-            for name, delta in avg_update.items():
-                update_perturbed.append(delta)
-            update_compensated = denoise(
-                gradients=update_perturbed,
-                scale=math.sqrt(_scale),
-                q=Config().algorithm.Q,
-            )
-            for i, name in enumerate(avg_update.keys()):
-                avg_update[name] = update_compensated[i]
-
-        return avg_update
 
     def customize_server_payload(self, payload):
         """Customizes the server payload before sending to the client."""

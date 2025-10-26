@@ -17,6 +17,31 @@ import os
 
 from plato.config import Config
 from plato.servers import fedavg
+from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
+
+
+class KnotRetrainingAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that ignores stale updates during retraining."""
+
+    async def aggregate_deltas(self, updates, deltas_received, context):
+        server = getattr(context, "server", None)
+        if server is None or not getattr(server, "retraining", False):
+            return await super().aggregate_deltas(updates, deltas_received, context)
+
+        current_round = getattr(server, "current_round", 0)
+        filtered_pairs = [
+            (update, delta)
+            for update, delta in zip(updates, deltas_received)
+            if getattr(update, "staleness", 0) <= current_round
+        ]
+
+        if not filtered_pairs:
+            return await super().aggregate_deltas(updates, deltas_received, context)
+
+        filtered_updates, filtered_deltas = map(list, zip(*filtered_pairs))
+        return await super().aggregate_deltas(
+            filtered_updates, filtered_deltas, context
+        )
 
 
 class Server(fedavg.Server):
@@ -49,6 +74,7 @@ class Server(fedavg.Server):
             trainer=trainer,
             **kwargs,
         )
+        self.aggregation_strategy = KnotRetrainingAggregationStrategy()
 
         self.retraining = False
 
@@ -69,46 +95,6 @@ class Server(fedavg.Server):
         # useful if we need to roll back to the very beginning, such as
         # in the federated unlearning process
         self.save_to_checkpoint()
-
-    async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate weight updates while supporting retraining-aware filtering."""
-        self.context.current_round = self.current_round
-        original_updates = updates
-
-        if not self.retraining:
-            self.context.updates = updates
-            avg_update = await self.aggregation_strategy.aggregate_deltas(
-                updates, deltas_received, self.context
-            )
-            self.total_samples = sum(update.report.num_samples for update in updates)
-            self.context.updates = original_updates
-            return avg_update
-
-        recent_mask = [update.staleness <= self.current_round for update in updates]
-        recent_updates = [
-            update for update, is_recent in zip(updates, recent_mask) if is_recent
-        ]
-        recent_deltas = [
-            delta for delta, is_recent in zip(deltas_received, recent_mask) if is_recent
-        ]
-
-        if not recent_updates:
-            # Fall back to the original set to avoid empty aggregation.
-            self.context.updates = updates
-            avg_update = await self.aggregation_strategy.aggregate_deltas(
-                updates, deltas_received, self.context
-            )
-            self.total_samples = sum(update.report.num_samples for update in updates)
-            self.context.updates = original_updates
-            return avg_update
-
-        self.context.updates = recent_updates
-        avg_update = await self.aggregation_strategy.aggregate_deltas(
-            recent_updates, recent_deltas, self.context
-        )
-        self.total_samples = sum(update.report.num_samples for update in recent_updates)
-        self.context.updates = original_updates
-        return avg_update
 
     def clients_processed(self) -> None:
         """Enters the retraining phase if a specific set of conditions are satisfied."""

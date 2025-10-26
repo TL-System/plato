@@ -19,6 +19,48 @@ import torch
 from lib_mia import mia_server
 
 from plato.config import Config
+from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
+
+
+class RetrainingAwareAggregationStrategy(FedAvgAggregationStrategy):
+    """Aggregation strategy that skips stale updates during retraining."""
+
+    def __init__(self, *, fallback_to_original: bool):
+        super().__init__()
+        self._fallback_to_original = fallback_to_original
+
+    async def aggregate_deltas(self, updates, deltas_received, context):
+        server = getattr(context, "server", None)
+        if server is None or not getattr(server, "retraining", False):
+            return await super().aggregate_deltas(updates, deltas_received, context)
+
+        current_round = getattr(server, "current_round", 0)
+        filtered_pairs = [
+            (update, delta)
+            for update, delta in zip(updates, deltas_received)
+            if getattr(update, "staleness", 0) <= current_round
+        ]
+
+        if not filtered_pairs:
+            if self._fallback_to_original:
+                return await super().aggregate_deltas(
+                    updates, deltas_received, context
+                )
+
+            zero_delta = self._zero_delta(
+                context, deltas_received[0] if deltas_received else None
+            )
+            if zero_delta is not None:
+                return zero_delta
+            return {}
+
+        filtered_updates, filtered_deltas = map(list, zip(*filtered_pairs))
+
+        return await super().aggregate_deltas(
+            filtered_updates,
+            filtered_deltas,
+            context,
+        )
 
 
 class Server(mia_server.Server):
@@ -51,6 +93,9 @@ class Server(mia_server.Server):
             trainer=trainer,
             callbacks=callbacks,
         )
+        self.aggregation_strategy = RetrainingAwareAggregationStrategy(
+            fallback_to_original=False
+        )
 
         self.retraining = False
 
@@ -73,55 +118,6 @@ class Server(mia_server.Server):
         # useful if we need to roll back to the very beginning, such as
         # in the federated unlearning process
         self.save_to_checkpoint()
-
-    async def aggregate_deltas(self, updates, deltas_received):
-        """Aggregate the reported weight updates from the selected clients.
-        If in retraing phase, staleness clients should not be aggregated.
-        Otherwise the stale clients updates contains old model's info,
-        will be aggregated after data_deletion_round.
-        """
-        if not self.retraining:
-            self.context.updates = updates
-            self.context.current_round = self.current_round
-            deltas = await self.aggregation_strategy.aggregate_deltas(
-                updates, deltas_received, self.context
-            )
-            self.total_samples = sum(update.report.num_samples for update in updates)
-            return deltas
-
-        recent_mask = list(
-            map(lambda update: update.staleness <= self.current_round, updates)
-        )
-        recent_updates = list(
-            filter(lambda update: update.staleness <= self.current_round, updates)
-        )
-
-        recent_deltas_received = [
-            delta for delta, fresh in zip(deltas_received, recent_mask) if fresh
-        ]
-
-        if not recent_updates:
-            if deltas_received:
-                zero_delta = {
-                    name: tensor.clone().zero_()
-                    for name, tensor in deltas_received[0].items()
-                }
-            else:
-                baseline = self.algorithm.extract_weights()
-                zero_delta = {
-                    name: weight.clone().zero_() for name, weight in baseline.items()
-                }
-            return zero_delta
-
-        self.context.updates = recent_updates
-        self.context.current_round = self.current_round
-
-        deltas = await self.aggregation_strategy.aggregate_deltas(
-            recent_updates, recent_deltas_received, self.context
-        )
-        self.total_samples = sum(update.report.num_samples for update in recent_updates)
-
-        return deltas
 
     def clients_processed(self):
         """Enters the retraining phase if a specific set of conditions are satisfied."""
