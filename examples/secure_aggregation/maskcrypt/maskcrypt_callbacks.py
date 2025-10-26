@@ -35,34 +35,78 @@ class MaskCryptCallback(ClientCallback):
         current_round = client.current_round
         if current_round % 2 != 0:
             # Update the exposed model weights from new global model
-            inbound_processor.processors.append(
-                ModelEstimateProcessor(client_id=client.client_id)
+            processors = inbound_processor.processors
+            processors[:] = [
+                proc
+                for proc in processors
+                if getattr(proc, "name", None)
+                not in {"MaskCryptModelEstimate", "model_decrypt"}
+            ]
+            decode_index = next(
+                (
+                    idx
+                    for idx, proc in enumerate(processors)
+                    if getattr(proc, "name", None) == "safetensor_decode"
+                ),
+                -1,
             )
 
-            # Server sends model weights in odd rounds, add decrypt processor
-            inbound_processor.processors.append(
-                model_decrypt.Processor(
-                    client_id=client.client_id,
-                    trainer=client.trainer,
-                    name="model_decrypt",
-                )
+            estimate_processor = ModelEstimateProcessor(
+                client_id=client.client_id, name="MaskCryptModelEstimate"
             )
+            decrypt_processor = model_decrypt.Processor(
+                client_id=client.client_id,
+                trainer=client.trainer,
+                name="model_decrypt",
+            )
+
+            insert_at = decode_index + 1 if decode_index >= 0 else len(processors)
+            processors.insert(insert_at, estimate_processor)
+            processors.insert(insert_at + 1, decrypt_processor)
+        else:
+            inbound_processor.processors[:] = [
+                proc
+                for proc in inbound_processor.processors
+                if getattr(proc, "name", None)
+                not in {"MaskCryptModelEstimate", "model_decrypt"}
+            ]
 
     def on_outbound_ready(self, client, report, outbound_processor):
         current_round = client.current_round
 
         if current_round % 2 == 0:
-            # Clients send model weights to server in even rounds, add encrypt processor
-            outbound_processor.processors.append(
-                model_encrypt.Processor(
-                    mask=client.final_mask,
-                    client_id=client.client_id,
-                    trainer=client.trainer,
-                    name="model_encrypt",
-                )
+            processors = outbound_processor.processors
+            processors[:] = [
+                proc
+                for proc in processors
+                if getattr(proc, "name", None)
+                not in {"model_encrypt", "MaskCryptModelEstimate"}
+            ]
+            encode_index = next(
+                (
+                    idx
+                    for idx, proc in enumerate(processors)
+                    if getattr(proc, "name", None) == "safetensor_encode"
+                ),
+                len(processors),
             )
 
-            # Update the exposed model weights after encryption
-            outbound_processor.processors.append(
-                ModelEstimateProcessor(client_id=client.client_id)
+            encrypt_processor = model_encrypt.Processor(
+                mask=client.final_mask,
+                client_id=client.client_id,
+                trainer=client.trainer,
+                name="model_encrypt",
             )
+            estimate_processor = ModelEstimateProcessor(
+                client_id=client.client_id, name="MaskCryptModelEstimate"
+            )
+
+            processors.insert(encode_index, encrypt_processor)
+            processors.insert(encode_index + 1, estimate_processor)
+        else:
+            outbound_processor.processors[:] = [
+                proc
+                for proc in outbound_processor.processors
+                if getattr(proc, "name", None)
+                not in {"model_encrypt", "MaskCryptModelEstimate"}
+            ]

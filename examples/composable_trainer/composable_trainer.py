@@ -15,6 +15,8 @@ Run this example:
     uv run composable_trainer_example.py
 """
 
+from typing import Optional
+
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset
@@ -202,7 +204,7 @@ def example_4_custom_strategy():
         def __init__(self, class_weights, l2_weight=0.01):
             self.class_weights = class_weights
             self.l2_weight = l2_weight
-            self._criterion = None
+            self._criterion: Optional[nn.CrossEntropyLoss] = None
 
         def setup(self, context: TrainingContext):
             """Initialize the loss criterion."""
@@ -213,6 +215,8 @@ def example_4_custom_strategy():
 
         def compute_loss(self, outputs, labels, context):
             """Compute weighted cross-entropy loss + L2 regularization."""
+            if self._criterion is None:
+                raise RuntimeError("Loss criterion is not initialized. Call setup first.")
             # Base cross-entropy loss with class weights
             ce_loss = self._criterion(outputs, labels)
 

@@ -248,9 +248,13 @@ def example_3_custom_selection():
     print(f"Server created with:")
     print(f"  - Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  - Selection: {type(server.client_selection_strategy).__name__}")
-    print(
-        f"  - Oort params: exploration={server.client_selection_strategy.exploration_factor}"
-    )
+    if isinstance(server.client_selection_strategy, OortSelectionStrategy):
+        print(
+            "  - Oort params: "
+            f"exploration={server.client_selection_strategy.exploration_factor}"
+        )
+    else:
+        print("  - Oort params: unavailable for current selection strategy")
     print("Ready to run with: server.run(client)")
 
 
@@ -289,10 +293,14 @@ def example_4_both_custom():
     print(f"Server created with:")
     print(f"  - Aggregation: {type(server.aggregation_strategy).__name__}")
     print(f"  - Selection: {type(server.client_selection_strategy).__name__}")
-    print(
-        f"  - AFL params: alpha1={server.client_selection_strategy.alpha1}, "
-        f"alpha2={server.client_selection_strategy.alpha2}"
-    )
+    if isinstance(server.client_selection_strategy, AFLSelectionStrategy):
+        print(
+            "  - AFL params: "
+            f"alpha1={server.client_selection_strategy.alpha1}, "
+            f"alpha2={server.client_selection_strategy.alpha2}"
+        )
+    else:
+        print("  - AFL params: unavailable for current selection strategy")
     print("Ready to run with: server.run(client)")
 
 

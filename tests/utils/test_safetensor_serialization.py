@@ -99,3 +99,13 @@ def test_serialize_tree_handles_strings_and_none():
     restored = deserialize_tree(blob)
 
     _assert_trees_allclose(restored, tree)
+
+
+def test_serialize_tree_handles_root_level_leaf():
+    leaf = np.arange(5, dtype=np.int64)
+
+    blob = serialize_tree(leaf)
+    restored = deserialize_tree(blob)
+
+    np.testing.assert_array_equal(restored, leaf)
+    assert restored.dtype == leaf.dtype

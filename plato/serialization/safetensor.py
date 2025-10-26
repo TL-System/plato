@@ -66,5 +66,5 @@ def deserialize_tree(buffer: bytes | bytearray | memoryview) -> Any:
 
     metadata_json = metadata_blob.tobytes().decode("utf-8")
     metadata = _metadata_from_json(metadata_json)
-    flat = {("" if key == "__root__" else key): value for key, value in tensors.items()}
+    flat = dict(tensors.items())
     return unflatten_tree(flat, metadata)
