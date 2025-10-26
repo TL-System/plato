@@ -7,17 +7,22 @@ in the Proceedings of NeurIPS 2020.
 https://github.com/JonasGeiping/invertinggradients
 """
 
+from __future__ import annotations
+
 import random
+from typing import Callable, Sequence, cast
 
 import numpy as np
 import torch
-import torchvision
 from torch import nn
+from torchvision.models.resnet import BasicBlock, Bottleneck, conv1x1
 
 from plato.config import Config
 
+BlockType = type[BasicBlock] | type[Bottleneck]
 
-def set_random_seed(seed=233):
+
+def set_random_seed(seed: int = 233) -> None:
     """233 = 144 + 89 is my favorite number."""
     torch.manual_seed(seed + 1)
     torch.cuda.manual_seed(seed + 2)
@@ -27,60 +32,70 @@ def set_random_seed(seed=233):
     random.seed(seed + 6)
 
 
-class Model(torchvision.models.ResNet):
-    """ResNet generalization for CIFAR thingies."""
+class Model(nn.Module):
+    """ResNet generalization for CIFAR variants."""
 
     def __init__(
         self,
-        block,
-        layers,
-        num_classes=10,
-        zero_init_residual=False,
-        groups=1,
-        base_width=64,
-        replace_stride_with_dilation=None,
-        norm_layer=None,
-        strides=[1, 2, 2, 2],
-        pool="avg",
+        block: BlockType,
+        layers: Sequence[int],
+        num_classes: int = 10,
+        zero_init_residual: bool = False,
+        groups: int = 1,
+        base_width: int = 64,
+        replace_stride_with_dilation: Sequence[bool] | None = None,
+        norm_layer: type[nn.Module] | None = None,
+        strides: Sequence[int] = (1, 2, 2, 2),
+        pool: str = "avg",
     ):
         """Initialize as usual. Layers and strides are scriptable."""
-        super(torchvision.models.ResNet, self).__init__()  # nn.Module
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
-        self._norm_layer = norm_layer
+        super().__init__()
 
-        self.dilation = 1
+        norm_layer_cls = cast(Callable[[int], nn.Module], norm_layer or nn.BatchNorm2d)
+
         if replace_stride_with_dilation is None:
-            # each element in the tuple indicates if we should replace
-            # the 2x2 stride with a dilated convolution instead
-            replace_stride_with_dilation = [False, False, False, False]
-        if len(replace_stride_with_dilation) != 4:
-            raise ValueError(
-                "replace_stride_with_dilation should be None "
-                "or a 4-element tuple, got {}".format(replace_stride_with_dilation)
-            )
-        self.groups = groups
+            replace = [False] * len(layers)
+        else:
+            replace = list(replace_stride_with_dilation)
 
-        self.inplanes = base_width
-        self.base_width = 64  # Do this to circumvent BasicBlock errors. The value is not actually used.
-        self.conv1 = nn.Conv2d(
-            3, self.inplanes, kernel_size=3, stride=1, padding=1, bias=False
+        if len(replace) < len(layers):
+            raise ValueError(
+                "replace_stride_with_dilation must match number of layers."
+            )
+
+        stride_list = list(strides)
+        if len(stride_list) < len(layers):
+            raise ValueError("strides must match number of layers.")
+
+        block_base_width = (
+            64  # BasicBlock requires base_width=64; this matches torchvision.
         )
-        self.bn1 = norm_layer(self.inplanes)
+
+        self.conv1 = nn.Conv2d(
+            3, base_width, kernel_size=3, stride=1, padding=1, bias=False
+        )
+        self.bn1 = norm_layer_cls(base_width)
         self.relu = nn.ReLU(inplace=True)
 
-        self.layers = torch.nn.ModuleList()
-        width = self.inplanes
-        for idx, layer in enumerate(layers):
-            self.layers.append(
-                self._make_layer(
-                    block,
-                    width,
-                    layer,
-                    stride=strides[idx],
-                    dilate=replace_stride_with_dilation[idx],
-                )
+        self.layers = nn.ModuleList()
+        width = base_width
+        inplanes = base_width
+        dilation = 1
+
+        for idx, block_count in enumerate(layers):
+            layer_module, inplanes, dilation = self._make_layer(
+                block=block,
+                inplanes=inplanes,
+                planes=width,
+                blocks=block_count,
+                stride=stride_list[idx],
+                dilate=replace[idx],
+                groups=groups,
+                base_width=block_base_width,
+                dilation=dilation,
+                norm_layer=norm_layer_cls,
             )
+            self.layers.append(layer_module)
             width *= 2
 
         self.pool = (
@@ -90,25 +105,85 @@ class Model(torchvision.models.ResNet):
         )
         self.fc = nn.Linear(width // 2 * block.expansion, num_classes)
 
-        # TODO: move initialization?
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
+        for module in self.modules():
+            if isinstance(module, nn.Conv2d):
+                nn.init.kaiming_normal_(
+                    module.weight, mode="fan_out", nonlinearity="relu"
+                )
+            elif isinstance(module, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(module.weight, 1)
+                nn.init.constant_(module.bias, 0)
 
-        # Zero-initialize the last BN in each residual branch,
-        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
-        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
         if zero_init_residual:
-            for m in self.modules():
-                if isinstance(m, torchvision.models.resnet.Bottleneck):
-                    nn.init.constant_(m.bn3.weight, 0)
-                elif isinstance(m, torchvision.models.resnet.BasicBlock):
-                    nn.init.constant_(m.bn2.weight, 0)
+            for module in self.modules():
+                if isinstance(module, Bottleneck) and isinstance(
+                    module.bn3.weight, torch.Tensor
+                ):
+                    nn.init.constant_(module.bn3.weight, 0.0)
+                elif isinstance(module, BasicBlock) and isinstance(
+                    module.bn2.weight, torch.Tensor
+                ):
+                    nn.init.constant_(module.bn2.weight, 0.0)
 
-    def _forward_impl(self, x):
+    def _make_layer(
+        self,
+        *,
+        block: BlockType,
+        inplanes: int,
+        planes: int,
+        blocks: int,
+        stride: int,
+        dilate: bool,
+        groups: int,
+        base_width: int,
+        dilation: int,
+        norm_layer: Callable[[int], nn.Module],
+    ) -> tuple[nn.Sequential, int, int]:
+        """Build a residual layer stack, mirroring torchvision's implementation."""
+        downsample: nn.Module | None = None
+        previous_dilation = dilation
+        stride_to_use = stride
+        updated_dilation = dilation
+
+        if dilate:
+            updated_dilation *= stride
+            stride_to_use = 1
+
+        if stride_to_use != 1 or inplanes != planes * block.expansion:
+            downsample = nn.Sequential(
+                conv1x1(inplanes, planes * block.expansion, stride_to_use),
+                norm_layer(planes * block.expansion),
+            )
+
+        layers = [
+            block(
+                inplanes,
+                planes,
+                stride_to_use,
+                downsample,
+                groups,
+                base_width,
+                previous_dilation,
+                norm_layer,
+            )
+        ]
+        current_inplanes = planes * block.expansion
+
+        for _ in range(1, blocks):
+            layers.append(
+                block(
+                    current_inplanes,
+                    planes,
+                    groups=groups,
+                    base_width=base_width,
+                    dilation=updated_dilation,
+                    norm_layer=norm_layer,
+                )
+            )
+
+        return nn.Sequential(*layers), current_inplanes, updated_dilation
+
+    def _forward_impl(self, x: torch.Tensor) -> torch.Tensor:
         """Model forwarding."""
         x = self.conv1(x)
         x = self.bn1(x)
@@ -123,7 +198,11 @@ class Model(torchvision.models.ResNet):
 
         return x
 
-    def forward_feature(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
+        """Standard forward pass matching torchvision's API."""
+        return self._forward_impl(x)
+
+    def forward_feature(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Model forwarding returning intermediate feature."""
         x = self.conv1(x)
         x = self.bn1(x)
@@ -140,87 +219,89 @@ class Model(torchvision.models.ResNet):
         return x, feature
 
     @staticmethod
-    def is_valid_model_type(model_type):
+    def is_valid_model_type(model_type: str | None) -> bool:
         return (
-            model_type.startswith("resnet_")
+            isinstance(model_type, str)
+            and model_type.startswith("resnet_")
             and len(model_type.split("_")) == 2
             and int(model_type.split("_")[1]) in [18, 34, 50, 101, 152, 32]
         )
 
     @staticmethod
-    def resnet18():
+    def resnet18() -> "Model":
         return Model(
-            torchvision.models.resnet.BasicBlock,
+            BasicBlock,
             [2, 2, 2, 2],
             Config().parameters.model.num_classes,
             base_width=64,
         )
 
     @staticmethod
-    def resnet32():
+    def resnet32() -> "Model":
         return Model(
-            torchvision.models.resnet.BasicBlock,
+            BasicBlock,
             [5, 5, 5],
             Config().parameters.model.num_classes,
             base_width=16 * 10,
         )
 
     @staticmethod
-    def resnet34():
+    def resnet34() -> "Model":
         return Model(
-            torchvision.models.resnet.BasicBlock,
+            BasicBlock,
             [3, 4, 6, 3],
             Config().parameters.model.num_classes,
             base_width=64,
         )
 
     @staticmethod
-    def resnet50():
+    def resnet50() -> "Model":
         return Model(
-            torchvision.models.resnet.Bottleneck,
+            Bottleneck,
             [3, 4, 6, 3],
             Config().parameters.model.num_classes,
             base_width=64,
         )
 
     @staticmethod
-    def resnet101():
+    def resnet101() -> "Model":
         return Model(
-            torchvision.models.resnet.Bottleneck,
+            Bottleneck,
             [3, 4, 23, 3],
             Config().parameters.model.num_classes,
             base_width=64,
         )
 
     @staticmethod
-    def resnet152():
+    def resnet152() -> "Model":
         return Model(
-            torchvision.models.resnet.Bottleneck,
+            Bottleneck,
             [3, 8, 36, 3],
             Config().parameters.model.num_classes,
             base_width=64,
         )
 
 
-def get(model_name=None):
+def get(model_name: str | None = None) -> Callable[[], Model] | None:
     """Returns a suitable ResNet model according to its type."""
     set_random_seed(1)
 
     if not Model.is_valid_model_type(model_name):
         raise ValueError(f"Invalid Resnet model name: {model_name}")
 
+    assert model_name is not None
     resnet_type = int(model_name.split("_")[1])
 
     if resnet_type == 18:
         return Model.resnet18
-    elif resnet_type == 32:
+    if resnet_type == 32:
         return Model.resnet32
-    elif resnet_type == 34:
+    if resnet_type == 34:
         return Model.resnet34
-    elif resnet_type == 50:
+    if resnet_type == 50:
         return Model.resnet50
-    elif resnet_type == 101:
+    if resnet_type == 101:
         return Model.resnet101
-    elif resnet_type == 152:
+    if resnet_type == 152:
         return Model.resnet152
     return None

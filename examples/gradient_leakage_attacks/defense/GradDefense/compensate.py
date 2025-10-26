@@ -10,6 +10,7 @@ import math
 
 import numpy as np
 import torch
+from numpy.typing import ArrayLike, NDArray
 
 
 def get_factor(num):
@@ -45,9 +46,10 @@ def get_matrix_size(total_params_num: int, q: float):
     return gradients_matrix_v, gradients_matrix_w, real_q
 
 
-def get_covariance_matrix(matrix):
+def get_covariance_matrix(matrix: ArrayLike) -> NDArray[np.float64]:
     """Calculate covariance matrix."""
-    return np.cov(matrix, rowvar=0)
+    matrix_array: NDArray[np.float64] = np.asarray(matrix, dtype=np.float64)
+    return np.cov(matrix_array, rowvar=False)
 
 
 def denoise(gradients: list, scale: float, q: float):

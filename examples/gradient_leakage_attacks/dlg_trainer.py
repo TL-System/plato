@@ -10,6 +10,7 @@ with strategies and callbacks instead of inheritance and hooks.
 import math
 import pickle
 import random
+from typing import Any, Iterable, Optional, Union, cast
 
 import numpy as np
 import torch
@@ -28,6 +29,10 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+
+GradientList = list[torch.Tensor]
+NestedGradientList = list[GradientList]
+GradientsLike = Union[GradientList, NestedGradientList]
 
 criterion = cross_entropy_for_onehot
 tt = transforms.ToPILImage()
@@ -84,15 +89,21 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
     computation and storage for gradient leakage analysis.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the training step strategy."""
-        self.examples = None
-        self.list_grad = None
-        self.feature_fc1_graph = None
+        self.examples: torch.Tensor | None = None
+        self.list_grad: GradientsLike | None = None
+        self.feature_fc1_graph: torch.Tensor | None = None
 
     def training_step(
-        self, model, optimizer, examples, labels, loss_criterion, context
-    ):
+        self,
+        model: torch.nn.Module,
+        optimizer: torch.optim.Optimizer,
+        examples: torch.Tensor,
+        labels: torch.Tensor,
+        loss_criterion: torch.nn.Module,
+        context: TrainingContext,
+    ) -> torch.Tensor:
         """Perform forward and backward passes for DLG attacks."""
         examples.requires_grad = True
         self.examples = examples
@@ -114,8 +125,8 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
             and hasattr(Config().algorithm, "clip")
             and Config().algorithm.clip is True
         ):
-            self.list_grad = []
-            step_losses = []
+            per_sample_grads: NestedGradientList = []
+            step_losses: list[torch.Tensor] = []
             for example, label in zip(examples, labels):
                 output = model(torch.unsqueeze(example, dim=0))
                 loss = loss_criterion(output, torch.unsqueeze(label, dim=0))
@@ -127,14 +138,19 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
                     create_graph=True,
                     only_inputs=True,
                 )
-                self.list_grad.append(list(_.detach().clone() for _ in grad))
-            loss = torch.mean(step_losses)
+                per_sample_grads.append([g.detach().clone() for g in grad])
+            loss = torch.stack(step_losses).mean()
+            self.list_grad = per_sample_grads
         else:
             if (
                 hasattr(Config().algorithm, "defense")
                 and Config().algorithm.defense == "Soteria"
             ):
-                outputs, self.feature_fc1_graph = model.forward_feature(examples)
+                forward_feature = getattr(model, "forward_feature", None)
+                if callable(forward_feature):
+                    outputs, self.feature_fc1_graph = forward_feature(examples)
+                else:
+                    outputs = model(examples)
             else:
                 outputs = model(examples)
             # Save the ground truth and gradients
@@ -146,7 +162,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
                 create_graph=True,
                 only_inputs=True,
             )
-            self.list_grad = list(_.detach().clone() for _ in grad)
+            self.list_grad = [g.detach().clone() for g in grad]
 
         # Store in context for use by callbacks
         context.state["examples"] = self.examples
@@ -170,164 +186,217 @@ class DLGTrainingCallbacks(TrainerCallback):
     Implements the logic from train_run_start, train_step_end, and train_run_end.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the callback."""
-        self.full_examples = None
-        self.full_labels = None
-        self.full_onehot_labels = None
-        self.target_grad = None
+        self.full_examples: torch.Tensor | None = None
+        self.full_labels: torch.Tensor | None = None
+        self.full_onehot_labels: torch.Tensor | None = None
+        self.target_grad: GradientList | None = None
 
-    def on_train_run_start(self, trainer, config, **kwargs):
+    def on_train_run_start(self, trainer, config, **kwargs) -> None:
         """Method called at the start of training run."""
         self.target_grad = None
 
-    def on_train_epoch_start(self, trainer, config, **kwargs):
+    def on_train_epoch_start(self, trainer, config, **kwargs) -> None:
         """Store data in the first epoch."""
         if trainer.current_epoch == 1:
             # Initialize storage for full examples and labels
             self.full_examples = None
             self.full_labels = None
 
-    def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+    def on_train_step_end(self, trainer, config, batch, loss, **kwargs) -> None:
         """Apply defense mechanisms and update model weights manually."""
         context = trainer.context
 
         # Retrieve stored data from context
-        examples = context.state.get("examples")
-        labels = context.state.get("labels")
-        list_grad = context.state.get("list_grad")
-        feature_fc1_graph = context.state.get("feature_fc1_graph")
+        examples = cast(Optional[torch.Tensor], context.state.get("examples"))
+        labels = cast(Optional[torch.Tensor], context.state.get("labels"))
+        gradients_like = cast(Optional[GradientsLike], context.state.get("list_grad"))
+        feature_fc1_graph = cast(
+            Optional[torch.Tensor], context.state.get("feature_fc1_graph")
+        )
 
         # Store data in the first epoch
         if trainer.current_epoch == 1 and examples is not None and labels is not None:
-            try:
-                self.full_examples = torch.cat((examples, self.full_examples), dim=0)
-                self.full_labels = torch.cat((labels, self.full_labels), dim=0)
-            except:
+            if self.full_examples is None:
                 self.full_examples = examples.detach().clone()
+            else:
+                self.full_examples = torch.cat((examples, self.full_examples), dim=0)
+
+            if self.full_labels is None:
                 self.full_labels = labels.detach().clone()
+            else:
+                self.full_labels = torch.cat((labels, self.full_labels), dim=0)
 
-            self.full_onehot_labels = label_to_onehot(
-                self.full_labels, num_classes=Config().parameters.model.num_classes
-            )
-
-        # Apply defense if needed
-        grad = list_grad
-        if hasattr(Config().algorithm, "defense") and list_grad is not None:
-            if Config().algorithm.defense == "GradDefense":
-                sensitivity = context.state.get("sensitivity")
-                if (
-                    hasattr(Config().algorithm, "clip")
-                    and Config().algorithm.clip is True
-                ):
-                    from defense.GradDefense.perturb import noise_with_clip as noise
-                else:
-                    from defense.GradDefense.perturb import noise
-                list_grad = noise(
-                    dy_dx=list_grad,
-                    sensitivity=sensitivity,
-                    slices_num=Config().algorithm.slices_num,
-                    perturb_slices_num=Config().algorithm.perturb_slices_num,
-                    noise_intensity=Config().algorithm.scale,
+            if self.full_labels is not None:
+                self.full_onehot_labels = label_to_onehot(
+                    self.full_labels, num_classes=Config().parameters.model.num_classes
                 )
 
-            elif Config().algorithm.defense == "Soteria":
-                if feature_fc1_graph is not None and examples is not None:
-                    deviation_f1_target = torch.zeros_like(feature_fc1_graph)
-                    deviation_f1_x_norm = torch.zeros_like(feature_fc1_graph)
-                    for f in range(deviation_f1_x_norm.size(1)):
-                        deviation_f1_target[:, f] = 1
-                        feature_fc1_graph.backward(
-                            deviation_f1_target, retain_graph=True
+        # Apply defense if needed
+        working_gradients = gradients_like
+        if hasattr(Config().algorithm, "defense") and working_gradients is not None:
+            defense_name = Config().algorithm.defense
+            if defense_name == "GradDefense":
+                sensitivity = cast(
+                    Optional[list[float]], context.state.get("sensitivity")
+                )
+                if sensitivity is None:
+                    raise ValueError("Sensitivity must be available for GradDefense.")
+                if getattr(Config().algorithm, "clip", False):
+                    if isinstance(working_gradients, list) and working_gradients:
+                        nested_gradients = cast(NestedGradientList, working_gradients)
+                        from defense.GradDefense.perturb import (
+                            noise_with_clip as graddefense_noise,
                         )
-                        deviation_f1_x = examples.grad.data
-                        deviation_f1_x_norm[:, f] = (
-                            torch.norm(
-                                deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
-                            )
-                            / (feature_fc1_graph.data[:, f])
-                        )
-                        trainer.model.zero_grad()
-                        examples.grad.data.zero_()
-                        deviation_f1_target[:, f] = 0
 
-                    deviation_f1_x_norm_sum = deviation_f1_x_norm.sum(axis=0)
-                    thresh = np.percentile(
-                        deviation_f1_x_norm_sum.flatten().cpu().numpy(),
-                        Config().algorithm.threshold,
+                        working_gradients = cast(
+                            GradientsLike,
+                            graddefense_noise(
+                                dy_dx=nested_gradients,
+                                sensitivity=sensitivity,
+                                slices_num=Config().algorithm.slices_num,
+                                perturb_slices_num=Config().algorithm.perturb_slices_num,
+                                noise_intensity=Config().algorithm.scale,
+                            ),
+                        )
+                else:
+                    if isinstance(working_gradients, list) and all(
+                        isinstance(item, torch.Tensor) for item in working_gradients
+                    ):
+                        from defense.GradDefense.perturb import (
+                            noise as graddefense_noise,
+                        )
+
+                        working_gradients = cast(
+                            GradientsLike,
+                            graddefense_noise(
+                                dy_dx=cast(GradientList, working_gradients),
+                                sensitivity=sensitivity,
+                                slices_num=Config().algorithm.slices_num,
+                                perturb_slices_num=Config().algorithm.perturb_slices_num,
+                                noise_intensity=Config().algorithm.scale,
+                            ),
+                        )
+
+            elif (
+                defense_name == "Soteria"
+                and feature_fc1_graph is not None
+                and examples is not None
+                and isinstance(working_gradients, list)
+                and all(isinstance(item, torch.Tensor) for item in working_gradients)
+            ):
+                deviation_f1_target = torch.zeros_like(feature_fc1_graph)
+                deviation_f1_x_norm = torch.zeros_like(feature_fc1_graph)
+
+                for f_index in range(deviation_f1_x_norm.size(1)):
+                    deviation_f1_target[:, f_index] = 1
+                    feature_fc1_graph.backward(deviation_f1_target, retain_graph=True)
+                    deviation_f1_x = examples.grad
+                    if deviation_f1_x is None:
+                        continue
+                    deviation_f1_x_norm[:, f_index] = (
+                        torch.norm(
+                            deviation_f1_x.view(deviation_f1_x.size(0), -1), dim=1
+                        )
+                        / feature_fc1_graph[:, f_index]
                     )
-                    mask = np.where(
-                        abs(deviation_f1_x_norm_sum.cpu()) < thresh, 0, 1
-                    ).astype(np.float32)
-                    list_grad[6] = list_grad[6] * torch.Tensor(mask).to(trainer.device)
+                    trainer.model.zero_grad()
+                    deviation_f1_target[:, f_index] = 0
+                    deviation_f1_x.zero_()
 
-            elif Config().algorithm.defense == "GC":
-                for i, grad_item in enumerate(list_grad):
+                deviation_f1_x_norm_sum = deviation_f1_x_norm.sum(dim=0)
+                thresh = np.percentile(
+                    deviation_f1_x_norm_sum.flatten().cpu().numpy(),
+                    Config().algorithm.threshold,
+                )
+                mask = np.where(
+                    np.abs(deviation_f1_x_norm_sum.cpu().numpy()) < thresh, 0, 1
+                ).astype(np.float32)
+                working_gradients[6] = cast(
+                    torch.Tensor, working_gradients[6]
+                ) * torch.from_numpy(mask).to(trainer.device)
+
+            elif (
+                defense_name == "GC"
+                and isinstance(working_gradients, list)
+                and all(isinstance(item, torch.Tensor) for item in working_gradients)
+            ):
+                for index, grad_item in enumerate(working_gradients):
                     grad_tensor = grad_item.cpu().numpy()
                     flattened_weights = np.abs(grad_tensor.flatten())
                     thresh = np.percentile(
                         flattened_weights, Config().algorithm.prune_pct
                     )
-                    grad_tensor = np.where(abs(grad_tensor) < thresh, 0, grad_tensor)
-                    list_grad[i] = torch.Tensor(grad_tensor).to(trainer.device)
+                    pruned = np.where(np.abs(grad_tensor) < thresh, 0, grad_tensor)
+                    working_gradients[index] = torch.from_numpy(pruned).to(
+                        trainer.device
+                    )
 
-            elif Config().algorithm.defense == "DP":
-                for i, grad_item in enumerate(list_grad):
+            elif (
+                defense_name == "DP"
+                and isinstance(working_gradients, list)
+                and all(isinstance(item, torch.Tensor) for item in working_gradients)
+            ):
+                for index, grad_item in enumerate(working_gradients):
                     grad_tensor = grad_item.cpu().numpy()
                     noise = np.random.laplace(
                         0, Config().algorithm.epsilon, size=grad_tensor.shape
                     )
-                    grad_tensor = grad_tensor + noise
-                    list_grad[i] = torch.Tensor(grad_tensor).to(trainer.device)
+                    working_gradients[index] = torch.from_numpy(grad_tensor + noise).to(
+                        trainer.device
+                    )
 
-            elif Config().algorithm.defense == "Outpost":
+            elif (
+                defense_name == "Outpost"
+                and isinstance(working_gradients, list)
+                and all(isinstance(item, torch.Tensor) for item in working_gradients)
+            ):
                 iteration = trainer.current_epoch * (batch + 1)
-                # Probability decay
                 if random.random() < 1 / (1 + Config().algorithm.beta * iteration):
-                    # Risk evaluation
                     risk = compute_risk(trainer.model)
-                    # Perturb
-                    from defense.Outpost.perturb import noise
+                    from defense.Outpost.perturb import noise as outpost_noise
 
-                    list_grad = noise(dy_dx=list_grad, risk=risk)
+                    working_gradients = cast(
+                        GradientsLike, outpost_noise(dy_dx=working_gradients, risk=risk)
+                    )
 
-            # cast grad back to tuple type
-            grad = tuple([g.to(trainer.device) for g in list_grad])
+        gradient_updates: GradientList | None = None
+        if isinstance(working_gradients, list) and all(
+            isinstance(item, torch.Tensor) for item in working_gradients
+        ):
+            gradient_updates = [
+                tensor.to(trainer.device) for tensor in working_gradients
+            ]
 
         # Update model weights with gradients and learning rate
-        if grad is not None:
-            for param, grad_part in zip(trainer.model.parameters(), grad):
+        if gradient_updates is not None:
+            for param, grad_part in zip(trainer.model.parameters(), gradient_updates):
                 param.data = (
                     param.data
                     - Config().parameters.optimizer.lr * grad_part.to(trainer.device)
                 )
 
             # Sum up the gradients for each local update
-            try:
+            if self.target_grad is None:
+                self.target_grad = [g.detach().clone() for g in gradient_updates]
+            else:
                 self.target_grad = [
-                    sum(x)
-                    for x in zip(
-                        list(_.detach().clone() for _ in grad), self.target_grad
-                    )
+                    existing + new.detach().clone()
+                    for existing, new in zip(self.target_grad, gradient_updates)
                 ]
-            except:
-                self.target_grad = list(_.detach().clone() for _ in grad)
 
-    def on_train_run_end(self, trainer, config, **kwargs):
+    def on_train_run_end(self, trainer, config, **kwargs) -> None:
         """Method called at the end of a training run."""
         if (
             hasattr(Config().algorithm, "share_gradients")
             and Config().algorithm.share_gradients
+            and self.target_grad is not None
         ):
-            try:
-                total_local_steps = config["epochs"] * math.ceil(
-                    Config().data.partition_size / config["batch_size"]
-                )
-                self.target_grad = [
-                    grad / total_local_steps for grad in self.target_grad
-                ]
-            except:
-                self.target_grad = None
+            total_local_steps = config["epochs"] * math.ceil(
+                Config().data.partition_size / config["batch_size"]
+            )
+            self.target_grad = [grad / total_local_steps for grad in self.target_grad]
 
         if self.full_examples is not None:
             self.full_examples = self.full_examples.detach()
@@ -434,6 +503,7 @@ class Trainer(ComposableTrainer):
         if (
             hasattr(Config().algorithm, "init_params")
             and Config().algorithm.init_params
+            and self.model is not None
         ):
             self.model.apply(weights_init)
 

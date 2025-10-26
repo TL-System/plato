@@ -216,7 +216,9 @@ def example_4_custom_strategy():
         def compute_loss(self, outputs, labels, context):
             """Compute weighted cross-entropy loss + L2 regularization."""
             if self._criterion is None:
-                raise RuntimeError("Loss criterion is not initialized. Call setup first.")
+                raise RuntimeError(
+                    "Loss criterion is not initialized. Call setup first."
+                )
             # Base cross-entropy loss with class weights
             ce_loss = self._criterion(outputs, labels)
 

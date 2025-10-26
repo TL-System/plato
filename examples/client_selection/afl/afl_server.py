@@ -13,10 +13,10 @@ https://arxiv.org/pdf/1909.12641.pdf
 
 from __future__ import annotations
 
+from afl_selection_strategy import AFLSelectionStrategy
+
 from plato.config import Config
 from plato.servers import fedavg
-
-from afl_selection_strategy import AFLSelectionStrategy
 
 
 class Server(fedavg.Server):

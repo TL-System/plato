@@ -25,6 +25,7 @@ import os
 import shutil
 from collections import OrderedDict
 from copy import deepcopy
+from typing import Any, Optional, cast
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -45,6 +46,7 @@ from utils.helpers import cross_entropy_for_onehot
 from utils.helpers import total_variation as TV
 from utils.modules import PatchedModule
 
+from plato.algorithms.base import Algorithm as BaseAlgorithm
 from plato.config import Config
 from plato.servers import fedavg
 from plato.utils import csv_processor
@@ -118,27 +120,49 @@ class Server(fedavg.Server):
         # Save trail 1 as the best as default when results are all bad
         self.best_trial = 1
         self.iter = 0
-        self.labels_ = None
+        self.labels_: torch.Tensor | None = None
 
-        self.gt_data = None
-        self.gt_labels = None
-        self.target_grad = None
-        self.target_weights = None
+        self.gt_data: torch.Tensor | None = None
+        self.gt_labels: torch.Tensor | None = None
+        self.target_grad: list[torch.Tensor] | None = None
+        self.target_weights: list[torch.Tensor] | None = None
         # Assume the reconstructed data shape is known, which can be also derived from the target dataset
         self.num_images = partition_size
-        self.dm = None
-        self.ds = None
+        self.dm: torch.Tensor | None = None
+        self.ds: torch.Tensor | None = None
 
         # Fishing attack related
         self.target_cls = 0
-        self.target_indx = None
+        self.target_indx: np.ndarray | None = None
         self.single_gradient_recovered = False
         self.feature_within_tolerance = False
-        self.all_feature_val = []
-        self.feature_loc = None
-        self.start_round = None
+        self.all_feature_val: list[float] = []
+        self.feature_loc: int | None = None
+        self.start_round: int | None = None
         self.rec_round = 0
-        self.modified_model_states = None
+        self.modified_model_states: OrderedDict[str, torch.Tensor] | None = None
+
+    def _require_trainer(self) -> Any:
+        """Ensure a trainer instance is available."""
+        trainer = self.trainer
+        if trainer is None:
+            raise ValueError("Trainer is not configured for the server.")
+        return trainer
+
+    def _require_algorithm(self) -> BaseAlgorithm:
+        """Ensure an algorithm instance is available."""
+        algorithm = self.algorithm
+        if algorithm is None:
+            raise ValueError("Algorithm is not configured for the server.")
+        return algorithm
+
+    def _require_model(self) -> torch.nn.Module:
+        """Ensure the trainer has an attached model."""
+        trainer = self._require_trainer()
+        model = getattr(trainer, "model", None)
+        if model is None:
+            raise ValueError("Trainer model is not configured.")
+        return cast(torch.nn.Module, model)
 
     def weights_received(self, weights_received):
         """
@@ -159,9 +183,11 @@ class Server(fedavg.Server):
         # Extract the total number of samples
         self.total_samples = sum([update.report.num_samples for update in updates])
 
+        trainer = self._require_trainer()
+
         # Perform weighted averaging
         avg_update = {
-            name: self.trainer.zeros(weights.shape)
+            name: trainer.zeros(weights.shape)
             for name, weights in deltas_received[0].items()
         }
 
@@ -209,16 +235,18 @@ class Server(fedavg.Server):
             and Config().algorithm.fishing
             and self.current_round > self.start_round
         ):
-            self.algorithm.load_weights(self.modified_model_states)
-            payload = self.algorithm.extract_weights()
+            algorithm = self._require_algorithm()
+            algorithm.load_weights(self.modified_model_states)
+            payload = algorithm.extract_weights()
         return payload
 
     def _deep_leakage_from_gradients(self, weights_received):
         """Analyze periodic gradients from certain clients."""
         # Process data from the victim client
         # The ground truth should be used only for evaluation
-        baseline_weights = self.algorithm.extract_weights()
-        deltas_received = self.algorithm.compute_weight_deltas(
+        algorithm = self._require_algorithm()
+        baseline_weights = algorithm.extract_weights()
+        deltas_received = algorithm.compute_weight_deltas(
             baseline_weights, weights_received
         )
         update = self.updates[Config().algorithm.victim_client]
@@ -279,9 +307,8 @@ class Server(fedavg.Server):
             else:
                 self.target_weights = update.payload[0]
             # ignore running statistics in state_dict()
-            states_to_save = []
-            for name, _ in self.trainer.model.named_parameters():
-                states_to_save.append(name)
+            model = self._require_model()
+            states_to_save = [name for name, _ in model.named_parameters()]
             states_to_remove = []
             for name in self.target_weights.keys():
                 if name not in states_to_save:
@@ -350,6 +377,8 @@ class Server(fedavg.Server):
 
         trial_result_path = f"{dlg_result_path}/t{trial_number + 1}"
         trial_csv_file = f"{trial_result_path}/evals.csv"
+
+        model_ref = self._require_model()
 
         # Initialize the csv file
         csv_processor.initialize_csv(
@@ -487,7 +516,7 @@ class Server(fedavg.Server):
 
         # Conduct gradients/weights/updates matching
         if not self.share_gradients and self.match_weights:
-            model = deepcopy(self.trainer.model.to(Config().device()))
+            model = deepcopy(model_ref.to(Config().device()))
             closure = self._weight_closure(
                 match_optimizer, dummy_data, labels_, target_weights, model
             )
@@ -521,7 +550,7 @@ class Server(fedavg.Server):
                         dummy_data,
                         gt_data,
                         num_images,
-                        self.trainer.model.to(Config().device()),
+                        model_ref.to(Config().device()),
                         ds,
                     )
                     avg_data_mses.append(eval_dict["avg_data_mses"])
@@ -627,29 +656,30 @@ class Server(fedavg.Server):
 
         def closure():
             match_optimizer.zero_grad()
-            self.trainer.model.to(Config().device())
+            model = self._require_model().to(Config().device())
             # Set model mode for dummy data optimization
             if (
                 hasattr(Config().algorithm, "dummy_eval")
                 and Config().algorithm.dummy_eval
             ):
-                self.trainer.model.eval()
+                model.eval()
             else:
-                self.trainer.model.train()
-            self.trainer.model.zero_grad()
+                model.train()
+            model.zero_grad()
 
-            dummy_pred = self.trainer.model(dummy_data)
+            dummy_pred = model(dummy_data)
 
-            if self.attack_method == "DLG":
+            attack_method = self.attack_method or ""
+            if attack_method == "DLG":
                 dummy_onehot_label = F.softmax(labels, dim=-1)
                 dummy_loss = cross_entropy_for_onehot(dummy_pred, dummy_onehot_label)
-            elif self.attack_method in "iDLG":
+            elif attack_method == "iDLG":
                 dummy_loss = cross_entropy(dummy_pred, labels)
-            elif self.attack_method in "csDLG":
+            elif attack_method == "csDLG":
                 dummy_loss = cross_entropy(dummy_pred, torch.argmax(labels, dim=-1))
 
             dummy_grad = torch.autograd.grad(
-                dummy_loss, self.trainer.model.parameters(), create_graph=True
+                dummy_loss, model.parameters(), create_graph=True
             )
 
             rec_loss = self._reconstruction_costs([dummy_grad], target_grad)
@@ -659,7 +689,7 @@ class Server(fedavg.Server):
             ):
                 rec_loss += Config().algorithm.total_variation * TV(dummy_data)
             rec_loss.backward()
-            if self.attack_method == "csDLG":
+            if attack_method == "csDLG":
                 if (
                     hasattr(Config().algorithm, "signed")
                     and Config().algorithm.signed == "soft"
@@ -745,6 +775,9 @@ class Server(fedavg.Server):
 
     def fishing_attack(self, target_grad, target_weights, gt_labels):
         """The fishing attack (https://github.com/JonasGeiping/breaching)."""
+        model = self._require_model()
+        algorithm = self._require_algorithm()
+
         if self.current_round == self.start_round:
             # Query the labels
             t_labels = torch.argmax(gt_labels, dim=-1).detach().cpu().numpy()
@@ -760,32 +793,39 @@ class Server(fedavg.Server):
 
             # Plot the images of the target class too for fishing attack
             if hasattr(Config().algorithm, "fishing") and Config().algorithm.fishing:
-                for i in self.target_indx:
-                    gt_target_cls = self.gt_data[i].unsqueeze(0)
-                    gt_cls_path = f"{dlg_result_path}/gt_target_cls_{self.target_cls}_indx_{i}.pdf"
-                    self._make_plot(
-                        1,
-                        gt_target_cls,
-                        gt_cls_path,
-                        self.dm,
-                        self.ds,
-                    )
+                target_index_preview = self.target_indx
+                if self.gt_data is not None and target_index_preview is not None:
+                    for i in target_index_preview:
+                        gt_target_cls = self.gt_data[i].unsqueeze(0)
+                        gt_cls_path = f"{dlg_result_path}/gt_target_cls_{self.target_cls}_indx_{i}.pdf"
+                        self._make_plot(
+                            1,
+                            gt_target_cls,
+                            gt_cls_path,
+                            self.dm,
+                            self.ds,
+                        )
 
-        if self.current_round == self.start_round and len(self.target_indx) == 1:
+        target_index = self.target_indx
+        if target_index is None or target_index.size == 0:
+            return
+        if self.gt_data is None or self.labels_ is None:
+            return
+        if self.current_round == self.start_round and len(target_index) == 1:
             # simple cls attack if there is no cls collision
             logging.info("Attacking label %d with cls attack.", self.labels_.item())
 
             # modify the parameters first
             self.modified_model_states = reconfigure_for_class_attack(
-                self.trainer.model, target_classes=self.target_cls
+                model, target_classes=self.target_cls
             )
 
             # Only target one data
             self.num_images = 1
-            self.gt_labels = gt_labels[self.target_indx[0]].unsqueeze(0)
+            self.gt_labels = gt_labels[target_index[0]].unsqueeze(0)
             self.rec_round = self.current_round + 1
 
-        elif len(self.target_indx) > 1:
+        elif len(target_index) > 1:
             # send several queries because of cls collision
             if self.current_round == self.start_round:
                 logging.info(
@@ -798,7 +838,7 @@ class Server(fedavg.Server):
 
                 # find the starting point and the feature entry gives the max avg value
                 self.modified_model_states = reconfigure_for_class_attack(
-                    self.trainer.model, target_classes=self.target_cls
+                    model, target_classes=self.target_cls
                 )
             else:
                 # binary attack to recover all single gradients
@@ -824,23 +864,21 @@ class Server(fedavg.Server):
                     else:
                         target = target_grad
                     curr_grad = list(target)
-                    curr_grad[-1] = curr_grad[-1] * len(self.target_indx)
+                    curr_grad[-1] = curr_grad[-1] * len(target_index)
                     curr_grad[:-1] = [
-                        grad_ii
-                        * len(self.target_indx)
-                        / Config().algorithm.feat_multiplier
+                        grad_ii * len(target_index) / Config().algorithm.feat_multiplier
                         for grad_ii in curr_grad[:-1]
                     ]
                     recovered_single_gradients = [curr_grad]
                     # return to the model with multiplier=1, (better with larger multiplier, but not optimizable if it is too large)
                     self.modified_model_states = reconfigure_for_feature_attack(
-                        self.trainer.model,
+                        model,
                         feature_val,
                         self.feature_loc,
                         target_classes=self.target_cls,
                         allow_reset_param_weights=True,
                     )
-                    self.algorithm.load_weights(self.modified_model_states)
+                    algorithm.load_weights(self.modified_model_states)
 
                     # add reversed() because the ith is always more confident than i-1th
                     if not self.share_gradients and self.match_weights:
@@ -854,7 +892,7 @@ class Server(fedavg.Server):
 
                     # Only target one data
                     self.num_images = 1
-                    self.gt_labels = gt_labels[self.target_indx[0]].unsqueeze(0)
+                    self.gt_labels = gt_labels[target_index[0]].unsqueeze(0)
                     self.rec_round = self.current_round
                 else:
                     self.all_feature_val.append(feature_val)
@@ -864,7 +902,7 @@ class Server(fedavg.Server):
                         feature_val,
                     )
                     self.modified_model_states = reconfigure_for_feature_attack(
-                        self.trainer.model,
+                        model,
                         feature_val,
                         self.feature_loc,
                         target_classes=self.target_cls,
@@ -901,10 +939,10 @@ class Server(fedavg.Server):
 
         cost_fn = Config().algorithm.cost_fn
 
-        total_costs = 0
+        total_costs = ex.new_tensor(0.0)
         for trial in dummy:
-            pnorm = [0, 0]
-            costs = 0
+            pnorm = [ex.new_tensor(0.0), ex.new_tensor(0.0)]
+            costs = ex.new_tensor(0.0)
             for i in indices:
                 if cost_fn == "l2":
                     costs += ((trial[i] - target[i]).pow(2)).sum() * weights[i]
@@ -925,7 +963,7 @@ class Server(fedavg.Server):
                         * weights[i]
                     )
             if cost_fn == "sim":
-                costs = 1 + costs / pnorm[0].sqrt() / pnorm[1].sqrt()
+                costs = ex.new_tensor(1.0) + costs / (pnorm[0].sqrt() * pnorm[1].sqrt())
 
             # Accumulate final costs
             total_costs += costs
@@ -939,11 +977,11 @@ class Server(fedavg.Server):
         if not os.path.exists(dlg_result_path):
             os.makedirs(dlg_result_path)
 
-        rows, cols = None, None
-        if hasattr(Config().results, "rows"):
-            rows = Config().results.rows
-        if hasattr(Config().results, "cols"):
-            cols = Config().results.cols
+        rows_attr = getattr(Config().results, "rows", None)
+        cols_attr = getattr(Config().results, "cols", None)
+
+        rows: int | None = int(rows_attr) if rows_attr is not None else None
+        cols: int | None = int(cols_attr) if cols_attr is not None else None
 
         if rows is not None and cols is None:
             cols = math.ceil(num_images / rows)
@@ -956,11 +994,14 @@ class Server(fedavg.Server):
             logging.info("Using default dimensions for images")
             cols = math.ceil(math.sqrt(num_images))
             rows = math.ceil(num_images / cols)
-        elif (rows * cols) < num_images:
+        elif rows is not None and cols is not None and (rows * cols) < num_images:
             logging.info("Row and column provided for plotting images is too small")
             logging.info("Using default dimensions for images")
             cols = math.ceil(math.sqrt(num_images))
             rows = math.ceil(num_images / cols)
+
+        if rows is None or cols is None:
+            raise ValueError("Failed to determine grid dimensions for plotting images.")
 
         scale_factor = rows + cols
         image_height = 16 * rows / scale_factor

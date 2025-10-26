@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from types import SimpleNamespace
+
 import numpy as np
 
 from plato.config import Config

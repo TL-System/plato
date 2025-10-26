@@ -1,15 +1,30 @@
 """
-Dataloader of GradDefense
+Dataloader of GradDefense.
 
 Reference:
 Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning," INFOCOM 2022.
 https://github.com/wangjunxiao/GradDefense
 """
 
+from __future__ import annotations
+
+from typing import Any, Protocol, Sequence, cast
+
 import numpy as np
 from torch.utils.data import Subset
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import Dataset
+
+
+class LabeledDataset(Protocol):
+    """Minimal protocol for datasets with labeled samples."""
+
+    classes: Sequence[Any]
+
+    def __len__(self) -> int: ...
+
+    def __getitem__(self, index: int) -> tuple[Any, Any]: ...
+
 
 DEFAULT_NUM_WORKERS = 8
 ROOTSET_PER_CLASS = 5
@@ -17,10 +32,10 @@ ROOTSET_SIZE = 50
 
 
 def extract_root_set(
-    dataset: Dataset,
+    dataset: LabeledDataset,
     sample_per_class: int = ROOTSET_PER_CLASS,
-    seed: int = None,
-):
+    seed: int | None = None,
+) -> tuple[list[int], dict[int, list[int]]]:
     """Extract root dataset."""
     num_classes = len(dataset.classes)
     class2sample = {i: [] for i in range(num_classes)}
@@ -39,10 +54,10 @@ def extract_root_set(
     return select_indices, class2sample
 
 
-def get_root_set_loader(trainset):
+def get_root_set_loader(trainset: LabeledDataset) -> DataLoader[Any]:
     """Obtain root dataset loader."""
     rootset_indices, __ = extract_root_set(trainset)
-    root_set = Subset(trainset, rootset_indices)
+    root_set = Subset(cast(Dataset[Any], trainset), rootset_indices)
     root_dataloader = DataLoader(
         root_set, batch_size=len(root_set), num_workers=DEFAULT_NUM_WORKERS
     )

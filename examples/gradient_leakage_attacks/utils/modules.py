@@ -12,6 +12,8 @@ https://proceedings.neurips.cc/paper/2020/file/c4ede56bbd98819ae6112b20ac6bf145-
 import warnings
 from collections import OrderedDict
 from functools import partial
+from typing import Callable, Iterator
+from typing import OrderedDict as OrderedDictType
 
 import torch
 import torch.nn.functional as F
@@ -22,31 +24,44 @@ torch.backends.cudnn.benchmark = True
 DEBUG = False
 
 
+ParameterDict = OrderedDictType[str, torch.Tensor]
+
+
 class PatchedModule(torch.nn.Module):
     """Trace a networks and then replace its module calls with functional calls.
 
     This allows for backpropagation w.r.t to weights for "normal" PyTorch networks.
     """
 
-    def __init__(self, net):
+    def __init__(self, net: torch.nn.Module):
         """Init with network."""
         super().__init__()
         self.net = net
-        self.parameters = OrderedDict(net.named_parameters())
+        self._parameters_dict: ParameterDict = OrderedDict(net.named_parameters())
 
-    def forward(self, inputs, parameters=None):
+    @property
+    def parameters(self) -> ParameterDict:
+        """External parameters tracked for patched updates."""
+        return self._parameters_dict
+
+    @parameters.setter
+    def parameters(self, value: ParameterDict) -> None:
+        self._parameters_dict = value
+
+    def forward(
+        self, inputs: torch.Tensor, parameters: ParameterDict | None = None
+    ) -> torch.Tensor:
         """Live Patch ... :> ..."""
         # If no parameter dictionary is given, everything is normal
         if parameters is None:
-            try:
-                out, _ = self.net(inputs)
-            except:
-                out = self.net(inputs)
+            out = self.net(inputs)
+            if isinstance(out, tuple):
+                out = out[0]
             return out
 
         # But if not ...
-        param_gen = iter(parameters.values())
-        method_pile = []
+        param_gen: Iterator[torch.Tensor] = iter(parameters.values())
+        method_pile: list[Callable[..., torch.Tensor]] = []
 
         for _, module in self.net.named_modules():
             if isinstance(module, torch.nn.Conv2d):
@@ -115,14 +130,13 @@ class PatchedModule(torch.nn.Module):
                         f"Patching for module {module.__class__} is not implemented."
                     )
 
-        try:
-            output, _ = self.net(inputs)
-        except:
-            output = self.net(inputs)
+        output = self.net(inputs)
+        if isinstance(output, tuple):
+            output = output[0]
 
         # Undo Patch
         for _, module in self.net.named_modules():
-            if isinstance(module, torch.nn.modules.conv.Conv2d):
+            if isinstance(module, torch.nn.Conv2d):
                 module.forward = method_pile.pop(0)
             elif isinstance(module, torch.nn.BatchNorm2d):
                 module.forward = method_pile.pop(0)

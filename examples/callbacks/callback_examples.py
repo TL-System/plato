@@ -6,6 +6,14 @@ from plato.callbacks.client import ClientCallback
 from plato.callbacks.server import ServerCallback
 from plato.callbacks.trainer import TrainerCallback
 
+__all__ = [
+    "argumentClientCallback",
+    "dynamicClientCallback",
+    "argumentServerCallback",
+    "dynamicServerCallback",
+    "customTrainerCallback",
+]
+
 
 class argumentClientCallback(ClientCallback):
     def on_inbound_received(self, client, inbound_processor):

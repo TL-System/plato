@@ -1,10 +1,12 @@
 """
-Sensitivity computation of GradDefense
+Sensitivity computation of GradDefense.
 
 Reference:
 Wang et al., "Protect Privacy from Gradient Leakage Attack in Federated Learning," INFOCOM 2022.
 https://github.com/wangjunxiao/GradDefense
 """
+
+from __future__ import annotations
 
 import torch
 import torch.nn as nn
@@ -13,10 +15,10 @@ from torch.utils.data.dataloader import DataLoader
 
 def compute_sens(
     model: nn.Module,
-    rootset_loader: DataLoader,
+    rootset_loader: DataLoader[tuple[torch.Tensor, torch.Tensor]],
     device: torch.device,
-    loss_fn=nn.CrossEntropyLoss(),
-):
+    loss_fn: nn.Module | None = None,
+) -> list[float]:
     """Compute sensitivity."""
     x, y = next(iter(rootset_loader))
 
@@ -24,11 +26,13 @@ def compute_sens(
     y = y.to(device)
     model = model.to(device)
 
+    if loss_fn is None:
+        loss_fn = nn.CrossEntropyLoss()
+
     # Compute prediction and loss
-    try:
-        pred, _ = model(x)
-    except:
-        pred = model(x)
+    pred = model(x)
+    if isinstance(pred, tuple):
+        pred = pred[0]
 
     loss = loss_fn(pred, y)
     # Backward propagation
@@ -49,11 +53,11 @@ def compute_sens(
 
     sensitivity = []
     for layer_vjp in vector_jacobian_products:
-        f_norm_sum = 0
+        sum_norms = torch.zeros((), device=layer_vjp.device)
         for sample_vjp in layer_vjp:
             # Sample-wise Frobenius norm
-            f_norm_sum += torch.norm(sample_vjp)
-        f_norm = f_norm_sum / len(layer_vjp)
-        sensitivity.append(f_norm.cpu().numpy())
+            sum_norms = sum_norms + torch.norm(sample_vjp)
+        f_norm = sum_norms / layer_vjp.shape[0]
+        sensitivity.append(float(f_norm.detach().cpu()))
 
     return sensitivity
