@@ -2,7 +2,7 @@
 # Usage: bash evaluate_model.sh <model_path> [optional: max_per_task]
 # Comment: This script evaluates a HuggingFace-based language model using the NanoChat benchmark infrastructure.
 # model_path: Path to the HuggingFace model to evaluate.
-# max_per_task: (Optional) Maximum number of examples to evaluate per task.
+# max_per_task: (Optional) Maximum number of examples to evaluate per task, default setting to 16.
 
 export NANOCHAT_BASE_DIR="$PWD/.cache/nanochat"
 mkdir -p $NANOCHAT_BASE_DIR
