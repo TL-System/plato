@@ -4,3 +4,6 @@
 [submodule "plato/models/t2tvit"]
 	path = plato/models/t2tvit
 	url = https://github.com/yitu-opensource/T2T-ViT
+[submodule "external/nanochat"]
+	path = external/nanochat
+	url = https://github.com/karpathy/nanochat.git

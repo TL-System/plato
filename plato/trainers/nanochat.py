@@ -249,7 +249,8 @@ class Trainer(ComposableTrainer):
             ensure_nanochat_importable()
         except ThirdPartyImportError as exc:  # pragma: no cover - defensive branch
             raise ImportError(
-                "Nanochat trainer requires the vendored runtime/third_party/nanochat project."
+                "Nanochat trainer requires the external/nanochat submodule. "
+                "Run `git submodule update --init --recursive`."
             ) from exc
 
         optimizer_strategy = NanochatOptimizerStrategy(

@@ -8,7 +8,7 @@ This workspace hosts Nanochat-focused experiments within Plato.
 
    ```bash
    uv sync --extra nanochat
-   uv run --with ./runtime/third_party/nanochat maturin develop --release
+   uv run --with ./external/nanochat maturin develop --release
    ```
 
 2. Run the synthetic smoke configuration:
