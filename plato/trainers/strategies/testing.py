@@ -7,6 +7,7 @@ for the composable trainer architecture.
 
 import logging
 import os
+from typing import Any
 
 import torch
 
@@ -97,3 +98,34 @@ class DefaultTestingStrategy(TestingStrategy):
             )
 
         return accuracy
+
+    def eval_model(
+        self,
+        model,
+        config,
+        benchmark,
+        sampler,
+        context
+    ) -> dict[str, Any]:
+        """
+        Evaluate the model on benchmark and return results.
+
+        Args:
+            model: The model to test
+            config: Testing configuration dictionary
+            benchmark: Benchmark instance for evaluation
+            sampler: Optional data sampler for test set
+            context: Training context with device, client_id, etc.
+
+        Returns:
+            Benchmark results dictionary
+
+        Note:
+            DefaultTestingStrategy does not implement benchmark evaluation.
+            Use a specialized testing strategy (e.g., LLMSplitLearningTestingStrategy)
+            for benchmark support.
+        """
+        raise NotImplementedError(
+            "DefaultTestingStrategy does not support benchmark evaluation. "
+            "Please implement a custom TestingStrategy with eval_model() for your use case."
+        )
