@@ -7,8 +7,8 @@ an adapter that conforms to Plato's processor interface.
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
 import pickle
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -111,7 +111,9 @@ class NanochatTokenizerProcessor(Processor):
             encode_single_token = self._encoding.encode_single_token
             special_token_set = getattr(self._encoding, "special_tokens_set", set())
         except AttributeError as exc:
-            raise RuntimeError("tiktoken encoding missing expected interfaces.") from exc
+            raise RuntimeError(
+                "tiktoken encoding missing expected interfaces."
+            ) from exc
 
         mapping = {}
         for token in SPECIAL_TOKENS:

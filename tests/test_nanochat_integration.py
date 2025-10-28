@@ -9,7 +9,6 @@ import pytest
 
 from plato.config import Config, ConfigNode
 
-
 pytestmark = pytest.mark.integration
 
 _RUSTBPE_AVAILABLE = importlib.util.find_spec("rustbpe") is not None
@@ -91,9 +90,7 @@ def test_nanochat_trainer_smoke(temp_config, tmp_path):
     assert elapsed >= 0.0
 
     model_dir = Config().params["model_path"]
-    checkpoint_name = (
-        f"{cfg.trainer.model_name}_{trainer.client_id}_{Config().params['run_id']}.safetensors"
-    )
+    checkpoint_name = f"{cfg.trainer.model_name}_{trainer.client_id}_{Config().params['run_id']}.safetensors"
     assert os.path.exists(os.path.join(model_dir, checkpoint_name))
 
 
@@ -105,6 +102,8 @@ def test_nanochat_trainer_selects_core_eval_strategy(temp_config, monkeypatch):
     from plato.models.nanochat import Model as NanochatModel
     from plato.trainers.nanochat import (
         NanochatCoreTestingStrategy,
+    )
+    from plato.trainers.nanochat import (
         Trainer as NanochatTrainer,
     )
 

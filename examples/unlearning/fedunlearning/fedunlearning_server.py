@@ -43,9 +43,7 @@ class RetrainingAwareAggregationStrategy(FedAvgAggregationStrategy):
 
         if not filtered_pairs:
             if self._fallback_to_original:
-                return await super().aggregate_deltas(
-                    updates, deltas_received, context
-                )
+                return await super().aggregate_deltas(updates, deltas_received, context)
 
             zero_delta = self._zero_delta(
                 context, deltas_received[0] if deltas_received else None

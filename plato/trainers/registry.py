@@ -10,8 +10,10 @@ from plato.trainers import (
     basic,
     composable,
     gan,
-    nanochat as nanochat_trainer,
     split_learning,
+)
+from plato.trainers import (
+    nanochat as nanochat_trainer,
 )
 
 registered_trainers = {
