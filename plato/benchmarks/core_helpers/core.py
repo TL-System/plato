@@ -154,13 +154,13 @@ def forward_model(model, input_ids):
     """
     batch_size, seq_len = input_ids.size()
     outputs = model(input_ids)
-    
+
     # Extract logits from model output (handles both raw tensors and HuggingFace output objects)
-    if hasattr(outputs, 'logits'):
+    if hasattr(outputs, "logits"):
         logits = outputs.logits
     else:
         logits = outputs
-    
+
     # Roll the tensor to the left by one position to get the (autoregressive) target ids
     target_ids = torch.roll(input_ids, shifts=-1, dims=1)
     # Calculate cross entropy at all positions

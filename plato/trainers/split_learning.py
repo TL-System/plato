@@ -215,7 +215,10 @@ class SplitLearningTestingStrategy(TestingStrategy):
         return accuracy
 
     def eval_model(self, model, config, benchmark, sampler, context):
-        raise NotImplementedError("eval_model is not implemented yet for SplitLearningTestingStrategy.")
+        raise NotImplementedError(
+            "eval_model is not implemented yet for SplitLearningTestingStrategy."
+        )
+
 
 # pylint:disable=too-many-instance-attributes
 class Trainer(ComposableTrainer):

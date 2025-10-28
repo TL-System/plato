@@ -256,15 +256,23 @@ class Server(base.Server):
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
         # Evaluating the global model on the specified benchmark
-        if hasattr(Config().config, "benchmark") and hasattr(Config().benchmark, "type"):
+        if hasattr(Config().config, "benchmark") and hasattr(
+            Config().benchmark, "type"
+        ):
             benchmark_type = Config().benchmark.type
             if self.benchmark is None:
                 self.benchmark = benchmarks_registry.get(benchmark_type)
-            logging.info("[%s] Started model evaluation on benchmark %s.", self, benchmark_type)
+            logging.info(
+                "[%s] Started model evaluation on benchmark %s.", self, benchmark_type
+            )
             trainer = self.require_trainer()
             self.benchmark_result = trainer.eval(self.benchmark, self.testset_sampler)
-            logging.info("[%s] Model evaluation result on benchmark %s:\n%s.", self, benchmark_type, self.benchmark.get_formatted_result(self.benchmark_result))
-
+            logging.info(
+                "[%s] Model evaluation result on benchmark %s:\n%s.",
+                self,
+                benchmark_type,
+                self.benchmark.get_formatted_result(self.benchmark_result),
+            )
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info(

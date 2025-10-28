@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 import requests
 import contextlib, time
 
+
 class Benchmark(ABC):
     """Base class for model benchmarks."""
 
@@ -23,24 +24,24 @@ class Benchmark(ABC):
         Initialize the benchmark.
         """
         super().__init__()
-    
+
     @abstractmethod
     def evaluate(self) -> dict[str, Any]:
         """
         Evaluate the model on benchmark tasks.
 
         evaluate() returns evaluation results.
-        
+
         Returns:
             Dictionary of evaluation metrics
-            
+
         Example:
             >>> results = benchmark.evaluate()
-            >>> print(results)  
+            >>> print(results)
             {'task1_accuracy': 0.85, 'overall': 0.875}
         """
         pass
-    
+
     @abstractmethod
     def get_formatted_result(self) -> str:
         pass

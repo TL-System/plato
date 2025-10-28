@@ -346,7 +346,7 @@ class Config:
             # User specific benchmark
             if hasattr(config, "benchmark"):
                 Config.benchmark = config.benchmark
-                
+
                 # Directory of benchmark dataset
                 if hasattr(Config().benchmark, "data_path"):
                     Config.params["benchmark_path"] = os.path.join(
@@ -416,7 +416,7 @@ class Config:
 
             if hasattr(config, "parameters"):
                 Config.parameters = config.parameters
-            
+
             # Benchmark configuration (for model evaluation)
             if hasattr(config, "benchmark"):
                 Config.benchmark = config.benchmark

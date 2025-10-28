@@ -161,15 +161,8 @@ class LLMSplitLearningTestingStrategy(TestingStrategy):
         # Save other metric information such as accuracy
         tester.log_metrics("eval", metrics)
         return metrics["eval_accuracy"]
-    
-    def eval_model( 
-        self,
-        model,
-        config,
-        benchmark,
-        sampler,
-        context
-    ):
+
+    def eval_model(self, model, config, benchmark, sampler, context):
         """
         Evaluate the model using the benchmark specified in the configuration.
 
@@ -194,17 +187,16 @@ class LLMSplitLearningTestingStrategy(TestingStrategy):
 
         # Get base model if available
         base_model = model.base_model if hasattr(model, "base_model") else model
-        
+
         # Set model to eval mode and move to device
         base_model.to(context.device)
         base_model.eval()
 
-    
-        if hasattr(benchmark, 'model'):
+        if hasattr(benchmark, "model"):
             benchmark.model = base_model
-        if hasattr(benchmark, 'device'):
+        if hasattr(benchmark, "device"):
             benchmark.device = context.device
-        if hasattr(benchmark, 'tokenizer') and self.tokenizer is not None:
+        if hasattr(benchmark, "tokenizer") and self.tokenizer is not None:
             benchmark.tokenizer = self.tokenizer
 
         # Use benchmark's evaluate method to get results
@@ -212,6 +204,7 @@ class LLMSplitLearningTestingStrategy(TestingStrategy):
         results = benchmark.evaluate()
 
         return results
+
 
 # ============================================================================
 # Custom Callbacks for LLM Split Learning

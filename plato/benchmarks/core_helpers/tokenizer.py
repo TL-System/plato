@@ -167,7 +167,7 @@ class HuggingFaceTokenizer:
 class UniversalHuggingFaceTokenizer:
     """
     Universal wrapper that provides a consistent interface for any HuggingFace tokenizer.
-    
+
     This wrapper automatically detects special tokens (BOS, PAD, EOS) and provides
     utility methods that work across different tokenizer implementations.
     """
@@ -175,7 +175,7 @@ class UniversalHuggingFaceTokenizer:
     def __init__(self, tokenizer):
         """
         Initialize the wrapper with a HuggingFace tokenizer.
-        
+
         Args:
             tokenizer: A HuggingFace tokenizer instance (e.g., GPT2TokenizerFast)
         """
@@ -188,7 +188,7 @@ class UniversalHuggingFaceTokenizer:
     def _detect_special_tokens(self):
         """
         Auto-detect special token IDs from the tokenizer.
-        
+
         Detection strategy (in order of priority):
         1. Try direct attributes on the tokenizer (bos_token_id, pad_token_id, eos_token_id)
         2. For missing tokens, use EOS as BOS/PAD for models like GPT-2
@@ -196,13 +196,22 @@ class UniversalHuggingFaceTokenizer:
         4. Final fallbacks: 0 for pad, pad for bos
         """
         # Strategy 1: Direct attributes (works for most HuggingFace tokenizers)
-        if hasattr(self.tokenizer, 'bos_token_id') and self.tokenizer.bos_token_id is not None:
+        if (
+            hasattr(self.tokenizer, "bos_token_id")
+            and self.tokenizer.bos_token_id is not None
+        ):
             self._bos_token_id = self.tokenizer.bos_token_id
-        
-        if hasattr(self.tokenizer, 'pad_token_id') and self.tokenizer.pad_token_id is not None:
+
+        if (
+            hasattr(self.tokenizer, "pad_token_id")
+            and self.tokenizer.pad_token_id is not None
+        ):
             self._pad_token_id = self.tokenizer.pad_token_id
-        
-        if hasattr(self.tokenizer, 'eos_token_id') and self.tokenizer.eos_token_id is not None:
+
+        if (
+            hasattr(self.tokenizer, "eos_token_id")
+            and self.tokenizer.eos_token_id is not None
+        ):
             self._eos_token_id = self.tokenizer.eos_token_id
             # For GPT-2 and similar models, BOS is often the same as EOS
             if self._bos_token_id is None:
@@ -210,18 +219,22 @@ class UniversalHuggingFaceTokenizer:
             # Use EOS as pad if no pad token exists
             if self._pad_token_id is None:
                 self._pad_token_id = self._eos_token_id
-        
+
         # Strategy 2: Try token_to_id method for tokenizers with nested structure
         if hasattr(self.tokenizer, "tokenizer"):
             tokenizer_obj = self.tokenizer.tokenizer
 
             if self._pad_token_id is None:
                 pad_candidates = ["<pad>", "[PAD]", "<|pad|>", "</s>", "<|endoftext|>"]
-                self._pad_token_id = self._try_token_candidates(tokenizer_obj, pad_candidates)
+                self._pad_token_id = self._try_token_candidates(
+                    tokenizer_obj, pad_candidates
+                )
 
             if self._bos_token_id is None:
                 bos_candidates = ["<s>", "[CLS]", "<|startoftext|>", "<|endoftext|>"]
-                self._bos_token_id = self._try_token_candidates(tokenizer_obj, bos_candidates)
+                self._bos_token_id = self._try_token_candidates(
+                    tokenizer_obj, bos_candidates
+                )
 
         # Strategy 3: Final fallbacks
         if self._pad_token_id is None:
@@ -233,17 +246,17 @@ class UniversalHuggingFaceTokenizer:
     def _try_token_candidates(self, tokenizer_obj, candidates):
         """
         Try to find a token ID from a list of candidate token strings.
-        
+
         Args:
             tokenizer_obj: The tokenizer object with token_to_id method
             candidates: List of token strings to try
-            
+
         Returns:
             Token ID if found, None otherwise
         """
         if not hasattr(tokenizer_obj, "token_to_id"):
             return None
-            
+
         for candidate in candidates:
             token_id = tokenizer_obj.token_to_id(candidate)
             if token_id is not None:
@@ -257,7 +270,7 @@ class UniversalHuggingFaceTokenizer:
     def get_pad_token_id(self):
         """Get the padding token ID."""
         return self._pad_token_id
-    
+
     def get_eos_token_id(self):
         """Get the end-of-sequence token ID."""
         return self._eos_token_id
@@ -265,11 +278,11 @@ class UniversalHuggingFaceTokenizer:
     def __call__(self, prompts, prepend=None):
         """
         Tokenize prompts with optional prepended token.
-        
+
         Args:
             prompts: Single string or list of strings to tokenize
             prepend: Optional token ID to prepend to each sequence
-            
+
         Returns:
             List of token IDs, or list of lists if multiple prompts
         """

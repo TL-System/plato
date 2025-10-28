@@ -99,14 +99,7 @@ class DefaultTestingStrategy(TestingStrategy):
 
         return accuracy
 
-    def eval_model(
-        self,
-        model,
-        config,
-        benchmark,
-        sampler,
-        context
-    ) -> dict[str, Any]:
+    def eval_model(self, model, config, benchmark, sampler, context) -> dict[str, Any]:
         """
         Evaluate the model on benchmark and return results.
 
