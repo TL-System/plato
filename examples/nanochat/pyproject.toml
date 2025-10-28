@@ -1,0 +1,7 @@
+[project]
+name = "plato-nanochat-examples"
+version = "0.1.0"
+description = "Nanochat integration examples for Plato."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
