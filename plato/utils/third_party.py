@@ -15,12 +15,12 @@ class ThirdPartyImportError(ImportError):
 
 @lru_cache(maxsize=None)
 def _nanochat_root() -> Path:
-    """Return the root directory of the vendored Nanochat project."""
+    """Return the root directory of the Nanochat submodule."""
     repo_root = Path(__file__).resolve().parents[2]
-    nanochat_root = repo_root / "runtime" / "third_party" / "nanochat"
+    nanochat_root = repo_root / "external" / "nanochat"
     if not nanochat_root.exists():
         raise ThirdPartyImportError(
-            "Nanochat is not vendored under runtime/third_party/nanochat."
+            "Nanochat submodule missing. Run `git submodule update --init --recursive`."
         )
     return nanochat_root
 

@@ -2,22 +2,22 @@
 
 This checklist coordinates the work to incorporate the Nanochat stack into Plato. Owners are placeholder roles until specific engineers are assigned.
 
-## Third-Party Snapshot
+## Third-Party Submodule
 - **Owner:** Infrastructure
-- **Deliverables:** Vendor `runtime/third_party/nanochat` snapshot with commit hash in docs; add provenance blurb to `docs/third_party.md`.
+- **Deliverables:** Maintain the `external/nanochat` git submodule; document update procedure in `docs/third_party.md`.
 - **Dependencies:** None.
 
 ## Model Registry
 - **Owner:** Modeling
 - **Deliverables:** Implement `plato/models/nanochat.py` mirroring Nanochat GPT config, register entry in `plato/models/registry.py`, supply weight-loading utilities.
 - **Status:** In progress – factory module and registry wiring landed.
-- **Dependencies:** Third-party snapshot.
+- **Dependencies:** Third-party submodule.
 
 ## Tokenizer & Processor
 - **Owner:** Infrastructure
 - **Deliverables:** Package Rust BPE via Maturin optional extra; wrap as `plato/processors/nanochat_tokenizer.py` with lazy import and fallbacks; document build steps in README.
 - **Status:** Prototype processor and optional dependency group landed; CI build integration remains TODO.
-- **Dependencies:** Third-party snapshot, build tooling prototype.
+- **Dependencies:** Third-party submodule, build tooling prototype.
 
 ## Datasource
 - **Owner:** Data

@@ -102,8 +102,8 @@ class Model:
             GPT, GPTConfig, _ = _import_nanochat_modules()
         except ThirdPartyImportError as exc:  # pragma: no cover - defensive branch
             raise ImportError(
-                "Nanochat vendor tree not found. "
-                "Ensure runtime/third_party/nanochat is available."
+                "Nanochat submodule not found. "
+                "Run `git submodule update --init --recursive` to populate external/nanochat."
             ) from exc
 
         init_weights = kwargs.pop("init_weights", True)
