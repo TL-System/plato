@@ -3,6 +3,7 @@ Base class for trainers.
 """
 
 import os
+import json
 from abc import ABC, abstractmethod
 from typing import Any, Optional
 
@@ -76,6 +77,39 @@ class Trainer(ABC):
             accuracy = float(file.read())
 
         return accuracy
+
+    @staticmethod
+    def save_benchmark_result(benchmark_result, filename=None):
+        """Saving the benchmark result to a file."""
+        model_path = Config().params["model_path"]
+        model_name = Config().trainer.model_name
+
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
+
+        if filename is not None:
+            benchmark_result_path = f"{model_path}/{filename}"
+        else:
+            benchmark_result_path = f"{model_path}/{model_name}.eval"
+
+        with open(benchmark_result_path, "w", encoding="utf-8") as file:
+            json.dump(benchmark_result, file)
+
+    @staticmethod
+    def load_benchmark_result(filename=None):
+        """Loading the benchmark result from a file."""
+        model_path = Config().params["model_path"]
+        model_name = Config().trainer.model_name
+
+        if filename is not None:
+            benchmark_result_path = f"{model_path}/{filename}"
+        else:
+            benchmark_result_path = f"{model_path}/{model_name}.eval"
+
+        with open(benchmark_result_path, encoding="utf-8") as file:
+            benchmark_result = json.load(file)
+
+        return benchmark_result
 
     def pause_training(self):
         """Remove files of running trainers."""
