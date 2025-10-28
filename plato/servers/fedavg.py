@@ -7,6 +7,7 @@ import logging
 import os
 
 from plato.algorithms import registry as algorithms_registry
+from plato.benchmarks import registry as benchmarks_registry
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
@@ -49,6 +50,8 @@ class Server(base.Server):
         self.testset = None
         self.testset_sampler = None
         self.total_samples = 0
+
+        self.benchmark = None
 
         self.total_clients = Config().clients.total_clients
         self.clients_per_round = Config().clients.per_round
@@ -251,6 +254,17 @@ class Server(base.Server):
             logging.info("[%s] Started model testing.", self)
             trainer = self.require_trainer()
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
+
+        # Evaluating the global model on the specified benchmark
+        if hasattr(Config().config, "benchmark") and hasattr(Config().benchmark, "type"):
+            benchmark_type = Config().benchmark.type
+            if self.benchmark is None:
+                self.benchmark = benchmarks_registry.get(benchmark_type)
+            logging.info("[%s] Started model evaluation on benchmark %s.", self, benchmark_type)
+            trainer = self.require_trainer()
+            self.benchmark_result = trainer.eval(self.benchmark, self.testset_sampler)
+            logging.info("[%s] Model evaluation result on benchmark %s:\n%s.", self, benchmark_type, self.benchmark.get_formatted_result(self.benchmark_result))
+
 
         if hasattr(Config().trainer, "target_perplexity"):
             logging.info(
