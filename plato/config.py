@@ -153,6 +153,7 @@ class Config:
     clients: Any
     server: Any
     data: Any
+    benchmark: Any
     trainer: Any
     algorithm: Any
     results: Any
@@ -342,6 +343,20 @@ class Config:
                     Config.params["base_path"], "data"
                 )
 
+            # User specific benchmark
+            if hasattr(config, "benchmark"):
+                Config.benchmark = config.benchmark
+                
+                # Directory of benchmark dataset
+                if hasattr(Config().benchmark, "data_path"):
+                    Config.params["benchmark_path"] = os.path.join(
+                        Config.params["base_path"], Config().benchmark.data_path
+                    )
+                else:
+                    Config.params["benchmark_path"] = os.path.join(
+                        Config.params["base_path"], "benchmark"
+                    )
+
             # Pretrained models
             if hasattr(Config().server, "model_path"):
                 Config.params["model_path"] = os.path.join(
@@ -401,6 +416,10 @@ class Config:
 
             if hasattr(config, "parameters"):
                 Config.parameters = config.parameters
+            
+            # Benchmark configuration (for model evaluation)
+            if hasattr(config, "benchmark"):
+                Config.benchmark = config.benchmark
 
         return cls._instance
 
