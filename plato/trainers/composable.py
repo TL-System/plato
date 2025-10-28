@@ -793,6 +793,85 @@ class ComposableTrainer(base.Trainer):
 
         return accuracy
 
+    def eval_process(self, config, benchmark, sampler=None, **kwargs):
+        """The evaluating loop, run in a separate process."""
+        self.eval_model(config, benchmark, sampler, **kwargs)
+
+        model_name = Config().trainer.model_name
+        filename = f"{model_name}_{self.client_id}_{config['run_id']}.eval"
+        self.save_benchmark_result(self.benchmark_result, filename)
+
+    def eval(self, benchmark, sampler=None, **kwargs) -> dict[str, Any]:
+        """
+        Evaluate the model using the provided benchmark.
+
+        Args:
+            benchmark: benchmark instance (from benchmarks.registry.get())
+            sampler: The sampler for the test dataset
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            Accuracy on benchmark
+        """
+        config = Config().trainer._asdict()
+        config["run_id"] = Config().params["run_id"]
+
+        if "max_concurrency" in config:
+            model = self._require_model()
+            model.cpu()
+
+            if mp.get_start_method(allow_none=True) != "spawn":
+                mp.set_start_method("spawn", force=True)
+
+            eval_proc = mp.Process(
+                target=self.eval_process,
+                args=(config, benchmark, sampler),
+                kwargs=kwargs,
+            )
+            eval_proc.start()
+            eval_proc.join()
+
+            model_name = Config().trainer.model_name
+            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.eval"
+
+            try:
+                benchmark_result = self.load_benchmark_result(filename)
+            except OSError as error:
+                raise ValueError(
+                    f"Evaluating on client {self.client_id} failed."
+                ) from error
+
+            self.pause_training()
+            return benchmark_result
+        else:
+            return self.eval_model(config, benchmark, sampler, **kwargs)
+
+    def eval_model(self, config, benchmark, sampler=None, **kwargs):
+        """
+        Evaluate the model using benchmark.
+
+        Args:
+            config: Evaluation configuration dictionary
+            benchmark: Benchmark instance (from benchmarks.registry.get())
+            sampler: Optional data sampler (usually None for benchmarks)
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            Benchmark results dictionary containing:
+                - 'results': per-task accuracies
+                - 'centered_results': normalized scores
+                - 'core_metric': overall CORE score
+        """
+
+        model = self._require_model()
+        result = self.testing_strategy.eval_model(
+            model, config, benchmark, sampler, self.context
+        )
+
+        self.benchmark_result = result
+
+        return result
+
     def obtain_model_update(self, config, trainset, sampler):
         """
         Obtain model updates from training.
