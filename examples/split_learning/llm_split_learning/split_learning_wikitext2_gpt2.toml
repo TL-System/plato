@@ -40,13 +40,18 @@ random_seed = 1
 # IID, biased, or sharded?
 sampler = "iid"
 
+[benchmark]
+type = "core"       # Benchmark type (from registry)
+max_per_task = 16   # Limit samples per task for faster evaluation
+random_seed = 1
+
 [trainer]
 
 # The type of the trainer
 type = "split_learning"
 
 # The maximum number of training rounds
-rounds = 100000
+rounds = 10
 
 # The machine learning model
 model_type = "huggingface"
