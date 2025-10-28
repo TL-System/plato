@@ -35,7 +35,10 @@ def _resolve_base_dir(base_dir: str | Path | None) -> Path | None:
 def _parquet_available(base_dir: Path | None) -> bool:
     try:
         ensure_nanochat_importable()
-        from nanochat.dataset import list_parquet_files, DATA_DIR  # type: ignore[attr-defined]
+        from nanochat.dataset import (  # type: ignore[attr-defined]
+            DATA_DIR,
+            list_parquet_files,
+        )
     except (ThirdPartyImportError, ImportError):  # pragma: no cover - defensive
         return False
 
@@ -182,9 +185,13 @@ class DataSource(BaseDataSource):  # type: ignore[misc]
         if cfg_data is not None:
             mode = getattr(cfg_data, "mode", mode)
             base_dir = getattr(cfg_data, "base_dir", base_dir)
-            max_train_batches = getattr(cfg_data, "max_train_batches", max_train_batches)
+            max_train_batches = getattr(
+                cfg_data, "max_train_batches", max_train_batches
+            )
             max_val_batches = getattr(cfg_data, "max_val_batches", max_val_batches)
-            tokenizer_threads = getattr(cfg_data, "tokenizer_threads", tokenizer_threads)
+            tokenizer_threads = getattr(
+                cfg_data, "tokenizer_threads", tokenizer_threads
+            )
             tokenizer_batch_size = getattr(
                 cfg_data, "tokenizer_batch_size", tokenizer_batch_size
             )
@@ -208,7 +215,9 @@ class DataSource(BaseDataSource):  # type: ignore[misc]
         resolved_base_dir = _resolve_base_dir(base_dir)
         dataset_mode = mode
         if dataset_mode == "auto":
-            dataset_mode = "parquet" if _parquet_available(resolved_base_dir) else "synthetic"
+            dataset_mode = (
+                "parquet" if _parquet_available(resolved_base_dir) else "synthetic"
+            )
 
         self.trainset = NanochatStreamingDataset(
             split="train",

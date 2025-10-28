@@ -55,7 +55,9 @@ class NanochatDataLoaderStrategy(DataLoaderStrategy):
                 num_workers=0,
                 collate_fn=_first_element_collate,
             )
-        return self._fallback.create_train_loader(trainset, sampler, batch_size, context)
+        return self._fallback.create_train_loader(
+            trainset, sampler, batch_size, context
+        )
 
 
 class NanochatTrainingStepStrategy(TrainingStepStrategy):
@@ -112,7 +114,9 @@ class _OptimizerBundle:
 
     def load_state_dict(self, state_dict: dict[str, Any]) -> None:
         for optimizer, payload in zip(
-            self.optimizers, state_dict.get("optimizers", []), strict=False  # type: ignore[arg-type]
+            self.optimizers,
+            state_dict.get("optimizers", []),
+            strict=False,  # type: ignore[arg-type]
         ):
             optimizer.load_state_dict(payload)
 
@@ -262,7 +266,9 @@ class Trainer(ComposableTrainer):
         data_loader_strategy = NanochatDataLoaderStrategy()
 
         evaluation_cfg = getattr(Config(), "evaluation", None)
-        evaluation_type = getattr(evaluation_cfg, "type", "").lower() if evaluation_cfg else ""
+        evaluation_type = (
+            getattr(evaluation_cfg, "type", "").lower() if evaluation_cfg else ""
+        )
         if evaluation_type == "nanochat_core":
             max_per_task = getattr(evaluation_cfg, "max_per_task", -1)
             max_per_task_value = -1 if max_per_task is None else int(max_per_task)
