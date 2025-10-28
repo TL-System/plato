@@ -554,3 +554,36 @@ class TestingStrategy(Strategy):
             setting eval mode, and computing the metric.
         """
         pass
+
+    @abstractmethod
+    def eval_model(
+        self,
+        model: nn.Module,
+        config: dict[str, Any],
+        benchmark,
+        sampler,
+        context: TrainingContext,
+    ) -> dict[str, Any]:
+        """
+        Evaluate the model on benchmark and return results.
+
+        Args:
+            model: The model to test
+            config: Testing configuration dictionary
+            benchmark: Benchmark instance for evaluation
+            sampler: Optional data sampler for test set
+            context: Training context with device, client_id, etc.
+
+        Returns:
+            Benchmark results dictionary containing evaluation metrics.
+            For CORE benchmark, this includes:
+                - 'results': per-task accuracies
+                - 'centered_results': normalized scores
+                - 'core_metric': overall CORE score
+
+        Note:
+            This method should handle moving model to device,
+            setting eval mode, and computing the benchmark metrics.
+            The specific return format depends on the benchmark type.
+        """
+        pass
