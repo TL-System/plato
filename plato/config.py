@@ -153,6 +153,7 @@ class Config:
     clients: Any
     server: Any
     data: Any
+    evaluation: Any
     trainer: Any
     algorithm: Any
     results: Any
@@ -341,6 +342,10 @@ class Config:
                 Config.params["data_path"] = os.path.join(
                     Config.params["base_path"], "data"
                 )
+
+            # User-defined evaluation configuration
+            if hasattr(config, "evaluation"):
+                Config.evaluation = config.evaluation
 
             # Pretrained models
             if hasattr(Config().server, "model_path"):
