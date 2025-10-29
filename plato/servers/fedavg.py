@@ -273,7 +273,7 @@ class Server(base.Server):
 
     def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
-        return {
+        logged = {
             "round": self.current_round,
             "accuracy": self.accuracy,
             "accuracy_std": self.accuracy_std,
@@ -290,6 +290,22 @@ class Server(base.Server):
             ),
             "comm_overhead": self.comm_overhead,
         }
+
+        # Add train_loss if available from client reports
+        if self.updates and hasattr(self.updates[0].report, "train_loss"):
+            # Compute weighted average of train_loss across clients
+            total_samples = sum(update.report.num_samples for update in self.updates)
+            if total_samples > 0:
+                weighted_loss = sum(
+                    update.report.train_loss * update.report.num_samples
+                    for update in self.updates
+                    if update.report.train_loss is not None
+                )
+                logged["train_loss"] = weighted_loss / total_samples
+            else:
+                logged["train_loss"] = 0.0
+
+        return logged
 
     @staticmethod
     def get_accuracy_mean_std(updates):
