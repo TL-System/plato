@@ -122,8 +122,8 @@ class NanochatStreamingDataset(IterableDataset):
                 dtype=torch.long,
                 generator=generator,
             )
-            inputs = tokens[:, :-1].to(dtype=torch.long)
-            targets = tokens[:, 1:].to(dtype=torch.long)
+            inputs = tokens[:, :-1].contiguous()
+            targets = tokens[:, 1:].contiguous()
             yield inputs, targets
 
     def _parquet_iterable(self) -> Iterable[tuple[torch.Tensor, torch.Tensor]]:
@@ -141,7 +141,10 @@ class NanochatStreamingDataset(IterableDataset):
             device=self.device,
         )
         for inputs, targets in loader:
-            yield inputs.to(dtype=torch.long), targets.to(dtype=torch.long)
+            yield (
+                inputs.to(dtype=torch.long).contiguous(),
+                targets.to(dtype=torch.long).contiguous(),
+            )
 
     def __iter__(self):
         iterable = (
