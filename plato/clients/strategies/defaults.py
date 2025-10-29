@@ -383,6 +383,18 @@ class DefaultTrainingStrategy(TrainingStrategy):
                 except TypeError:
                     num_samples = 0
 
+        # Extract train_loss from trainer's run_history if available
+        train_loss = None
+        if (
+            context.trainer is not None
+            and hasattr(context.trainer, "run_history")
+            and context.trainer.run_history is not None
+        ):
+            try:
+                train_loss = context.trainer.run_history.get_latest_metric("train_loss")
+            except (AttributeError, KeyError, IndexError):
+                train_loss = None
+
         report = SimpleNamespace(
             client_id=context.client_id,
             num_samples=num_samples,
@@ -390,6 +402,7 @@ class DefaultTrainingStrategy(TrainingStrategy):
             training_time=training_time,
             comm_time=time.time(),
             update_response=False,
+            train_loss=train_loss,
         )
 
         return report, weights
