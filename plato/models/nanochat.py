@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from dataclasses import fields
 from typing import Any
+import logging
 
 try:
     import torch
@@ -126,9 +127,47 @@ class Model:
             )
             return model
 
+        # Model vocab_size MUST match tokenizer vocab_size to avoid IndexError
+        try:
+            from nanochat.tokenizer import get_tokenizer
+
+            tokenizer = get_tokenizer()
+            actual_vocab_size = tokenizer.get_vocab_size()
+
+            # Override vocab_size with tokenizer's actual vocab_size
+            if "vocab_size" in config_kwargs:
+                configured_vocab = config_kwargs["vocab_size"]
+                if configured_vocab != actual_vocab_size:
+                    logging.warning(
+                        f"[Nanochat Model] Config specifies vocab_size={configured_vocab}, "
+                        f"but tokenizer has vocab_size={actual_vocab_size}. "
+                        f"Using tokenizer's vocab_size={actual_vocab_size} to match tokenizer."
+                    )
+            config_kwargs["vocab_size"] = actual_vocab_size
+
+            logging.info(
+                f"[Nanochat Model] Using vocab_size={actual_vocab_size} from tokenizer"
+            )
+        except Exception as e:
+            logging.warning(
+                f"[Nanochat Model] Could not auto-detect vocab_size from tokenizer: {e}. "
+                f"Using configured or default vocab_size."
+            )
+
         config = GPTConfig(**config_kwargs)
         model = GPT(config)
         if init_weights:
             model.init_weights()
+
+        # This allows CORE evaluation and other components to access the tokenizer
+        try:
+            from nanochat.tokenizer import get_tokenizer
+
+            tokenizer = get_tokenizer()
+            setattr(model, "nanochat_tokenizer", tokenizer)
+        except Exception:
+            pass
+        # Set max_seq_len for CORE evaluation truncation
+        setattr(model, "max_seq_len", config.sequence_len)
         setattr(model, "nanochat_config", config_kwargs)
         return model
