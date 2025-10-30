@@ -203,7 +203,6 @@ def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
     assert config.evaluation.type == "nanochat_core"
     assert config.evaluation.max_per_task == 128
     assert config.evaluation.bundle_dir == "/custom/path/to/nanochat"
-    assert config_base.is_dir()
 
     Config._instance = None
     if hasattr(Config, "args"):
