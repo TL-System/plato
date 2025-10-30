@@ -294,7 +294,11 @@ class Server(base.Server):
         # Add train_loss if available from client reports
         if self.updates and hasattr(self.updates[0].report, "train_loss"):
             # Compute weighted average of train_loss across clients
-            total_samples = sum(update.report.num_samples for update in self.updates)
+            total_samples = sum(
+                update.report.num_samples
+                for update in self.updates
+                if update.report.train_loss is not None
+            )
             if total_samples > 0:
                 weighted_loss = sum(
                     update.report.train_loss * update.report.num_samples
@@ -303,7 +307,7 @@ class Server(base.Server):
                 )
                 logged["train_loss"] = weighted_loss / total_samples
             else:
-                logged["train_loss"] = 0.0
+                logged["train_loss"] = None
 
         return logged
 
