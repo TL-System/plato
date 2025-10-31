@@ -260,7 +260,16 @@ class Server(base.Server):
                 core_results = trainer.context.state["nanochat_core_results"]
                 self._core_metric = core_results.get("core_metric", self.accuracy)
 
-        if hasattr(Config().trainer, "target_perplexity"):
+        # If CORE benchmark was run via a Nanochat testing strategy, report the specialized CORE metric instead of the generic 'Global model accuracy' label.
+        core_metric = getattr(self, "_core_metric", None)
+
+        if core_metric is not None:
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
+                )
+            )
+        elif hasattr(Config().trainer, "target_perplexity"):
             logging.info(
                 fonts.colourize(
                     f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
@@ -284,6 +293,7 @@ class Server(base.Server):
         logged = {
             "round": self.current_round,
             "accuracy": self.accuracy,
+            "core_metric": getattr(self, "_core_metric", None),
             "accuracy_std": self.accuracy_std,
             "elapsed_time": self.wall_time - self.initial_wall_time,
             "processing_time": max(

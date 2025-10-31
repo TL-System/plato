@@ -253,7 +253,22 @@ class Server(fedavg.Server):
             logging.info("[%s] Started model testing.", self)
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
-            if hasattr(Config().trainer, "target_perplexity"):
+            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
+            if (
+                hasattr(trainer, "context")
+                and "nanochat_core_results" in trainer.context.state
+            ):
+                core_results = trainer.context.state["nanochat_core_results"]
+                self._core_metric = core_results.get("core_metric", None)
+
+            core_metric = getattr(self, "_core_metric", None)
+            if core_metric is not None:
+                logging.info(
+                    fonts.colourize(
+                        f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
+                    )
+                )
+            elif hasattr(Config().trainer, "target_perplexity"):
                 logging.info(
                     fonts.colourize(
                         f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
@@ -274,7 +289,22 @@ class Server(fedavg.Server):
             logging.info("[%s] Started model testing.", self)
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
-            if hasattr(Config().trainer, "target_perplexity"):
+            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
+            if (
+                hasattr(trainer, "context")
+                and "nanochat_core_results" in trainer.context.state
+            ):
+                core_results = trainer.context.state["nanochat_core_results"]
+                self._core_metric = core_results.get("core_metric", None)
+
+            core_metric = getattr(self, "_core_metric", None)
+            if core_metric is not None:
+                logging.info(
+                    fonts.colourize(
+                        f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
+                    )
+                )
+            elif hasattr(Config().trainer, "target_perplexity"):
                 logging.info(
                     fonts.colourize(
                         f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
