@@ -146,18 +146,14 @@ def main() -> None:
             continue
 
         cleared = clean_directory(runtime_dir)
-        print(
-            f"Failed to delete {runtime_dir}; cleared {cleared} items instead."
-        )
+        print(f"Failed to delete {runtime_dir}; cleared {cleared} items instead.")
         fallback_dirs += 1
         fallback_items += cleared
 
     if runtime_total == 0:
         print("No runtime directories found.")
     else:
-        print(
-            f"Removed {runtime_removed} of {runtime_total} runtime directories."
-        )
+        print(f"Removed {runtime_removed} of {runtime_total} runtime directories.")
         if fallback_dirs:
             print(
                 f"Cleared {fallback_items} items in "
