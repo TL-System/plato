@@ -222,7 +222,7 @@ class DataSource(BaseDataSource):  # type: ignore[misc]
                 "parquet" if _parquet_available(resolved_base_dir) else "synthetic"
             )
 
-        self.trainset = NanochatStreamingDataset(
+        self.trainset: NanochatStreamingDataset = NanochatStreamingDataset(
             split="train",
             batch_size=resolved_batch_size,
             sequence_length=resolved_sequence_len,
@@ -235,7 +235,7 @@ class DataSource(BaseDataSource):  # type: ignore[misc]
             vocab_size=vocab_size,
             synthetic_seed=synthetic_seed,
         )
-        self.testset = NanochatStreamingDataset(
+        self.testset: NanochatStreamingDataset = NanochatStreamingDataset(
             split="val",
             batch_size=resolved_batch_size,
             sequence_length=resolved_sequence_len,

@@ -153,12 +153,16 @@ class NanochatOptimizerStrategy(OptimizerStrategy):
     def create_optimizer(
         self, model: torch.nn.Module, context: TrainingContext
     ) -> _OptimizerBundle:
-        if not hasattr(model, "setup_optimizers"):
+        if not isinstance(model, torch.nn.Module):
+            raise TypeError("Nanochat optimizer strategy requires a torch.nn.Module.")
+
+        setup_fn = getattr(model, "setup_optimizers", None)
+        if not callable(setup_fn):
             raise AttributeError(
                 "Nanochat model is expected to expose setup_optimizers()."
             )
 
-        optimizers = model.setup_optimizers(
+        optimizers = setup_fn(
             unembedding_lr=self.unembedding_lr,
             embedding_lr=self.embedding_lr,
             matrix_lr=self.matrix_lr,
