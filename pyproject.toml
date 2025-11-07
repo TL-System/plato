@@ -48,16 +48,16 @@ mlx = [
     "mlx",
 ]
 nanochat = [
-    "datasets>=2.14.0",
-    "numpy==1.26.4",
-    "psutil>=5.9.0",
-    "regex>=2023.8.8",
-    "tiktoken>=0.5.0",
-    "tokenizers>=0.15.0",
-    "torch>=2.2.0",
-    "wandb>=0.16.0",
-    "jinja2>=3.0",
-    "PyYAML>=6.0",
+    "datasets",
+    "numpy",
+    "psutil",
+    "regex",
+    "tiktoken",
+    "tokenizers",
+    "torch",
+    "wandb",
+    "jinja2",
+    "PyYAML",
 ]
 
 [project.urls]
