@@ -8,6 +8,7 @@ import os
 import pytest
 
 from plato.config import Config, ConfigNode
+from plato.utils.third_party import ensure_nanochat_importable
 
 pytestmark = pytest.mark.integration
 
@@ -40,6 +41,11 @@ def test_nanochat_trainer_smoke(temp_config, tmp_path):
     """Run one training step with synthetic Nanochat data on CPU."""
     _ = pytest.importorskip(
         "torch", reason="Nanochat trainer smoke requires torch (nanochat extra)."
+    )
+    ensure_nanochat_importable()
+    _ = pytest.importorskip(
+        "nanochat",
+        reason="Nanochat trainer smoke requires the nanochat package (nanochat extra).",
     )
     from plato.datasources.nanochat import DataSource as NanochatDataSource
     from plato.models.nanochat import Model as NanochatModel
@@ -98,6 +104,11 @@ def test_nanochat_trainer_selects_core_eval_strategy(temp_config, monkeypatch):
     """Ensure evaluation config triggers the CORE testing strategy."""
     _ = pytest.importorskip(
         "torch", reason="Nanochat trainer requires torch (nanochat extra)."
+    )
+    ensure_nanochat_importable()
+    _ = pytest.importorskip(
+        "nanochat",
+        reason="Nanochat trainer requires the nanochat package (nanochat extra).",
     )
     from plato.models.nanochat import Model as NanochatModel
     from plato.trainers.nanochat import (
