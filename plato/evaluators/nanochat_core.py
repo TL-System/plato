@@ -308,15 +308,22 @@ def run_core_evaluation(
             LOGGER.debug("Skipping unnamed CORE task entry: %s", task)
             continue
 
+        dataset_uri = task.get("dataset_uri")
+        if not isinstance(dataset_uri, str):
+            LOGGER.debug(
+                "Skipping CORE task %s due to missing dataset_uri metadata.", task
+            )
+            continue
+
         task_meta = {
             "task_type": task.get("icl_task_type"),
-            "dataset_uri": task.get("dataset_uri"),
+            "dataset_uri": dataset_uri,
             "num_fewshot": task.get("num_fewshot", [0])[0],
             "continuation_delimiter": task.get("continuation_delimiter", " "),
         }
         start_time = time.perf_counter()
 
-        data = _load_task_data(data_dir, task_meta["dataset_uri"])
+        data = _load_task_data(data_dir, dataset_uri)
         shuffle_rng = random.Random(1337)
         shuffle_rng.shuffle(data)
         if max_per_task > 0:
