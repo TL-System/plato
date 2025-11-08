@@ -4,14 +4,26 @@ This workspace hosts Nanochat-focused experiments within Plato.
 
 ## Quick Start
 
-1. Install dependencies (including the vendored tokenizer build requirements):
+1. Initialize the nanochat submodule (required for the nanochat integration):
+
+   ```bash
+   git submodule update --init --recursive
+   ```
+
+2. Install dependencies (including the vendored tokenizer build requirements):
 
    ```bash
    uv sync --extra nanochat
    uv run --with ./external/nanochat maturin develop --release
    ```
+   **Troubleshooting:** If you encounter a `maturin failed` error with "Can't find Cargo.toml", run the maturin command from within the nanochat directory:
 
-2. Run the synthetic smoke configuration:
+   ```bash
+   uv sync --extra nanochat
+   cd external/nanochat && uv run maturin develop --release && cd ../..
+   ```
+
+3. Run the synthetic smoke configuration:
 
    ```bash
    uv run --extra nanochat python plato.py --config configs/Nanochat/synthetic_micro.toml
