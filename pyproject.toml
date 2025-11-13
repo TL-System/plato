@@ -107,6 +107,7 @@ members = [
 [dependency-groups]
 dev = [
     "pytest",
+    "ruff",
     "ty",
 ]
 

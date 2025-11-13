@@ -4,9 +4,9 @@ Factory for Nanochat GPT models integrated with Plato's registry.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import fields
 from typing import Any
-import logging
 
 try:
     import torch
