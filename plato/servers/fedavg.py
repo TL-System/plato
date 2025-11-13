@@ -269,18 +269,28 @@ class Server(base.Server):
                     f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
                 )
             )
-        elif hasattr(Config().trainer, "target_perplexity"):
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
-                )
-            )
         else:
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
+            trainer = self.require_trainer()
+            metric_name = getattr(trainer.testing_strategy, "metric_name", "accuracy")
+
+            if metric_name == "mse":
+                logging.info(
+                    fonts.colourize(f"[{self}] Global model MSE: {self.accuracy:.4f}\n")
                 )
-            )
+            elif metric_name == "perplexity" or hasattr(
+                Config().trainer, "target_perplexity"
+            ):
+                logging.info(
+                    fonts.colourize(
+                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
+                    )
+                )
+            else:
+                logging.info(
+                    fonts.colourize(
+                        f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
+                    )
+                )
 
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
