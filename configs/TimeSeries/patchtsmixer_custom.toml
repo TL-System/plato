@@ -1,0 +1,67 @@
+# Federated Learning with PatchTSMixer for Time Series Forecasting
+# This configuration demonstrates using the IBM Granite PatchTSMixer model
+# with time series data from HuggingFace datasets
+
+[clients]
+type = "simple"
+total_clients = 1
+per_round = 1
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/timeseries/patchtsmixer"
+model_path = "models/timeseries/patchtsmixer"
+
+[data]
+# ETTh1: Electricity Transformer Temperature dataset (7 features)
+datasource = "ETTh1"
+
+partition_size = 100  # Number of training samples
+sampler = "iid"
+random_seed = 1
+
+[trainer]
+type = "HuggingFace"
+rounds = 3
+max_concurrency = 2
+model_type = "huggingface"
+
+# Train from scratch - simpler for testing
+model_name = "custom_patchtsmixer" 
+
+# Task type: forecasting, classification, regression, or pretraining
+task_type = "forecasting"
+
+# PatchTSMixer specific parameters (smaller model for testing)
+context_length = 64
+prediction_length = 24
+num_input_channels = 7  # ETTh1 has 7 features (HUFL, HULL, MUFL, MULL, LUFL, LULL, OT)
+patch_length = 8
+patch_stride = 8
+d_model = 32  # Hidden dimension of the model. Recommended to set it as a multiple of patch_length (i.e. 2-8X of patch_len). Larger value indicates more complex model.
+num_layers = 3  # Number of layers to use. Recommended range is 3-15. Larger value indicates more complex model.
+expansion_factor = 2 # Expansion factor to use inside MLP. Recommended range is 2-5. Larger value indicates more complex model.
+dropout = 0.5
+head_dropout = 0.7
+mode = "common_channel"
+gated_attn = true
+scaling = "std"
+
+# Training parameters
+epochs = 2
+batch_size = 8
+optimizer = "Adam"
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+[parameters.optimizer]
+lr = 0.001
+weight_decay = 0.0
+
+[results]
+types = "round, elapsed_time, accuracy"
