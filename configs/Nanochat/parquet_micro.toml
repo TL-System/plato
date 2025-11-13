@@ -1,0 +1,53 @@
+[clients]
+type = "simple"
+total_clients = 10
+per_round = 3
+do_test = true
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/nanochat/parquet"
+model_path = "models/nanochat/parquet"
+
+[data]
+datasource = "Nanochat"
+sampler = "iid"
+partition_size = 1
+random_seed = 1
+mode = "parquet"
+max_train_batches = 16
+max_val_batches = 1
+tokenizer_threads = 2
+tokenizer_batch_size = 32
+device = "cuda"
+vocab_size = 512
+synthetic_seed = 123
+
+[evaluation]
+type = "nanochat_core"
+# bundle_dir = "~/nanochat"
+max_per_task = 16
+
+[trainer]
+type = "nanochat"
+rounds = 10000
+epochs = 5
+batch_size = 1
+model_name = "nanochat"
+optimizer = "nanochat"
+
+[algorithm]
+type = "fedavg"
+
+[parameters.model]
+sequence_len = 256
+vocab_size = 50304
+n_layer = 4
+n_head = 4
+n_kv_head = 4
+n_embd = 256
+
+[results]
+types = "round, elapsed_time, core_metric, train_loss"
