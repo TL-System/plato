@@ -45,6 +45,11 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 
 - [Model Pruning Algorithms](algorithms/13.%20Model%20Pruning%20Algorithms.md)
 
+- [Gradient Leakage Attacks and Defences](algorithms/14.%20Gradient%20Leakage%20Attacks%20and%20Defences.md)
+
+- [Time Series Models](algorithms/15.%20Time%20Series%20Models.md)
+
+
 ## Case Studies
 
 - [Federated LoRA Fine-Tuning](case-studies/1.%20LoRA.md)
