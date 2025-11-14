@@ -9,7 +9,9 @@ https://huggingface.co/docs/datasets/quicktour.html
 import logging
 import os
 
+import torch
 from datasets import load_dataset, load_from_disk
+from torch.utils.data import Dataset as TorchDataset
 from transformers import (
     AutoConfig,
     AutoTokenizer,
@@ -21,6 +23,78 @@ from transformers.utils import logging as hf_logging
 
 from plato.config import Config
 from plato.datasources import base
+from plato.utils.timeseries_utils import is_timeseries_model
+
+
+class TimeSeriesDatasetWrapper(TorchDataset):
+    """
+    Wrapper for time series data from HuggingFace datasets.
+    Converts HuggingFace dataset format to standard time-series format used by HuggingFace time-series models.
+    """
+
+    def __init__(self, hf_dataset, context_length, prediction_length):
+        """
+        Args:
+            hf_dataset: HuggingFace dataset with time series data
+            context_length: Number of historical timesteps
+            prediction_length: Number of future timesteps to predict
+        """
+        self.dataset = hf_dataset
+        self.context_length = context_length
+        self.prediction_length = prediction_length
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        """
+        Returns time series data in PatchTSMixer format.
+
+        Expected HuggingFace dataset format:
+        - 'past_values'/'future_values': Pre-split time series
+        - 'target': Full time series to be split
+        """
+        item = self.dataset[idx]
+
+        # Handle different dataset formats
+        if isinstance(item, dict):
+            if "past_values" in item and "future_values" in item:
+                # Already in the right format
+                return {
+                    "past_values": torch.FloatTensor(item["past_values"]),
+                    "future_values": torch.FloatTensor(item["future_values"]),
+                }
+            elif "target" in item:
+                # Extract from 'target' field and split
+                target = torch.FloatTensor(item["target"])
+            else:
+                raise ValueError(
+                    f"Dataset must contain either 'past_values'/'future_values' or 'target' field. "
+                    f"Found keys: {list(item.keys())}"
+                )
+        else:
+            target = item if torch.is_tensor(item) else torch.FloatTensor(item)
+
+        # If 1D, add channel dimension: (length,) -> (length, 1)
+        if target.dim() == 1:
+            target = target.unsqueeze(-1)
+
+        # Split into past and future
+        if len(target) < self.context_length + self.prediction_length:
+            raise ValueError(
+                f"Time series too short: got {len(target)} timesteps, "
+                f"need at least {self.context_length + self.prediction_length}"
+            )
+
+        past_values = target[: self.context_length]
+        future_values = target[
+            self.context_length : self.context_length + self.prediction_length
+        ]
+
+        return {
+            "past_values": past_values,
+            "future_values": future_values,
+        }
 
 
 class DataSource(base.DataSource):
@@ -50,6 +124,50 @@ class DataSource(base.DataSource):
             save_to_disk = getattr(self.dataset, "save_to_disk", None)
             if callable(save_to_disk):
                 save_to_disk(saved_data_path)
+
+        # Determine dataset type from config or model type
+        model_type = getattr(Config().trainer, "model_type", None)
+        dataset_type = getattr(Config().data, "dataset_type", "text")
+
+        is_timeseries = is_timeseries_model(
+            model_type=model_type, dataset_type=dataset_type
+        )
+
+        if is_timeseries:
+            self._init_timeseries_dataset()
+        else:
+            self._init_text_dataset()
+
+    def _init_timeseries_dataset(self):
+        """Initialize time series dataset."""
+        logging.info("Initializing time series dataset")
+
+        # Get time series parameters from config
+        context_length = getattr(Config().trainer, "context_length", 512)
+        prediction_length = getattr(Config().trainer, "prediction_length", 96)
+
+        # Wrap datasets
+        train_split = (
+            "train" if "train" in self.dataset else list(self.dataset.keys())[0]
+        )
+        test_split = (
+            "test"
+            if "test" in self.dataset
+            else "validation"
+            if "validation" in self.dataset
+            else train_split
+        )
+
+        self.trainset = TimeSeriesDatasetWrapper(
+            self.dataset[train_split], context_length, prediction_length
+        )
+        self.testset = TimeSeriesDatasetWrapper(
+            self.dataset[test_split], context_length, prediction_length
+        )
+
+    def _init_text_dataset(self):
+        """Initialize text/NLP dataset."""
+        logging.info("Initializing text/NLP dataset")
 
         parser = HfArgumentParser(TrainingArguments)
         (self.training_args,) = parser.parse_args_into_dataclasses(
