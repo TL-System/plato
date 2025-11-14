@@ -83,10 +83,9 @@ class DataSource(base.DataSource):
 
         # Get dataset name
         dataset_name = kwargs.get(
-            "dataset_name", 
-            getattr(Config().data, "dataset_name", "ETTh1")
+            "dataset_name", getattr(Config().data, "dataset_name", "ETTh1")
         )
-        
+
         # Validate dataset name
         if dataset_name not in self.DATASET_INFO:
             raise ValueError(
@@ -94,13 +93,15 @@ class DataSource(base.DataSource):
                 f"Supported datasets: {list(self.DATASET_INFO.keys())}"
             )
 
-        logging.info("Using %s (Electricity Transformer Temperature) dataset", dataset_name)
-        
+        logging.info(
+            "Using %s (Electricity Transformer Temperature) dataset", dataset_name
+        )
+
         dataset_info = self.DATASET_INFO[dataset_name]
         logging.info(
             "Dataset frequency: %s (%d points per hour)",
             dataset_info["freq"],
-            dataset_info["points_per_hour"]
+            dataset_info["points_per_hour"],
         )
 
         # Get configuration

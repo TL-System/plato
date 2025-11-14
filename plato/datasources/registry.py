@@ -8,6 +8,7 @@ import logging
 from plato.config import Config
 from plato.datasources import (
     cinic10,
+    ETT,
     feature,
     femnist,
     huggingface,
@@ -29,6 +30,7 @@ registered_datasources = {
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
     "Nanochat": nanochat,
+    "ETT": ETT,
 }
 
 registered_partitioned_datasources = {"FEMNIST": femnist}
@@ -41,6 +43,10 @@ _datasource_aliases = {
     "CIFAR10": ("Torchvision", {"dataset_name": "CIFAR10"}),
     "CIFAR100": ("Torchvision", {"dataset_name": "CIFAR100"}),
     "CelebA": ("Torchvision", {"dataset_name": "CelebA"}),
+    "ETTh1": ("ETT", {"dataset_name": "ETTh1"}),
+    "ETTh2": ("ETT", {"dataset_name": "ETTh2"}),
+    "ETTm1": ("ETT", {"dataset_name": "ETTm1"}),
+    "ETTm2": ("ETT", {"dataset_name": "ETTm2"}),
 }
 
 
