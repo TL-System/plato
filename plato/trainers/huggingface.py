@@ -5,6 +5,7 @@ This implementation uses Plato's composable trainer architecture by wiring
 HuggingFace data handling through strategy objects instead of overriding
 `load_model`/`save_model` hooks.
 
+Supports both text/NLP models and time series models (e.g., PatchTSMixer).
 """
 
 import logging
@@ -39,6 +40,7 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.timeseries_utils import is_timeseries_model
 
 
 class HuggingFaceBatch(dict):
@@ -79,6 +81,23 @@ class HuggingFaceCollateWrapper:
         return HuggingFaceBatch(batch), labels
 
 
+class TimeSeriesCollateWrapper:
+    """Collator for time series data (PatchTSMixer format)."""
+
+    def __call__(
+        self, examples: Iterable[dict]
+    ) -> tuple[HuggingFaceBatch, torch.Tensor | None]:
+        """
+        Collate time series examples into batches.
+
+        Expected format: {"past_values": tensor, "future_values": tensor}
+        """
+        batch = default_data_collator(list(examples))
+        labels = batch.get("future_values", None)
+
+        return HuggingFaceBatch(batch), labels
+
+
 def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
     """
     Resolve a loss tensor from HuggingFace model outputs.
@@ -110,8 +129,10 @@ def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
         raise ValueError("HuggingFace model did not return a tensor loss.")
 
     logits = getattr(outputs, "logits", None)
+    if logits is None:
+        logits = getattr(outputs, "prediction_outputs", None)  # PatchTSMixer
     if logits is None and isinstance(outputs, dict):
-        logits = outputs.get("logits")
+        logits = outputs.get("logits") or outputs.get("prediction_outputs")
     if logits is None and isinstance(outputs, tuple) and len(outputs) > 0:
         logits = outputs[0]
 
@@ -133,6 +154,13 @@ def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
     logits = logits.to(labels.device) if labels.device != logits.device else logits
     labels = labels.to(logits.device)
 
+    # Check if this is a regression task (shapes match) -> use MSE
+    # Time series: logits (batch, pred_len, channels), labels (batch, pred_len, channels)
+    # Text generation: logits (batch, seq_len, vocab_size), labels (batch, seq_len)
+    if logits.shape == labels.shape:
+        return F.mse_loss(logits, labels)
+
+    # Text generation with causal LM -> use cross-entropy
     vocab_size = logits.size(-1)
     if logits.ndim > 2:
         shift_logits = logits[..., :-1, :].contiguous()
@@ -196,12 +224,25 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
             optimizer.zero_grad()
 
         batch_inputs = dict(examples)
-        if labels is not None:
+
+        # For time series models like PatchTSMixer, future_values should not be passed as 'labels'
+        # TODO: Need to check if other time series models follow this
+        is_timeseries = (
+            "past_values" in batch_inputs and "future_values" in batch_inputs
+        )
+
+        if not is_timeseries and labels is not None:
             batch_inputs["labels"] = labels
         batch_inputs.setdefault("return_dict", True)
 
         outputs = model(**batch_inputs)
-        labels_tensor = batch_inputs.get("labels")
+
+        # For time series, get labels from batch_inputs, otherwise from labels argument
+        labels_tensor = (
+            batch_inputs.get("future_values")
+            if is_timeseries
+            else batch_inputs.get("labels")
+        )
         loss = _resolve_hf_loss(outputs, labels_tensor)
 
         loss_for_backward = loss.div(accum_steps) if accum_steps > 1 else loss
@@ -291,10 +332,21 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
 
 
 class HuggingFaceTestingStrategy(TestingStrategy):
-    """Evaluates HuggingFace models and reports perplexity based on loss."""
+    """Evaluates HuggingFace models (text: perplexity, time series: MSE)."""
 
-    def __init__(self, collate_fn: HuggingFaceCollateWrapper):
+    def __init__(self, collate_fn, is_timeseries=False):
         self.collate_fn = collate_fn
+        self.is_timeseries = is_timeseries
+
+    @property
+    def metric_name(self) -> str:
+        """Return the name of the metric this strategy computes."""
+        if self.is_timeseries:
+            return "mse"  # For time series models, using mean squared error.
+        elif hasattr(Config().trainer, "target_perplexity"):
+            return "perplexity"
+        else:
+            return "accuracy"
 
     def test_model(self, model, config, testset, sampler, context: TrainingContext):
         batch_size = config.get("batch_size", 1)
@@ -324,41 +376,80 @@ class HuggingFaceTestingStrategy(TestingStrategy):
         model.eval()
         context.state["eval_loader"] = data_loader
 
-        total_loss = 0.0
-        total_weight = 0
+        if self.is_timeseries:
+            total_loss = 0.0
+            total_samples = 0
 
-        with torch.no_grad():
-            for batch_inputs, labels in data_loader:
-                batch_inputs = batch_inputs.to(context.device)
-                if labels is not None:
-                    labels = labels.to(context.device)
-                    batch_inputs["labels"] = labels
+            with torch.no_grad():
+                for batch_inputs, labels in data_loader:
+                    batch_inputs = batch_inputs.to(context.device)
+                    if labels is not None:
+                        labels = labels.to(context.device)
+                        batch_inputs["future_values"] = labels
 
-                batch_inputs.setdefault("return_dict", True)
-                outputs = model(**batch_inputs)
-                loss = _resolve_hf_loss(outputs, labels)
+                    batch_inputs.setdefault("return_dict", True)
+                    outputs = model(**batch_inputs)
 
-                if labels is not None:
-                    weight = labels.ne(-100).sum().item()
-                    if weight == 0:
-                        continue
-                else:
-                    weight = 1
+                    loss = getattr(outputs, "loss", None)
+                    if loss is None:
+                        loss = (
+                            outputs.get("loss") if isinstance(outputs, dict) else None
+                        )
 
-                total_loss += loss.item() * weight
-                total_weight += weight
+                    if loss is not None:
+                        batch_size = (
+                            batch_inputs["past_values"].size(0)
+                            if "past_values" in batch_inputs
+                            else 1
+                        )
+                        total_loss += loss.item() * batch_size
+                        total_samples += batch_size
 
-        model.train()
-        context.state.pop("eval_loader", None)
+            model.train()
+            context.state.pop("eval_loader", None)
 
-        if total_weight == 0:
-            return float("inf")
+            if total_samples == 0:
+                return float("inf")
 
-        avg_loss = total_loss / total_weight
-        try:
-            return math.exp(avg_loss)
-        except OverflowError:
-            return float("inf")
+            # Return MSE
+            return total_loss / total_samples
+        else:
+            # Text/NLP: compute perplexity
+            total_loss = 0.0
+            total_weight = 0
+
+            with torch.no_grad():
+                for batch_inputs, labels in data_loader:
+                    batch_inputs = batch_inputs.to(context.device)
+                    if labels is not None:
+                        labels = labels.to(context.device)
+                        batch_inputs["labels"] = labels
+
+                    batch_inputs.setdefault("return_dict", True)
+                    outputs = model(**batch_inputs)
+                    loss = _resolve_hf_loss(outputs, labels)
+
+                    if labels is not None:
+                        weight = labels.ne(-100).sum().item()
+                        if weight == 0:
+                            continue
+                    else:
+                        weight = 1
+
+                    total_loss += loss.item() * weight
+                    total_weight += weight
+
+            model.train()
+            context.state.pop("eval_loader", None)
+
+            if total_weight == 0:
+                return float("inf")
+
+            avg_loss = total_loss / total_weight
+            try:
+                return math.exp(avg_loss)
+            except OverflowError:
+                return float("inf")
 
 
 def _split_callback_types(
@@ -433,57 +524,75 @@ class Trainer(ComposableTrainer):
             ]
         )
 
-        model_name = Config().trainer.model_name
-        config_kwargs = {
-            "cache_dir": None,
-            "revision": "main",
-            "use_auth_token": None,
-        }
-        self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+        model_name = getattr(Config().trainer, "model_name", "")
+        model_type = getattr(Config().trainer, "model_type", None)
 
-        cache_dir = Config().params["data_path"]
-        use_fast_tokenizer = True
-        revision = "main"
-        auth_token = getattr(
-            getattr(Config(), "parameters", None), "huggingface_token", None
+        # Detect if this is a time series model
+        self._is_timeseries = is_timeseries_model(
+            model_name=model_name, model_type=model_type
         )
 
-        if "llama" in model_name:
-            if isinstance(auth_token, str) and auth_token:
-                self.tokenizer = LlamaTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                    use_auth_token=auth_token,
-                )
+        if self._is_timeseries:
+            logging.info(
+                "Detected time series model (type: %s, name: %s)",
+                model_type,
+                model_name,
+            )
+
+        self.config = None
+        if not self._is_timeseries:
+            config_kwargs = {
+                "cache_dir": None,
+                "revision": "main",
+                "use_auth_token": None,
+            }
+            self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+
+        self.tokenizer = None
+        if not self._is_timeseries:
+            cache_dir = Config().params["data_path"]
+            use_fast_tokenizer = True
+            revision = "main"
+            auth_token = getattr(
+                getattr(Config(), "parameters", None), "huggingface_token", None
+            )
+
+            if "llama" in model_name:
+                if isinstance(auth_token, str) and auth_token:
+                    self.tokenizer = LlamaTokenizer.from_pretrained(
+                        model_name,
+                        config=self.config,
+                        cache_dir=cache_dir,
+                        use_fast=use_fast_tokenizer,
+                        revision=revision,
+                        use_auth_token=auth_token,
+                    )
+                else:
+                    self.tokenizer = LlamaTokenizer.from_pretrained(
+                        model_name,
+                        config=self.config,
+                        cache_dir=cache_dir,
+                        use_fast=use_fast_tokenizer,
+                        revision=revision,
+                    )
             else:
-                self.tokenizer = LlamaTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                )
-        else:
-            if isinstance(auth_token, str) and auth_token:
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                    use_auth_token=auth_token,
-                )
-            else:
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                )
+                if isinstance(auth_token, str) and auth_token:
+                    self.tokenizer = AutoTokenizer.from_pretrained(
+                        model_name,
+                        config=self.config,
+                        cache_dir=cache_dir,
+                        use_fast=use_fast_tokenizer,
+                        revision=revision,
+                        use_auth_token=auth_token,
+                    )
+                else:
+                    self.tokenizer = AutoTokenizer.from_pretrained(
+                        model_name,
+                        config=self.config,
+                        cache_dir=cache_dir,
+                        use_fast=use_fast_tokenizer,
+                        revision=revision,
+                    )
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -491,7 +600,15 @@ class Trainer(ComposableTrainer):
         except (TypeError, ValueError):
             grad_accum_steps = 1
         self._gradient_accumulation_steps = max(grad_accum_steps, 1)
-        self._collate_wrapper = HuggingFaceCollateWrapper(self.tokenizer)
+
+        # Choose collator based on model type
+        if self._is_timeseries:
+            self._collate_wrapper = TimeSeriesCollateWrapper()
+            logging.info("Using TimeSeriesCollateWrapper for time series model")
+        else:
+            self._collate_wrapper = HuggingFaceCollateWrapper(self.tokenizer)
+            logging.info("Using HuggingFaceCollateWrapper for text model")
+
         self.training_args.gradient_accumulation_steps = (
             self._gradient_accumulation_steps
         )
@@ -513,14 +630,16 @@ class Trainer(ComposableTrainer):
                 num_workers=0,
                 pin_memory=True,
             ),
-            testing_strategy=HuggingFaceTestingStrategy(self._collate_wrapper),
+            testing_strategy=HuggingFaceTestingStrategy(
+                self._collate_wrapper, is_timeseries=self._is_timeseries
+            ),
         )
 
         if hf_callbacks:
             self.add_callbacks(hf_callbacks)
 
         model_instance = self._require_model()
-        if hasattr(model_instance, "loss_type"):
+        if hasattr(model_instance, "loss_type") and not self._is_timeseries:
             setattr(model_instance, "loss_type", "ForCausalLM")
 
         # Ensure model checkpoints can be saved when model names include slashes.
