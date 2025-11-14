@@ -66,6 +66,7 @@ nav:
           - Poisoning Detection: examples/algorithms/12. Poisoning Detection Algorithms.md
           - Model Pruning: examples/algorithms/13. Model Pruning Algorithms.md
           - Gradient Leakage Attacks and Defences: examples/algorithms/14. Gradient Leakage Attacks and Defences.md
+          - Time Series Models: examples/algorithms/15. Time Series Models.md
       - Case Studies:
           - Federated LoRA Fine-Tuning: examples/case-studies/1. LoRA.md
           - Composable Trainer API: examples/case-studies/2. Composable Trainer.md

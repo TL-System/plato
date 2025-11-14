@@ -32,6 +32,7 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
     - **[Poisoning Detection](examples/algorithms/12.%20Poisoning%20Detection%20Algorithms.md)**
     - **[Model Pruning](examples/algorithms/13.%20Model%20Pruning%20Algorithms.md)**
     - **[Gradient Leakage Attacks and Defences](examples/algorithms/14.%20Gradient%20Leakage%20Attacks%20and%20Defences.md)**
+    - **[Time Series Models](examples/algorithms/15.%20Time%20Series%20Models.md)**
 
 ## Configuration Settings
 
