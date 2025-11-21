@@ -120,10 +120,10 @@ class DataSource(base.DataSource):
         )  # -1 for date column
 
         # Split into train/val/test following the standard ETT split
-        # Standard split: 12 months train, 4 months val, 4 months test
+        # Standard split: 16 months train, 2 months val, 2 months test
         points_per_hour = dataset_info["points_per_hour"]
-        train_end = 12 * 30 * 24 * points_per_hour  # 12 months
-        val_end = train_end + 4 * 30 * 24 * points_per_hour  # + 4 months
+        train_end = 16 * 30 * 24 * points_per_hour  # 16 months
+        val_end = train_end + 2 * 30 * 24 * points_per_hour  # + 2 months
 
         train_df = df[:train_end]
         val_df = df[train_end:val_end]
