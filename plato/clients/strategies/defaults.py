@@ -347,7 +347,10 @@ class DefaultTrainingStrategy(TrainingStrategy):
 
             if metric_name == "mse":
                 LOGGER.info("[%s] Test MSE: %.2f", context, accuracy)
-            elif hasattr(Config().trainer, "target_perplexity") or metric_name == "perplexity":
+            elif (
+                hasattr(Config().trainer, "target_perplexity")
+                or metric_name == "perplexity"
+            ):
                 LOGGER.info("[%s] Test perplexity: %.2f", context, accuracy)
             else:
                 LOGGER.info("[%s] Test accuracy: %.2f%%", context, 100 * accuracy)

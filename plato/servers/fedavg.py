@@ -246,11 +246,9 @@ class Server(base.Server):
 
             trainer = self.require_trainer()
             metric_name = getattr(trainer.testing_strategy, "metric_name", "accuracy")
-            
+
             if metric_name == "mse":
-                logging.info(
-                    "[%s] Average client MSE: %.2f.", self, self.accuracy
-                )
+                logging.info("[%s] Average client MSE: %.2f.", self, self.accuracy)
             elif metric_name == "perplexity" or hasattr(
                 Config().trainer, "target_perplexity"
             ):
