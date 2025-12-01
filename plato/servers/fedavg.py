@@ -243,9 +243,24 @@ class Server(base.Server):
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy, self.accuracy_std = self.get_accuracy_mean_std(self.updates)
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
-            )
+
+            trainer = self.require_trainer()
+            metric_name = getattr(trainer.testing_strategy, "metric_name", "accuracy")
+            
+            if metric_name == "mse":
+                logging.info(
+                    "[%s] Average client MSE: %.2f.", self, self.accuracy
+                )
+            elif metric_name == "perplexity" or hasattr(
+                Config().trainer, "target_perplexity"
+            ):
+                logging.info(
+                    "[%s] Average client perplexity: %.2f.", self, self.accuracy
+                )
+            else:
+                logging.info(
+                    "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
+                )
         else:
             # Testing the updated model directly at the server
             logging.info("[%s] Started model testing.", self)
@@ -275,7 +290,7 @@ class Server(base.Server):
 
             if metric_name == "mse":
                 logging.info(
-                    fonts.colourize(f"[{self}] Global model MSE: {self.accuracy:.4f}\n")
+                    fonts.colourize(f"[{self}] Global model MSE: {self.accuracy:.2f}\n")
                 )
             elif metric_name == "perplexity" or hasattr(
                 Config().trainer, "target_perplexity"
@@ -340,6 +355,9 @@ class Server(base.Server):
         # Add core_metric if Nanochat CORE evaluation was performed
         if hasattr(self, "_core_metric"):
             logged["core_metric"] = self._core_metric
+
+        logged["mse"] = self.accuracy
+        logged["perplexity"] = self.accuracy
 
         return logged
 
