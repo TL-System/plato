@@ -1,0 +1,67 @@
+# Federated Learning with Large PatchTSMixer for Time Series Forecasting
+# This configuration matches the PatchTSMixer paper parameters for ETTh1
+
+[clients]
+type = "simple"
+total_clients = 1
+per_round = 1
+do_test = true  # Enable testing to evaluate model on test set
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/timeseries/patchtsmixer"
+model_path = "models/timeseries/patchtsmixer"
+
+[data]
+# ETTh1: Electricity Transformer Temperature dataset (7 features)
+datasource = "ETTh1"
+
+partition_size = 6960  # Full ETTh1 training set
+sampler = "iid"
+random_seed = 1
+
+[trainer]
+type = "HuggingFace"
+rounds = 1000
+max_concurrency = 10
+model_type = "huggingface"
+model_name = "custom_patchtsmixer" 
+
+# Task type: forecasting, classification, regression, or pretraining
+task_type = "forecasting"
+
+# PatchTSMixer specific parameters
+context_length = 512  # Paper uses 512 context length
+prediction_length = 96  # Standard benchmark (paper tests 96, 192, 336, 720)
+num_input_channels = 7  # ETTh1 has 7 features (HUFL, HULL, MUFL, MULL, LUFL, LULL, OT)
+patch_length = 16
+patch_stride = 8
+
+d_model = 128
+num_layers = 8
+expansion_factor = 2
+
+dropout = 0.3  # Increase regularization to prevent overfitting
+head_dropout = 0.3  # Increase regularization to prevent overfitting
+
+# Model configuration
+mode = "common_channel"
+gated_attn = true 
+scaling = "std"
+
+epochs = 100
+batch_size = 64
+optimizer = "Adam"
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+[parameters.optimizer]
+lr = 0.0001
+weight_decay = 0.001
+
+[results]
+types = "round, elapsed_time, mse"
