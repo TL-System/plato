@@ -18,29 +18,33 @@ class Sampler(base.Sampler):
         super().__init__()
 
         if testing:
+            # Use the full test set for evaluation to avoid sampling/duplication
             dataset = datasource.get_test_set()
+            self.subset_indices = list(range(len(dataset)))
         else:
             dataset = datasource.get_train_set()
 
-        self.dataset_size = len(dataset)
-        indices = list(range(self.dataset_size))
-        np.random.seed(self.random_seed)
-        np.random.shuffle(indices)
+            self.dataset_size = len(dataset)
+            indices = list(range(self.dataset_size))
+            np.random.seed(self.random_seed)
+            np.random.shuffle(indices)
 
-        partition_size = Config().data.partition_size
-        total_clients = Config().clients.total_clients
-        total_size = partition_size * total_clients
+            partition_size = Config().data.partition_size
+            total_clients = Config().clients.total_clients
+            total_size = partition_size * total_clients
 
-        # add extra samples to make it evenly divisible, if needed
-        if len(indices) < total_size:
-            while len(indices) < total_size:
-                indices += indices[: (total_size - len(indices))]
-        else:
-            indices = indices[:total_size]
-        assert len(indices) == total_size
+            # add extra samples to make it evenly divisible, if needed
+            if len(indices) < total_size:
+                while len(indices) < total_size:
+                    indices += indices[: (total_size - len(indices))]
+            else:
+                indices = indices[:total_size]
+            assert len(indices) == total_size
 
-        # Compute the indices of data in the subset for this client
-        self.subset_indices = indices[(int(client_id) - 1) : total_size : total_clients]
+            # Compute the indices of data in the subset for this client
+            self.subset_indices = indices[
+                (int(client_id) - 1) : total_size : total_clients
+            ]
 
     def get(self):
         """Obtains an instance of the sampler."""

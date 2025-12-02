@@ -119,15 +119,31 @@ class DataSource(base.DataSource):
             len(df.columns) - 1,
         )  # -1 for date column
 
-        # Split into train/val/test following the standard ETT split
-        # Standard split: 16 months train, 2 months val, 2 months test
+        # Split into train/val/test following the standard ETT split used by HF examples
+        # Standard split: 12 months train, 4 months val, 4 months test
         points_per_hour = dataset_info["points_per_hour"]
-        train_end = 16 * 30 * 24 * points_per_hour  # 16 months
-        val_end = train_end + 2 * 30 * 24 * points_per_hour  # + 2 months
+        train_end = 12 * 30 * 24 * points_per_hour  # 12 months
+        val_end = train_end + 4 * 30 * 24 * points_per_hour  # + 4 months
+        test_end = train_end + 8 * 30 * 24 * points_per_hour  # + 8 months
+
+        # Shift val/test start back by context_length so their first window has history
+        val_start = max(0, train_end - context_length)
+        test_start = max(0, val_end - context_length)
 
         train_df = df[:train_end]
-        val_df = df[train_end:val_end]
-        test_df = df[val_end:]
+        val_df = df[val_start:val_end]
+        test_df = df[test_start:test_end]
+
+        # Compute train mean/std per channel and normalize all splits (matches HF demo preprocessing)
+        feature_cols = [col for col in df.columns if col != "date"]
+        train_features = train_df[feature_cols]
+        eps = 1e-6
+        feature_mean = train_features.mean()
+        feature_std = train_features.std().replace(0, eps)
+
+        train_norm = ((train_features - feature_mean) / feature_std).to_numpy()
+        val_norm = ((val_df[feature_cols] - feature_mean) / feature_std).to_numpy()
+        test_norm = ((test_df[feature_cols] - feature_mean) / feature_std).to_numpy()
 
         logging.info(
             "%s split - train: %d, val: %d, test: %d",
@@ -139,13 +155,11 @@ class DataSource(base.DataSource):
 
         # Create datasets with sliding windows
         self.trainset = ETTDataset(
-            train_df, context_length, prediction_length, stride=1
+            train_norm, context_length, prediction_length, stride=1
         )
 
-        # Use validation set as test set for federated learning
-        self.testset = ETTDataset(
-            val_df, context_length, prediction_length, stride=prediction_length
-        )
+        # Evaluate on the standard test split with full coverage
+        self.testset = ETTDataset(test_norm, context_length, prediction_length, stride=1)
 
         logging.info(
             "Created %d training windows and %d test windows",
