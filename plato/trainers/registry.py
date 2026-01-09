@@ -12,6 +12,9 @@ from plato.trainers import (
     gan,
     split_learning,
 )
+from plato.trainers import (
+    nanochat as nanochat_trainer,
+)
 
 registered_trainers = {
     "composable": composable.ComposableTrainer,
@@ -19,6 +22,7 @@ registered_trainers = {
     "timm_basic": basic.TrainerWithTimmScheduler,
     "gan": gan.Trainer,
     "split_learning": split_learning.Trainer,
+    "nanochat": nanochat_trainer.Trainer,
 }
 
 

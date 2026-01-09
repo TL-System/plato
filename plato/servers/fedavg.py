@@ -252,7 +252,24 @@ class Server(base.Server):
             trainer = self.require_trainer()
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
-        if hasattr(Config().trainer, "target_perplexity"):
+            # Extract CORE evaluation results if available (Nanochat CORE evaluation)
+            if (
+                hasattr(trainer, "context")
+                and "nanochat_core_results" in trainer.context.state
+            ):
+                core_results = trainer.context.state["nanochat_core_results"]
+                self._core_metric = core_results.get("core_metric", self.accuracy)
+
+        # If CORE benchmark was run via a Nanochat testing strategy, report the specialized CORE metric instead of the generic 'Global model accuracy' label.
+        core_metric = getattr(self, "_core_metric", None)
+
+        if core_metric is not None:
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
+                )
+            )
+        elif hasattr(Config().trainer, "target_perplexity"):
             logging.info(
                 fonts.colourize(
                     f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
@@ -273,9 +290,10 @@ class Server(base.Server):
 
     def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
-        return {
+        logged = {
             "round": self.current_round,
             "accuracy": self.accuracy,
+            "core_metric": getattr(self, "_core_metric", None),
             "accuracy_std": self.accuracy_std,
             "elapsed_time": self.wall_time - self.initial_wall_time,
             "processing_time": max(
@@ -290,6 +308,30 @@ class Server(base.Server):
             ),
             "comm_overhead": self.comm_overhead,
         }
+
+        # Add train_loss if available from client reports
+        if self.updates and hasattr(self.updates[0].report, "train_loss"):
+            # Compute weighted average of train_loss across clients
+            total_samples = sum(
+                update.report.num_samples
+                for update in self.updates
+                if update.report.train_loss is not None
+            )
+            if total_samples > 0:
+                weighted_loss = sum(
+                    update.report.train_loss * update.report.num_samples
+                    for update in self.updates
+                    if update.report.train_loss is not None
+                )
+                logged["train_loss"] = weighted_loss / total_samples
+            else:
+                logged["train_loss"] = None
+
+        # Add core_metric if Nanochat CORE evaluation was performed
+        if hasattr(self, "_core_metric"):
+            logged["core_metric"] = self._core_metric
+
+        return logged
 
     @staticmethod
     def get_accuracy_mean_std(updates):

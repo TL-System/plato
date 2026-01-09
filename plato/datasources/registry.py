@@ -12,6 +12,7 @@ from plato.datasources import (
     femnist,
     huggingface,
     lora,
+    nanochat,
     purchase,
     texas,
     tiny_imagenet,
@@ -27,6 +28,7 @@ registered_datasources = {
     "Texas": texas,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
+    "Nanochat": nanochat,
 }
 
 registered_partitioned_datasources = {"FEMNIST": femnist}

@@ -1,0 +1,54 @@
+[clients]
+
+type = "simple"
+total_clients = 1
+per_round = 1
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/nanochat/synthetic"
+model_path = "models/nanochat/synthetic"
+
+[data]
+datasource = "Nanochat"
+sampler = "iid"
+partition_size = 1
+random_seed = 1
+mode = "synthetic"
+max_train_batches = 4
+max_val_batches = 1
+tokenizer_threads = 2
+tokenizer_batch_size = 64
+device = "cpu"
+vocab_size = 512
+synthetic_seed = 123
+
+[evaluation]
+type = "nanochat_core"
+# bundle_dir = "~/nanochat"  # Optional, defaults to nanochat base dir or Plato's data directory
+max_per_task = 16  # Optional, -1 means run all examples
+
+[trainer]
+type = "nanochat"
+rounds = 1
+epochs = 1
+batch_size = 2
+model_name = "nanochat"
+optimizer = "nanochat"
+
+[algorithm]
+type = "fedavg"
+
+[parameters.model]
+sequence_len = 128
+vocab_size = 512
+n_layer = 2
+n_head = 4
+n_kv_head = 4
+n_embd = 256
+
+[results]
+types = "round, elapsed_time, core_metric, train_loss"

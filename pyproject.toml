@@ -47,6 +47,18 @@ dp = [
 mlx = [
     "mlx",
 ]
+nanochat = [
+    "datasets",
+    "numpy",
+    "psutil",
+    "regex",
+    "tiktoken",
+    "tokenizers",
+    "torch",
+    "wandb",
+    "jinja2",
+    "PyYAML",
+]
 
 [project.urls]
 Homepage = "https://github.com/TL-System/plato"
@@ -89,11 +101,13 @@ members = [
     "examples/detector",
     "examples/gradient_leakage_attacks",
     "tools",
+    "examples/nanochat",
 ]
 
 [dependency-groups]
 dev = [
     "pytest",
+    "ruff",
     "ty",
 ]
 

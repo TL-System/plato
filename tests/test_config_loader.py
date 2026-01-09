@@ -157,3 +157,54 @@ def test_config_base_path_used_without_cli_override(tmp_path: Path, monkeypatch)
     if hasattr(Config, "args"):
         delattr(Config, "args")
     Config._cli_overrides = {}
+
+
+def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
+    """Test that [evaluation] configuration is properly loaded."""
+    config_base = tmp_path / "runtime"
+    config_path = tmp_path / "config.toml"
+
+    config_data = {
+        "clients": {"type": "simple", "total_clients": 2, "per_round": 1},
+        "server": {"address": "127.0.0.1", "port": 8000},
+        "data": {"datasource": "MNIST"},
+        "trainer": {"type": "basic", "rounds": 1, "epochs": 1, "batch_size": 10},
+        "algorithm": {"type": "fedavg"},
+        "evaluation": {
+            "type": "nanochat_core",
+            "max_per_task": 128,
+            "bundle_dir": "/custom/path/to/nanochat",
+        },
+    }
+
+    toml_writer.dump(config_data, config_path)
+
+    monkeypatch.delenv("config_file", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            sys.argv[0],
+            "--config",
+            str(config_path),
+            "--base",
+            str(config_base),
+        ],
+    )
+
+    Config._instance = None
+    if hasattr(Config, "args"):
+        delattr(Config, "args")
+    Config._cli_overrides = {}
+
+    config = Config()
+
+    assert hasattr(config, "evaluation")
+    assert config.evaluation.type == "nanochat_core"
+    assert config.evaluation.max_per_task == 128
+    assert config.evaluation.bundle_dir == "/custom/path/to/nanochat"
+
+    Config._instance = None
+    if hasattr(Config, "args"):
+        delattr(Config, "args")
+    Config._cli_overrides = {}
