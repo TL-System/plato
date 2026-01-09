@@ -46,6 +46,10 @@ Available Strategies:
         - DittoUpdateStrategy: Personalized model training
         - DittoUpdateStrategyFromConfig: Config-based variant
 
+    FedALA:
+        - FedALAUpdateStrategy: Adaptive local aggregation
+        - FedALAUpdateStrategyFromConfig: Config-based variant
+
 Example:
     >>> from plato.trainers.composable import ComposableTrainer
     >>> from plato.trainers.strategies.algorithms import (
@@ -85,6 +89,12 @@ from plato.trainers.strategies.algorithms.apfl_strategy import (
 from plato.trainers.strategies.algorithms.ditto_strategy import (
     DittoUpdateStrategy,
     DittoUpdateStrategyFromConfig,
+)
+
+# FedALA strategies
+from plato.trainers.strategies.algorithms.fedala_strategy import (
+    FedALAUpdateStrategy,
+    FedALAUpdateStrategyFromConfig,
 )
 
 # FedDyn strategies
@@ -161,4 +171,7 @@ __all__ = [
     # Ditto
     "DittoUpdateStrategy",
     "DittoUpdateStrategyFromConfig",
+    # FedALA
+    "FedALAUpdateStrategy",
+    "FedALAUpdateStrategyFromConfig",
 ]
