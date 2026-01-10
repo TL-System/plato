@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import moon_client
 import moon_server
-from moon_model import Model as MoonModel
+from moon_model_factory import resolve_moon_model
 
 
 def main():
     """Launch a Plato training session with the MOON algorithm."""
-    model = MoonModel
+    model = resolve_moon_model()
     client = moon_client.create_client(model=model)
     server = moon_server.Server(model=model)
     server.run(client)
