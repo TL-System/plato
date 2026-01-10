@@ -298,7 +298,13 @@ class DataSource(base.DataSource):
         common_kwargs.setdefault("root", config.params["data_path"])
 
         download_flag = getattr(data_cfg, "download", kwargs.get("download", True))
-        download_supported = "download" in signature.parameters
+        # Some torchvision datasets accept download via **kwargs (e.g., EMNIST).
+        # Treat VAR_KEYWORD as supporting download to avoid skipping it.
+        has_var_kwargs = any(
+            param.kind == inspect.Parameter.VAR_KEYWORD
+            for param in signature.parameters.values()
+        )
+        download_supported = "download" in signature.parameters or has_var_kwargs
 
         default_train_transform = dataset_defaults.get("train_transform")
         if default_train_transform is None:
