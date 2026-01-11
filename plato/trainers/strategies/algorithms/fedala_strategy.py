@@ -72,6 +72,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         batch_size: int | None = None,
         threshold: float = 0.1,
         num_pre_loss: int = 10,
+        max_ala_epochs: int | None = 20,
         loss_fn: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] | None = None,
         save_state: bool = True,
     ) -> None:
@@ -89,6 +90,10 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
             raise ValueError(
                 f"num_pre_loss must be >= 1, got {num_pre_loss}"
             )
+        if max_ala_epochs is not None and max_ala_epochs < 1:
+            raise ValueError(
+                f"max_ala_epochs must be >= 1 or None, got {max_ala_epochs}"
+            )
         if batch_size is not None and batch_size < 1:
             raise ValueError(f"batch_size must be >= 1, got {batch_size}")
 
@@ -98,6 +103,9 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         self.batch_size = batch_size
         self.threshold = float(threshold)
         self.num_pre_loss = int(num_pre_loss)
+        self.max_ala_epochs = (
+            int(max_ala_epochs) if max_ala_epochs is not None else None
+        )
         self.loss_fn = loss_fn or nn.CrossEntropyLoss()
         self.save_state = save_state
 
@@ -469,6 +477,13 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
 
             losses.append(float(loss_value.item()))
             cnt += 1
+            if self.max_ala_epochs is not None and cnt >= self.max_ala_epochs:
+                LOGGER.info(
+                    "[Client #%d] FedALA reached max_ala_epochs=%d; stopping ALA.",
+                    context.client_id,
+                    self.max_ala_epochs,
+                )
+                break
 
             if not self.start_phase:
                 break
@@ -525,6 +540,7 @@ class FedALAUpdateStrategyFromConfig(FedALAUpdateStrategy):
         - layer_idx (default: 0)
         - threshold (default: 0.1)
         - num_pre_loss (default: 10)
+        - max_ala_epochs (default: 20)
         - ala_batch_size (optional)
     """
 
@@ -545,6 +561,16 @@ class FedALAUpdateStrategyFromConfig(FedALAUpdateStrategy):
         num_pre_loss = self._get_config_value(
             algo, ["num_pre_loss", "fedala_num_pre_loss", "ala_num_pre_loss"], 10
         )
+        max_ala_epochs = self._get_config_value(
+            algo,
+            [
+                "max_ala_epochs",
+                "fedala_max_ala_epochs",
+                "ala_max_epochs",
+                "fedala_max_epochs",
+            ],
+            20,
+        )
         batch_size = self._get_config_value(
             algo, ["ala_batch_size", "fedala_batch_size"], None
         )
@@ -559,6 +585,7 @@ class FedALAUpdateStrategyFromConfig(FedALAUpdateStrategy):
             batch_size=batch_size,
             threshold=float(threshold),
             num_pre_loss=int(num_pre_loss),
+            max_ala_epochs=None if max_ala_epochs is None else int(max_ala_epochs),
         )
 
     @staticmethod
