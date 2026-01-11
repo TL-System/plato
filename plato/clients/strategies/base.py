@@ -218,5 +218,12 @@ class CommunicationStrategy(ClientStrategy):
         self, context: ClientContext, report: Any, payload: Any
     ) -> None:
         """Send both report metadata and payload to the server."""
+        if getattr(context, "comm_simulation", False):
+            # The server reads the simulated payload file as soon as the report arrives.
+            # Write the payload first to avoid races under high concurrency.
+            await self.send_payload(context, payload)
+            await self.send_report(context, report)
+            return
+
         await self.send_report(context, report)
         await self.send_payload(context, payload)
