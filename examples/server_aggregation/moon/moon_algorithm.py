@@ -19,6 +19,25 @@ from plato.algorithms import fedavg
 class Algorithm(fedavg.Algorithm):
     """Algorithm providing MOON aggregation utilities."""
 
+    @staticmethod
+    def _cast_tensor_like(tensor: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
+        """Cast a tensor to match a reference dtype (handles bool/int safely)."""
+        if tensor.dtype == reference.dtype:
+            return tensor
+
+        if torch.is_floating_point(reference):
+            return tensor.to(reference.dtype)
+
+        if reference.dtype == torch.bool:
+            if torch.is_floating_point(tensor):
+                return tensor >= 0.5
+            return tensor.ne(0)
+
+        if torch.is_floating_point(tensor):
+            return torch.round(tensor).to(reference.dtype)
+
+        return tensor.to(reference.dtype)
+
     def moon_snapshot(self, weights: Mapping[str, torch.Tensor]) -> dict:
         """Create a safe snapshot of the provided weights."""
         # Use a deepcopy to avoid in-place mutations on tensors; keep on CPU
@@ -35,16 +54,27 @@ class Algorithm(fedavg.Algorithm):
 
         total = sum(u.report.num_samples for u in updates) or 1
 
-        aggregated: OrderedDict[str, torch.Tensor] = OrderedDict(
-            (name, torch.zeros_like(delta))
-            for name, delta in deltas_received[0].items()
-        )
+        reference = deltas_received[0]
+        aggregated: OrderedDict[str, torch.Tensor] = OrderedDict()
+        for name, delta in reference.items():
+            if torch.is_floating_point(delta):
+                aggregated[name] = torch.zeros_like(delta)
+            else:
+                aggregated[name] = torch.zeros_like(
+                    delta, dtype=torch.get_default_dtype()
+                )
 
         for u, delta in zip(updates, deltas_received):
             w = (u.report.num_samples or 0) / total
             if w == 0.0:
                 continue
             for name, value in delta.items():
-                aggregated[name] += value * w
+                target = aggregated[name]
+                if not torch.is_floating_point(value) or value.dtype != target.dtype:
+                    value = value.to(target.dtype)
+                aggregated[name] = target + value * w
+
+        for name, ref_tensor in reference.items():
+            aggregated[name] = self._cast_tensor_like(aggregated[name], ref_tensor)
 
         return aggregated
