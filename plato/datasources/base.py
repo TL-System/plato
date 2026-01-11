@@ -74,47 +74,94 @@ class DataSource:
             if sentinel.exists():
                 return
 
-            logging.info("Downloading %s.", url)
+            max_attempts = 3
+            for attempt in range(1, max_attempts + 1):
+                if attempt == 1:
+                    logging.info("Downloading %s.", url)
+                else:
+                    logging.info(
+                        "Retrying download (%s/%s) for %s.",
+                        attempt,
+                        max_attempts,
+                        url,
+                    )
 
-            res = requests.get(url, stream=True, timeout=60)
-            total_size = int(res.headers.get("Content-Length", 0))
-            downloaded_size = 0
+                try:
+                    res = requests.get(url, stream=True, timeout=60)
+                    res.raise_for_status()
+                except requests.RequestException as exc:
+                    logging.warning("Download failed for %s: %s", url, exc)
+                    if attempt == max_attempts:
+                        raise
+                    time.sleep(1)
+                    continue
 
-            with open(file_name, "wb+") as file:
-                for chunk in res.iter_content(chunk_size=1024):
-                    if not chunk:
-                        continue
-                    downloaded_size += len(chunk)
-                    file.write(chunk)
-                    file.flush()
+                total_size = int(res.headers.get("Content-Length", 0))
+                downloaded_size = 0
+
+                with open(file_name, "wb+") as file:
+                    for chunk in res.iter_content(chunk_size=1024):
+                        if not chunk:
+                            continue
+                        downloaded_size += len(chunk)
+                        file.write(chunk)
+                        file.flush()
+                        if total_size:
+                            sys.stdout.write(
+                                f"\r{100 * downloaded_size / total_size:.1f}%"
+                            )
+                            sys.stdout.flush()
                     if total_size:
-                        sys.stdout.write(f"\r{100 * downloaded_size / total_size:.1f}%")
-                        sys.stdout.flush()
-                if total_size:
-                    sys.stdout.write("\n")
+                        sys.stdout.write("\n")
 
-            # Unzip the compressed file just downloaded
-            logging.info("Decompressing the dataset downloaded.")
-            name, suffix = os.path.splitext(file_name)
+                if total_size and downloaded_size != total_size:
+                    logging.warning(
+                        "Download size mismatch for %s (expected %s, got %s).",
+                        file_name,
+                        total_size,
+                        downloaded_size,
+                    )
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+                    if attempt == max_attempts:
+                        raise RuntimeError(
+                            f"Incomplete download for {url}. Please retry."
+                        )
+                    time.sleep(1)
+                    continue
 
-            if file_name.endswith("tar.gz"):
-                with tarfile.open(file_name, "r:gz") as tar:
-                    tar.extractall(data_path)
-                os.remove(file_name)
-            elif suffix == ".zip":
-                logging.info("Extracting %s to %s.", file_name, data_path)
-                with zipfile.ZipFile(file_name, "r") as zip_ref:
-                    zip_ref.extractall(data_path)
-            elif suffix == ".gz":
-                with gzip.open(file_name, "rb") as zipped_file:
-                    with open(name, "wb") as unzipped_file:
-                        unzipped_file.write(zipped_file.read())
-                os.remove(file_name)
-            else:
-                logging.info("Unknown compressed file type for %s.", file_name)
-                sys.exit()
+                # Unzip the compressed file just downloaded
+                logging.info("Decompressing the dataset downloaded.")
+                name, suffix = os.path.splitext(file_name)
 
-            sentinel.touch()
+                try:
+                    if file_name.endswith("tar.gz"):
+                        with tarfile.open(file_name, "r:gz") as tar:
+                            tar.extractall(data_path)
+                        os.remove(file_name)
+                    elif suffix == ".zip":
+                        logging.info("Extracting %s to %s.", file_name, data_path)
+                        with zipfile.ZipFile(file_name, "r") as zip_ref:
+                            zip_ref.extractall(data_path)
+                    elif suffix == ".gz":
+                        with gzip.open(file_name, "rb") as zipped_file:
+                            with open(name, "wb") as unzipped_file:
+                                unzipped_file.write(zipped_file.read())
+                        os.remove(file_name)
+                    else:
+                        logging.info("Unknown compressed file type for %s.", file_name)
+                        sys.exit()
+                except (OSError, tarfile.ReadError, zipfile.BadZipFile) as exc:
+                    logging.warning("Failed to extract %s: %s", file_name, exc)
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+                    if attempt == max_attempts:
+                        raise
+                    time.sleep(1)
+                    continue
+
+                sentinel.touch()
+                break
 
     @staticmethod
     def input_shape():
