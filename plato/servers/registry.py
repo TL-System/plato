@@ -16,6 +16,7 @@ from plato.servers import (
     fedavg_mpc_additive,
     fedavg_mpc_shamir,
     fedavg_personalized,
+    pfedgraph,
     split_learning,
 )
 
@@ -34,6 +35,7 @@ else:
         "fedavg_personalized": fedavg_personalized.Server,
         "fedavg_mpc_additive": fedavg_mpc_additive.Server,
         "fedavg_mpc_shamir": fedavg_mpc_shamir.Server,
+        "pfedgraph": pfedgraph.Server,
         "split_learning": split_learning.Server,
     }
 

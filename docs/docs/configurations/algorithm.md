@@ -6,6 +6,7 @@
     - `fedavg` the federated averaging algorithm
     - `split_learning` the Split Learning algorithm
     - `fedavg_personalized` the personalized federated learning algorithm
+    - `pfedgraph` the Personalized Federated Learning with Inferred Collaboration Graphs algorithm
 
 !!! example "cross_silo"
     Whether or not cross-silo training should be used.
@@ -26,3 +27,27 @@
         A float to show the proportion of clients participating in the federated training process. It is under `personalization`, which is a sub-config path that contains other personalized training parameters.
 
         Default value: `1.0`
+
+!!! example "pfedgraph"
+    Configuration for pFedGraph.
+
+    !!! example "pfedgraph_alpha"
+        Hyper-parameter controlling the collaboration graph update.
+
+        Default value: `0.8`
+
+    !!! example "pfedgraph_lambda"
+        Regularization strength for cosine similarity in the local objective.
+
+        Default value: `0.01`
+
+    !!! example "pfedgraph_similarity_metric"
+        Similarity metric scope for graph inference. Use `all` for all parameters
+        or `fc` to focus on the final fully-connected layers.
+
+        Default value: `all`
+
+    !!! example "pfedgraph_similarity_layers"
+        Optional list of layer name substrings to use when computing model
+        similarity for graph inference. Overrides `pfedgraph_similarity_metric`
+        when provided.

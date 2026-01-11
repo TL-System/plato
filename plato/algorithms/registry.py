@@ -16,6 +16,7 @@ from plato.algorithms import (
     fedavg_personalized,
     lora,
     mlx_fedavg,
+    pfedgraph,
     split_learning,
 )
 from plato.algorithms.base import Algorithm as AlgorithmBase
@@ -27,6 +28,7 @@ registered_algorithms: dict[str, type[AlgorithmBase]] = {
     "fedavg_personalized": fedavg_personalized.Algorithm,
     "fedavg_lora": lora.Algorithm,
     "mlx_fedavg": mlx_fedavg.Algorithm,
+    "pfedgraph": pfedgraph.Algorithm,
     "split_learning": split_learning.Algorithm,
 }
 

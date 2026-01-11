@@ -10,6 +10,7 @@ from plato.trainers import (
     basic,
     composable,
     gan,
+    pfedgraph,
     split_learning,
 )
 from plato.trainers import (
@@ -21,6 +22,7 @@ registered_trainers = {
     "basic": basic.Trainer,
     "timm_basic": basic.TrainerWithTimmScheduler,
     "gan": gan.Trainer,
+    "pfedgraph": pfedgraph.Trainer,
     "split_learning": split_learning.Trainer,
     "nanochat": nanochat_trainer.Trainer,
 }

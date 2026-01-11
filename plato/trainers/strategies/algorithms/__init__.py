@@ -50,6 +50,11 @@ Available Strategies:
         - FedALAUpdateStrategy: Adaptive local aggregation
         - FedALAUpdateStrategyFromConfig: Config-based variant
 
+    pFedGraph:
+        - PFedGraphLossStrategy: Cosine similarity regularization
+        - PFedGraphLossStrategyFromConfig: Config-based variant
+        - PFedGraphUpdateStrategy: Reference snapshot management
+
 Example:
     >>> from plato.trainers.composable import ComposableTrainer
     >>> from plato.trainers.strategies.algorithms import (
@@ -123,6 +128,11 @@ from plato.trainers.strategies.algorithms.lgfedavg_strategy import (
     LGFedAvgStepStrategyAuto,
     LGFedAvgStepStrategyFromConfig,
 )
+from plato.trainers.strategies.algorithms.pfedgraph_strategy import (
+    PFedGraphLossStrategy,
+    PFedGraphLossStrategyFromConfig,
+    PFedGraphUpdateStrategy,
+)
 
 # Personalized FL strategies (FedPer, FedRep)
 from plato.trainers.strategies.algorithms.personalized_fl_strategy import (
@@ -174,4 +184,8 @@ __all__ = [
     # FedALA
     "FedALAUpdateStrategy",
     "FedALAUpdateStrategyFromConfig",
+    # pFedGraph
+    "PFedGraphLossStrategy",
+    "PFedGraphLossStrategyFromConfig",
+    "PFedGraphUpdateStrategy",
 ]
