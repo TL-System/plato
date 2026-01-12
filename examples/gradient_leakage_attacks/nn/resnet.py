@@ -198,7 +198,7 @@ class Model(nn.Module):
 
         return x
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Standard forward pass matching torchvision's API."""
         return self._forward_impl(x)
 

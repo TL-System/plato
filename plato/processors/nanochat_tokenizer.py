@@ -71,14 +71,14 @@ class NanochatTokenizerProcessor(Processor):
 
     def _train_from_corpus(self, corpus: Iterable[str]):
         try:
-            import rustbpe  # type: ignore[import-not-found]
+            import rustbpe
         except ImportError as exc:  # pragma: no cover - guarded import
             raise RuntimeError(
                 "rustbpe extension is required to train a Nanochat tokenizer."
             ) from exc
 
         try:
-            import tiktoken  # type: ignore[import-not-found]
+            import tiktoken
         except ImportError as exc:  # pragma: no cover - guarded import
             raise RuntimeError(
                 "tiktoken is required to construct Nanochat tokenizer encodings."

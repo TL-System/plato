@@ -123,7 +123,7 @@ class ServerSync(fedavg.Server):
             raise TypeError(
                 "PerFedRLNAS server requires the MobileNetV3 FedNAS algorithm."
             )
-        return cast(fednas_algorithm.ServerAlgorithmSync, algorithm)
+        return algorithm
 
     def _supernet(self) -> SupernetProtocol:
         return self._fednas_algorithm().get_supernet()

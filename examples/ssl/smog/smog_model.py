@@ -22,6 +22,10 @@ from plato.models.cnn_encoder import Model as encoder_registry
 class SMoG(nn.Module):
     """The structure of the SMoG model."""
 
+    _temperature: float
+    _n_groups: int
+    _n_iteration: int
+
     def __init__(self, encoder: nn.Module | None = None) -> None:
         super().__init__()
         temperature = (
@@ -29,7 +33,7 @@ class SMoG(nn.Module):
             if hasattr(Config().trainer, "smog_temperature")
             else 0.1
         )
-        object.__setattr__(self, "_temperature", float(temperature))
+        self._temperature = float(temperature)
 
         encoder_name = Config().trainer.encoder_name
         params: dict[str, Any] = Config().params
@@ -70,25 +74,23 @@ class SMoG(nn.Module):
         deactivate_requires_grad(self.projector_momentum)
 
         # Set the necessary hyper-parameter for SMoG
-        object.__setattr__(self, "_n_groups", int(Config().trainer.n_groups))
+        self._n_groups = int(Config().trainer.n_groups)
         n_prototypes = Config().trainer.n_prototypes
         beta = Config().trainer.smog_beta
 
         # Define the prototypes
-        group_count = cast(int, self._n_groups)
         self.smog = SMoGPrototypes(
-            group_features=torch.rand(group_count, n_prototypes), beta=beta
+            group_features=torch.rand(self._n_groups, n_prototypes), beta=beta
         )
 
         # Current iteration.
-        object.__setattr__(self, "_n_iteration", 0)
+        self._n_iteration = 0
 
     def _cluster_features(self, features: torch.Tensor) -> torch.Tensor:
         """Cluster the features using sklearn."""
         # Cluster the features using sklearn
         features = features.cpu().numpy()
-        group_count = cast(int, self._n_groups)
-        kmeans = KMeans(group_count).fit(features)
+        kmeans = KMeans(self._n_groups).fit(features)
         clustered = torch.from_numpy(kmeans.cluster_centers_).float()
         clustered = torch.nn.functional.normalize(clustered, dim=1)
         return clustered
@@ -148,7 +150,7 @@ class SMoG(nn.Module):
 
     @temperature.setter
     def temperature(self, value: float) -> None:
-        object.__setattr__(self, "_temperature", float(value))
+        self._temperature = float(value)
 
     @property
     def n_iteration(self) -> int:
@@ -157,4 +159,4 @@ class SMoG(nn.Module):
 
     @n_iteration.setter
     def n_iteration(self, value: int) -> None:
-        object.__setattr__(self, "_n_iteration", int(value))
+        self._n_iteration = int(value)

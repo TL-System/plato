@@ -36,7 +36,7 @@ class dynamicServerCallback(ServerCallback):
 
 
 class customTrainerCallback(TrainerCallback):
-    def on_train_run_start(self, trainer, config):
+    def on_train_run_start(self, trainer, config, **kwargs):
         logging.info(
             f"[Client {trainer.client_id}] Trainer callback from dynamic adding."
         )

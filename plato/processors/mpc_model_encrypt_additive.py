@@ -8,7 +8,10 @@ import copy
 import logging
 import os
 import random
-from typing import Any, Dict, List
+from collections.abc import MutableMapping
+from typing import Any
+
+import torch
 
 from plato.config import Config
 from plato.mpc import RoundInfoStore
@@ -34,7 +37,7 @@ class Processor(model.Processor):
         self.debug_artifacts = debug_artifacts
 
     @staticmethod
-    def _split_tensor(tensor, num_shares: int) -> list[Any]:
+    def _split_tensor(tensor: torch.Tensor, num_shares: int) -> list[torch.Tensor]:
         """Randomly decomposes ``tensor`` into ``num_shares`` additive shares."""
         if num_shares == 1:
             return [tensor]
@@ -60,7 +63,9 @@ class Processor(model.Processor):
             except OSError:
                 logging.debug("Unable to persist MPC debug artefact at %s.", path)
 
-    def process(self, data: dict[str, Any]) -> dict[str, Any]:
+    def process(
+        self, data: MutableMapping[str, torch.Tensor]
+    ) -> MutableMapping[str, torch.Tensor]:
         state = self.round_store.load_state()
         if self.client_id not in state.selected_clients:
             raise RuntimeError(
@@ -78,7 +83,7 @@ class Processor(model.Processor):
         num_clients = len(state.selected_clients)
         data_shares = [copy.deepcopy(data) for _ in range(num_clients)]
 
-        self._write_debug_artifact(state.round_number, "raw_weights", data)
+        self._write_debug_artifact(state.round_number, "raw_weights", dict(data))
 
         for name, tensor in data.items():
             scaled = tensor * num_samples
@@ -92,10 +97,12 @@ class Processor(model.Processor):
             if target_client == self.client_id:
                 continue
 
-            self.round_store.append_additive_share(target_client, data_shares[idx])
+            self.round_store.append_additive_share(
+                target_client, dict(data_shares[idx])
+            )
 
         self._write_debug_artifact(
-            state.round_number, "encrypted_weights", data_shares[self_index]
+            state.round_number, "encrypted_weights", dict(data_shares[self_index])
         )
 
         return data_shares[self_index]

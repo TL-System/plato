@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 from types import SimpleNamespace
+from typing import cast
 
 import torch
 
@@ -44,7 +45,10 @@ def test_structured_pruning_zeroes_all_channels():
     torch.manual_seed(0)
     model = torch.nn.Sequential(torch.nn.Linear(4, 4))
     trainer = SimpleNamespace(model=model)
-    original_bias = model[0].bias.detach().cpu().clone()
+    layer = cast(torch.nn.Linear, model[0])
+    bias = layer.bias
+    assert bias is not None
+    original_bias = bias.detach().cpu().clone()
 
     processor = structured_pruning.Processor(
         name="structured",

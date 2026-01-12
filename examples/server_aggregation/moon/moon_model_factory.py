@@ -13,11 +13,10 @@ from typing import Any
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from moon_model import Model as MoonLeNetModel
 
 from plato.config import Config
 from plato.models import resnet, vgg
-
-from moon_model import Model as MoonLeNetModel
 
 
 def _resolve_model_name() -> str:

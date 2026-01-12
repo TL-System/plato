@@ -132,9 +132,9 @@ class AggregationStrategy(ServerStrategy):
     async def aggregate_deltas(
         self,
         updates: list[SimpleNamespace],
-        deltas_received: list[dict],
+        deltas_received: list[Any],
         context: ServerContext,
-    ) -> dict:
+    ) -> Any:
         """
         Aggregate weight deltas from clients.
 

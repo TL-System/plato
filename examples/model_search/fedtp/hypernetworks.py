@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from typing import OrderedDict as OrderedDictType
+from typing import cast
 
 from torch import Tensor, nn
 from torch.nn.utils import spectral_norm
@@ -83,15 +84,16 @@ class ViTHyper(nn.Module):
             layer_d_qkv_value_hyper = self.to_qkv_value_list[dep]
             attention_map = Config().parameters.hypernet.attention.split(",")
             if len(attention_map) == 1:
-                layer_d_qkv_value = layer_d_qkv_value_hyper(features).view(
+                layer_module = cast(nn.Module, layer_d_qkv_value_hyper)
+                layer_d_qkv_value = layer_module(features).view(
                     self.inner_dim * 3, self.dim
                 )
                 name = Config().parameters.hypernet.attention % (dep)
                 weights[name] = layer_d_qkv_value.cpu()
             else:
+                layer_list = cast(nn.ModuleList, layer_d_qkv_value_hyper)
                 layer_d_qkv_value = [
-                    layer(features).view(self.inner_dim, self.dim)
-                    for layer in layer_d_qkv_value_hyper
+                    layer(features).view(self.inner_dim, self.dim) for layer in layer_list
                 ]
                 name = Config().parameters.hypernet.attention % (dep, dep, dep)
                 names = name.split(",")

@@ -23,8 +23,8 @@ try:  # Optional dependency – only required when S3/ZooKeeper mode is enabled.
     from kazoo.client import KazooClient
     from kazoo.recipe.lock import Lock
 except ImportError:  # pragma: no cover - fallback when kazoo is unavailable.
-    KazooClient = None  # type: ignore
-    Lock = None  # type: ignore
+    KazooClient = None
+    Lock = None
 
 logger = logging.getLogger(__name__)
 

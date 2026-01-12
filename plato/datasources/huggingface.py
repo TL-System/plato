@@ -8,6 +8,7 @@ https://huggingface.co/docs/datasets/quicktour.html
 
 import logging
 import os
+from typing import Any, cast
 
 from datasets import load_dataset, load_from_disk
 from transformers import (
@@ -51,10 +52,11 @@ class DataSource(base.DataSource):
             if callable(save_to_disk):
                 save_to_disk(saved_data_path)
 
-        parser = HfArgumentParser(TrainingArguments)
+        parser = HfArgumentParser(cast(Any, TrainingArguments))
         (self.training_args,) = parser.parse_args_into_dataclasses(
             args=["--output_dir=/tmp", "--report_to=none"]
         )
+        self.training_args = cast(TrainingArguments, self.training_args)
 
         model_name = Config().trainer.model_name
         use_auth_token = None
@@ -140,7 +142,8 @@ class DataSource(base.DataSource):
 
     def preprocess_data(self, datasets):
         """Tokenizing and grouping the raw dataset."""
-        with self.training_args.main_process_first(desc="dataset map tokenization"):
+        training_args = cast(TrainingArguments, self.training_args)
+        with training_args.main_process_first(desc="dataset map tokenization"):
             tokenized_datasets = datasets.map(
                 self.tokenize_function,
                 batched=True,
@@ -159,7 +162,7 @@ class DataSource(base.DataSource):
             )
             block_size = 1024
 
-        with self.training_args.main_process_first(desc="grouping texts together"):
+        with training_args.main_process_first(desc="grouping texts together"):
             lm_datasets = tokenized_datasets.map(
                 self.group_texts,
                 batched=True,

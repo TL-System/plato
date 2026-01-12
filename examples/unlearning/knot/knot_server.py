@@ -8,6 +8,7 @@ import logging
 import os
 import random
 from collections import deque
+from typing import Any
 
 import fedunlearning_server
 import numpy
@@ -147,8 +148,8 @@ class Server(fedunlearning_server.Server):
         self.clustered_test_accuracy = {}
 
         # The recent history of global accuracies
-        self.recent_global_accuracies = None
-        self.recent_history_size = None
+        self.recent_global_accuracies: deque[float] = deque()
+        self.recent_history_size: int = 0
 
         # A dictionary that maps the cluster ID to the earliest round that retraining
         # must start from when entering the retraining phase
@@ -181,7 +182,18 @@ class Server(fedunlearning_server.Server):
         """Load the trainer and initialize the dictionary that maps cluster IDs to client IDs."""
         super().init_trainer()
 
-        self.algorithm.init_clusters(self.clusters)
+        algorithm = self._require_algorithm()
+        algorithm.init_clusters(self.clusters)
+
+    def _require_algorithm(self) -> Any:
+        if self.algorithm is None:
+            raise RuntimeError("Knot server requires a clustering algorithm.")
+        return self.algorithm
+
+    def _require_trainer(self) -> Any:
+        if self.trainer is None:
+            raise RuntimeError("Knot server requires an initialized trainer.")
+        return self.trainer
 
     def choose_clients(self, clients_pool, clients_count):
         """
@@ -224,6 +236,8 @@ class Server(fedunlearning_server.Server):
 
     def weights_aggregated(self, updates):
         """Method called after the updated weights have been aggregated."""
+        algorithm = self._require_algorithm()
+        trainer = self._require_trainer()
         # Testing the updated clustered model directly at the server
         if (
             hasattr(Config().server, "do_clustered_test")
@@ -241,7 +255,7 @@ class Server(fedunlearning_server.Server):
                         update.client_id,
                     )
                     continue
-                if cluster_id not in self.algorithm.models:
+                if cluster_id not in algorithm.models:
                     logging.debug(
                         "[%s] Skipping clustered test for cluster %s without aggregated model.",
                         self,
@@ -257,11 +271,11 @@ class Server(fedunlearning_server.Server):
                 )
             else:
                 test_accuracy_per_cluster = (
-                    self.trainer.testing_strategy.test_clustered_models(
+                    trainer.testing_strategy.test_clustered_models(
                         self.testset,
                         self.testset_sampler,
-                        self.trainer.context,
-                        self.algorithm.models,
+                        trainer.context,
+                        algorithm.models,
                         updated_cluster_ids,
                     )
                 )
@@ -271,7 +285,7 @@ class Server(fedunlearning_server.Server):
 
         if hasattr(Config().server, "do_test") and Config().server.do_test:
             # Retrieve the model from the cluster with the highest accuracy
-            self.trainer.model.load_state_dict(self._aggregate_models(), strict=True)
+            trainer.model.load_state_dict(self._aggregate_models(), strict=True)
 
     def clients_processed(self):
         """Determining the rollback round and roll back to that round, if retraining is needed
@@ -502,10 +516,12 @@ class Server(fedunlearning_server.Server):
 
         logging.info("[Server #%d] Loading a model from %s.", os.getpid(), model_path)
 
-        if cluster_id in self.algorithm.models:
-            model = self.algorithm.models[cluster_id]
+        algorithm = self._require_algorithm()
+        trainer = self._require_trainer()
+        if cluster_id in algorithm.models:
+            model = algorithm.models[cluster_id]
         else:
-            model = self.trainer.model
+            model = trainer.model
 
         model.load_state_dict(torch.load(model_path), strict=True)
 
@@ -525,10 +541,12 @@ class Server(fedunlearning_server.Server):
         else:
             model_path = f"{model_path}/{model_name}.pth"
 
-        if cluster_id in self.algorithm.models:
-            model = self.algorithm.models[cluster_id]
+        algorithm = self._require_algorithm()
+        trainer = self._require_trainer()
+        if cluster_id in algorithm.models:
+            model = algorithm.models[cluster_id]
         else:
-            model = self.trainer.model
+            model = trainer.model
         torch.save(model.state_dict(), model_path)
 
         logging.info("[Server #%d] Model saved to %s.", os.getpid(), model_path)
@@ -600,9 +618,10 @@ class Server(fedunlearning_server.Server):
         """Aggregate the models from the clusters by using the one with the
         highest test accuracy.
         """
+        trainer = self._require_trainer()
         avg_model = {
-            name: self.trainer.zeros(weights.shape).to(Config().device())
-            for name, weights in self.trainer.model.state_dict().items()
+            name: trainer.zeros(weights.shape).to(Config().device())
+            for name, weights in trainer.model.state_dict().items()
         }
 
         if hasattr(Config().trainer, "target_perplexity"):
@@ -623,7 +642,8 @@ class Server(fedunlearning_server.Server):
                     best_cluster_acc = cluster_acc
                     best_cluster_id = cluster_id
 
-        for cluster_id, clustered_model in self.algorithm.models.items():
+        algorithm = self._require_algorithm()
+        for cluster_id, clustered_model in algorithm.models.items():
             if cluster_id == best_cluster_id:
                 for name, weights in clustered_model.state_dict().items():
                     avg_model[name] = weights
@@ -705,6 +725,8 @@ class Server(fedunlearning_server.Server):
     def _cosine_similarity(self, updates):
         """Compute the cosine similarity of the received updates and the difference
         between the first round model - initial model and clients' updates."""
+        trainer = self._require_trainer()
+        algorithm = self._require_algorithm()
 
         model_name = (
             Config().trainer.model_name
@@ -715,7 +737,7 @@ class Server(fedunlearning_server.Server):
         checkpoint_path = Config.params["checkpoint_path"]
         model_path = f"{checkpoint_path}/{filename}"
 
-        initial_model = copy.deepcopy(self.trainer.model)
+        initial_model = copy.deepcopy(trainer.model)
         initial_model.load_state_dict(torch.load(model_path))
 
         initial = torch.zeros(0)
@@ -723,12 +745,12 @@ class Server(fedunlearning_server.Server):
             initial = torch.cat((initial, weight.view(-1)))
 
         current = torch.zeros(0)
-        for __, weight in self.trainer.model.cpu().state_dict().items():
+        for __, weight in trainer.model.cpu().state_dict().items():
             current = torch.cat((current, weight.view(-1)))
 
         weights_received = [update.payload for update in self.updates]
-        baseline_weights = self.algorithm.extract_weights()
-        deltas_received = self.algorithm.compute_weight_deltas(
+        baseline_weights = algorithm.extract_weights()
+        deltas_received = algorithm.compute_weight_deltas(
             baseline_weights, weights_received, cluster_id=None
         )
 
@@ -863,7 +885,8 @@ class Server(fedunlearning_server.Server):
         index_of_value_1 = numpy.array(numpy.argwhere(assignment_array == 1))
 
         self.clusters = dict(zip(index_of_value_1[:, 1] + 1, index_of_value_1[:, 0]))
-        self.algorithm.init_clusters(self.clusters)
+        algorithm = self._require_algorithm()
+        algorithm.init_clusters(self.clusters)
 
         logging.info(
             fonts.colourize(

@@ -75,8 +75,8 @@ class Attention(nn.Module):
     MHS module.
     """
 
-    heads: int
-    scale: float
+    _heads: int
+    _scale: float
 
     # pylint:disable=too-many-arguments
     def __init__(self, dim, heads=8, dim_head=64, dropout=0.0, model_rate=1.0):
@@ -84,8 +84,8 @@ class Attention(nn.Module):
         inner_dim = dim_head * heads
         project_out = not (heads == 1 and dim_head == dim)
 
-        object.__setattr__(self, "_heads", int(heads))
-        object.__setattr__(self, "_scale", float(dim_head**-0.5))
+        self._heads = int(heads)
+        self._scale = float(dim_head**-0.5)
 
         self.attend = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(dropout)
@@ -158,7 +158,11 @@ class Transformer(nn.Module):
 
     def forward(self, x):
         "Forward function"
-        for attn, ff in self.layers:
+        for layer in self.layers:
+            if not isinstance(layer, nn.ModuleList):
+                raise TypeError("Expected transformer layer to be a ModuleList.")
+            attn = layer[0]
+            ff = layer[1]
             x = attn(x) + x
             x = ff(x) + x
         return x

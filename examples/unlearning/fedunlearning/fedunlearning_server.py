@@ -165,7 +165,13 @@ class Server(mia_server.Server):
                     else "custom"
                 )
                 filename = f"checkpoint_{model_name}_{self.current_round}.safetensors"
-                self.trainer.load_model(filename, checkpoint_path)
+                trainer = getattr(self, "trainer", None)
+                load_model = getattr(trainer, "load_model", None)
+                if not callable(load_model):
+                    raise AttributeError(
+                        "FedUnlearningServer requires a trainer with load_model()."
+                    )
+                load_model(filename, checkpoint_path)
 
                 logging.info(
                     "[Server #%d] Model used for the retraining phase loaded from %s.",

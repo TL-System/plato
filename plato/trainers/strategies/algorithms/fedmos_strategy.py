@@ -21,7 +21,7 @@ global model proximity.
 
 import copy
 from collections.abc import Callable
-from typing import Any, Optional, cast
+from typing import Any, Optional, cast, overload
 
 import torch
 import torch.nn as nn
@@ -147,8 +147,18 @@ class FedMosOptimizer(Optimizer):
                 # Store current gradient for next iteration
                 grad_prev.copy_(grad_current)
 
+    @overload
+    def step(self, closure: Callable[[], float]) -> float: ...
+
+    @overload
+    def step(self, closure: None = ..., **kwargs: Any) -> None: ...
+
     @torch.no_grad()
-    def step(self, global_model_params=None, closure=None):
+    def step(
+        self,
+        closure: Callable[[], float] | None = None,
+        **kwargs: Any,
+    ) -> float | None:
         """
         Perform a single optimization step.
 
@@ -164,6 +174,7 @@ class FedMosOptimizer(Optimizer):
             with torch.enable_grad():
                 loss = closure()
 
+        global_model_params = kwargs.get("global_model_params")
         for group in self.param_groups:
             lr = group["lr"]
             mu = group["mu"]
@@ -532,14 +543,10 @@ class FedMosStepStrategy(TrainingStepStrategy):
         global_model = context.state.get("fedmos_global_model")
         step_fn = getattr(optimizer, "step")
         step_callable = cast(Callable[..., Any], step_fn)
-        if global_model is not None and hasattr(optimizer, "step"):
-            # Check if step accepts global_model_params argument
-            import inspect
-
-            sig = inspect.signature(step_fn)
-            if "global_model_params" in sig.parameters:
+        if global_model is not None:
+            try:
                 step_callable(global_model_params=global_model)
-            else:
+            except TypeError:
                 step_callable()
         else:
             step_callable()

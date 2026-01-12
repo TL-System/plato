@@ -117,7 +117,7 @@ class OortSelectionStrategy(ClientSelectionStrategy):
             if exploited_clients_count > 0:
                 sorted_by_utility = sorted(
                     self.client_utilities,
-                    key=self.client_utilities.get,
+                    key=lambda client_id: self.client_utilities.get(client_id, 0.0),
                     reverse=True,
                 )
                 sorted_by_utility = [

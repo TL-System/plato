@@ -8,8 +8,9 @@ import copy
 import logging
 import math
 import os
+from collections.abc import MutableMapping
 from random import randint
-from typing import Any, Dict, List
+from typing import Any
 
 import torch
 
@@ -108,7 +109,9 @@ class Processor(model.Processor):
         encrypted_size.append(2)
         return coords.view(encrypted_size)
 
-    def process(self, data: dict[str, Any]) -> dict[str, Any]:
+    def process(
+        self, data: MutableMapping[str, torch.Tensor]
+    ) -> MutableMapping[str, torch.Tensor]:
         state = self.round_store.load_state()
         if self.client_id not in state.selected_clients:
             raise RuntimeError(
@@ -127,11 +130,11 @@ class Processor(model.Processor):
         num_clients = len(selected_clients)
         threshold = self.threshold or max(num_clients - 2, 1)
 
-        data_shares: list[dict[str, Any]] = [
+        data_shares: list[MutableMapping[str, torch.Tensor]] = [
             copy.deepcopy(data) for _ in range(num_clients)
         ]
 
-        self._write_debug_artifact(state.round_number, "raw_weights", data)
+        self._write_debug_artifact(state.round_number, "raw_weights", dict(data))
 
         for name, tensor in data.items():
             scaled = tensor * num_samples
@@ -145,10 +148,10 @@ class Processor(model.Processor):
             if idx == self_index:
                 continue
             self.round_store.store_pairwise_share(
-                target_client, self.client_id, data_shares[idx]
+                target_client, self.client_id, dict(data_shares[idx])
             )
 
         self._write_debug_artifact(
-            state.round_number, "encrypted_weights", data_shares[self_index]
+            state.round_number, "encrypted_weights", dict(data_shares[self_index])
         )
         return data_shares[self_index]

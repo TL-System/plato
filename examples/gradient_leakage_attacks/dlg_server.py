@@ -679,9 +679,8 @@ class Server(fedavg.Server):
             elif attack_method == "csDLG":
                 dummy_loss = cross_entropy(dummy_pred, torch.argmax(labels, dim=-1))
 
-            dummy_grad = torch.autograd.grad(
-                dummy_loss, model.parameters(), create_graph=True
-            )
+            params = list(model.parameters())
+            dummy_grad = torch.autograd.grad(dummy_loss, params, create_graph=True)
 
             rec_loss = self._reconstruction_costs([dummy_grad], target_grad)
             if (
@@ -752,7 +751,7 @@ class Server(fedavg.Server):
 
                 grad = torch.autograd.grad(
                     loss,
-                    patched_model.parameters.values(),
+                    list(patched_model.parameters.values()),
                     retain_graph=True,
                     create_graph=True,
                     only_inputs=True,

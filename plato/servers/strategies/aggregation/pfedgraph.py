@@ -33,7 +33,7 @@ def _project_to_simplex(vector: torch.Tensor) -> torch.Tensor:
     if not torch.any(condition):
         theta = cumulative[-1] / vector.numel()
     else:
-        rho = torch.nonzero(condition, as_tuple=False)[-1].item()
+        rho = int(torch.nonzero(condition, as_tuple=False)[-1].item())
         theta = cumulative[rho] / (rho + 1)
     return torch.clamp(vector - theta, min=0.0)
 

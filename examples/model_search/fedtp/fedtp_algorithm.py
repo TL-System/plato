@@ -10,6 +10,7 @@ arXiv preprint arXiv:2211.01572 (2022).
 https://arxiv.org/pdf/2211.01572v1.pdf.
 """
 
+from collections import OrderedDict
 from typing import Tuple
 
 import torch
@@ -27,13 +28,17 @@ class ServerAlgorithm(fedavg.Algorithm):
 
     def __init__(self, trainer: Trainer):
         super().__init__(trainer)
-        self.current_weights: Tensor | None = None
+        self.current_weights: OrderedDict[str, Tensor] | None = None
 
-    def generate_attention(self, hnet: Module, client_id: int) -> Tensor:
+    def generate_attention(self, hnet: Module, client_id: int) -> OrderedDict[str, Tensor]:
         """Generated the customized attention of each client."""
         weights = hnet(
             torch.tensor([client_id - 1], dtype=torch.long).to(Config().device())
         )
+        if not isinstance(weights, OrderedDict):
+            raise RuntimeError(
+                "FedTP hypernetwork must return an OrderedDict of weights."
+            )
         self.current_weights = weights
         return weights
 
@@ -46,7 +51,7 @@ class ServerAlgorithm(fedavg.Algorithm):
         """Manullay calculate the gradients of hypernet."""
         hnet_grads = torch.autograd.grad(
             list(node_weights.values()),
-            hnet.parameters(),
+            list(hnet.parameters()),
             grad_outputs=list(delta_theta.values()),
             retain_graph=True,
         )

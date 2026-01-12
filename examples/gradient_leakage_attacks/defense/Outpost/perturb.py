@@ -30,7 +30,11 @@ def noise(dy_dx: list, risk: list):
         else:
             flattened_fim = np.append(flattened_fim, squared_grad.flatten())
 
-    fim_thresh = np.percentile(flattened_fim, 100 - Config().algorithm.phi)
+    if flattened_fim is None:
+        return dy_dx
+
+    phi = float(Config().algorithm.phi)
+    fim_thresh = np.percentile(flattened_fim, 100.0 - phi)
 
     for i, grad in enumerate(dy_dx):
         # pruning
@@ -44,11 +48,12 @@ def noise(dy_dx: list, risk: list):
             0, risk[i] * Config().algorithm.noise_base, grad.shape
         )
         noise_mask = np.where(fim[i] < fim_thresh, 0, 1)
-        gauss_noise = noise_base * noise_mask
-        grad = (
-            (torch.Tensor(grad_tensor) + gauss_noise)
-            .to(dtype=torch.float32)
-            .to(Config().device())
+        noise_mask_tensor = torch.as_tensor(
+            noise_mask, device=grad.device, dtype=grad.dtype
         )
+        gauss_noise = noise_base * noise_mask_tensor
+        grad = torch.as_tensor(
+            grad_tensor, device=grad.device, dtype=torch.float32
+        ) + gauss_noise
 
     return dy_dx

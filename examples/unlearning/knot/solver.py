@@ -9,7 +9,7 @@ the number of papers
 from typing import Any, cast
 
 try:
-    import mosek  # type: ignore
+    import mosek
 except ImportError:  # pragma: no cover - optional dependency
     mosek = cast(Any, None)
 

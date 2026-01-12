@@ -15,7 +15,7 @@ class Policy(base.Policy):
     def __init__(self, state_dim, action_space):
         super().__init__(state_dim, action_space)
 
-    def select_action(self, state):
+    def select_action(self, state, hidden=None, test=False):
         """Select action from policy."""
         state = torch.FloatTensor(state.reshape(1, -1)).to(self.device)
         return self.actor(state).cpu().data.numpy().flatten()

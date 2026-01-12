@@ -12,11 +12,11 @@ from typing import Any, Callable, cast
 import numpy as np
 
 try:
-    import mosek  # type: ignore
+    import mosek
     from cvxopt import log, matrix, solvers, sparse
 except ImportError:  # pragma: no cover - optional dependency
-    mosek = None  # type: ignore
-    log = matrix = solvers = sparse = None  # type: ignore
+    mosek = None
+    log = matrix = solvers = sparse = None
 
 from plato.config import Config
 from plato.servers.strategies.base import ClientSelectionStrategy, ServerContext

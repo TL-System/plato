@@ -1,3 +1,5 @@
+from typing import Any
+
 import torch
 from torch.utils.data import Dataset
 
@@ -8,11 +10,11 @@ class FeatureDataset(Dataset):
     def __init__(self, dataset):
         self.dataset = dataset
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.dataset)
 
-    def __getitem__(self, item):
-        sample = self.dataset[item]
+    def __getitem__(self, index):
+        sample = self.dataset[index]
 
         if isinstance(sample, (list, tuple)):
             if len(sample) >= 2:

@@ -86,14 +86,14 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
         )
         self.sampler = sampler
 
-    def _get_train_sampler(self) -> Sampler | None:
+    def _get_train_sampler(self, train_dataset=None) -> Sampler | None:
         """Get training sampler."""
-        if self.sampler is None:
-            if self.train_dataset is None:
-                raise ValueError("Training dataset is not initialized.")
-            dataset = cast(Sized, self.train_dataset)
-            return RandomSampler(dataset)
-        return self.sampler
+        if self.sampler is not None:
+            return self.sampler
+        dataset = train_dataset if train_dataset is not None else self.train_dataset
+        if dataset is None or not hasattr(dataset, "__len__"):
+            return None
+        return RandomSampler(cast(Sized, dataset))
 
     def _get_eval_sampler(self, eval_dataset) -> Sampler | None:
         """Get evaluation sampler."""
@@ -210,7 +210,7 @@ class LLMTrainingArgsCallback(TrainerCallback):
 
     def on_trainer_initialized(self, trainer, **kwargs):
         """Initialize HuggingFace training arguments."""
-        parser = HfArgumentParser(TrainingArguments)
+        parser = HfArgumentParser(cast(Any, TrainingArguments))
 
         (self.training_args,) = parser.parse_args_into_dataclasses(
             args=[

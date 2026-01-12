@@ -105,6 +105,8 @@ class QNetwork(nn.Module):
 
 
 class GaussianPolicy(nn.Module):
+    action_scale: torch.Tensor
+    action_bias: torch.Tensor
     def __init__(self, num_inputs, num_actions, hidden_dim, action_space=None):
         super().__init__()
 
@@ -156,6 +158,8 @@ class GaussianPolicy(nn.Module):
 
 
 class DeterministicPolicy(nn.Module):
+    action_scale: torch.Tensor
+    action_bias: torch.Tensor
     def __init__(self, num_inputs, num_actions, hidden_dim, action_space=None):
         super().__init__()
         self.linear1 = nn.Linear(num_inputs, hidden_dim)
@@ -258,7 +262,7 @@ class Policy(base.Policy):
         if not Config().algorithm.deterministic:
             self.automatic_entropy_tuning = Config().algorithm.automatic_entropy_tuning
 
-    def select_action(self, state, test=False):
+    def select_action(self, state, hidden=None, test=False):
         state = torch.FloatTensor(state).to(self.device).unsqueeze(0)
         if test is False:
             action, _, _ = self.actor.sample(state)

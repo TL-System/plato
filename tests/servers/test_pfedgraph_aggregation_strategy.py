@@ -1,8 +1,8 @@
 """Tests for pFedGraph aggregation strategy."""
 
+import asyncio
 from types import SimpleNamespace
 
-import asyncio
 import torch
 
 from plato.servers.strategies.aggregation.pfedgraph import (

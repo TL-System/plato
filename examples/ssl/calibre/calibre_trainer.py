@@ -68,13 +68,14 @@ class CalibreLossStrategy(LossCriterionStrategy):
             else {}
         )
 
+        device = context.device if context.device is not None else Config().device()
         self._calibre_loss = CalibreLoss(
             main_loss=loss_criterion_name,
             main_loss_params=loss_criterion_params,
             auxiliary_losses=auxiliary_losses,
             auxiliary_loss_params=auxiliary_loss_params,
             losses_weight=losses_weight,
-            device=context.device,
+            device=device,
         )
 
         # Prepare personalization loss if the downstream stage is enabled

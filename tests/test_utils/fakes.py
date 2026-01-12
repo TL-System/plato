@@ -242,10 +242,10 @@ class RecordingPayloadStrategy(PayloadStrategy):
         self.events.append("outbound_ready")
         context.state.setdefault("event_log", []).append("payload_outbound")
 
-    async def accumulate_chunk(self, context: ClientContext, data: bytes) -> None:
+    async def accumulate_chunk(self, context: ClientContext, chunk: bytes) -> None:
         self.events.append("chunk")
         context.state.setdefault("event_log", []).append("chunk")
-        await super().accumulate_chunk(context, data)
+        await super().accumulate_chunk(context, chunk)
 
     async def commit_chunk_group(
         self,

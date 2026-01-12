@@ -10,6 +10,7 @@ with strategies and callbacks instead of inheritance and hooks.
 import math
 import pickle
 import random
+from collections.abc import Callable
 from typing import Any, Iterable, Optional, Union, cast
 
 import numpy as np
@@ -101,7 +102,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
         optimizer: torch.optim.Optimizer,
         examples: torch.Tensor,
         labels: torch.Tensor,
-        loss_criterion: torch.nn.Module,
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         """Perform forward and backward passes for DLG attacks."""
@@ -133,7 +134,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
                 step_losses.append(loss)
                 grad = torch.autograd.grad(
                     loss,
-                    model.parameters(),
+                    list(model.parameters()),
                     retain_graph=True,
                     create_graph=True,
                     only_inputs=True,
@@ -157,7 +158,7 @@ class DLGTrainingStepStrategy(TrainingStepStrategy):
             loss = loss_criterion(outputs, labels)
             grad = torch.autograd.grad(
                 loss,
-                model.parameters(),
+                list(model.parameters()),
                 retain_graph=True,
                 create_graph=True,
                 only_inputs=True,
@@ -286,6 +287,7 @@ class DLGTrainingCallbacks(TrainerCallback):
                 and isinstance(working_gradients, list)
                 and all(isinstance(item, torch.Tensor) for item in working_gradients)
             ):
+                gradient_list = cast(GradientList, working_gradients)
                 deviation_f1_target = torch.zeros_like(feature_fc1_graph)
                 deviation_f1_x_norm = torch.zeros_like(feature_fc1_graph)
 
@@ -313,23 +315,24 @@ class DLGTrainingCallbacks(TrainerCallback):
                 mask = np.where(
                     np.abs(deviation_f1_x_norm_sum.cpu().numpy()) < thresh, 0, 1
                 ).astype(np.float32)
-                working_gradients[6] = cast(
-                    torch.Tensor, working_gradients[6]
-                ) * torch.from_numpy(mask).to(trainer.device)
+                gradient_list[6] = gradient_list[6] * torch.from_numpy(mask).to(
+                    trainer.device
+                )
 
             elif (
                 defense_name == "GC"
                 and isinstance(working_gradients, list)
                 and all(isinstance(item, torch.Tensor) for item in working_gradients)
             ):
-                for index, grad_item in enumerate(working_gradients):
+                gradient_list = cast(GradientList, working_gradients)
+                for index, grad_item in enumerate(gradient_list):
                     grad_tensor = grad_item.cpu().numpy()
                     flattened_weights = np.abs(grad_tensor.flatten())
                     thresh = np.percentile(
                         flattened_weights, Config().algorithm.prune_pct
                     )
                     pruned = np.where(np.abs(grad_tensor) < thresh, 0, grad_tensor)
-                    working_gradients[index] = torch.from_numpy(pruned).to(
+                    gradient_list[index] = torch.from_numpy(pruned).to(
                         trainer.device
                     )
 
@@ -338,12 +341,13 @@ class DLGTrainingCallbacks(TrainerCallback):
                 and isinstance(working_gradients, list)
                 and all(isinstance(item, torch.Tensor) for item in working_gradients)
             ):
-                for index, grad_item in enumerate(working_gradients):
+                gradient_list = cast(GradientList, working_gradients)
+                for index, grad_item in enumerate(gradient_list):
                     grad_tensor = grad_item.cpu().numpy()
                     noise = np.random.laplace(
                         0, Config().algorithm.epsilon, size=grad_tensor.shape
                     )
-                    working_gradients[index] = torch.from_numpy(grad_tensor + noise).to(
+                    gradient_list[index] = torch.from_numpy(grad_tensor + noise).to(
                         trainer.device
                     )
 
@@ -366,7 +370,8 @@ class DLGTrainingCallbacks(TrainerCallback):
             isinstance(item, torch.Tensor) for item in working_gradients
         ):
             gradient_updates = [
-                tensor.to(trainer.device) for tensor in working_gradients
+                tensor.to(trainer.device)
+                for tensor in cast(GradientList, working_gradients)
             ]
 
         # Update model weights with gradients and learning rate

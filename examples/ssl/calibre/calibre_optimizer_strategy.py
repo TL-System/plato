@@ -145,7 +145,8 @@ class CalibreOptimizerStrategy(OptimizerStrategy):
 
         # Add encoder parameters as an additional parameter group
         # Note: These are not trained but included to build the complete model structure
-        if hasattr(model, "encoder"):
-            optimizer.add_param_group({"params": model.encoder.parameters()})
+        encoder = getattr(model, "encoder", None)
+        if isinstance(encoder, nn.Module):
+            optimizer.add_param_group({"params": encoder.parameters()})
 
         return optimizer

@@ -121,7 +121,8 @@ class Sampler(base.Sampler):
         gen = torch.Generator()
         gen.manual_seed(self.random_seed)
 
-        return SubsetRandomSampler(self.subset_indices, generator=gen)
+        indices = [int(idx) for idx in self.subset_indices]
+        return SubsetRandomSampler(indices, generator=gen)
 
     def num_samples(self):
         """Returns the length of the dataset after sampling."""

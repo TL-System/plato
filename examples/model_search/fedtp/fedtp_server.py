@@ -85,11 +85,9 @@ class Server(fedavg.Server):
     def customize_server_response(self, server_response: dict, client_id) -> dict:
         """Generate personalized attention for models of each client and keep a copy on server."""
         algorithm = cast(fedtp_algorithm.ServerAlgorithm, self.require_algorithm())
-        attentions_customized = algorithm.generate_attention(self.hnet, client_id)
-        if not isinstance(attentions_customized, OrderedDict):
-            raise RuntimeError(
-                "FedTP hypernetwork must return an OrderedDict of weights."
-            )
+        attentions_customized: OrderedDict[str, Tensor] = algorithm.generate_attention(
+            self.hnet, client_id
+        )
         self.attentions[client_id] = attentions_customized
         self.current_attention = attentions_customized
         return super().customize_server_response(

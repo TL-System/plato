@@ -30,10 +30,10 @@ DEFAULT_MODEL_CONFIG: dict[str, int] = {
 
 def _import_nanochat_modules():
     ensure_nanochat_importable()
-    from nanochat.checkpoint_manager import (  # type: ignore[attr-defined]
+    from nanochat.checkpoint_manager import (
         load_model_from_dir,
     )
-    from nanochat.gpt import GPT, GPTConfig  # type: ignore[attr-defined]
+    from nanochat.gpt import GPT, GPTConfig
 
     return GPT, GPTConfig, load_model_from_dir
 

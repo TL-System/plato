@@ -5,7 +5,7 @@ Trainer wiring for Nanochat models within the composable trainer framework.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Iterable, Iterator, List, Sequence
+from typing import Any, Callable, Iterable, Iterator, List, Sequence, overload
 
 try:
     import torch
@@ -45,7 +45,7 @@ class NanochatDataLoaderStrategy(DataLoaderStrategy):
 
     def create_train_loader(
         self, trainset, sampler, batch_size: int, context: TrainingContext
-    ) -> torch.utils.data.DataLoader | Iterator:
+    ) -> torch.utils.data.DataLoader:
         if isinstance(trainset, NanochatStreamingDataset):
             return torch.utils.data.DataLoader(
                 trainset,
@@ -94,18 +94,38 @@ class NanochatTrainingStepStrategy(TrainingStepStrategy):
 
 
 @dataclass
-class _OptimizerBundle:
+class _OptimizerBundle(torch.optim.Optimizer):
     """Bundle multiple optimizers under a single interface."""
 
     optimizers: List[torch.optim.Optimizer]
 
-    def zero_grad(self) -> None:
+    def __init__(self, optimizers: List[torch.optim.Optimizer]) -> None:
+        self.optimizers = optimizers
+        param_groups: list[dict[str, Any]] = []
         for optimizer in self.optimizers:
-            optimizer.zero_grad()
+            param_groups.extend(getattr(optimizer, "param_groups", []))
+        super().__init__(param_groups, {})
 
-    def step(self) -> None:
+    def zero_grad(self, set_to_none: bool = False) -> None:
+        for optimizer in self.optimizers:
+            try:
+                optimizer.zero_grad(set_to_none=set_to_none)
+            except TypeError:
+                optimizer.zero_grad()
+
+    @overload
+    def step(self, closure: Callable[[], float]) -> float: ...
+
+    @overload
+    def step(self, closure: None = ...) -> None: ...
+
+    def step(self, closure: Callable[[], float] | None = None) -> float | None:
+        loss = None
+        if closure is not None:
+            loss = closure()
         for optimizer in self.optimizers:
             optimizer.step()
+        return loss
 
     def state_dict(self) -> dict[str, Any]:
         return {
@@ -116,7 +136,7 @@ class _OptimizerBundle:
         for optimizer, payload in zip(
             self.optimizers,
             state_dict.get("optimizers", []),
-            strict=False,  # type: ignore[arg-type]
+            strict=False,
         ):
             optimizer.load_state_dict(payload)
 

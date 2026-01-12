@@ -83,14 +83,19 @@ class RNNReplayMemory:
             ]
             done = [self.done[i] for i in ind]
         else:
-            state = torch.FloatTensor(self.state[ind][:, None, :]).to(self.device)
+            state_store = cast(np.ndarray, self.state)
+            action_store = cast(np.ndarray, self.action)
+            reward_store = cast(np.ndarray, self.reward)
+            next_state_store = cast(np.ndarray, self.next_state)
+            done_store = cast(np.ndarray, self.done)
 
-            action = torch.FloatTensor(self.action[ind][:, None, :]).to(self.device)
-            reward = torch.FloatTensor(self.reward[ind][:, None, :]).to(self.device)
-            next_state = torch.FloatTensor(self.next_state[ind][:, None, :]).to(
+            state = torch.FloatTensor(state_store[ind][:, None, :]).to(self.device)
+            action = torch.FloatTensor(action_store[ind][:, None, :]).to(self.device)
+            reward = torch.FloatTensor(reward_store[ind][:, None, :]).to(self.device)
+            next_state = torch.FloatTensor(next_state_store[ind][:, None, :]).to(
                 self.device
             )
-            done = torch.FloatTensor(self.done[ind][:, None, :]).to(self.device)
+            done = torch.FloatTensor(done_store[ind][:, None, :]).to(self.device)
 
         return state, action, reward, next_state, done, h, c, nh, nc
 

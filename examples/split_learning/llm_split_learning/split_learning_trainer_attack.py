@@ -5,6 +5,7 @@ A curious split learning trainer which will try to reconstruct private data
 
 import logging
 import os
+from typing import Protocol, cast
 
 import torch
 from split_learning_llm_model import get_module
@@ -13,6 +14,12 @@ from torchmetrics.text.rouge import ROUGEScore
 
 from plato.config import Config
 from plato.trainers import tracking
+
+
+class _HasGuessedClientModel(Protocol):
+    guessed_client_model: torch.nn.Module
+
+    def calibrate_guessed_client(self, calibrate: bool = True) -> None: ...
 
 
 class CuriousTrainer(HonestTrainer):
@@ -33,7 +40,10 @@ class CuriousTrainer(HonestTrainer):
         """
         Train models for attack for one step.
         """
-        outputs = self.model.guessed_client_model(inputs_embeds=reconstructed_data)
+        if self.model is None:
+            raise RuntimeError("Model is not initialized.")
+        model = cast(_HasGuessedClientModel, self.model)
+        outputs = model.guessed_client_model(inputs_embeds=reconstructed_data)
         loss = torch.nn.functional.mse_loss(outputs.logits, intermediate_features)
         loss.backward()
         return loss
@@ -47,11 +57,14 @@ class CuriousTrainer(HonestTrainer):
         """
 
         attack_parameters = Config().parameters.attack
+        if self.model is None:
+            raise RuntimeError("Model is not initialized.")
+        model = cast(_HasGuessedClientModel, self.model)
         if not (
             hasattr(attack_parameters, "calibrate_guessed_client")
             and not attack_parameters.calibrate_guessed_client
         ):
-            self.model.calibrate_guessed_client()
+            model.calibrate_guessed_client()
         reconstructed_data = torch.zeros(intermediate_features.shape).requires_grad_(
             True
         )
@@ -60,7 +73,7 @@ class CuriousTrainer(HonestTrainer):
         # AdamW is the optimizer of language model. In the origin Unsplit,
         #   they use SGD for ResNet.
         optimizer_guessed_client = torch.optim.AdamW(
-            self.model.guessed_client_model.parameters(),
+            model.guessed_client_model.parameters(),
             lr=attack_parameters.optimizer.lr_guessed_client,
         )
         optimizer_reconstructed_data = torch.optim.Adam(
@@ -69,12 +82,10 @@ class CuriousTrainer(HonestTrainer):
             amsgrad=True,
         )
         reconstructed_data = reconstructed_data.to(self.device)
-        self.model.guessed_client_model = self.model.guessed_client_model.to(
-            self.device
-        )
+        model.guessed_client_model = model.guessed_client_model.to(self.device)
         # Server can set is as evaluation mode for ease of attack
         #   due to the randomness in norm layers, drop out layer.
-        self.model.guessed_client_model.eval()
+        model.guessed_client_model.eval()
         intermediate_features = intermediate_features.to(self.device)
 
         self._loss_tracker_reconstructed_data.reset()
@@ -112,18 +123,16 @@ class CuriousTrainer(HonestTrainer):
                     self._loss_tracker_guessed_client.average,
                 )
 
-        self.model.guessed_client_model = self.model.guessed_client_model.to(
-            torch.device("cpu")
-        )
+        model.guessed_client_model = model.guessed_client_model.to(torch.device("cpu"))
         intermediate_features = intermediate_features.detach().cpu()
         reconstructed_data = reconstructed_data.detach().cpu()
         # We will generate the reconstructed input ids
         #   from the reconstructed embeddings.
         embedding_layer = get_module(
-            self.model.guessed_client_model,
+            model.guessed_client_model,
             attack_parameters.embedding_layer.split("."),
         )
-        embedding_weights = embedding_layer.weight.data
+        embedding_weights = cast(torch.Tensor, embedding_layer.weight).detach()
         reconstructed_inputs = torch.zeros(
             reconstructed_data.size(0), reconstructed_data.size(1)
         )
@@ -155,8 +164,11 @@ class CuriousTrainer(HonestTrainer):
         self.sample_counts += reconstructed_inputs.size(0)
         evaluation_metrics["attack_accuracy"] = self.accuracy_sum / self.sample_counts
         # calculate Rouge scores
+        if self.tokenizer is None:
+            raise RuntimeError("Tokenizer is not initialized.")
         predicted_text = self.tokenizer.batch_decode(reconstructed_inputs)
         ground_truth = self.tokenizer.batch_decode(labels.detach().cpu())
         self.rouge_score.update(predicted_text, ground_truth)
-        evaluation_metrics["ROUGE"] = self.rouge_score.compute()
+        compute_fn = getattr(self.rouge_score, "compute")
+        evaluation_metrics["ROUGE"] = compute_fn()
         return evaluation_metrics

@@ -427,10 +427,13 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         optimizer = torch.optim.SGD(params_tp, lr=0.0)
 
         self._ensure_weights(params_p)
-        self.weights = [weight.to(params_p[0].device) for weight in self.weights]
+        if self.weights is None:
+            raise RuntimeError("FedALA weights were not initialized.")
+        weights = [weight.to(params_p[0].device) for weight in self.weights]
+        self.weights = weights
 
         for param_t, param, param_g, weight in zip(
-            params_tp, params_p, params_gp, self.weights
+            params_tp, params_p, params_gp, weights
         ):
             param_t.data = param.data + (param_g.data - param.data) * weight
 
@@ -457,7 +460,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
                 loss_value.backward()
 
                 for param_t, param, param_g, weight in zip(
-                    params_tp, params_p, params_gp, self.weights
+                    params_tp, params_p, params_gp, weights
                 ):
                     if param_t.grad is None:
                         continue
@@ -468,7 +471,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
                     )
 
                 for param_t, param, param_g, weight in zip(
-                    params_tp, params_p, params_gp, self.weights
+                    params_tp, params_p, params_gp, weights
                 ):
                     param_t.data = param.data + (param_g.data - param.data) * weight
 

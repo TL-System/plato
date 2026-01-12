@@ -128,11 +128,6 @@ from plato.trainers.strategies.algorithms.lgfedavg_strategy import (
     LGFedAvgStepStrategyAuto,
     LGFedAvgStepStrategyFromConfig,
 )
-from plato.trainers.strategies.algorithms.pfedgraph_strategy import (
-    PFedGraphLossStrategy,
-    PFedGraphLossStrategyFromConfig,
-    PFedGraphUpdateStrategy,
-)
 
 # Personalized FL strategies (FedPer, FedRep)
 from plato.trainers.strategies.algorithms.personalized_fl_strategy import (
@@ -140,6 +135,11 @@ from plato.trainers.strategies.algorithms.personalized_fl_strategy import (
     FedPerUpdateStrategyFromConfig,
     FedRepUpdateStrategy,
     FedRepUpdateStrategyFromConfig,
+)
+from plato.trainers.strategies.algorithms.pfedgraph_strategy import (
+    PFedGraphLossStrategy,
+    PFedGraphLossStrategyFromConfig,
+    PFedGraphUpdateStrategy,
 )
 
 # SCAFFOLD strategies

@@ -87,7 +87,7 @@ class LogProgressCallback(ServerCallback):
         """
         logging.info("[%s] Finished aggregating updated weights.", server)
 
-    def on_clients_selected(self, server, selected_clients):
+    def on_clients_selected(self, server, selected_clients, **kwargs):
         """
         Event called after clients have been selected in each round.
         """

@@ -36,9 +36,8 @@ def compute_sens(
 
     loss = loss_fn(pred, y)
     # Backward propagation
-    dy_dx = torch.autograd.grad(
-        outputs=loss, inputs=model.parameters(), create_graph=True
-    )
+    params = list(model.parameters())
+    dy_dx = torch.autograd.grad(outputs=loss, inputs=params, create_graph=True)
 
     vector_jacobian_products = []
     for layer in dy_dx:

@@ -35,7 +35,7 @@ def _resolve_base_dir(base_dir: str | Path | None) -> Path | None:
 def _parquet_available(base_dir: Path | None) -> bool:
     try:
         ensure_nanochat_importable()
-        from nanochat.dataset import (  # type: ignore[attr-defined]
+        from nanochat.dataset import (
             DATA_DIR,
             list_parquet_files,
         )
@@ -128,7 +128,7 @@ class NanochatStreamingDataset(IterableDataset):
 
     def _parquet_iterable(self) -> Iterable[tuple[torch.Tensor, torch.Tensor]]:
         ensure_nanochat_importable()
-        from nanochat.dataloader import (  # type: ignore[attr-defined]
+        from nanochat.dataloader import (
             tokenizing_distributed_data_loader,
         )
 
@@ -164,7 +164,7 @@ class NanochatStreamingDataset(IterableDataset):
         return self.max_batches
 
 
-class DataSource(BaseDataSource):  # type: ignore[misc]
+class DataSource(BaseDataSource):
     """Plato datasource exposing Nanochat token streams."""
 
     def __init__(

@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import overload
+
 import torch
 
 
@@ -5,6 +8,10 @@ class FedMosOptimizer(torch.optim.Optimizer):
     def __init__(self, params, lr, a=1.0, mu=0.0):
         defaults = dict(lr=lr, a=a, mu=mu)
         super().__init__(params, defaults)
+        self._local_net: torch.nn.Module | None = None
+
+    def set_local_net(self, local_net: torch.nn.Module) -> None:
+        self._local_net = local_net
 
     def clone_grad(self):
         for group in self.param_groups:
@@ -50,7 +57,21 @@ class FedMosOptimizer(torch.optim.Optimizer):
                 state["gt_prev"] = gt.clone().detach()
                 # state['gt_prev'] = None
 
-    def step(self, local_net):
+    @overload
+    def step(self, closure: None = None) -> None: ...
+
+    @overload
+    def step(self, closure: Callable[[], float]) -> float: ...
+
+    def step(self, closure: Callable[[], float] | None = None) -> float | None:
+        local_net = self._local_net
+        if local_net is None:
+            raise ValueError("FedMosOptimizer.step requires a local_net module.")
+
+        loss = None
+        if closure is not None:
+            loss = closure()
+
         for group in self.param_groups:
             # For different groups, we might want to use different lr, regularizer, ...
             for p, local_p in zip(group["params"], local_net.parameters()):
@@ -63,3 +84,5 @@ class FedMosOptimizer(torch.optim.Optimizer):
                 prox = p.data - local_p.data
                 p.data.add_(dt, alpha=-lr)
                 p.data.add_(prox, alpha=-mu)
+
+        return loss

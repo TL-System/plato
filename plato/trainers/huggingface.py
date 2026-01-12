@@ -11,7 +11,7 @@ import logging
 import math
 import os
 from collections.abc import Iterable, Sequence
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union, cast
 
 import torch
 import torch.nn.functional as F
@@ -415,6 +415,7 @@ class HuggingFaceCallbackBridge(PlatoTrainerCallback):
 
 class Trainer(ComposableTrainer):
     """Composable HuggingFace trainer built on Plato's strategy API."""
+    training_args: TrainingArguments
 
     def __init__(self, model=None, callbacks=None):
         hf_callbacks, plato_callbacks = _split_callback_types(callbacks)
@@ -425,13 +426,14 @@ class Trainer(ComposableTrainer):
         self._hf_control = TrainerControl()
         self._hf_steps_per_epoch: int | None = None
 
-        parser = HfArgumentParser(TrainingArguments)
-        (self.training_args,) = parser.parse_args_into_dataclasses(
+        parser = HfArgumentParser(cast(Any, TrainingArguments))
+        (training_args,) = parser.parse_args_into_dataclasses(
             args=[
                 "--output_dir=" + Config.params["checkpoint_path"],
                 "--report_to=none",
             ]
         )
+        self.training_args = cast(TrainingArguments, training_args)
 
         model_name = Config().trainer.model_name
         config_kwargs = {

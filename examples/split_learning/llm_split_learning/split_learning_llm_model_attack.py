@@ -36,7 +36,14 @@ class ServerModelCurious(ServerModelHonest):
         transformer_module = self.guessed_client_model
         for module_name in Config().parameters.model.transformer_module_name.split("."):
             transformer_module = getattr(transformer_module, module_name)
-        client_layers = transformer_module[: self.cut_layer]
+        if isinstance(transformer_module, torch.nn.ModuleList):
+            client_layers = transformer_module[: self.cut_layer]
+        elif isinstance(transformer_module, list):
+            client_layers = transformer_module[: self.cut_layer]
+        else:
+            raise TypeError(
+                "Expected transformer_module to be a ModuleList or list of layers."
+            )
         client_module_names = Config().parameters.model.transformer_module_name.split(
             "."
         )

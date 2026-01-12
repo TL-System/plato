@@ -561,11 +561,13 @@ class ComposableTrainer(base.Trainer):
                     batch=last_batch_id,
                     loss=finalize_loss,
                 )
-                self.context.state["last_loss"] = (
-                    finalize_loss.item()
-                    if hasattr(finalize_loss, "item")
-                    else float(finalize_loss)
-                )
+                if finalize_loss is None:
+                    last_loss_value = 0.0
+                elif hasattr(finalize_loss, "item"):
+                    last_loss_value = float(finalize_loss.item())
+                else:
+                    last_loss_value = float(finalize_loss)
+                self.context.state["last_loss"] = last_loss_value
                 self.context.state.pop("optimizer_step_completed", None)
 
                 control_actions = {}
