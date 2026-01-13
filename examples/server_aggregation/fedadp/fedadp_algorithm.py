@@ -54,14 +54,15 @@ class Algorithm(fedavg.Algorithm):
         total_samples = total_samples if total_samples > 0 else 1
 
         # Global gradients as the sample-weighted average of client deltas
-        global_grads: OrderedDict[str, torch.Tensor] = OrderedDict(
-            (name, torch.zeros_like(tensor))
-            for name, tensor in deltas_received[0].items()
-        )
+        global_grads: OrderedDict[str, torch.Tensor] = OrderedDict()
+        reference_delta = deltas_received[0]
+        for name, tensor in reference_delta.items():
+            base = self._to_float_tensor(tensor)
+            global_grads[name] = torch.zeros_like(base, dtype=base.dtype)
         for idx, delta in enumerate(deltas_received):
             weight = num_samples[idx] / total_samples
             for name, value in delta.items():
-                global_grads[name] += value * weight
+                global_grads[name] += self._to_float_tensor(value) * weight
 
         # Compute adaptive weighting
         contribs = self._calc_contribution(
@@ -81,16 +82,19 @@ class Algorithm(fedavg.Algorithm):
                 weights[i] = (num_samples[i] * math.exp(c)) / denom
 
         # Aggregate deltas with the computed weights
-        agg: OrderedDict[str, torch.Tensor] = OrderedDict(
-            (name, torch.zeros_like(tensor))
-            for name, tensor in deltas_received[0].items()
-        )
+        agg: OrderedDict[str, torch.Tensor] = OrderedDict()
+        for name, tensor in reference_delta.items():
+            base = self._to_float_tensor(tensor)
+            agg[name] = torch.zeros_like(base, dtype=base.dtype)
         for idx, delta in enumerate(deltas_received):
             w = weights[idx]
             if w == 0.0:
                 continue
             for name, value in delta.items():
-                agg[name] += value * w
+                agg[name] += self._to_float_tensor(value) * w
+
+        for name, reference in reference_delta.items():
+            agg[name] = self._cast_tensor_like(agg[name], reference)
 
         return agg
 
@@ -160,3 +164,31 @@ class Algorithm(fedavg.Algorithm):
             arr = to_np(tensor)
             flat = np.append(flat, -arr / lr)
         return flat
+
+    @staticmethod
+    def _to_float_tensor(tensor: torch.Tensor) -> torch.Tensor:
+        """Ensure a tensor is floating for weighted accumulation."""
+        if torch.is_floating_point(tensor):
+            return tensor
+        return tensor.to(torch.get_default_dtype())
+
+    @staticmethod
+    def _cast_tensor_like(
+        tensor: torch.Tensor, reference: torch.Tensor
+    ) -> torch.Tensor:
+        """Cast a tensor to match the dtype of a reference tensor."""
+        if tensor.dtype == reference.dtype:
+            return tensor
+
+        if torch.is_floating_point(reference):
+            return tensor.to(reference.dtype)
+
+        if reference.dtype == torch.bool:
+            if torch.is_floating_point(tensor):
+                return tensor >= 0.5
+            return tensor.ne(0)
+
+        if torch.is_floating_point(tensor):
+            return torch.round(tensor).to(reference.dtype)
+
+        return tensor.to(reference.dtype)
