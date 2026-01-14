@@ -415,6 +415,7 @@ class HuggingFaceCallbackBridge(PlatoTrainerCallback):
 
 class Trainer(ComposableTrainer):
     """Composable HuggingFace trainer built on Plato's strategy API."""
+
     training_args: TrainingArguments
 
     def __init__(self, model=None, callbacks=None):

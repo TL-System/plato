@@ -52,8 +52,9 @@ def noise(dy_dx: list, risk: list):
             noise_mask, device=grad.device, dtype=grad.dtype
         )
         gauss_noise = noise_base * noise_mask_tensor
-        grad = torch.as_tensor(
-            grad_tensor, device=grad.device, dtype=torch.float32
-        ) + gauss_noise
+        grad = (
+            torch.as_tensor(grad_tensor, device=grad.device, dtype=torch.float32)
+            + gauss_noise
+        )
 
     return dy_dx

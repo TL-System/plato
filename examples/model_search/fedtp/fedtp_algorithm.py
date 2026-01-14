@@ -30,7 +30,9 @@ class ServerAlgorithm(fedavg.Algorithm):
         super().__init__(trainer)
         self.current_weights: OrderedDict[str, Tensor] | None = None
 
-    def generate_attention(self, hnet: Module, client_id: int) -> OrderedDict[str, Tensor]:
+    def generate_attention(
+        self, hnet: Module, client_id: int
+    ) -> OrderedDict[str, Tensor]:
         """Generated the customized attention of each client."""
         weights = hnet(
             torch.tensor([client_id - 1], dtype=torch.long).to(Config().device())

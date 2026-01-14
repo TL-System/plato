@@ -107,6 +107,7 @@ class QNetwork(nn.Module):
 class GaussianPolicy(nn.Module):
     action_scale: torch.Tensor
     action_bias: torch.Tensor
+
     def __init__(self, num_inputs, num_actions, hidden_dim, action_space=None):
         super().__init__()
 
@@ -160,6 +161,7 @@ class GaussianPolicy(nn.Module):
 class DeterministicPolicy(nn.Module):
     action_scale: torch.Tensor
     action_bias: torch.Tensor
+
     def __init__(self, num_inputs, num_actions, hidden_dim, action_space=None):
         super().__init__()
         self.linear1 = nn.Linear(num_inputs, hidden_dim)

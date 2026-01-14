@@ -81,15 +81,11 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         if eta <= 0:
             raise ValueError(f"eta must be positive, got {eta}")
         if rand_percent < 0 or rand_percent > 100:
-            raise ValueError(
-                f"rand_percent must be in [0, 100], got {rand_percent}"
-            )
+            raise ValueError(f"rand_percent must be in [0, 100], got {rand_percent}")
         if threshold < 0:
             raise ValueError(f"threshold must be non-negative, got {threshold}")
         if num_pre_loss < 1:
-            raise ValueError(
-                f"num_pre_loss must be >= 1, got {num_pre_loss}"
-            )
+            raise ValueError(f"num_pre_loss must be >= 1, got {num_pre_loss}")
         if max_ala_epochs is not None and max_ala_epochs < 1:
             raise ValueError(
                 f"max_ala_epochs must be >= 1 or None, got {max_ala_epochs}"
@@ -378,9 +374,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         if isinstance(value, torch.Tensor):
             return value.to(device)
         if isinstance(value, tuple):
-            return tuple(
-                FedALAUpdateStrategy._move_to_device(v, device) for v in value
-            )
+            return tuple(FedALAUpdateStrategy._move_to_device(v, device) for v in value)
         if isinstance(value, list):
             return [FedALAUpdateStrategy._move_to_device(v, device) for v in value]
         if isinstance(value, dict):
@@ -450,9 +444,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
                 examples = self._move_to_device(
                     examples, next(model_t.parameters()).device
                 )
-                labels = self._move_to_device(
-                    labels, next(model_t.parameters()).device
-                )
+                labels = self._move_to_device(labels, next(model_t.parameters()).device)
 
                 optimizer.zero_grad()
                 output = model_t(examples)
@@ -526,9 +518,7 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
 
         for weight, param in zip(self.weights, params_list):
             if weight.shape != param.data.shape:
-                self.weights = [
-                    torch.ones_like(param.data) for param in params_list
-                ]
+                self.weights = [torch.ones_like(param.data) for param in params_list]
                 return
 
 

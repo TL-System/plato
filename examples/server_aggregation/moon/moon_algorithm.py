@@ -20,7 +20,9 @@ class Algorithm(fedavg.Algorithm):
     """Algorithm providing MOON aggregation utilities."""
 
     @staticmethod
-    def _cast_tensor_like(tensor: torch.Tensor, reference: torch.Tensor) -> torch.Tensor:
+    def _cast_tensor_like(
+        tensor: torch.Tensor, reference: torch.Tensor
+    ) -> torch.Tensor:
         """Cast a tensor to match a reference dtype (handles bool/int safely)."""
         if tensor.dtype == reference.dtype:
             return tensor

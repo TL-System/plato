@@ -93,7 +93,8 @@ class ViTHyper(nn.Module):
             else:
                 layer_list = cast(nn.ModuleList, layer_d_qkv_value_hyper)
                 layer_d_qkv_value = [
-                    layer(features).view(self.inner_dim, self.dim) for layer in layer_list
+                    layer(features).view(self.inner_dim, self.dim)
+                    for layer in layer_list
                 ]
                 name = Config().parameters.hypernet.attention % (dep, dep, dep)
                 names = name.split(",")

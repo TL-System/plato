@@ -332,9 +332,7 @@ class DLGTrainingCallbacks(TrainerCallback):
                         flattened_weights, Config().algorithm.prune_pct
                     )
                     pruned = np.where(np.abs(grad_tensor) < thresh, 0, grad_tensor)
-                    gradient_list[index] = torch.from_numpy(pruned).to(
-                        trainer.device
-                    )
+                    gradient_list[index] = torch.from_numpy(pruned).to(trainer.device)
 
             elif (
                 defense_name == "DP"

@@ -95,8 +95,7 @@ class PFedGraphAggregationStrategy(AggregationStrategy):
         if algorithm is not None and hasattr(algorithm, "extract_weights"):
             baseline = algorithm.extract_weights()
             self.initial_weights = {
-                name: tensor.detach().cpu().clone()
-                for name, tensor in baseline.items()
+                name: tensor.detach().cpu().clone() for name, tensor in baseline.items()
             }
 
         if self.total_clients > 0:
@@ -257,8 +256,7 @@ class PFedGraphAggregationStrategy(AggregationStrategy):
         for client_id in selected_ids:
             row = graph[client_id, selected_ids]
             aggregated = {
-                name: torch.zeros_like(value)
-                for name, value in weights_cpu[0].items()
+                name: torch.zeros_like(value) for name, value in weights_cpu[0].items()
             }
 
             for neighbor_idx, weight in enumerate(row):
@@ -283,10 +281,13 @@ class PFedGraphAggregationStrategy(AggregationStrategy):
         for idx, client_weights in enumerate(aggregated_weights):
             weight = float(sample_weights[idx])
             for name, tensor in client_weights.items():
-                global_weights[name] += tensor.to(
-                    dtype=baseline_weights[name].dtype,
-                    device=baseline_weights[name].device,
-                ) * weight
+                global_weights[name] += (
+                    tensor.to(
+                        dtype=baseline_weights[name].dtype,
+                        device=baseline_weights[name].device,
+                    )
+                    * weight
+                )
 
         return global_weights
 
