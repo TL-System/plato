@@ -14,6 +14,7 @@ from plato.datasources import (
     huggingface,
     lora,
     nanochat,
+    openmeteo,
     purchase,
     texas,
     tiny_imagenet,
@@ -31,6 +32,7 @@ registered_datasources = {
     "Feature": feature,
     "Nanochat": nanochat,
     "ETT": ETT,
+    "OpenMeteo": openmeteo,
 }
 
 registered_partitioned_datasources = {"FEMNIST": femnist}
@@ -47,6 +49,22 @@ _datasource_aliases = {
     "ETTh2": ("ETT", {"dataset_name": "ETTh2"}),
     "ETTm1": ("ETT", {"dataset_name": "ETTm1"}),
     "ETTm2": ("ETT", {"dataset_name": "ETTm2"}),
+    "TorontoTemperature": (
+        "OpenMeteo",
+        {"task_type": "temperature", "latitude": 43.65, "longitude": -79.38},
+    ),
+    "TorontoSolar": (
+        "OpenMeteo",
+        {"task_type": "solar", "latitude": 43.65, "longitude": -79.38},
+    ),
+    "TorontoSolarWeather": (
+        "OpenMeteo",
+        {
+            "task_type": "solar_weather_multivariate",
+            "latitude": 43.65,
+            "longitude": -79.38,
+        },
+    ),
 }
 
 

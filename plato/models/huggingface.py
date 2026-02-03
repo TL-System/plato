@@ -101,6 +101,10 @@ class Model:
             )
             trainer_config = Config().trainer
 
+            scaling_param = getattr(trainer_config, "scaling", "std")
+            if isinstance(scaling_param, str) and scaling_param.lower() == "none":
+                scaling_param = None
+
             config = PatchTSMixerConfig(
                 context_length=getattr(trainer_config, "context_length", 512),
                 prediction_length=getattr(trainer_config, "prediction_length", 96),
@@ -114,7 +118,7 @@ class Model:
                 head_dropout=getattr(trainer_config, "head_dropout", 0.2),
                 mode=getattr(trainer_config, "mode", "common_channel"),
                 gated_attn=getattr(trainer_config, "gated_attn", True),
-                scaling=getattr(trainer_config, "scaling", "std"),
+                scaling=scaling_param,
                 prediction_channel_indices=getattr(
                     trainer_config, "prediction_channel_indices", None
                 ),

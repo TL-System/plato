@@ -379,6 +379,14 @@ class HuggingFaceTestingStrategy(TestingStrategy):
         if self.is_timeseries:
             total_loss = 0.0
             total_samples = 0
+            channel_indices = getattr(
+                Config().trainer, "prediction_channel_indices", None
+            )
+            if channel_indices is not None:
+                try:
+                    channel_indices = list(channel_indices)
+                except TypeError:
+                    channel_indices = None
 
             with torch.no_grad():
                 for batch_inputs, labels in data_loader:
@@ -390,20 +398,40 @@ class HuggingFaceTestingStrategy(TestingStrategy):
                     batch_inputs.setdefault("return_dict", True)
                     outputs = model(**batch_inputs)
 
-                    loss = getattr(outputs, "loss", None)
-                    if loss is None:
-                        loss = (
-                            outputs.get("loss") if isinstance(outputs, dict) else None
+                    preds = getattr(outputs, "prediction_outputs", None)
+                    if preds is None:
+                        preds = getattr(outputs, "logits", None)
+                    if preds is None and isinstance(outputs, dict):
+                        preds = outputs.get("prediction_outputs") or outputs.get(
+                            "logits"
                         )
 
-                    if loss is not None:
-                        batch_size = (
-                            batch_inputs["past_values"].size(0)
-                            if "past_values" in batch_inputs
-                            else 1
-                        )
-                        total_loss += loss.item() * batch_size
-                        total_samples += batch_size
+                    if preds is None:
+                        loss = getattr(outputs, "loss", None)
+                        if loss is None and isinstance(outputs, dict):
+                            loss = outputs.get("loss")
+                        if loss is None:
+                            continue
+                        batch_loss = loss
+                    else:
+                        if labels is None:
+                            continue
+                        preds = preds.to(labels.device)
+                        labels_for_loss = labels
+                        if channel_indices is not None:
+                            if preds.shape[-1] != len(channel_indices):
+                                preds = preds[..., channel_indices]
+                            if labels_for_loss.shape[-1] != len(channel_indices):
+                                labels_for_loss = labels_for_loss[..., channel_indices]
+                        batch_loss = F.mse_loss(preds, labels_for_loss)
+
+                    batch_size = (
+                        batch_inputs["past_values"].size(0)
+                        if "past_values" in batch_inputs
+                        else 1
+                    )
+                    total_loss += batch_loss.item() * batch_size
+                    total_samples += batch_size
 
             model.train()
             context.state.pop("eval_loader", None)

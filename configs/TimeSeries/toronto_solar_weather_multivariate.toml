@@ -1,0 +1,79 @@
+# Configuration for Toronto multivariate solar + weather forecasting using PatchTSMixer
+# Forecasts 24-hour solar and weather at 5-minute intervals (288 timesteps)
+#
+# Input features (7 channels): solar radiation, temperature, humidity, precipitation, wind, pressure, cloud cover
+# Primary prediction targets: solar radiation and temperature (channels 0 and 1)
+
+[clients]
+type = "simple"
+total_clients = 1
+per_round = 1
+do_test = true
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/timeseries/toronto_solar_weather_multivariate"
+model_path = "models/timeseries/toronto_solar_weather_multivariate"
+
+[data]
+datasource = "TorontoSolarWeather"
+partition_size = 102519 # data for 360 days
+sampler = "iid"
+random_seed = 42
+
+# OpenMeteo specific parameters
+latitude = 43.65
+longitude = -79.38
+task_type = "solar_weather_multivariate"
+location_name = "Toronto"
+historical_days = 360  # 360 days for better pattern learning
+
+[trainer]
+type = "HuggingFace"
+rounds = 100
+max_concurrency = 10
+model_type = "huggingface"
+
+# Train from scratch
+model_name = "toronto_solar_weather_multivariate_patchtsmixer"
+task_type = "forecasting"
+
+# PatchTSMixer parameters for 5-minute multivariate forecasting
+# At 5-minute intervals: 1 day = 24*12 = 288 timesteps
+context_length = 576      # 2 days of history (2 * 288 = 576 timesteps)
+prediction_length = 288   # 24 hours forecast (24 * 12 = 288 timesteps)
+num_input_channels = 7    # 7 channels: [shortwave_radiation, temperature_2m, relative_humidity_2m,
+                          #              precipitation, wind_speed_10m, pressure_msl, cloud_cover]
+prediction_channel_indices = [0, 1]  # Predict solar radiation + temperature only
+
+# Patch configuration
+patch_length = 12
+patch_stride = 12
+d_model = 128              # Larger model for multivariate
+num_layers = 6             # More layers for complexity
+expansion_factor = 2
+dropout = 0.2
+head_dropout = 0.2
+mode = "mix_channel"       # Use mix_channel for multivariate to learn cross-channel relationships
+gated_attn = true
+# Disable internal scaling - we use manual normalization in datasource
+scaling = "none"
+
+# Training parameters
+epochs = 50
+batch_size = 16
+optimizer = "Adam"
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+[parameters.optimizer]
+lr = 0.001
+weight_decay = 0.0
+
+[results]
+types = "round, elapsed_time, mse"
+result_dir = "results/toronto_solar_weather_multivariate"

@@ -159,7 +159,9 @@ class DataSource(base.DataSource):
         )
 
         # Evaluate on the standard test split with full coverage
-        self.testset = ETTDataset(test_norm, context_length, prediction_length, stride=1)
+        self.testset = ETTDataset(
+            test_norm, context_length, prediction_length, stride=1
+        )
 
         logging.info(
             "Created %d training windows and %d test windows",
