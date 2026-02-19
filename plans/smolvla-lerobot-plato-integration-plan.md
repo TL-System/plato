@@ -212,11 +212,29 @@ gotchas:
 
 ### T10. Add tests (unit + integration smoke)
 depends_on: [T7, T8, T9]
+status: completed (2026-02-19)
 - Datasource registry + constructor tests for LeRobot datasource.
 - Model registry + construction tests for SmolVLA wrapper.
 - Trainer step test with tiny synthetic batch.
 - End-to-end config smoke test covering startup and one short training run.
 - Add regression tests for any bug fixes discovered during integration.
+work_log:
+- Added focused LeRobot datasource tests covering partitioned registry resolution, deterministic constructor split behavior, and mapped `plato_inputs`/`plato_targets` sample keys.
+- Added SmolVLA model tests covering registry-based wrapper construction and a FedAvg regression check asserting adapter-mode metadata results in adapter-only payload extraction.
+- Added a LeRobot trainer tiny-batch unit test that exercises one short training step with synthetic dict samples, stubbed pre/post processors, and parameter-update assertions.
+- Added an end-to-end LeRobot+SmolVLA smoke test that boots from config, runs one short client training pass, and processes a server FedAvg report/update loop with external dependencies fully monkeypatched.
+- Fixed local test import shadowing discovered during validation by adding package markers under `tests/` and `tests/test_utils/`.
+files_touched:
+- `tests/__init__.py` (created)
+- `tests/test_utils/__init__.py` (created)
+- `tests/test_utils/lerobot_stubs.py` (created)
+- `tests/datasources/test_lerobot_datasource.py` (created)
+- `tests/models/test_smolvla_model.py` (created)
+- `tests/trainers/test_lerobot_trainer.py` (created)
+- `tests/integration/test_lerobot_smolvla_smoke.py` (created)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- The local environment includes a third-party `tests` package in site-packages; without `tests/__init__.py`, pytest imports can resolve to the wrong module namespace.
 
 ### T11. Add documentation and runbook
 depends_on: [T10]
