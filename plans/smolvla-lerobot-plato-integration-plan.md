@@ -152,10 +152,23 @@ gotchas:
 
 ### T7. Harden federated payload/aggregation behavior
 depends_on: [T6]
+status: completed (2026-02-19)
 - Ensure only intended trainable tensors are exchanged/aggregated.
 - Add safeguards for payload size and dtype handling.
 - Verify checkpoint/state restore consistency across rounds.
 - Validate no regressions in FedAvg flow with large model weights.
+work_log:
+- Hardened `plato/algorithms/fedavg.py` to exchange adapter-only tensors when `plato_finetune_mode = "adapter"` and `plato_trainable_parameter_names` are provided, while preserving full-state behavior for existing non-adapter models.
+- Added dtype-safe tensor casting and partial payload merge logic in `load_weights()`, plus stricter key/shape validation and delta application safeguards for partial/full state dicts across rounds.
+- Added payload-size safeguards with an optional limit (`model.plato_max_payload_size_mb` or `PLATO_FEDAVG_MAX_PAYLOAD_MB`) and fail-fast checks when payloads exceed the configured cap.
+- Added targeted regression tests for filtered extract/load round-trip, dtype safety, optional payload-size guard, and full-mode FedAvg round-trip with large weights.
+- Ran `uv run ruff check` and focused `uv run pytest` for the new FedAvg algorithm tests.
+files_touched:
+- `plato/algorithms/fedavg.py` (updated)
+- `tests/algorithms/test_fedavg_algorithm.py` (created)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- Payload-size enforcement is intentionally opt-in to maintain backward compatibility for existing workloads that may exchange large full-model state dicts.
 
 ### T8. Validate runtime lifecycle compatibility
 depends_on: [T6]
