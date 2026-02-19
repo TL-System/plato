@@ -85,11 +85,24 @@ gotchas:
 
 ### T4. Implement LeRobot datasource adapter
 depends_on: [T2, T3]
+status: completed (2026-02-19)
 - Add `plato/datasources/lerobot.py`.
 - Implement dataset loading via LeRobot APIs and map samples into Plato’s expected batch format.
 - Register datasource in `plato/datasources/registry.py`.
 - Add deterministic client partitioning strategy (episode/task aware split).
 - Provide train/test dataset access methods compatible with existing samplers.
+work_log:
+- Added `plato/datasources/lerobot.py` with guarded LeRobot imports, config parsing for `parameters.dataset.*` and `parameters.transforms.*`, and sample mapping that preserves raw fields while attaching `plato_inputs`, `plato_targets`, and `plato_metadata`.
+- Implemented deterministic episode-level train/test splitting with optional explicit episode overrides, task-aware stratification when task metadata is available, and deterministic per-client episode partitioning keyed by `data.random_seed`/`parameters.dataset.split_seed`.
+- Wired `"LeRobot"` through `plato/datasources/registry.py` as a partitioned datasource so `datasources_registry.get(client_id=...)` passes client identity into the adapter.
+- Ran a targeted no-download constructor/registry validation using stubbed `LeRobotDataset` and `LeRobotDatasetMetadata`, confirming deterministic splits and registry retrieval.
+files_touched:
+- `plato/datasources/lerobot.py` (created)
+- `plato/datasources/registry.py` (updated)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- Constructor/registry validation was intentionally monkeypatched to avoid external dataset access and to keep split checks deterministic and offline.
+- When task metadata is sparse or missing, the adapter falls back to deterministic episode-only splitting.
 
 ### T5. Implement SmolVLA model/policy wrapper
 depends_on: [T2, T3]

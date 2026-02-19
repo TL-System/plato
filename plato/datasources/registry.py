@@ -11,6 +11,7 @@ from plato.datasources import (
     feature,
     femnist,
     huggingface,
+    lerobot,
     lora,
     nanochat,
     purchase,
@@ -31,7 +32,7 @@ registered_datasources = {
     "Nanochat": nanochat,
 }
 
-registered_partitioned_datasources = {"FEMNIST": femnist}
+registered_partitioned_datasources = {"FEMNIST": femnist, "LeRobot": lerobot}
 
 _datasource_aliases = {
     "STL10": ("Torchvision", {"dataset_name": "STL10"}),
