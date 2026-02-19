@@ -63,6 +63,7 @@ gotchas:
 
 ### T3. Extend Plato configuration schema for SmolVLA/LeRobot
 depends_on: [T1]
+status: completed (2026-02-19)
 - Add/validate config keys needed for SmolVLA + LeRobot:
 - `policy.path` / `policy.type`
 - `dataset.repo_id`
@@ -71,6 +72,16 @@ depends_on: [T1]
 - precision/device flags
 - full-finetune vs adapter mode switch
 - Ensure keys flow through `Config()` and into trainer/model/datasource constructors.
+work_log:
+- Verified that `plato/config.py` already preserves nested TOML keys under `Config().parameters` without schema whitelisting, so SmolVLA/LeRobot keys are backward-compatible pass-through.
+- Added a focused config loader test to assert `parameters.policy`, `parameters.dataset`, and `parameters.transforms` keys are parsed and exposed as constructor-ready dictionaries via `_asdict()`.
+- Extended configuration documentation with an explicit mapping table from config keys to trainer/model/datasource consumption paths and a full SmolVLA/LeRobot TOML example.
+files_touched:
+- `tests/test_config_loader.py` (updated)
+- `docs/docs/configurations/parameters.md` (updated)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- No `Config()` code change was required; introducing strict validation at this stage would have been intrusive and risked regressions for existing custom `parameters.*` users.
 
 ### T4. Implement LeRobot datasource adapter
 depends_on: [T2, T3]
