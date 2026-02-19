@@ -167,11 +167,25 @@ depends_on: [T6]
 
 ### T9. Add runnable experiment configs
 depends_on: [T3, T4, T5, T6]
+status: completed (2026-02-19)
 - Add `configs/LeRobot/` config set:
 - reusable base datasource fragment
 - minimal smoke config
 - full fine-tune config aligned to SmolVLA guidance
 - Ensure includes/overrides follow repository config conventions.
+work_log:
+- Added `configs/LeRobot/` with a reusable datasource include fragment plus runnable single-client smoke, two-client FedAvg smoke, and fuller full-fine-tune configs.
+- Aligned all new configs with T4-T6 integration keys: `data.datasource = "LeRobot"`, `trainer.type = "lerobot"`, `trainer.model_type = "smolvla"`, and explicit `[parameters.policy]`, `[parameters.dataset]`, `[parameters.transforms]` sections.
+- Mapped SmolVLA fine-tuning guidance into Plato semantics by keeping `policy.path = "lerobot/smolvla_base"`, `policy.finetune_mode = "full"`, `policy.device = "cuda"`, and `batch_size = 64` in the fuller config.
+files_touched:
+- `configs/LeRobot/lerobot_datasource_base.toml` (created)
+- `configs/LeRobot/smolvla_single_client_smoke.toml` (created)
+- `configs/LeRobot/smolvla_fedavg_two_client_smoke.toml` (created)
+- `configs/LeRobot/smolvla_full_finetune.toml` (created)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- The datasource include fragment is intentionally sectionless so `[data].include` merges it directly into the `data` table.
+- SmolVLA upstream examples are step-based (`lerobot-train --steps`), while Plato scheduling is round/epoch-based, so the fuller config mirrors guidance through batch/device/fine-tune mode and keeps runtime knobs in `trainer.rounds` + `trainer.epochs`.
 
 ### T10. Add tests (unit + integration smoke)
 depends_on: [T7, T8, T9]
