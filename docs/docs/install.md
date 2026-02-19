@@ -74,9 +74,9 @@ LeRobot and SmolVLA dependencies are available behind Plato's optional
 uv sync --extra robotics
 ```
 
-See [SmolVLA + LeRobot Optional Setup](smolvla_lerobot_setup.md) for runtime
+See [SmolVLA + LeRobot Optional Setup](examples/case-studies/smolvla_lerobot_setup.md) for runtime
 requirements and guarded-import guidance, and
-[SmolVLA + LeRobot Runbook](smolvla_lerobot_runbook.md) for setup-to-run
+[SmolVLA + LeRobot Runbook](examples/case-studies/smolvla_lerobot_runbook.md) for setup-to-run
 operational steps and troubleshooting.
 
 ### Building the `plato-learn` PyPi Package

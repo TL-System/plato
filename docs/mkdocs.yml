@@ -48,8 +48,6 @@ extra_css:
 nav:
   - Home: index.md
   - Installation: install.md
-  - SmolVLA + LeRobot Optional Setup: smolvla_lerobot_setup.md
-  - SmolVLA + LeRobot Runbook: smolvla_lerobot_runbook.md
   - Quick Start: quickstart.md
   - Examples:
       - Getting Started: examples/Getting Started.md
@@ -71,6 +69,8 @@ nav:
       - Case Studies:
           - Federated LoRA Fine-Tuning: examples/case-studies/1. LoRA.md
           - Composable Trainer API: examples/case-studies/2. Composable Trainer.md
+          - SmolVLA + LeRobot Optional Setup: examples/case-studies/smolvla_lerobot_setup.md
+          - SmolVLA + LeRobot Runbook: examples/case-studies/smolvla_lerobot_runbook.md
   - Configuration Settings:
       - Overview: configurations/overview.md
       - General: configurations/general.md
