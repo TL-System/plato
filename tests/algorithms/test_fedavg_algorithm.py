@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from types import SimpleNamespace
+from typing import Any, cast
 
 import pytest
 import torch
@@ -33,8 +34,18 @@ class DtypeToyModel(torch.nn.Module):
         self.register_buffer("flag", torch.tensor([True, False], dtype=torch.bool))
 
 
+class BFloat16ToyModel(torch.nn.Module):
+    """Toy model for bf16 transport-cast regression coverage."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.weight = torch.nn.Parameter(
+            torch.ones((2, 2), dtype=torch.bfloat16)
+        )
+
+
 def _algorithm_for(model: torch.nn.Module) -> FedAvgAlgorithm:
-    trainer = SimpleNamespace(model=model)
+    trainer = cast(Any, SimpleNamespace(model=model))
     return FedAvgAlgorithm(trainer=trainer)
 
 
@@ -93,6 +104,27 @@ def test_load_weights_casts_dtype_and_rounds_non_float_tensors():
     assert int(state["step"].item()) == 4
     assert state["flag"].dtype == torch.bool
     assert torch.equal(state["flag"], torch.tensor([False, True]))
+
+
+def test_extract_weights_casts_bfloat16_payloads_for_transport():
+    """bf16 tensors should be cast to fp32 for safe payload serialization."""
+    model = BFloat16ToyModel()
+    algorithm = _algorithm_for(model)
+
+    payload = algorithm.extract_weights()
+    assert payload["weight"].dtype == torch.float32
+
+    inbound = OrderedDict(
+        {"weight": torch.full((2, 2), 3.5, dtype=torch.float32)}
+    )
+    algorithm.load_weights(inbound)
+
+    state = model.state_dict()
+    assert state["weight"].dtype == torch.bfloat16
+    assert torch.allclose(
+        state["weight"].float(),
+        torch.full((2, 2), 3.5, dtype=torch.float32),
+    )
 
 
 def test_extract_weights_respects_optional_payload_size_limit():

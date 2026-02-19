@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+from typing import Any, cast
 
 from plato.algorithms.fedavg import Algorithm as FedAvgAlgorithm
 from plato.models import registry as models_registry
@@ -55,7 +56,8 @@ def test_smolvla_adapter_metadata_filters_fedavg_payload(
         adapter_parameter_patterns=["adapter"],
     )
 
-    algorithm = FedAvgAlgorithm(trainer=SimpleNamespace(model=model))
+    trainer = cast(Any, SimpleNamespace(model=model))
+    algorithm = FedAvgAlgorithm(trainer=trainer)
     payload = algorithm.extract_weights()
 
     assert list(payload.keys()) == ["adapter.weight"]

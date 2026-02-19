@@ -74,17 +74,22 @@ def test_lerobot_constructor_is_deterministic_and_maps_samples(
     patched_lerobot_backend,
 ):
     """Constructor should produce stable splits and mapped Plato sample keys."""
-    kwargs = {
-        "client_id": 2,
-        "repo_id": "stub/lerobot",
-        "split_seed": 11,
-        "train_split": 0.5,
-        "task_aware_split": True,
-        "task_aware_partition": True,
-    }
-
-    first = lerobot_datasource.DataSource(**kwargs)
-    second = lerobot_datasource.DataSource(**kwargs)
+    first = lerobot_datasource.DataSource(
+        client_id=2,
+        repo_id="stub/lerobot",
+        split_seed=11,
+        train_split=0.5,
+        task_aware_split=True,
+        task_aware_partition=True,
+    )
+    second = lerobot_datasource.DataSource(
+        client_id=2,
+        repo_id="stub/lerobot",
+        split_seed=11,
+        train_split=0.5,
+        task_aware_split=True,
+        task_aware_partition=True,
+    )
 
     assert first.train_episodes == second.train_episodes
     assert first.test_episodes == second.test_episodes

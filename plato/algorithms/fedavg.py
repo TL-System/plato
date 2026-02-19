@@ -26,6 +26,28 @@ class Algorithm(base.Algorithm):
         return weights
 
     @staticmethod
+    def _to_transport_tensor(
+        tensor: torch.Tensor, tensor_name: str
+    ) -> torch.Tensor:
+        """
+        Convert a tensor to a wire-safe representation for payload transport.
+
+        Safetensor serialization in the current runtime path does not support
+        `torch.bfloat16` conversion through numpy. Cast bf16 payload tensors to
+        fp32 for transport, then cast back in `load_weights`.
+        """
+        if not isinstance(tensor, torch.Tensor):
+            raise TypeError(
+                f"Payload tensor '{tensor_name}' must be a torch.Tensor, "
+                f"received {type(tensor).__name__}."
+            )
+
+        prepared = tensor.detach().cpu().clone()
+        if prepared.dtype == torch.bfloat16:
+            return prepared.to(torch.float32)
+        return prepared
+
+    @staticmethod
     def _cast_tensor_like(
         tensor: torch.Tensor, reference: torch.Tensor, tensor_name: str
     ) -> torch.Tensor:
@@ -266,7 +288,11 @@ class Algorithm(base.Algorithm):
         keys_to_exchange = adapter_names or list(state_dict.keys())
 
         payload = OrderedDict(
-            (name, state_dict[name].detach().cpu().clone()) for name in keys_to_exchange
+            (
+                name,
+                self._to_transport_tensor(state_dict[name], name),
+            )
+            for name in keys_to_exchange
         )
         self._assert_payload_size(payload, source="Extracted")
         return payload

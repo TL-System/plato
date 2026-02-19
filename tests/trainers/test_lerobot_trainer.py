@@ -5,6 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import Any
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -131,3 +132,80 @@ def test_lerobot_trainer_train_model_runs_on_tiny_synthetic_batch(
     assert trainer.run_history.get_metric_values("train_loss")
     assert factory_calls["kwargs"]["pretrained_path"] == "stub/smolvla"
     assert factory_calls["kwargs"]["dataset_stats"] == trainset.meta.stats
+
+
+def test_lerobot_trainer_consumes_policy_precision_and_device(
+    temp_config,
+    monkeypatch,
+):
+    """Trainer should apply policy precision/device runtime settings."""
+    config = Config()
+    config.trainer = config.trainer._replace(
+        type="lerobot",
+        model_type="smolvla",
+        model_name="smolvla_unit",
+        batch_size=2,
+        epochs=1,
+        optimizer="SGD",
+    )
+    config.parameters = Config.node_from_dict(
+        {
+            "optimizer": {
+                "lr": 0.05,
+                "momentum": 0.0,
+                "weight_decay": 0.0,
+            },
+            "policy": {
+                "path": "stub/smolvla",
+                "precision": "bf16",
+                "device": "cpu",
+            },
+        }
+    )
+
+    monkeypatch.setattr(
+        lerobot_trainer,
+        "_import_make_pre_post_processors",
+        lambda: (lambda *_args, **_kwargs: (lambda batch: batch, lambda out: out)),
+    )
+
+    trainer = lerobot_trainer.Trainer(model=_TinyLeRobotPolicy())
+    trainset = _SyntheticLeRobotDataset()
+
+    assert trainer.device == "cpu"
+    assert trainer.context.device == torch.device("cpu")
+    assert trainer.context.state["lerobot_precision"] == "bf16"
+
+    trainer.train_model(
+        {"batch_size": 2, "epochs": 1, "run_id": "lerobot-precision"},
+        trainset,
+        sampler=list(range(len(trainset))),
+    )
+    assert trainer.context.state["lerobot_precision"] == "bf16"
+    assert isinstance(trainer.context.state["lerobot_autocast_enabled"], bool)
+
+
+def test_lerobot_trainer_rejects_unavailable_cuda_device(
+    temp_config,
+    monkeypatch,
+):
+    """Policy device should be validated against runtime accelerator availability."""
+    config = Config()
+    config.trainer = config.trainer._replace(
+        type="lerobot",
+        model_type="smolvla",
+        model_name="smolvla_unit",
+    )
+    config.parameters = Config.node_from_dict(
+        {
+            "policy": {
+                "path": "stub/smolvla",
+                "device": "cuda",
+            },
+        }
+    )
+
+    monkeypatch.setattr(lerobot_trainer.torch.cuda, "is_available", lambda: False)
+
+    with pytest.raises(RuntimeError, match="CUDA is not available"):
+        lerobot_trainer.Trainer(model=_TinyLeRobotPolicy())

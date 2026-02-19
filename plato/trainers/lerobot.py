@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from collections.abc import Callable, Iterable, Mapping
 from typing import Any, cast
@@ -21,6 +22,7 @@ from plato.trainers.strategies.base import (
 )
 
 _RESERVED_KEYS = frozenset({"plato_inputs", "plato_targets", "plato_metadata"})
+_SUPPORTED_POLICY_PRECISIONS = frozenset({"fp32", "fp16", "bf16"})
 
 
 def _config_node_to_dict(node: Any) -> dict[str, Any]:
@@ -284,6 +286,151 @@ def _resolve_sampler_for_loader(sampler: Any) -> Any:
     return sampler
 
 
+def _resolve_precision(precision: Any) -> str:
+    """Normalize policy precision values from config."""
+    if precision is None:
+        return "fp32"
+    if not isinstance(precision, str):
+        raise TypeError("`parameters.policy.precision` must be a string.")
+
+    normalized = precision.strip().lower()
+    if normalized not in _SUPPORTED_POLICY_PRECISIONS:
+        supported = ", ".join(sorted(_SUPPORTED_POLICY_PRECISIONS))
+        raise ValueError(
+            "Unsupported `parameters.policy.precision` value "
+            f"'{precision}'. Expected one of: {supported}."
+        )
+    return normalized
+
+
+def _resolve_runtime_device(device_value: Any, fallback_device: Any) -> torch.device:
+    """
+    Resolve runtime device from policy config, falling back to trainer default.
+
+    Raises explicit errors when a requested accelerator is unavailable so users
+    can detect mismatched config/environment early.
+    """
+    if isinstance(fallback_device, torch.device):
+        fallback = fallback_device
+    else:
+        fallback = torch.device(str(fallback_device))
+
+    if device_value is None:
+        return fallback
+    if not isinstance(device_value, str):
+        raise TypeError("`parameters.policy.device` must be a string.")
+
+    normalized = device_value.strip().lower()
+    if not normalized:
+        return fallback
+
+    if normalized == "cpu":
+        return torch.device("cpu")
+
+    if normalized == "cuda":
+        if not torch.cuda.is_available():
+            raise RuntimeError(
+                "`parameters.policy.device` is set to 'cuda' but CUDA is not "
+                "available on this host."
+            )
+        return torch.device("cuda:0")
+
+    if normalized.startswith("cuda:"):
+        if not torch.cuda.is_available():
+            raise RuntimeError(
+                f"`parameters.policy.device` is set to '{device_value}' but CUDA "
+                "is not available on this host."
+            )
+        try:
+            gpu_index = int(normalized.split(":", 1)[1])
+        except (IndexError, ValueError) as exc:
+            raise ValueError(
+                f"Invalid CUDA device value: '{device_value}'."
+            ) from exc
+        if gpu_index < 0 or gpu_index >= torch.cuda.device_count():
+            raise RuntimeError(
+                f"`parameters.policy.device` requested CUDA device {gpu_index}, "
+                f"but only {torch.cuda.device_count()} device(s) are available."
+            )
+        return torch.device(normalized)
+
+    if normalized == "mps":
+        mps_backend = getattr(torch.backends, "mps", None)
+        if mps_backend is None or not mps_backend.is_available():
+            raise RuntimeError(
+                "`parameters.policy.device` is set to 'mps' but MPS is not "
+                "available on this host."
+            )
+        return torch.device("mps")
+
+    raise ValueError(
+        "Unsupported `parameters.policy.device` value "
+        f"'{device_value}'. Expected cpu, cuda[:index], or mps."
+    )
+
+
+def _autocast_context(
+    context: TrainingContext,
+) -> tuple[contextlib.AbstractContextManager[Any], bool]:
+    """Resolve an autocast context from runtime precision and device settings."""
+    precision = str(context.state.get("lerobot_precision", "fp32")).lower()
+    device = context.device
+
+    if not isinstance(device, torch.device):
+        device = torch.device(str(device))
+
+    if precision == "fp32":
+        return contextlib.nullcontext(), False
+
+    if device.type == "cuda":
+        if not torch.cuda.is_available():
+            if not context.state.get("lerobot_precision_warning_emitted"):
+                logging.warning(
+                    "LeRobot precision '%s' requested, but CUDA is unavailable. "
+                    "Falling back to fp32 execution.",
+                    precision,
+                )
+                context.state["lerobot_precision_warning_emitted"] = True
+            return contextlib.nullcontext(), False
+
+        dtype = torch.float16 if precision == "fp16" else torch.bfloat16
+        return torch.autocast(device_type="cuda", dtype=dtype), True
+
+    if device.type == "cpu":
+        if precision == "bf16":
+            return torch.autocast(device_type="cpu", dtype=torch.bfloat16), True
+        if not context.state.get("lerobot_precision_warning_emitted"):
+            logging.warning(
+                "LeRobot precision '%s' is not supported on CPU autocast. "
+                "Falling back to fp32 execution.",
+                precision,
+            )
+            context.state["lerobot_precision_warning_emitted"] = True
+        return contextlib.nullcontext(), False
+
+    if device.type == "mps":
+        if precision == "fp16":
+            return torch.autocast(device_type="mps", dtype=torch.float16), True
+        if not context.state.get("lerobot_precision_warning_emitted"):
+            logging.warning(
+                "LeRobot precision '%s' is not supported on MPS autocast. "
+                "Falling back to fp32 execution.",
+                precision,
+            )
+            context.state["lerobot_precision_warning_emitted"] = True
+        return contextlib.nullcontext(), False
+
+    if not context.state.get("lerobot_precision_warning_emitted"):
+        logging.warning(
+            "LeRobot precision '%s' is not supported on device type '%s'. "
+            "Falling back to fp32 execution.",
+            precision,
+            device.type,
+        )
+        context.state["lerobot_precision_warning_emitted"] = True
+    return contextlib.nullcontext(), False
+
+
 class LeRobotTrainingStepStrategy(TrainingStepStrategy):
     """Training step strategy for LeRobot policies with dict-style batches."""
 
@@ -294,19 +441,29 @@ class LeRobotTrainingStepStrategy(TrainingStepStrategy):
         self,
         model: nn.Module,
         optimizer: torch.optim.Optimizer,
-        examples: LeRobotBatch,
+        examples: torch.Tensor | Mapping[str, Any],
         labels: torch.Tensor,  # pylint: disable=unused-argument
-        loss_criterion,  # pylint: disable=unused-argument
+        loss_criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         context: TrainingContext,
     ) -> torch.Tensor:
         optimizer.zero_grad()
+        del labels, loss_criterion
 
-        batch = _apply_preprocessor(examples, context)
-        loss, loss_dict = _resolve_policy_forward(
-            model,
-            batch,
-            reduction=self.reduction,
-        )
+        if not isinstance(examples, Mapping):
+            raise TypeError(
+                "LeRobot training expects dictionary-style batches. "
+                f"Received {type(examples).__name__}."
+            )
+
+        autocast_guard, autocast_enabled = _autocast_context(context)
+        context.state["lerobot_autocast_enabled"] = autocast_enabled
+        with autocast_guard:
+            batch = _apply_preprocessor(LeRobotBatch(dict(examples)), context)
+            loss, loss_dict = _resolve_policy_forward(
+                model,
+                batch,
+                reduction=self.reduction,
+            )
 
         if not torch.is_tensor(loss):
             raise TypeError(
@@ -354,7 +511,9 @@ class LeRobotTestingStrategy(TestingStrategy):
         total_loss = 0.0
         total_weight = 0
 
-        with torch.no_grad():
+        autocast_guard, autocast_enabled = _autocast_context(context)
+        context.state["lerobot_autocast_enabled"] = autocast_enabled
+        with torch.no_grad(), autocast_guard:
             for examples, labels in test_loader:
                 examples = examples.to(context.device)
                 labels = labels.to(context.device)
@@ -413,6 +572,8 @@ class Trainer(ComposableTrainer):
         self._collate_wrapper = LeRobotCollateWrapper()
         self._processors_initialised = False
         self._pretrained_path = self._resolve_policy_path()
+        self._runtime_precision = self._resolve_policy_precision()
+        self._policy_device = self._resolve_policy_device()
         self._preprocessor_factory: Callable[..., tuple[Callable, Callable]] | None = (
             None
         )
@@ -433,6 +594,11 @@ class Trainer(ComposableTrainer):
             testing_strategy=LeRobotTestingStrategy(self._collate_wrapper),
         )
 
+        resolved_device = _resolve_runtime_device(self._policy_device, self.device)
+        self.device = str(resolved_device)
+        self.context.device = resolved_device
+        self.context.state["lerobot_precision"] = self._runtime_precision
+        self.context.state["lerobot_runtime_device"] = str(resolved_device)
         self.context.state["lerobot_preprocessor"] = None
         self.context.state["lerobot_postprocessor"] = None
 
@@ -445,6 +611,24 @@ class Trainer(ComposableTrainer):
             value = candidate.strip()
             return value if value else None
         return None
+
+    @staticmethod
+    def _resolve_policy_precision() -> str:
+        parameters = getattr(Config(), "parameters", None)
+        policy_cfg = _config_node_to_dict(getattr(parameters, "policy", None))
+        return _resolve_precision(policy_cfg.get("precision", "fp32"))
+
+    @staticmethod
+    def _resolve_policy_device() -> str | None:
+        parameters = getattr(Config(), "parameters", None)
+        policy_cfg = _config_node_to_dict(getattr(parameters, "policy", None))
+        candidate = policy_cfg.get("device")
+        if candidate is None:
+            return None
+        if not isinstance(candidate, str):
+            raise TypeError("`parameters.policy.device` must be a string.")
+        value = candidate.strip()
+        return value if value else None
 
     def _resolve_model_pretrained_path(self) -> str | None:
         model = self._require_model()
@@ -494,8 +678,12 @@ class Trainer(ComposableTrainer):
 
     def train_model(self, config, trainset, sampler, **kwargs):
         self._ensure_pre_post_processors(trainset)
+        self.context.state["lerobot_precision"] = self._runtime_precision
+        self.context.device = torch.device(str(self.device))
         return super().train_model(config, trainset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):
         self._ensure_pre_post_processors(testset)
+        self.context.state["lerobot_precision"] = self._runtime_precision
+        self.context.device = torch.device(str(self.device))
         return super().test_model(config, testset, sampler, **kwargs)
