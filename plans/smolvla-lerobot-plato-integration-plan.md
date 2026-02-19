@@ -159,11 +159,21 @@ depends_on: [T6]
 
 ### T8. Validate runtime lifecycle compatibility
 depends_on: [T6]
+status: completed (2026-02-19)
 - Confirm integration works with existing lifecycle code paths:
 - client setup strategies
 - server trainer initialization
 - training/report/aggregation loop
 - Avoid special-case branching unless strictly necessary.
+work_log:
+- Ran a focused runtime smoke with `data.datasource = "LeRobot"`, `trainer.type = "lerobot"`, and `trainer.model_type = "smolvla"` using monkeypatched LeRobot/SmolVLA externals to avoid downloads, then exercised the default `simple.Client` lifecycle (`_load_data` -> `configure` -> `_allocate_data` -> `_train`).
+- Verified lifecycle construction path through existing registries and strategy plumbing: datasource (`LeRobot`) + trainer (`lerobot`) + algorithm (`fedavg`) were all instantiated through default client/server setup with no special-case branching.
+- Executed a short mocked client/server round-trip by feeding the client-produced payload/report into `fedavg.Server._process_reports()` after `Server.configure()`, confirming server trainer initialization and aggregation/report processing completed successfully.
+- No lifecycle compatibility bug was found in this scope, so no runtime code patch was applied.
+files_touched:
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- The focused smoke directly called `client._train()`; because `report.processing_time` is normally attached in the payload strategy path, the smoke sets `report.processing_time = 0.0` before invoking server report processing.
 
 ### T9. Add runnable experiment configs
 depends_on: [T3, T4, T5, T6]
