@@ -41,10 +41,25 @@ gotchas:
 
 ### T2. Add dependencies and environment gating
 depends_on: [T1]
+status: completed (2026-02-19)
 - Update `pyproject.toml` with required LeRobot and training stack dependencies.
 - Regenerate `uv.lock`.
 - Add guarded imports so environments without robotics extras still run existing Plato workloads.
 - Document required system/runtime notes for optional robotics path.
+work_log:
+- Added a new optional extra (`robotics`) in `pyproject.toml` with `lerobot[smolvla]>=0.4.3,<0.5.0` so default installs remain unchanged.
+- Regenerated `uv.lock` with `uv lock`, then validated both paths:
+- `uv sync --frozen` + import check for core Plato.
+- `uv sync --frozen --extra robotics` + `import lerobot` check for the optional robotics stack.
+- Added focused setup docs for SmolVLA/LeRobot and linked them from `docs/docs/install.md`.
+files_touched:
+- `pyproject.toml`
+- `uv.lock`
+- `docs/docs/install.md`
+- `docs/docs/smolvla_lerobot_setup.md` (created)
+- `plans/smolvla-lerobot-plato-integration-plan.md`
+gotchas:
+- The optional LeRobot path constrains parts of the Torch stack in lock resolution; keeping it under `--extra robotics` avoids forcing robotics dependencies into default `uv sync` environments.
 
 ### T3. Extend Plato configuration schema for SmolVLA/LeRobot
 depends_on: [T1]

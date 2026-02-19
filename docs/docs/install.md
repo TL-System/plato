@@ -65,6 +65,18 @@ uv sync --extra mlx
 
 See the [Quick Start guide](quickstart.md#using-mlx-as-a-backend) for configuration details.
 
+### Optional: SmolVLA + LeRobot Robotics Stack
+
+LeRobot and SmolVLA dependencies are available behind Plato's optional
+`robotics` extra so default federated-learning installs remain lightweight:
+
+```bash
+uv sync --extra robotics
+```
+
+See [SmolVLA + LeRobot Optional Setup](smolvla_lerobot_setup.md) for runtime
+requirements and guarded-import guidance.
+
 ### Building the `plato-learn` PyPi Package
 
 The `plato-learn` PyPi package will be automatically built and published by a GitHub action workflow every time a release is created on GitHub. To build the package manually, follow these steps:

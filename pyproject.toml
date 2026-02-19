@@ -59,6 +59,9 @@ nanochat = [
     "jinja2",
     "PyYAML",
 ]
+robotics = [
+    "lerobot[smolvla]>=0.4.3,<0.5.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/TL-System/plato"
