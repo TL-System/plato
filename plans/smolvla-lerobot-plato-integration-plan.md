@@ -127,11 +127,28 @@ gotchas:
 
 ### T6. Implement LeRobot trainer backend
 depends_on: [T4, T5]
+status: completed (2026-02-19)
 - Add `plato/trainers/lerobot.py` (ComposableTrainer-compatible).
 - Implement multimodal collate + preprocessing for LeRobot samples.
 - Wire forward/loss/backward/optimizer/scheduler flow for SmolVLA policy.
 - Implement evaluation hooks suitable for regression checks.
 - Register trainer in `plato/trainers/registry.py`.
+work_log:
+- Added `plato/trainers/lerobot.py` with a ComposableTrainer-compatible backend that wires custom dict/multimodal collation, processor-aware training steps, and evaluation loss reporting for regression checks.
+- Implemented LeRobot pre/post-processor integration via `make_pre_post_processors(policy_cfg, pretrained_path=..., dataset_stats=...)`, with lazy optional-dependency import guards and actionable installation errors.
+- Implemented SmolVLA policy forward integration handling tuple loss outputs and preserving optimizer + scheduler flow through the base composable lifecycle.
+- Registered `trainer.type = "lerobot"` in `plato/trainers/registry.py`.
+- Ran targeted offline validation with monkeypatched processor stubs:
+- trainer registry resolution and construction (`trainer.type = "lerobot"`),
+- synthetic one-epoch training-step path,
+- synthetic evaluation pass returning numeric loss.
+- Ran `uv run ruff check` on touched trainer files.
+files_touched:
+- `plato/trainers/lerobot.py` (created)
+- `plato/trainers/registry.py` (updated)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- LeRobot preprocessing depends on optional robotics extras at runtime; the trainer defers imports until processor initialization so non-robotics workloads remain unaffected, and it fails with a clear `uv sync --extra robotics` message when required dependencies are missing.
 
 ### T7. Harden federated payload/aggregation behavior
 depends_on: [T6]

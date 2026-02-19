@@ -14,6 +14,9 @@ from plato.trainers import (
     split_learning,
 )
 from plato.trainers import (
+    lerobot as lerobot_trainer,
+)
+from plato.trainers import (
     nanochat as nanochat_trainer,
 )
 
@@ -25,6 +28,7 @@ registered_trainers = {
     "pfedgraph": pfedgraph.Trainer,
     "split_learning": split_learning.Trainer,
     "nanochat": nanochat_trainer.Trainer,
+    "lerobot": lerobot_trainer.Trainer,
 }
 
 
