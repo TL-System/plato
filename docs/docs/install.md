@@ -75,7 +75,9 @@ uv sync --extra robotics
 ```
 
 See [SmolVLA + LeRobot Optional Setup](smolvla_lerobot_setup.md) for runtime
-requirements and guarded-import guidance.
+requirements and guarded-import guidance, and
+[SmolVLA + LeRobot Runbook](smolvla_lerobot_runbook.md) for setup-to-run
+operational steps and troubleshooting.
 
 ### Building the `plato-learn` PyPi Package
 

@@ -48,6 +48,8 @@ extra_css:
 nav:
   - Home: index.md
   - Installation: install.md
+  - SmolVLA + LeRobot Optional Setup: smolvla_lerobot_setup.md
+  - SmolVLA + LeRobot Runbook: smolvla_lerobot_runbook.md
   - Quick Start: quickstart.md
   - Examples:
       - Getting Started: examples/Getting Started.md

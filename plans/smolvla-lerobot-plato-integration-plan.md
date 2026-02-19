@@ -238,10 +238,23 @@ gotchas:
 
 ### T11. Add documentation and runbook
 depends_on: [T10]
+status: completed (2026-02-19)
 - Document setup and dependency extras.
 - Document config fields and examples.
 - Add troubleshooting notes (dataset access, device setup, common failures).
 - Add mapping between Plato config and equivalent `lerobot-train` concepts.
+work_log:
+- Added an operator-facing runbook covering dependency setup, runnable commands, minimum TOML contract, and troubleshooting for common LeRobot/SmolVLA failures.
+- Added an explicit Plato TOML to `lerobot-train` mapping table with direct flag mappings (`policy.path`, `dataset.repo_id`, `batch_size`, `policy.device`) and conceptual mappings (`rounds`/`epochs` vs `steps`, output paths).
+- Referenced all new `configs/LeRobot/*` profiles directly in the runbook and linked the runbook from installation docs and top-level docs navigation.
+- Grounded mapping/troubleshooting notes against current LeRobot documentation via Context7 and implementation-specific runtime errors from Plato's LeRobot datasource/trainer/model integration.
+files_touched:
+- `docs/docs/smolvla_lerobot_runbook.md` (created)
+- `docs/docs/install.md` (updated)
+- `docs/mkdocs.yml` (updated)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- `lerobot-train` examples are primarily step-based (`--steps`) while Plato scheduling is round/epoch-based; documentation uses explicit conceptual mapping instead of implying a one-to-one flag conversion.
 
 ### T12. Stage validation and rollout gate
 depends_on: [T11]
