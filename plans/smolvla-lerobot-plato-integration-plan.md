@@ -258,12 +258,27 @@ gotchas:
 
 ### T12. Stage validation and rollout gate
 depends_on: [T11]
+status: completed (2026-02-19)
 - Execute staged validation:
 - single-client local run
 - 2-client federated smoke run
 - larger run for convergence and stability check
 - Compare behavior/runtime against expected baseline.
 - Define go/no-go criteria and recommended defaults for first public release.
+work_log:
+- Captured validation window and environment (`2026-02-19 12:51-13:05 EST`, `uv 0.9.18`, Python `3.13.11`, `lerobot` + `torch` importable, `torch.cuda.is_available() == False`).
+- Ran focused preflight baseline: `uv run pytest -q tests/test_config_loader.py::test_config_loads_smolvla_lerobot_parameter_contract tests/datasources/test_lerobot_datasource.py tests/models/test_smolvla_model.py tests/trainers/test_lerobot_trainer.py tests/integration/test_lerobot_smolvla_smoke.py tests/algorithms/test_fedavg_algorithm.py` -> `12 passed`.
+- Ran staged real-config commands with bounded runtime:
+- `timeout 300 uv run python plato.py --config configs/LeRobot/smolvla_single_client_smoke.toml` -> fail (exit `124`, hit `TypeError: Got unsupported ScalarType BFloat16` during round-1 model payload serialization).
+- `timeout 240 uv run python plato.py --config configs/LeRobot/smolvla_fedavg_two_client_smoke.toml` -> fail (exit `124`, same BFloat16 serialization failure).
+- `timeout 120 uv run python plato.py --config configs/LeRobot/smolvla_full_finetune.toml -u` -> fail (exit `124`, same BFloat16 serialization failure before convergence phase).
+- Verified generated runtime CSVs (`runtime/results/94032.csv`, `runtime/results/94157.csv`, `runtime/results/94326.csv`) contain headers only and no completed round rows.
+- Recorded gate decision and release defaults in `plans/smolvla-lerobot-validation-report.md`: current gate is `NO-GO` until bfloat16 payload serialization is fixed.
+files_touched:
+- `plans/smolvla-lerobot-validation-report.md` (created)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- Staged runs can download/load SmolVLA and initialize LeRobot datasets, but federated round dispatch currently blocks on safetensor/tree serialization of bfloat16 tensors (`Got unsupported ScalarType BFloat16`), resulting in stalled runs that require timeout fencing.
 
 ## Milestones
 
