@@ -93,11 +93,24 @@ depends_on: [T2, T3]
 
 ### T5. Implement SmolVLA model/policy wrapper
 depends_on: [T2, T3]
+status: completed (2026-02-19)
 - Add `plato/models/smolvla.py`.
 - Implement pretrained loading path (`smolvla_base` and custom repo id/path).
 - Expose trainable-parameter policy (full model or adapter path).
 - Register model in `plato/models/registry.py`.
 - Ensure state dict save/load compatibility with Plato aggregation pipeline.
+work_log:
+- Added `plato/models/smolvla.py` with lazy LeRobot import guards, actionable installation errors for missing robotics extras, and a SmolVLA factory path compatible with Plato model registry usage.
+- Implemented pretrained policy source resolution with support for `smolvla_base` aliasing to `lerobot/smolvla_base`, config-based `parameters.policy.path`, and explicit constructor overrides (`policy_path` / `path`).
+- Added finetune policy modes for `full` and `adapter`; adapter mode uses configurable name-pattern matching and falls back to the loaded policy's existing `requires_grad` flags when patterns do not match.
+- Added compatibility checks for `state_dict`, `load_state_dict`, and `save_pretrained`, then registered `model_type = "smolvla"` in `plato/models/registry.py`.
+- Ran a targeted constructor/import validation without downloads by monkeypatching `SmolVLAPolicy.from_pretrained` and verifying both direct wrapper construction and registry resolution.
+files_touched:
+- `plato/models/smolvla.py` (created)
+- `plato/models/registry.py` (updated)
+- `plans/smolvla-lerobot-plato-integration-plan.md` (updated)
+gotchas:
+- Adapter parameter names are model-dependent; when no configured adapter patterns match, the wrapper intentionally reuses the model's preconfigured trainable flags instead of silently leaving zero trainable tensors.
 
 ### T6. Implement LeRobot trainer backend
 depends_on: [T4, T5]
