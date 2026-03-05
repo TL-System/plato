@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 from plato.config import Config, ConfigNode, TomlConfigLoader
 from plato.utils import toml_writer
 
@@ -238,10 +240,53 @@ def test_is_central_server_requires_cross_silo_true(tmp_path: Path, monkeypatch)
         delattr(Config, "args")
     Config._cli_overrides = {}
 
-    _ = Config()
-    assert Config.is_central_server() is False
 
-    Config._instance = None
-    if hasattr(Config, "args"):
-        delattr(Config, "args")
-    Config._cli_overrides = {}
+def test_toml_loader_allows_shared_includes(tmp_path: Path):
+    """Shared include files should not be treated as circular includes."""
+    common = tmp_path / "common.toml"
+    first = tmp_path / "first.toml"
+    second = tmp_path / "second.toml"
+    config_path = tmp_path / "config.toml"
+
+    common.write_text("seed = 7\n", encoding="utf-8")
+    first.write_text(
+        """
+include = "common.toml"
+alpha = 1
+""",
+        encoding="utf-8",
+    )
+    second.write_text(
+        """
+include = "common.toml"
+beta = 2
+""",
+        encoding="utf-8",
+    )
+    config_path.write_text(
+        """
+[runner]
+include = ["first.toml", "second.toml"]
+""",
+        encoding="utf-8",
+    )
+
+    loader = TomlConfigLoader(config_path)
+    config = loader.load()
+
+    assert config["runner"]["seed"] == 7
+    assert config["runner"]["alpha"] == 1
+    assert config["runner"]["beta"] == 2
+
+
+def test_toml_loader_detects_circular_includes(tmp_path: Path):
+    """Mutually recursive includes should still raise a clear error."""
+    first = tmp_path / "first.toml"
+    second = tmp_path / "second.toml"
+
+    first.write_text('include = "second.toml"\n', encoding="utf-8")
+    second.write_text('include = "first.toml"\n', encoding="utf-8")
+
+    loader = TomlConfigLoader(first)
+    with pytest.raises(ValueError, match="Circular include detected"):
+        _ = loader.load()

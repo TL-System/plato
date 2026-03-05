@@ -64,9 +64,12 @@ class TomlConfigLoader:
         if filename in seen:
             raise ValueError(f"Circular include detected while loading {filename}.")
         seen.add(filename)
-        with filename.open("rb") as handle:
-            data = tomllib.load(handle)
-        return self._resolve(data, filename.parent, seen)
+        try:
+            with filename.open("rb") as handle:
+                data = tomllib.load(handle)
+            return self._resolve(data, filename.parent, seen)
+        finally:
+            seen.remove(filename)
 
     def _resolve(self, value: Any, base_dir: Path, seen: set[Path]) -> Any:
         if isinstance(value, dict):
