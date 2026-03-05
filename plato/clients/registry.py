@@ -33,6 +33,12 @@ ClientFactory = Callable[..., Client]
 def _instantiate_with_signature(cls: type[Client], **kwargs) -> Client:
     """Instantiate a client class using only parameters supported by its signature."""
     signature = inspect.signature(cls.__init__)
+    if any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
+    ):
+        return cls(**kwargs)
+
     supported_kwargs = {
         name: value for name, value in kwargs.items() if name in signature.parameters
     }

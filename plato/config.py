@@ -64,9 +64,12 @@ class TomlConfigLoader:
         if filename in seen:
             raise ValueError(f"Circular include detected while loading {filename}.")
         seen.add(filename)
-        with filename.open("rb") as handle:
-            data = tomllib.load(handle)
-        return self._resolve(data, filename.parent, seen)
+        try:
+            with filename.open("rb") as handle:
+                data = tomllib.load(handle)
+            return self._resolve(data, filename.parent, seen)
+        finally:
+            seen.remove(filename)
 
     def _resolve(self, value: Any, base_dir: Path, seen: set[Path]) -> Any:
         if isinstance(value, dict):
@@ -487,7 +490,9 @@ class Config:
     @staticmethod
     def is_central_server() -> bool:
         """Returns whether the current instance is a central server in cross-silo FL."""
-        return hasattr(Config().algorithm, "cross_silo") and Config().args.port is None
+        return Config().args.port is None and bool(
+            getattr(Config().algorithm, "cross_silo", False)
+        )
 
     @staticmethod
     def gpu_count() -> int:

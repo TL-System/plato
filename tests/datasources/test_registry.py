@@ -33,6 +33,16 @@ class _VisionStubModule:
             self.testset = _FakeDataset(length=2, shape=(1, 28, 28))
 
 
+class _NoKwargsStubModule:
+    """Module-style datasource whose constructor accepts no kwargs."""
+
+    class DataSource(base.DataSource):
+        def __init__(self):
+            super().__init__()
+            self.trainset = _FakeDataset(length=1, shape=(1, 1, 1))
+            self.testset = _FakeDataset(length=1, shape=(1, 1, 1))
+
+
 def test_registry_returns_stub_datasource(monkeypatch):
     """Registry should instantiate registered modules and expose metadata helpers."""
     monkeypatch.setitem(
@@ -84,6 +94,17 @@ def test_registry_supports_feature_datasource(monkeypatch):
     assert feature.shape == (2,)
     assert label.item() in {0, 1}
     assert datasource.testset == []
+
+
+def test_registry_does_not_forward_datasource_name(monkeypatch):
+    """The `datasource_name` selector should not leak into datasource kwargs."""
+    monkeypatch.setitem(
+        registry.registered_datasources, "NoKwargsDS", _NoKwargsStubModule
+    )
+
+    datasource = registry.get(datasource_name="NoKwargsDS")
+
+    assert isinstance(datasource, _NoKwargsStubModule.DataSource)
 
 
 def test_registry_raises_for_unknown_datasource(monkeypatch):

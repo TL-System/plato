@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 from plato.config import Config, ConfigNode, TomlConfigLoader
 from plato.utils import toml_writer
 
@@ -210,6 +212,8 @@ def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
     Config._cli_overrides = {}
 
 
+
+
 def test_config_loads_smolvla_lerobot_parameter_contract(tmp_path: Path, monkeypatch):
     """SmolVLA/LeRobot config keys should round-trip through Config()."""
     config_base = tmp_path / "runtime"
@@ -294,7 +298,6 @@ def test_config_loads_smolvla_lerobot_parameter_contract(tmp_path: Path, monkeyp
     assert config.parameters.transforms.normalize is True
     assert config.parameters.transforms.interpolation == "bilinear"
 
-    # These dictionaries are the direct constructor kwargs expected by T4/T5/T6.
     assert config.parameters.policy._asdict() == {
         "type": "smolvla",
         "path": "lerobot/smolvla_base",
@@ -318,3 +321,94 @@ def test_config_loads_smolvla_lerobot_parameter_contract(tmp_path: Path, monkeyp
     if hasattr(Config, "args"):
         delattr(Config, "args")
     Config._cli_overrides = {}
+
+
+def test_is_central_server_requires_cross_silo_true(tmp_path: Path, monkeypatch):
+    """Central-server detection should respect `cross_silo = false`."""
+    config_path = tmp_path / "config.toml"
+    config_data = {
+        "clients": {"type": "simple", "total_clients": 1, "per_round": 1},
+        "server": {"address": "127.0.0.1", "port": 8000},
+        "data": {"datasource": "toy"},
+        "trainer": {"type": "basic", "rounds": 1},
+        "algorithm": {"type": "fedavg", "cross_silo": False},
+    }
+
+    toml_writer.dump(config_data, config_path)
+
+    monkeypatch.delenv("config_file", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            sys.argv[0],
+            "--config",
+            str(config_path),
+        ],
+    )
+
+    Config._instance = None
+    if hasattr(Config, "args"):
+        delattr(Config, "args")
+    Config._cli_overrides = {}
+
+    config = Config()
+
+    assert Config.is_central_server() is False
+    assert getattr(config.algorithm, "cross_silo", False) is False
+
+    Config._instance = None
+    if hasattr(Config, "args"):
+        delattr(Config, "args")
+    Config._cli_overrides = {}
+
+
+def test_toml_loader_allows_shared_includes(tmp_path: Path):
+    """Shared include files should not be treated as circular includes."""
+    common = tmp_path / "common.toml"
+    first = tmp_path / "first.toml"
+    second = tmp_path / "second.toml"
+    config_path = tmp_path / "config.toml"
+
+    common.write_text("seed = 7\n", encoding="utf-8")
+    first.write_text(
+        """
+include = "common.toml"
+alpha = 1
+""",
+        encoding="utf-8",
+    )
+    second.write_text(
+        """
+include = "common.toml"
+beta = 2
+""",
+        encoding="utf-8",
+    )
+    config_path.write_text(
+        """
+[runner]
+include = ["first.toml", "second.toml"]
+""",
+        encoding="utf-8",
+    )
+
+    loader = TomlConfigLoader(config_path)
+    config = loader.load()
+
+    assert config["runner"]["seed"] == 7
+    assert config["runner"]["alpha"] == 1
+    assert config["runner"]["beta"] == 2
+
+
+def test_toml_loader_detects_circular_includes(tmp_path: Path):
+    """Mutually recursive includes should still raise a clear error."""
+    first = tmp_path / "first.toml"
+    second = tmp_path / "second.toml"
+
+    first.write_text('include = "second.toml"\n', encoding="utf-8")
+    second.write_text('include = "first.toml"\n', encoding="utf-8")
+
+    loader = TomlConfigLoader(first)
+    with pytest.raises(ValueError, match="Circular include detected"):
+        _ = loader.load()
