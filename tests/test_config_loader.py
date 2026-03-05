@@ -208,3 +208,40 @@ def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
     if hasattr(Config, "args"):
         delattr(Config, "args")
     Config._cli_overrides = {}
+
+
+def test_is_central_server_requires_cross_silo_true(tmp_path: Path, monkeypatch):
+    """Central-server detection should respect `cross_silo = false`."""
+    config_path = tmp_path / "config.toml"
+    config_data = {
+        "clients": {"type": "simple", "total_clients": 1, "per_round": 1},
+        "server": {"address": "127.0.0.1", "port": 8000},
+        "data": {"datasource": "toy"},
+        "trainer": {"type": "basic", "rounds": 1},
+        "algorithm": {"type": "fedavg", "cross_silo": False},
+    }
+    toml_writer.dump(config_data, config_path)
+
+    monkeypatch.delenv("config_file", raising=False)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            sys.argv[0],
+            "--config",
+            str(config_path),
+        ],
+    )
+
+    Config._instance = None
+    if hasattr(Config, "args"):
+        delattr(Config, "args")
+    Config._cli_overrides = {}
+
+    _ = Config()
+    assert Config.is_central_server() is False
+
+    Config._instance = None
+    if hasattr(Config, "args"):
+        delattr(Config, "args")
+    Config._cli_overrides = {}

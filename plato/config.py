@@ -487,7 +487,9 @@ class Config:
     @staticmethod
     def is_central_server() -> bool:
         """Returns whether the current instance is a central server in cross-silo FL."""
-        return hasattr(Config().algorithm, "cross_silo") and Config().args.port is None
+        return Config().args.port is None and bool(
+            getattr(Config().algorithm, "cross_silo", False)
+        )
 
     @staticmethod
     def gpu_count() -> int:
