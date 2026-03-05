@@ -46,11 +46,10 @@ _datasource_aliases = {
 
 def get(client_id: int = 0, **kwargs):
     """Get the data source with the provided name."""
-    datasource_name = (
-        kwargs["datasource_name"]
-        if "datasource_name" in kwargs
-        else Config().data.datasource
-    )
+    if "datasource_name" in kwargs:
+        datasource_name = kwargs.pop("datasource_name")
+    else:
+        datasource_name = Config().data.datasource
 
     logging.info("Data source: %s", datasource_name)
 
