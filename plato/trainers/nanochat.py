@@ -4,7 +4,6 @@ Trainer wiring for Nanochat models within the composable trainer framework.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Iterator, List, Sequence, overload
 
 try:
@@ -93,7 +92,6 @@ class NanochatTrainingStepStrategy(TrainingStepStrategy):
         return loss.detach()
 
 
-@dataclass
 class _OptimizerBundle(torch.optim.Optimizer):
     """Bundle multiple optimizers under a single interface."""
 
@@ -139,13 +137,6 @@ class _OptimizerBundle(torch.optim.Optimizer):
             strict=False,
         ):
             optimizer.load_state_dict(payload)
-
-    @property
-    def param_groups(self) -> list[dict[str, Any]]:
-        groups: list[dict[str, Any]] = []
-        for optimizer in self.optimizers:
-            groups.extend(getattr(optimizer, "param_groups", []))
-        return groups
 
     def params_state_update(self) -> None:
         for optimizer in self.optimizers:
