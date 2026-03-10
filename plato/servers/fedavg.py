@@ -191,7 +191,7 @@ class Server(base.Server):
         # Check if we should aggregate weights directly or use deltas
         # Try strategy's aggregate_weights first, fall back to aggregate_deltas
         strategy_weights = None
-        if hasattr(self.aggregation_strategy, "aggregate_weights"):
+        if self._should_prefer_weight_aggregation():
             strategy_weights = await self.aggregation_strategy.aggregate_weights(
                 self.updates, baseline_weights, weights_received, self.context
             )
@@ -284,6 +284,20 @@ class Server(base.Server):
 
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
+
+    def _should_prefer_weight_aggregation(self) -> bool:
+        """Return whether the strategy should use direct weight aggregation."""
+        strategy_cls = type(self.aggregation_strategy)
+        aggregate_weights_impl = getattr(strategy_cls, "aggregate_weights", None)
+        aggregate_deltas_impl = getattr(strategy_cls, "aggregate_deltas", None)
+
+        if aggregate_weights_impl is None:
+            return False
+
+        return not (
+            aggregate_weights_impl is FedAvgAggregationStrategy.aggregate_weights
+            and aggregate_deltas_impl is not FedAvgAggregationStrategy.aggregate_deltas
+        )
 
     def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""
