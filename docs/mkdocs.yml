@@ -69,6 +69,8 @@ nav:
       - Case Studies:
           - Federated LoRA Fine-Tuning: examples/case-studies/1. LoRA.md
           - Composable Trainer API: examples/case-studies/2. Composable Trainer.md
+          - SmolVLA + LeRobot Optional Setup: examples/case-studies/smolvla_lerobot_setup.md
+          - SmolVLA + LeRobot Runbook: examples/case-studies/smolvla_lerobot_runbook.md
   - Configuration Settings:
       - Overview: configurations/overview.md
       - General: configurations/general.md

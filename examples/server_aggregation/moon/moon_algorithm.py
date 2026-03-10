@@ -21,7 +21,9 @@ class Algorithm(fedavg.Algorithm):
 
     @staticmethod
     def _cast_tensor_like(
-        tensor: torch.Tensor, reference: torch.Tensor
+        tensor: torch.Tensor,
+        reference: torch.Tensor,
+        tensor_name: str = "tensor",
     ) -> torch.Tensor:
         """Cast a tensor to match a reference dtype (handles bool/int safely)."""
         if tensor.dtype == reference.dtype:

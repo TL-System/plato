@@ -1,0 +1,70 @@
+[clients]
+
+# Type
+type = "simple"
+
+# The total number of clients
+total_clients = 1
+
+# The number of clients selected in each round
+per_round = 1
+
+# Should the clients compute test accuracy locally?
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/lerobot/smolvla_single_client_smoke"
+model_path = "models/lerobot/smolvla_single_client_smoke"
+
+[data]
+include = "lerobot_datasource_base.toml"
+
+[trainer]
+
+# The type of the trainer
+type = "lerobot"
+
+# The maximum number of training rounds
+rounds = 1
+
+# The maximum number of clients running concurrently
+max_concurrency = 1
+
+# The machine learning model
+model_type = "smolvla"
+model_name = "smolvla"
+
+# Number of epoches for local training in each communication round
+epochs = 1
+batch_size = 2
+optimizer = "AdamW"
+
+[algorithm]
+
+# Aggregation algorithm
+type = "fedavg"
+
+[parameters]
+
+[parameters.policy]
+type = "smolvla"
+path = "lerobot/smolvla_base"
+finetune_mode = "adapter"
+precision = "fp32"
+device = "cpu"
+
+[parameters.dataset]
+repo_id = "lerobot/pusht_image"
+delta_timestamps = { observation_image = [-0.2, -0.1, 0.0] }
+
+[parameters.transforms]
+image_size = [224, 224]
+normalize = true
+interpolation = "bilinear"
+
+[parameters.optimizer]
+lr = 0.0001
+weight_decay = 0.0

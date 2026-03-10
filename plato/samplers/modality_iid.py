@@ -16,7 +16,7 @@ class Sampler(base.Sampler):
     """Create a data sampler for each client to use a randomly divided partition of the
     dataset."""
 
-    def __init__(self, datasource, client_id):
+    def __init__(self, datasource, client_id, testing=False):
         super().__init__()
 
         self.client_id = client_id

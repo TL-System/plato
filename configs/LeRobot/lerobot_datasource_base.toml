@@ -1,0 +1,9 @@
+
+# The training and testing dataset
+datasource = "LeRobot"
+
+# IID or non-IID? LeRobot handles deterministic episode partitioning internally.
+sampler = "iid"
+
+# The random seed used for deterministic train/test split and client partitioning.
+random_seed = 1

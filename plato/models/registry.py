@@ -17,6 +17,7 @@ from plato.models import (
     multilayer,
     nanochat,
     resnet,
+    smolvla,
     torch_hub,
     vgg,
     vit,
@@ -42,6 +43,7 @@ registered_factories = {
     "huggingface": huggingface.Model,
     "vit": vit.Model,
     "nanochat": nanochat.Model,
+    "smolvla": smolvla.Model,
 }
 
 registered_mlx_models = {}

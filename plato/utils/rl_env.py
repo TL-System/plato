@@ -10,6 +10,7 @@ https://stable-baselines3.readthedocs.io/en/master/guide/custom_env.html.
 
 import asyncio
 import logging
+from typing import Any
 
 import gymnasium as gym
 import numpy as np
@@ -43,19 +44,27 @@ class RLEnv(gym.Env):
         # https://stable-baselines3.readthedocs.io/en/master/guide/rl_tips.html#tips-and-tricks-when-creating-a-custom-environment
         n_actions = 1
         self.action_space = spaces.Box(
-            low=-1, high=1, shape=(n_actions,), dtype="float32"
+            low=-1, high=1, shape=(n_actions,), dtype=np.float32
         )
 
         # Use only global model accurarcy as state for now
         self.n_states = 1
         # Also normalize observation space for better RL training
         self.observation_space = spaces.Box(
-            low=-1, high=1, shape=(self.n_states,), dtype="float32"
+            low=-1, high=1, shape=(self.n_states,), dtype=np.float32
         )
 
         self.state = np.zeros(self.n_states, dtype=np.float32)
 
-    def reset(self):
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[np.ndarray, dict[str, Any]]:
+        super().reset(seed=seed)
+        del options
+
         if self.rl_agent.rl_episode >= Config().algorithm.rl_episodes:
             while True:
                 # Give RL agent some time to close connections and exit
@@ -72,7 +81,7 @@ class RLEnv(gym.Env):
         self.rl_agent.new_episode_begin.set()
 
         self.state = np.zeros(self.n_states, dtype=np.float32)
-        return self.state.copy()
+        return self.state.copy(), {}
 
     def step(self, action):
         """One step of reinforcement learning."""
