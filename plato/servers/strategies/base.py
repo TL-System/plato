@@ -193,8 +193,10 @@ class AggregationStrategy(ServerStrategy):
 
         Note:
             If this returns None, the server will compute deltas and call
-            aggregate_deltas instead. Return a weight dictionary to bypass
-            delta computation.
+            aggregate_deltas instead. Strategies that customize only
+            aggregate_deltas can rely on that hook without also overriding
+            aggregate_weights. Return a weight dictionary only when the
+            strategy truly wants to bypass delta computation.
 
         Example:
             >>> async def aggregate_weights(self, updates, baseline, weights, context):

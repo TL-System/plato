@@ -116,8 +116,13 @@ class StragglerAwareSelection(ClientSelectionStrategy):
 Key tips:
 
 - Strategies receive a `ServerContext` instance on every call; use it to read or share runtime state.
-- Aggregation strategies may override `aggregate_weights()` when working with weight dictionaries
-  instead of deltas.
+- Override `aggregate_deltas()` for delta-based customization and
+  `aggregate_weights()` only when your strategy truly needs to aggregate model
+  weights directly.
+- The composable FedAvg server prefers a strategy's custom
+  `aggregate_weights()` implementation when one is provided, but it will still
+  route through `aggregate_deltas()` when the strategy only customizes delta
+  aggregation.
 - Client selection strategies can optionally implement `on_clients_selected()` and
   `on_reports_received()` hooks when additional bookkeeping is required.
 
@@ -224,7 +229,7 @@ The common practice is to customize the server using subclassing for important f
 !!! example "aggregate_weights()"
     **`async def aggregate_weights(self, updates, baseline_weights, weights_received)`**
 
-    Sometimes it is more convenient to aggregate the received model weights directly to the global model. In this case, override this method to aggregate the weights received directly to baseline weights. This method is optional, and the server will call this method rather than `aggregate_deltas` when it is defined. Refer to `examples/fedasync/fedasync_server.py` for an example.
+    Sometimes it is more convenient to aggregate the received model weights directly to the global model. In this case, override this method to aggregate the weights received directly to baseline weights. This method is optional. In the composable FedAvg server, return a weight dictionary to bypass delta aggregation, or return `None` to fall back to `aggregate_deltas()`. Refer to `examples/fedasync/fedasync_server.py` for an example.
 
     `updates` the client updates received at the server.
 

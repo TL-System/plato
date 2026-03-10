@@ -161,7 +161,10 @@ The example above:
 
 Most examples under `examples/` now follow this pattern—copy a nearby strategy,
 customise the hook you need, register it in a factory or config, and keep the
-rest of the stack unchanged.
+rest of the stack unchanged. For aggregation strategies, prefer
+`aggregate_deltas()` when your logic operates on framework-agnostic deltas, and
+override `aggregate_weights()` only for algorithms that genuinely need direct
+weight-level aggregation.
 
 ---
 
