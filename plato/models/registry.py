@@ -44,6 +44,8 @@ registered_factories = {
     "vit": vit.Model,
     "nanochat": nanochat.Model,
     "smolvla": smolvla.Model,
+    "timesfm": huggingface.Model,
+    "patchtsmixer": huggingface.Model,
 }
 
 registered_mlx_models = {}
