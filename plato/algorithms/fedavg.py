@@ -22,13 +22,13 @@ class Algorithm(base.Algorithm):
     def _as_state_mapping(weights: Any, context: str) -> Mapping[str, torch.Tensor]:
         """Validate and cast a state-dict-like payload."""
         if not isinstance(weights, Mapping):
-            raise TypeError(f"{context} must be a mapping of parameter names to tensors.")
+            raise TypeError(
+                f"{context} must be a mapping of parameter names to tensors."
+            )
         return weights
 
     @staticmethod
-    def _to_transport_tensor(
-        tensor: torch.Tensor, tensor_name: str
-    ) -> torch.Tensor:
+    def _to_transport_tensor(tensor: torch.Tensor, tensor_name: str) -> torch.Tensor:
         """
         Convert a tensor to a wire-safe representation for payload transport.
 
@@ -88,7 +88,9 @@ class Algorithm(base.Algorithm):
         if baseline_weight.dtype == torch.bool:
             return current_casted.to(torch.int8) - baseline_weight.to(torch.int8)
 
-        if torch.is_floating_point(baseline_weight) or torch.is_complex(baseline_weight):
+        if torch.is_floating_point(baseline_weight) or torch.is_complex(
+            baseline_weight
+        ):
             return current_casted.to(baseline_weight.dtype) - baseline_weight
 
         return current_casted.to(torch.int64) - baseline_weight.to(torch.int64)
@@ -111,7 +113,9 @@ class Algorithm(base.Algorithm):
                 delta_integral = delta.to(torch.int8)
             return (baseline_weight.to(torch.int8) + delta_integral).ne(0)
 
-        if torch.is_floating_point(baseline_weight) or torch.is_complex(baseline_weight):
+        if torch.is_floating_point(baseline_weight) or torch.is_complex(
+            baseline_weight
+        ):
             return baseline_weight + delta.to(baseline_weight.dtype)
 
         if torch.is_floating_point(delta):
@@ -156,7 +160,9 @@ class Algorithm(base.Algorithm):
             size_bytes += tensor.numel() * tensor.element_size()
         return size_bytes
 
-    def _assert_payload_size(self, weights: Mapping[str, torch.Tensor], source: str) -> None:
+    def _assert_payload_size(
+        self, weights: Mapping[str, torch.Tensor], source: str
+    ) -> None:
         """Enforce an optional payload-size safeguard."""
         limit_mb = self._resolve_payload_limit_mb()
         if limit_mb is None:
@@ -175,10 +181,15 @@ class Algorithm(base.Algorithm):
     ) -> list[str] | None:
         """Resolve parameter names to exchange for adapter-only finetuning."""
         finetune_mode = getattr(target_model, "plato_finetune_mode", None)
-        if not isinstance(finetune_mode, str) or finetune_mode.strip().lower() != "adapter":
+        if (
+            not isinstance(finetune_mode, str)
+            or finetune_mode.strip().lower() != "adapter"
+        ):
             return None
 
-        trainable_names_attr = getattr(target_model, "plato_trainable_parameter_names", None)
+        trainable_names_attr = getattr(
+            target_model, "plato_trainable_parameter_names", None
+        )
         names_from_attr = (
             [
                 name
@@ -224,7 +235,9 @@ class Algorithm(base.Algorithm):
             unknown_keys = set(weight_mapping).difference(baseline_mapping)
             if unknown_keys:
                 unknown = ", ".join(sorted(unknown_keys))
-                raise KeyError(f"Received weights include unexpected parameter(s): {unknown}.")
+                raise KeyError(
+                    f"Received weights include unexpected parameter(s): {unknown}."
+                )
 
             delta = OrderedDict()
             for name, current_weight in weight_mapping.items():
@@ -308,7 +321,9 @@ class Algorithm(base.Algorithm):
         unknown_keys = set(weights_mapping).difference(current_state)
         if unknown_keys:
             unknown = ", ".join(sorted(unknown_keys))
-            raise KeyError(f"Inbound weights include unexpected parameter(s): {unknown}.")
+            raise KeyError(
+                f"Inbound weights include unexpected parameter(s): {unknown}."
+            )
 
         merged_state = OrderedDict(current_state.items())
         for name, incoming_tensor in weights_mapping.items():

@@ -166,7 +166,7 @@ def test_lerobot_trainer_consumes_policy_precision_and_device(
     monkeypatch.setattr(
         lerobot_trainer,
         "_import_make_pre_post_processors",
-        lambda: (lambda *_args, **_kwargs: (lambda batch: batch, lambda out: out)),
+        lambda: lambda *_args, **_kwargs: (lambda batch: batch, lambda out: out),
     )
 
     trainer = lerobot_trainer.Trainer(model=_TinyLeRobotPolicy())

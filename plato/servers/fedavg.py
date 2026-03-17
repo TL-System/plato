@@ -249,9 +249,7 @@ class Server(base.Server):
             # Compute the average metric from client reports
             self.accuracy, self.accuracy_std = self.get_accuracy_mean_std(self.updates)
             if metric_name == "mse":
-                logging.info(
-                    "[%s] Average client MSE: %.6f.", self, self.accuracy
-                )
+                logging.info("[%s] Average client MSE: %.6f.", self, self.accuracy)
             else:
                 logging.info(
                     "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy

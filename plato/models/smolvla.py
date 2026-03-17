@@ -273,7 +273,9 @@ class Model:
         setattr(policy, "plato_policy_path", policy_path)
         setattr(policy, "plato_finetune_mode", finetune_mode)
         setattr(policy, "plato_adapter_patterns", tuple(adapter_patterns))
-        setattr(policy, "plato_adapter_fallback_mode", trainable_metadata["fallback_mode"])
+        setattr(
+            policy, "plato_adapter_fallback_mode", trainable_metadata["fallback_mode"]
+        )
         setattr(policy, "plato_trainable_parameter_count", trainable_count)
         setattr(
             policy,

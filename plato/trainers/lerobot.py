@@ -344,9 +344,7 @@ def _resolve_runtime_device(device_value: Any, fallback_device: Any) -> torch.de
         try:
             gpu_index = int(normalized.split(":", 1)[1])
         except (IndexError, ValueError) as exc:
-            raise ValueError(
-                f"Invalid CUDA device value: '{device_value}'."
-            ) from exc
+            raise ValueError(f"Invalid CUDA device value: '{device_value}'.") from exc
         if gpu_index < 0 or gpu_index >= torch.cuda.device_count():
             raise RuntimeError(
                 f"`parameters.policy.device` requested CUDA device {gpu_index}, "
@@ -466,9 +464,7 @@ class LeRobotTrainingStepStrategy(TrainingStepStrategy):
             )
 
         if not torch.is_tensor(loss):
-            raise TypeError(
-                "LeRobot policy forward did not return a tensor loss."
-            )
+            raise TypeError("LeRobot policy forward did not return a tensor loss.")
 
         loss.backward()
         optimizer.step()
