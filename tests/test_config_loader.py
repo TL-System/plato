@@ -212,8 +212,6 @@ def test_config_loads_evaluation_section(tmp_path: Path, monkeypatch):
     Config._cli_overrides = {}
 
 
-
-
 def test_config_loads_smolvla_lerobot_parameter_contract(tmp_path: Path, monkeypatch):
     """SmolVLA/LeRobot config keys should round-trip through Config()."""
     config_base = tmp_path / "runtime"
