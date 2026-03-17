@@ -8,6 +8,7 @@ import logging
 from plato.config import Config
 from plato.datasources import (
     cinic10,
+    ev_charging,
     feature,
     femnist,
     huggingface,
@@ -32,7 +33,11 @@ registered_datasources = {
     "Nanochat": nanochat,
 }
 
-registered_partitioned_datasources = {"FEMNIST": femnist, "LeRobot": lerobot}
+registered_partitioned_datasources = {
+    "FEMNIST": femnist,
+    "LeRobot": lerobot,
+    "EVCharging": ev_charging,  # per-user split; client_id selects the user
+}
 
 _datasource_aliases = {
     "STL10": ("Torchvision", {"dataset_name": "STL10"}),
