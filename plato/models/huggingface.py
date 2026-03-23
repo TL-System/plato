@@ -5,7 +5,7 @@ Obtaining a model from HuggingFace with optional parameter-efficient fine-tuning
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 import torch
 import torch.nn as nn
@@ -175,148 +175,187 @@ class TimesFmMultivariateWrapper(nn.Module):
         return [int(f) for f in freq for _ in range(channels)]
 
 
+# ---------------------------------------------------------------------------
+# Time-series model loaders
+#
+# To add a new HuggingFace time series model:
+#   1. Implement a loader function with signature:
+#          def _load_<name>(resolved_model_name, cache_dir, **kwargs) -> nn.Module
+#   2. Register it below in _TIMESERIES_LOADERS.
+#   3. Add the model type string to TIMESERIES_MODEL_TYPES in
+#      plato/utils/timeseries_utils.py.
+# ---------------------------------------------------------------------------
+
+
+def _load_timesfm(resolved_model_name: str, cache_dir: str, **kwargs) -> nn.Module:
+    """Load or create a TimesFM model wrapped for batched multivariate use."""
+    if TimesFmModelForPrediction is None:
+        raise ImportError(
+            "TimesFM models are not available. "
+            "Ensure you have transformers>=5.0.0 installed."
+        )
+
+    trainer_config = Config().trainer
+    prediction_length = getattr(trainer_config, "prediction_length", 128)
+    default_freq = getattr(trainer_config, "freq", 0)
+
+    try:
+        logging.info(
+            "Attempting to load pretrained TimesFM model: %s",
+            resolved_model_name,
+        )
+        inner = TimesFmModelForPrediction.from_pretrained(
+            resolved_model_name, cache_dir=cache_dir
+        )
+        logging.info("Successfully loaded pretrained TimesFM model")
+    except (OSError, ValueError, Exception):
+        logging.info(
+            "TimesFM model '%s' not found as pretrained, creating from config",
+            resolved_model_name,
+        )
+        context_length = getattr(trainer_config, "context_length", 512)
+        horizon_length = prediction_length
+
+        config = TimesFmConfig(
+            context_length=context_length,
+            horizon_length=horizon_length,
+            patch_length=getattr(trainer_config, "patch_length", 32),
+            num_hidden_layers=getattr(trainer_config, "num_hidden_layers", 20),
+            hidden_size=getattr(trainer_config, "hidden_size", 1280),
+            intermediate_size=getattr(trainer_config, "intermediate_size", 1280),
+            num_attention_heads=getattr(trainer_config, "num_attention_heads", 16),
+            head_dim=getattr(trainer_config, "head_dim", 80),
+            attention_dropout=getattr(trainer_config, "dropout", 0.0),
+        )
+        inner = TimesFmModelForPrediction(config)
+
+    return TimesFmMultivariateWrapper(
+        model=inner,
+        prediction_length=prediction_length,
+        default_freq=default_freq,
+    )
+
+
+def _load_patchtsmixer(resolved_model_name: str, cache_dir: str, **kwargs) -> nn.Module:
+    """Load or create a PatchTSMixer model."""
+    if PatchTSMixerForPrediction is None:
+        raise ImportError(
+            "PatchTSMixer models are not available. "
+            "Ensure you have transformers>=4.35.0 installed."
+        )
+
+    trainer_config = Config().trainer
+    model_task = (
+        kwargs.get("model_task")
+        or getattr(trainer_config, "model_task", None)
+        or getattr(trainer_config, "task_type", "forecasting")
+    )
+
+    task_models = {
+        "classification": PatchTSMixerForTimeSeriesClassification,
+        "regression": PatchTSMixerForRegression,
+        "pretraining": PatchTSMixerForPretraining,
+        "forecasting": PatchTSMixerForPrediction,
+    }
+    model_class = task_models.get(model_task, PatchTSMixerForPrediction)
+
+    try:
+        logging.info(
+            "Attempting to load pretrained PatchTSMixer model: %s",
+            resolved_model_name,
+        )
+        model = model_class.from_pretrained(resolved_model_name, cache_dir=cache_dir)
+        logging.info("Successfully loaded pretrained model")
+    except (OSError, ValueError, Exception):
+        logging.info(
+            "Model '%s' not found as pretrained, creating from config settings",
+            resolved_model_name,
+        )
+        scaling_param = getattr(trainer_config, "scaling", "std")
+        if isinstance(scaling_param, str) and scaling_param.lower() == "none":
+            scaling_param = None
+
+        config = PatchTSMixerConfig(
+            context_length=getattr(trainer_config, "context_length", 512),
+            prediction_length=getattr(trainer_config, "prediction_length", 96),
+            num_input_channels=getattr(trainer_config, "num_input_channels", 7),
+            patch_length=getattr(trainer_config, "patch_length", 8),
+            patch_stride=getattr(trainer_config, "patch_stride", 8),
+            d_model=getattr(trainer_config, "d_model", 64),
+            num_layers=getattr(trainer_config, "num_layers", 8),
+            expansion_factor=getattr(trainer_config, "expansion_factor", 2),
+            dropout=getattr(trainer_config, "dropout", 0.2),
+            head_dropout=getattr(trainer_config, "head_dropout", 0.2),
+            mode=getattr(trainer_config, "mode", "common_channel"),
+            gated_attn=getattr(trainer_config, "gated_attn", True),
+            scaling=scaling_param,
+            prediction_channel_indices=getattr(
+                trainer_config, "prediction_channel_indices", None
+            ),
+        )
+
+        if model_task == "classification":
+            config.num_labels = getattr(trainer_config, "num_classes", 2)
+            model = PatchTSMixerForTimeSeriesClassification(config)
+        elif model_task == "regression":
+            config.num_targets = getattr(trainer_config, "num_targets", 1)
+            model = PatchTSMixerForRegression(config)
+        elif model_task == "pretraining":
+            model = PatchTSMixerForPretraining(config)
+        else:
+            model = PatchTSMixerForPrediction(config)
+
+    return model
+
+
+# Registry mapping model_type (lowercase) -> loader function.
+# This is the only place that needs updating when a new HF time series model
+# is added (along with TIMESERIES_MODEL_TYPES in timeseries_utils.py).
+_TIMESERIES_LOADERS: Dict[str, Callable[..., nn.Module]] = {
+    "timesfm": _load_timesfm,
+    "patchtsmixer": _load_patchtsmixer,
+}
+
+
 class Model:
     """The HuggingFace model factory supporting various model types."""
 
     @staticmethod
-    def _get_timeseries_task_type(model_task=None):
-        """Determine the task type for time series models from config or arguments."""
-        trainer_config = Config().trainer
-        return (
-            model_task
-            or getattr(trainer_config, "model_task", None)
-            or getattr(trainer_config, "task_type", "forecasting")
-        )
+    def _get_timeseries_model(
+        resolved_model_name: str, cache_dir: str, model_type: str = "", **kwargs
+    ) -> nn.Module:
+        """Unified entry point for all HuggingFace time series models.
 
-    # PatchTSMixer
+        Dispatches to the appropriate loader in ``_TIMESERIES_LOADERS`` based
+        on ``model_type`` or a substring match in ``resolved_model_name``.
+        """
+        model_type_lower = model_type.lower()
+        model_name_lower = resolved_model_name.lower()
 
-    @staticmethod
-    def _get_patchtsmixer_model(resolved_model_name, cache_dir, model_task=None):
-        """Load or create a PatchTSMixer model."""
-        if PatchTSMixerForPrediction is None:
-            raise ImportError(
-                "PatchTSMixer models are not available. "
-                "Ensure you have transformers>=4.35.0 installed."
+        loader = None
+        for ts_type, ts_loader in _TIMESERIES_LOADERS.items():
+            if model_type_lower == ts_type or ts_type in model_name_lower:
+                loader = ts_loader
+                break
+
+        if loader is None:
+            raise ValueError(
+                f"No time series loader found for model '{resolved_model_name}' "
+                f"(type='{model_type}'). "
+                "Register a loader in _TIMESERIES_LOADERS in plato/models/huggingface.py "
+                "and add the type to TIMESERIES_MODEL_TYPES in plato/utils/timeseries_utils.py."
             )
 
-        task_type = Model._get_timeseries_task_type(model_task)
-
-        task_models = {
-            "classification": PatchTSMixerForTimeSeriesClassification,
-            "regression": PatchTSMixerForRegression,
-            "pretraining": PatchTSMixerForPretraining,
-            "forecasting": PatchTSMixerForPrediction,
-        }
-        model_class = task_models.get(task_type, PatchTSMixerForPrediction)
-
-        try:
-            logging.info(
-                "Attempting to load pretrained PatchTSMixer model: %s",
-                resolved_model_name,
-            )
-            model = model_class.from_pretrained(
-                resolved_model_name, cache_dir=cache_dir
-            )
-            logging.info("Successfully loaded pretrained model")
-        except (OSError, ValueError, Exception):
-            logging.info(
-                "Model '%s' not found as pretrained, creating from config settings",
-                resolved_model_name,
-            )
-            trainer_config = Config().trainer
-
-            scaling_param = getattr(trainer_config, "scaling", "std")
-            if isinstance(scaling_param, str) and scaling_param.lower() == "none":
-                scaling_param = None
-
-            config = PatchTSMixerConfig(
-                context_length=getattr(trainer_config, "context_length", 512),
-                prediction_length=getattr(trainer_config, "prediction_length", 96),
-                num_input_channels=getattr(trainer_config, "num_input_channels", 7),
-                patch_length=getattr(trainer_config, "patch_length", 8),
-                patch_stride=getattr(trainer_config, "patch_stride", 8),
-                d_model=getattr(trainer_config, "d_model", 64),
-                num_layers=getattr(trainer_config, "num_layers", 8),
-                expansion_factor=getattr(trainer_config, "expansion_factor", 2),
-                dropout=getattr(trainer_config, "dropout", 0.2),
-                head_dropout=getattr(trainer_config, "head_dropout", 0.2),
-                mode=getattr(trainer_config, "mode", "common_channel"),
-                gated_attn=getattr(trainer_config, "gated_attn", True),
-                scaling=scaling_param,
-                prediction_channel_indices=getattr(
-                    trainer_config, "prediction_channel_indices", None
-                ),
-            )
-
-            if task_type == "classification":
-                config.num_labels = getattr(trainer_config, "num_classes", 2)
-                model = PatchTSMixerForTimeSeriesClassification(config)
-            elif task_type == "regression":
-                config.num_targets = getattr(trainer_config, "num_targets", 1)
-                model = PatchTSMixerForRegression(config)
-            elif task_type == "pretraining":
-                model = PatchTSMixerForPretraining(config)
-            else:
-                model = PatchTSMixerForPrediction(config)
-
-        return model
-
-    # TimesFM
-
-    @staticmethod
-    def _get_timesfm_model(resolved_model_name, cache_dir):
-        """Load or create a TimesFM model wrapped for batched multivariate use."""
-        if TimesFmModelForPrediction is None:
-            raise ImportError(
-                "TimesFM models are not available. "
-                "Ensure you have transformers>=5.0.0 installed."
-            )
-
-        trainer_config = Config().trainer
-        prediction_length = getattr(trainer_config, "prediction_length", 128)
-        default_freq = getattr(trainer_config, "freq", 0)
-
-        try:
-            logging.info(
-                "Attempting to load pretrained TimesFM model: %s",
-                resolved_model_name,
-            )
-            inner = TimesFmModelForPrediction.from_pretrained(
-                resolved_model_name, cache_dir=cache_dir
-            )
-            logging.info("Successfully loaded pretrained TimesFM model")
-        except (OSError, ValueError, Exception):
-            logging.info(
-                "TimesFM model '%s' not found as pretrained, creating from config",
-                resolved_model_name,
-            )
-            context_length = getattr(trainer_config, "context_length", 512)
-            horizon_length = prediction_length
-
-            config = TimesFmConfig(
-                context_length=context_length,
-                horizon_length=horizon_length,
-                patch_length=getattr(trainer_config, "patch_length", 32),
-                num_hidden_layers=getattr(trainer_config, "num_hidden_layers", 20),
-                hidden_size=getattr(trainer_config, "hidden_size", 1280),
-                intermediate_size=getattr(trainer_config, "intermediate_size", 1280),
-                num_attention_heads=getattr(trainer_config, "num_attention_heads", 16),
-                head_dim=getattr(trainer_config, "head_dim", 80),
-                attention_dropout=getattr(trainer_config, "dropout", 0.0),
-            )
-            inner = TimesFmModelForPrediction(config)
-
-        return TimesFmMultivariateWrapper(
-            model=inner,
-            prediction_length=prediction_length,
-            default_freq=default_freq,
-        )
-
-    # Main factory entry point
+        return loader(resolved_model_name, cache_dir, **kwargs)
 
     @staticmethod
     def get(model_name=None, **kwargs):  # pylint: disable=unused-argument
-        """Returns a named model from HuggingFace."""
+        """Returns a named model from HuggingFace.
+
+        Two paths:
+          - Time series models  -> ``_get_timeseries_model()``
+          - All other models    -> ``AutoModelForCausalLM`` (with optional LoRA)
+        """
         resolved_model_name = (
             model_name
             if isinstance(model_name, str) and model_name
@@ -327,25 +366,15 @@ class Model:
 
         cache_dir = Config().params["model_path"] + "/huggingface"
 
-        model_type = kwargs.get("model_type") or getattr(
-            getattr(Config(), "trainer", None), "model_type", None
+        model_type = (
+            kwargs.get("model_type")
+            or getattr(getattr(Config(), "trainer", None), "model_type", None)
+            or ""
         )
 
-        is_timeseries = is_timeseries_model(
-            model_name=resolved_model_name, model_type=model_type
-        )
-
-        if is_timeseries:
-            model_type_lower = (model_type or "").lower()
-            model_name_lower = resolved_model_name.lower()
-
-            if model_type_lower == "timesfm" or "timesfm" in model_name_lower:
-                return Model._get_timesfm_model(resolved_model_name, cache_dir)
-
-            # Default time-series path -> PatchTSMixer
-            model_task = kwargs.get("model_task")
-            return Model._get_patchtsmixer_model(
-                resolved_model_name, cache_dir, model_task
+        if is_timeseries_model(model_name=resolved_model_name, model_type=model_type):
+            return Model._get_timeseries_model(
+                resolved_model_name, cache_dir, model_type=model_type, **kwargs
             )
 
         #  NLP / CausalLM path

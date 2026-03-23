@@ -132,7 +132,7 @@ def _build_hourly_series(
         users = list(user_ids)  # preserve config order
     else:
         users = available[:num_users]
-    logging.info("EVCharging: garage '%s' → users %s", garage, users)
+    logging.info("EVCharging: garage '%s' -> users %s", garage, users)
 
     result: dict[str, pd.DataFrame] = {}
     for user in users:
@@ -335,7 +335,7 @@ class DataSource:
             )
 
         user_key = users[user_index]
-        logging.info("EVCharging: client_id=%d → user '%s'", client_id, user_key)
+        logging.info("EVCharging: client_id=%d -> user '%s'", client_id, user_key)
 
         user_df = _add_time_features(user_series[user_key])
         raw_array = user_df[

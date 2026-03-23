@@ -4,6 +4,11 @@ Utility functions for time series model detection and handling.
 
 from typing import Optional
 
+# Single source of truth: all known HuggingFace time series model types.
+# When adding a new time series model, register it here AND add a loader to
+# plato/models/huggingface.py (_TIMESERIES_LOADERS).
+TIMESERIES_MODEL_TYPES: frozenset[str] = frozenset({"timesfm", "patchtsmixer"})
+
 
 def is_timeseries_model(
     model_name: Optional[str] = None,
@@ -21,19 +26,19 @@ def is_timeseries_model(
     Returns:
         True if this is a time series model, False otherwise
     """
-    model_name_lower = model_name.lower() if model_name else ""
-    model_type_lower = model_type.lower() if model_type else ""
+    model_name_lower = (model_name or "").lower()
+    model_type_lower = (model_type or "").lower()
 
-    # Check for PatchTSMixer
-    if (
-        model_type_lower == "patchtsmixer"
-        or "patchtsmixer" in model_name_lower
-        or "timeseries" in model_name_lower
-    ):
+    # Check explicit model type
+    if model_type_lower in TIMESERIES_MODEL_TYPES:
         return True
 
-    # Check for TimesFM
-    if model_type_lower == "timesfm" or "timesfm" in model_name_lower:
+    # Check if any known time series type appears in the model name
+    if any(ts_type in model_name_lower for ts_type in TIMESERIES_MODEL_TYPES):
+        return True
+
+    # Generic "timeseries" keyword in name
+    if "timeseries" in model_name_lower:
         return True
 
     # Check dataset type
