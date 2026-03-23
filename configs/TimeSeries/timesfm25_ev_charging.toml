@@ -1,4 +1,4 @@
-# Federated Learning with TimesFM for EV Charging Prediction
+# Federated Learning with TimesFM2.5 for EV Charging Prediction
 #
 # Task: Given the past 28 days (672 h) of a user's EV charging behaviour,
 #       predict whether they will be charging in each of the next 168 hours.
@@ -44,7 +44,7 @@ random_seed = 42
 type = "HuggingFace"
 rounds = 100
 max_concurrency = 4
-model_name = "google/timesfm-2.0-500m-pytorch"
+model_name = "google/timesfm-2.5-200m-pytorch"
 model_type = "timesfm"
 
 context_length    = 672   # 4 × 7 × 24
