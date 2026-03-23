@@ -1,4 +1,4 @@
-# Federated Learning with TimesFM for EV Charging Prediction
+# Federated Learning with PatchTSMixer for EV Charging Prediction
 #
 # Task: Given the past 28 days (672 h) of a user's EV charging behaviour,
 #       predict whether they will be charging in each of the next 168 hours.
@@ -6,14 +6,14 @@
 # Dataset: "EV Charging Reports" – AdO1 garage, 4 users
 #   https://data.mendeley.com/datasets/jbks2rcwyj/1
 #
-# Federated setup: 4 clients, one user each.  All clients participate every round.
+# Federated setup: 4 clients, one user each. All clients participate every round.
 #
-# Model: TimesFM (custom, trained from scratch for the small data regime)
-#   – channel-independent: each of the 6 input features is processed
-#     as a separate univariate series; only is_charging is evaluated.
+# Model: PatchTSMixer (trained from scratch)
+#   - uses all 6 input features jointly via mix_channel mode
+#   - predicts only the is_charging channel
 #
 # Usage:
-#   uv run plato.py -c configs/TimeSeries/timesfm_ev_charging.toml
+#   uv run plato.py -c configs/TimeSeries/patchtsmixer_ev_charging.toml
 
 [clients]
 type = "simple"
@@ -25,8 +25,8 @@ do_test = true
 address = "127.0.0.1"
 port = 8000
 simulate_wall_time = false
-checkpoint_path = "checkpoints/timeseries/timesfm_ev"
-model_path = "models/timeseries/timesfm_ev"
+checkpoint_path = "checkpoints/timeseries/patchtsmixer_ev"
+model_path = "models/timeseries/patchtsmixer_ev"
 
 [data]
 datasource = "EVCharging"
@@ -44,31 +44,35 @@ random_seed = 42
 type = "HuggingFace"
 rounds = 100
 max_concurrency = 4
-model_name = "google/timesfm-2.0-500m-pytorch"
-model_type = "timesfm"
+model_name = "patchtsmixer_scratch"
+model_type = "patchtsmixer"
+model_task = "forecasting"
 
 context_length    = 672   # 4 × 7 × 24
 prediction_length = 168   # 7 × 24
 
-# Number of input channels:  is_charging, energy_scaled,
-#                            hour_sin, hour_cos, dow_sin, dow_cos
+# Number of input channels: is_charging, energy_scaled,
+#                           hour_sin, hour_cos, dow_sin, dow_cos
 num_input_channels = 6
 
-# Only evaluate the is_charging channel (index 0)
+# Predict and evaluate only the is_charging channel (index 0)
 prediction_channel_indices = [0]
 
-patch_length         = 8
-num_hidden_layers    = 4
-hidden_size          = 256
-intermediate_size    = 256
-num_attention_heads  = 4
-head_dim             = 64
-dropout              = 0.1
+patch_length     = 8
+patch_stride     = 8
+d_model          = 64
+num_layers       = 4
+expansion_factor = 2
+dropout          = 0.1
+head_dropout     = 0.1
 
-freq = 0
+# Mix all channels so the model can use time features jointly.
+mode = "mix_channel"
+gated_attn = true
+scaling = "std"
 
 # Sliding-window stride for dataset creation
-stride = 1    # advance 1 hour at a time to maximizes training windows
+stride = 1    # advance 1 hour at a time to maximize training windows
 
 epochs     = 10
 batch_size = 16
