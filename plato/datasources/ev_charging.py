@@ -14,7 +14,8 @@ Raw CSV format:
 
 Preprocessing pipeline
 -----------------------
-1. Filter to the requested garage (default "AdO1", which has 4 private users).
+1. Filter to the requested garage (default "AdO1", which has 4 private users),
+   or use all garages when ``garage = "all"``.
 2. For each user, build a continuous hourly grid from the first to the last
    session hour in the dataset.
 3. For every hour, mark is_charging = 1 if the user had an active session,
@@ -37,7 +38,7 @@ TOML configuration
 [data]
 datasource      = "EVCharging"
 datasource_path = "runtime/data/ado1/dataset1_ev_charging_reports.csv"
-garage          = "AdO1"   # optional
+garage          = "AdO1"   # optional; use "all" for cross-garage user lists
 num_users       = 4        # optional
 
 [trainer]
@@ -85,7 +86,7 @@ def _parse_european_float(series: pd.Series) -> pd.Series:
 
 def _build_hourly_series(
     df: pd.DataFrame,
-    garage: str,
+    garage: str | None,
     num_users: int,
     user_ids: list[str] | None = None,
 ) -> dict[str, pd.DataFrame]:
@@ -101,14 +102,22 @@ def _build_hourly_series(
     dict mapping user_id (str) -> pd.DataFrame with hourly index and columns:
         is_charging (0/1 float), energy_kwh (float >= 0)
     """
-    # Filter to requested garage
-    mask = df[_GARAGE_COL].astype(str).str.strip() == garage
-    df = df[mask].copy()
-    if df.empty:
-        raise ValueError(
-            f"No records found for garage '{garage}'. "
-            f"Available: {sorted(df[_GARAGE_COL].unique())}"
+    garage_name = None if garage is None else str(garage).strip()
+    use_all_garages = not garage_name or garage_name.lower() in {"all", "*", "any"}
+
+    if use_all_garages:
+        df = df.copy()
+    else:
+        available_garages = sorted(
+            df[_GARAGE_COL].astype(str).str.strip().dropna().unique()
         )
+        mask = df[_GARAGE_COL].astype(str).str.strip() == garage_name
+        df = df[mask].copy()
+        if df.empty:
+            raise ValueError(
+                f"No records found for garage '{garage_name}'. "
+                f"Available: {available_garages}"
+            )
 
     # Parse datetimes
     df[_START_COL] = pd.to_datetime(df[_START_COL].str.strip(), format=_DT_FORMAT)
@@ -125,14 +134,16 @@ def _build_hourly_series(
         # Explicit list from config — validate each entry
         missing = [u for u in user_ids if u not in available]
         if missing:
+            scope = "all garages" if use_all_garages else f"garage '{garage_name}'"
             raise ValueError(
-                f"Users not found in garage '{garage}': {missing}. "
+                f"Users not found in {scope}: {missing}. "
                 f"Available: {available}"
             )
         users = list(user_ids)  # preserve config order
     else:
         users = available[:num_users]
-    logging.info("EVCharging: garage '%s' -> users %s", garage, users)
+    scope = "all garages" if use_all_garages else f"garage '{garage_name}'"
+    logging.info("EVCharging: %s -> users %s", scope, users)
 
     result: dict[str, pd.DataFrame] = {}
     for user in users:
@@ -294,7 +305,9 @@ class DataSource:
                 "Download from https://data.mendeley.com/datasets/jbks2rcwyj/1"
             )
 
-        garage = str(kwargs.get("garage", getattr(data_cfg, "garage", "AdO1")))
+        garage_cfg = kwargs.get("garage", getattr(data_cfg, "garage", "AdO1"))
+        garage = None if garage_cfg is None else str(garage_cfg)
+        garage_name = None if garage is None else garage.strip()
 
         # Config: users = ["AdO1-1", "AdO1-2", "AdO1-3", "AdO1-4"]
         user_ids_cfg = kwargs.get("users", getattr(data_cfg, "users", None))
@@ -329,9 +342,14 @@ class DataSource:
         user_index = max(0, client_id - 1)
 
         if user_index >= len(users):
+            scope = (
+                "all garages"
+                if not garage_name or garage_name.lower() in {"all", "*", "any"}
+                else f"garage '{garage_name}'"
+            )
             raise ValueError(
                 f"client_id={client_id} out of range; "
-                f"found {len(users)} users in garage '{garage}': {users}"
+                f"found {len(users)} users in {scope}: {users}"
             )
 
         user_key = users[user_index]

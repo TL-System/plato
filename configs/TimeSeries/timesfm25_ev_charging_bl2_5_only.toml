@@ -1,0 +1,89 @@
+# Federated Learning with TimesFM2.5 for EV Charging Prediction
+#
+# Task: Given the past 28 days (672 h) of a user's EV charging behaviour,
+#       predict whether they will be charging in each of the next 168 hours.
+#
+# Dataset: "EV Charging Reports" – single-user run for Bl2-5
+#   https://data.mendeley.com/datasets/jbks2rcwyj/1
+#
+# Federated setup: 1 client, using only user Bl2-5.
+#
+# Model: TimesFM (custom, trained from scratch for the small data regime)
+#   – channel-independent: each of the 6 input features is processed
+#     as a separate univariate series; only is_charging is evaluated.
+#
+# Usage:
+#   uv run plato.py -c configs/TimeSeries/timesfm25_ev_charging_bl2_5_only.toml
+
+[clients]
+type = "simple"
+total_clients = 1
+per_round = 1
+do_test = true
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+checkpoint_path = "checkpoints/timeseries/timesfm25_ev_bl2_5_only"
+model_path = "models/timeseries/timesfm25_ev_bl2_5_only"
+
+[data]
+datasource = "EVCharging"
+
+datasource_path = "runtime/data/ado1/dataset1_ev_charging_reports.csv"
+
+garage = "Bl2"
+
+# Explicit user IDs to include — one client per user.
+users = ["Bl2-5"]
+sampler = "all_inclusive"
+random_seed = 42
+
+[trainer]
+type = "HuggingFace"
+rounds = 100
+max_concurrency = 1
+model_name = "google/timesfm-2.5-200m-pytorch"
+model_type = "timesfm"
+
+context_length    = 672
+prediction_length = 168
+
+# Number of input channels: is_charging, energy_scaled,
+#                           hour_sin, hour_cos, dow_sin, dow_cos
+num_input_channels = 6
+
+# Only evaluate the is_charging channel (index 0)
+prediction_channel_indices = [0]
+
+patch_length         = 8
+num_hidden_layers    = 4
+hidden_size          = 256
+intermediate_size    = 256
+num_attention_heads  = 4
+head_dim             = 64
+dropout              = 0.1
+
+freq = 0
+
+# Sliding-window stride for dataset creation
+stride = 1
+
+epochs     = 10
+batch_size = 16
+optimizer  = "Adam"
+
+train_ratio = 0.70
+val_ratio   = 0.15
+
+[algorithm]
+type = "fedavg"
+
+[parameters]
+[parameters.optimizer]
+lr           = 0.0005
+weight_decay = 1e-4
+
+[results]
+types = "round, elapsed_time, mse"
