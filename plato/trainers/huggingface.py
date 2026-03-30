@@ -22,7 +22,6 @@ from transformers import (
     HfArgumentParser,
     LlamaTokenizer,
     TrainingArguments,
-    default_data_collator,
 )
 from transformers import (
     TrainerCallback as HFTrainerCallback,
@@ -52,17 +51,69 @@ class HuggingFaceBatch(dict):
 
 
 class HuggingFaceCollateWrapper:
-    """Wraps the default HuggingFace data collator for Plato data loader strategy."""
+    """Pad variable-length token batches while keeping labels separate."""
 
     def __init__(self, tokenizer=None):
         self.tokenizer = tokenizer
 
+    def _pad_labels(
+        self,
+        label_rows: list[list[int]],
+        sequence_length: int,
+        *,
+        padding_side: str = "right",
+    ) -> torch.Tensor:
+        padded = torch.full(
+            (len(label_rows), sequence_length),
+            -100,
+            dtype=torch.long,
+        )
+        for index, row in enumerate(label_rows):
+            row_tensor = torch.tensor(row, dtype=torch.long)
+            length = min(sequence_length, row_tensor.numel())
+            if length <= 0:
+                continue
+            if padding_side == "left":
+                padded[index, sequence_length - length :] = row_tensor[-length:]
+            else:
+                padded[index, :length] = row_tensor[:length]
+        return padded
+
     def __call__(
         self, examples: Iterable[dict]
     ) -> tuple[HuggingFaceBatch, torch.Tensor | None]:
-        batch = default_data_collator(list(examples))
-        labels = batch.pop("labels", None)
-        if labels is None:
+        example_list = [dict(example) for example in examples]
+        if not example_list:
+            raise ValueError("HuggingFace collator received an empty batch.")
+
+        feature_rows = [{k: v for k, v in example.items() if k != "labels"} for example in example_list]
+
+        padding_side = getattr(self.tokenizer, "padding_side", "right")
+        if self.tokenizer is not None and hasattr(self.tokenizer, "pad"):
+            batch = self.tokenizer.pad(
+                feature_rows,
+                padding=True,
+                return_tensors="pt",
+            )
+        else:
+            raise ValueError(
+                "HuggingFace collator requires a tokenizer with pad() support."
+            )
+
+        batch = HuggingFaceBatch(batch)
+        labels_raw = [example.get("labels") for example in example_list]
+        labels = None
+        if any(label is not None for label in labels_raw):
+            normalized_rows = [
+                list(label) if label is not None else list(example["input_ids"])
+                for example, label in zip(example_list, labels_raw, strict=False)
+            ]
+            labels = self._pad_labels(
+                normalized_rows,
+                batch["input_ids"].shape[1],
+                padding_side=padding_side,
+            )
+        else:
             input_ids = batch.get("input_ids")
             if input_ids is not None:
                 labels = input_ids.clone()
@@ -76,7 +127,8 @@ class HuggingFaceCollateWrapper:
                     labels = labels.masked_fill(
                         labels == self.tokenizer.pad_token_id, -100
                     )
-        return HuggingFaceBatch(batch), labels
+
+        return batch, labels
 
 
 def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
@@ -437,6 +489,10 @@ class Trainer(ComposableTrainer):
         self.training_args = cast(TrainingArguments, training_args)
 
         model_name = Config().trainer.model_name
+        tokenizer_name = getattr(Config().trainer, "tokenizer_name", model_name)
+        if not isinstance(tokenizer_name, str) or not tokenizer_name:
+            tokenizer_name = model_name
+
         config_kwargs = {
             "cache_dir": None,
             "revision": "main",
@@ -451,42 +507,24 @@ class Trainer(ComposableTrainer):
             getattr(Config(), "parameters", None), "huggingface_token", None
         )
 
-        if "llama" in model_name:
-            if isinstance(auth_token, str) and auth_token:
-                self.tokenizer = LlamaTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                    use_auth_token=auth_token,
-                )
-            else:
-                self.tokenizer = LlamaTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                )
-        else:
-            if isinstance(auth_token, str) and auth_token:
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                    use_auth_token=auth_token,
-                )
-            else:
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                )
+        tokenizer_loader = LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
+        tokenizer_kwargs = {
+            "config": self.config,
+            "cache_dir": cache_dir,
+            "use_fast": use_fast_tokenizer,
+            "revision": revision,
+        }
+        if isinstance(auth_token, str) and auth_token:
+            tokenizer_kwargs["use_auth_token"] = auth_token
+        self.tokenizer = tokenizer_loader.from_pretrained(
+            tokenizer_name,
+            **tokenizer_kwargs,
+        )
+
+        if getattr(self.tokenizer, "pad_token_id", None) is None:
+            eos_token = getattr(self.tokenizer, "eos_token", None)
+            if eos_token is not None:
+                self.tokenizer.pad_token = eos_token
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -498,6 +536,11 @@ class Trainer(ComposableTrainer):
         self.training_args.gradient_accumulation_steps = (
             self._gradient_accumulation_steps
         )
+        self.training_args.gradient_checkpointing = bool(
+            getattr(Config().trainer, "gradient_checkpointing", False)
+        )
+        self.training_args.bf16 = bool(getattr(Config().trainer, "bf16", False))
+        self.training_args.fp16 = bool(getattr(Config().trainer, "fp16", False))
 
         plato_callbacks_list = list(plato_callbacks)
 
@@ -525,6 +568,34 @@ class Trainer(ComposableTrainer):
         model_instance = self._require_model()
         if hasattr(model_instance, "loss_type"):
             setattr(model_instance, "loss_type", "ForCausalLM")
+
+        tokenizer_vocab_size = None
+        if hasattr(self.tokenizer, "__len__"):
+            try:
+                tokenizer_vocab_size = len(self.tokenizer)
+            except TypeError:
+                tokenizer_vocab_size = None
+        embedding_getter = getattr(model_instance, "get_input_embeddings", None)
+        embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
+        if (
+            tokenizer_vocab_size is not None
+            and callable(embedding_getter)
+            and callable(embedding_resizer)
+        ):
+            embeddings = embedding_getter()
+            embedding_size = getattr(embeddings, "num_embeddings", None)
+            if embedding_size is not None and embedding_size != tokenizer_vocab_size:
+                embedding_resizer(tokenizer_vocab_size)
+
+        if self.training_args.gradient_checkpointing:
+            enable_gradient_checkpointing = getattr(
+                model_instance, "gradient_checkpointing_enable", None
+            )
+            if callable(enable_gradient_checkpointing):
+                enable_gradient_checkpointing()
+            model_config = getattr(model_instance, "config", None)
+            if model_config is not None and hasattr(model_config, "use_cache"):
+                setattr(model_config, "use_cache", False)
 
         # Ensure model checkpoints can be saved when model names include slashes.
         params = Config().params
