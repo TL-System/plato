@@ -36,7 +36,7 @@ def _config_to_dict(config: Any) -> dict[str, Any] | Any:
     return config
 
 
-def get(config: Any | None = None):
+def get(config: Any | None = None, *, allow_missing: bool = False):
     """Resolve the configured evaluator instance, or ``None`` when disabled."""
     resolved = config
     if resolved is None:
@@ -57,6 +57,8 @@ def get(config: Any | None = None):
         raise ValueError("Evaluation config must define a non-empty 'type'.")
 
     if evaluator_type not in _registered_evaluators:
+        if allow_missing:
+            return None
         raise ValueError(
             f"No such evaluator: {evaluator_type}. Registered evaluators: {registered_names()}"
         )

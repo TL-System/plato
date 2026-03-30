@@ -24,7 +24,7 @@ def run_configured_evaluation(
     local_metric: float | None = None,
 ) -> EvaluationResult | None:
     """Run the configured evaluator, storing normalized output in context state."""
-    evaluator = registry.get()
+    evaluator = registry.get(allow_missing=True)
     if evaluator is None:
         context.state.pop(EVALUATION_RESULTS_KEY, None)
         context.state.pop(EVALUATION_PRIMARY_KEY, None)
