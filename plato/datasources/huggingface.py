@@ -37,6 +37,13 @@ def _sanitize_cache_component(value: Any) -> str:
     return normalized or "default"
 
 
+def _legacy_dataset_cache_path(
+    data_path: str, *, dataset_name: str, dataset_config: Any
+) -> str:
+    """Return the historical raw-dataset cache path for backward compatibility."""
+    return f"{data_path}/{dataset_name}_{dataset_config}"
+
+
 def _dataset_cache_path(
     data_path: str,
     *,
@@ -110,9 +117,16 @@ class DataSource(base.DataSource):
             train_split=train_split_name,
             validation_split=requested_validation_split,
         )
+        legacy_saved_data_path = _legacy_dataset_cache_path(
+            Config().params["data_path"],
+            dataset_name=dataset_name,
+            dataset_config=dataset_config,
+        )
 
         if os.path.exists(saved_data_path):
             self.dataset = load_from_disk(saved_data_path)
+        elif os.path.exists(legacy_saved_data_path):
+            self.dataset = load_from_disk(legacy_saved_data_path)
         else:
             dataset_kwargs: dict[str, Any] = {}
             if dataset_config is not None:
@@ -243,15 +257,15 @@ class DataSource(base.DataSource):
             )
 
         configured_block_size = getattr(Config().data, "block_size", None)
-        block_size = configured_block_size or self.tokenizer.model_max_length
+        block_size = configured_block_size if configured_block_size is not None else self.block_size
+        block_size = int(block_size)
         if block_size > 1024:
             logging.warning(
-                "The tokenizer picked seems to have a very large `model_max_length` "
-                "%s. Picking 1024 instead.",
-                self.tokenizer.model_max_length,
+                "The configured block size %s is very large. Picking 1024 instead.",
+                block_size,
             )
             block_size = 1024
-        self.block_size = int(block_size)
+        self.block_size = block_size
 
         with training_args.main_process_first(desc="grouping texts together"):
             lm_datasets = tokenized_datasets.map(

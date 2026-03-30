@@ -174,6 +174,109 @@ def test_huggingface_datasource_falls_back_to_test_split(temp_config, monkeypatc
     assert datasource.testset.num_rows == 1
 
 
+def test_huggingface_datasource_loads_legacy_cache_path_when_present(
+    temp_config, monkeypatch
+):
+    from plato.datasources import huggingface as huggingface_datasource
+
+    cfg = Config()
+    cfg.data.dataset_name = "legacy_ds"
+    cfg.data.dataset_config = None
+    cfg.data.preprocessing_mode = "corpus_lm"
+    cfg.data.train_split = "train"
+    cfg.data.validation_split = "validation"
+    cfg.trainer.model_name = "dummy-model"
+
+    dataset = DatasetDict(
+        {
+            "train": Dataset.from_dict({"text": ["hello"]}),
+            "validation": Dataset.from_dict({"text": ["world"]}),
+        }
+    )
+
+    legacy_path = (
+        f"{Config().params['data_path']}/{cfg.data.dataset_name}_{cfg.data.dataset_config}"
+    )
+    loaded_paths: list[str] = []
+
+    monkeypatch.setattr(
+        huggingface_datasource.os.path,
+        "exists",
+        lambda path: path == legacy_path,
+    )
+    monkeypatch.setattr(
+        huggingface_datasource,
+        "load_from_disk",
+        lambda path: loaded_paths.append(path) or dataset,
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoConfig,
+        "from_pretrained",
+        lambda *args, **kwargs: SimpleNamespace(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoTokenizer,
+        "from_pretrained",
+        lambda *args, **kwargs: DummyTokenizer(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.DataSource,
+        "preprocess_corpus_lm",
+        lambda self, split: split,
+    )
+
+    datasource = huggingface_datasource.DataSource()
+
+    assert loaded_paths == [legacy_path]
+    assert datasource.trainset.num_rows == 1
+
+
+class LargeContextDummyTokenizer(DummyTokenizer):
+    model_max_length = 4096
+
+
+
+def test_huggingface_corpus_mode_keeps_legacy_default_block_size(
+    temp_config, monkeypatch
+):
+    from plato.datasources import huggingface as huggingface_datasource
+
+    cfg = Config()
+    cfg.data.dataset_name = "dummy"
+    cfg.data.text_field = "text"
+    cfg.data.preprocessing_mode = "corpus_lm"
+    cfg.data.train_split = "train"
+    cfg.data.validation_split = "validation"
+    if "block_size" in cfg.data:
+        del cfg.data["block_size"]
+    cfg.trainer.model_name = "dummy-model"
+
+    dataset = DatasetDict(
+        {
+            "train": Dataset.from_dict({"text": ["hello world"]}),
+            "validation": Dataset.from_dict({"text": ["bye world"]}),
+        }
+    )
+
+    monkeypatch.setattr(huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset)
+    monkeypatch.setattr(huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset)
+    monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
+    monkeypatch.setattr(
+        huggingface_datasource.AutoConfig,
+        "from_pretrained",
+        lambda *args, **kwargs: SimpleNamespace(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoTokenizer,
+        "from_pretrained",
+        lambda *args, **kwargs: LargeContextDummyTokenizer(),
+    )
+
+    datasource = huggingface_datasource.DataSource()
+
+    assert datasource.block_size == 128
+
+
 def test_chat_sft_preprocesses_messages_without_corpus_concatenation(
     temp_config, monkeypatch
 ):
