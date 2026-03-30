@@ -59,11 +59,8 @@ nanochat = [
     "jinja2",
     "PyYAML",
 ]
-robotics = [
-    "lerobot[smolvla]>=0.4.3,<0.5.0",
-]
 llm_eval = [
-    "lighteval",
+    "lighteval"
 ]
 
 [project.urls]
