@@ -131,3 +131,17 @@ def test_composable_trainer_without_evaluator_keeps_legacy_test_behavior(
     assert EVALUATION_RESULTS_KEY not in trainer.context.state
     assert EVALUATION_PRIMARY_KEY not in trainer.context.state
     _clear_evaluation_config()
+
+
+def test_composable_trainer_raises_for_unknown_evaluator_config(temp_config):
+    _clear_evaluation_config()
+    Config().evaluation = ConfigNode.from_object({"type": "unknown-evaluator"})
+    trainer = ComposableTrainer(
+        model=nn.Linear(2, 1),
+        testing_strategy=ConstantTestingStrategy(0.5),
+    )
+
+    with pytest.raises(ValueError, match="No such evaluator"):
+        trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+
+    _clear_evaluation_config()

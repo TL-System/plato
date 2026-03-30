@@ -4,12 +4,26 @@ from __future__ import annotations
 
 from typing import Any
 
+from plato.config import Config
 from plato.evaluators.base import EvaluationInput, EvaluationResult
 from plato.evaluators import registry
 from plato.trainers.strategies.base import TrainingContext
 
 EVALUATION_RESULTS_KEY = "evaluation_results"
 EVALUATION_PRIMARY_KEY = "evaluation_primary"
+LEGACY_OPTIONAL_EVALUATORS = {"nanochat_core"}
+
+
+def _configured_evaluator_type() -> str | None:
+    """Return the configured evaluator type when present."""
+    evaluation_cfg = getattr(Config(), "evaluation", None)
+    if evaluation_cfg is None:
+        return None
+    if isinstance(evaluation_cfg, dict):
+        evaluator_type = evaluation_cfg.get("type")
+    else:
+        evaluator_type = getattr(evaluation_cfg, "type", None)
+    return evaluator_type if isinstance(evaluator_type, str) and evaluator_type else None
 
 
 def run_configured_evaluation(
@@ -24,7 +38,10 @@ def run_configured_evaluation(
     local_metric: float | None = None,
 ) -> EvaluationResult | None:
     """Run the configured evaluator, storing normalized output in context state."""
-    evaluator = registry.get(allow_missing=True)
+    evaluator_type = _configured_evaluator_type()
+    evaluator = registry.get(
+        allow_missing=evaluator_type in LEGACY_OPTIONAL_EVALUATORS,
+    )
     if evaluator is None:
         context.state.pop(EVALUATION_RESULTS_KEY, None)
         context.state.pop(EVALUATION_PRIMARY_KEY, None)
