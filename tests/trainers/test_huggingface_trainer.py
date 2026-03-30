@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pickle
 from types import SimpleNamespace
 
 import torch
@@ -66,6 +67,12 @@ class DummyHFModel(nn.Module):
 
     def gradient_checkpointing_enable(self):
         self.gradient_checkpointing_enabled = True
+
+        def make_inputs_require_grads(*args, **kwargs):
+            del args, kwargs
+            return None
+
+        self._require_grads_hook = make_inputs_require_grads
 
 
 def test_huggingface_collate_wrapper_dynamically_pads_variable_length_labels():
@@ -179,5 +186,28 @@ def test_huggingface_trainer_applies_gradient_checkpointing_and_precision_flags(
     assert trainer.training_args.gradient_checkpointing is True
     assert trainer.training_args.bf16 is True
     assert trainer.training_args.fp16 is False
-    assert model.gradient_checkpointing_enabled is True
+    assert model.gradient_checkpointing_enabled is False
     assert model.config.use_cache is False
+
+    # Gradient-checkpointing hooks must be installed lazily so the trainer can
+    # still be pickled when multiprocessing uses the spawn start method.
+    pickle.dumps(trainer)
+
+    delegated: list[bool] = []
+
+    def fake_super_train_model(self, config, trainset, sampler, **kwargs):
+        del self, config, trainset, sampler, kwargs
+        delegated.append(model.gradient_checkpointing_enabled)
+        return "trained"
+
+    monkeypatch.setattr(
+        huggingface_trainer.ComposableTrainer,
+        "train_model",
+        fake_super_train_model,
+    )
+
+    result = trainer.train_model({"epochs": 1, "batch_size": 1}, [], [])
+
+    assert result == "trained"
+    assert delegated == [True]
+    assert model.gradient_checkpointing_enabled is True

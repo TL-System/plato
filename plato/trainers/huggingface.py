@@ -478,6 +478,7 @@ class Trainer(ComposableTrainer):
         self._hf_state = TrainerState()
         self._hf_control = TrainerControl()
         self._hf_steps_per_epoch: int | None = None
+        self._gradient_checkpointing_prepared = False
 
         parser = HfArgumentParser(cast(Any, TrainingArguments))
         (training_args,) = parser.parse_args_into_dataclasses(
@@ -588,11 +589,6 @@ class Trainer(ComposableTrainer):
                 embedding_resizer(tokenizer_vocab_size)
 
         if self.training_args.gradient_checkpointing:
-            enable_gradient_checkpointing = getattr(
-                model_instance, "gradient_checkpointing_enable", None
-            )
-            if callable(enable_gradient_checkpointing):
-                enable_gradient_checkpointing()
             model_config = getattr(model_instance, "config", None)
             if model_config is not None and hasattr(model_config, "use_cache"):
                 setattr(model_config, "use_cache", False)
@@ -650,6 +646,27 @@ class Trainer(ComposableTrainer):
             self._hf_bridge = HuggingFaceCallbackBridge(self)
             self.callback_handler.add_callbacks([self._hf_bridge])
 
+    def _prepare_model_for_training(self):
+        """Apply model mutations that must happen inside the training process."""
+        if not self.training_args.gradient_checkpointing:
+            return
+
+        model_instance = self._require_model()
+        model_config = getattr(model_instance, "config", None)
+        if model_config is not None and hasattr(model_config, "use_cache"):
+            setattr(model_config, "use_cache", False)
+
+        if self._gradient_checkpointing_prepared:
+            return
+
+        enable_gradient_checkpointing = getattr(
+            model_instance, "gradient_checkpointing_enable", None
+        )
+        if callable(enable_gradient_checkpointing):
+            enable_gradient_checkpointing()
+
+        self._gradient_checkpointing_prepared = True
+
     def train_model(self, config, trainset, sampler, **kwargs):
         """Update HuggingFace training arguments before delegating to strategies."""
         self.training_args.num_train_epochs = config["epochs"]
@@ -682,6 +699,7 @@ class Trainer(ComposableTrainer):
             self._hf_steps_per_epoch = None
             self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
             self._hf_pending_log_data = None
+        self._prepare_model_for_training()
         return super().train_model(config, trainset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):
