@@ -1,3 +1,11 @@
 """Evaluation helpers for Plato integrations."""
 
-# Intentionally empty for now; modules register themselves when imported.
+from .base import EvaluationInput, EvaluationResult, Evaluator
+from . import registry
+
+__all__ = [
+    "EvaluationInput",
+    "EvaluationResult",
+    "Evaluator",
+    "registry",
+]

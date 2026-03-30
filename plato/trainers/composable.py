@@ -36,6 +36,7 @@ from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.evaluators.runner import run_configured_evaluation
 from plato.models import registry as models_registry
 from plato.serialization.safetensor import deserialize_tree, serialize_tree
 from plato.trainers import base, tracking
@@ -792,6 +793,17 @@ class ComposableTrainer(base.Trainer):
 
         # Store accuracy for compatibility with existing code
         self.accuracy = accuracy
+
+        run_configured_evaluation(
+            model=model,
+            context=self.context,
+            trainer=self,
+            tokenizer=getattr(self, "tokenizer", None),
+            config=config,
+            testset=testset,
+            sampler=sampler,
+            local_metric=accuracy,
+        )
 
         return accuracy
 
