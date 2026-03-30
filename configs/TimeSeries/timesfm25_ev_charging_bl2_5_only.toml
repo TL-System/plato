@@ -1,7 +1,7 @@
 # Federated Learning with TimesFM2.5 for EV Charging Prediction
 #
 # Task: Given the past 28 days (672 h) of a user's EV charging behaviour,
-#       predict whether they will be charging in each of the next 168 hours.
+#       predict whether they will be charging in each of the next 128 hours.
 #
 # Dataset: "EV Charging Reports" – single-user run for Bl2-5
 #   https://data.mendeley.com/datasets/jbks2rcwyj/1
@@ -48,7 +48,7 @@ model_name = "google/timesfm-2.5-200m-pytorch"
 model_type = "timesfm"
 
 context_length    = 672
-prediction_length = 168
+prediction_length = 128
 
 # Number of input channels: is_charging, energy_scaled,
 #                           hour_sin, hour_cos, dow_sin, dow_cos
