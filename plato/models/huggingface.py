@@ -37,6 +37,11 @@ except ImportError:
     TimesFmModelForPrediction = None
 
 try:
+    from transformers import TimesFm2_5ModelForPrediction
+except ImportError:
+    TimesFm2_5ModelForPrediction = None
+
+try:
     from peft import LoraConfig, get_peft_model
 except ImportError:  # pragma: no cover - handled at runtime with friendly message.
     LoraConfig = None  # type: ignore
@@ -99,11 +104,13 @@ class TimesFmMultivariateWrapper(nn.Module):
         model: "TimesFmModelForPrediction",
         prediction_length: int | None = None,
         default_freq: int = 0,
+        use_transformers_api: bool = False,
     ):
         super().__init__()
         self.model = model
         self.prediction_length = prediction_length
         self.default_freq = default_freq
+        self.use_transformers_api = use_transformers_api
 
     def forward(
         self,
@@ -122,9 +129,12 @@ class TimesFmMultivariateWrapper(nn.Module):
             # (batch, ctx, ch) -> (batch*ch, ctx)
             pv_2d = past_values.permute(0, 2, 1).reshape(batch * channels, ctx)
             past_list = [pv_2d[i] for i in range(pv_2d.size(0))]
-            freq_list = self._build_freq_list(freq, batch, channels)
 
-            outputs = self.model(past_values=past_list, freq=freq_list)
+            if self.use_transformers_api:
+                outputs = self.model(past_values=past_list, forecast_context_len=ctx)
+            else:
+                freq_list = self._build_freq_list(freq, batch, channels)
+                outputs = self.model(past_values=past_list, freq=freq_list)
 
             # (batch*ch, horizon) -> (batch, horizon, ch)
             raw = outputs.mean_predictions
@@ -134,10 +144,15 @@ class TimesFmMultivariateWrapper(nn.Module):
         else:
             #  Univariate path
             batch = past_values.size(0)
+            ctx = past_values.size(1)
             past_list = [past_values[i] for i in range(batch)]
-            freq_list = self._build_freq_list(freq, batch, channels=1)
 
-            outputs = self.model(past_values=past_list, freq=freq_list)
+            if self.use_transformers_api:
+                outputs = self.model(past_values=past_list, forecast_context_len=ctx)
+            else:
+                freq_list = self._build_freq_list(freq, batch, channels=1)
+                outputs = self.model(past_values=past_list, freq=freq_list)
+
             mean_preds = outputs.mean_predictions.unsqueeze(-1)  # (batch, horizon, 1)
 
         # Truncate to configured prediction_length
@@ -188,51 +203,73 @@ class TimesFmMultivariateWrapper(nn.Module):
 
 
 def _load_timesfm(resolved_model_name: str, cache_dir: str, **kwargs) -> nn.Module:
-    """Load or create a TimesFM model wrapped for batched multivariate use."""
-    if TimesFmModelForPrediction is None:
-        raise ImportError(
-            "TimesFM models are not available. "
-            "Ensure you have transformers>=5.0.0 installed."
-        )
+    """Load or create a TimesFM model wrapped for batched multivariate use.
+
+    Supports two HuggingFace variants:
+    - ``*-transformers``: Uses ``TimesFm2_5ModelForPrediction`` from the
+      ``transformers`` library.  Forward call uses ``forecast_context_len``.
+    - ``*-pytorch`` (default): Uses ``TimesFmModelForPrediction``.
+      Forward call uses ``freq``.
+    """
+    use_transformers_api = "transformers" in resolved_model_name.lower()
 
     trainer_config = Config().trainer
     prediction_length = getattr(trainer_config, "prediction_length", 128)
     default_freq = getattr(trainer_config, "freq", 0)
 
-    try:
+    if use_transformers_api:
+        if TimesFm2_5ModelForPrediction is None:
+            raise ImportError(
+                "TimesFm2_5ModelForPrediction is not available. "
+                "Ensure you have a recent transformers version installed."
+            )
         logging.info(
-            "Attempting to load pretrained TimesFM model: %s",
+            "Attempting to load pretrained TimesFM 2.5 (transformers) model: %s",
             resolved_model_name,
         )
-        inner = TimesFmModelForPrediction.from_pretrained(
+        inner = TimesFm2_5ModelForPrediction.from_pretrained(
             resolved_model_name, cache_dir=cache_dir
         )
-        logging.info("Successfully loaded pretrained TimesFM model")
-    except (OSError, ValueError, Exception):
-        logging.info(
-            "TimesFM model '%s' not found as pretrained, creating from config",
-            resolved_model_name,
-        )
-        context_length = getattr(trainer_config, "context_length", 512)
-        horizon_length = prediction_length
-
-        config = TimesFmConfig(
-            context_length=context_length,
-            horizon_length=horizon_length,
-            patch_length=getattr(trainer_config, "patch_length", 32),
-            num_hidden_layers=getattr(trainer_config, "num_hidden_layers", 20),
-            hidden_size=getattr(trainer_config, "hidden_size", 1280),
-            intermediate_size=getattr(trainer_config, "intermediate_size", 1280),
-            num_attention_heads=getattr(trainer_config, "num_attention_heads", 16),
-            head_dim=getattr(trainer_config, "head_dim", 80),
-            attention_dropout=getattr(trainer_config, "dropout", 0.0),
-        )
-        inner = TimesFmModelForPrediction(config)
+        logging.info("Successfully loaded pretrained TimesFM 2.5 (transformers) model")
+    else:
+        if TimesFmModelForPrediction is None:
+            raise ImportError(
+                "TimesFM models are not available. "
+                "Ensure you have transformers>=5.0.0 installed."
+            )
+        try:
+            logging.info(
+                "Attempting to load pretrained TimesFM model: %s",
+                resolved_model_name,
+            )
+            inner = TimesFmModelForPrediction.from_pretrained(
+                resolved_model_name, cache_dir=cache_dir
+            )
+            logging.info("Successfully loaded pretrained TimesFM model")
+        except (OSError, ValueError, Exception):
+            logging.info(
+                "TimesFM model '%s' not found as pretrained, creating from config",
+                resolved_model_name,
+            )
+            context_length = getattr(trainer_config, "context_length", 512)
+            config = TimesFmConfig(
+                context_length=context_length,
+                horizon_length=prediction_length,
+                patch_length=getattr(trainer_config, "patch_length", 32),
+                num_hidden_layers=getattr(trainer_config, "num_hidden_layers", 20),
+                hidden_size=getattr(trainer_config, "hidden_size", 1280),
+                intermediate_size=getattr(trainer_config, "intermediate_size", 1280),
+                num_attention_heads=getattr(trainer_config, "num_attention_heads", 16),
+                head_dim=getattr(trainer_config, "head_dim", 80),
+                attention_dropout=getattr(trainer_config, "dropout", 0.0),
+            )
+            inner = TimesFmModelForPrediction(config)
 
     return TimesFmMultivariateWrapper(
         model=inner,
         prediction_length=prediction_length,
         default_freq=default_freq,
+        use_transformers_api=use_transformers_api,
     )
 
 
