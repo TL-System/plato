@@ -16,7 +16,12 @@ except ImportError as exc:  # pragma: no cover - optional dependency
 
 from plato.config import Config
 from plato.datasources.nanochat import NanochatStreamingDataset
-from plato.evaluators.nanochat_core import run_core_evaluation
+from plato.evaluators import registry as evaluator_registry
+from plato.evaluators.nanochat_core import (
+    NANOCHAT_CORE_RESULTS_KEY,
+    NanochatCoreEvaluator,
+    run_core_evaluation,
+)
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     DataLoaderStrategy,
@@ -249,7 +254,7 @@ class NanochatCoreTestingStrategy(TestingStrategy):
             max_per_task=self.max_per_task,
             device=device,
         )
-        context.state["nanochat_core_results"] = results
+        context.state[NANOCHAT_CORE_RESULTS_KEY] = results
         return float(results["core_metric"])
 
 
@@ -285,6 +290,7 @@ class Trainer(ComposableTrainer):
             getattr(evaluation_cfg, "type", "").lower() if evaluation_cfg else ""
         )
         if evaluation_type == "nanochat_core":
+            evaluator_registry.register("nanochat_core", NanochatCoreEvaluator)
             max_per_task = getattr(evaluation_cfg, "max_per_task", -1)
             max_per_task_value = -1 if max_per_task is None else int(max_per_task)
             testing_strategy = NanochatCoreTestingStrategy(
