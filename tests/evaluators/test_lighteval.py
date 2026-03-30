@@ -207,6 +207,32 @@ def test_lighteval_evaluator_normalizes_metrics(monkeypatch, temp_config):
     ]
 
 
+def test_lighteval_normalizes_versioned_task_keys(temp_config):
+    from plato.evaluators.lighteval import _normalize_metrics
+
+    metrics = _normalize_metrics(
+        {
+            "ifeval:0": {
+                "prompt_level_strict_acc": 0.30,
+                "prompt_level_loose_acc": 0.50,
+            },
+            "hellaswag:0": {"exact_match": 0.44},
+            "arc:easy:0": {"loglikelihood_acc": 0.35},
+            "arc:challenge:0": {"loglikelihood_acc": 0.25},
+            "piqa:0": {"exact_match": 0.61},
+        }
+    )
+
+    assert metrics == {
+        "ifeval_avg": 0.40,
+        "hellaswag": 0.44,
+        "arc_easy": 0.35,
+        "arc_challenge": 0.25,
+        "arc_avg": 0.30,
+        "piqa": 0.61,
+    }
+
+
 def test_lighteval_evaluator_cleans_up_temp_exports(monkeypatch, temp_config):
     from plato.evaluators.lighteval import LightevalEvaluator
 

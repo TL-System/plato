@@ -58,13 +58,29 @@ def _is_numeric_metric(value: Any) -> bool:
     return isinstance(value, Real) and not isinstance(value, bool)
 
 
+def _canonical_task_name(task_name: str) -> str:
+    prefix, separator, suffix = task_name.rpartition(":")
+    if separator and suffix.isdigit():
+        return prefix
+    return task_name
+
+
 def _find_task_metrics(
     raw_metrics: dict[str, Any],
     task_name: str,
 ) -> dict[str, Any] | None:
-    for candidate in TASK_ALIASES.get(task_name, (task_name,)):
+    aliases = TASK_ALIASES.get(task_name, (task_name,))
+    for candidate in aliases:
         task_metrics = raw_metrics.get(candidate)
         if isinstance(task_metrics, dict):
+            return task_metrics
+
+    canonical_candidates = {_canonical_task_name(candidate) for candidate in aliases}
+    for raw_task_name, task_metrics in raw_metrics.items():
+        if (
+            isinstance(task_metrics, dict)
+            and _canonical_task_name(raw_task_name) in canonical_candidates
+        ):
             return task_metrics
     return None
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 import torch
 import torch.nn as nn
 
@@ -205,3 +206,116 @@ def test_nanochat_trainer_does_not_register_core_evaluator_globally(
 
     assert unrelated_trainer.context.state == {}
     _clear_evaluation_config()
+
+
+def test_nanochat_trainer_refreshes_evaluation_mode_between_test_calls(
+    temp_config, monkeypatch
+):
+    from plato.datasources.nanochat import NanochatStreamingDataset
+    from plato.evaluators.base import EvaluationResult
+    from plato.trainers.nanochat import (
+        NanochatCoreTestingStrategy,
+        NanochatTestingStrategy,
+    )
+    from plato.trainers.nanochat import (
+        Trainer as NanochatTrainer,
+    )
+
+    class MockEvaluator:
+        def __init__(self, config):
+            self.config = config
+
+        def evaluate(self, request):
+            return EvaluationResult(
+                evaluator="mock",
+                primary_metric="mock_score",
+                metrics={"mock_score": 0.2},
+            )
+
+    core_results = {
+        "results": {"task_a": 0.75},
+        "centered_results": {"task_a": 0.8},
+        "core_metric": 0.8,
+    }
+
+    monkeypatch.setattr(
+        "plato.trainers.nanochat.ensure_nanochat_importable", lambda: None
+    )
+    monkeypatch.setattr(
+        "plato.evaluators.nanochat_core.ensure_nanochat_importable", lambda: None
+    )
+    monkeypatch.setattr(
+        "plato.trainers.nanochat.run_core_evaluation",
+        lambda *args, **kwargs: core_results,
+    )
+    monkeypatch.setattr(
+        "plato.evaluators.nanochat_core.run_core_evaluation",
+        lambda *args, **kwargs: core_results,
+    )
+
+    cfg = Config()
+    cfg.trainer.type = "nanochat"
+    cfg.trainer.model_name = "nanochat_core"
+    cfg.evaluation = ConfigNode.from_object(
+        {
+            "type": "nanochat_core",
+            "max_per_task": 1,
+        }
+    )
+    evaluator_registry.register("mock", MockEvaluator)
+
+    try:
+        trainer = NanochatTrainer(model=DummyNanochatModel())
+        testset = NanochatStreamingDataset(
+            split="val",
+            batch_size=1,
+            sequence_length=4,
+            mode="synthetic",
+            base_dir=None,
+            max_batches=1,
+            tokenizer_threads=1,
+            tokenizer_batch_size=1,
+            device="cpu",
+            vocab_size=32,
+            synthetic_seed=123,
+        )
+
+        core_accuracy = trainer.test_model(
+            config={"batch_size": 1},
+            testset=testset,
+            sampler=None,
+        )
+
+        assert core_accuracy == pytest.approx(0.8)
+        assert isinstance(trainer.testing_strategy, NanochatCoreTestingStrategy)
+        assert trainer.context.state["nanochat_core_results"] == core_results
+
+        cfg.evaluation = ConfigNode.from_object({"type": "mock"})
+        switched_accuracy = trainer.test_model(
+            config={"batch_size": 1},
+            testset=testset,
+            sampler=None,
+        )
+
+        assert switched_accuracy == pytest.approx(0.0625)
+        assert isinstance(trainer.testing_strategy, NanochatTestingStrategy)
+        assert "nanochat_core_results" not in trainer.context.state
+        assert trainer.context.state[EVALUATION_PRIMARY_KEY] == {
+            "evaluator": "mock",
+            "metric": "mock_score",
+            "value": 0.2,
+        }
+        assert trainer.context.state[EVALUATION_RESULTS_KEY] == {
+            "mock": {
+                "evaluator": "mock",
+                "primary_metric": "mock_score",
+                "metrics": {"mock_score": 0.2},
+                "higher_is_better": {},
+                "metadata": {},
+                "artifacts": {},
+                "primary_value": 0.2,
+            }
+        }
+    finally:
+        evaluator_registry.unregister("mock")
+        _clear_evaluation_config()
