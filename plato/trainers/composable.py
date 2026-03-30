@@ -682,6 +682,11 @@ class ComposableTrainer(base.Trainer):
             train_proc.start()
             train_proc.join()
 
+            if train_proc.exitcode not in (0, None):
+                raise ValueError(
+                    f"Training worker for client {self.client_id} exited with code {train_proc.exitcode}."
+                )
+
             model_name = Config().trainer.model_name
             filename = (
                 f"{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
@@ -756,6 +761,11 @@ class ComposableTrainer(base.Trainer):
             )
             test_proc.start()
             test_proc.join()
+
+            if test_proc.exitcode not in (0, None):
+                raise ValueError(
+                    f"Testing worker for client {self.client_id} exited with code {test_proc.exitcode}."
+                )
 
             model_name = Config().trainer.model_name
             filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"

@@ -90,6 +90,57 @@ def _resolve_split_name(
     )
 
 
+def _coerce_token_sequence(value: Any, *, field_name: str) -> list[int]:
+    """Normalize tokenizer outputs into a flat list of token ids."""
+    if hasattr(value, "tolist"):
+        value = value.tolist()
+    elif isinstance(value, tuple):
+        value = list(value)
+
+    if isinstance(value, list) and value and isinstance(value[0], list):
+        if len(value) != 1:
+            raise TypeError(
+                f"Expected a single token sequence for '{field_name}', got {len(value)} sequences."
+            )
+        value = value[0]
+
+    if not isinstance(value, list):
+        raise TypeError(
+            f"Expected '{field_name}' to be a token sequence, got {type(value)}."
+        )
+
+    return [int(token) for token in value]
+
+
+def _normalize_chat_template_output(
+    rendered: Any,
+) -> tuple[list[int], list[int] | None]:
+    """Handle tokenizers that return either raw ids or a mapping payload."""
+    attention_mask = None
+    input_ids_source = rendered
+
+    if isinstance(rendered, Mapping):
+        if "input_ids" not in rendered:
+            raise KeyError(
+                "Chat template tokenization output must include 'input_ids'."
+            )
+        input_ids_source = rendered["input_ids"]
+        if "attention_mask" in rendered:
+            attention_mask = _coerce_token_sequence(
+                rendered["attention_mask"],
+                field_name="attention_mask",
+            )
+
+    input_ids = _coerce_token_sequence(input_ids_source, field_name="input_ids")
+
+    if attention_mask is not None and len(attention_mask) != len(input_ids):
+        raise ValueError(
+            "Chat template output produced mismatched input_ids and attention_mask lengths."
+        )
+
+    return input_ids, attention_mask
+
+
 class DataSource(base.DataSource):
     """A data source for HuggingFace datasets supporting multiple preprocessing modes."""
 
@@ -313,7 +364,8 @@ class DataSource(base.DataSource):
                 tokenize=True,
                 add_generation_prompt=False,
             )
-            current_length = min(len(rendered), len(input_ids))
+            rendered_ids, _ = _normalize_chat_template_output(rendered)
+            current_length = min(len(rendered_ids), len(input_ids))
             if message.get("role") == "assistant":
                 labels[previous_length:current_length] = input_ids[
                     previous_length:current_length
@@ -346,18 +398,22 @@ class DataSource(base.DataSource):
                     f"Expected a list of messages under '{messages_field}'."
                 )
 
-            input_ids = self.tokenizer.apply_chat_template(
+            rendered = self.tokenizer.apply_chat_template(
                 messages,
                 tokenize=True,
                 add_generation_prompt=False,
             )
+            input_ids, attention_mask = _normalize_chat_template_output(rendered)
             labels = self._build_chat_labels(messages, input_ids)
 
             if len(input_ids) > max_seq_length:
                 input_ids = input_ids[-max_seq_length:]
                 labels = labels[-max_seq_length:]
+                if attention_mask is not None:
+                    attention_mask = attention_mask[-max_seq_length:]
 
-            attention_mask = [1] * len(input_ids)
+            if attention_mask is None:
+                attention_mask = [1] * len(input_ids)
             return {
                 "input_ids": input_ids,
                 "attention_mask": attention_mask,

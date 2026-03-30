@@ -392,7 +392,7 @@ class DefaultTrainingStrategy(TrainingStrategy):
         ):
             try:
                 train_loss = context.trainer.run_history.get_latest_metric("train_loss")
-            except (AttributeError, KeyError, IndexError):
+            except (AttributeError, KeyError, IndexError, ValueError):
                 train_loss = None
 
         report = SimpleNamespace(

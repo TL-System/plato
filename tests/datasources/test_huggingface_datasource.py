@@ -44,6 +44,27 @@ class DummyChatTokenizer:
         return tokens
 
 
+class DummyChatTokenizerWithBatchEncoding(DummyChatTokenizer):
+    def apply_chat_template(
+        self,
+        messages,
+        *,
+        tokenize=False,
+        add_generation_prompt=False,
+    ):
+        tokens = super().apply_chat_template(
+            messages,
+            tokenize=tokenize,
+            add_generation_prompt=add_generation_prompt,
+        )
+        if not tokenize:
+            return tokens
+        return {
+            "input_ids": tokens,
+            "attention_mask": [1] * len(tokens),
+        }
+
+
 def test_resolve_validation_split_falls_back_to_test_when_missing(temp_config):
     from plato.datasources.huggingface import _resolve_split_name
 
@@ -474,3 +495,67 @@ def test_chat_sft_honors_max_seq_length_and_messages_field(temp_config, monkeypa
     assert len(example["input_ids"]) == 4
     assert len(example["labels"]) == 4
     assert len(example["attention_mask"]) == 4
+
+
+def test_chat_sft_normalizes_mapping_chat_template_outputs(temp_config, monkeypatch):
+    from plato.datasources import huggingface as huggingface_datasource
+
+    cfg = Config()
+    cfg.data.dataset_name = "dummy-chat"
+    cfg.data.preprocessing_mode = "chat_sft"
+    cfg.data.messages_field = "messages"
+    cfg.data.label_strategy = "assistant_only"
+    cfg.data.max_seq_length = 16
+    cfg.data.train_split = "train"
+    cfg.data.validation_split = "test"
+    cfg.trainer.model_name = "dummy-chat-model"
+
+    dataset = DatasetDict(
+        {
+            "train": Dataset.from_dict(
+                {
+                    "messages": [
+                        [
+                            {"role": "user", "content": "u"},
+                            {"role": "assistant", "content": "a"},
+                        ]
+                    ]
+                }
+            ),
+            "test": Dataset.from_dict(
+                {
+                    "messages": [
+                        [
+                            {"role": "user", "content": "v"},
+                            {"role": "assistant", "content": "b"},
+                        ]
+                    ]
+                }
+            ),
+        }
+    )
+
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
+    monkeypatch.setattr(
+        huggingface_datasource.AutoConfig,
+        "from_pretrained",
+        lambda *args, **kwargs: SimpleNamespace(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoTokenizer,
+        "from_pretrained",
+        lambda *args, **kwargs: DummyChatTokenizerWithBatchEncoding(),
+    )
+
+    datasource = huggingface_datasource.DataSource()
+    example = datasource.trainset[0]
+
+    assert isinstance(example["input_ids"], list)
+    assert isinstance(example["attention_mask"], list)
+    assert len(example["input_ids"]) == len(example["attention_mask"])

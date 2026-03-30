@@ -10,7 +10,7 @@ HuggingFace data handling through strategy objects instead of overriding
 import logging
 import math
 import os
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any, Dict, Optional, Tuple, Union, cast
 
 import torch
@@ -56,6 +56,40 @@ class HuggingFaceCollateWrapper:
     def __init__(self, tokenizer=None):
         self.tokenizer = tokenizer
 
+    @staticmethod
+    def _to_list(value):
+        if hasattr(value, "tolist"):
+            value = value.tolist()
+        elif isinstance(value, tuple):
+            value = list(value)
+        return value
+
+    def _normalize_example(self, example: dict[str, Any]) -> dict[str, Any]:
+        """Flatten nested tokenizer payloads stored under input_ids."""
+        normalized = dict(example)
+        nested_inputs = normalized.get("input_ids")
+        if isinstance(nested_inputs, Mapping) and "input_ids" in nested_inputs:
+            normalized["input_ids"] = self._to_list(nested_inputs["input_ids"])
+
+            nested_attention = nested_inputs.get("attention_mask")
+            current_attention = normalized.get("attention_mask")
+            normalized_input_ids = normalized.get("input_ids")
+            current_attention = self._to_list(current_attention)
+
+            if nested_attention is not None:
+                nested_attention = self._to_list(nested_attention)
+            if (
+                nested_attention is not None
+                and isinstance(normalized_input_ids, list)
+                and (
+                    not isinstance(current_attention, list)
+                    or len(current_attention) != len(normalized_input_ids)
+                )
+            ):
+                normalized["attention_mask"] = nested_attention
+
+        return normalized
+
     def _pad_labels(
         self,
         label_rows: list[list[int]],
@@ -82,7 +116,7 @@ class HuggingFaceCollateWrapper:
     def __call__(
         self, examples: Iterable[dict]
     ) -> tuple[HuggingFaceBatch, torch.Tensor | None]:
-        example_list = [dict(example) for example in examples]
+        example_list = [self._normalize_example(dict(example)) for example in examples]
         if not example_list:
             raise ValueError("HuggingFace collator received an empty batch.")
 

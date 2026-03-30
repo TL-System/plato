@@ -99,6 +99,35 @@ def test_huggingface_collate_wrapper_dynamically_pads_variable_length_labels():
     assert labels.tolist() == [[-100, 2, 3], [-100, 5, -100]]
 
 
+def test_huggingface_collate_wrapper_unwraps_nested_batch_encodings():
+    from plato.trainers.huggingface import HuggingFaceCollateWrapper
+
+    wrapper = HuggingFaceCollateWrapper(tokenizer=DummyPadTokenizer())
+    batch, labels = wrapper(
+        [
+            {
+                "input_ids": {
+                    "input_ids": [1, 2, 3],
+                    "attention_mask": [1, 1, 1],
+                },
+                "attention_mask": [1, 1],
+                "labels": [-100, 2, 3],
+            },
+            {
+                "input_ids": {
+                    "input_ids": [4, 5],
+                    "attention_mask": [1, 1],
+                },
+                "labels": [-100, 5],
+            },
+        ]
+    )
+
+    assert batch["input_ids"].tolist() == [[1, 2, 3], [4, 5, 0]]
+    assert batch["attention_mask"].tolist() == [[1, 1, 1], [1, 1, 0]]
+    assert labels.tolist() == [[-100, 2, 3], [-100, 5, -100]]
+
+
 def test_huggingface_trainer_defaults_tokenizer_name_to_model_name(
     temp_config, monkeypatch
 ):
