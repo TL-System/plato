@@ -1,11 +1,12 @@
 """Evaluation helpers for Plato integrations."""
 
 from .base import EvaluationInput, EvaluationResult, Evaluator
-from . import registry
+from . import lighteval, registry
 
 __all__ = [
     "EvaluationInput",
     "EvaluationResult",
     "Evaluator",
     "registry",
+    "lighteval",
 ]

@@ -62,6 +62,9 @@ nanochat = [
 robotics = [
     "lerobot[smolvla]>=0.4.3,<0.5.0",
 ]
+llm_eval = [
+    "lighteval",
+]
 
 [project.urls]
 Homepage = "https://github.com/TL-System/plato"
