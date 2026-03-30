@@ -30,7 +30,7 @@ dependencies = [
     "torch",
     "torch-optimizer",
     "torchvision",
-    "transformers",
+    "transformers>=5.4.0",
     "zstd",
 ]
 
@@ -60,7 +60,7 @@ nanochat = [
     "PyYAML",
 ]
 robotics = [
-    "lerobot[smolvla]>=0.4.3,<0.5.0",
+    "lerobot[smolvla]>=0.5.0",
 ]
 
 [project.urls]
