@@ -101,6 +101,71 @@ def test_composable_trainer_runs_registered_evaluator_and_stores_results(temp_co
         _clear_evaluation_config()
 
 
+def test_composable_trainer_replaces_stale_evaluator_payloads(temp_config):
+    from plato.evaluators import registry as evaluator_registry
+    from plato.evaluators.base import EvaluationResult
+    from plato.evaluators.runner import EVALUATION_RESULTS_KEY
+    from plato.servers import evaluation_logging
+
+    class EvaluatorA:
+        def __init__(self, config):
+            self.config = config
+
+        def evaluate(self, request):
+            return EvaluationResult(
+                evaluator="eval_a",
+                primary_metric="metric_a",
+                metrics={"metric_a": 0.1},
+            )
+
+    class EvaluatorB:
+        def __init__(self, config):
+            self.config = config
+
+        def evaluate(self, request):
+            return EvaluationResult(
+                evaluator="eval_b",
+                primary_metric="metric_b",
+                metrics={"metric_b": 0.2},
+            )
+
+    _clear_evaluation_config()
+    evaluator_registry.register("eval_a", EvaluatorA)
+    evaluator_registry.register("eval_b", EvaluatorB)
+
+    try:
+        trainer = ComposableTrainer(
+            model=nn.Linear(2, 1),
+            testing_strategy=ConstantTestingStrategy(0.5),
+        )
+
+        Config().evaluation = ConfigNode.from_object({"type": "eval_a"})
+        trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+
+        Config().evaluation = ConfigNode.from_object({"type": "eval_b"})
+        trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+
+        assert trainer.context.state[EVALUATION_RESULTS_KEY] == {
+            "eval_b": {
+                "evaluator": "eval_b",
+                "primary_metric": "metric_b",
+                "metrics": {"metric_b": 0.2},
+                "higher_is_better": {},
+                "metadata": {},
+                "artifacts": {},
+                "primary_value": 0.2,
+            }
+        }
+        assert evaluation_logging.extract_logged_items(trainer) == {
+            "evaluation_primary_value": 0.2,
+            "evaluation_metric_b": 0.2,
+        }
+    finally:
+        evaluator_registry.unregister("eval_a")
+        evaluator_registry.unregister("eval_b")
+        _clear_evaluation_config()
+
+
 @pytest.mark.parametrize(
     "evaluation_config",
     [

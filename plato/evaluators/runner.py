@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Any
 
 from plato.config import Config
-from plato.evaluators.base import EvaluationInput, EvaluationResult
 from plato.evaluators import registry
+from plato.evaluators.base import EvaluationInput, EvaluationResult
 from plato.trainers.strategies.base import TrainingContext
 
 EVALUATION_RESULTS_KEY = "evaluation_results"
@@ -36,12 +36,31 @@ def run_configured_evaluation(
     testset: Any | None = None,
     sampler: Any | None = None,
     local_metric: float | None = None,
+    evaluator_override: Any | None = None,
 ) -> EvaluationResult | None:
     """Run the configured evaluator, storing normalized output in context state."""
     evaluator_type = _configured_evaluator_type()
-    evaluator = registry.get(
-        allow_missing=evaluator_type in LEGACY_OPTIONAL_EVALUATORS,
-    )
+    if evaluator_type is None:
+        context.state.pop(EVALUATION_RESULTS_KEY, None)
+        context.state.pop(EVALUATION_PRIMARY_KEY, None)
+        return None
+
+    evaluator = None
+    if evaluator_override is not None:
+        override_config = getattr(evaluator_override, "config", None)
+        override_type = None
+        if isinstance(override_config, dict):
+            override_type = override_config.get("type")
+        else:
+            override_type = getattr(override_config, "type", None)
+        if override_type == evaluator_type:
+            evaluator = evaluator_override
+
+    if evaluator is None:
+        evaluator = registry.get(
+            allow_missing=evaluator_type in LEGACY_OPTIONAL_EVALUATORS,
+        )
+
     if evaluator is None:
         context.state.pop(EVALUATION_RESULTS_KEY, None)
         context.state.pop(EVALUATION_PRIMARY_KEY, None)
@@ -60,8 +79,7 @@ def run_configured_evaluation(
     result = evaluator.evaluate(request)
     payload = result.to_dict()
 
-    all_results = context.state.setdefault(EVALUATION_RESULTS_KEY, {})
-    all_results[result.evaluator] = payload
+    context.state[EVALUATION_RESULTS_KEY] = {result.evaluator: payload}
     context.state[EVALUATION_PRIMARY_KEY] = {
         "evaluator": result.evaluator,
         "metric": result.primary_metric,

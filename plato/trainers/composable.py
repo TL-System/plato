@@ -803,6 +803,7 @@ class ComposableTrainer(base.Trainer):
             testset=testset,
             sampler=sampler,
             local_metric=accuracy,
+            evaluator_override=getattr(self, "_configured_evaluator_override", None),
         )
 
         return accuracy

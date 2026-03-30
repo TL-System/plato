@@ -4,9 +4,11 @@ import torch
 import torch.nn as nn
 
 from plato.config import Config, ConfigNode
+from plato.evaluators import registry as evaluator_registry
 from plato.evaluators.base import EvaluationInput
 from plato.evaluators.runner import EVALUATION_PRIMARY_KEY, EVALUATION_RESULTS_KEY
-from plato.trainers.strategies.base import TrainingContext
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.base import TestingStrategy, TrainingContext
 
 
 class DummyNanochatModel(nn.Module):
@@ -71,7 +73,6 @@ def test_nanochat_trainer_core_eval_populates_generic_evaluation_state(
     temp_config, monkeypatch
 ):
     from plato.datasources.nanochat import NanochatStreamingDataset
-    from plato.evaluators import registry as evaluator_registry
     from plato.trainers.nanochat import Trainer as NanochatTrainer
 
     core_results = {
@@ -149,3 +150,58 @@ def test_nanochat_trainer_core_eval_populates_generic_evaluation_state(
     finally:
         evaluator_registry.unregister("nanochat_core")
         _clear_evaluation_config()
+
+
+def test_nanochat_trainer_does_not_register_core_evaluator_globally(
+    temp_config, monkeypatch
+):
+    from plato.trainers.nanochat import Trainer as NanochatTrainer
+
+    class ConstantTestingStrategy(TestingStrategy):
+        def test_model(self, model, config, testset, sampler, context):
+            return 0.5
+
+    core_results = {
+        "results": {},
+        "centered_results": {},
+        "core_metric": 0.8,
+    }
+
+    monkeypatch.setattr(
+        "plato.trainers.nanochat.ensure_nanochat_importable", lambda: None
+    )
+    monkeypatch.setattr(
+        "plato.evaluators.nanochat_core.ensure_nanochat_importable", lambda: None
+    )
+    monkeypatch.setattr(
+        "plato.trainers.nanochat.run_core_evaluation",
+        lambda *args, **kwargs: core_results,
+    )
+    monkeypatch.setattr(
+        "plato.evaluators.nanochat_core.run_core_evaluation",
+        lambda *args, **kwargs: core_results,
+    )
+
+    cfg = Config()
+    cfg.trainer.type = "nanochat"
+    cfg.trainer.model_name = "nanochat_core"
+    cfg.evaluation = ConfigNode.from_object(
+        {
+            "type": "nanochat_core",
+            "max_per_task": 1,
+        }
+    )
+
+    registered_before = evaluator_registry.registered_names()
+    _ = NanochatTrainer(model=DummyNanochatModel())
+
+    assert evaluator_registry.registered_names() == registered_before
+
+    unrelated_trainer = ComposableTrainer(
+        model=nn.Linear(2, 1),
+        testing_strategy=ConstantTestingStrategy(),
+    )
+    unrelated_trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+
+    assert unrelated_trainer.context.state == {}
+    _clear_evaluation_config()

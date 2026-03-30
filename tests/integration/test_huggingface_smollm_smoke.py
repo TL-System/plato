@@ -190,7 +190,10 @@ def test_smollm_smoltalk_config_smoke(monkeypatch, tmp_path):
         monkeypatch.setattr(
             lighteval_eval,
             "_resolve_model_reference",
-            lambda request: "/tmp/mock-smollm",
+            lambda request, export_dir=None: lighteval_eval.LightevalModelReference(
+                model_name="/tmp/mock-smollm",
+                tokenizer_name="/tmp/mock-smollm",
+            ),
         )
         monkeypatch.setattr(
             lighteval_eval,
