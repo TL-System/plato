@@ -155,6 +155,10 @@ class DataSource(base.DataSource):
 
         self.preprocessing_mode = str(preprocessing_mode)
         self.text_column_name = getattr(data_cfg, "text_field", "text")
+        self.messages_field = getattr(data_cfg, "messages_field", "messages")
+        self.label_strategy = getattr(data_cfg, "label_strategy", "assistant_only")
+        self.max_seq_length = getattr(data_cfg, "max_seq_length", None)
+        self.pack_sequences = getattr(data_cfg, "pack_sequences", False)
         self.column_names = [self.text_column_name]
         self.preprocess_num_proc = getattr(data_cfg, "preprocessing_num_proc", 4)
         self.block_size = getattr(data_cfg, "block_size", 128)
@@ -260,11 +264,103 @@ class DataSource(base.DataSource):
 
         return lm_datasets
 
+    def _chat_max_seq_length(self) -> int:
+        """Resolve the effective max sequence length for chat SFT examples."""
+        configured = self.max_seq_length
+        if configured is not None:
+            return int(configured)
+
+        tokenizer_limit = getattr(self.tokenizer, "model_max_length", 1024)
+        if not isinstance(tokenizer_limit, int) or tokenizer_limit <= 0:
+            return 1024
+        return min(tokenizer_limit, 1024)
+
+    def _build_chat_labels(
+        self, messages: list[dict[str, Any]], input_ids: list[int]
+    ) -> list[int]:
+        """Build labels for chat SFT according to the configured label strategy."""
+        if self.label_strategy == "full_sequence":
+            return list(input_ids)
+        if self.label_strategy != "assistant_only":
+            raise ValueError(
+                f"Unsupported chat label strategy: {self.label_strategy}"
+            )
+
+        if not hasattr(self.tokenizer, "apply_chat_template"):
+            raise AttributeError(
+                "Tokenizer must expose apply_chat_template() for chat_sft preprocessing."
+            )
+
+        labels = [-100] * len(input_ids)
+        previous_length = 0
+        for index, message in enumerate(messages):
+            rendered = self.tokenizer.apply_chat_template(
+                messages[: index + 1],
+                tokenize=True,
+                add_generation_prompt=False,
+            )
+            current_length = min(len(rendered), len(input_ids))
+            if message.get("role") == "assistant":
+                labels[previous_length:current_length] = input_ids[
+                    previous_length:current_length
+                ]
+            previous_length = current_length
+        return labels
+
     def preprocess_chat_sft(self, dataset_split):
-        """Placeholder for follow-up chat-SFT preprocessing support."""
-        raise NotImplementedError(
-            "chat_sft preprocessing is implemented in a follow-up issue."
-        )
+        """Tokenize chat-style supervision examples one conversation at a time."""
+        if self.pack_sequences:
+            raise NotImplementedError(
+                "chat_sft preprocessing does not support pack_sequences=true."
+            )
+        if not hasattr(self.tokenizer, "apply_chat_template"):
+            raise AttributeError(
+                "Tokenizer must expose apply_chat_template() for chat_sft preprocessing."
+            )
+
+        column_names_raw = getattr(dataset_split, "column_names", None)
+        if not isinstance(column_names_raw, list):
+            raise AttributeError("Chat split must expose 'column_names'.")
+        remove_columns = [str(name) for name in column_names_raw]
+        max_seq_length = self._chat_max_seq_length()
+        messages_field = self.messages_field
+
+        def tokenize_chat_example(example: dict[str, Any]) -> dict[str, list[int]]:
+            messages = example[messages_field]
+            if not isinstance(messages, list):
+                raise TypeError(
+                    f"Expected a list of messages under '{messages_field}'."
+                )
+
+            input_ids = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=True,
+                add_generation_prompt=False,
+            )
+            labels = self._build_chat_labels(messages, input_ids)
+
+            if len(input_ids) > max_seq_length:
+                input_ids = input_ids[-max_seq_length:]
+                labels = labels[-max_seq_length:]
+
+            attention_mask = [1] * len(input_ids)
+            return {
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
+                "labels": labels,
+            }
+
+        training_args = cast(TrainingArguments, self.training_args)
+        with training_args.main_process_first(desc="chat sft preprocessing"):
+            tokenized = dataset_split.map(
+                tokenize_chat_example,
+                num_proc=None,
+                remove_columns=remove_columns,
+                load_from_cache_file=True,
+                desc="Running chat template preprocessing",
+            )
+
+        return tokenized
 
     def preprocess_data(self, datasets):
         """Backward-compatible alias for the legacy corpus LM preprocessing path."""

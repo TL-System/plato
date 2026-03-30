@@ -15,6 +15,35 @@ class DummyTokenizer:
         return {"input_ids": [[1, 2, 3] for _ in texts]}
 
 
+class DummyChatTokenizer:
+    model_max_length = 256
+    pad_token_id = 0
+
+    role_ids = {"system": 71, "user": 72, "assistant": 73}
+
+    def apply_chat_template(
+        self,
+        messages,
+        *,
+        tokenize=False,
+        add_generation_prompt=False,
+    ):
+        if not tokenize:
+            return "".join(
+                f"<{message['role']}>{message['content']}|"
+                for message in messages
+            )
+
+        tokens = []
+        for message in messages:
+            tokens.append(self.role_ids[message["role"]])
+            tokens.extend(100 + ord(char) for char in message["content"])
+            tokens.append(0)
+        if add_generation_prompt:
+            tokens.append(99)
+        return tokens
+
+
 def test_resolve_validation_split_falls_back_to_test_when_missing(temp_config):
     from plato.datasources.huggingface import _resolve_split_name
 
@@ -145,11 +174,200 @@ def test_huggingface_datasource_falls_back_to_test_split(temp_config, monkeypatc
     assert datasource.testset.num_rows == 1
 
 
-def test_chat_mode_scaffold_is_explicit_not_implicit(temp_config):
-    from plato.datasources.huggingface import DataSource
+def test_chat_sft_preprocesses_messages_without_corpus_concatenation(
+    temp_config, monkeypatch
+):
+    from plato.datasources import huggingface as huggingface_datasource
 
-    datasource = DataSource.__new__(DataSource)
-    datasource.preprocessing_mode = "chat_sft"
+    cfg = Config()
+    cfg.data.dataset_name = "dummy-chat"
+    cfg.data.preprocessing_mode = "chat_sft"
+    cfg.data.messages_field = "messages"
+    cfg.data.label_strategy = "assistant_only"
+    cfg.data.max_seq_length = 64
+    cfg.data.train_split = "train"
+    cfg.data.validation_split = "test"
+    cfg.trainer.model_name = "dummy-chat-model"
+    cfg.trainer.tokenizer_name = "dummy-chat-tokenizer"
 
-    with pytest.raises(NotImplementedError, match="chat_sft"):
-        DataSource.preprocess_chat_sft(datasource, object())
+    dataset = DatasetDict(
+        {
+            "train": Dataset.from_dict(
+                {
+                    "messages": [
+                        [
+                            {"role": "user", "content": "u"},
+                            {"role": "assistant", "content": "a"},
+                        ],
+                        [
+                            {"role": "user", "content": "v"},
+                            {"role": "assistant", "content": "b"},
+                        ],
+                    ]
+                }
+            ),
+            "test": Dataset.from_dict(
+                {
+                    "messages": [
+                        [
+                            {"role": "user", "content": "w"},
+                            {"role": "assistant", "content": "c"},
+                        ]
+                    ]
+                }
+            ),
+        }
+    )
+
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
+    monkeypatch.setattr(
+        huggingface_datasource.AutoConfig,
+        "from_pretrained",
+        lambda *args, **kwargs: SimpleNamespace(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoTokenizer,
+        "from_pretrained",
+        lambda *args, **kwargs: DummyChatTokenizer(),
+    )
+
+    datasource = huggingface_datasource.DataSource()
+
+    assert datasource.trainset.num_rows == 2
+    example = datasource.trainset[0]
+    assert set(example) == {"input_ids", "attention_mask", "labels"}
+    assert len(example["input_ids"]) == len(example["attention_mask"])
+    assert len(example["input_ids"]) == len(example["labels"])
+
+
+def test_chat_sft_masks_non_assistant_tokens_with_minus_100(temp_config, monkeypatch):
+    from plato.datasources import huggingface as huggingface_datasource
+
+    cfg = Config()
+    cfg.data.dataset_name = "dummy-chat"
+    cfg.data.preprocessing_mode = "chat_sft"
+    cfg.data.messages_field = "messages"
+    cfg.data.label_strategy = "assistant_only"
+    cfg.data.max_seq_length = 64
+    cfg.data.train_split = "train"
+    cfg.data.validation_split = "test"
+    cfg.trainer.model_name = "dummy-chat-model"
+
+    dataset = DatasetDict(
+        {
+            "train": Dataset.from_dict(
+                {
+                    "messages": [
+                        [
+                            {"role": "user", "content": "u"},
+                            {"role": "assistant", "content": "a"},
+                        ]
+                    ]
+                }
+            ),
+            "test": Dataset.from_dict(
+                {
+                    "messages": [
+                        [
+                            {"role": "user", "content": "x"},
+                            {"role": "assistant", "content": "y"},
+                        ]
+                    ]
+                }
+            ),
+        }
+    )
+
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
+    monkeypatch.setattr(
+        huggingface_datasource.AutoConfig,
+        "from_pretrained",
+        lambda *args, **kwargs: SimpleNamespace(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoTokenizer,
+        "from_pretrained",
+        lambda *args, **kwargs: DummyChatTokenizer(),
+    )
+
+    datasource = huggingface_datasource.DataSource()
+    example = datasource.trainset[0]
+
+    assert example["labels"][:3] == [-100, -100, -100]
+    assert example["labels"][3:] == example["input_ids"][3:]
+
+
+def test_chat_sft_honors_max_seq_length_and_messages_field(temp_config, monkeypatch):
+    from plato.datasources import huggingface as huggingface_datasource
+
+    cfg = Config()
+    cfg.data.dataset_name = "dummy-chat"
+    cfg.data.preprocessing_mode = "chat_sft"
+    cfg.data.messages_field = "dialogue"
+    cfg.data.label_strategy = "assistant_only"
+    cfg.data.max_seq_length = 4
+    cfg.data.train_split = "train"
+    cfg.data.validation_split = "test"
+    cfg.trainer.model_name = "dummy-chat-model"
+
+    dataset = DatasetDict(
+        {
+            "train": Dataset.from_dict(
+                {
+                    "dialogue": [
+                        [
+                            {"role": "user", "content": "long"},
+                            {"role": "assistant", "content": "reply"},
+                        ]
+                    ]
+                }
+            ),
+            "test": Dataset.from_dict(
+                {
+                    "dialogue": [
+                        [
+                            {"role": "user", "content": "hold"},
+                            {"role": "assistant", "content": "out"},
+                        ]
+                    ]
+                }
+            ),
+        }
+    )
+
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
+    monkeypatch.setattr(
+        huggingface_datasource.AutoConfig,
+        "from_pretrained",
+        lambda *args, **kwargs: SimpleNamespace(),
+    )
+    monkeypatch.setattr(
+        huggingface_datasource.AutoTokenizer,
+        "from_pretrained",
+        lambda *args, **kwargs: DummyChatTokenizer(),
+    )
+
+    datasource = huggingface_datasource.DataSource()
+    example = datasource.trainset[0]
+
+    assert len(example["input_ids"]) == 4
+    assert len(example["labels"]) == 4
+    assert len(example["attention_mask"]) == 4
