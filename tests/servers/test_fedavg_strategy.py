@@ -1,6 +1,8 @@
 """Tests for FedAvg aggregation and algorithm utilities."""
 
 import asyncio
+import json
+import os
 from types import SimpleNamespace
 
 import torch
@@ -8,6 +10,44 @@ import torch
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.servers.strategies.base import ServerContext
 from plato.trainers.composable import ComposableTrainer
+
+
+def _mock_evaluation_state():
+    from plato.evaluators.runner import (
+        EVALUATION_PRIMARY_KEY,
+        EVALUATION_RESULTS_KEY,
+    )
+
+    payload = {
+        "evaluator": "mock",
+        "primary_metric": "mock_score",
+        "metrics": {"mock_score": 0.8, "aux_metric": 0.2},
+        "higher_is_better": {"mock_score": True, "aux_metric": False},
+        "metadata": {"source": "unit-test"},
+        "artifacts": {"report": "mock.json"},
+        "primary_value": 0.8,
+    }
+
+    return {
+        EVALUATION_PRIMARY_KEY: {
+            "evaluator": "mock",
+            "metric": "mock_score",
+            "value": 0.8,
+        },
+        EVALUATION_RESULTS_KEY: {"mock": payload},
+    }
+
+
+def _runtime_update():
+    return SimpleNamespace(
+        report=SimpleNamespace(
+            num_samples=4,
+            accuracy=0.5,
+            processing_time=0.1,
+            comm_time=0.2,
+            training_time=0.3,
+        )
+    )
 
 
 def test_fedavg_aggregation_weighted_mean(temp_config):
@@ -141,3 +181,84 @@ def test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights(
     assert strategy.delta_calls == 1
     assert torch.allclose(server.algorithm.current["weight"], torch.ones((1, 2)))
     assert torch.allclose(server.algorithm.current["bias"], torch.ones(1))
+
+
+def test_fedavg_server_logged_items_flatten_evaluator_metrics(
+    temp_config, tmp_path
+):
+    """FedAvg should keep accuracy while surfacing evaluator summary metrics."""
+    from plato.config import Config
+    from plato.servers import fedavg
+
+    result_path = tmp_path / "results"
+    result_path.mkdir()
+    Config.params["result_path"] = str(result_path)
+
+    server = fedavg.Server()
+    server.current_round = 2
+    server.accuracy = 0.5
+    server.accuracy_std = 0.0
+    server.initial_wall_time = 10.0
+    server.wall_time = 15.0
+    server.comm_overhead = 1.5
+    server.updates = [_runtime_update()]
+    server.trainer = SimpleNamespace(
+        context=SimpleNamespace(state=_mock_evaluation_state())
+    )
+
+    logged_items = server.get_logged_items()
+
+    assert logged_items["accuracy"] == 0.5
+    assert logged_items["evaluation_primary_value"] == 0.8
+    assert logged_items["evaluation_mock_score"] == 0.8
+    assert logged_items["evaluation_aux_metric"] == 0.2
+
+
+def test_fedavg_server_persists_full_evaluator_payloads_to_jsonl(
+    temp_config, tmp_path
+):
+    """FedAvg should persist the full evaluator payload in a JSONL sidecar."""
+    from plato.config import Config
+    from plato.servers import fedavg
+
+    result_path = tmp_path / "results"
+    result_path.mkdir()
+    Config.params["result_path"] = str(result_path)
+
+    server = fedavg.Server()
+    server.current_round = 3
+    server.accuracy = 0.5
+    server.trainer = SimpleNamespace(
+        context=SimpleNamespace(state=_mock_evaluation_state())
+    )
+
+    server.clients_processed()
+
+    sidecar_path = result_path / f"{os.getpid()}_evaluation.jsonl"
+    entries = [json.loads(line) for line in sidecar_path.read_text().splitlines()]
+
+    assert entries == [
+        {
+            "round": 3,
+            "accuracy": 0.5,
+            "evaluation_primary": {
+                "evaluator": "mock",
+                "metric": "mock_score",
+                "value": 0.8,
+            },
+            "evaluation_results": {
+                "mock": {
+                    "artifacts": {"report": "mock.json"},
+                    "evaluator": "mock",
+                    "higher_is_better": {
+                        "aux_metric": False,
+                        "mock_score": True,
+                    },
+                    "metadata": {"source": "unit-test"},
+                    "metrics": {"aux_metric": 0.2, "mock_score": 0.8},
+                    "primary_metric": "mock_score",
+                    "primary_value": 0.8,
+                }
+            },
+        }
+    ]

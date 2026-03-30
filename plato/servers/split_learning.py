@@ -20,7 +20,7 @@ from plato.config import Config
 from plato.datasources import feature
 from plato.datasources import registry as datasources_registry
 from plato.samplers import all_inclusive
-from plato.servers import fedavg
+from plato.servers import evaluation_logging, fedavg
 from plato.servers.strategies.client_selection import (
     SplitLearningSequentialSelectionStrategy,
 )
@@ -138,3 +138,8 @@ class Server(fedavg.Server):
     def clients_processed(self):
         # Replace the default accuracy by manually tested accuracy
         self.accuracy = self.test_accuracy
+        evaluation_logging.persist_jsonl(
+            trainer=self.trainer,
+            current_round=self.current_round,
+            accuracy=self.accuracy,
+        )

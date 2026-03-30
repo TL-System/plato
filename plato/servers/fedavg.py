@@ -11,7 +11,7 @@ from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
-from plato.servers import base
+from plato.servers import base, evaluation_logging
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, fonts
@@ -301,6 +301,11 @@ class Server(base.Server):
 
     def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""
+        evaluation_logging.persist_jsonl(
+            trainer=self.trainer,
+            current_round=self.current_round,
+            accuracy=self.accuracy,
+        )
 
     def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""
@@ -344,6 +349,8 @@ class Server(base.Server):
         # Add core_metric if Nanochat CORE evaluation was performed
         if hasattr(self, "_core_metric"):
             logged["core_metric"] = self._core_metric
+
+        logged.update(evaluation_logging.extract_logged_items(self.trainer))
 
         return logged
 
