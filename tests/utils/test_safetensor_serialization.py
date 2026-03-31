@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+import torch
 
 from plato.processors import safetensor_decode, safetensor_encode
 from plato.serialization.safetensor import deserialize_tree, serialize_tree
@@ -109,3 +110,16 @@ def test_serialize_tree_handles_root_level_leaf():
 
     np.testing.assert_array_equal(restored, leaf)
     assert restored.dtype == leaf.dtype
+
+
+def test_serialize_tree_roundtrip_preserves_torch_bfloat16_tensors():
+    tree = {
+        "weight": torch.arange(6, dtype=torch.float32).reshape(2, 3).to(torch.bfloat16)
+    }
+
+    blob = serialize_tree(tree)
+    restored = deserialize_tree(blob)
+
+    assert isinstance(restored["weight"], torch.Tensor)
+    assert restored["weight"].dtype == torch.bfloat16
+    assert torch.equal(restored["weight"], tree["weight"])
