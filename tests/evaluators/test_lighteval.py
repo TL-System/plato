@@ -74,9 +74,23 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
             calls["save_details"] = save_details
 
     class FakeTransformersModelConfig:
-        def __init__(self, model_name, tokenizer=None):
+        def __init__(
+            self,
+            model_name,
+            tokenizer=None,
+            batch_size=None,
+            max_length=None,
+            model_parallel=None,
+            dtype=None,
+            device=None,
+        ):
             calls["model_name"] = model_name
             calls["tokenizer"] = tokenizer
+            calls["batch_size"] = batch_size
+            calls["max_length"] = max_length
+            calls["model_parallel"] = model_parallel
+            calls["dtype"] = dtype
+            calls["device"] = device
 
     class FakePipeline:
         def __init__(
@@ -158,6 +172,11 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
     assert calls["launcher_type"] is FakeParallelismManager.ACCELERATE
     assert calls["model_name"] == "/tmp/mock-model"
     assert calls["tokenizer"] == "/tmp/mock-tokenizer"
+    assert calls["batch_size"] == 1
+    assert calls["max_length"] is None
+    assert calls["model_parallel"] is None
+    assert calls["dtype"] is None
+    assert calls["device"] == "cuda"
     assert calls["save_details"] is False
     assert calls["custom_tasks_directory"] == "plato.evaluators.lighteval_tasks"
     assert calls["tasks"] == "ifeval,hellaswag,arc:easy,arc:challenge,piqa_hf"
@@ -177,6 +196,100 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
         "arc:easy": {"loglikelihood_acc": 0.35},
         "arc:challenge": {"loglikelihood_acc": 0.25},
         "piqa": {"exact_match": 0.61},
+    }
+
+
+def test_lighteval_pipeline_forwards_runtime_overrides(monkeypatch, temp_config):
+    from plato.evaluators.lighteval import (
+        LightevalModelReference,
+        _run_lighteval_pipeline,
+    )
+
+    calls = {}
+
+    class FakeParallelismManager(Enum):
+        ACCELERATE = auto()
+
+    class FakePipelineParameters:
+        def __init__(self, launcher_type, custom_tasks_directory=None):
+            del launcher_type, custom_tasks_directory
+
+    class FakeEvaluationTracker:
+        def __init__(self, output_dir, save_details=False):
+            del output_dir, save_details
+
+    class FakeTransformersModelConfig:
+        def __init__(self, model_name, tokenizer=None, **kwargs):
+            del model_name, tokenizer
+            calls.update(kwargs)
+
+    class FakePipeline:
+        def __init__(self, *args, **kwargs):
+            del args, kwargs
+
+        def evaluate(self):
+            return None
+
+        def get_results(self):
+            return {"results": {"ifeval": 0.31}}
+
+    lighteval_pkg = types.ModuleType("lighteval")
+    logging_pkg = types.ModuleType("lighteval.logging")
+    tracker_pkg = types.ModuleType("lighteval.logging.evaluation_tracker")
+    tracker_pkg.EvaluationTracker = FakeEvaluationTracker
+    models_pkg = types.ModuleType("lighteval.models")
+    transformers_pkg = types.ModuleType("lighteval.models.transformers")
+    transformers_model_pkg = types.ModuleType(
+        "lighteval.models.transformers.transformers_model"
+    )
+    transformers_model_pkg.TransformersModelConfig = FakeTransformersModelConfig
+    pipeline_pkg = types.ModuleType("lighteval.pipeline")
+    pipeline_pkg.Pipeline = FakePipeline
+    pipeline_pkg.PipelineParameters = FakePipelineParameters
+    pipeline_pkg.ParallelismManager = FakeParallelismManager
+
+    monkeypatch.setitem(sys.modules, "lighteval", lighteval_pkg)
+    monkeypatch.setitem(sys.modules, "lighteval.logging", logging_pkg)
+    monkeypatch.setitem(
+        sys.modules,
+        "lighteval.logging.evaluation_tracker",
+        tracker_pkg,
+    )
+    monkeypatch.setitem(sys.modules, "lighteval.models", models_pkg)
+    monkeypatch.setitem(
+        sys.modules,
+        "lighteval.models.transformers",
+        transformers_pkg,
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "lighteval.models.transformers.transformers_model",
+        transformers_model_pkg,
+    )
+    monkeypatch.setitem(sys.modules, "lighteval.pipeline", pipeline_pkg)
+
+    _run_lighteval_pipeline(
+        model_reference=LightevalModelReference(
+            model_name="/tmp/mock-model",
+            tokenizer_name="/tmp/mock-tokenizer",
+        ),
+        tasks=["ifeval"],
+        backend="transformers",
+        config={
+            "batch_size": 2,
+            "max_length": 1024,
+            "model_parallel": False,
+            "dtype": "bfloat16",
+            "device": "cuda:1",
+        },
+    )
+
+    assert calls == {
+        "batch_size": 2,
+        "max_length": 1024,
+        "model_parallel": False,
+        "dtype": "bfloat16",
+        "device": "cuda:1",
     }
 
 

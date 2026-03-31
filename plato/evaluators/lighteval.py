@@ -156,6 +156,19 @@ def _resolve_pipeline_tasks(tasks: list[str]) -> list[str]:
     return [TASK_PIPELINE_NAMES.get(task, task) for task in tasks]
 
 
+def _optional_int_config(
+    config: dict[str, Any] | Any, key: str, default: int | None = None
+) -> int | None:
+    """Read an optional integer config value with validation."""
+    value = _config_value(config, key, default)
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Lighteval config '{key}' must be an integer.") from exc
+
+
 def _normalize_nested_metrics(raw_metrics: dict[str, Any]) -> dict[str, float]:
     metrics: dict[str, float] = {}
 
@@ -311,6 +324,11 @@ def _run_lighteval_pipeline(
 
     launcher_type = _resolve_launcher_type(backend, ParallelismManager)
     resolved_tasks = _resolve_pipeline_tasks(tasks)
+    batch_size = _optional_int_config(config, "batch_size", 1)
+    max_length = _optional_int_config(config, "max_length", None)
+    model_parallel = _config_value(config, "model_parallel", None)
+    dtype = _config_value(config, "dtype", None)
+    device = _config_value(config, "device", "cuda")
 
     with tempfile.TemporaryDirectory(prefix="plato-lighteval-output-") as output_dir:
         if progress is not None:
@@ -325,6 +343,11 @@ def _run_lighteval_pipeline(
         model_config = TransformersModelConfig(
             model_name=model_reference.model_name,
             tokenizer=model_reference.tokenizer_name,
+            batch_size=batch_size,
+            max_length=max_length,
+            model_parallel=model_parallel,
+            dtype=dtype,
+            device=device,
         )
         pipeline = Pipeline(
             tasks=",".join(resolved_tasks),
