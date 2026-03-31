@@ -26,6 +26,10 @@ TASK_ALIASES: dict[str, tuple[str, ...]] = {
     "arc_challenge": ("arc_challenge", "arc:challenge"),
     "piqa": ("piqa",),
 }
+TASK_PIPELINE_NAMES: dict[str, str] = {
+    "arc_easy": "arc:easy",
+    "arc_challenge": "arc:challenge",
+}
 TASK_METRIC_PREFERENCES: dict[str, tuple[str, ...]] = {
     "hellaswag": ("exact_match", "loglikelihood_acc", "accuracy", "acc"),
     "arc_easy": ("loglikelihood_acc", "exact_match", "accuracy", "acc"),
@@ -97,6 +101,11 @@ def _preferred_task_value(task_metrics: dict[str, Any], task_name: str) -> float
         if _is_numeric_metric(metric_value):
             return float(metric_value)
     return None
+
+
+def _resolve_pipeline_tasks(tasks: list[str]) -> list[str]:
+    """Convert friendly task aliases into concrete Lighteval task ids."""
+    return [TASK_PIPELINE_NAMES.get(task, task) for task in tasks]
 
 
 def _normalize_nested_metrics(raw_metrics: dict[str, Any]) -> dict[str, float]:
@@ -247,6 +256,7 @@ def _run_lighteval_pipeline(
         ) from exc
 
     launcher_type = _resolve_launcher_type(backend, ParallelismManager)
+    resolved_tasks = _resolve_pipeline_tasks(tasks)
 
     with tempfile.TemporaryDirectory(prefix="plato-lighteval-output-") as output_dir:
         tracker = EvaluationTracker(output_dir=output_dir, save_details=False)
@@ -256,7 +266,7 @@ def _run_lighteval_pipeline(
             tokenizer=model_reference.tokenizer_name,
         )
         pipeline = Pipeline(
-            tasks=",".join(tasks),
+            tasks=",".join(resolved_tasks),
             pipeline_parameters=pipeline_parameters,
             evaluation_tracker=tracker,
             model_config=model_config,

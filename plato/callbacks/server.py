@@ -95,9 +95,10 @@ class LogProgressCallback(ServerCallback):
     def on_clients_processed(self, server, **kwargs):
         """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
+        logged_items = server.get_logged_items()
         new_row = []
         for item in self.recorded_items:
-            item_value = server.get_logged_items()[item]
+            item_value = logged_items.get(item)
             new_row.append(item_value)
 
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"

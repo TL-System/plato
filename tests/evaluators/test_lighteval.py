@@ -38,6 +38,14 @@ def test_lighteval_fast_preset_contains_expected_tasks(temp_config):
     assert preset["primary_metric"] == "ifeval_avg"
 
 
+def test_lighteval_pipeline_task_resolution_maps_arc_aliases(temp_config):
+    from plato.evaluators.lighteval import _resolve_pipeline_tasks
+
+    assert _resolve_pipeline_tasks(
+        ["ifeval", "hellaswag", "arc_easy", "arc_challenge", "piqa"]
+    ) == ["ifeval", "hellaswag", "arc:easy", "arc:challenge", "piqa"]
+
+
 def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_config):
     from plato.evaluators.lighteval import (
         LightevalModelReference,
@@ -144,7 +152,7 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
     assert calls["model_name"] == "/tmp/mock-model"
     assert calls["tokenizer"] == "/tmp/mock-tokenizer"
     assert calls["save_details"] is False
-    assert calls["tasks"] == "ifeval,hellaswag,arc_easy,arc_challenge,piqa"
+    assert calls["tasks"] == "ifeval,hellaswag,arc:easy,arc:challenge,piqa"
     assert calls["evaluated"] is True
     assert calls["get_results"] is True
     assert results == {
