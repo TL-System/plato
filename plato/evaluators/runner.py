@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from plato.config import Config
@@ -24,6 +25,20 @@ def _configured_evaluator_type() -> str | None:
     else:
         evaluator_type = getattr(evaluation_cfg, "type", None)
     return evaluator_type if isinstance(evaluator_type, str) and evaluator_type else None
+
+
+def _evaluation_fail_on_error() -> bool:
+    """Return whether configured evaluator failures should abort execution."""
+    evaluation_cfg = getattr(Config(), "evaluation", None)
+    if evaluation_cfg is None:
+        return False
+
+    if isinstance(evaluation_cfg, dict):
+        fail_on_error = evaluation_cfg.get("fail_on_error", False)
+    else:
+        fail_on_error = getattr(evaluation_cfg, "fail_on_error", False)
+
+    return bool(fail_on_error)
 
 
 def run_configured_evaluation(
@@ -76,7 +91,21 @@ def run_configured_evaluation(
         sampler=sampler,
         local_metric=local_metric,
     )
-    result = evaluator.evaluate(request)
+    try:
+        result = evaluator.evaluate(request)
+    except Exception:  # pragma: no cover - exercised via unit tests
+        context.state.pop(EVALUATION_RESULTS_KEY, None)
+        context.state.pop(EVALUATION_PRIMARY_KEY, None)
+        if _evaluation_fail_on_error():
+            raise
+
+        logging.exception(
+            "Configured evaluator '%s' failed; continuing without structured evaluation. "
+            "Set evaluation.fail_on_error = true to make such failures fatal.",
+            evaluator_type,
+        )
+        return None
+
     payload = result.to_dict()
 
     context.state[EVALUATION_RESULTS_KEY] = {result.evaluator: payload}

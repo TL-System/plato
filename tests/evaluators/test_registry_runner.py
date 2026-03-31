@@ -38,6 +38,15 @@ class MockEvaluator:
         )
 
 
+class FailingEvaluator:
+    def __init__(self, config):
+        self.config = config
+
+    def evaluate(self, request):
+        del request
+        raise RuntimeError("boom")
+
+
 def test_evaluator_registry_resolves_registered_evaluator(temp_config):
     from plato.evaluators import registry as evaluator_registry
 
@@ -210,3 +219,55 @@ def test_composable_trainer_raises_for_unknown_evaluator_config(temp_config):
         trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
 
     _clear_evaluation_config()
+
+
+def test_composable_trainer_tolerates_evaluator_runtime_failure_by_default(
+    temp_config,
+):
+    from plato.evaluators import registry as evaluator_registry
+    from plato.evaluators.runner import (
+        EVALUATION_PRIMARY_KEY,
+        EVALUATION_RESULTS_KEY,
+    )
+
+    _clear_evaluation_config()
+    Config().evaluation = ConfigNode.from_object({"type": "failing"})
+    evaluator_registry.register("failing", FailingEvaluator)
+
+    try:
+        trainer = ComposableTrainer(
+            model=nn.Linear(2, 1),
+            testing_strategy=ConstantTestingStrategy(0.5),
+        )
+
+        accuracy = trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+
+        assert accuracy == 0.5
+        assert trainer.accuracy == 0.5
+        assert EVALUATION_RESULTS_KEY not in trainer.context.state
+        assert EVALUATION_PRIMARY_KEY not in trainer.context.state
+    finally:
+        evaluator_registry.unregister("failing")
+        _clear_evaluation_config()
+
+
+def test_composable_trainer_can_make_evaluator_failures_fatal(temp_config):
+    from plato.evaluators import registry as evaluator_registry
+
+    _clear_evaluation_config()
+    Config().evaluation = ConfigNode.from_object(
+        {"type": "failing", "fail_on_error": True}
+    )
+    evaluator_registry.register("failing", FailingEvaluator)
+
+    try:
+        trainer = ComposableTrainer(
+            model=nn.Linear(2, 1),
+            testing_strategy=ConstantTestingStrategy(0.5),
+        )
+
+        with pytest.raises(RuntimeError, match="boom"):
+            trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+    finally:
+        evaluator_registry.unregister("failing")
+        _clear_evaluation_config()
