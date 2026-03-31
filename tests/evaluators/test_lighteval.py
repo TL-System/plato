@@ -53,6 +53,11 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
     )
 
     calls = {}
+    progress_updates: list[str] = []
+
+    class FakeProgress:
+        def advance(self, message: str) -> None:
+            progress_updates.append(message)
 
     class FakeParallelismManager(Enum):
         ACCELERATE = auto()
@@ -147,6 +152,7 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
         tasks=["ifeval", "hellaswag", "arc_easy", "arc_challenge", "piqa"],
         backend="transformers",
         config={},
+        progress=FakeProgress(),
     )
 
     assert calls["launcher_type"] is FakeParallelismManager.ACCELERATE
@@ -157,6 +163,11 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
     assert calls["tasks"] == "ifeval,hellaswag,arc:easy,arc:challenge,piqa_hf"
     assert calls["evaluated"] is True
     assert calls["get_results"] is True
+    assert progress_updates == [
+        "Initializing Lighteval for 5 task(s)",
+        "Running benchmark tasks",
+        "Collecting evaluation metrics",
+    ]
     assert results == {
         "ifeval": {
             "prompt_level_strict_acc": 0.30,

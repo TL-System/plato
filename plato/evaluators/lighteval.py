@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -52,6 +53,51 @@ def _config_value(config: dict[str, Any] | Any, key: str, default: Any = None) -
     if isinstance(config, dict):
         return config.get(key, default)
     return getattr(config, key, default)
+
+
+class _LightevalProgress:
+    """Coarse-grained progress reporting for long server-side evaluations."""
+
+    def __init__(self, config: dict[str, Any] | Any, *, total: int) -> None:
+        self.total = total
+        self.enabled = bool(_config_value(config, "show_progress", True))
+        self._current = 0
+        self._bar = None
+
+    def __enter__(self):
+        if self.enabled:
+            try:
+                from tqdm.auto import tqdm
+            except ImportError:  # pragma: no cover - tqdm is normally available
+                tqdm = None
+
+            if tqdm is not None:
+                self._bar = tqdm(
+                    total=self.total,
+                    desc="Server Lighteval evaluation",
+                    unit="stage",
+                    dynamic_ncols=True,
+                    leave=True,
+                )
+        return self
+
+    def __exit__(self, exc_type, exc, exc_tb) -> None:
+        if self._bar is not None:
+            self._bar.close()
+
+    def advance(self, message: str) -> None:
+        self._current += 1
+        logging.info(
+            "[Lighteval] %s (%d/%d).", message, self._current, self.total
+        )
+        if self._bar is not None:
+            self._bar.set_postfix_str(message)
+            self._bar.update(1)
+
+    def note(self, message: str) -> None:
+        logging.info("[Lighteval] %s", message)
+        if self._bar is not None:
+            self._bar.set_postfix_str(message)
 
 
 def _resolve_preset(name: str) -> dict[str, Any]:
@@ -211,6 +257,7 @@ def _resolve_model_reference(
 @contextmanager
 def _materialize_model_reference(
     request: EvaluationInput,
+    progress: _LightevalProgress | None = None,
 ) -> Iterator[LightevalModelReference]:
     model = request.model
     tokenizer = request.tokenizer
@@ -219,6 +266,10 @@ def _materialize_model_reference(
 
     if callable(save_model) and callable(save_tokenizer):
         with tempfile.TemporaryDirectory(prefix="plato-lighteval-") as export_dir:
+            if progress is not None:
+                progress.note(
+                    "Exporting the current model and tokenizer for evaluation."
+                )
             yield _resolve_model_reference(request, export_dir=export_dir)
         return
 
@@ -245,6 +296,7 @@ def _run_lighteval_pipeline(
     tasks: list[str],
     backend: str,
     config: dict[str, Any] | Any,
+    progress: _LightevalProgress | None = None,
 ) -> dict[str, Any]:
     try:
         from lighteval.logging.evaluation_tracker import EvaluationTracker
@@ -261,6 +313,10 @@ def _run_lighteval_pipeline(
     resolved_tasks = _resolve_pipeline_tasks(tasks)
 
     with tempfile.TemporaryDirectory(prefix="plato-lighteval-output-") as output_dir:
+        if progress is not None:
+            progress.advance(
+                f"Initializing Lighteval for {len(resolved_tasks)} task(s)"
+            )
         tracker = EvaluationTracker(output_dir=output_dir, save_details=False)
         pipeline_parameters = PipelineParameters(
             launcher_type=launcher_type,
@@ -276,8 +332,12 @@ def _run_lighteval_pipeline(
             evaluation_tracker=tracker,
             model_config=model_config,
         )
+        if progress is not None:
+            progress.advance("Running benchmark tasks")
         pipeline.evaluate()
 
+        if progress is not None:
+            progress.advance("Collecting evaluation metrics")
         results = pipeline.get_results()
         if isinstance(results, dict):
             nested_results = results.get("results")
@@ -308,13 +368,19 @@ class LightevalEvaluator(Evaluator):
         )
 
         try:
-            with _materialize_model_reference(request) as model_reference:
-                raw_metrics = _run_lighteval_pipeline(
-                    model_reference=model_reference,
-                    tasks=tasks,
-                    backend=backend,
-                    config=self.config,
-                )
+            with _LightevalProgress(self.config, total=5) as progress:
+                progress.advance("Preparing model reference")
+                with _materialize_model_reference(
+                    request, progress=progress
+                ) as model_reference:
+                    raw_metrics = _run_lighteval_pipeline(
+                        model_reference=model_reference,
+                        tasks=tasks,
+                        backend=backend,
+                        config=self.config,
+                        progress=progress,
+                    )
+                progress.advance("Normalizing evaluation metrics")
         except ImportError as exc:
             raise ImportError(
                 "Lighteval or one of its runtime dependencies is missing; install the project's llm_eval extra to use evaluation.type = 'lighteval'. "
