@@ -317,7 +317,8 @@ class LightevalEvaluator(Evaluator):
                 )
         except ImportError as exc:
             raise ImportError(
-                "Lighteval is an optional dependency; install the project's optional dependency to use evaluation.type = 'lighteval'."
+                "Lighteval or one of its runtime dependencies is missing; install the project's llm_eval extra to use evaluation.type = 'lighteval'. "
+                f"Original error: {exc}"
             ) from exc
 
         metrics = _normalize_metrics(raw_metrics)

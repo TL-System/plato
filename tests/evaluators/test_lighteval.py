@@ -305,7 +305,10 @@ def test_lighteval_evaluator_raises_helpful_import_error(monkeypatch, temp_confi
         _raise_import_error,
     )
 
-    with pytest.raises(ImportError, match="optional dependency"):
+    with pytest.raises(
+        ImportError,
+        match="runtime dependencies.*Original error: No module named lighteval",
+    ):
         LightevalEvaluator(
             {"type": "lighteval", "preset": "smollm_round_fast"}
         ).evaluate(EvaluationInput(model=object(), tokenizer=object()))
