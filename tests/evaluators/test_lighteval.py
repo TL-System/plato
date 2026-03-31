@@ -43,7 +43,7 @@ def test_lighteval_pipeline_task_resolution_maps_arc_aliases(temp_config):
 
     assert _resolve_pipeline_tasks(
         ["ifeval", "hellaswag", "arc_easy", "arc_challenge", "piqa"]
-    ) == ["ifeval", "hellaswag", "arc:easy", "arc:challenge", "piqa"]
+    ) == ["ifeval", "hellaswag", "arc:easy", "arc:challenge", "piqa_hf"]
 
 
 def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_config):
@@ -58,8 +58,9 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
         ACCELERATE = auto()
 
     class FakePipelineParameters:
-        def __init__(self, launcher_type):
+        def __init__(self, launcher_type, custom_tasks_directory=None):
             calls["launcher_type"] = launcher_type
+            calls["custom_tasks_directory"] = custom_tasks_directory
 
     class FakeEvaluationTracker:
         def __init__(self, output_dir, save_details=False):
@@ -152,7 +153,8 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
     assert calls["model_name"] == "/tmp/mock-model"
     assert calls["tokenizer"] == "/tmp/mock-tokenizer"
     assert calls["save_details"] is False
-    assert calls["tasks"] == "ifeval,hellaswag,arc:easy,arc:challenge,piqa"
+    assert calls["custom_tasks_directory"] == "plato.evaluators.lighteval_tasks"
+    assert calls["tasks"] == "ifeval,hellaswag,arc:easy,arc:challenge,piqa_hf"
     assert calls["evaluated"] is True
     assert calls["get_results"] is True
     assert results == {
@@ -227,7 +229,7 @@ def test_lighteval_normalizes_versioned_task_keys(temp_config):
             "hellaswag:0": {"exact_match": 0.44},
             "arc:easy:0": {"loglikelihood_acc": 0.35},
             "arc:challenge:0": {"loglikelihood_acc": 0.25},
-            "piqa:0": {"exact_match": 0.61},
+            "piqa_hf:0": {"exact_match": 0.61},
         }
     )
 

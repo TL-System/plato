@@ -13,6 +13,7 @@ from plato.evaluators import registry
 from plato.evaluators.base import EvaluationInput, EvaluationResult, Evaluator
 
 LIGHTEVAL_EVALUATOR = "lighteval"
+CUSTOM_TASKS_MODULE = "plato.evaluators.lighteval_tasks"
 LIGHTEVAL_PRESETS: dict[str, dict[str, Any]] = {
     "smollm_round_fast": {
         "tasks": ["ifeval", "hellaswag", "arc_easy", "arc_challenge", "piqa"],
@@ -24,11 +25,12 @@ TASK_ALIASES: dict[str, tuple[str, ...]] = {
     "hellaswag": ("hellaswag",),
     "arc_easy": ("arc_easy", "arc:easy"),
     "arc_challenge": ("arc_challenge", "arc:challenge"),
-    "piqa": ("piqa",),
+    "piqa": ("piqa", "piqa_hf"),
 }
 TASK_PIPELINE_NAMES: dict[str, str] = {
     "arc_easy": "arc:easy",
     "arc_challenge": "arc:challenge",
+    "piqa": "piqa_hf",
 }
 TASK_METRIC_PREFERENCES: dict[str, tuple[str, ...]] = {
     "hellaswag": ("exact_match", "loglikelihood_acc", "accuracy", "acc"),
@@ -260,7 +262,10 @@ def _run_lighteval_pipeline(
 
     with tempfile.TemporaryDirectory(prefix="plato-lighteval-output-") as output_dir:
         tracker = EvaluationTracker(output_dir=output_dir, save_details=False)
-        pipeline_parameters = PipelineParameters(launcher_type=launcher_type)
+        pipeline_parameters = PipelineParameters(
+            launcher_type=launcher_type,
+            custom_tasks_directory=CUSTOM_TASKS_MODULE,
+        )
         model_config = TransformersModelConfig(
             model_name=model_reference.model_name,
             tokenizer=model_reference.tokenizer_name,
