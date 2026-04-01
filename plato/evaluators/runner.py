@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+import torch
+
 from plato.config import Config
 from plato.evaluators import registry
 from plato.evaluators.base import EvaluationInput, EvaluationResult
@@ -91,6 +93,7 @@ def run_configured_evaluation(
         sampler=sampler,
         local_metric=local_metric,
     )
+    previous_grad_enabled = torch.is_grad_enabled()
     try:
         result = evaluator.evaluate(request)
     except Exception:  # pragma: no cover - exercised via unit tests
@@ -105,6 +108,8 @@ def run_configured_evaluation(
             evaluator_type,
         )
         return None
+    finally:
+        torch.set_grad_enabled(previous_grad_enabled)
 
     payload = result.to_dict()
 

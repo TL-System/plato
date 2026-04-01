@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+import torch
 import torch.nn as nn
 
 from plato.config import Config, ConfigNode
@@ -45,6 +46,22 @@ class FailingEvaluator:
     def evaluate(self, request):
         del request
         raise RuntimeError("boom")
+
+
+class GradDisablingEvaluator:
+    def __init__(self, config):
+        self.config = config
+
+    def evaluate(self, request):
+        from plato.evaluators.base import EvaluationResult
+
+        del request
+        torch.set_grad_enabled(False)
+        return EvaluationResult(
+            evaluator="grad-disabler",
+            primary_metric="metric",
+            metrics={"metric": 1.0},
+        )
 
 
 def test_evaluator_registry_resolves_registered_evaluator(temp_config):
@@ -270,4 +287,29 @@ def test_composable_trainer_can_make_evaluator_failures_fatal(temp_config):
             trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
     finally:
         evaluator_registry.unregister("failing")
+        _clear_evaluation_config()
+
+
+def test_composable_trainer_restores_grad_mode_after_evaluator_side_effect(
+    temp_config,
+):
+    from plato.evaluators import registry as evaluator_registry
+
+    _clear_evaluation_config()
+    Config().evaluation = ConfigNode.from_object({"type": "grad-disabler"})
+    evaluator_registry.register("grad-disabler", GradDisablingEvaluator)
+
+    try:
+        trainer = ComposableTrainer(
+            model=nn.Linear(2, 1),
+            testing_strategy=ConstantTestingStrategy(0.5),
+        )
+
+        assert torch.is_grad_enabled() is True
+        accuracy = trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+
+        assert accuracy == 0.5
+        assert torch.is_grad_enabled() is True
+    finally:
+        evaluator_registry.unregister("grad-disabler")
         _clear_evaluation_config()
