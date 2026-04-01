@@ -65,6 +65,9 @@ def _ensure_numpy(value: Any) -> np.ndarray:
         cpu_fn = getattr(tensor, "cpu", None)
         if callable(cpu_fn):
             tensor = cpu_fn()
+        torch_bfloat16 = getattr(torch, "bfloat16", None) if torch is not None else None
+        if torch_bfloat16 is not None and getattr(tensor, "dtype", None) == torch_bfloat16:
+            tensor = tensor.to(torch.float32)
         numpy_fn = getattr(tensor, "numpy", None)
         if callable(numpy_fn):
             return numpy_fn()
@@ -101,7 +104,26 @@ def _detect_backend(value: Any) -> str:
     return "native"
 
 
-def _restore_backend(array: np.ndarray, backend: str | None) -> Any:
+def _detect_dtype(value: Any) -> str | None:
+    """Record backend-specific dtype hints needed for round-tripping."""
+    if _TORCH_TENSOR_TYPE is not None and isinstance(value, _TORCH_TENSOR_TYPE):
+        dtype = getattr(value, "dtype", None)
+        return None if dtype is None else str(dtype)
+    return None
+
+
+def _resolve_torch_dtype(dtype_name: str | None):
+    """Resolve a serialized torch dtype name back to a torch.dtype."""
+    if torch is None or not dtype_name:
+        return None
+    if dtype_name.startswith("torch."):
+        dtype_name = dtype_name.split(".", 1)[1]
+    return getattr(torch, dtype_name, None)
+
+
+def _restore_backend(
+    array: np.ndarray, backend: str | None, dtype_name: str | None = None
+) -> Any:
     if backend == "none":
         return None
     if backend == "string":
@@ -115,6 +137,9 @@ def _restore_backend(array: np.ndarray, backend: str | None) -> Any:
         if not callable(from_numpy_fn):
             raise AttributeError("torch.from_numpy is unavailable.")
         tensor = from_numpy_fn(array)
+        target_dtype = _resolve_torch_dtype(dtype_name)
+        if target_dtype is not None and getattr(tensor, "dtype", None) != target_dtype:
+            tensor = tensor.to(target_dtype)
         clone_fn = getattr(tensor, "clone", None)
         return clone_fn() if callable(clone_fn) else tensor
     if backend == "mlx":
@@ -130,6 +155,7 @@ class TreeMetadata:
     children: list[str] | None = None
     container: str | None = None  # distinguish tuple vs list
     backend: str | None = None
+    dtype: str | None = None
 
 
 def flatten_tree(tree: Any) -> tuple[dict[str, np.ndarray], dict[str, TreeMetadata]]:
@@ -165,7 +191,11 @@ def flatten_tree(tree: Any) -> tuple[dict[str, np.ndarray], dict[str, TreeMetada
         key = path or "__root__"
         backend = _detect_backend(node)
         metadata[path] = TreeMetadata(
-            type="leaf", children=None, container=None, backend=backend
+            type="leaf",
+            children=None,
+            container=None,
+            backend=backend,
+            dtype=_detect_dtype(node),
         )
         flat[key] = _ensure_numpy(node)
 
@@ -187,7 +217,7 @@ def unflatten_tree(
             key = path or "__root__"
             if key not in flat:
                 raise KeyError(f"Missing tensor data for leaf '{key}'.")
-            return _restore_backend(flat[key], entry.backend)
+            return _restore_backend(flat[key], entry.backend, entry.dtype)
 
         if entry.type == "dict":
             result = {}

@@ -10,7 +10,7 @@ HuggingFace data handling through strategy objects instead of overriding
 import logging
 import math
 import os
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import Any, Dict, Optional, Tuple, Union, cast
 
 import torch
@@ -22,7 +22,6 @@ from transformers import (
     HfArgumentParser,
     LlamaTokenizer,
     TrainingArguments,
-    default_data_collator,
 )
 from transformers import (
     TrainerCallback as HFTrainerCallback,
@@ -52,31 +51,114 @@ class HuggingFaceBatch(dict):
 
 
 class HuggingFaceCollateWrapper:
-    """Wraps the default HuggingFace data collator for Plato data loader strategy."""
+    """Pad variable-length token batches while keeping labels separate."""
 
-    def __init__(self, tokenizer=None):
+    def __init__(self, tokenizer):
+        if tokenizer is None or not hasattr(tokenizer, "pad"):
+            raise ValueError(
+                "HuggingFaceCollateWrapper requires a tokenizer with pad() support."
+            )
         self.tokenizer = tokenizer
+
+    @staticmethod
+    def _to_list(value):
+        if hasattr(value, "tolist"):
+            value = value.tolist()
+        elif isinstance(value, tuple):
+            value = list(value)
+        return value
+
+    def _normalize_example(self, example: dict[str, Any]) -> dict[str, Any]:
+        """Flatten nested tokenizer payloads stored under input_ids."""
+        normalized = dict(example)
+        nested_inputs = normalized.get("input_ids")
+        if isinstance(nested_inputs, Mapping) and "input_ids" in nested_inputs:
+            normalized["input_ids"] = self._to_list(nested_inputs["input_ids"])
+
+            nested_attention = nested_inputs.get("attention_mask")
+            current_attention = normalized.get("attention_mask")
+            normalized_input_ids = normalized.get("input_ids")
+            current_attention = self._to_list(current_attention)
+
+            if nested_attention is not None:
+                nested_attention = self._to_list(nested_attention)
+            if (
+                nested_attention is not None
+                and isinstance(normalized_input_ids, list)
+                and (
+                    not isinstance(current_attention, list)
+                    or len(current_attention) != len(normalized_input_ids)
+                )
+            ):
+                normalized["attention_mask"] = nested_attention
+
+        return normalized
+
+    def _pad_labels(
+        self,
+        label_rows: list[list[int]],
+        sequence_length: int,
+        *,
+        padding_side: str = "right",
+    ) -> torch.Tensor:
+        padded = torch.full(
+            (len(label_rows), sequence_length),
+            -100,
+            dtype=torch.long,
+        )
+        for index, row in enumerate(label_rows):
+            row_tensor = torch.tensor(row, dtype=torch.long)
+            length = min(sequence_length, row_tensor.numel())
+            if length <= 0:
+                continue
+            if padding_side == "left":
+                padded[index, sequence_length - length :] = row_tensor[-length:]
+            else:
+                padded[index, :length] = row_tensor[:length]
+        return padded
 
     def __call__(
         self, examples: Iterable[dict]
     ) -> tuple[HuggingFaceBatch, torch.Tensor | None]:
-        batch = default_data_collator(list(examples))
-        labels = batch.pop("labels", None)
-        if labels is None:
+        example_list = [self._normalize_example(dict(example)) for example in examples]
+        if not example_list:
+            raise ValueError("HuggingFace collator received an empty batch.")
+
+        feature_rows = [{k: v for k, v in example.items() if k != "labels"} for example in example_list]
+
+        padding_side = getattr(self.tokenizer, "padding_side", "right")
+        batch = self.tokenizer.pad(
+            feature_rows,
+            padding=True,
+            return_tensors="pt",
+        )
+
+        batch = HuggingFaceBatch(batch)
+        labels_raw = [example.get("labels") for example in example_list]
+        labels = None
+        if any(label is not None for label in labels_raw):
+            normalized_rows = [
+                list(label) if label is not None else list(example["input_ids"])
+                for example, label in zip(example_list, labels_raw, strict=False)
+            ]
+            labels = self._pad_labels(
+                normalized_rows,
+                batch["input_ids"].shape[1],
+                padding_side=padding_side,
+            )
+        else:
             input_ids = batch.get("input_ids")
             if input_ids is not None:
                 labels = input_ids.clone()
                 attention_mask = batch.get("attention_mask")
                 if attention_mask is not None:
                     labels = labels.masked_fill(attention_mask == 0, -100)
-                elif (
-                    self.tokenizer is not None
-                    and self.tokenizer.pad_token_id is not None
-                ):
+                elif self.tokenizer.pad_token_id is not None:
                     labels = labels.masked_fill(
                         labels == self.tokenizer.pad_token_id, -100
                     )
-        return HuggingFaceBatch(batch), labels
+
+        return batch, labels
 
 
 def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
@@ -426,6 +508,7 @@ class Trainer(ComposableTrainer):
         self._hf_state = TrainerState()
         self._hf_control = TrainerControl()
         self._hf_steps_per_epoch: int | None = None
+        self._gradient_checkpointing_prepared = False
 
         parser = HfArgumentParser(cast(Any, TrainingArguments))
         (training_args,) = parser.parse_args_into_dataclasses(
@@ -437,6 +520,10 @@ class Trainer(ComposableTrainer):
         self.training_args = cast(TrainingArguments, training_args)
 
         model_name = Config().trainer.model_name
+        tokenizer_name = getattr(Config().trainer, "tokenizer_name", model_name)
+        if not isinstance(tokenizer_name, str) or not tokenizer_name:
+            tokenizer_name = model_name
+
         config_kwargs = {
             "cache_dir": None,
             "revision": "main",
@@ -451,42 +538,24 @@ class Trainer(ComposableTrainer):
             getattr(Config(), "parameters", None), "huggingface_token", None
         )
 
-        if "llama" in model_name:
-            if isinstance(auth_token, str) and auth_token:
-                self.tokenizer = LlamaTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                    use_auth_token=auth_token,
-                )
-            else:
-                self.tokenizer = LlamaTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                )
-        else:
-            if isinstance(auth_token, str) and auth_token:
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                    use_auth_token=auth_token,
-                )
-            else:
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    model_name,
-                    config=self.config,
-                    cache_dir=cache_dir,
-                    use_fast=use_fast_tokenizer,
-                    revision=revision,
-                )
+        tokenizer_loader = LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
+        tokenizer_kwargs = {
+            "config": self.config,
+            "cache_dir": cache_dir,
+            "use_fast": use_fast_tokenizer,
+            "revision": revision,
+        }
+        if isinstance(auth_token, str) and auth_token:
+            tokenizer_kwargs["use_auth_token"] = auth_token
+        self.tokenizer = tokenizer_loader.from_pretrained(
+            tokenizer_name,
+            **tokenizer_kwargs,
+        )
+
+        if getattr(self.tokenizer, "pad_token_id", None) is None:
+            eos_token = getattr(self.tokenizer, "eos_token", None)
+            if eos_token is not None:
+                self.tokenizer.pad_token = eos_token
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -498,6 +567,11 @@ class Trainer(ComposableTrainer):
         self.training_args.gradient_accumulation_steps = (
             self._gradient_accumulation_steps
         )
+        self.training_args.gradient_checkpointing = bool(
+            getattr(Config().trainer, "gradient_checkpointing", False)
+        )
+        self.training_args.bf16 = bool(getattr(Config().trainer, "bf16", False))
+        self.training_args.fp16 = bool(getattr(Config().trainer, "fp16", False))
 
         plato_callbacks_list = list(plato_callbacks)
 
@@ -525,6 +599,29 @@ class Trainer(ComposableTrainer):
         model_instance = self._require_model()
         if hasattr(model_instance, "loss_type"):
             setattr(model_instance, "loss_type", "ForCausalLM")
+
+        tokenizer_vocab_size = None
+        if hasattr(self.tokenizer, "__len__"):
+            try:
+                tokenizer_vocab_size = len(self.tokenizer)
+            except TypeError:
+                tokenizer_vocab_size = None
+        embedding_getter = getattr(model_instance, "get_input_embeddings", None)
+        embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
+        if (
+            tokenizer_vocab_size is not None
+            and callable(embedding_getter)
+            and callable(embedding_resizer)
+        ):
+            embeddings = embedding_getter()
+            embedding_size = getattr(embeddings, "num_embeddings", None)
+            if embedding_size is not None and embedding_size != tokenizer_vocab_size:
+                embedding_resizer(tokenizer_vocab_size)
+
+        if self.training_args.gradient_checkpointing:
+            model_config = getattr(model_instance, "config", None)
+            if model_config is not None and hasattr(model_config, "use_cache"):
+                setattr(model_config, "use_cache", False)
 
         # Ensure model checkpoints can be saved when model names include slashes.
         params = Config().params
@@ -579,6 +676,27 @@ class Trainer(ComposableTrainer):
             self._hf_bridge = HuggingFaceCallbackBridge(self)
             self.callback_handler.add_callbacks([self._hf_bridge])
 
+    def _prepare_model_for_training(self):
+        """Apply model mutations that must happen inside the training process."""
+        if not self.training_args.gradient_checkpointing:
+            return
+
+        model_instance = self._require_model()
+        model_config = getattr(model_instance, "config", None)
+        if model_config is not None and hasattr(model_config, "use_cache"):
+            setattr(model_config, "use_cache", False)
+
+        if self._gradient_checkpointing_prepared:
+            return
+
+        enable_gradient_checkpointing = getattr(
+            model_instance, "gradient_checkpointing_enable", None
+        )
+        if callable(enable_gradient_checkpointing):
+            enable_gradient_checkpointing()
+
+        self._gradient_checkpointing_prepared = True
+
     def train_model(self, config, trainset, sampler, **kwargs):
         """Update HuggingFace training arguments before delegating to strategies."""
         self.training_args.num_train_epochs = config["epochs"]
@@ -611,6 +729,7 @@ class Trainer(ComposableTrainer):
             self._hf_steps_per_epoch = None
             self._hf_pending_actions = {key: False for key in self._hf_pending_keys}
             self._hf_pending_log_data = None
+        self._prepare_model_for_training()
         return super().train_model(config, trainset, sampler, **kwargs)
 
     def test_model(self, config, testset, sampler=None, **kwargs):

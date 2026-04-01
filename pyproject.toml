@@ -17,7 +17,6 @@ dependencies = [
     "datasets",
     "evaluate",
     "gdown",
-    "lightly",
     "munch",
     "numpy",
     "peft",
@@ -59,8 +58,9 @@ nanochat = [
     "jinja2",
     "PyYAML",
 ]
-robotics = [
-    "lerobot[smolvla]>=0.4.3,<0.5.0",
+llm_eval = [
+    "lighteval==0.13.0",
+    "langdetect>=1.0.9,<2",
 ]
 
 [project.urls]

@@ -1,3 +1,12 @@
 """Evaluation helpers for Plato integrations."""
 
-# Intentionally empty for now; modules register themselves when imported.
+from . import lighteval, registry
+from .base import EvaluationInput, EvaluationResult, Evaluator
+
+__all__ = [
+    "EvaluationInput",
+    "EvaluationResult",
+    "Evaluator",
+    "registry",
+    "lighteval",
+]

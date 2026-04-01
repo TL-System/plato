@@ -31,12 +31,80 @@ import requests
 import yaml
 
 from plato.config import Config
+from plato.evaluators.base import EvaluationInput, EvaluationResult, Evaluator
 from plato.utils.third_party import ThirdPartyImportError, ensure_nanochat_importable
 
 LOGGER = logging.getLogger(__name__)
 
 # URL for the CORE evaluation bundle
 EVAL_BUNDLE_URL = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
+NANOCHAT_CORE_EVALUATOR = "nanochat_core"
+NANOCHAT_CORE_RESULTS_KEY = "nanochat_core_results"
+
+
+def _config_value(config: dict[str, Any] | Any, key: str, default: Any = None) -> Any:
+    """Read a config value from either a mapping or attribute container."""
+    if isinstance(config, dict):
+        return config.get(key, default)
+    return getattr(config, key, default)
+
+
+def _context_state(context: Any | None) -> dict[str, Any] | None:
+    """Return the evaluator context state mapping when present."""
+    state = getattr(context, "state", None)
+    return state if isinstance(state, dict) else None
+
+
+def _core_metadata(results: dict[str, Any]) -> dict[str, Any]:
+    """Extract structured CORE task outputs for logging/persistence."""
+    metadata: dict[str, Any] = {}
+
+    raw_results = results.get("results")
+    if isinstance(raw_results, dict):
+        metadata["results"] = dict(raw_results)
+
+    centered_results = results.get("centered_results")
+    if isinstance(centered_results, dict):
+        metadata["centered_results"] = dict(centered_results)
+
+    return metadata
+
+
+class NanochatCoreEvaluator(Evaluator):
+    """Structured evaluator adapter for Nanochat's CORE benchmark."""
+
+    def _resolve_results(self, request: EvaluationInput) -> dict[str, Any]:
+        state = _context_state(request.context)
+        cached_results = None if state is None else state.get(NANOCHAT_CORE_RESULTS_KEY)
+        if isinstance(cached_results, dict) and "core_metric" in cached_results:
+            return cached_results
+
+        max_per_task = _config_value(self.config, "max_per_task", -1)
+        max_per_task_value = -1 if max_per_task is None else int(max_per_task)
+
+        return run_core_evaluation(
+            request.model,
+            tokenizer=request.tokenizer,
+            bundle_dir=_config_value(self.config, "bundle_dir", None),
+            max_per_task=max_per_task_value,
+            device=getattr(request.context, "device", None),
+        )
+
+    def evaluate(self, request: EvaluationInput) -> EvaluationResult:
+        results = self._resolve_results(request)
+        core_metric = float(results["core_metric"])
+
+        state = _context_state(request.context)
+        if state is not None:
+            state[NANOCHAT_CORE_RESULTS_KEY] = results
+
+        return EvaluationResult(
+            evaluator=NANOCHAT_CORE_EVALUATOR,
+            primary_metric="core_metric",
+            metrics={"core_metric": core_metric},
+            higher_is_better={"core_metric": True},
+            metadata=_core_metadata(results),
+        )
 
 
 @contextlib.contextmanager

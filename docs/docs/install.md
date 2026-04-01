@@ -32,7 +32,7 @@ In order to run any of the examples, first run the following command to include 
 uv sync
 ```
 
-In case you need extra dependencies (including differential privacy, reinforcement learning, secure multi-party computation, and the MLX framework), you should run:
+In case you need optional dependency groups, you can install them with:
 
 ```bash
 uv sync --all-extras
@@ -45,6 +45,13 @@ uv sync --extra mlx
 ```
 
 where `mlx` is the name of the dependency group.
+
+Useful extras in the current root package include:
+
+- `llm_eval` for server-side Lighteval evaluation
+- `nanochat` for Nanochat training and CORE evaluation
+- `mlx` for Apple Silicon MLX workloads
+- `dp`, `rl`, and `mpc` for specialized research workloads
 
 Each example should be run in its own directory:
 
@@ -65,19 +72,42 @@ uv sync --extra mlx
 
 See the [Quick Start guide](quickstart.md#using-mlx-as-a-backend) for configuration details.
 
-### Optional: SmolVLA + LeRobot Robotics Stack
+### Optional: Server-side LLM Evaluation with Lighteval
 
-LeRobot and SmolVLA dependencies are available behind Plato's optional
-`robotics` extra so default federated-learning installs remain lightweight:
+To enable `evaluation.type = "lighteval"`, install the evaluator stack:
 
 ```bash
-uv sync --extra robotics
+uv sync --extra llm_eval
 ```
 
-See [SmolVLA + LeRobot Optional Setup](examples/case-studies/smolvla_lerobot_setup.md) for runtime
-requirements and guarded-import guidance, and
-[SmolVLA + LeRobot Runbook](examples/case-studies/smolvla_lerobot_runbook.md) for setup-to-run
-operational steps and troubleshooting.
+This installs `lighteval` together with the runtime dependencies used by Plato's built-in Lighteval adapter.
+
+See:
+
+- [Evaluation](configurations/evaluation.md) for the configuration contract
+- [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for an end-to-end example
+
+### Optional: Nanochat Training and CORE Evaluation
+
+To use Nanochat workloads or the `nanochat_core` evaluator, install:
+
+```bash
+uv sync --extra nanochat
+```
+
+### Optional: SmolVLA + LeRobot Robotics Stack
+
+The LeRobot / SmolVLA path is intentionally kept separate from the default Plato install so the root environment stays lean.
+
+!!! warning "Migration note"
+    Older runbooks may still reference `uv sync --extra robotics`.
+    That root-package extra no longer exists. Use a dedicated environment that already has the LeRobot / SmolVLA stack installed, then verify it with:
+
+    ```bash
+    uv run python -c "import lerobot; print(lerobot.__version__)"
+    ```
+
+See [SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md) for the current setup guidance, configuration contract, and troubleshooting notes.
 
 ### Building the `plato-learn` PyPi Package
 

@@ -16,7 +16,11 @@ except ImportError as exc:  # pragma: no cover - optional dependency
 
 from plato.config import Config
 from plato.datasources.nanochat import NanochatStreamingDataset
-from plato.evaluators.nanochat_core import run_core_evaluation
+from plato.evaluators.nanochat_core import (
+    NANOCHAT_CORE_RESULTS_KEY,
+    NanochatCoreEvaluator,
+    run_core_evaluation,
+)
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies.base import (
     DataLoaderStrategy,
@@ -249,12 +253,43 @@ class NanochatCoreTestingStrategy(TestingStrategy):
             max_per_task=self.max_per_task,
             device=device,
         )
-        context.state["nanochat_core_results"] = results
+        context.state[NANOCHAT_CORE_RESULTS_KEY] = results
         return float(results["core_metric"])
 
 
 class Trainer(ComposableTrainer):
     """Composable trainer specialised for Nanochat workloads."""
+
+    @staticmethod
+    def _resolve_evaluation_components(
+        evaluation_cfg: Any | None,
+    ) -> tuple[TestingStrategy, NanochatCoreEvaluator | None]:
+        evaluation_type = (
+            getattr(evaluation_cfg, "type", "").lower() if evaluation_cfg else ""
+        )
+        if evaluation_type == "nanochat_core":
+            max_per_task = getattr(evaluation_cfg, "max_per_task", -1)
+            max_per_task_value = -1 if max_per_task is None else int(max_per_task)
+            return (
+                NanochatCoreTestingStrategy(
+                    bundle_dir=getattr(evaluation_cfg, "bundle_dir", None),
+                    max_per_task=max_per_task_value,
+                ),
+                NanochatCoreEvaluator(evaluation_cfg),
+            )
+
+        return NanochatTestingStrategy(), None
+
+    def _refresh_evaluation_mode(self) -> None:
+        evaluation_cfg = getattr(Config(), "evaluation", None)
+        testing_strategy, evaluator_override = self._resolve_evaluation_components(
+            evaluation_cfg
+        )
+        self.testing_strategy = testing_strategy
+        self._configured_evaluator_override = evaluator_override
+
+        if evaluator_override is None:
+            self.context.state.pop(NANOCHAT_CORE_RESULTS_KEY, None)
 
     def __init__(
         self,
@@ -279,20 +314,12 @@ class Trainer(ComposableTrainer):
             loss_reduction=loss_reduction
         )
         data_loader_strategy = NanochatDataLoaderStrategy()
+        self._configured_evaluator_override = None
 
         evaluation_cfg = getattr(Config(), "evaluation", None)
-        evaluation_type = (
-            getattr(evaluation_cfg, "type", "").lower() if evaluation_cfg else ""
+        testing_strategy, self._configured_evaluator_override = (
+            self._resolve_evaluation_components(evaluation_cfg)
         )
-        if evaluation_type == "nanochat_core":
-            max_per_task = getattr(evaluation_cfg, "max_per_task", -1)
-            max_per_task_value = -1 if max_per_task is None else int(max_per_task)
-            testing_strategy = NanochatCoreTestingStrategy(
-                bundle_dir=getattr(evaluation_cfg, "bundle_dir", None),
-                max_per_task=max_per_task_value,
-            )
-        else:
-            testing_strategy = NanochatTestingStrategy()
 
         super().__init__(
             model=model,
@@ -305,3 +332,7 @@ class Trainer(ComposableTrainer):
             data_loader_strategy=data_loader_strategy,
             testing_strategy=testing_strategy,
         )
+
+    def test_model(self, config, testset, sampler=None, **kwargs):
+        self._refresh_evaluation_mode()
+        return super().test_model(config, testset, sampler=sampler, **kwargs)
