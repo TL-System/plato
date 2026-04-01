@@ -301,11 +301,6 @@ class Server(base.Server):
 
     def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""
-        evaluation_logging.persist_jsonl(
-            trainer=self.trainer,
-            current_round=self.current_round,
-            accuracy=self.accuracy,
-        )
 
     def get_logged_items(self) -> dict:
         """Get items to be logged by the LogProgressCallback class in a .csv file."""

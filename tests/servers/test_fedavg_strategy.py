@@ -1,8 +1,6 @@
 """Tests for FedAvg aggregation and algorithm utilities."""
 
 import asyncio
-import json
-import os
 from types import SimpleNamespace
 
 import torch
@@ -311,10 +309,10 @@ def test_fedavg_server_logged_items_include_detailed_lighteval_metrics(
     assert logged_items["evaluation_arc_challenge_acc_stderr"] == 0.0701
 
 
-def test_fedavg_server_persists_full_evaluator_payloads_to_jsonl(
+def test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar(
     temp_config, tmp_path
 ):
-    """FedAvg should persist the full evaluator payload in a JSONL sidecar."""
+    """FedAvg should rely on CSV logging instead of a JSONL sidecar."""
     from plato.config import Config
     from plato.servers import fedavg
 
@@ -331,31 +329,4 @@ def test_fedavg_server_persists_full_evaluator_payloads_to_jsonl(
 
     server.clients_processed()
 
-    sidecar_path = result_path / f"{os.getpid()}_evaluation.jsonl"
-    entries = [json.loads(line) for line in sidecar_path.read_text().splitlines()]
-
-    assert entries == [
-        {
-            "round": 3,
-            "accuracy": 0.5,
-            "evaluation_primary": {
-                "evaluator": "mock",
-                "metric": "mock_score",
-                "value": 0.8,
-            },
-            "evaluation_results": {
-                "mock": {
-                    "artifacts": {"report": "mock.json"},
-                    "evaluator": "mock",
-                    "higher_is_better": {
-                        "aux_metric": False,
-                        "mock_score": True,
-                    },
-                    "metadata": {"source": "unit-test"},
-                    "metrics": {"aux_metric": 0.2, "mock_score": 0.8},
-                    "primary_metric": "mock_score",
-                    "primary_value": 0.8,
-                }
-            },
-        }
-    ]
+    assert not any(result_path.glob("*_evaluation.jsonl"))

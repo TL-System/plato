@@ -13,7 +13,7 @@ from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
 from plato.samplers import registry as samplers_registry
-from plato.servers import evaluation_logging, fedavg
+from plato.servers import fedavg
 from plato.utils import fonts
 
 
@@ -330,12 +330,6 @@ class Server(fedavg.Server):
             super().clients_processed()
 
         if Config().is_edge_server():
-            evaluation_logging.persist_jsonl(
-                trainer=self.trainer,
-                current_round=self.current_round,
-                accuracy=self.accuracy,
-            )
-
             logged_items = self.get_logged_items()
             self.edge_training_time += logged_items["round_time"]
             self.edge_comm_time += logged_items["comm_time"]

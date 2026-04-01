@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-import json
-import os
 import re
 from numbers import Real
 from typing import Any
 
-from plato.config import Config
 from plato.evaluators.runner import EVALUATION_PRIMARY_KEY, EVALUATION_RESULTS_KEY
 
 LIGHTEVAL_TASK_COLUMN_ALIASES = {
@@ -102,28 +99,3 @@ def extract_logged_items(trainer: Any | None) -> dict[str, float]:
             logged_items.update(_extract_lighteval_logged_items(payload))
 
     return logged_items
-
-
-def persist_jsonl(
-    *, trainer: Any | None, current_round: int, accuracy: float | int | None
-) -> None:
-    """Append the full structured evaluator payload to a JSONL sidecar."""
-    state = _state_from_trainer(trainer)
-    results = state.get(EVALUATION_RESULTS_KEY)
-    if not isinstance(results, dict) or not results:
-        return
-
-    payload = {
-        "round": current_round,
-        "accuracy": accuracy,
-        "evaluation_primary": state.get(EVALUATION_PRIMARY_KEY),
-        "evaluation_results": results,
-    }
-
-    result_path = Config().params["result_path"]
-    os.makedirs(result_path, exist_ok=True)
-
-    sidecar_path = os.path.join(result_path, f"{os.getpid()}_evaluation.jsonl")
-    with open(sidecar_path, "a", encoding="utf-8") as sidecar_file:
-        json.dump(payload, sidecar_file, sort_keys=True, default=str)
-        sidecar_file.write("\n")
