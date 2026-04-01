@@ -169,6 +169,19 @@ def _optional_int_config(
         raise ValueError(f"Lighteval config '{key}' must be an integer.") from exc
 
 
+def _default_lighteval_dtype() -> str | None:
+    """Infer a sensible evaluation dtype from the trainer config."""
+    trainer_cfg = getattr(Config(), "trainer", None)
+    if trainer_cfg is None:
+        return None
+
+    if bool(getattr(trainer_cfg, "bf16", False)):
+        return "bfloat16"
+    if bool(getattr(trainer_cfg, "fp16", False)):
+        return "float16"
+    return None
+
+
 def _normalize_nested_metrics(raw_metrics: dict[str, Any]) -> dict[str, float]:
     metrics: dict[str, float] = {}
 
@@ -326,9 +339,10 @@ def _run_lighteval_pipeline(
     resolved_tasks = _resolve_pipeline_tasks(tasks)
     batch_size = _optional_int_config(config, "batch_size", 1)
     max_length = _optional_int_config(config, "max_length", None)
-    model_parallel = _config_value(config, "model_parallel", None)
-    dtype = _config_value(config, "dtype", None)
-    device = _config_value(config, "device", "cuda")
+    max_samples = _optional_int_config(config, "max_samples", None)
+    model_parallel = bool(_config_value(config, "model_parallel", False))
+    dtype = _config_value(config, "dtype", _default_lighteval_dtype())
+    device = _config_value(config, "device", Config.device())
 
     with tempfile.TemporaryDirectory(prefix="plato-lighteval-output-") as output_dir:
         if progress is not None:
@@ -339,6 +353,7 @@ def _run_lighteval_pipeline(
         pipeline_parameters = PipelineParameters(
             launcher_type=launcher_type,
             custom_tasks_directory=CUSTOM_TASKS_MODULE,
+            max_samples=max_samples,
         )
         model_config = TransformersModelConfig(
             model_name=model_reference.model_name,
