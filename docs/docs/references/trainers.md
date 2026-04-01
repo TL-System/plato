@@ -56,6 +56,12 @@ same strategy stack in every round.
 - **`TestingStrategy`**: customise evaluation logic and return scalar metrics for
   downstream logging.
 
+Structured evaluators are layered **after** the testing strategy. In other
+words, `TestingStrategy` still returns the trainer's scalar metric (accuracy,
+perplexity, loss, and so on), and an optional `[evaluation]` section can then
+run a named benchmark adapter such as Lighteval or Nanochat CORE. See
+[Evaluators](evaluators.md) for that layer.
+
 Each concrete strategy inherits optional `setup`/`teardown` hooks and can emit
 callback events via `context.callback_handler`.
 
@@ -95,6 +101,25 @@ and adaptation methods.
 - `run_history`, which records loss and accuracy per epoch/round.
 
 Use these fields instead of storing state on the trainer subclass directly.
+
+## Structured Evaluators and Trainer State
+
+When `[evaluation]` is configured, `ComposableTrainer.test_model(...)` calls the
+configured evaluator after the testing strategy finishes. The evaluator stores
+its structured payload in `TrainingContext.state`, which is then consumed by the
+server logger.
+
+Important details:
+
+- summary metrics become `evaluation_*` CSV columns automatically;
+- detailed Lighteval task metrics are flattened into additional `evaluation_*`
+  columns;
+- when `trainer.max_concurrency` causes testing to run in a spawned subprocess,
+  Plato persists and restores the evaluator state so those metrics still reach
+  the parent server process.
+
+See [Evaluation](../configurations/evaluation.md) and
+[Evaluators](evaluators.md) for the configuration and API details.
 
 ## Example: Creating a Custom Strategy
 

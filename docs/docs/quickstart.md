@@ -28,6 +28,31 @@ In `examples/`, a number of federated learning algorithms have been included. To
 uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
+## Running Server-side Lighteval Evaluation
+
+If your config uses:
+
+```toml
+[evaluation]
+type = "lighteval"
+```
+
+install the optional evaluator stack first:
+
+```bash
+uv sync --extra llm_eval
+```
+
+Then run the reference SmolLM2 configuration:
+
+```bash
+uv run python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml
+```
+
+This configuration performs Hugging Face training locally while the server evaluates the aggregated global model with Lighteval after each round.
+
+See [Evaluation](configurations/evaluation.md) for the available evaluator options and [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for the full example.
+
 ## Using MLX as a Backend
 
 Plato supports MLX as an alternative backend to PyTorch for Apple Silicon devices. To use MLX, first install the optional dependencies:

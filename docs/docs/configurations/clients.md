@@ -1,5 +1,5 @@
 !!! example "type"
-    The type of the server.
+    The type of the client.
 
     - `simple` a basic client who sends weight updates to the server.
     - `split_learning` a client following the Split Learning algorithm. When this client is used, `clients.do_test` in configuration should be set as `False` because in split learning, we conduct the test on the server.
@@ -19,7 +19,7 @@
     Valid values: `true` or `false`
 
     !!! note "Note"
-        If this setting is `true` and the configuration file has a `results` section, test accuracies of every selected client in each round will be logged in a `.csv` file.
+        If this setting is `true` and `results.record_clients_accuracy = true`, test accuracies of every selected client in each round will be logged in a separate `.csv` file.
 
 !!! example "comm_simulation"
     Whether client-server communication should be simulated with reading and writing files. This is useful when the clients and the server are launched on the same machine and share a filesystem.

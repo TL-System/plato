@@ -48,8 +48,8 @@ def _import_make_pre_post_processors() -> Callable[..., tuple[Callable, Callable
         from lerobot.policies.factory import make_pre_post_processors
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise ImportError(
-            "LeRobot trainer requires optional robotics dependencies. "
-            "Install them with `uv sync --extra robotics`."
+            "LeRobot trainer requires optional LeRobot / SmolVLA robotics dependencies. "
+            "Install the robotics stack in the active environment before running LeRobot workloads."
         ) from exc
 
     return make_pre_post_processors

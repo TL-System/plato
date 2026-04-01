@@ -93,10 +93,10 @@ def _import_lerobot() -> tuple[Any, Any]:
             LeRobotDataset,
             LeRobotDatasetMetadata,
         )
-    except ImportError as exc:  # pragma: no cover - exercised without robotics extra.
+    except ImportError as exc:  # pragma: no cover - environment dependent.
         raise ImportError(
-            "LeRobot datasource requires optional robotics dependencies. "
-            "Install them with \"uv sync --extra robotics\" before using "
+            "LeRobot datasource requires optional LeRobot / SmolVLA robotics dependencies. "
+            "Install the robotics stack in the active environment before using "
             '"data.datasource = \"LeRobot\"". '
         ) from exc
 

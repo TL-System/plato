@@ -2,32 +2,39 @@
     The type of the trainer. The following types are available:
 
     - `basic` a basic trainer with a standard training loop.
+    - `composable` the strategy-based trainer that exposes loss, optimiser, scheduler, data-loader, model-update, and testing strategies directly.
     - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
-
-        !!! example "max_physical_batch_size"
-            The limit on the physical batch size when using the `diff_privacy` trainer.
-
-            Default value: `128`. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
-
-        !!! example "dp_epsilon"
-            Total privacy budget of epsilon with the `diff_privacy` trainer.
-
-            Default value: `10.0`
-
-        !!! example "dp_delta"
-            Total privacy budget of delta with the `diff_privacy` trainer.
-
-            Default value: `1e-5`
-
-        !!! example "dp_max_grad_norm"
-            The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.
-
-            Default value: `1.0`
-
+    - `HuggingFace` a trainer for Hugging Face causal language models and tokenizers.
+    - `nanochat` a trainer for Nanochat language-model workloads.
+    - `lerobot` a trainer for LeRobot / SmolVLA workloads.
     - `split_learning` a trainer that supports the split learning framework.
     - `self_supervised_learning` a trainer that supports personalized federated learning based on self supervised learning.
     - `gan` a trainer for Generative Adversarial Networks (GANs).
+    - `pfedgraph` a trainer used by the pFedGraph personalized federated learning algorithm.
+
+    !!! note "Framework shortcut"
+        Plato also supports `framework = "mlx"`, which resolves to the MLX trainer backend.
+
+    !!! example "max_physical_batch_size"
+        The limit on the physical batch size when using the `diff_privacy` trainer.
+
+        Default value: `128`. The GPU memory usage of one process training the ResNet-18 model is around 2817 MB.
+
+    !!! example "dp_epsilon"
+        Total privacy budget of epsilon with the `diff_privacy` trainer.
+
+        Default value: `10.0`
+
+    !!! example "dp_delta"
+        Total privacy budget of delta with the `diff_privacy` trainer.
+
+        Default value: `1e-5`
+
+    !!! example "dp_max_grad_norm"
+        The maximum norm of the per-sample gradients with the `diff_privacy` trainer. Any gradient with norm higher than this will be clipped to this value.
+
+        Default value: `1.0`
 
 !!! example "rounds"
     The maximum number of training rounds.
@@ -51,6 +58,22 @@
 
 !!! example "batch_size"
     The size of the mini-batch of data in each step (iteration) of the training loop.
+
+!!! example "gradient_accumulation_steps"
+    The number of mini-batches to accumulate before applying an optimizer step.
+
+    This is commonly used by the `HuggingFace` trainer to keep memory usage manageable when fine-tuning larger language models.
+
+!!! example "gradient_checkpointing"
+    Whether activation checkpointing should be enabled when supported by the trainer/model stack.
+
+    This is especially useful for Hugging Face LLM fine-tuning.
+
+!!! example "bf16"
+    Whether bfloat16 should be used when supported by the runtime.
+
+!!! example "fp16"
+    Whether float16 should be used when supported by the runtime.
 
 !!! example "optimizer"
     The type of the optimizer. The following options are supported:
@@ -116,7 +139,21 @@
     - `KLDivLoss`
     - `NegativeCosineSimilarity`
     - `NTXentLoss`
+    - `BarlowTwinsLoss`
+    - `DCLLoss`
+    - `DCLWLoss`
+    - `DINOLoss`
+    - `PMSNCustomLoss`
+    - `PMSNLoss`
     - `SwaVLoss`
+    - `SymNegCosineSimilarityLoss`
+    - `TiCoLoss`
+    - `VICRegLoss`
+    - `VICRegLLoss`
+    - `MSNLoss`
+
+    !!! note "Optional dependency"
+        Self-supervised loss criteria are loaded lazily and require the optional `lightly` package in the runtime environment.
 
 !!! example "global_lr_scheduler"
     Whether the learning rate should be scheduled globally (`true`) or not (`false`).
@@ -130,6 +167,7 @@
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
     - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
     - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
+    - `smolvla` (for LeRobot / SmolVLA robotics policies)
 
     The name of the model should be specified below, in `model_name`.
 
@@ -150,8 +188,15 @@
     - `vgg_x`
     - `dcgan`
     - `multilayer`
+    - `nanochat`
+    - `smolvla`
 
     !!! note "Note"
-        If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, here.
+        If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `smolvla`, here.
 
-        For `resnet_x`, x = 18, 34, 50, 101, or 152; For `vgg_x`, x = 11, 13, 16, or 19.
+        For `resnet_x`, x = 18, 34, 50, 101, or 152; for `vgg_x`, x = 11, 13, 16, or 19.
+
+!!! example "tokenizer_name"
+    An optional tokenizer identifier to use instead of `trainer.model_name`.
+
+    This is mainly useful for Hugging Face language-model workloads where the tokenizer/chat template comes from a separate repository.

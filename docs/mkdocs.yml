@@ -69,13 +69,14 @@ nav:
       - Case Studies:
           - Federated LoRA Fine-Tuning: examples/case-studies/1. LoRA.md
           - Composable Trainer API: examples/case-studies/2. Composable Trainer.md
-          - SmolVLA + LeRobot Optional Setup: examples/case-studies/smolvla_lerobot_setup.md
-          - SmolVLA + LeRobot Runbook: examples/case-studies/smolvla_lerobot_runbook.md
+          - Server-side Lighteval for SmolLM2: examples/case-studies/4. Server-side Lighteval for SmolLM2.md
+          - SmolVLA Trainer with LeRobot: examples/case-studies/3. SmolVLA Trainer with LeRobot.md
   - Configuration Settings:
       - Overview: configurations/overview.md
       - General: configurations/general.md
       - Clients: configurations/clients.md
       - Server: configurations/server.md
+      - Evaluation: configurations/evaluation.md
       - Data: configurations/data.md
       - Trainer: configurations/trainer.md
       - Algorithm: configurations/algorithm.md
@@ -85,6 +86,7 @@ nav:
       - Clients: references/clients.md
       - Servers: references/servers.md
       - Trainers: references/trainers.md
+      - Evaluators: references/evaluators.md
   - Developer's Guide: development.md
   - Deployment Guide: deployment.md
   - Digital Research Alliance of Canada: ccdb.md
