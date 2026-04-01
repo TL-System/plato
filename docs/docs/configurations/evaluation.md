@@ -23,7 +23,10 @@ If `[evaluation]` is omitted, Plato only records the trainer's normal scalar met
     Built-in values include:
 
     - `lighteval` for Hugging Face's Lighteval benchmark runner.
-    - `nanochat_core` for Nanochat's CORE benchmark.
+    - `nanochat_core` for Nanochat's CORE benchmark. **Requires `trainer.type = "nanochat"`.**
+      This evaluator is not registered in the general evaluator registry; it is wired
+      internally by the nanochat trainer. Using it with any other trainer type produces
+      no evaluation output and no error.
 
 !!! example "fail_on_error"
     Whether evaluator failures should abort the run.
@@ -37,7 +40,7 @@ If `[evaluation]` is omitted, Plato only records the trainer's normal scalar met
 | Evaluator | Install path | Primary output style | Typical use |
 | --- | --- | --- | --- |
 | `lighteval` | `uv sync --extra llm_eval` | Named benchmark metrics such as `ifeval_avg` and `arc_avg` | Server-side LLM evaluation |
-| `nanochat_core` | `uv sync --extra nanochat` | `core_metric` | Nanochat benchmark runs |
+| `nanochat_core` | `uv sync --extra nanochat` | `core_metric` | Nanochat benchmark runs — requires `trainer.type = "nanochat"` |
 
 ## Lighteval
 
@@ -176,7 +179,16 @@ Nanochat's CORE benchmark is also available through `[evaluation]`.
 
 ### Example
 
+!!! warning "Requires the nanochat trainer"
+    `nanochat_core` is only wired up when `trainer.type = "nanochat"`. The nanochat
+    trainer creates the evaluator internally rather than looking it up in the registry.
+    Setting `[evaluation] type = "nanochat_core"` with any other trainer type silently
+    produces no evaluation output.
+
 ```toml
+[trainer]
+type = "nanochat"
+
 [evaluation]
 type = "nanochat_core"
 max_per_task = 16
