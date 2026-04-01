@@ -10,6 +10,14 @@ import shutil
 import numpy as np
 
 
+def _asdict_if_available(value):
+    """Return a dict from namedtuple-like objects when `_asdict` exists."""
+    asdict_fn = getattr(value, "_asdict", None)
+    if callable(asdict_fn):
+        return asdict_fn()
+    return None
+
+
 def config_to_dict(plato_config):
     """Convert the plato config (can be nested one) instance to the dict."""
     # convert the whole to dict - OrderedDict
@@ -17,18 +25,16 @@ def config_to_dict(plato_config):
 
     def to_dict(elem):
         for key, value in elem.items():
-            try:
-                value = value._asdict()
+            value_dict = _asdict_if_available(value)
+            if value_dict is not None:
+                value = value_dict
                 elem[key] = to_dict(value)
-            except:
-                pass
             if isinstance(value, list):
                 for idx, value_item in enumerate(value):
-                    try:
-                        value_item = value_item._asdict()
+                    value_item_dict = _asdict_if_available(value_item)
+                    if value_item_dict is not None:
+                        value_item = value_item_dict
                         value[idx] = to_dict(value_item)
-                    except:
-                        pass
                 elem[key] = value
         return elem
 

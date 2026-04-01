@@ -68,6 +68,8 @@ class SmokeHFModel(nn.Module):
 
     def forward(self, input_ids=None, attention_mask=None, labels=None, **kwargs):
         del attention_mask, kwargs
+        if input_ids is None:
+            raise ValueError("input_ids must be provided.")
         batch, seq = input_ids.shape
         vocab_size = self.embedding.num_embeddings
         logits = torch.zeros((batch, seq, vocab_size), dtype=torch.float32)

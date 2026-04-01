@@ -34,7 +34,7 @@ class VideoClassificationTrainTransformer:
         std=(0.22803, 0.22145, 0.216989),
         hflip_prob=0.5,
     ):
-        trans = [
+        trans: list[nn.Module] = [
             ConvertBHWCtoBCHW(),
             transforms.ConvertImageDtype(torch.float32),
             transforms.Resize(resize_size),

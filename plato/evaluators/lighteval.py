@@ -7,7 +7,7 @@ import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
 from numbers import Real
-from typing import Any, Iterator
+from typing import Any, Iterator, Protocol, cast
 
 from plato.config import Config
 from plato.evaluators import registry
@@ -49,6 +49,14 @@ class LightevalModelReference:
     tokenizer_name: str | None = None
 
 
+class _ProgressAdvancer(Protocol):
+    def advance(self, message: str) -> None: ...
+
+
+class _ProgressReporter(_ProgressAdvancer, Protocol):
+    def note(self, message: str) -> None: ...
+
+
 def _config_value(config: dict[str, Any] | Any, key: str, default: Any = None) -> Any:
     if isinstance(config, dict):
         return config.get(key, default)
@@ -62,17 +70,20 @@ class _LightevalProgress:
         self.total = total
         self.enabled = bool(_config_value(config, "show_progress", True))
         self._current = 0
-        self._bar = None
+        self._bar: Any | None = None
 
     def __enter__(self):
         if self.enabled:
+            tqdm_factory: Any | None = None
             try:
                 from tqdm.auto import tqdm
             except ImportError:  # pragma: no cover - tqdm is normally available
-                tqdm = None
+                pass
+            else:
+                tqdm_factory = tqdm
 
-            if tqdm is not None:
-                self._bar = tqdm(
+            if tqdm_factory is not None:
+                self._bar = tqdm_factory(
                     total=self.total,
                     desc="Server Lighteval evaluation",
                     unit="stage",
@@ -110,6 +121,12 @@ def _is_numeric_metric(value: Any) -> bool:
     return isinstance(value, Real) and not isinstance(value, bool)
 
 
+def _to_float_metric(value: Any, *, metric_name: str) -> float:
+    if not _is_numeric_metric(value):
+        raise TypeError(f"Lighteval metric '{metric_name}' must be numeric.")
+    return float(cast(Real, value))
+
+
 def _canonical_task_name(task_name: str) -> str:
     prefix, separator, suffix = task_name.rpartition(":")
     if separator and suffix.isdigit():
@@ -141,13 +158,13 @@ def _preferred_task_value(task_metrics: dict[str, Any], task_name: str) -> float
     for metric_name in TASK_METRIC_PREFERENCES.get(task_name, ()):  # pragma: no branch
         metric_value = task_metrics.get(metric_name)
         if _is_numeric_metric(metric_value):
-            return float(metric_value)
+            return _to_float_metric(metric_value, metric_name=metric_name)
 
     for metric_name, metric_value in task_metrics.items():
         if metric_name.endswith("_stderr"):
             continue
         if _is_numeric_metric(metric_value):
-            return float(metric_value)
+            return _to_float_metric(metric_value, metric_name=metric_name)
     return None
 
 
@@ -190,11 +207,20 @@ def _normalize_nested_metrics(raw_metrics: dict[str, Any]) -> dict[str, float]:
         strict_acc = ifeval_metrics.get("prompt_level_strict_acc")
         loose_acc = ifeval_metrics.get("prompt_level_loose_acc")
         if _is_numeric_metric(strict_acc) and _is_numeric_metric(loose_acc):
-            metrics["ifeval_avg"] = (float(strict_acc) + float(loose_acc)) / 2.0
+            metrics["ifeval_avg"] = (
+                _to_float_metric(strict_acc, metric_name="prompt_level_strict_acc")
+                + _to_float_metric(loose_acc, metric_name="prompt_level_loose_acc")
+            ) / 2.0
         elif _is_numeric_metric(strict_acc):
-            metrics["ifeval_avg"] = float(strict_acc)
+            metrics["ifeval_avg"] = _to_float_metric(
+                strict_acc,
+                metric_name="prompt_level_strict_acc",
+            )
         elif _is_numeric_metric(loose_acc):
-            metrics["ifeval_avg"] = float(loose_acc)
+            metrics["ifeval_avg"] = _to_float_metric(
+                loose_acc,
+                metric_name="prompt_level_loose_acc",
+            )
         else:
             fallback = _preferred_task_value(ifeval_metrics, "ifeval")
             if fallback is not None:
@@ -283,7 +309,7 @@ def _resolve_model_reference(
 @contextmanager
 def _materialize_model_reference(
     request: EvaluationInput,
-    progress: _LightevalProgress | None = None,
+    progress: _ProgressReporter | None = None,
 ) -> Iterator[LightevalModelReference]:
     model = request.model
     tokenizer = request.tokenizer
@@ -322,7 +348,7 @@ def _run_lighteval_pipeline(
     tasks: list[str],
     backend: str,
     config: dict[str, Any] | Any,
-    progress: _LightevalProgress | None = None,
+    progress: _ProgressAdvancer | None = None,
 ) -> dict[str, Any]:
     try:
         from lighteval.logging.evaluation_tracker import EvaluationTracker

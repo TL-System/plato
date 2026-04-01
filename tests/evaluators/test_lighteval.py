@@ -4,6 +4,7 @@ import sys
 import types
 from enum import Enum, auto
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -14,6 +15,13 @@ from plato.evaluators.base import EvaluationInput
 def _clear_evaluation_config() -> None:
     if hasattr(Config, "evaluation"):
         delattr(Config, "evaluation")
+
+
+def _fake_module(name: str, **attributes: object) -> Any:
+    module = cast(Any, types.ModuleType(name))
+    for attribute_name, value in attributes.items():
+        setattr(module, attribute_name, value)
+    return module
 
 
 def test_lighteval_registry_resolves_without_importing_optional_backend(temp_config):
@@ -125,20 +133,24 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
                 }
             }
 
-    lighteval_pkg = types.ModuleType("lighteval")
-    logging_pkg = types.ModuleType("lighteval.logging")
-    tracker_pkg = types.ModuleType("lighteval.logging.evaluation_tracker")
-    tracker_pkg.EvaluationTracker = FakeEvaluationTracker
-    models_pkg = types.ModuleType("lighteval.models")
-    transformers_pkg = types.ModuleType("lighteval.models.transformers")
-    transformers_model_pkg = types.ModuleType(
-        "lighteval.models.transformers.transformers_model"
+    lighteval_pkg = _fake_module("lighteval")
+    logging_pkg = _fake_module("lighteval.logging")
+    tracker_pkg = _fake_module(
+        "lighteval.logging.evaluation_tracker",
+        EvaluationTracker=FakeEvaluationTracker,
     )
-    transformers_model_pkg.TransformersModelConfig = FakeTransformersModelConfig
-    pipeline_pkg = types.ModuleType("lighteval.pipeline")
-    pipeline_pkg.Pipeline = FakePipeline
-    pipeline_pkg.PipelineParameters = FakePipelineParameters
-    pipeline_pkg.ParallelismManager = FakeParallelismManager
+    models_pkg = _fake_module("lighteval.models")
+    transformers_pkg = _fake_module("lighteval.models.transformers")
+    transformers_model_pkg = _fake_module(
+        "lighteval.models.transformers.transformers_model",
+        TransformersModelConfig=FakeTransformersModelConfig,
+    )
+    pipeline_pkg = _fake_module(
+        "lighteval.pipeline",
+        Pipeline=FakePipeline,
+        PipelineParameters=FakePipelineParameters,
+        ParallelismManager=FakeParallelismManager,
+    )
 
     monkeypatch.setitem(sys.modules, "lighteval", lighteval_pkg)
     monkeypatch.setitem(sys.modules, "lighteval.logging", logging_pkg)
@@ -238,20 +250,24 @@ def test_lighteval_pipeline_forwards_runtime_overrides(monkeypatch, temp_config)
         def get_results(self):
             return {"results": {"ifeval": 0.31}}
 
-    lighteval_pkg = types.ModuleType("lighteval")
-    logging_pkg = types.ModuleType("lighteval.logging")
-    tracker_pkg = types.ModuleType("lighteval.logging.evaluation_tracker")
-    tracker_pkg.EvaluationTracker = FakeEvaluationTracker
-    models_pkg = types.ModuleType("lighteval.models")
-    transformers_pkg = types.ModuleType("lighteval.models.transformers")
-    transformers_model_pkg = types.ModuleType(
-        "lighteval.models.transformers.transformers_model"
+    lighteval_pkg = _fake_module("lighteval")
+    logging_pkg = _fake_module("lighteval.logging")
+    tracker_pkg = _fake_module(
+        "lighteval.logging.evaluation_tracker",
+        EvaluationTracker=FakeEvaluationTracker,
     )
-    transformers_model_pkg.TransformersModelConfig = FakeTransformersModelConfig
-    pipeline_pkg = types.ModuleType("lighteval.pipeline")
-    pipeline_pkg.Pipeline = FakePipeline
-    pipeline_pkg.PipelineParameters = FakePipelineParameters
-    pipeline_pkg.ParallelismManager = FakeParallelismManager
+    models_pkg = _fake_module("lighteval.models")
+    transformers_pkg = _fake_module("lighteval.models.transformers")
+    transformers_model_pkg = _fake_module(
+        "lighteval.models.transformers.transformers_model",
+        TransformersModelConfig=FakeTransformersModelConfig,
+    )
+    pipeline_pkg = _fake_module(
+        "lighteval.pipeline",
+        Pipeline=FakePipeline,
+        PipelineParameters=FakePipelineParameters,
+        ParallelismManager=FakeParallelismManager,
+    )
 
     monkeypatch.setitem(sys.modules, "lighteval", lighteval_pkg)
     monkeypatch.setitem(sys.modules, "lighteval.logging", logging_pkg)
@@ -341,20 +357,24 @@ def test_lighteval_pipeline_uses_trainer_precision_for_default_dtype(
         def get_results(self):
             return {"results": {"ifeval": 0.31}}
 
-    lighteval_pkg = types.ModuleType("lighteval")
-    logging_pkg = types.ModuleType("lighteval.logging")
-    tracker_pkg = types.ModuleType("lighteval.logging.evaluation_tracker")
-    tracker_pkg.EvaluationTracker = FakeEvaluationTracker
-    models_pkg = types.ModuleType("lighteval.models")
-    transformers_pkg = types.ModuleType("lighteval.models.transformers")
-    transformers_model_pkg = types.ModuleType(
-        "lighteval.models.transformers.transformers_model"
+    lighteval_pkg = _fake_module("lighteval")
+    logging_pkg = _fake_module("lighteval.logging")
+    tracker_pkg = _fake_module(
+        "lighteval.logging.evaluation_tracker",
+        EvaluationTracker=FakeEvaluationTracker,
     )
-    transformers_model_pkg.TransformersModelConfig = FakeTransformersModelConfig
-    pipeline_pkg = types.ModuleType("lighteval.pipeline")
-    pipeline_pkg.Pipeline = FakePipeline
-    pipeline_pkg.PipelineParameters = FakePipelineParameters
-    pipeline_pkg.ParallelismManager = FakeParallelismManager
+    models_pkg = _fake_module("lighteval.models")
+    transformers_pkg = _fake_module("lighteval.models.transformers")
+    transformers_model_pkg = _fake_module(
+        "lighteval.models.transformers.transformers_model",
+        TransformersModelConfig=FakeTransformersModelConfig,
+    )
+    pipeline_pkg = _fake_module(
+        "lighteval.pipeline",
+        Pipeline=FakePipeline,
+        PipelineParameters=FakePipelineParameters,
+        ParallelismManager=FakeParallelismManager,
+    )
 
     monkeypatch.setitem(sys.modules, "lighteval", lighteval_pkg)
     monkeypatch.setitem(sys.modules, "lighteval.logging", logging_pkg)
@@ -427,20 +447,24 @@ def test_lighteval_pipeline_forwards_max_samples_to_each_task(monkeypatch, temp_
         def get_results(self):
             return {"results": {"ifeval": 0.31}}
 
-    lighteval_pkg = types.ModuleType("lighteval")
-    logging_pkg = types.ModuleType("lighteval.logging")
-    tracker_pkg = types.ModuleType("lighteval.logging.evaluation_tracker")
-    tracker_pkg.EvaluationTracker = FakeEvaluationTracker
-    models_pkg = types.ModuleType("lighteval.models")
-    transformers_pkg = types.ModuleType("lighteval.models.transformers")
-    transformers_model_pkg = types.ModuleType(
-        "lighteval.models.transformers.transformers_model"
+    lighteval_pkg = _fake_module("lighteval")
+    logging_pkg = _fake_module("lighteval.logging")
+    tracker_pkg = _fake_module(
+        "lighteval.logging.evaluation_tracker",
+        EvaluationTracker=FakeEvaluationTracker,
     )
-    transformers_model_pkg.TransformersModelConfig = FakeTransformersModelConfig
-    pipeline_pkg = types.ModuleType("lighteval.pipeline")
-    pipeline_pkg.Pipeline = FakePipeline
-    pipeline_pkg.PipelineParameters = FakePipelineParameters
-    pipeline_pkg.ParallelismManager = FakeParallelismManager
+    models_pkg = _fake_module("lighteval.models")
+    transformers_pkg = _fake_module("lighteval.models.transformers")
+    transformers_model_pkg = _fake_module(
+        "lighteval.models.transformers.transformers_model",
+        TransformersModelConfig=FakeTransformersModelConfig,
+    )
+    pipeline_pkg = _fake_module(
+        "lighteval.pipeline",
+        Pipeline=FakePipeline,
+        PipelineParameters=FakePipelineParameters,
+        ParallelismManager=FakeParallelismManager,
+    )
 
     monkeypatch.setitem(sys.modules, "lighteval", lighteval_pkg)
     monkeypatch.setitem(sys.modules, "lighteval.logging", logging_pkg)

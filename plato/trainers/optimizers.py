@@ -2,7 +2,7 @@
 Optimizers for training workloads.
 """
 
-from typing import Union
+from typing import Any, Union
 
 import torch_optimizer as torch_optim
 from timm import optim as timm_optim
@@ -11,7 +11,7 @@ from torch import optim
 from plato.config import Config
 
 
-def get(model, **kwargs: str | dict) -> optim.Optimizer:
+def get(model, **kwargs: Any) -> optim.Optimizer:
     """Get an optimizer with its name and parameters obtained from the configuration file."""
     registered_optimizers = {
         "Adam": optim.Adam,
@@ -40,6 +40,8 @@ def get(model, **kwargs: str | dict) -> optim.Optimizer:
         if "optimizer_name" in kwargs
         else Config().trainer.optimizer
     )
+    if not isinstance(optimizer_name, str):
+        raise TypeError("optimizer_name must be provided as a string.")
     if "optimizer_params" in kwargs:
         optimizer_params = kwargs["optimizer_params"]
     else:

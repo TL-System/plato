@@ -73,8 +73,8 @@ class RLAgent(rl_agent.RLAgent):
             )
 
         # Record test accuracy of the latest 5 rounds/steps
-        self.pre_acc = deque(5 * [0], maxlen=5)
-        self.test_accuracy = None
+        self.pre_acc: deque[float] = deque(5 * [0.0], maxlen=5)
+        self.test_accuracy: float | None = None
         self.num_samples = None
         self.client_ids = []
 
@@ -166,6 +166,8 @@ class RLAgent(rl_agent.RLAgent):
     def get_done(self):
         """Get done condition for agent."""
         if Config().algorithm.mode == "train":
+            if self.test_accuracy is None:
+                return False
             self.pre_acc.append(self.test_accuracy)
             if stdev(self.pre_acc) < Config().algorithm.theta:
                 logging.info("[RL Agent] Episode #%d ended.", self.current_episode)

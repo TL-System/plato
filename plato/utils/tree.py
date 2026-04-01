@@ -172,10 +172,12 @@ def flatten_tree(tree: Any) -> tuple[dict[str, np.ndarray], dict[str, TreeMetada
     def recurse(node: Any, path: str) -> None:
         if isinstance(node, dict):
             metadata[path] = TreeMetadata(
-                type="dict", children=list(node.keys()), container=None
+                type="dict",
+                children=[str(key) for key in node.keys()],
+                container=None,
             )
             for key, value in node.items():
-                recurse(value, _join_path(path, key))
+                recurse(value, _join_path(path, str(key)))
             return
 
         if isinstance(node, (list, tuple)):

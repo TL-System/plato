@@ -75,7 +75,7 @@ def _resolve_loss_criterion(name: str) -> type[Any]:
     raise ValueError(f"Unknown loss criterion: {name}")
 
 
-def get(**kwargs: str | dict):
+def get(**kwargs: Any):
     """Get a loss function with its name from the configuration file."""
     if "loss_criterion" in kwargs:
         loss_criterion_name = kwargs["loss_criterion"]
@@ -83,6 +83,9 @@ def get(**kwargs: str | dict):
         loss_criterion_name = Config().trainer.loss_criterion
     else:
         loss_criterion_name = "CrossEntropyLoss"
+
+    if not isinstance(loss_criterion_name, str):
+        raise TypeError("loss_criterion must be provided as a string.")
 
     if "loss_criterion_params" in kwargs:
         loss_criterion_params = kwargs["loss_criterion_params"]
