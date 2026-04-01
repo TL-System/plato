@@ -53,6 +53,9 @@ class DummyHFModel(nn.Module):
         self.resized_to = None
 
     def forward(self, input_ids=None, attention_mask=None, labels=None, **kwargs):
+        del attention_mask, labels, kwargs
+        if input_ids is None:
+            raise ValueError("input_ids must be provided.")
         batch, seq = input_ids.shape
         vocab_size = self.embedding.num_embeddings
         logits = torch.zeros((batch, seq, vocab_size), dtype=torch.float32)
@@ -97,6 +100,7 @@ def test_huggingface_collate_wrapper_dynamically_pads_variable_length_labels():
 
     assert batch["input_ids"].shape == (2, 3)
     assert batch["attention_mask"].tolist() == [[1, 1, 1], [1, 1, 0]]
+    assert labels is not None
     assert labels.tolist() == [[-100, 2, 3], [-100, 5, -100]]
 
 
@@ -126,6 +130,7 @@ def test_huggingface_collate_wrapper_unwraps_nested_batch_encodings():
 
     assert batch["input_ids"].tolist() == [[1, 2, 3], [4, 5, 0]]
     assert batch["attention_mask"].tolist() == [[1, 1, 1], [1, 1, 0]]
+    assert labels is not None
     assert labels.tolist() == [[-100, 2, 3], [-100, 5, -100]]
 
 

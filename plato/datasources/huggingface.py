@@ -109,7 +109,15 @@ def _coerce_token_sequence(value: Any, *, field_name: str) -> list[int]:
             f"Expected '{field_name}' to be a token sequence, got {type(value)}."
         )
 
-    return [int(token) for token in value]
+    tokens: list[int] = []
+    for token in value:
+        try:
+            tokens.append(int(cast(Any, token)))
+        except (TypeError, ValueError) as exc:
+            raise TypeError(
+                f"Expected '{field_name}' to contain token ids, got {type(token)}."
+            ) from exc
+    return tokens
 
 
 def _normalize_chat_template_output(
@@ -213,8 +221,10 @@ class DataSource(base.DataSource):
         }
 
         self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            model_name, config=self.config, **tokenizer_kwargs
+        self.tokenizer: Any = AutoTokenizer.from_pretrained(
+            model_name,
+            config=self.config,
+            **tokenizer_kwargs,
         )
         self.tok_logger = hf_logging.get_logger("transformers.tokenization_utils_base")
 
@@ -229,15 +239,22 @@ class DataSource(base.DataSource):
         self.block_size = getattr(data_cfg, "block_size", 128)
         self.saved_data_path = saved_data_path
 
-        self.train_split_name = _resolve_split_name(self.dataset, train_split_name)
+        if not isinstance(self.dataset, Mapping):
+            raise TypeError(
+                "HuggingFace datasource expects a dataset mapping keyed by split name."
+            )
+        dataset_mapping = cast(Mapping[str, Any], self.dataset)
+        self.train_split_name = _resolve_split_name(dataset_mapping, train_split_name)
         self.validation_split_name = _resolve_split_name(
-            self.dataset,
+            dataset_mapping,
             requested_validation_split,
             fallback="test" if requested_validation_split == "validation" else None,
         )
 
-        self.trainset = self.preprocess_split(self.dataset[self.train_split_name])
-        self.testset = self.preprocess_split(self.dataset[self.validation_split_name])
+        self.trainset = self.preprocess_split(dataset_mapping[self.train_split_name])
+        self.testset = self.preprocess_split(
+            dataset_mapping[self.validation_split_name]
+        )
 
     def num_train_examples(self):
         return len(self.require_trainset())

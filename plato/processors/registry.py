@@ -31,7 +31,7 @@ from plato.processors import (
     unstructured_pruning,
 )
 
-registered_processors = {
+registered_processors: dict[str, type[base.Processor]] = {
     "base": base.Processor,
     "compress": compress.Processor,
     "decompress": decompress.Processor,

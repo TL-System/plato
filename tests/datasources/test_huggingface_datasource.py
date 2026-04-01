@@ -145,11 +145,13 @@ def test_huggingface_datasource_keeps_validation_split_for_corpus_mode(
     )
 
     datasource = huggingface_datasource.DataSource()
+    trainset = datasource.require_trainset()
+    testset = datasource.require_testset()
 
     assert datasource.train_split_name == "train"
     assert datasource.validation_split_name == "validation"
-    assert datasource.trainset.num_rows == 1
-    assert datasource.testset.num_rows == 1
+    assert trainset.num_rows == 1
+    assert testset.num_rows == 1
 
 
 def test_huggingface_datasource_falls_back_to_test_split(temp_config, monkeypatch):
@@ -190,9 +192,10 @@ def test_huggingface_datasource_falls_back_to_test_split(temp_config, monkeypatc
     )
 
     datasource = huggingface_datasource.DataSource()
+    testset = datasource.require_testset()
 
     assert datasource.validation_split_name == "test"
-    assert datasource.testset.num_rows == 1
+    assert testset.num_rows == 1
 
 
 def test_huggingface_datasource_loads_legacy_cache_path_when_present(
@@ -247,9 +250,10 @@ def test_huggingface_datasource_loads_legacy_cache_path_when_present(
     )
 
     datasource = huggingface_datasource.DataSource()
+    trainset = datasource.require_trainset()
 
     assert loaded_paths == [legacy_path]
-    assert datasource.trainset.num_rows == 1
+    assert trainset.num_rows == 1
 
 
 class LargeContextDummyTokenizer(DummyTokenizer):
@@ -362,9 +366,10 @@ def test_chat_sft_preprocesses_messages_without_corpus_concatenation(
     )
 
     datasource = huggingface_datasource.DataSource()
+    trainset = datasource.require_trainset()
 
-    assert datasource.trainset.num_rows == 2
-    example = datasource.trainset[0]
+    assert trainset.num_rows == 2
+    example = trainset[0]
     assert set(example) == {"input_ids", "attention_mask", "labels"}
     assert len(example["input_ids"]) == len(example["attention_mask"])
     assert len(example["input_ids"]) == len(example["labels"])
@@ -427,7 +432,7 @@ def test_chat_sft_masks_non_assistant_tokens_with_minus_100(temp_config, monkeyp
     )
 
     datasource = huggingface_datasource.DataSource()
-    example = datasource.trainset[0]
+    example = datasource.require_trainset()[0]
 
     assert example["labels"][:3] == [-100, -100, -100]
     assert example["labels"][3:] == example["input_ids"][3:]
@@ -490,7 +495,7 @@ def test_chat_sft_honors_max_seq_length_and_messages_field(temp_config, monkeypa
     )
 
     datasource = huggingface_datasource.DataSource()
-    example = datasource.trainset[0]
+    example = datasource.require_trainset()[0]
 
     assert len(example["input_ids"]) == 4
     assert len(example["labels"]) == 4
@@ -554,7 +559,7 @@ def test_chat_sft_normalizes_mapping_chat_template_outputs(temp_config, monkeypa
     )
 
     datasource = huggingface_datasource.DataSource()
-    example = datasource.trainset[0]
+    example = datasource.require_trainset()[0]
 
     assert isinstance(example["input_ids"], list)
     assert isinstance(example["attention_mask"], list)

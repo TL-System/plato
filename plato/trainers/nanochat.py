@@ -186,7 +186,14 @@ class NanochatOptimizerStrategy(OptimizerStrategy):
         if not isinstance(optimizers, Iterable):
             raise TypeError("setup_optimizers() must return an iterable of optimizers.")
 
-        optimizer_list: list[torch.optim.Optimizer] = list(optimizers)
+        optimizer_candidates = list(optimizers)
+        optimizer_list: list[torch.optim.Optimizer] = []
+        for optimizer in optimizer_candidates:
+            if not isinstance(optimizer, torch.optim.Optimizer):
+                raise TypeError(
+                    "setup_optimizers() must yield torch.optim.Optimizer instances."
+                )
+            optimizer_list.append(optimizer)
         if not optimizer_list:
             raise ValueError("setup_optimizers() returned an empty optimizer list.")
         return _OptimizerBundle(optimizer_list)

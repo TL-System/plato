@@ -538,8 +538,10 @@ class Trainer(ComposableTrainer):
             getattr(Config(), "parameters", None), "huggingface_token", None
         )
 
-        tokenizer_loader = LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
-        tokenizer_kwargs = {
+        tokenizer_loader: Any = (
+            LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
+        )
+        tokenizer_kwargs: dict[str, Any] = {
             "config": self.config,
             "cache_dir": cache_dir,
             "use_fast": use_fast_tokenizer,
@@ -547,15 +549,16 @@ class Trainer(ComposableTrainer):
         }
         if isinstance(auth_token, str) and auth_token:
             tokenizer_kwargs["use_auth_token"] = auth_token
-        self.tokenizer = tokenizer_loader.from_pretrained(
+        self.tokenizer: Any = tokenizer_loader.from_pretrained(
             tokenizer_name,
             **tokenizer_kwargs,
         )
 
-        if getattr(self.tokenizer, "pad_token_id", None) is None:
-            eos_token = getattr(self.tokenizer, "eos_token", None)
+        tokenizer = cast(Any, self.tokenizer)
+        if getattr(tokenizer, "pad_token_id", None) is None:
+            eos_token = getattr(tokenizer, "eos_token", None)
             if eos_token is not None:
-                self.tokenizer.pad_token = eos_token
+                tokenizer.pad_token = eos_token
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -563,7 +566,7 @@ class Trainer(ComposableTrainer):
         except (TypeError, ValueError):
             grad_accum_steps = 1
         self._gradient_accumulation_steps = max(grad_accum_steps, 1)
-        self._collate_wrapper = HuggingFaceCollateWrapper(self.tokenizer)
+        self._collate_wrapper = HuggingFaceCollateWrapper(tokenizer)
         self.training_args.gradient_accumulation_steps = (
             self._gradient_accumulation_steps
         )

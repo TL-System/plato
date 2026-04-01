@@ -50,7 +50,7 @@ class ViTHyper(nn.Module):
             num_embeddings=n_nodes, embedding_dim=embedding_dim
         )
 
-        layers = [
+        layers: list[nn.Module] = [
             spectral_norm(nn.Linear(embedding_dim, hidden_dim))
             if spec_norm
             else nn.Linear(embedding_dim, hidden_dim),
@@ -144,7 +144,7 @@ class ShakesHyper(nn.Module):
             num_embeddings=n_nodes, embedding_dim=embedding_dim
         )
 
-        layers = [
+        layers: list[nn.Module] = [
             spectral_norm(nn.Linear(embedding_dim, hidden_dim))
             if spec_norm
             else nn.Linear(embedding_dim, hidden_dim),

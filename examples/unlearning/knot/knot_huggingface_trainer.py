@@ -57,7 +57,7 @@ class ClusteredHuggingFaceTestingStrategy:
                 args=self.training_args,
                 train_dataset=None,
                 eval_dataset=testset,
-                tokenizer=self.tokenizer,
+                processing_class=self.tokenizer,
                 data_collator=default_data_collator,
             )
 

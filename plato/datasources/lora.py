@@ -5,7 +5,7 @@ LoRA-friendly datasource built on HuggingFace datasets.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from datasets import Dataset, load_dataset
 from transformers import AutoTokenizer, LlamaTokenizer
@@ -59,10 +59,12 @@ class DataSource(base.DataSource):
         column_names: list[str] = [str(name) for name in column_names_raw]
 
         model_name = Config().trainer.model_name
+        tokenizer: Any
         if "llama" in model_name.lower():
             tokenizer = LlamaTokenizer.from_pretrained(model_name)
         else:
             tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer = cast(Any, tokenizer)
 
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token = tokenizer.eos_token
