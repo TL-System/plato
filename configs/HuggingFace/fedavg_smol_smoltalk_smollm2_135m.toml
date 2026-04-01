@@ -54,6 +54,11 @@ type = "lighteval"
 preset = "smollm_round_fast"
 primary_metric = "ifeval_avg"
 backend = "transformers"
+batch_size = 1
+model_parallel = false
+device = "cuda:0"
+show_progress = true
+max_samples = 32
 
 [parameters]
 
