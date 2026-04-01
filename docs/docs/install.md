@@ -99,6 +99,14 @@ uv sync --extra nanochat
 
 The LeRobot / SmolVLA path is intentionally kept separate from the default Plato install so the root environment stays lean.
 
+!!! warning "Migration note"
+    Older runbooks may still reference `uv sync --extra robotics`.
+    That root-package extra no longer exists. Use a dedicated environment that already has the LeRobot / SmolVLA stack installed, then verify it with:
+
+    ```bash
+    uv run python -c "import lerobot; print(lerobot.__version__)"
+    ```
+
 See [SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md) for the current setup guidance, configuration contract, and troubleshooting notes.
 
 ### Building the `plato-learn` PyPi Package

@@ -53,7 +53,11 @@ class HuggingFaceBatch(dict):
 class HuggingFaceCollateWrapper:
     """Pad variable-length token batches while keeping labels separate."""
 
-    def __init__(self, tokenizer=None):
+    def __init__(self, tokenizer):
+        if tokenizer is None or not hasattr(tokenizer, "pad"):
+            raise ValueError(
+                "HuggingFaceCollateWrapper requires a tokenizer with pad() support."
+            )
         self.tokenizer = tokenizer
 
     @staticmethod
@@ -123,16 +127,11 @@ class HuggingFaceCollateWrapper:
         feature_rows = [{k: v for k, v in example.items() if k != "labels"} for example in example_list]
 
         padding_side = getattr(self.tokenizer, "padding_side", "right")
-        if self.tokenizer is not None and hasattr(self.tokenizer, "pad"):
-            batch = self.tokenizer.pad(
-                feature_rows,
-                padding=True,
-                return_tensors="pt",
-            )
-        else:
-            raise ValueError(
-                "HuggingFace collator requires a tokenizer with pad() support."
-            )
+        batch = self.tokenizer.pad(
+            feature_rows,
+            padding=True,
+            return_tensors="pt",
+        )
 
         batch = HuggingFaceBatch(batch)
         labels_raw = [example.get("labels") for example in example_list]
@@ -154,10 +153,7 @@ class HuggingFaceCollateWrapper:
                 attention_mask = batch.get("attention_mask")
                 if attention_mask is not None:
                     labels = labels.masked_fill(attention_mask == 0, -100)
-                elif (
-                    self.tokenizer is not None
-                    and self.tokenizer.pad_token_id is not None
-                ):
+                elif self.tokenizer.pad_token_id is not None:
                     labels = labels.masked_fill(
                         labels == self.tokenizer.pad_token_id, -100
                     )
