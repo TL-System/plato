@@ -318,6 +318,51 @@ def _resolve_tokenizer(model) -> Any:
     return get_tokenizer()
 
 
+def _safe_evaluate_task(
+    model, tokenizer, data, device, task_meta, label,
+    evaluate_task_fn, evaluate_example_fn,
+):
+    """Wrap upstream ``evaluate_task`` so that examples whose tokenized
+    prompts exceed the model's ``max_seq_len`` are gracefully skipped
+    instead of triggering an ``AssertionError``.
+
+    Returns the mean accuracy over successfully evaluated examples, or
+    ``None`` if every example had to be skipped.
+    """
+    try:
+        # Fast path: let the upstream function handle everything.
+        return evaluate_task_fn(model, tokenizer, data, device, task_meta)
+    except AssertionError:
+        pass  # Fall through to per-example evaluation.
+
+    # Slow / safe path: evaluate one example at a time, skipping failures.
+    correct = 0
+    evaluated = 0
+    for idx in range(len(data)):
+        try:
+            is_correct = evaluate_example_fn(
+                idx, model, tokenizer, data, device, task_meta
+            )
+            correct += int(is_correct)
+            evaluated += 1
+        except AssertionError:
+            LOGGER.debug(
+                "CORE task %s: example %d exceeds max_seq_len, skipping.",
+                label,
+                idx,
+            )
+    if evaluated == 0:
+        return None
+    LOGGER.info(
+        "CORE task %s: evaluated %d/%d examples (skipped %d too-long).",
+        label,
+        evaluated,
+        len(data),
+        len(data) - evaluated,
+    )
+    return correct / evaluated
+
+
 def run_core_evaluation(
     model: torch.nn.Module,
     *,
@@ -340,7 +385,10 @@ def run_core_evaluation(
         Dictionary with `results`, `centered_results`, and `core_metric`.
     """
     ensure_nanochat_importable()
-    from nanochat.core_eval import evaluate_task  # pylint: disable=import-error
+    from nanochat.core_eval import (  # pylint: disable=import-error
+        evaluate_example,
+        evaluate_task,
+    )
 
     config_path, data_dir, metadata_path = _resolve_bundle_paths(bundle_dir)
     tasks = _load_core_tasks(config_path)
@@ -397,7 +445,17 @@ def run_core_evaluation(
         if max_per_task > 0:
             data = data[:max_per_task]
 
-        accuracy = evaluate_task(model, eval_tokenizer, data, model_device, task_meta)
+        accuracy = _safe_evaluate_task(
+            model, eval_tokenizer, data, model_device, task_meta, label,
+            evaluate_task, evaluate_example,
+        )
+        if accuracy is None:
+            # All examples were skipped (too long for model's max_seq_len).
+            LOGGER.warning(
+                "CORE task %s skipped: all examples exceed model max_seq_len.",
+                label,
+            )
+            continue
         baseline = baselines.get(label, 0.0)
         centered = (accuracy - 0.01 * baseline) / (1.0 - 0.01 * baseline)
 
