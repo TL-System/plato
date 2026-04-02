@@ -40,7 +40,7 @@ If `[evaluation]` is omitted, Plato only records the trainer's normal scalar met
 | Evaluator | Install path | Primary output style | Typical use |
 | --- | --- | --- | --- |
 | `lighteval` | `uv sync --extra llm_eval` | Named benchmark metrics such as `ifeval_avg` and `arc_avg` | Server-side LLM evaluation |
-| `nanochat_core` | `uv sync --extra nanochat` | `core_metric` | Nanochat benchmark runs — requires `trainer.type = "nanochat"` |
+| `nanochat_core` | `uv sync --extra nanochat` | `core_metric` | Nanochat benchmark runs — requires `trainer.type = "nanochat"` and a trained Nanochat tokenizer under `~/.cache/nanochat/tokenizer/` |
 
 ## Lighteval
 
@@ -164,6 +164,17 @@ These columns are added to the CSV automatically the first time they appear.
 ## Nanochat CORE
 
 Nanochat's CORE benchmark is also available through `[evaluation]`.
+
+!!! note "Tokenizer required"
+    `nanochat_core` does not just need the `nanochat` Python dependencies. It also
+    requires a trained Nanochat tokenizer under `~/.cache/nanochat/tokenizer/`
+    (notably `tokenizer.pkl` and `token_bytes.pt`).
+
+    Plato can download the CORE evaluation bundle automatically, but it does **not**
+    create the tokenizer automatically.
+
+    See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the
+    full setup sequence, including tokenizer training.
 
 ### Supported options
 

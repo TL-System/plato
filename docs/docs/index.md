@@ -36,8 +36,9 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
     ### Case Studies
     - **[Federated LoRA Fine-Tuning](examples/case-studies/1. LoRA.md)**
     - **[Composable Trainer API](examples/case-studies/2. Composable Trainer.md)**
-    - **[Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)**
     - **[SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md)**
+    - **[Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)**
+    - **[Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md)**
 
 ## Configuration Settings
 

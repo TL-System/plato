@@ -81,6 +81,14 @@ def evaluate(self, request: EvaluationInput) -> EvaluationResult:
     or `composable`) produces no evaluation output and no error — the runner silently
     skips it.
 
+!!! note "nanochat_core tokenizer prerequisite"
+    In addition to `uv sync --extra nanochat`, this evaluator requires a trained
+    Nanochat tokenizer under `~/.cache/nanochat/tokenizer/`. Plato can auto-download
+    the CORE bundle, but it does **not** auto-create the tokenizer.
+
+    See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the
+    end-to-end setup.
+
 ## Evaluator registry
 
 `plato.evaluators.registry` provides the registration surface:

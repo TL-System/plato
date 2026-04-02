@@ -95,6 +95,15 @@ To use Nanochat workloads or the `nanochat_core` evaluator, install:
 uv sync --extra nanochat
 ```
 
+Nanochat also requires the `external/nanochat` git submodule, and the Rust tokenizer extension must be built before running the Nanochat configs successfully.
+
+See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the full step-by-step setup, including:
+
+- `git submodule update --init --recursive`
+- installing `maturin` and building `rustbpe`
+- preparing the tokenizer required by CORE evaluation
+- running `configs/Nanochat/synthetic_micro.toml` and `configs/Nanochat/parquet_micro.toml`
+
 ### Optional: SmolVLA + LeRobot Robotics Stack
 
 The LeRobot / SmolVLA path is intentionally kept separate from the default Plato install so the root environment stays lean.
