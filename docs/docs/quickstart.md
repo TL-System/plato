@@ -28,6 +28,42 @@ In `examples/`, a number of federated learning algorithms have been included. To
 uv run examples/basic/basic.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
+## Running Server-side Lighteval Evaluation
+
+If your config uses:
+
+```toml
+[evaluation]
+type = "lighteval"
+```
+
+install the optional evaluator stack first:
+
+```bash
+uv sync --extra llm_eval
+```
+
+Then run the reference SmolLM2 configuration:
+
+```bash
+uv run python plato.py --config configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml
+```
+
+This configuration performs Hugging Face training locally while the server evaluates the aggregated global model with Lighteval after each round.
+
+See [Evaluation](configurations/evaluation.md) for the available evaluator options and [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for the full example.
+
+## Running Nanochat in Plato
+
+Nanochat requires additional setup beyond `uv sync --extra nanochat`:
+
+- initialize the `external/nanochat` submodule
+- install `maturin` and build the `rustbpe` extension
+- prepare a tokenizer if you want to run CORE evaluation
+- use `--cpu` for the synthetic smoke-test path if you want the run to stay on CPU
+
+See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the full step-by-step instructions.
+
 ## Using MLX as a Backend
 
 Plato supports MLX as an alternative backend to PyTorch for Apple Silicon devices. To use MLX, first install the optional dependencies:

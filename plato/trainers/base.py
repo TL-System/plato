@@ -84,11 +84,14 @@ class Trainer(ABC):
             model_path = Config().params["model_path"]
             model_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
             accuracy_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            evaluation_file = f"{model_path}/{model_name}_{self.client_id}_{Config().params['run_id']}.eval.pkl"
 
             if os.path.exists(model_file):
                 os.remove(model_file)
             if os.path.exists(accuracy_file):
                 os.remove(accuracy_file)
+            if os.path.exists(evaluation_file):
+                os.remove(evaluation_file)
 
     @abstractmethod
     def train(self, trainset, sampler, **kwargs) -> float:

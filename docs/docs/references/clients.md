@@ -35,10 +35,10 @@ from plato.clients import base
 from plato.clients.strategies import (
     DefaultCommunicationStrategy,
     DefaultLifecycleStrategy,
+    DefaultPayloadStrategy,
     DefaultReportingStrategy,
     DefaultTrainingStrategy,
 )
-from plato.clients.strategies.defaults import DefaultPayloadStrategy
 
 
 class AugmentedPayloadStrategy(DefaultPayloadStrategy):

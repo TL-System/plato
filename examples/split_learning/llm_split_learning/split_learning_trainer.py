@@ -14,6 +14,7 @@ from torch.utils.data import RandomSampler, Sampler
 from transformers import (
     AutoTokenizer,
     HfArgumentParser,
+    PreTrainedTokenizerBase,
     TrainingArguments,
     default_data_collator,
 )
@@ -67,7 +68,7 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
         args,
         train_dataset,
         eval_dataset,
-        tokenizer,
+        tokenizer: PreTrainedTokenizerBase,
         data_collator,
         sampler,
         callbacks,
@@ -78,7 +79,7 @@ class SampledHuggingFaceTrainer(HuggingFaceTrainer):
             args=args,
             train_dataset=train_dataset,
             eval_dataset=eval_dataset,
-            tokenizer=tokenizer,
+            processing_class=tokenizer,
             data_collator=data_collator,
             compute_metrics=compute_metrics,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,
@@ -116,7 +117,7 @@ class LLMSplitLearningTestingStrategy(TestingStrategy):
 
     def __init__(self, tokenizer, training_args):
         """Initialize with tokenizer and training arguments."""
-        self.tokenizer = tokenizer
+        self.tokenizer: PreTrainedTokenizerBase = tokenizer
         self.training_args = training_args
 
     def test_model(self, model, config, testset, sampler, context):
@@ -177,7 +178,7 @@ class LLMTokenizerCallback(TrainerCallback):
 
     def __init__(self):
         """Initialize the callback."""
-        self.tokenizer = None
+        self.tokenizer: PreTrainedTokenizerBase | None = None
 
     def on_trainer_initialized(self, trainer, **kwargs):
         """Initialize tokenizer and resize embeddings if needed."""
@@ -188,15 +189,19 @@ class LLMTokenizerCallback(TrainerCallback):
             "use_auth_token": None,
         }
         model_name = Config().trainer.model_name
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, **tokenizer_kwargs)
+        self.tokenizer = cast(
+            PreTrainedTokenizerBase,
+            AutoTokenizer.from_pretrained(model_name, **tokenizer_kwargs),
+        )
 
         # Resize embeddings to avoid index errors
         embedding_size = trainer.model.get_input_embeddings().weight.shape[0]
-        if len(self.tokenizer) > embedding_size:
-            trainer.model.resize_token_embeddings(len(self.tokenizer))
+        tokenizer = self.tokenizer
+        if len(tokenizer) > embedding_size:
+            trainer.model.resize_token_embeddings(len(tokenizer))
 
         # Store tokenizer in trainer for easy access
-        trainer.tokenizer = self.tokenizer
+        trainer.tokenizer = tokenizer
 
 
 class LLMTrainingArgsCallback(TrainerCallback):

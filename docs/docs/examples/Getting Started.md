@@ -19,34 +19,38 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 
 ## Algorithms Using Plato
 
-- [Server Aggregation Algorithms](algorithms/1.%20Server%20Aggregation%20Algorithms.md)
+- [Server Aggregation Algorithms](algorithms/1. Server Aggregation Algorithms.md)
 
-- [Secure Aggregation with Homomorphic Encryption](algorithms/2.%20Secure%20Aggregation%20with%20Homomorphic%20Encryption.md)
+- [Secure Aggregation with Homomorphic Encryption](algorithms/2. Secure Aggregation with Homomorphic Encryption.md)
 
-- [Asynchronous Federated Learning Algorithms](algorithms/3.%20Asynchronous%20Federated%20Learning%20Algorithms.md)
+- [Asynchronous Federated Learning Algorithms](algorithms/3. Asynchronous Federated Learning Algorithms.md)
 
-- [Federated Unlearning](algorithms/4.%20Federated%20Unlearning.md)
+- [Federated Unlearning](algorithms/4. Federated Unlearning.md)
 
-- [Algorithms with Customized Client Training Loops](algorithms/5.%20Algorithms%20with%20Customized%20Client%20Training%20Loops.md)
+- [Algorithms with Customized Client Training Loops](algorithms/5. Algorithms with Customized Client Training Loops.md)
 
-- [Client Selection Algorithms](algorithms/6.%20Client%20Selection%20Algorithms.md)
+- [Client Selection Algorithms](algorithms/6. Client Selection Algorithms.md)
 
-- [Split Learning Algorithms](algorithms/7.%20Split%20Learning%20Algorithms.md)
+- [Split Learning Algorithms](algorithms/7. Split Learning Algorithms.md)
 
-- [Personalized Federated Learning Algorithms](algorithms/8.%20Personalized%20Federated%20Learning%20Algorithms.md)
+- [Personalized Federated Learning Algorithms](algorithms/8. Personalized Federated Learning Algorithms.md)
 
-- [Personalized Federated Learning Algorithms based on Self-Supervised Learning](algorithms/9.%20Personalized%20Federated%20Learning%20Algorithms%20based%20on%20Self-Supervised%20Learning.md)
+- [Personalized Federated Learning Algorithms based on Self-Supervised Learning](algorithms/9. Personalized Federated Learning Algorithms based on Self-Supervised Learning.md)
 
-- [Algorithms based on Neural Architecture Search and Model Search](algorithms/10.%20Algorithms%20based%20on%20Neural%20Architecture%20Search%20and%20Model%20Search.md)
+- [Algorithms based on Neural Architecture Search and Model Search](algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md)
 
-- [Three-layer Federated Learning Algorithms](algorithms/11.%20Three-layer%20Federated%20Learning%20Algorithms.md)
+- [Three-layer Federated Learning Algorithms](algorithms/11. Three-layer Federated Learning Algorithms.md)
 
-- [Poisoning Detection Algorithms](algorithms/12.%20Poisoning%20Detection%20Algorithms.md)
+- [Poisoning Detection Algorithms](algorithms/12. Poisoning Detection Algorithms.md)
 
-- [Model Pruning Algorithms](algorithms/13.%20Model%20Pruning%20Algorithms.md)
+- [Model Pruning Algorithms](algorithms/13. Model Pruning Algorithms.md)
 
 ## Case Studies
 
-- [Federated LoRA Fine-Tuning](case-studies/1.%20LoRA.md)
+- [Federated LoRA Fine-Tuning](case-studies/1. LoRA.md)
 
-- [Composable Trainer API](case-studies/2.%20Composable%20Trainer.md)
+- [Composable Trainer API](case-studies/2. Composable Trainer.md)
+
+- [Server-side Lighteval for SmolLM2](case-studies/4. Server-side Lighteval for SmolLM2.md)
+
+- [SmolVLA Trainer with LeRobot](case-studies/3. SmolVLA Trainer with LeRobot.md)

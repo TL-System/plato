@@ -75,6 +75,23 @@ class LogProgressCallback(ServerCallback):
             )
         )
 
+    def _result_csv_file(self) -> str:
+        """Return the runtime CSV file path for the current server process."""
+        return f"{Config().params['result_path']}/{os.getpid()}.csv"
+
+    def _ensure_evaluation_columns(self, logged_items: dict[str, object]) -> None:
+        """Expand the CSV schema when new structured evaluation metrics appear."""
+        additional_columns = [
+            item
+            for item in logged_items
+            if item.startswith("evaluation_") and item not in self.recorded_items
+        ]
+        if not additional_columns:
+            return
+
+        self.recorded_items.extend(additional_columns)
+        csv_processor.expand_csv_columns(self._result_csv_file(), additional_columns)
+
     def on_weights_received(self, server, weights_received):
         """
         Event called after the updated weights have been received.
@@ -95,13 +112,14 @@ class LogProgressCallback(ServerCallback):
     def on_clients_processed(self, server, **kwargs):
         """Additional work to be performed after client reports have been processed."""
         # Record results into a .csv file
+        logged_items = server.get_logged_items()
+        self._ensure_evaluation_columns(logged_items)
         new_row = []
         for item in self.recorded_items:
-            item_value = server.get_logged_items()[item]
+            item_value = logged_items.get(item)
             new_row.append(item_value)
 
-        result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
-        csv_processor.write_csv(result_csv_file, new_row)
+        csv_processor.write_csv(self._result_csv_file(), new_row)
 
         if (
             hasattr(Config().clients, "do_test")

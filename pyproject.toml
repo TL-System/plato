@@ -17,7 +17,6 @@ dependencies = [
     "datasets",
     "evaluate",
     "gdown",
-    "lightly",
     "munch",
     "numpy",
     "peft",
@@ -30,7 +29,7 @@ dependencies = [
     "torch",
     "torch-optimizer",
     "torchvision",
-    "transformers>=5.4.0",
+    "transformers",
     "zstd",
 ]
 
@@ -59,8 +58,9 @@ nanochat = [
     "jinja2",
     "PyYAML",
 ]
-robotics = [
-    "lerobot[smolvla]>=0.5.0",
+llm_eval = [
+    "lighteval==0.13.0",
+    "langdetect>=1.0.9,<2",
 ]
 
 [project.urls]

@@ -10,6 +10,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset
 
+from plato.config import Config
+from plato.evaluators.runner import EVALUATION_PRIMARY_KEY, EVALUATION_RESULTS_KEY
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies import (
     AdamOptimizerStrategy,
@@ -437,6 +439,51 @@ class TestComposableTrainerEdgeCases:
 
         # Should complete successfully
         assert trainer.current_epoch == config["epochs"]
+
+    def test_test_state_roundtrip_persists_evaluation_metadata(self, temp_config):
+        trainer = ComposableTrainer(model=nn.Linear(2, 1))
+        run_id = Config().params["run_id"]
+        filename = trainer._test_state_filename(run_id)
+
+        trainer.context.state[EVALUATION_RESULTS_KEY] = {
+            "lighteval": {"metrics": {"ifeval_avg": 0.31}}
+        }
+        trainer.context.state[EVALUATION_PRIMARY_KEY] = {
+            "evaluator": "lighteval",
+            "metric": "ifeval_avg",
+            "value": 0.31,
+        }
+        trainer.context.state["nanochat_core_results"] = {"core_metric": 0.9}
+
+        trainer._save_test_state(filename)
+
+        trainer.context.state.clear()
+        trainer._load_test_state(filename)
+
+        assert trainer.context.state[EVALUATION_RESULTS_KEY] == {
+            "lighteval": {"metrics": {"ifeval_avg": 0.31}}
+        }
+        assert trainer.context.state[EVALUATION_PRIMARY_KEY] == {
+            "evaluator": "lighteval",
+            "metric": "ifeval_avg",
+            "value": 0.31,
+        }
+        assert trainer.context.state["nanochat_core_results"] == {
+            "core_metric": 0.9
+        }
+
+    def test_test_state_restore_clears_stale_evaluation_metadata(self, temp_config):
+        trainer = ComposableTrainer(model=nn.Linear(2, 1))
+
+        trainer.context.state[EVALUATION_RESULTS_KEY] = {"stale": {}}
+        trainer.context.state[EVALUATION_PRIMARY_KEY] = {"metric": "old"}
+        trainer.context.state["nanochat_core_results"] = {"core_metric": 0.1}
+
+        trainer._load_test_state("missing.eval.pkl")
+
+        assert EVALUATION_RESULTS_KEY not in trainer.context.state
+        assert EVALUATION_PRIMARY_KEY not in trainer.context.state
+        assert "nanochat_core_results" not in trainer.context.state
 
 
 class TestComposableTrainerComparison:

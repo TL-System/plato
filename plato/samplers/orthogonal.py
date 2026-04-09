@@ -70,9 +70,9 @@ class Sampler(base.Sampler):
                 1.0 / len(class_id_list) for i in range(len(class_id_list))
             ]
 
-        target_proportions = [0 for i in range(len(class_list))]
+        target_proportions = [0.0 for i in range(len(class_list))]
         for index, class_id in enumerate(class_id_list):
-            target_proportions[class_id] = class_proportions[index]
+            target_proportions[class_id] = float(class_proportions[index])
         target_proportions = np.asarray(target_proportions)
 
         self.sample_weights = target_proportions[target_list]

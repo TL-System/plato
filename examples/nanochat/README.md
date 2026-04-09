@@ -4,55 +4,60 @@ This workspace hosts Nanochat-focused experiments within Plato.
 
 ## Quick Start
 
-1. Initialize the nanochat submodule (required for the nanochat integration):
+For the full working setup, see:
+
+- [Nanochat in Plato](../../docs/docs/examples/case-studies/5. Nanochat in Plato.md)
+
+The short version is:
+
+1. Initialize the nanochat submodule:
 
    ```bash
    git submodule update --init --recursive
    ```
 
-2. Install dependencies (including the vendored tokenizer build requirements):
+2. Install dependencies:
 
    ```bash
    uv sync --extra nanochat
-   uv run --with ./external/nanochat maturin develop --release
    ```
-   **Troubleshooting:** If you encounter a `maturin failed` error with "Can't find Cargo.toml", run the maturin command from within the nanochat directory:
+
+3. Install `maturin` if needed, then build the Rust tokenizer extension for Plato's environment:
 
    ```bash
-   uv sync --extra nanochat
-   cd external/nanochat && uv run maturin develop --release && cd ../..
+   uv tool install maturin
+   uv run --extra nanochat maturin develop --release --manifest-path external/nanochat/rustbpe/Cargo.toml
    ```
 
-3. Run the synthetic smoke configuration:
+4. Run the synthetic configuration **after either** (a) preparing the tokenizer for CORE evaluation or (b) disabling the `[evaluation]` block in a local config copy:
 
    ```bash
-   uv run --extra nanochat python plato.py --config configs/Nanochat/synthetic_micro.toml
+   uv run --extra nanochat python plato.py --config configs/Nanochat/synthetic_micro.toml --cpu
    ```
 
-   This launches a single-client training round using the Nanochat trainer, synthetic
-   token streams, and a downsized GPT configuration for CPU debugging.
+## Important note about CORE evaluation
 
-## CORE Evaluation
-
-The Nanochat trainer can invoke the upstream CORE benchmark by adding the section
-below to your TOML configuration:
+`configs/Nanochat/synthetic_micro.toml` already enables:
 
 ```toml
 [evaluation]
 type = "nanochat_core"
-max_per_task = 128  # optional; limits evaluation samples per task
-# bundle_dir = "/custom/path/to/nanochat"  # defaults to ~/.cache/nanochat
 ```
 
-Make sure the official evaluation bundle has been downloaded so the following files
-exist (the default location is `~/.cache/nanochat/eval_bundle`):
+That means a tokenizer must exist under `~/.cache/nanochat/tokenizer/` before the
+run can finish successfully.
 
-- `core.yaml`
-- `eval_data/*.jsonl`
-- `eval_meta_data.csv`
+To prepare it, use the commands documented in:
 
-The provided `configs/Nanochat/synthetic_micro.toml` can be extended with the
-`[evaluation]` block once those assets are present.
+- `docs/docs/examples/case-studies/5. Nanochat in Plato.md`
+
+In particular, the current working flow is:
+
+1. download at least 2 Nanochat data shards
+2. train a tokenizer with `external/nanochat/scripts/tok_train.py`
+3. then run the Plato config
+
+The CORE evaluation bundle itself is downloaded automatically on first use.
 
 ## Roadmap
 

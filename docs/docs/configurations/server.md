@@ -80,6 +80,9 @@
 
     Default value: `true`
 
+    !!! note "Structured evaluators"
+        The optional `[evaluation]` section runs as part of this server-side test flow. If you want Lighteval or Nanochat CORE metrics, keep `server.do_test = true`.
+
 !!! example "model_path"
     The path to the pretrained and trained models.
 

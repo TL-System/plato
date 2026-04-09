@@ -1,0 +1,72 @@
+[clients]
+type = "simple"
+total_clients = 2
+per_round = 2
+do_test = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+simulate_wall_time = false
+do_test = true
+checkpoint_path = "checkpoints/huggingface/fedavg"
+model_path = "models/huggingface/fedavg"
+
+[data]
+datasource = "HuggingFace"
+dataset_name = "HuggingFaceTB/smol-smoltalk"
+preprocessing_mode = "chat_sft"
+messages_field = "messages"
+label_strategy = "assistant_only"
+train_split = "train"
+validation_split = "test"
+max_seq_length = 512
+pack_sequences = false
+partition_size = 512
+sampler = "iid"
+random_seed = 1
+
+[trainer]
+type = "HuggingFace"
+rounds = 5
+max_concurrency = 1
+model_type = "huggingface"
+# Use the base model weights for full fine-tuning, but load the instruct tokenizer
+# to reuse SmolLM2's chat template for SmolTalk conversations.
+model_name = "HuggingFaceTB/SmolLM2-135M"
+tokenizer_name = "HuggingFaceTB/SmolLM2-135M-Instruct"
+epochs = 1
+batch_size = 2
+gradient_accumulation_steps = 4
+optimizer = "AdamW"
+gradient_checkpointing = true
+bf16 = false
+fp16 = false
+# Keep perplexity as the trainer-local scalar metric while Lighteval adds
+# instruction-following summary metrics after each server-side evaluation.
+target_perplexity = 50
+
+[algorithm]
+type = "fedavg"
+
+[evaluation]
+type = "lighteval"
+preset = "smollm_round_fast"
+primary_metric = "ifeval_avg"
+backend = "transformers"
+batch_size = 1
+model_parallel = false
+device = "cuda:0"
+show_progress = true
+max_samples = 32
+
+[parameters]
+
+[parameters.optimizer]
+lr = 0.00005
+weight_decay = 0.01
+
+[results]
+# Evaluator summary metrics are exported with the `evaluation_` prefix from the
+# generic server logging helper.
+types = "round, elapsed_time, accuracy, train_loss, evaluation_ifeval_avg, evaluation_hellaswag, evaluation_arc_avg, evaluation_piqa"

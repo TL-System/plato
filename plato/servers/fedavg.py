@@ -11,7 +11,7 @@ from plato.config import Config
 from plato.datasources import registry as datasources_registry
 from plato.processors import registry as processor_registry
 from plato.samplers import all_inclusive
-from plato.servers import base
+from plato.servers import base, evaluation_logging
 from plato.servers.strategies.aggregation import FedAvgAggregationStrategy
 from plato.trainers import registry as trainers_registry
 from plato.utils import csv_processor, fonts
@@ -240,23 +240,16 @@ class Server(base.Server):
         self.callback_handler.call_event("on_weights_aggregated", self, self.updates)
 
         # Testing the global model accuracy
-        trainer = self.require_trainer()
-        metric_name = getattr(
-            getattr(trainer, "testing_strategy", None), "metric_name", "accuracy"
-        )
-
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
-            # Compute the average metric from client reports
+            # Compute the average accuracy from client reports
             self.accuracy, self.accuracy_std = self.get_accuracy_mean_std(self.updates)
-            if metric_name == "mse":
-                logging.info("[%s] Average client MSE: %.6f.", self, self.accuracy)
-            else:
-                logging.info(
-                    "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
-                )
+            logging.info(
+                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
+            )
         else:
             # Testing the updated model directly at the server
             logging.info("[%s] Started model testing.", self)
+            trainer = self.require_trainer()
             self.accuracy = trainer.test(self.testset, self.testset_sampler)
 
             # Extract CORE evaluation results if available (Nanochat CORE evaluation)
@@ -267,7 +260,7 @@ class Server(base.Server):
                 core_results = trainer.context.state["nanochat_core_results"]
                 self._core_metric = core_results.get("core_metric", self.accuracy)
 
-        # Log with metric-appropriate label and format
+        # If CORE benchmark was run via a Nanochat testing strategy, report the specialized CORE metric instead of the generic 'Global model accuracy' label.
         core_metric = getattr(self, "_core_metric", None)
 
         if core_metric is not None:
@@ -275,10 +268,6 @@ class Server(base.Server):
                 fonts.colourize(
                     f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
                 )
-            )
-        elif metric_name == "mse":
-            logging.info(
-                fonts.colourize(f"[{self}] Global model MSE: {self.accuracy:.6f}\n")
             )
         elif hasattr(Config().trainer, "target_perplexity"):
             logging.info(
@@ -356,13 +345,7 @@ class Server(base.Server):
         if hasattr(self, "_core_metric"):
             logged["core_metric"] = self._core_metric
 
-        metric_name = getattr(
-            getattr(getattr(self, "trainer", None), "testing_strategy", None),
-            "metric_name",
-            "accuracy",
-        )
-        if metric_name and metric_name != "accuracy":
-            logged[metric_name] = self.accuracy
+        logged.update(evaluation_logging.extract_logged_items(self.trainer))
 
         return logged
 

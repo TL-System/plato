@@ -57,6 +57,28 @@ The model name is used to retrieve the corresponding model from the repository.
 
 If the model type is not supplied by the configuration file, the model name is used to retrieve one of the basic models provided by Plato for benchmarking purposes. In addition to using the registry, a custom model class can be directly passed into the client and server for them to instantiate a model instance when needed.
 
+### Structured Evaluators
+
+Plato also supports optional **structured evaluators** under `plato/evaluators/`.
+These run after the trainer's normal testing strategy and are intended for
+benchmark-style outputs such as Lighteval or Nanochat CORE.
+
+The key pieces are:
+
+- `plato.evaluators.base.EvaluationInput` and `EvaluationResult`
+- `plato.evaluators.base.Evaluator`
+- `plato.evaluators.registry` for registration and lookup
+- `plato.evaluators.runner.run_configured_evaluation(...)` for the runtime hook
+
+Evaluator implementations should return a compact set of summary metrics in
+`EvaluationResult.metrics` and put heavier nested details into
+`EvaluationResult.metadata`. The server logger automatically exports summary
+metrics to the runtime CSV under the `evaluation_` prefix.
+
+For a worked example, see [Evaluators](references/evaluators.md) and the
+[Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)
+case study.
+
 ---
 
 ## Extending Plato with New Federated Learning Algorithms

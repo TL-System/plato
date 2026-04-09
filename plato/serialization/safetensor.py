@@ -21,6 +21,7 @@ def _metadata_to_json(metadata: dict[str, TreeMetadata]) -> str:
             "children": value.children,
             "container": value.container,
             "backend": value.backend,
+            "dtype": value.dtype,
         }
         for path, value in metadata.items()
     }
@@ -35,6 +36,7 @@ def _metadata_from_json(payload: str) -> dict[str, TreeMetadata]:
             children=value.get("children"),
             container=value.get("container"),
             backend=value.get("backend"),
+            dtype=value.get("dtype"),
         )
         for path, value in data.items()
     }
