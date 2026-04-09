@@ -14,12 +14,12 @@ The accuracy obtained by KNN during the regular federated training rounds may
 not be used to compare with the accuracy in supervised learning methods.
 """
 
+import importlib
 import logging
 from collections import UserList
 from collections.abc import Callable
 
 import torch
-from lightly.data.multi_view_collate import MultiViewCollate
 
 from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
@@ -51,10 +51,32 @@ class SSLSamples(UserList):
         return self.data
 
 
-class MultiViewCollateWrapper(MultiViewCollate):
+def _require_multiview_collate():
+    """Import Lightly's MultiViewCollate only for SSL workloads."""
+    try:
+        module = importlib.import_module("lightly.data.multi_view_collate")
+    except ImportError as exc:  # pragma: no cover - depends on optional install
+        raise ImportError(
+            "The self_supervised_learning trainer requires the optional "
+            "'lightly' package. Install it in environments that run SSL "
+            "training workloads."
+        ) from exc
+
+    collate_cls = getattr(module, "MultiViewCollate", None)
+    if collate_cls is None:
+        raise AttributeError(
+            "Optional dependency 'lightly' does not expose MultiViewCollate."
+        )
+    return collate_cls
+
+
+class MultiViewCollateWrapper:
     """
     An interface to connect collate from lightly with Plato's data loading mechanism.
     """
+
+    def __init__(self):
+        self._delegate = _require_multiview_collate()()
 
     def __call__(self, batch):
         """Turn a batch of tuples into a single tuple."""
@@ -62,7 +84,7 @@ class MultiViewCollateWrapper(MultiViewCollate):
         batch = [batch[i] + (" ",) for i in range(len(batch))]
 
         # Process first two parts with the lightly collate
-        views, labels, _ = super().__call__(batch)
+        views, labels, _ = self._delegate(batch)
 
         # Assign views, which is a list of tensors, into SSLSamples
         samples = SSLSamples(views)

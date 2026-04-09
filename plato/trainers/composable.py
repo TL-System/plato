@@ -36,6 +36,11 @@ from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.trainer import LogProgressCallback
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.evaluators.runner import (
+    EVALUATION_PRIMARY_KEY,
+    EVALUATION_RESULTS_KEY,
+    run_configured_evaluation,
+)
 from plato.models import registry as models_registry
 from plato.serialization.safetensor import deserialize_tree, serialize_tree
 from plato.trainers import base, tracking
@@ -171,6 +176,61 @@ class ComposableTrainer(base.Trainer):
                 "ComposableTrainer model has not been initialised correctly."
             )
         return cast(nn.Module, self.model)
+
+    @staticmethod
+    def _persisted_test_state_keys() -> tuple[str, ...]:
+        """State keys that must survive spawned test subprocesses."""
+        return (
+            EVALUATION_RESULTS_KEY,
+            EVALUATION_PRIMARY_KEY,
+            "nanochat_core_results",
+        )
+
+    def _test_accuracy_filename(self, run_id: str) -> str:
+        model_name = Config().trainer.model_name
+        return f"{model_name}_{self.client_id}_{run_id}.acc"
+
+    def _test_state_filename(self, run_id: str) -> str:
+        model_name = Config().trainer.model_name
+        return f"{model_name}_{self.client_id}_{run_id}.eval.pkl"
+
+    def _save_test_state(self, filename: str) -> None:
+        """Persist evaluation-related context state from a test subprocess."""
+        model_path = Config().params["model_path"]
+        if not os.path.exists(model_path):
+            os.makedirs(model_path)
+
+        state = getattr(self.context, "state", {})
+        payload = {
+            key: copy.deepcopy(state[key])
+            for key in self._persisted_test_state_keys()
+            if key in state
+        }
+        with open(f"{model_path}/{filename}", "wb") as state_file:
+            pickle.dump(payload, state_file)
+
+    def _load_test_state(self, filename: str) -> None:
+        """Restore evaluation-related context state after a spawned test subprocess."""
+        model_path = Config().params["model_path"]
+        state = getattr(self.context, "state", None)
+        if not isinstance(state, dict):
+            return
+
+        for key in self._persisted_test_state_keys():
+            state.pop(key, None)
+
+        state_path = f"{model_path}/{filename}"
+        if not os.path.exists(state_path):
+            return
+
+        with open(state_path, "rb") as state_file:
+            payload = pickle.load(state_file)
+        if not isinstance(payload, dict):
+            raise TypeError("Persisted test state must be a mapping.")
+
+        for key in self._persisted_test_state_keys():
+            if key in payload:
+                state[key] = payload[key]
 
     def _setup_strategies(self):
         """Setup all strategies."""
@@ -681,6 +741,11 @@ class ComposableTrainer(base.Trainer):
             train_proc.start()
             train_proc.join()
 
+            if train_proc.exitcode not in (0, None):
+                raise ValueError(
+                    f"Training worker for client {self.client_id} exited with code {train_proc.exitcode}."
+                )
+
             model_name = Config().trainer.model_name
             filename = (
                 f"{model_name}_{self.client_id}_{Config().params['run_id']}.safetensors"
@@ -722,9 +787,9 @@ class ComposableTrainer(base.Trainer):
         """The testing loop, run in a separate process."""
         self.test_model(config, testset, sampler, **kwargs)
 
-        model_name = Config().trainer.model_name
-        filename = f"{model_name}_{self.client_id}_{config['run_id']}.acc"
-        self.save_accuracy(self.accuracy, filename)
+        accuracy_filename = self._test_accuracy_filename(config["run_id"])
+        self.save_accuracy(self.accuracy, accuracy_filename)
+        self._save_test_state(self._test_state_filename(config["run_id"]))
 
     def test(self, testset, sampler=None, **kwargs) -> float:
         """
@@ -756,15 +821,23 @@ class ComposableTrainer(base.Trainer):
             test_proc.start()
             test_proc.join()
 
-            model_name = Config().trainer.model_name
-            filename = f"{model_name}_{self.client_id}_{Config().params['run_id']}.acc"
+            if test_proc.exitcode not in (0, None):
+                raise ValueError(
+                    f"Testing worker for client {self.client_id} exited with code {test_proc.exitcode}."
+                )
+
+            accuracy_filename = self._test_accuracy_filename(Config().params["run_id"])
+            state_filename = self._test_state_filename(Config().params["run_id"])
 
             try:
-                accuracy = self.load_accuracy(filename)
+                accuracy = self.load_accuracy(accuracy_filename)
             except OSError as error:
                 raise ValueError(
                     f"Testing on client {self.client_id} failed."
                 ) from error
+
+            self._load_test_state(state_filename)
+            self.accuracy = accuracy
 
             self.pause_training()
             return accuracy
@@ -792,6 +865,18 @@ class ComposableTrainer(base.Trainer):
 
         # Store accuracy for compatibility with existing code
         self.accuracy = accuracy
+
+        run_configured_evaluation(
+            model=model,
+            context=self.context,
+            trainer=self,
+            tokenizer=getattr(self, "tokenizer", None),
+            config=config,
+            testset=testset,
+            sampler=sampler,
+            local_metric=accuracy,
+            evaluator_override=getattr(self, "_configured_evaluator_override", None),
+        )
 
         return accuracy
 

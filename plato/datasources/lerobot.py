@@ -93,11 +93,11 @@ def _import_lerobot() -> tuple[Any, Any]:
             LeRobotDataset,
             LeRobotDatasetMetadata,
         )
-    except ImportError as exc:  # pragma: no cover - exercised without robotics extra.
+    except ImportError as exc:  # pragma: no cover - environment dependent.
         raise ImportError(
-            "LeRobot datasource requires optional robotics dependencies. "
-            'Install them with "uv sync --extra robotics" before using '
-            '"data.datasource = "LeRobot"". '
+            "LeRobot datasource requires optional LeRobot / SmolVLA robotics dependencies. "
+            "Install the robotics stack in the active environment before using "
+            '"data.datasource = \"LeRobot\"". '
         ) from exc
 
     return LeRobotDataset, LeRobotDatasetMetadata
@@ -362,9 +362,7 @@ def _resolve_task_name(row: Mapping[str, Any], tasks_lookup: Any) -> str | None:
     return None
 
 
-def _resolve_episode_tasks(
-    metadata: Any, episodes: Sequence[int]
-) -> dict[int, str | None]:
+def _resolve_episode_tasks(metadata: Any, episodes: Sequence[int]) -> dict[int, str | None]:
     episode_tasks = {episode: None for episode in episodes}
     episode_rows = _episode_rows(getattr(metadata, "episodes", None))
     tasks_lookup = _to_plain(getattr(metadata, "tasks", None))
@@ -475,14 +473,10 @@ def _resolve_episode_split(
     episode_set = set(int(episode) for episode in all_episodes)
 
     if explicit_train is None and explicit_test is None:
-        return _split_episodes(
-            all_episodes, episode_tasks, train_ratio, seed, task_aware
-        )
+        return _split_episodes(all_episodes, episode_tasks, train_ratio, seed, task_aware)
 
     train_episodes = [
-        int(episode)
-        for episode in (explicit_train or [])
-        if int(episode) in episode_set
+        int(episode) for episode in (explicit_train or []) if int(episode) in episode_set
     ]
     test_episodes = [
         int(episode)
@@ -575,9 +569,7 @@ def _resolve_total_clients(config: Any) -> int:
     return total_clients
 
 
-def _filter_constructor_kwargs(
-    dataset_cls: Any, kwargs: Mapping[str, Any]
-) -> dict[str, Any]:
+def _filter_constructor_kwargs(dataset_cls: Any, kwargs: Mapping[str, Any]) -> dict[str, Any]:
     try:
         signature = inspect.signature(dataset_cls.__init__)
     except (TypeError, ValueError):
@@ -590,7 +582,9 @@ def _filter_constructor_kwargs(
     if accepts_var_kwargs:
         return dict(kwargs)
 
-    valid_parameters = {name for name in signature.parameters.keys() if name != "self"}
+    valid_parameters = {
+        name for name in signature.parameters.keys() if name != "self"
+    }
     filtered = {key: value for key, value in kwargs.items() if key in valid_parameters}
 
     dropped = sorted(set(kwargs.keys()) - set(filtered.keys()))
@@ -652,7 +646,8 @@ class DataSource(base.DataSource):
         repo_id = str(dataset_cfg.pop("repo_id", "")).strip()
         if not repo_id:
             raise ValueError(
-                'LeRobot datasource requires "parameters.dataset.repo_id" to be set.'
+                "LeRobot datasource requires "
+                '"parameters.dataset.repo_id" to be set.'
             )
 
         train_split_raw = dataset_cfg.pop("train_split", _DEFAULT_TRAIN_SPLIT)

@@ -56,45 +56,79 @@ same strategy stack in every round.
 - **`TestingStrategy`**: customise evaluation logic and return scalar metrics for
   downstream logging.
 
-Each concrete strategy inherits optional `setup`/`teardown` hooks and can emit
-callback events via `context.callback_handler`.
+Structured evaluators are layered **after** the testing strategy. In other
+words, `TestingStrategy` still returns the trainer's scalar metric (accuracy,
+perplexity, loss, and so on), and an optional `[evaluation]` section can then
+run a named benchmark adapter such as Lighteval or Nanochat CORE. See
+[Evaluators](evaluators.md) for that layer.
+
+Each concrete strategy inherits optional `setup`/`teardown` hooks. To fire
+callback events from within a strategy, hold a reference to the trainer and
+call `trainer.callback_handler.call_event(...)` directly. The
+`TrainingContext` passed to strategies does not carry a `callback_handler`
+attribute; only `ClientContext` (for client strategies) does.
 
 ## Composing Trainers
 
 `ComposableTrainer` accepts either concrete strategy instances or `None` for the defaults. You can start from `plato.trainers.basic.Trainer` (which simply wraps the defaults) and override only the pieces you need:
 
 ```py
-from plato.trainers.basic import Trainer
-from plato.trainers.strategies.training_step import GradientClipStepStrategy
+from plato.trainers.composable import ComposableTrainer
+from plato.trainers.strategies.training_step import GradientClippingStepStrategy
 
-class ClippedTrainer(Trainer):
+class ClippedTrainer(ComposableTrainer):
     def __init__(self, *, model=None, callbacks=None, max_norm=1.0):
-        super().__init__(model=model, callbacks=callbacks)
-        self._configure_composable(
-            loss_strategy=self.loss_strategy,
-            optimizer_strategy=self.optimizer_strategy,
-            training_step_strategy=GradientClipStepStrategy(max_norm=max_norm),
-            lr_scheduler_strategy=self.lr_scheduler_strategy,
-            model_update_strategy=self.model_update_strategy,
-            data_loader_strategy=self.data_loader_strategy,
-            testing_strategy=self.testing_strategy,
+        super().__init__(
+            model=model,
+            callbacks=callbacks,
+            training_step_strategy=GradientClippingStepStrategy(max_norm=max_norm),
+            # All other strategies default to their standard implementations.
         )
 ```
 
-Strategies can also be registered in experiment configs—see the references under
-`plato.trainers.strategies` for ready-made options such as FedNova, Scaffold,
-and adaptation methods.
+See the references under `plato.trainers.strategies` for ready-made options
+such as Scaffold, FedProx, FedDyn, and personalised-FL adaptation strategies.
+FedNova is a server-side aggregation algorithm and lives under
+`plato.servers.strategies`, not the trainer strategies.
 
 ## Trainer Context and Run History
 
-`TrainingContext` exposes:
+`TrainingContext` carries the following fields:
 
-- `model`, `optimizer`, `lr_scheduler`, and active data loaders.
-- `client_id`, `current_round`, `current_epoch`, and `device`.
-- `state` and `metadata` dictionaries for cross-strategy coordination.
-- `run_history`, which records loss and accuracy per epoch/round.
+- `model`: the neural network being trained.
+- `device`: the active `torch.device`.
+- `client_id`, `current_round`, `current_epoch`: round/epoch counters.
+- `config`: the training configuration dictionary for the current round.
+- `state`: a plain dictionary for cross-strategy coordination at runtime.
 
-Use these fields instead of storing state on the trainer subclass directly.
+Note that `optimizer`, `lr_scheduler`, and `run_history` are attributes of
+`ComposableTrainer` itself, not of `TrainingContext`. The active data loader
+is stored at `context.state["train_loader"]` during training. A `metadata`
+dictionary exists on `ClientContext` (for client strategies) but not on
+`TrainingContext`.
+
+Prefer `context.state` for sharing transient values between strategies, and
+`trainer.run_history` when you need to read or update per-epoch metrics from
+callbacks.
+
+## Structured Evaluators and Trainer State
+
+When `[evaluation]` is configured, `ComposableTrainer.test_model(...)` calls the
+configured evaluator after the testing strategy finishes. The evaluator stores
+its structured payload in `TrainingContext.state`, which is then consumed by the
+server logger.
+
+Important details:
+
+- summary metrics become `evaluation_*` CSV columns automatically;
+- detailed Lighteval task metrics are flattened into additional `evaluation_*`
+  columns;
+- when `trainer.max_concurrency` causes testing to run in a spawned subprocess,
+  Plato persists and restores the evaluator state so those metrics still reach
+  the parent server process.
+
+See [Evaluation](../configurations/evaluation.md) and
+[Evaluators](evaluators.md) for the configuration and API details.
 
 ## Example: Creating a Custom Strategy
 

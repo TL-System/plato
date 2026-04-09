@@ -6,7 +6,7 @@ To allow SSL transform to use the desired parameters, one should place the
 'data_transforms' sub-block under the 'algorithm' block in the config file.
 """
 
-from lightly import transforms
+import importlib
 
 from plato.config import Config
 from plato.datasources import base
@@ -33,21 +33,41 @@ dataset_normalizations = {
 
 
 # All transforms for different SSL algorithms
-registered_transforms = {
-    "SimCLR": transforms.SimCLRTransform,
-    "DINO": transforms.DINOTransform,
-    "MAE": transforms.MAETransform,
-    "MoCoV1": transforms.MoCoV1Transform,
-    "MoCoV2": transforms.MoCoV2Transform,
-    "MSN": transforms.MSNTransform,
-    "PIRL": transforms.PIRLTransform,
-    "SimSiam": transforms.SimSiamTransform,
-    "SMoG": transforms.SMoGTransform,
-    "SwaV": transforms.SwaVTransform,
-    "VICReg": transforms.VICRegTransform,
-    "VICRegL": transforms.VICRegLTransform,
-    "FastSiam": transforms.FastSiamTransform,
+_REGISTERED_TRANSFORM_NAMES = {
+    "SimCLR": "SimCLRTransform",
+    "DINO": "DINOTransform",
+    "MAE": "MAETransform",
+    "MoCoV1": "MoCoV1Transform",
+    "MoCoV2": "MoCoV2Transform",
+    "MSN": "MSNTransform",
+    "PIRL": "PIRLTransform",
+    "SimSiam": "SimSiamTransform",
+    "SMoG": "SMoGTransform",
+    "SwaV": "SwaVTransform",
+    "VICReg": "VICRegTransform",
+    "VICRegL": "VICRegLTransform",
+    "FastSiam": "FastSiamTransform",
 }
+
+
+def _require_lightly_transforms_module():
+    """Import Lightly transforms only for SSL data pipelines."""
+    try:
+        return importlib.import_module("lightly.transforms")
+    except ImportError as exc:  # pragma: no cover - depends on optional install
+        raise ImportError(
+            "The self_supervised_learning datasource requires the optional "
+            "'lightly' package. Install it in environments that run SSL "
+            "training workloads."
+        ) from exc
+
+
+def _registered_transforms():
+    transforms = _require_lightly_transforms_module()
+    return {
+        name: getattr(transforms, attr_name)
+        for name, attr_name in _REGISTERED_TRANSFORM_NAMES.items()
+    }
 
 
 def get_transforms():
@@ -107,6 +127,7 @@ def get_transforms():
             )
 
         transform_params["normalize"] = dataset_normalizations[normalization_key]
+        registered_transforms = _registered_transforms()
         # Get the SSL transform
         if transform_name in registered_transforms:
             dataset_transform = registered_transforms[transform_name](

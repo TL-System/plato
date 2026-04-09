@@ -10,6 +10,105 @@ from plato.servers.strategies.base import ServerContext
 from plato.trainers.composable import ComposableTrainer
 
 
+def _mock_evaluation_state():
+    from plato.evaluators.runner import (
+        EVALUATION_PRIMARY_KEY,
+        EVALUATION_RESULTS_KEY,
+    )
+
+    payload = {
+        "evaluator": "mock",
+        "primary_metric": "mock_score",
+        "metrics": {"mock_score": 0.8, "aux_metric": 0.2},
+        "higher_is_better": {"mock_score": True, "aux_metric": False},
+        "metadata": {"source": "unit-test"},
+        "artifacts": {"report": "mock.json"},
+        "primary_value": 0.8,
+    }
+
+    return {
+        EVALUATION_PRIMARY_KEY: {
+            "evaluator": "mock",
+            "metric": "mock_score",
+            "value": 0.8,
+        },
+        EVALUATION_RESULTS_KEY: {"mock": payload},
+    }
+
+
+def _mock_lighteval_state():
+    from plato.evaluators.runner import (
+        EVALUATION_PRIMARY_KEY,
+        EVALUATION_RESULTS_KEY,
+    )
+
+    payload = {
+        "evaluator": "lighteval",
+        "primary_metric": "ifeval_avg",
+        "metrics": {
+            "ifeval_avg": 0.21875,
+            "hellaswag": 0.0,
+            "arc_avg": 0.28125,
+            "arc_easy": 0.375,
+            "arc_challenge": 0.1875,
+            "piqa": 0.0,
+        },
+        "higher_is_better": {},
+        "metadata": {
+            "raw_metrics": {
+                "all": {
+                    "acc": 0.28125,
+                    "prompt_level_strict_acc": 0.21875,
+                },
+                "arc:challenge:0": {
+                    "acc": 0.1875,
+                    "acc_stderr": 0.0701,
+                },
+                "arc:easy:0": {
+                    "acc": 0.375,
+                    "acc_stderr": 0.0869,
+                },
+                "ifeval:0": {
+                    "inst_level_loose_acc": 0.3191489361702128,
+                    "prompt_level_loose_acc": 0.21875,
+                    "prompt_level_strict_acc": 0.21875,
+                },
+                "hellaswag:0": {
+                    "em": 0.0,
+                    "em_stderr": 0.0,
+                },
+                "piqa_hf:0": {
+                    "em": 0.0,
+                    "em_stderr": 0.0,
+                },
+            }
+        },
+        "artifacts": {},
+        "primary_value": 0.21875,
+    }
+
+    return {
+        EVALUATION_PRIMARY_KEY: {
+            "evaluator": "lighteval",
+            "metric": "ifeval_avg",
+            "value": 0.21875,
+        },
+        EVALUATION_RESULTS_KEY: {"lighteval": payload},
+    }
+
+
+def _runtime_update():
+    return SimpleNamespace(
+        report=SimpleNamespace(
+            num_samples=4,
+            accuracy=0.5,
+            processing_time=0.1,
+            comm_time=0.2,
+            training_time=0.3,
+        )
+    )
+
+
 def test_fedavg_aggregation_weighted_mean(temp_config):
     """FedAvg aggregation should compute the weighted mean of client deltas."""
     trainer = ComposableTrainer(model=lambda: torch.nn.Linear(2, 1))
@@ -141,3 +240,93 @@ def test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights(
     assert strategy.delta_calls == 1
     assert torch.allclose(server.algorithm.current["weight"], torch.ones((1, 2)))
     assert torch.allclose(server.algorithm.current["bias"], torch.ones(1))
+
+
+def test_fedavg_server_logged_items_flatten_evaluator_metrics(
+    temp_config, tmp_path
+):
+    """FedAvg should keep accuracy while surfacing evaluator summary metrics."""
+    from plato.config import Config
+    from plato.servers import fedavg
+
+    result_path = tmp_path / "results"
+    result_path.mkdir()
+    Config.params["result_path"] = str(result_path)
+
+    server = fedavg.Server()
+    server.current_round = 2
+    server.accuracy = 0.5
+    server.accuracy_std = 0.0
+    server.initial_wall_time = 10.0
+    server.wall_time = 15.0
+    server.comm_overhead = 1.5
+    server.updates = [_runtime_update()]
+    server.trainer = SimpleNamespace(
+        context=SimpleNamespace(state=_mock_evaluation_state())
+    )
+
+    logged_items = server.get_logged_items()
+
+    assert logged_items["accuracy"] == 0.5
+    assert logged_items["evaluation_primary_value"] == 0.8
+    assert logged_items["evaluation_mock_score"] == 0.8
+    assert logged_items["evaluation_aux_metric"] == 0.2
+
+
+def test_fedavg_server_logged_items_include_detailed_lighteval_metrics(
+    temp_config, tmp_path
+):
+    """FedAvg should expose detailed Lighteval task metrics for CSV logging."""
+    from plato.config import Config
+    from plato.servers import fedavg
+
+    result_path = tmp_path / "results"
+    result_path.mkdir()
+    Config.params["result_path"] = str(result_path)
+
+    server = fedavg.Server()
+    server.current_round = 2
+    server.accuracy = 0.5
+    server.accuracy_std = 0.0
+    server.initial_wall_time = 10.0
+    server.wall_time = 15.0
+    server.comm_overhead = 1.5
+    server.updates = [_runtime_update()]
+    server.trainer = SimpleNamespace(
+        context=SimpleNamespace(state=_mock_lighteval_state())
+    )
+
+    logged_items = server.get_logged_items()
+
+    assert logged_items["evaluation_ifeval_avg"] == 0.21875
+    assert logged_items["evaluation_arc_easy"] == 0.375
+    assert logged_items["evaluation_arc_challenge"] == 0.1875
+    assert logged_items["evaluation_ifeval_prompt_level_strict_acc"] == 0.21875
+    assert logged_items["evaluation_ifeval_inst_level_loose_acc"] == 0.3191489361702128
+    assert logged_items["evaluation_hellaswag_em"] == 0.0
+    assert logged_items["evaluation_piqa_em"] == 0.0
+    assert logged_items["evaluation_arc_easy_acc"] == 0.375
+    assert logged_items["evaluation_arc_challenge_acc_stderr"] == 0.0701
+
+
+def test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar(
+    temp_config, tmp_path
+):
+    """FedAvg should rely on CSV logging instead of a JSONL sidecar."""
+    from plato.config import Config
+    from plato.servers import fedavg
+
+    result_path = tmp_path / "results"
+    result_path.mkdir()
+    Config.params["result_path"] = str(result_path)
+
+    server = fedavg.Server()
+    server.current_round = 3
+    server.accuracy = 0.5
+    server.trainer = SimpleNamespace(
+        context=SimpleNamespace(state=_mock_evaluation_state())
+    )
+
+    server.clients_processed()
+
+    assert not any(result_path.glob("*_evaluation.jsonl"))

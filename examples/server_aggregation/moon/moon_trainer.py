@@ -116,7 +116,7 @@ class MoonTrainingStepStrategy(TrainingStepStrategy):
         moon_model = cast(MoonModel, model)
         _, local_projection, logits = moon_model.forward_with_projection(examples)
 
-        outputs = {
+        outputs: dict[str, torch.Tensor | list[torch.Tensor]] = {
             "logits": logits,
             "local_projection": local_projection,
         }

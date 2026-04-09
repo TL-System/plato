@@ -5,6 +5,8 @@ Tests the default loss criterion strategy implementations to ensure
 they compute losses correctly.
 """
 
+import importlib
+
 import pytest
 import torch
 import torch.nn as nn
@@ -19,6 +21,48 @@ from plato.trainers.strategies.loss_criterion import (
     MSELossStrategy,
     NLLLossStrategy,
 )
+
+
+def test_loss_registry_core_loss_does_not_import_lightly(temp_config, monkeypatch):
+    from plato.trainers import loss_criterion as loss_criterion_registry
+
+    original_import_module = importlib.import_module
+
+    def import_without_lightly(name, package=None):
+        if name == "lightly.loss":
+            raise AssertionError("Core loss criteria should not import lightly.")
+        return original_import_module(name, package)
+
+    monkeypatch.setattr(
+        loss_criterion_registry.importlib,
+        "import_module",
+        import_without_lightly,
+    )
+
+    criterion = loss_criterion_registry.get(loss_criterion="CrossEntropyLoss")
+
+    assert isinstance(criterion, nn.CrossEntropyLoss)
+
+
+
+def test_loss_registry_ssl_loss_requires_optional_lightly(temp_config, monkeypatch):
+    from plato.trainers import loss_criterion as loss_criterion_registry
+
+    original_import_module = importlib.import_module
+
+    def missing_lightly(name, package=None):
+        if name == "lightly.loss":
+            raise ImportError("lightly is missing")
+        return original_import_module(name, package)
+
+    monkeypatch.setattr(
+        loss_criterion_registry.importlib,
+        "import_module",
+        missing_lightly,
+    )
+
+    with pytest.raises(ImportError, match="optional 'lightly' package"):
+        loss_criterion_registry.get(loss_criterion="NTXentLoss")
 
 
 class TestCrossEntropyLossStrategy:

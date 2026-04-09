@@ -42,8 +42,8 @@ def _import_smolvla_policy() -> type[Any]:
         from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy
     except ImportError as exc:  # pragma: no cover - environment dependent
         raise ImportError(
-            "SmolVLA requires LeRobot robotics dependencies. "
-            "Install them with `uv sync --extra robotics`."
+            "SmolVLA requires optional LeRobot robotics dependencies. "
+            "Install the robotics stack in the active environment before using `model_type = \"smolvla\"`."
         ) from exc
     return SmolVLAPolicy
 
