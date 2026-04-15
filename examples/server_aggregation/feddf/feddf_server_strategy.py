@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import Mapping
 
 from feddf_utils import resolve_algorithm_value, select_proxy_subset
@@ -136,7 +137,9 @@ class FedDFAggregationStrategy(AggregationStrategy):
             "shuffle_batches", self.shuffle_batches, True
         )
 
-        return algorithm.distill_weights(
+        context.state["feddf_server_distillation_time"] = 0.0
+        tic = time.perf_counter()
+        updated_weights = algorithm.distill_weights(
             baseline_weights,
             teacher_logits,
             proxy_dataset,
@@ -148,3 +151,6 @@ class FedDFAggregationStrategy(AggregationStrategy):
             use_cosine_annealing=use_cosine_annealing,
             shuffle_batches=shuffle_batches,
         )
+        context.state["feddf_server_distillation_time"] = time.perf_counter() - tic
+
+        return updated_weights

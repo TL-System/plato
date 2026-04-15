@@ -198,6 +198,14 @@ def test_feddf_server_process_reports_distills_global_model(temp_config):
         reduction="batchmean",
     )
     assert distilled_loss < baseline_loss
+    assert server.feddf_server_distillation_time > 0
+
+    logged_items = server.get_logged_items()
+    assert logged_items["feddf_server_distillation_time"] == (
+        server.feddf_server_distillation_time
+    )
+    assert logged_items["round_time"] == server.feddf_server_distillation_time
+    assert logged_items["elapsed_time"] >= server.feddf_server_distillation_time
 
 
 def test_feddf_teacher_logits_average_uniformly_by_default(temp_config):

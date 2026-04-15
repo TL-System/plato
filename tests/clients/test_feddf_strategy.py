@@ -62,11 +62,17 @@ def test_feddf_training_strategy_returns_teacher_logits(temp_config):
         feddf_client.DefaultTrainingStrategy,
         "train",
         new=async_mock,
-    ) as mock_train:
+    ) as mock_train, patch.object(
+        feddf_client.time,
+        "perf_counter",
+        side_effect=[10.0, 10.25],
+    ):
         report, payload = asyncio.run(strategy.train(context))
 
     mock_train.assert_awaited_once()
     assert report is mock_report
+    assert getattr(report, "training_time") == 0.25
+    assert getattr(report, "feddf_proxy_logits_time") == 0.25
     assert getattr(report, "payload_type") == "feddf_logits"
     assert getattr(report, "proxy_size") == 3
     assert "logits" in payload
@@ -74,3 +80,4 @@ def test_feddf_training_strategy_returns_teacher_logits(temp_config):
     assert tuple(payload["logits"].shape) == (3, 2)
     assert loaded_weights == [inbound_payload["weights"]]
     assert torch.equal(context.state["feddf_proxy_inputs"], proxy_inputs)
+    assert context.state["feddf_proxy_logits_time"] == 0.25

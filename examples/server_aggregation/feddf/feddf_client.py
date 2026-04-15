@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 from feddf_utils import (
     collect_proxy_logits,
     resolve_algorithm_value,
@@ -50,12 +52,18 @@ class FedDFTrainingStrategy(DefaultTrainingStrategy):
         proxy_batch_size = resolve_algorithm_value(
             "proxy_batch_size", self.proxy_batch_size, 128
         )
+        tic = time.perf_counter()
         logits = collect_proxy_logits(
             trainer.model,
             TensorDataset(proxy_inputs),
             batch_size=proxy_batch_size,
             device=getattr(trainer, "device", "cpu"),
         )
+        proxy_logits_time = time.perf_counter() - tic
+
+        report.training_time = getattr(report, "training_time", 0.0) + proxy_logits_time
+        report.feddf_proxy_logits_time = proxy_logits_time
+        context.state["feddf_proxy_logits_time"] = proxy_logits_time
 
         report.payload_type = "feddf_logits"
         report.proxy_size = len(proxy_inputs)
