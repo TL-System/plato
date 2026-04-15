@@ -60,28 +60,35 @@ class TinyStudent(torch.nn.Module):
         return self.linear(inputs)
 
 
+class SharedProxyDatasource:
+    """Datasource stub exposing a shared test split for FedDF."""
+
+    def __init__(self, proxy_inputs: torch.Tensor) -> None:
+        self._test = TensorDataset(proxy_inputs, torch.zeros(len(proxy_inputs)))
+
+    def get_test_set(self):
+        return self._test
+
+
 def test_feddf_server_process_reports_distills_global_model(temp_config):
     """FedDF should consume logits payloads and update the global model."""
-    from plato.servers import fedavg
+    feddf_server = _load_module(
+        "feddf_server_module",
+        _FEDDF_DIR / "feddf_server.py",
+    )
 
     Config().server.do_test = False
 
     trainer = SimpleNamespace(model=TinyStudent(), device="cpu")
     algorithm = feddf_algorithm.Algorithm(trainer=trainer)
     strategy = feddf_server_strategy.FedDFAggregationStrategy(
+        proxy_set_size=4,
+        proxy_seed=1,
         temperature=1.0,
         distillation_epochs=80,
         distillation_batch_size=2,
         distillation_learning_rate=0.4,
     )
-    server = fedavg.Server(aggregation_strategy=strategy)
-    server.algorithm = algorithm
-    server.trainer = trainer
-    server.context.server = server
-    server.context.algorithm = algorithm
-    server.context.trainer = trainer
-    server.context.state["prng_state"] = None
-
     proxy_inputs = torch.tensor(
         [
             [2.0, 0.0],
@@ -90,8 +97,19 @@ def test_feddf_server_process_reports_distills_global_model(temp_config):
             [0.2, 1.5],
         ]
     )
-    proxy_dataset = TensorDataset(proxy_inputs, torch.zeros(len(proxy_inputs)))
-    server.context.state["feddf_proxy_dataset"] = proxy_dataset
+    server = feddf_server.Server(
+        aggregation_strategy=strategy,
+        datasource=lambda: SharedProxyDatasource(proxy_inputs),
+    )
+    server.algorithm = algorithm
+    server.trainer = trainer
+    server.context.server = server
+    server.context.algorithm = algorithm
+    server.context.trainer = trainer
+    server.context.state["prng_state"] = None
+    server_payload = server.customize_server_payload(algorithm.extract_weights())
+    assert set(server_payload.keys()) == {"weights", "proxy_inputs"}
+    assert torch.equal(server_payload["proxy_inputs"], proxy_inputs)
 
     teacher_logits_a = torch.tensor(
         [

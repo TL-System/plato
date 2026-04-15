@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, patch
 
 import torch
 
-from tests.test_utils.fakes import FakeDatasource, FakeModel
+from tests.test_utils.fakes import FakeModel
 
 _TESTS_ROOT = Path(__file__).resolve().parent
 _FEDDF_DIR = (
@@ -38,17 +38,22 @@ loader.exec_module(feddf_client)
 def test_feddf_training_strategy_returns_teacher_logits(temp_config):
     """FedDF clients should send proxy-set logits instead of model weights."""
     strategy = feddf_client.FedDFTrainingStrategy(
-        proxy_size=3,
         proxy_batch_size=2,
-        proxy_seed=11,
     )
+    loaded_weights = []
     context = SimpleNamespace(
         client_id=1,
         current_round=1,
-        datasource=FakeDatasource(test_length=5),
+        algorithm=SimpleNamespace(load_weights=lambda weights: loaded_weights.append(weights)),
         trainer=SimpleNamespace(model=FakeModel(), device="cpu"),
         state={},
     )
+    proxy_inputs = torch.randn(3, 4)
+    inbound_payload = {
+        "weights": {"linear.weight": torch.ones(2, 4)},
+        "proxy_inputs": proxy_inputs,
+    }
+    strategy.load_payload(context, inbound_payload)
 
     mock_report = SimpleNamespace(num_samples=8)
     async_mock = AsyncMock(return_value=(mock_report, {"weights": torch.ones(1)}))
@@ -67,4 +72,5 @@ def test_feddf_training_strategy_returns_teacher_logits(temp_config):
     assert "logits" in payload
     assert "weights" not in payload
     assert tuple(payload["logits"].shape) == (3, 2)
-    assert context.state["feddf_proxy_indices"] == [1, 2, 4]
+    assert loaded_weights == [inbound_payload["weights"]]
+    assert torch.equal(context.state["feddf_proxy_inputs"], proxy_inputs)

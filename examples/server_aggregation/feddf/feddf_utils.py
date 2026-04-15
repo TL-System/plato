@@ -90,3 +90,12 @@ def collect_proxy_logits(
         model.train()
 
     return torch.cat(logits, dim=0)
+
+
+def stack_proxy_inputs(proxy_dataset: Dataset) -> torch.Tensor:
+    """Materialise the proxy inputs in their deterministic dataset order."""
+    inputs = []
+    for example in proxy_dataset:
+        inputs.append(extract_batch_inputs(example))
+
+    return torch.stack(inputs)

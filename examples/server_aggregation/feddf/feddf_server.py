@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from feddf_algorithm import Algorithm as FedDFAlgorithm
 from feddf_server_strategy import FedDFAggregationStrategy
+from feddf_utils import stack_proxy_inputs
 
 from plato.servers import fedavg
 
@@ -35,3 +36,14 @@ class Server(fedavg.Server):
             aggregation_strategy=aggregation_strategy,
             client_selection_strategy=client_selection_strategy,
         )
+
+    def customize_server_payload(self, payload):
+        """Send weights together with the shared proxy inputs for FedDF."""
+        proxy_dataset = self.aggregation_strategy._resolve_proxy_dataset(self.context)
+        proxy_inputs = stack_proxy_inputs(proxy_dataset)
+        self.context.state["feddf_proxy_inputs"] = proxy_inputs
+
+        return {
+            "weights": payload,
+            "proxy_inputs": proxy_inputs,
+        }
