@@ -189,6 +189,65 @@ def test_torchvision_datasource_supports_boolean_splits_and_kwargs(
     assert datasource.classes() == ["neg", "pos"]
 
 
+def test_torchvision_datasource_supports_deterministic_non_overlapping_subsets(
+    monkeypatch, tmp_path
+):
+    """Subset configs should carve deterministic, disjoint slices from one split."""
+
+    class DummyBoolDataset:
+        def __init__(
+            self,
+            root,
+            train=True,
+            download=False,
+            transform=None,
+        ):
+            self.root = root
+            self.train = train
+            self.download = download
+            self.transform = transform
+            self.targets = list(range(10))
+            self.classes = ("neg", "pos")
+            self.data = list(range(10))
+
+        def __len__(self):
+            return len(self.data)
+
+        def __getitem__(self, index):
+            return self.data[index], self.targets[index]
+
+    stub_datasets = types.SimpleNamespace(DummyBoolDataset=DummyBoolDataset)
+    dummy_config = _build_config(
+        tmp_path,
+        {
+            "datasource": "Torchvision",
+            "dataset_name": "DummyBoolDataset",
+            "download": False,
+            "unlabeled_split": "train",
+            "train_subset": {"seed": 7, "start": 2, "size": 4},
+            "unlabeled_subset": {"seed": 7, "start": 0, "size": 2},
+        },
+    )
+
+    monkeypatch.setattr(torchvision_ds, "datasets", stub_datasets)
+    monkeypatch.setattr(torchvision_ds, "transforms", _StubTransforms())
+    monkeypatch.setattr(torchvision_ds, "Config", lambda: dummy_config)
+
+    datasource = torchvision_ds.DataSource()
+
+    expected_indices = torch.randperm(
+        10, generator=torch.Generator().manual_seed(7)
+    ).tolist()
+    assert datasource.trainset.indices == expected_indices[2:6]
+    assert datasource.get_unlabeled_set().indices == expected_indices[:2]
+    assert set(datasource.trainset.indices).isdisjoint(
+        datasource.get_unlabeled_set().indices
+    )
+    assert datasource.targets() == [3, 4, 1, 7]
+    assert datasource.get_unlabeled_set().targets == [5, 0]
+    assert datasource.classes() == ["neg", "pos"]
+
+
 def test_torchvision_datasource_celeba_defaults(monkeypatch, tmp_path):
     """CelebA should inherit legacy defaults including target handling."""
 

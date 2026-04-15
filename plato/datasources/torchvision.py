@@ -14,6 +14,7 @@ from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
 import torch
+from torch.utils.data import Subset
 from torchvision import datasets, transforms
 
 from plato.config import Config
@@ -50,6 +51,30 @@ def _to_plain_list(value: Any) -> list[Any]:
     if hasattr(value, "__iter__") and not isinstance(value, (str, bytes, dict)):
         return list(value)
     raise TypeError("Expected a list-like object for dataset arguments.")
+
+
+def _normalize_subset_spec(value: Any) -> dict[str, int] | None:
+    """Normalize an optional subset-selection config into plain integers."""
+    spec = _to_plain_dict(value)
+    if not spec:
+        return None
+
+    normalized: dict[str, int] = {}
+    if "seed" in spec:
+        normalized["seed"] = int(spec["seed"])
+
+    start = int(spec.get("start", 0))
+    if start < 0:
+        raise ValueError("Subset start must be non-negative.")
+    normalized["start"] = start
+
+    if "size" in spec:
+        size = int(spec["size"])
+        if size < 0:
+            raise ValueError("Subset size must be non-negative.")
+        normalized["size"] = size
+
+    return normalized
 
 
 def _default_transform():
@@ -264,6 +289,11 @@ class DataSource(base.DataSource):
         user_unlabeled_kwargs = _to_plain_dict(
             getattr(data_cfg, "unlabeled_kwargs", None)
         )
+        train_subset = _normalize_subset_spec(getattr(data_cfg, "train_subset", None))
+        test_subset = _normalize_subset_spec(getattr(data_cfg, "test_subset", None))
+        unlabeled_subset = _normalize_subset_spec(
+            getattr(data_cfg, "unlabeled_subset", None)
+        )
 
         common_args = list(dataset_defaults.get("dataset_args", [])) + _to_plain_list(
             getattr(data_cfg, "dataset_args", None)
@@ -355,6 +385,9 @@ class DataSource(base.DataSource):
                 train_transform,
                 train_target_transform,
             )
+            self.trainset = self._subset_dataset(
+                self.trainset, train_subset, subset_name="train"
+            )
         else:
             self.trainset = None
 
@@ -375,6 +408,9 @@ class DataSource(base.DataSource):
                 test_transform,
                 test_target_transform,
             )
+            self.testset = self._subset_dataset(
+                self.testset, test_subset, subset_name="test"
+            )
         else:
             self.testset = None
 
@@ -394,6 +430,9 @@ class DataSource(base.DataSource):
                 unlabeled_download,
                 unlabeled_transform,
                 unlabeled_target_transform,
+            )
+            self.unlabeledset = self._subset_dataset(
+                self.unlabeledset, unlabeled_subset, subset_name="unlabeled"
             )
         else:
             self.unlabeledset = None
@@ -525,25 +564,82 @@ class DataSource(base.DataSource):
         if not hasattr(dataset, "classes") and hasattr(dataset, "class_to_idx"):
             dataset.classes = list(dataset.class_to_idx.keys())
 
-    def classes(self):
-        dataset = self.trainset or self.testset
-        if dataset is None:
-            return []
+    @staticmethod
+    def _dataset_classes(dataset):
         if hasattr(dataset, "classes") and dataset.classes is not None:
             return list(dataset.classes)
         if hasattr(dataset, "class_to_idx"):
             return list(dataset.class_to_idx.keys())
-        return []
+        return None
+
+    @staticmethod
+    def _dataset_targets(dataset):
+        targets = None
+        if hasattr(dataset, "targets"):
+            targets = dataset.targets
+        elif hasattr(dataset, "labels"):
+            targets = dataset.labels
+
+        if targets is None:
+            return None
+        if isinstance(targets, torch.Tensor):
+            return targets.tolist()
+        if isinstance(targets, tuple):
+            return list(targets)
+        if hasattr(targets, "tolist") and not isinstance(targets, list):
+            return targets.tolist()
+        return list(targets)
+
+    def _subset_dataset(self, dataset, subset_spec, *, subset_name: str):
+        """Apply a deterministic subset slice while preserving metadata."""
+        if dataset is None or subset_spec is None:
+            return dataset
+
+        total_examples = len(dataset)
+        start = subset_spec.get("start", 0)
+        size = subset_spec.get("size", total_examples - start)
+        stop = start + size
+
+        if start > total_examples:
+            raise ValueError(
+                f"{subset_name}_subset start {start} exceeds dataset size {total_examples}."
+            )
+        if stop > total_examples:
+            raise ValueError(
+                f"{subset_name}_subset stop {stop} exceeds dataset size {total_examples}."
+            )
+
+        indices = list(range(total_examples))
+        if "seed" in subset_spec:
+            generator = torch.Generator().manual_seed(subset_spec["seed"])
+            indices = torch.randperm(total_examples, generator=generator).tolist()
+
+        selected_indices = indices[start:stop]
+        subset = Subset(dataset, selected_indices)
+
+        classes = self._dataset_classes(dataset)
+        if classes is not None:
+            subset.classes = classes
+
+        targets = self._dataset_targets(dataset)
+        if targets is not None:
+            subset.targets = [targets[index] for index in selected_indices]
+
+        return subset
+
+    def classes(self):
+        dataset = self.trainset or self.testset
+        if dataset is None:
+            return []
+        classes = self._dataset_classes(dataset)
+        return [] if classes is None else classes
 
     def targets(self):
         dataset = self.trainset or self.testset
         if dataset is None:
             return []
-        if hasattr(dataset, "targets"):
-            return dataset.targets
-        if hasattr(dataset, "labels"):
-            return dataset.labels
-        return []
+        targets = self._dataset_targets(dataset)
+        return [] if targets is None else targets
 
     def get_unlabeled_set(self):
         return getattr(self, "unlabeledset", None)

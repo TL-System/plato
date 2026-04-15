@@ -36,6 +36,21 @@ class FedDFAggregationStrategy(AggregationStrategy):
         """FedDF does not aggregate parameter deltas."""
         raise NotImplementedError("FedDF uses aggregate_weights with logits payloads.")
 
+    @staticmethod
+    def _proxy_source_dataset(datasource):
+        """Prefer an unlabeled proxy split, falling back to the test split."""
+        if hasattr(datasource, "get_unlabeled_set"):
+            unlabeled_set = datasource.get_unlabeled_set()
+            if unlabeled_set is not None:
+                return unlabeled_set
+
+        test_set = datasource.get_test_set()
+        if test_set is None:
+            raise RuntimeError(
+                "FedDF requires either an unlabeled proxy split or a test split."
+            )
+        return test_set
+
     def _resolve_proxy_dataset(self, context: ServerContext) -> Dataset:
         """Construct or reuse the deterministic proxy subset."""
         cached = context.state.get("feddf_proxy_dataset")
@@ -60,7 +75,7 @@ class FedDFAggregationStrategy(AggregationStrategy):
         )
         proxy_seed = resolve_algorithm_value("proxy_seed", self.proxy_seed, 1)
         proxy_dataset, proxy_indices = select_proxy_subset(
-            datasource.get_test_set(),
+            self._proxy_source_dataset(datasource),
             size=proxy_set_size,
             seed=proxy_seed,
         )

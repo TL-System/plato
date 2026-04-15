@@ -61,10 +61,21 @@ class TinyStudent(torch.nn.Module):
 
 
 class SharedProxyDatasource:
-    """Datasource stub exposing a shared test split for FedDF."""
+    """Datasource stub exposing both unlabeled and test splits for FedDF."""
 
-    def __init__(self, proxy_inputs: torch.Tensor) -> None:
-        self._test = TensorDataset(proxy_inputs, torch.zeros(len(proxy_inputs)))
+    def __init__(
+        self,
+        proxy_inputs: torch.Tensor,
+        test_inputs: torch.Tensor | None = None,
+    ) -> None:
+        self._unlabeled = TensorDataset(proxy_inputs, torch.zeros(len(proxy_inputs)))
+        self._test = TensorDataset(
+            test_inputs if test_inputs is not None else proxy_inputs,
+            torch.zeros(len(test_inputs) if test_inputs is not None else len(proxy_inputs)),
+        )
+
+    def get_unlabeled_set(self):
+        return self._unlabeled
 
     def get_test_set(self):
         return self._test
@@ -97,9 +108,17 @@ def test_feddf_server_process_reports_distills_global_model(temp_config):
             [0.2, 1.5],
         ]
     )
+    held_out_test_inputs = torch.tensor(
+        [
+            [9.0, 9.0],
+            [8.0, 8.0],
+            [7.0, 7.0],
+            [6.0, 6.0],
+        ]
+    )
     server = feddf_server.Server(
         aggregation_strategy=strategy,
-        datasource=lambda: SharedProxyDatasource(proxy_inputs),
+        datasource=lambda: SharedProxyDatasource(proxy_inputs, held_out_test_inputs),
     )
     server.algorithm = algorithm
     server.trainer = trainer
