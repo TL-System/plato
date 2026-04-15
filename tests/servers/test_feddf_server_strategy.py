@@ -198,3 +198,21 @@ def test_feddf_server_process_reports_distills_global_model(temp_config):
         reduction="batchmean",
     )
     assert distilled_loss < baseline_loss
+
+
+def test_feddf_teacher_logits_average_uniformly_by_default(temp_config):
+    """FedDF should use uniform AVGLOGITS unless configured otherwise."""
+    updates = [
+        SimpleNamespace(report=SimpleNamespace(num_samples=1)),
+        SimpleNamespace(report=SimpleNamespace(num_samples=99)),
+    ]
+    teacher_logits_a = torch.tensor([[10.0, -10.0]])
+    teacher_logits_b = torch.tensor([[-6.0, 6.0]])
+
+    aggregated = feddf_algorithm.Algorithm.aggregate_teacher_logits(
+        updates,
+        [{"logits": teacher_logits_a}, {"logits": teacher_logits_b}],
+    )
+
+    expected = (teacher_logits_a + teacher_logits_b) / 2
+    assert torch.allclose(aggregated, expected)

@@ -20,8 +20,10 @@ class Algorithm(fedavg.Algorithm):
     def aggregate_teacher_logits(
         updates,
         payloads: Sequence[Mapping[str, torch.Tensor]],
+        *,
+        weighting: str = "uniform",
     ) -> torch.Tensor:
-        """Compute a sample-weighted ensemble of client logits."""
+        """Compute the ensembled teacher logits for AVGLOGITS distillation."""
         if not payloads:
             raise ValueError("FedDF requires at least one logits payload.")
 
@@ -29,9 +31,14 @@ class Algorithm(fedavg.Algorithm):
         if not isinstance(first_logits, torch.Tensor):
             raise TypeError("FedDF payloads must include a 'logits' tensor.")
 
+        weighting_name = weighting.strip().lower()
+        if weighting_name not in {"uniform", "samples"}:
+            raise ValueError(
+                "FedDF teacher weighting must be either 'uniform' or 'samples'."
+            )
+
         total_samples = sum(getattr(update.report, "num_samples", 0) for update in updates)
-        if total_samples <= 0:
-            total_samples = len(payloads)
+        use_uniform_average = weighting_name == "uniform" or total_samples <= 0
 
         aggregated = torch.zeros_like(first_logits, dtype=torch.float32)
 
@@ -44,9 +51,10 @@ class Algorithm(fedavg.Algorithm):
                     "FedDF client logits must share the same proxy-set shape."
                 )
 
-            weight = getattr(update.report, "num_samples", 0) / total_samples
-            if total_samples == len(payloads):
+            if use_uniform_average:
                 weight = 1 / len(payloads)
+            else:
+                weight = getattr(update.report, "num_samples", 0) / total_samples
 
             aggregated += logits.detach().float() * weight
 
@@ -62,6 +70,9 @@ class Algorithm(fedavg.Algorithm):
         distillation_epochs: int,
         distillation_batch_size: int,
         distillation_learning_rate: float,
+        distillation_optimizer_name: str,
+        use_cosine_annealing: bool,
+        shuffle_batches: bool,
     ) -> OrderedDict[str, torch.Tensor]:
         """Distill the server model on proxy inputs using ensemble logits."""
         if len(proxy_dataset) != len(teacher_logits):
@@ -84,17 +95,36 @@ class Algorithm(fedavg.Algorithm):
         dataloader = DataLoader(
             distillation_dataset,
             batch_size=distillation_batch_size,
-            shuffle=False,
+            shuffle=shuffle_batches,
         )
 
         was_training = model.training
         model.to(device)
         model.train()
 
-        optimizer = torch.optim.SGD(
-            model.parameters(),
-            lr=distillation_learning_rate,
-        )
+        optimizer_name = distillation_optimizer_name.strip().lower()
+        if optimizer_name == "adam":
+            optimizer = torch.optim.Adam(
+                model.parameters(),
+                lr=distillation_learning_rate,
+            )
+        elif optimizer_name == "sgd":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=distillation_learning_rate,
+            )
+        else:
+            raise ValueError(
+                "FedDF distillation optimizer must be either 'adam' or 'sgd'."
+            )
+
+        total_steps = max(distillation_epochs * len(dataloader), 1)
+        scheduler = None
+        if use_cosine_annealing:
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer,
+                T_max=total_steps,
+            )
 
         for _ in range(distillation_epochs):
             for batch_inputs, batch_logits in dataloader:
@@ -112,6 +142,8 @@ class Algorithm(fedavg.Algorithm):
                 )
                 loss.backward()
                 optimizer.step()
+                if scheduler is not None:
+                    scheduler.step()
 
         if not was_training:
             model.eval()

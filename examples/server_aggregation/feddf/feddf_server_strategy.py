@@ -23,6 +23,10 @@ class FedDFAggregationStrategy(AggregationStrategy):
         distillation_epochs: int | None = None,
         distillation_batch_size: int | None = None,
         distillation_learning_rate: float | None = None,
+        teacher_weighting: str | None = None,
+        distillation_optimizer_name: str | None = None,
+        use_cosine_annealing: bool | None = None,
+        shuffle_batches: bool | None = None,
     ) -> None:
         super().__init__()
         self.proxy_set_size = proxy_set_size
@@ -31,6 +35,10 @@ class FedDFAggregationStrategy(AggregationStrategy):
         self.distillation_epochs = distillation_epochs
         self.distillation_batch_size = distillation_batch_size
         self.distillation_learning_rate = distillation_learning_rate
+        self.teacher_weighting = teacher_weighting
+        self.distillation_optimizer_name = distillation_optimizer_name
+        self.use_cosine_annealing = use_cosine_annealing
+        self.shuffle_batches = shuffle_batches
 
     async def aggregate_deltas(self, updates, deltas_received, context: ServerContext):
         """FedDF does not aggregate parameter deltas."""
@@ -97,17 +105,35 @@ class FedDFAggregationStrategy(AggregationStrategy):
             raise RuntimeError("FedDF requires an algorithm instance in context.")
 
         proxy_dataset = self._resolve_proxy_dataset(context)
-        teacher_logits = algorithm.aggregate_teacher_logits(updates, weights_received)
+        teacher_weighting = resolve_algorithm_value(
+            "teacher_weighting", self.teacher_weighting, "uniform"
+        )
+        teacher_logits = algorithm.aggregate_teacher_logits(
+            updates,
+            weights_received,
+            weighting=teacher_weighting,
+        )
 
-        temperature = resolve_algorithm_value("temperature", self.temperature, 2.0)
+        temperature = resolve_algorithm_value("temperature", self.temperature, 1.0)
         distillation_epochs = resolve_algorithm_value(
             "distillation_epochs", self.distillation_epochs, 5
         )
         distillation_batch_size = resolve_algorithm_value(
-            "distillation_batch_size", self.distillation_batch_size, 64
+            "distillation_batch_size", self.distillation_batch_size, 128
         )
         distillation_learning_rate = resolve_algorithm_value(
             "learning_rate", self.distillation_learning_rate, 0.001
+        )
+        distillation_optimizer_name = resolve_algorithm_value(
+            "distillation_optimizer_name",
+            self.distillation_optimizer_name,
+            "adam",
+        )
+        use_cosine_annealing = resolve_algorithm_value(
+            "use_cosine_annealing", self.use_cosine_annealing, True
+        )
+        shuffle_batches = resolve_algorithm_value(
+            "shuffle_batches", self.shuffle_batches, True
         )
 
         return algorithm.distill_weights(
@@ -118,4 +144,7 @@ class FedDFAggregationStrategy(AggregationStrategy):
             distillation_epochs=distillation_epochs,
             distillation_batch_size=distillation_batch_size,
             distillation_learning_rate=distillation_learning_rate,
+            distillation_optimizer_name=distillation_optimizer_name,
+            use_cosine_annealing=use_cosine_annealing,
+            shuffle_batches=shuffle_batches,
         )
