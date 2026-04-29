@@ -107,6 +107,36 @@ def configure_environment(config_dict: dict):
         Config._instance = None
 
 
+@contextlib.contextmanager
+def configure_environment_from_path(config_path: Path):
+    """
+    Context manager that initialises Config singleton from an existing config.
+    """
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        Config._instance = None  # reset singleton
+        Config.params = {}
+
+        previous_env = os.environ.get("config_file")
+        previous_argv = sys.argv[:]
+        os.environ["config_file"] = str(config_path)
+        sys.argv = [
+            previous_argv[0] if previous_argv else "pytest",
+            "--base",
+            tmp_dir,
+        ]
+
+        try:
+            config = Config()
+            yield config
+        finally:
+            if previous_env is None:
+                os.environ.pop("config_file", None)
+            else:
+                os.environ["config_file"] = previous_env
+            sys.argv = previous_argv
+            Config._instance = None
+
+
 def async_run(coro):
     """Utility to execute the coroutine using asyncio.run (Python 3.7+)."""
     return asyncio.run(coro)

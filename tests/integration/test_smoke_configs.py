@@ -4,7 +4,8 @@ Integration smoke tests covering minimal client-server orchestration.
 
 from __future__ import annotations
 
-from importlib import import_module
+from importlib import import_module, reload
+from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
 
@@ -17,7 +18,10 @@ from tests.integration.utils import (
     async_run,
     build_minimal_config,
     configure_environment,
+    configure_environment_from_path,
 )
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 class MNISTSmokeDatasource:
@@ -95,6 +99,36 @@ def test_fedavg_lenet5_smoke(monkeypatch):
 
         async_run(server._process_reports())
         assert server.accuracy >= 0
+
+
+@pytest.mark.integration
+def test_diloco_lenet5_smoke_config_contract_loads():
+    """Smoke config should load the faithful DiLoCo contract."""
+    config_path = REPO_ROOT / "configs" / "MNIST" / "diloco_lenet5_smoke.toml"
+
+    with configure_environment_from_path(config_path) as config:
+        assert config.server.type == "diloco"
+        assert config.algorithm.type == "fedavg"
+        assert config.trainer.local_steps_per_round == 2
+        assert config.trainer.preserve_optimizer_state is True
+        assert config.trainer.optimizer == "AdamW"
+        assert config.server.diloco.outer_optimizer == "nesterov"
+        assert config.server.diloco.outer_learning_rate == 0.7
+        assert config.server.diloco.outer_momentum == 0.9
+        assert config.server.diloco.aggregation_weighting == "uniform"
+        assert config.server.diloco.apply_outer_optimizer_to == "parameters"
+
+        server_registry = reload(import_module("plato.servers.registry"))
+        diloco_server = import_module("plato.servers.diloco")
+        diloco_aggregation = import_module("plato.servers.strategies.aggregation")
+
+        server = server_registry.get()
+
+        assert isinstance(server, diloco_server.Server)
+        assert isinstance(
+            server.aggregation_strategy,
+            diloco_aggregation.DiLoCoAggregationStrategy,
+        )
 
 
 @pytest.mark.integration
