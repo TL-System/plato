@@ -20,6 +20,19 @@ CollateFn = Callable[[list[Any]], Any]
 AdjustFn = Callable[[TrainingContext], int]
 
 
+class _FixedOrderSampler(torch.utils.data.Sampler):
+    """Sampler that yields precomputed dataset indices in order."""
+
+    def __init__(self, indices: list[int]):
+        self._indices = indices
+
+    def __iter__(self):
+        return iter(self._indices)
+
+    def __len__(self):
+        return len(self._indices)
+
+
 def _context_uses_cuda(context: TrainingContext) -> bool:
     """Return True if the training context targets a CUDA device."""
     device = getattr(context, "device", None)
@@ -38,6 +51,54 @@ def _resolve_pin_memory(setting: bool | None, context: TrainingContext) -> bool:
         return _context_uses_cuda(context)
     # Auto-detect when None (default behaviour)
     return _context_uses_cuda(context)
+
+
+def _local_step_stream_start(
+    context: TrainingContext, samples_per_round: int, stream_length: int
+) -> int:
+    """Return the deterministic stream offset for this local-step round."""
+    current_round = int(getattr(context, "current_round", 0) or 0)
+    if current_round > 0:
+        return ((current_round - 1) * samples_per_round) % stream_length
+
+    offset = int(context.state.get("_local_step_sampler_stream_offset", 0))
+    context.state["_local_step_sampler_stream_offset"] = offset + samples_per_round
+    return offset % stream_length
+
+
+def _apply_local_step_sampling_stream(
+    sampler_obj, batch_size: int, context: TrainingContext
+):
+    """Advance deterministic samplers across short local-step rounds."""
+    local_steps_per_round = context.state.get("local_steps_per_round")
+    if local_steps_per_round is None or sampler_obj is None:
+        return sampler_obj
+
+    samples_per_round = int(local_steps_per_round) * int(batch_size)
+    if samples_per_round <= 0:
+        return sampler_obj
+
+    try:
+        indices = list(iter(sampler_obj))
+    except TypeError:
+        logging.warning(
+            "Sampler %s cannot be materialized for round-aware local-step "
+            "sampling; using it unchanged. Consecutive short local rounds may "
+            "replay the same sampler prefix.",
+            type(sampler_obj),
+        )
+        return sampler_obj
+
+    if len(indices) == 0:
+        return sampler_obj
+
+    start = _local_step_stream_start(context, samples_per_round, len(indices))
+    if start == 0:
+        ordered_indices = indices
+    else:
+        ordered_indices = indices[start:] + indices[:start]
+
+    return _FixedOrderSampler(ordered_indices)
 
 
 class DefaultDataLoaderStrategy(DataLoaderStrategy):
@@ -99,6 +160,10 @@ class DefaultDataLoaderStrategy(DataLoaderStrategy):
         else:
             sampler_obj = None
             shuffle = self.shuffle
+
+        sampler_obj = _apply_local_step_sampling_stream(
+            sampler_obj, batch_size, context
+        )
 
         if sampler is None and not shuffle:
             logging.warning(
@@ -174,6 +239,10 @@ class CustomCollateFnDataLoaderStrategy(DataLoaderStrategy):
             sampler_obj = None
             shuffle = False
 
+        sampler_obj = _apply_local_step_sampling_stream(
+            sampler_obj, batch_size, context
+        )
+
         return torch.utils.data.DataLoader(
             dataset=trainset,
             batch_size=batch_size,
@@ -238,6 +307,10 @@ class PrefetchDataLoaderStrategy(DataLoaderStrategy):
         else:
             sampler_obj = None
             shuffle = False
+
+        sampler_obj = _apply_local_step_sampling_stream(
+            sampler_obj, batch_size, context
+        )
 
         return torch.utils.data.DataLoader(
             dataset=trainset,
@@ -320,6 +393,10 @@ class DynamicBatchSizeDataLoaderStrategy(DataLoaderStrategy):
             sampler_obj = None
             shuffle = False
 
+        sampler_obj = _apply_local_step_sampling_stream(
+            sampler_obj, actual_batch_size, context
+        )
+
         return torch.utils.data.DataLoader(
             dataset=trainset,
             batch_size=actual_batch_size,
@@ -382,6 +459,10 @@ class ShuffleDataLoaderStrategy(DataLoaderStrategy):
         else:
             sampler_obj = None
             shuffle = True
+
+        sampler_obj = _apply_local_step_sampling_stream(
+            sampler_obj, batch_size, context
+        )
 
         return torch.utils.data.DataLoader(
             dataset=trainset,

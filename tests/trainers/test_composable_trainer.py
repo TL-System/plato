@@ -8,7 +8,7 @@ it works correctly in end-to-end training scenarios.
 import pytest
 import torch
 import torch.nn as nn
-from torch.utils.data import TensorDataset
+from torch.utils.data import SubsetRandomSampler, TensorDataset
 
 from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
@@ -184,6 +184,19 @@ class TestComposableTrainerTraining:
 class TestComposableTrainerLocalSteps:
     """Test local optimizer-step limits for DiLoCo-style local work."""
 
+    class DeterministicPlatoSampler:
+        def __init__(self, indices, seed=47):
+            self.indices = list(indices)
+            self.seed = seed
+
+        def get(self):
+            generator = torch.Generator()
+            generator.manual_seed(self.seed)
+            return SubsetRandomSampler(self.indices, generator=generator)
+
+        def num_samples(self):
+            return len(self.indices)
+
     class CountingCallback(TrainerCallback):
         def __init__(self):
             self.train_run_end_called = False
@@ -221,6 +234,33 @@ class TestComposableTrainerLocalSteps:
             context,
         ):
             self.batch_count += 1
+            return super().training_step(
+                model=model,
+                optimizer=optimizer,
+                examples=examples,
+                labels=labels,
+                loss_criterion=loss_criterion,
+                context=context,
+            )
+
+    class RecordingStepStrategy(DefaultTrainingStepStrategy):
+        def __init__(self):
+            super().__init__()
+            self.samples_by_round = {}
+
+        def training_step(
+            self,
+            model,
+            optimizer,
+            examples,
+            labels,
+            loss_criterion,
+            context,
+        ):
+            sample_ids = examples[:, 0].detach().cpu().int().tolist()
+            self.samples_by_round.setdefault(context.current_round, []).extend(
+                sample_ids
+            )
             return super().training_step(
                 model=model,
                 optimizer=optimizer,
@@ -419,6 +459,52 @@ class TestComposableTrainerLocalSteps:
         assert step_strategy.batch_count == 20
         assert trainer.current_epoch == 2
         assert len(trainer.run_history.get_metric_values("train_loss")) == 2
+
+    def test_local_steps_do_not_replay_same_deterministic_sampler_prefix(
+        self, simple_model, simple_config
+    ):
+        dataset_size = 10
+        features = torch.arange(dataset_size, dtype=torch.float32).view(-1, 1)
+        features = features.repeat(1, 10)
+        labels = torch.arange(dataset_size) % 2
+        dataset = TensorDataset(features, labels)
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 1,
+            "local_steps_per_round": 3,
+        }
+        sampler = self.DeterministicPlatoSampler(range(dataset_size))
+        step_strategy = self.RecordingStepStrategy()
+        trainer = ComposableTrainer(
+            model=simple_model,
+            training_step_strategy=step_strategy,
+        )
+        trainer.set_client_id(2)
+
+        for round_number in (1, 2):
+            trainer.current_round = round_number
+            trainer.train_model(config, dataset, sampler)
+
+        round_one_samples = step_strategy.samples_by_round[1]
+        round_two_samples = step_strategy.samples_by_round[2]
+
+        assert len(round_one_samples) == config["local_steps_per_round"]
+        assert len(round_two_samples) == config["local_steps_per_round"]
+        assert round_one_samples != round_two_samples
+
+        repeat_step_strategy = self.RecordingStepStrategy()
+        repeat_trainer = ComposableTrainer(
+            model=simple_model,
+            training_step_strategy=repeat_step_strategy,
+        )
+        repeat_trainer.set_client_id(2)
+
+        for round_number in (1, 2):
+            repeat_trainer.current_round = round_number
+            repeat_trainer.train_model(config, dataset, sampler)
+
+        assert repeat_step_strategy.samples_by_round == step_strategy.samples_by_round
 
     @pytest.mark.parametrize("local_steps_per_round", [0, -1, 1.5, "2", True])
     def test_invalid_local_steps_fail_clearly(
