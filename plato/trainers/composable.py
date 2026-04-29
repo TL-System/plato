@@ -292,6 +292,11 @@ class ComposableTrainer(base.Trainer):
         if not self._preserved_state_is_compatible(
             payload, model, self.optimizer, self.lr_scheduler
         ):
+            logging.info(
+                "[Client #%d] Discarding incompatible optimizer state; "
+                "starting with fresh optimizer and scheduler state.",
+                self.client_id,
+            )
             self._preserved_optimizer_states.pop(self.client_id, None)
             return
 
@@ -302,8 +307,9 @@ class ComposableTrainer(base.Trainer):
 
             self.optimizer.load_state_dict(copy.deepcopy(payload["optimizer_state"]))
         except Exception as error:
-            logging.debug(
-                "[Client #%d] Discarding incompatible optimizer state: %s",
+            logging.warning(
+                "[Client #%d] Discarding incompatible optimizer state; "
+                "starting with fresh optimizer and scheduler state: %s",
                 self.client_id,
                 error,
             )
@@ -337,6 +343,82 @@ class ComposableTrainer(base.Trainer):
                 model, self.optimizer
             ),
         }
+
+    def _optimizer_state_filename(self, run_id: str) -> str:
+        """Return the local optimizer-state handoff filename."""
+        model_name = Config().trainer.model_name
+        return f"{model_name}_{self.client_id}_{run_id}.optim.pkl"
+
+    def _optimizer_state_path(self, filename: str) -> str:
+        """Return the local optimizer-state handoff path."""
+        return os.path.join(Config().params["model_path"], filename)
+
+    def _save_preserved_optimizer_state_file(self, filename: str) -> None:
+        """Persist preserved optimizer state for subprocess handoff."""
+        payload = self._preserved_optimizer_states.get(self.client_id)
+        if payload is None:
+            return
+
+        model_path = Config().params["model_path"]
+        os.makedirs(model_path, exist_ok=True)
+        state_path = self._optimizer_state_path(filename)
+        tmp_path = f"{state_path}.{os.getpid()}.tmp"
+
+        try:
+            with open(tmp_path, "wb") as state_file:
+                pickle.dump(copy.deepcopy(payload), state_file)
+            os.replace(tmp_path, state_path)
+        except Exception as error:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+            logging.warning(
+                "[Client #%d] Failed to persist optimizer state to %s: %s",
+                self.client_id,
+                state_path,
+                error,
+            )
+
+    def _load_preserved_optimizer_state_file(
+        self, filename: str, *, clear_on_missing: bool = False
+    ) -> None:
+        """Load preserved optimizer state from a subprocess handoff file."""
+        state_path = self._optimizer_state_path(filename)
+        if not os.path.exists(state_path):
+            if clear_on_missing:
+                self._preserved_optimizer_states.pop(self.client_id, None)
+            logging.info(
+                "[Client #%d] No persisted optimizer state found at %s; "
+                "starting with fresh optimizer and scheduler state.",
+                self.client_id,
+                state_path,
+            )
+            return
+
+        try:
+            with open(state_path, "rb") as state_file:
+                payload = pickle.load(state_file)
+        except Exception as error:
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            logging.warning(
+                "[Client #%d] Discarding unreadable optimizer state at %s; "
+                "starting with fresh optimizer and scheduler state: %s",
+                self.client_id,
+                state_path,
+                error,
+            )
+            return
+
+        if not isinstance(payload, dict):
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            logging.warning(
+                "[Client #%d] Discarding invalid optimizer state at %s; "
+                "starting with fresh optimizer and scheduler state.",
+                self.client_id,
+                state_path,
+            )
+            return
+
+        self._preserved_optimizer_states[self.client_id] = payload
 
     @staticmethod
     def _persisted_test_state_keys() -> tuple[str, ...]:
@@ -545,7 +627,15 @@ class ComposableTrainer(base.Trainer):
 
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
+        preserve_optimizer_state = self._preserve_optimizer_state(config)
+        if preserve_optimizer_state:
+            optimizer_state_filename = self._optimizer_state_filename(config["run_id"])
+            self._load_preserved_optimizer_state_file(optimizer_state_filename)
+
         self.train_model(config, trainset, sampler, **kwargs)
+
+        if preserve_optimizer_state:
+            self._save_preserved_optimizer_state_file(optimizer_state_filename)
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
@@ -911,6 +1001,12 @@ class ComposableTrainer(base.Trainer):
 
         if "max_concurrency" in config:
             tic = time.perf_counter()
+            preserve_optimizer_state = self._preserve_optimizer_state(config)
+            optimizer_state_filename = None
+            if preserve_optimizer_state:
+                optimizer_state_filename = self._optimizer_state_filename(
+                    config["run_id"]
+                )
 
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
@@ -962,6 +1058,11 @@ class ComposableTrainer(base.Trainer):
                 raise ValueError(
                     f"Training on client {self.client_id} failed."
                 ) from error
+
+            if optimizer_state_filename is not None:
+                self._load_preserved_optimizer_state_file(
+                    optimizer_state_filename, clear_on_missing=True
+                )
 
             toc = time.perf_counter()
             self.pause_training()
