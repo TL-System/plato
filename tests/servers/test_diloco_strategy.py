@@ -35,6 +35,60 @@ class DummyAlgorithm:
         ]
 
 
+class ServerAlgorithm(DummyAlgorithm):
+    """Algorithm stub for exercising FedAvg-compatible server dispatch."""
+
+    def __init__(self, baseline):
+        self.current = {
+            name: value.clone() if hasattr(value, "clone") else value
+            for name, value in baseline.items()
+        }
+        self.delta_payloads = None
+
+    def extract_weights(self):
+        return {
+            name: value.clone() if hasattr(value, "clone") else value
+            for name, value in self.current.items()
+        }
+
+    def compute_weight_deltas(self, baseline_weights, weights_list):
+        self.delta_payloads = weights_list
+        return super().compute_weight_deltas(baseline_weights, weights_list)
+
+    def update_weights(self, deltas):
+        self.current = {
+            name: self.current[name] + deltas[name] for name in self.current
+        }
+        return self.extract_weights()
+
+    def load_weights(self, weights):
+        self.current = {
+            name: value.clone() if hasattr(value, "clone") else value
+            for name, value in weights.items()
+        }
+
+
+class RecordingDiLoCoStrategy(DiLoCoAggregationStrategy):
+    """DiLoCo strategy recording server dispatch calls."""
+
+    def __init__(self):
+        super().__init__(
+            outer_optimizer="sgd",
+            outer_learning_rate=1.0,
+            aggregation_weighting="uniform",
+            apply_outer_optimizer_to="all_floating",
+        )
+        self.delta_calls = 0
+        self.last_updates = None
+        self.last_deltas = None
+
+    async def aggregate_deltas(self, updates, deltas_received, context):
+        self.delta_calls += 1
+        self.last_updates = updates
+        self.last_deltas = deltas_received
+        return await super().aggregate_deltas(updates, deltas_received, context)
+
+
 class MixedStateModel(torch.nn.Module):
     """Model exposing trainable, frozen, floating-buffer, and integer state."""
 
@@ -87,10 +141,135 @@ def _update(num_samples, report_type="weights"):
     )
 
 
+def _server_update(payload, num_samples=1, report_type="weights"):
+    update = _update(num_samples, report_type)
+    update.client_id = len(str(payload))
+    update.report.accuracy = 0.5
+    update.report.processing_time = 0.1
+    update.report.comm_time = 0.1
+    update.report.training_time = 0.1
+    update.payload = payload
+    return update
+
+
 def _aggregate(strategy, updates, deltas, baseline=None, model=None):
     return asyncio.run(
         strategy.aggregate_deltas(updates, deltas, _context(baseline, model))
     )
+
+
+def test_diloco_server_type_uses_fedavg_algorithm_and_strategy(temp_config):
+    """server.type=diloco should select a FedAvg-compatible DiLoCo server."""
+    from plato.algorithms import registry as algorithms_registry
+    from plato.config import Config
+    from plato.servers import diloco as diloco_server
+    from plato.servers import fedavg
+    from plato.servers import registry as servers_registry
+
+    Config().server.type = "diloco"
+    Config().algorithm.type = "fedavg"
+    Config().server.diloco = SimpleNamespace(
+        outer_optimizer="sgd",
+        outer_learning_rate=0.25,
+        outer_momentum=0.1,
+        aggregation_weighting="num_samples",
+        apply_outer_optimizer_to="all_floating",
+    )
+
+    server = servers_registry.get()
+
+    assert isinstance(server, diloco_server.Server)
+    assert isinstance(server, fedavg.Server)
+    assert isinstance(server.aggregation_strategy, DiLoCoAggregationStrategy)
+    assert server.aggregation_strategy.outer_optimizer == "sgd"
+    assert server.aggregation_strategy.outer_learning_rate == 0.25
+    assert server.aggregation_strategy.outer_momentum == 0.1
+    assert server.aggregation_strategy.aggregation_weighting == "num_samples"
+    assert server.aggregation_strategy.apply_outer_optimizer_to == "all_floating"
+    assert Config().algorithm.type == "fedavg"
+    assert "diloco" not in algorithms_registry.registered_algorithms
+
+
+def test_diloco_server_process_reports_uses_delta_aggregation(temp_config):
+    """DiLoCo server processing should reach the delta aggregation path."""
+    from plato.config import Config
+    from plato.servers import diloco
+
+    Config().server.do_test = False
+    strategy = RecordingDiLoCoStrategy()
+    server = diloco.Server(aggregation_strategy=strategy)
+    baseline = {"w": torch.zeros(1)}
+    server.algorithm = ServerAlgorithm(baseline)
+    server.context.algorithm = server.algorithm
+    server.context.server = server
+    server.context.state["prng_state"] = None
+    server.updates = [
+        _server_update({"w": torch.tensor([2.0])}),
+        _server_update({"w": torch.tensor([4.0])}),
+    ]
+
+    asyncio.run(server._process_reports())
+
+    assert strategy.delta_calls == 1
+    assert strategy.last_updates == server.updates
+    assert len(strategy.last_deltas) == 2
+    assert torch.allclose(server.algorithm.current["w"], torch.tensor([3.0]))
+
+
+def test_diloco_server_does_not_use_inherited_weight_aggregation(temp_config):
+    """DiLoCo must not bypass delta aggregation via inherited FedAvg weights."""
+    from plato.config import Config
+    from plato.servers import diloco
+
+    Config().server.do_test = False
+    strategy = RecordingDiLoCoStrategy()
+
+    async def fail_if_called(*_args, **_kwargs):
+        raise AssertionError("Inherited aggregate_weights() must not be called.")
+
+    strategy.aggregate_weights = fail_if_called
+    server = diloco.Server(aggregation_strategy=strategy)
+    baseline = {"w": torch.zeros(1)}
+    server.algorithm = ServerAlgorithm(baseline)
+    server.context.algorithm = server.algorithm
+    server.context.server = server
+    server.context.state["prng_state"] = None
+    server.updates = [_server_update({"w": torch.tensor([2.0])})]
+
+    asyncio.run(server._process_reports())
+
+    assert strategy.delta_calls == 1
+    assert torch.allclose(server.algorithm.current["w"], torch.tensor([2.0]))
+
+
+def test_diloco_server_filters_non_weight_reports_before_delta_computation(
+    temp_config,
+):
+    """Non-weight payloads should not reach compute_weight_deltas()."""
+    from plato.config import Config
+    from plato.servers import diloco
+
+    Config().server.do_test = False
+    strategy = RecordingDiLoCoStrategy()
+    server = diloco.Server(aggregation_strategy=strategy)
+    baseline = {"w": torch.zeros(1)}
+    server.algorithm = ServerAlgorithm(baseline)
+    server.context.algorithm = server.algorithm
+    server.context.server = server
+    server.context.state["prng_state"] = None
+    weight_payload = {"w": torch.tensor([2.0])}
+    server.updates = [
+        _server_update("feature payload", report_type="features"),
+        _server_update({"metrics": 1.0}, report_type="metrics"),
+        _server_update(weight_payload),
+    ]
+
+    asyncio.run(server._process_reports())
+
+    assert server.algorithm.delta_payloads == [weight_payload]
+    assert strategy.last_updates == [server.updates[2]]
+    assert len(strategy.last_deltas) == 1
+    assert torch.allclose(server.algorithm.current["w"], torch.tensor([2.0]))
 
 
 def test_sgd_lr_one_uniform_matches_uniform_model_averaging(temp_config):
