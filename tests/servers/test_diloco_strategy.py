@@ -47,6 +47,20 @@ class MixedStateModel(torch.nn.Module):
         self.register_buffer("bool_buffer", torch.tensor([True], dtype=torch.bool))
 
 
+class PeftLikeAdapterModel(torch.nn.Module):
+    """Model whose adapter payload keys omit PEFT's default adapter segment."""
+
+    def __init__(self):
+        super().__init__()
+        self.peft_config = {"default": object()}
+        self.base_model = torch.nn.Module()
+        self.base_model.model = torch.nn.Module()
+        self.base_model.model.linear = torch.nn.Module()
+        self.base_model.model.linear.lora_A = torch.nn.ModuleDict(
+            {"default": torch.nn.Linear(1, 1, bias=False)}
+        )
+
+
 def _context(baseline=None, model=None):
     context = ServerContext()
     if baseline is not None:
@@ -502,6 +516,33 @@ def test_parameters_policy_requires_trainer_model_context(temp_config):
             [{"trainable": torch.tensor([2.0])}],
             {"trainable": torch.tensor([0.0])},
         )
+
+
+def test_parameters_policy_maps_peft_adapter_payload_names(temp_config):
+    """PEFT payloads can omit adapter-name segments from trainable param names."""
+    strategy = DiLoCoAggregationStrategy(
+        outer_optimizer="sgdm",
+        outer_learning_rate=0.5,
+        outer_momentum=0.5,
+        aggregation_weighting="uniform",
+    )
+    model = PeftLikeAdapterModel()
+    payload_name = "base_model.model.linear.lora_A.weight"
+    baseline = {payload_name: torch.zeros((1, 1))}
+
+    server_delta = _aggregate(
+        strategy,
+        [_update(1)],
+        [{payload_name: torch.full((1, 1), 4.0)}],
+        baseline,
+        model,
+    )
+
+    assert torch.allclose(server_delta[payload_name], torch.full((1, 1), 2.0))
+    assert set(strategy.momentum_state) == {payload_name}
+    assert torch.allclose(
+        strategy.momentum_state[payload_name], torch.full((1, 1), -4.0)
+    )
 
 
 @pytest.mark.parametrize(

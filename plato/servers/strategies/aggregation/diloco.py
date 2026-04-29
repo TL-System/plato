@@ -182,12 +182,11 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         if self.apply_outer_optimizer_to == "all_floating":
             return self._floating_leaf_paths(avg_delta)
 
-        trainable_parameter_names = self._trainable_parameter_names(context)
-        return self._collect_leaf_paths(
-            avg_delta,
-            lambda value, path: path in trainable_parameter_names
-            and self._is_floating_value(value),
+        floating_paths = self._floating_leaf_paths(avg_delta)
+        trainable_parameter_names = self._trainable_parameter_names(
+            context, floating_paths
         )
+        return floating_paths.intersection(trainable_parameter_names)
 
     def _apply_outer_optimizer(
         self, avg_delta: Any, optimizer_paths: set[str]
@@ -255,17 +254,64 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
             if path not in active_paths:
                 del self.momentum_state[path]
 
-    def _trainable_parameter_names(self, context: ServerContext) -> set[str]:
+    def _trainable_parameter_names(
+        self, context: ServerContext, payload_paths: set[str] | None = None
+    ) -> set[str]:
         model = self._model_from_context(context)
+        adapter_names = self._adapter_names(model)
         trainable_names: set[str] = set()
 
         for name, parameter in model.named_parameters():
             if getattr(parameter, "requires_grad", False) and self._is_floating_value(
                 parameter
             ):
-                trainable_names.add(name)
+                trainable_names.update(
+                    self._payload_name_candidates(name, adapter_names, payload_paths)
+                )
 
         return trainable_names
+
+    @staticmethod
+    def _adapter_names(model: Any) -> set[str]:
+        adapter_names = {"default"}
+
+        peft_config = getattr(model, "peft_config", None)
+        if isinstance(peft_config, Mapping):
+            adapter_names.update(str(name) for name in peft_config)
+
+        active_adapter = getattr(model, "active_adapter", None)
+        if isinstance(active_adapter, str):
+            adapter_names.add(active_adapter)
+
+        active_adapters = getattr(model, "active_adapters", None)
+        if callable(active_adapters):
+            try:
+                adapter_names.update(str(name) for name in active_adapters())
+            except TypeError:
+                pass
+        elif isinstance(active_adapters, (list, tuple, set)):
+            adapter_names.update(str(name) for name in active_adapters)
+
+        return adapter_names
+
+    @classmethod
+    def _payload_name_candidates(
+        cls,
+        parameter_name: str,
+        adapter_names: set[str],
+        payload_paths: set[str] | None,
+    ) -> set[str]:
+        candidates = {parameter_name}
+        parts = parameter_name.split(".")
+        for index, part in enumerate(parts):
+            if part not in adapter_names:
+                continue
+
+            candidate = ".".join(parts[:index] + parts[index + 1 :])
+            if payload_paths is None or candidate in payload_paths:
+                candidates.add(candidate)
+
+        return candidates
 
     @staticmethod
     def _model_from_context(context: ServerContext) -> Any:
