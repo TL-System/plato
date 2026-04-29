@@ -31,6 +31,7 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
 
     _SUPPORTED_OPTIMIZERS = {"sgd", "sgdm", "nesterov"}
     _SUPPORTED_WEIGHTING_MODES = {"uniform", "num_samples"}
+    _SUPPORTED_APPLY_POLICIES = {"parameters", "all_floating"}
 
     def __init__(
         self,
@@ -38,6 +39,7 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         outer_learning_rate: float = 0.7,
         outer_momentum: float = 0.9,
         aggregation_weighting: str = "uniform",
+        apply_outer_optimizer_to: str = "parameters",
     ):
         super().__init__()
         self.outer_optimizer = self._validate_outer_optimizer(outer_optimizer)
@@ -47,6 +49,9 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         self.outer_momentum = self._validate_momentum(outer_momentum)
         self.aggregation_weighting = self._validate_weighting_mode(
             aggregation_weighting
+        )
+        self.apply_outer_optimizer_to = self._validate_apply_policy(
+            apply_outer_optimizer_to
         )
         self.momentum_state: dict[str, Any] = {}
 
@@ -77,8 +82,10 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
             return self._empty_delta(context, eligible[0][1])
 
         avg_delta = self._match_reference_structure(avg_delta, eligible[0][1])
-        outer_gradient = self._scale_tree(avg_delta, -1.0)
-        server_delta, active_paths = self._apply_outer_optimizer(outer_gradient)
+        optimizer_paths = self._outer_optimizer_paths(avg_delta, context)
+        server_delta, active_paths = self._apply_outer_optimizer(
+            avg_delta, optimizer_paths
+        )
         self._remove_stale_momentum(active_paths)
 
         return self._match_reference_structure(server_delta, eligible[0][1])
@@ -117,6 +124,17 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
                 f"'{value}'. Supported values: {supported}."
             )
         return weighting
+
+    @classmethod
+    def _validate_apply_policy(cls, value: str) -> str:
+        policy = str(value).lower()
+        if policy not in cls._SUPPORTED_APPLY_POLICIES:
+            supported = ", ".join(sorted(cls._SUPPORTED_APPLY_POLICIES))
+            raise ValueError(
+                "Invalid apply_outer_optimizer_to "
+                f"'{value}'. Supported values: {supported}."
+            )
+        return policy
 
     def _eligible_updates(
         self,
@@ -158,19 +176,47 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
 
         return [num_samples / total_samples for _, _, num_samples in eligible]
 
-    def _apply_outer_optimizer(self, outer_gradient: Any) -> tuple[Any, set[str]]:
+    def _outer_optimizer_paths(
+        self, avg_delta: Any, context: ServerContext
+    ) -> set[str]:
+        if self.apply_outer_optimizer_to == "all_floating":
+            return self._floating_leaf_paths(avg_delta)
+
+        trainable_parameter_names = self._trainable_parameter_names(context)
+        return self._collect_leaf_paths(
+            avg_delta,
+            lambda value, path: path in trainable_parameter_names
+            and self._is_floating_value(value),
+        )
+
+    def _apply_outer_optimizer(
+        self, avg_delta: Any, optimizer_paths: set[str]
+    ) -> tuple[Any, set[str]]:
         active_paths: set[str] = set()
 
-        if self.outer_optimizer == "sgd":
-            return self._scale_tree(outer_gradient, -self.outer_learning_rate), set()
-
         server_delta = self._map_tree(
-            outer_gradient,
-            lambda value, path: self._apply_momentum_leaf(
-                value, path, active_paths
+            avg_delta,
+            lambda value, path: self._apply_outer_optimizer_leaf(
+                value, path, optimizer_paths, active_paths
             ),
         )
         return server_delta, active_paths
+
+    def _apply_outer_optimizer_leaf(
+        self,
+        avg_delta: Any,
+        path: str,
+        optimizer_paths: set[str],
+        active_paths: set[str],
+    ) -> Any:
+        if path not in optimizer_paths:
+            return avg_delta
+
+        outer_gradient = self._scale_tree(avg_delta, -1.0)
+        if self.outer_optimizer == "sgd":
+            return self._scale_tree(outer_gradient, -self.outer_learning_rate)
+
+        return self._apply_momentum_leaf(outer_gradient, path, active_paths)
 
     def _apply_momentum_leaf(
         self, outer_gradient: Any, path: str, active_paths: set[str]
@@ -208,6 +254,84 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         for path in list(self.momentum_state):
             if path not in active_paths:
                 del self.momentum_state[path]
+
+    def _trainable_parameter_names(self, context: ServerContext) -> set[str]:
+        model = self._model_from_context(context)
+        trainable_names: set[str] = set()
+
+        for name, parameter in model.named_parameters():
+            if getattr(parameter, "requires_grad", False) and self._is_floating_value(
+                parameter
+            ):
+                trainable_names.add(name)
+
+        return trainable_names
+
+    @staticmethod
+    def _model_from_context(context: ServerContext) -> Any:
+        trainer = getattr(context, "trainer", None)
+        model = getattr(trainer, "model", None) if trainer is not None else None
+        if model is None or not hasattr(model, "named_parameters"):
+            raise AttributeError(
+                "DiLoCo apply_outer_optimizer_to='parameters' requires "
+                "context.trainer.model with named_parameters()."
+            )
+        return model
+
+    def _floating_leaf_paths(self, value: Any) -> set[str]:
+        return self._collect_leaf_paths(
+            value, lambda leaf, _: self._is_floating_value(leaf)
+        )
+
+    def _collect_leaf_paths(
+        self,
+        value: Any,
+        predicate: Callable[[Any, str], bool],
+        path: str = "",
+    ) -> set[str]:
+        if isinstance(value, Mapping):
+            paths: set[str] = set()
+            for key, item in value.items():
+                paths.update(
+                    self._collect_leaf_paths(
+                        item, predicate, self._join_path(path, key)
+                    )
+                )
+            return paths
+
+        if isinstance(value, list):
+            paths = set()
+            for index, item in enumerate(value):
+                paths.update(
+                    self._collect_leaf_paths(
+                        item, predicate, self._join_path(path, index)
+                    )
+                )
+            return paths
+
+        if isinstance(value, tuple):
+            paths = set()
+            for index, item in enumerate(value):
+                paths.update(
+                    self._collect_leaf_paths(
+                        item, predicate, self._join_path(path, index)
+                    )
+                )
+            return paths
+
+        return {path} if predicate(value, path) else set()
+
+    @staticmethod
+    def _is_floating_value(value: Any) -> bool:
+        if torch is not None and isinstance(value, torch.Tensor):
+            return torch.is_floating_point(value)
+
+        if isinstance(value, np.ndarray):
+            return np.issubdtype(value.dtype, np.floating)
+
+        return isinstance(value, numbers.Real) and not isinstance(
+            value, (numbers.Integral, bool)
+        )
 
     def _empty_delta(self, context: ServerContext, reference_delta: Any | None) -> dict:
         zero_delta = self._zero_delta(context, reference_delta)
