@@ -349,15 +349,21 @@ class ComposableTrainer(base.Trainer):
         model_name = Config().trainer.model_name
         return f"{model_name}_{self.client_id}_{run_id}.optim.pkl"
 
+    def _optimizer_state_output_filename(self, run_id: str) -> str:
+        """Return a unique subprocess optimizer-state output filename."""
+        model_name = Config().trainer.model_name
+        token = time.time_ns()
+        return f"{model_name}_{self.client_id}_{run_id}_{os.getpid()}_{token}.optim.pkl"
+
     def _optimizer_state_path(self, filename: str) -> str:
         """Return the local optimizer-state handoff path."""
         return os.path.join(Config().params["model_path"], filename)
 
-    def _save_preserved_optimizer_state_file(self, filename: str) -> None:
+    def _save_preserved_optimizer_state_file(self, filename: str) -> bool:
         """Persist preserved optimizer state for subprocess handoff."""
         payload = self._preserved_optimizer_states.get(self.client_id)
         if payload is None:
-            return
+            return False
 
         model_path = Config().params["model_path"]
         os.makedirs(model_path, exist_ok=True)
@@ -368,6 +374,7 @@ class ComposableTrainer(base.Trainer):
             with open(tmp_path, "wb") as state_file:
                 pickle.dump(copy.deepcopy(payload), state_file)
             os.replace(tmp_path, state_path)
+            return True
         except Exception as error:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
@@ -377,10 +384,11 @@ class ComposableTrainer(base.Trainer):
                 state_path,
                 error,
             )
+            return False
 
     def _load_preserved_optimizer_state_file(
         self, filename: str, *, clear_on_missing: bool = False
-    ) -> None:
+    ) -> bool:
         """Load preserved optimizer state from a subprocess handoff file."""
         state_path = self._optimizer_state_path(filename)
         if not os.path.exists(state_path):
@@ -392,7 +400,7 @@ class ComposableTrainer(base.Trainer):
                 self.client_id,
                 state_path,
             )
-            return
+            return False
 
         try:
             with open(state_path, "rb") as state_file:
@@ -406,7 +414,7 @@ class ComposableTrainer(base.Trainer):
                 state_path,
                 error,
             )
-            return
+            return False
 
         if not isinstance(payload, dict):
             self._preserved_optimizer_states.pop(self.client_id, None)
@@ -416,9 +424,38 @@ class ComposableTrainer(base.Trainer):
                 self.client_id,
                 state_path,
             )
-            return
+            return False
 
         self._preserved_optimizer_states[self.client_id] = payload
+        return True
+
+    def _remove_preserved_optimizer_state_file(self, filename: str) -> None:
+        """Remove a local optimizer-state sidecar if it exists."""
+        state_path = self._optimizer_state_path(filename)
+        try:
+            os.remove(state_path)
+        except FileNotFoundError:
+            return
+        except OSError as error:
+            logging.warning(
+                "[Client #%d] Failed to remove optimizer state at %s: %s",
+                self.client_id,
+                state_path,
+                error,
+            )
+
+    def _finish_subprocess_optimizer_state(
+        self, input_filename: str, output_filename: str
+    ) -> None:
+        """Load the child output sidecar and promote it for the next round."""
+        loaded = self._load_preserved_optimizer_state_file(
+            output_filename, clear_on_missing=True
+        )
+        if loaded:
+            self._save_preserved_optimizer_state_file(input_filename)
+            self._remove_preserved_optimizer_state_file(output_filename)
+        else:
+            self._remove_preserved_optimizer_state_file(input_filename)
 
     @staticmethod
     def _persisted_test_state_keys() -> tuple[str, ...]:
@@ -629,13 +666,22 @@ class ComposableTrainer(base.Trainer):
         """The training process in a federated learning workload."""
         preserve_optimizer_state = self._preserve_optimizer_state(config)
         if preserve_optimizer_state:
-            optimizer_state_filename = self._optimizer_state_filename(config["run_id"])
-            self._load_preserved_optimizer_state_file(optimizer_state_filename)
+            optimizer_state_filename = config.get(
+                "_optimizer_state_input_filename",
+                self._optimizer_state_filename(config["run_id"]),
+            )
+            optimizer_state_output_filename = config.get(
+                "_optimizer_state_output_filename",
+                optimizer_state_filename,
+            )
+            self._load_preserved_optimizer_state_file(
+                optimizer_state_filename, clear_on_missing=True
+            )
 
         self.train_model(config, trainset, sampler, **kwargs)
 
         if preserve_optimizer_state:
-            self._save_preserved_optimizer_state_file(optimizer_state_filename)
+            self._save_preserved_optimizer_state_file(optimizer_state_output_filename)
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
@@ -1003,10 +1049,19 @@ class ComposableTrainer(base.Trainer):
             tic = time.perf_counter()
             preserve_optimizer_state = self._preserve_optimizer_state(config)
             optimizer_state_filename = None
+            optimizer_state_output_filename = None
             if preserve_optimizer_state:
                 optimizer_state_filename = self._optimizer_state_filename(
                     config["run_id"]
                 )
+                optimizer_state_output_filename = self._optimizer_state_output_filename(
+                    config["run_id"]
+                )
+                config = {
+                    **config,
+                    "_optimizer_state_input_filename": optimizer_state_filename,
+                    "_optimizer_state_output_filename": optimizer_state_output_filename,
+                }
 
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
@@ -1059,9 +1114,12 @@ class ComposableTrainer(base.Trainer):
                     f"Training on client {self.client_id} failed."
                 ) from error
 
-            if optimizer_state_filename is not None:
-                self._load_preserved_optimizer_state_file(
-                    optimizer_state_filename, clear_on_missing=True
+            if (
+                optimizer_state_filename is not None
+                and optimizer_state_output_filename is not None
+            ):
+                self._finish_subprocess_optimizer_state(
+                    optimizer_state_filename, optimizer_state_output_filename
                 )
 
             toc = time.perf_counter()
