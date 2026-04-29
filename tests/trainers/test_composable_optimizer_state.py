@@ -262,6 +262,82 @@ def test_subprocess_scheduler_state_persists_across_rounds(
     assert payload["optimizer_state"]["param_groups"][0]["lr"] == pytest.approx(0.05)
 
 
+def test_subprocess_missing_sidecar_clears_inherited_parent_cache(
+    temp_config, monkeypatch, tmp_path, tiny_dataset, one_step_config
+):
+    _configure_subprocess_training(
+        monkeypatch, tmp_path, preserve_optimizer_state=True
+    )
+    source_trainer = ComposableTrainer(
+        model=_linear_model,
+        loss_strategy=CrossEntropyLossStrategy(),
+        optimizer_strategy=AdamWOptimizerStrategy(lr=0.01),
+    )
+    source_trainer.set_client_id(7)
+    config = {
+        **one_step_config,
+        "run_id": Config.params["run_id"],
+        "preserve_optimizer_state": True,
+    }
+    source_trainer.train_model(config, tiny_dataset, list(range(len(tiny_dataset))))
+    assert _cached_optimizer_step(source_trainer) == 1
+
+    trainer = ComposableTrainer(
+        model=_linear_model,
+        loss_strategy=CrossEntropyLossStrategy(),
+        optimizer_strategy=AdamWOptimizerStrategy(lr=0.01),
+    )
+    trainer.set_client_id(7)
+    trainer._preserved_optimizer_states[7] = copy.deepcopy(
+        source_trainer._preserved_optimizer_states[7]
+    )
+
+    state_path = (
+        Path(Config.params["model_path"])
+        / trainer._optimizer_state_filename(Config.params["run_id"])
+    )
+    state_path.unlink(missing_ok=True)
+
+    trainer.train(tiny_dataset, list(range(len(tiny_dataset))))
+
+    assert _cached_optimizer_step(trainer) == 1
+
+
+def test_missing_subprocess_output_removes_stale_input_sidecar(
+    temp_config, monkeypatch, tmp_path, tiny_dataset, one_step_config
+):
+    _configure_subprocess_training(
+        monkeypatch, tmp_path, preserve_optimizer_state=True
+    )
+    trainer = ComposableTrainer(
+        model=_linear_model,
+        loss_strategy=CrossEntropyLossStrategy(),
+        optimizer_strategy=AdamWOptimizerStrategy(lr=0.01),
+    )
+    trainer.set_client_id(7)
+    config = {
+        **one_step_config,
+        "run_id": Config.params["run_id"],
+        "preserve_optimizer_state": True,
+    }
+    trainer.train_model(config, tiny_dataset, list(range(len(tiny_dataset))))
+
+    input_filename = trainer._optimizer_state_filename(Config.params["run_id"])
+    missing_output_filename = trainer._optimizer_state_output_filename(
+        Config.params["run_id"]
+    )
+    assert trainer._save_preserved_optimizer_state_file(input_filename)
+    input_path = Path(Config.params["model_path"]) / input_filename
+    assert input_path.exists()
+
+    trainer._finish_subprocess_optimizer_state(
+        input_filename, missing_output_filename
+    )
+
+    assert trainer.client_id not in trainer._preserved_optimizer_states
+    assert not input_path.exists()
+
+
 def test_subprocess_invalid_optimizer_state_resets_safely(
     temp_config, monkeypatch, tmp_path, tiny_dataset
 ):
