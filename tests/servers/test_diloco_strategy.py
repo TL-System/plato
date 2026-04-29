@@ -35,10 +35,24 @@ class DummyAlgorithm:
         ]
 
 
-def _context(baseline=None):
+class MixedStateModel(torch.nn.Module):
+    """Model exposing trainable, frozen, floating-buffer, and integer state."""
+
+    def __init__(self):
+        super().__init__()
+        self.trainable = torch.nn.Parameter(torch.tensor([1.0]))
+        self.frozen = torch.nn.Parameter(torch.tensor([1.0]), requires_grad=False)
+        self.register_buffer("floating_buffer", torch.tensor([1.0]))
+        self.register_buffer("integer_buffer", torch.tensor([1], dtype=torch.int64))
+        self.register_buffer("bool_buffer", torch.tensor([True], dtype=torch.bool))
+
+
+def _context(baseline=None, model=None):
     context = ServerContext()
     if baseline is not None:
         context.algorithm = DummyAlgorithm(baseline)
+    if model is not None:
+        context.trainer = SimpleNamespace(model=model)
     return context
 
 
@@ -48,9 +62,9 @@ def _update(num_samples, report_type="weights"):
     )
 
 
-def _aggregate(strategy, updates, deltas, baseline=None):
+def _aggregate(strategy, updates, deltas, baseline=None, model=None):
     return asyncio.run(
-        strategy.aggregate_deltas(updates, deltas, _context(baseline))
+        strategy.aggregate_deltas(updates, deltas, _context(baseline, model))
     )
 
 
@@ -60,6 +74,7 @@ def test_sgd_lr_one_uniform_matches_uniform_model_averaging(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=1.0,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     baseline = {"w": torch.tensor([10.0])}
@@ -77,6 +92,7 @@ def test_sgd_lr_one_num_samples_matches_weighted_fedavg(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=1.0,
         aggregation_weighting="num_samples",
+        apply_outer_optimizer_to="all_floating",
     )
 
     baseline = {"w": torch.tensor([10.0])}
@@ -95,6 +111,7 @@ def test_sgd_lr_half_moves_halfway_to_averaged_model(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=0.5,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     baseline = {"w": torch.tensor([10.0])}
@@ -113,6 +130,7 @@ def test_sgd_uses_diloco_outer_gradient_sign(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=0.25,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     server_delta = _aggregate(
@@ -131,6 +149,7 @@ def test_uniform_weighting_ignores_positive_sample_count_magnitude(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=1.0,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     server_delta = _aggregate(
@@ -149,6 +168,7 @@ def test_nonpositive_sample_reports_are_ineligible(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=1.0,
         aggregation_weighting="num_samples",
+        apply_outer_optimizer_to="all_floating",
     )
 
     server_delta = _aggregate(
@@ -171,6 +191,7 @@ def test_empty_eligible_updates_return_zero_delta(temp_config):
         outer_optimizer="sgd",
         outer_learning_rate=1.0,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     baseline = {"w": torch.tensor([3.0, 4.0])}
@@ -191,6 +212,7 @@ def test_empty_eligible_updates_remove_stale_momentum(temp_config):
         outer_learning_rate=1.0,
         outer_momentum=0.5,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     _aggregate(
@@ -217,6 +239,7 @@ def test_sgdm_persists_momentum_across_rounds(temp_config):
         outer_learning_rate=1.0,
         outer_momentum=0.5,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     first_delta = _aggregate(
@@ -244,6 +267,7 @@ def test_nesterov_uses_pytorch_style_two_round_recurrence(temp_config):
         outer_learning_rate=1.0,
         outer_momentum=0.5,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     first_delta = _aggregate(
@@ -273,6 +297,7 @@ def test_momentum_state_resets_on_shape_mismatch_and_removes_stale_keys(
         outer_learning_rate=1.0,
         outer_momentum=0.5,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     _aggregate(
@@ -301,6 +326,7 @@ def test_momentum_state_resets_on_dtype_mismatch(temp_config):
         outer_learning_rate=1.0,
         outer_momentum=0.5,
         aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
     )
 
     _aggregate(
@@ -320,11 +346,170 @@ def test_momentum_state_resets_on_dtype_mismatch(temp_config):
     assert strategy.momentum_state["w"].dtype == torch.float64
 
 
+def test_parameters_policy_optimizes_only_trainable_floating_parameters(
+    temp_config,
+):
+    """Default policy should leave frozen parameters and buffers on FedAvg deltas."""
+    strategy = DiLoCoAggregationStrategy(
+        outer_optimizer="sgdm",
+        outer_learning_rate=0.5,
+        outer_momentum=0.5,
+        aggregation_weighting="uniform",
+    )
+    model = MixedStateModel()
+    baseline = {name: tensor.clone() for name, tensor in model.state_dict().items()}
+
+    first_delta = _aggregate(
+        strategy,
+        [_update(1), _update(1)],
+        [
+            {
+                "trainable": torch.tensor([2.0]),
+                "frozen": torch.tensor([2.0]),
+                "floating_buffer": torch.tensor([2.0]),
+                "integer_buffer": torch.tensor([1], dtype=torch.int64),
+                "bool_buffer": torch.tensor([False]),
+            },
+            {
+                "trainable": torch.tensor([6.0]),
+                "frozen": torch.tensor([6.0]),
+                "floating_buffer": torch.tensor([6.0]),
+                "integer_buffer": torch.tensor([2], dtype=torch.int64),
+                "bool_buffer": torch.tensor([True]),
+            },
+        ],
+        baseline,
+        model,
+    )
+
+    assert torch.allclose(first_delta["trainable"], torch.tensor([2.0]))
+    assert torch.allclose(first_delta["frozen"], torch.tensor([4.0]))
+    assert torch.allclose(first_delta["floating_buffer"], torch.tensor([4.0]))
+    assert torch.equal(first_delta["integer_buffer"], torch.tensor([2]))
+    assert torch.equal(first_delta["bool_buffer"], torch.tensor([True]))
+    assert set(strategy.momentum_state) == {"trainable"}
+    assert torch.allclose(strategy.momentum_state["trainable"], torch.tensor([-4.0]))
+
+    second_delta = _aggregate(
+        strategy,
+        [_update(1)],
+        [
+            {
+                "trainable": torch.tensor([6.0]),
+                "frozen": torch.tensor([6.0]),
+                "floating_buffer": torch.tensor([6.0]),
+                "integer_buffer": torch.tensor([1], dtype=torch.int64),
+                "bool_buffer": torch.tensor([False]),
+            }
+        ],
+        baseline,
+        model,
+    )
+
+    assert torch.allclose(second_delta["trainable"], torch.tensor([4.0]))
+    assert torch.allclose(second_delta["frozen"], torch.tensor([6.0]))
+    assert torch.allclose(second_delta["floating_buffer"], torch.tensor([6.0]))
+    assert torch.equal(second_delta["integer_buffer"], torch.tensor([1]))
+    assert torch.equal(second_delta["bool_buffer"], torch.tensor([False]))
+    assert set(strategy.momentum_state) == {"trainable"}
+    assert torch.allclose(strategy.momentum_state["trainable"], torch.tensor([-8.0]))
+
+
+def test_all_floating_policy_optimizes_every_floating_state_tensor(temp_config):
+    """All-floating mode should not require model context for eligibility."""
+    strategy = DiLoCoAggregationStrategy(
+        outer_optimizer="sgdm",
+        outer_learning_rate=0.5,
+        outer_momentum=0.5,
+        aggregation_weighting="uniform",
+        apply_outer_optimizer_to="all_floating",
+    )
+    model = MixedStateModel()
+    baseline = {name: tensor.clone() for name, tensor in model.state_dict().items()}
+
+    server_delta = _aggregate(
+        strategy,
+        [_update(1), _update(1)],
+        [
+            {
+                "trainable": torch.tensor([2.0]),
+                "frozen": torch.tensor([2.0]),
+                "floating_buffer": torch.tensor([2.0]),
+                "integer_buffer": torch.tensor([1], dtype=torch.int64),
+                "bool_buffer": torch.tensor([False]),
+            },
+            {
+                "trainable": torch.tensor([6.0]),
+                "frozen": torch.tensor([6.0]),
+                "floating_buffer": torch.tensor([6.0]),
+                "integer_buffer": torch.tensor([2], dtype=torch.int64),
+                "bool_buffer": torch.tensor([True]),
+            },
+        ],
+        baseline,
+    )
+
+    assert torch.allclose(server_delta["trainable"], torch.tensor([2.0]))
+    assert torch.allclose(server_delta["frozen"], torch.tensor([2.0]))
+    assert torch.allclose(server_delta["floating_buffer"], torch.tensor([2.0]))
+    assert torch.equal(server_delta["integer_buffer"], torch.tensor([2]))
+    assert torch.equal(server_delta["bool_buffer"], torch.tensor([True]))
+    assert set(strategy.momentum_state) == {
+        "trainable",
+        "frozen",
+        "floating_buffer",
+    }
+
+    second_delta = _aggregate(
+        strategy,
+        [_update(1)],
+        [
+            {
+                "trainable": torch.tensor([6.0]),
+                "frozen": torch.tensor([6.0]),
+                "floating_buffer": torch.tensor([6.0]),
+                "integer_buffer": torch.tensor([1], dtype=torch.int64),
+                "bool_buffer": torch.tensor([False]),
+            }
+        ],
+        baseline,
+    )
+
+    assert torch.allclose(second_delta["trainable"], torch.tensor([4.0]))
+    assert torch.allclose(second_delta["frozen"], torch.tensor([4.0]))
+    assert torch.allclose(second_delta["floating_buffer"], torch.tensor([4.0]))
+    assert torch.equal(second_delta["integer_buffer"], torch.tensor([1]))
+    assert torch.equal(second_delta["bool_buffer"], torch.tensor([False]))
+    assert set(strategy.momentum_state) == {
+        "trainable",
+        "frozen",
+        "floating_buffer",
+    }
+
+
+def test_parameters_policy_requires_trainer_model_context(temp_config):
+    """Default parameter eligibility should fail clearly without a model."""
+    strategy = DiLoCoAggregationStrategy(
+        outer_optimizer="sgd",
+        outer_learning_rate=1.0,
+        aggregation_weighting="uniform",
+    )
+
+    with pytest.raises(AttributeError, match="context.trainer.model"):
+        _aggregate(
+            strategy,
+            [_update(1)],
+            [{"trainable": torch.tensor([2.0])}],
+            {"trainable": torch.tensor([0.0])},
+        )
+
+
 @pytest.mark.parametrize(
     ("kwargs", "match"),
     [
         ({"outer_optimizer": "adam"}, "outer_optimizer"),
         ({"aggregation_weighting": "weighted"}, "aggregation_weighting"),
+        ({"apply_outer_optimizer_to": "buffers"}, "apply_outer_optimizer_to"),
         ({"outer_learning_rate": -0.1}, "outer_learning_rate"),
         ({"outer_momentum": -0.1}, "outer_momentum"),
         ({"outer_momentum": 1.0}, "outer_momentum"),
