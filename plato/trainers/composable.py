@@ -168,6 +168,7 @@ class ComposableTrainer(base.Trainer):
         self.current_epoch = 0
         self.training_start_time = time.time()
         self.model_state_dict = None
+        self._preserved_optimizer_states: dict[int, dict[str, Any]] = {}
 
     def _require_model(self) -> nn.Module:
         """Return the underlying model, ensuring it is available."""
@@ -199,6 +200,143 @@ class ComposableTrainer(base.Trainer):
         completed_steps = int(self.context.state.get("local_optimizer_steps", 0)) + 1
         self.context.state["local_optimizer_steps"] = completed_steps
         return completed_steps >= local_steps_per_round
+
+    @staticmethod
+    def _preserve_optimizer_state(config: dict[str, Any]) -> bool:
+        """Return whether optimizer state should survive local train runs."""
+        return bool(config.get("preserve_optimizer_state", False))
+
+    @staticmethod
+    def _parameter_signature(name: str | None, parameter: torch.Tensor):
+        """Build a compatibility signature for one model parameter."""
+        return (name, tuple(parameter.shape), str(parameter.dtype))
+
+    @classmethod
+    def _model_parameter_signature(cls, model: nn.Module):
+        """Return parameter names, shapes, dtypes, and order for a model."""
+        return tuple(
+            cls._parameter_signature(name, parameter)
+            for name, parameter in model.named_parameters()
+        )
+
+    @classmethod
+    def _optimizer_parameter_signature(
+        cls, model: nn.Module, optimizer: torch.optim.Optimizer
+    ):
+        """Return optimizer parameter group ordering with model metadata."""
+        named_parameters = {
+            id(parameter): cls._parameter_signature(name, parameter)
+            for name, parameter in model.named_parameters()
+        }
+
+        group_signatures = []
+        for group in optimizer.param_groups:
+            group_signatures.append(
+                tuple(
+                    named_parameters.get(
+                        id(parameter),
+                        cls._parameter_signature(None, parameter),
+                    )
+                    for parameter in group.get("params", [])
+                )
+            )
+
+        return tuple(group_signatures)
+
+    @staticmethod
+    def _scheduler_type(scheduler: Any | None) -> type | None:
+        """Return the scheduler type used for compatibility checks."""
+        if scheduler is None:
+            return None
+        return type(scheduler)
+
+    def _preserved_state_is_compatible(
+        self,
+        payload: dict[str, Any],
+        model: nn.Module,
+        optimizer: torch.optim.Optimizer,
+        scheduler: Any | None,
+    ) -> bool:
+        """Return whether a cached optimizer bundle matches this train run."""
+        if payload.get("optimizer_type") is not type(optimizer):
+            return False
+
+        if payload.get("scheduler_type") is not self._scheduler_type(scheduler):
+            return False
+
+        if payload.get("model_parameters") != self._model_parameter_signature(model):
+            return False
+
+        if payload.get("optimizer_parameters") != self._optimizer_parameter_signature(
+            model, optimizer
+        ):
+            return False
+
+        if not callable(getattr(optimizer, "load_state_dict", None)):
+            return False
+
+        if payload.get("scheduler_state") is not None and not callable(
+            getattr(scheduler, "load_state_dict", None)
+        ):
+            return False
+
+        return True
+
+    def _restore_preserved_optimizer_state(self) -> None:
+        """Restore compatible optimizer and scheduler state for this client."""
+        payload = self._preserved_optimizer_states.get(self.client_id)
+        if payload is None or self.optimizer is None:
+            return
+
+        model = self._require_model()
+        if not self._preserved_state_is_compatible(
+            payload, model, self.optimizer, self.lr_scheduler
+        ):
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            return
+
+        try:
+            scheduler_state = payload.get("scheduler_state")
+            if scheduler_state is not None:
+                self.lr_scheduler.load_state_dict(copy.deepcopy(scheduler_state))
+
+            self.optimizer.load_state_dict(copy.deepcopy(payload["optimizer_state"]))
+        except Exception as error:
+            logging.debug(
+                "[Client #%d] Discarding incompatible optimizer state: %s",
+                self.client_id,
+                error,
+            )
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            self.optimizer = self.optimizer_strategy.create_optimizer(
+                model, self.context
+            )
+            self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
+                self.optimizer, self.context
+            )
+
+    def _save_preserved_optimizer_state(self) -> None:
+        """Save optimizer and scheduler state locally for this logical client."""
+        if self.optimizer is None:
+            return
+
+        model = self._require_model()
+        scheduler_state = None
+        if self.lr_scheduler is not None:
+            state_dict_fn = getattr(self.lr_scheduler, "state_dict", None)
+            if callable(state_dict_fn):
+                scheduler_state = copy.deepcopy(state_dict_fn())
+
+        self._preserved_optimizer_states[self.client_id] = {
+            "optimizer_type": type(self.optimizer),
+            "optimizer_state": copy.deepcopy(self.optimizer.state_dict()),
+            "scheduler_type": self._scheduler_type(self.lr_scheduler),
+            "scheduler_state": scheduler_state,
+            "model_parameters": self._model_parameter_signature(model),
+            "optimizer_parameters": self._optimizer_parameter_signature(
+                model, self.optimizer
+            ),
+        }
 
     @staticmethod
     def _persisted_test_state_keys() -> tuple[str, ...]:
@@ -420,6 +558,10 @@ class ComposableTrainer(base.Trainer):
         self.sampler = sampler
         self.context.config = config
         self.context.current_round = self.current_round
+        preserve_optimizer_state = self._preserve_optimizer_state(config)
+        if not preserve_optimizer_state:
+            self._preserved_optimizer_states.pop(self.client_id, None)
+
         local_steps_per_round = self._local_steps_per_round(config)
         self.context.state["local_optimizer_steps"] = 0
         if local_steps_per_round is None:
@@ -513,6 +655,8 @@ class ComposableTrainer(base.Trainer):
         self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
             self.optimizer, self.context
         )
+        if preserve_optimizer_state:
+            self._restore_preserved_optimizer_state()
 
         # Move model to device
         model = self._require_model()
@@ -743,6 +887,9 @@ class ComposableTrainer(base.Trainer):
 
         # Callbacks: train run end
         self.callback_handler.call_event("on_train_run_end", self, config)
+
+        if preserve_optimizer_state:
+            self._save_preserved_optimizer_state()
 
     def train(self, trainset, sampler, **kwargs) -> float:
         """
