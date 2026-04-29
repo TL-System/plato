@@ -783,8 +783,13 @@ class ComposableTrainer(base.Trainer):
         self.context.state["grad_accum_loss_total"] = 0.0
         self.context.state["grad_accum_loss_count"] = 0
 
-        # Create optimizer using strategy
+        # Move the model before optimizer state restore so PyTorch maps restored
+        # state tensors onto the same device as the optimizer parameters.
         model = self._require_model()
+        model.to(self.device)
+        model.train()
+
+        # Create optimizer using strategy
         self.optimizer = self.optimizer_strategy.create_optimizer(model, self.context)
 
         # Create LR scheduler using strategy
@@ -793,11 +798,6 @@ class ComposableTrainer(base.Trainer):
         )
         if preserve_optimizer_state:
             self._restore_preserved_optimizer_state()
-
-        # Move model to device
-        model = self._require_model()
-        model.to(self.device)
-        model.train()
 
         # Training epochs
         total_epochs = config["epochs"]

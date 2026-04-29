@@ -21,6 +21,7 @@ from plato.trainers.strategies import (
     SGDOptimizerStrategy,
     StepLRSchedulerStrategy,
 )
+from plato.trainers.strategies.base import OptimizerStrategy, TrainingContext
 
 LOCAL_STATE_PAYLOAD_KEYS = {
     "optimizer_state",
@@ -94,6 +95,51 @@ class CapturingTrainingStep(DefaultTrainingStepStrategy):
 
 def _linear_model():
     return nn.Sequential(OrderedDict([("linear", nn.Linear(2, 2))]))
+
+
+class DeviceTrackingModel(nn.Module):
+    """Model that records whether it has been moved to a trainer device."""
+
+    def __init__(self):
+        super().__init__()
+        self.linear = nn.Linear(2, 2)
+        self.moved_to_trainer_device = False
+
+    def forward(self, features):
+        return self.linear(features)
+
+    def to(self, *args, **kwargs):
+        self.moved_to_trainer_device = True
+        return super().to(*args, **kwargs)
+
+
+class RestoreOrderOptimizer(torch.optim.SGD):
+    """Optimizer that records whether state restore happens after model.to()."""
+
+    def __init__(self, params, model: DeviceTrackingModel):
+        self.model = model
+        self.loaded_after_model_to = None
+        super().__init__(params, lr=0.01, momentum=0.9)
+
+    def load_state_dict(self, state_dict):
+        self.loaded_after_model_to = self.model.moved_to_trainer_device
+        if not self.loaded_after_model_to:
+            raise AssertionError("optimizer state restored before model.to()")
+        return super().load_state_dict(state_dict)
+
+
+class RestoreOrderOptimizerStrategy(OptimizerStrategy):
+    """Create restore-order-aware optimizers for regression tests."""
+
+    def __init__(self):
+        self.optimizers = []
+
+    def create_optimizer(
+        self, model: DeviceTrackingModel, context: TrainingContext
+    ) -> torch.optim.Optimizer:
+        optimizer = RestoreOrderOptimizer(model.parameters(), model)
+        self.optimizers.append(optimizer)
+        return optimizer
 
 
 def _two_layer_model(first_name="first", second_name="second"):
@@ -182,6 +228,38 @@ def test_adamw_moment_buffers_persist_between_rounds_for_same_client(
     assert torch.allclose(restored_state["exp_avg_sq"], saved_state["exp_avg_sq"])
     final_param_state = _first_param_state(trainer.optimizer.state_dict()["state"])
     assert _state_step(final_param_state) == 2
+
+
+def test_preserved_optimizer_state_restores_after_model_moves_to_device(
+    temp_config, tiny_dataset, one_step_config
+):
+    config = {**one_step_config, "preserve_optimizer_state": True}
+    source_trainer = ComposableTrainer(
+        model=DeviceTrackingModel,
+        loss_strategy=CrossEntropyLossStrategy(),
+        optimizer_strategy=RestoreOrderOptimizerStrategy(),
+    )
+    source_trainer.set_client_id(11)
+    source_trainer.train_model(config, tiny_dataset, list(range(len(tiny_dataset))))
+
+    restore_strategy = RestoreOrderOptimizerStrategy()
+    trainer = ComposableTrainer(
+        model=DeviceTrackingModel,
+        loss_strategy=CrossEntropyLossStrategy(),
+        optimizer_strategy=restore_strategy,
+    )
+    trainer.set_client_id(11)
+    trainer._preserved_optimizer_states[11] = copy.deepcopy(
+        source_trainer._preserved_optimizer_states[11]
+    )
+
+    trainer.train_model(config, tiny_dataset, list(range(len(tiny_dataset))))
+
+    assert restore_strategy.optimizers[0].loaded_after_model_to is True
+    restored_state = _first_param_state(
+        trainer._preserved_optimizer_states[11]["optimizer_state"]["state"]
+    )
+    assert "momentum_buffer" in restored_state
 
 
 def test_scheduler_state_and_lr_progress_persist_between_rounds(
