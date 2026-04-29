@@ -1,13 +1,26 @@
 # DiLoCo Design Contract
 
-This note defines what Plato will call faithful DiLoCo for the initial
-implementation. It is a contract for the implementation issues that follow; it
-does not describe runtime behavior that already exists in Plato.
+This note defines what Plato calls faithful DiLoCo in the current
+implementation.
 
 Faithful DiLoCo in Plato means algorithm-faithful execution of the DiLoCo
 training loop inside Plato's federated runtime. It does not mean reproducing
 the paper's exact C4 dataset, model scale, tokenizer, hardware topology,
 pretraining duration, or final benchmark numbers.
+
+## Smoke Configuration
+
+Plato includes a small MNIST/LeNet smoke configuration for checking the DiLoCo
+mechanics:
+
+```bash
+uv run python plato.py --config configs/MNIST/diloco_lenet5_smoke.toml
+```
+
+This smoke run validates configuration loading, DiLoCo server selection, local
+optimizer-step work, client-local optimizer-state persistence, and server-side
+outer aggregation. It is intentionally tiny and does not reproduce the C4
+language-model pretraining setup or the paper's reported metrics.
 
 ## Algorithm Contract
 
@@ -132,8 +145,10 @@ rate `1.0` is valid only when both runs use the same weighting rule.
 Unsupported modes must fail clearly. They must not silently fall back to an
 approximate DiLoCo variant. Examples include trainer backends that cannot count
 local optimizer steps exactly, execution paths that cannot preserve
-client-local optimizer and scheduler state, or payload paths that would send
-optimizer state to the server.
+client-local optimizer and scheduler state, samplers that cannot advance the
+small-`H` local data stream across rounds, or payload paths that would send
+optimizer state to the server. Experimental combinations that are allowed but
+not faithful must warn clearly.
 
 ## Implementation Sequence
 
