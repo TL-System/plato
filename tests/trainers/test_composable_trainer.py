@@ -19,6 +19,7 @@ from plato.trainers.strategies import (
     CrossEntropyLossStrategy,
     DefaultDataLoaderStrategy,
     DefaultTrainingStepStrategy,
+    GradientAccumulationStepStrategy,
     NoOpUpdateStrategy,
     NoSchedulerStrategy,
 )
@@ -272,6 +273,30 @@ class TestComposableTrainerLocalSteps:
             context.state["optimizer_step_completed"] = True
             return torch.tensor(0.0)
 
+    class CountingGradientAccumulationStepStrategy(GradientAccumulationStepStrategy):
+        def __init__(self, accumulation_steps):
+            super().__init__(accumulation_steps=accumulation_steps)
+            self.raw_batch_count = 0
+
+        def training_step(
+            self,
+            model,
+            optimizer,
+            examples,
+            labels,
+            loss_criterion,
+            context,
+        ):
+            self.raw_batch_count += 1
+            return super().training_step(
+                model=model,
+                optimizer=optimizer,
+                examples=examples,
+                labels=labels,
+                loss_criterion=loss_criterion,
+                context=context,
+            )
+
     def test_local_steps_stop_mid_epoch_and_run_cleanup(
         self, simple_model, simple_dataset, simple_config
     ):
@@ -322,6 +347,31 @@ class TestComposableTrainerLocalSteps:
 
         assert step_strategy.raw_batch_count == 6
         assert step_strategy.optimizer_step_count == 2
+        assert update_strategy.after_step_count == 2
+        assert trainer.context.state["local_optimizer_steps"] == 2
+
+    def test_local_steps_respect_builtin_gradient_accumulation(
+        self, simple_model, simple_dataset, simple_config
+    ):
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 2,
+        }
+        update_strategy = self.CountingUpdateStrategy()
+        step_strategy = self.CountingGradientAccumulationStepStrategy(
+            accumulation_steps=3
+        )
+        trainer = ComposableTrainer(
+            model=simple_model,
+            model_update_strategy=update_strategy,
+            training_step_strategy=step_strategy,
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert step_strategy.raw_batch_count == 6
         assert update_strategy.after_step_count == 2
         assert trainer.context.state["local_optimizer_steps"] == 2
 
