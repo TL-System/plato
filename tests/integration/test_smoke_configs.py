@@ -28,13 +28,14 @@ class MNISTSmokeDatasource:
     """Datasource returning image-shaped tensors for LeNet smoke tests."""
 
     def __init__(self, train_size: int = 4, test_size: int = 2):
+        generator = torch.Generator().manual_seed(13)
         self._train = TensorDataset(
-            torch.randn(train_size, 1, 28, 28),
-            torch.randint(0, 10, (train_size,)),
+            torch.randn(train_size, 1, 28, 28, generator=generator),
+            torch.randint(0, 10, (train_size,), generator=generator),
         )
         self._test = TensorDataset(
-            torch.randn(test_size, 1, 28, 28),
-            torch.randint(0, 10, (test_size,)),
+            torch.randn(test_size, 1, 28, 28, generator=generator),
+            torch.randint(0, 10, (test_size,), generator=generator),
         )
 
     def num_train_examples(self):
@@ -45,6 +46,56 @@ class MNISTSmokeDatasource:
 
     def get_test_set(self):
         return self._test
+
+
+LOCAL_STATE_PAYLOAD_KEYS = {
+    "optimizer_state",
+    "scheduler_state",
+    "trainer_state",
+    "local_metadata",
+    "metadata",
+    "global_step",
+    "local_optimizer_steps",
+    "_optimizer_state_input_filename",
+    "_optimizer_state_output_filename",
+}
+
+
+def _model_weight_payload(payload, model):
+    """Assert that a client payload contains model weights only."""
+    model_state = model.state_dict()
+
+    assert isinstance(payload, dict)
+    assert set(payload) == set(model_state)
+    assert LOCAL_STATE_PAYLOAD_KEYS.isdisjoint(payload)
+    assert all(torch.is_tensor(value) for value in payload.values())
+
+
+def _shifted_payload(weights, amount):
+    """Build a fake client model payload shifted from the server baseline."""
+    shifted = {}
+    for name, value in weights.items():
+        shifted[name] = value.clone()
+        if torch.is_floating_point(shifted[name]):
+            shifted[name] = shifted[name] + amount
+    return shifted
+
+
+def _server_update(client_id, payload):
+    """Build a minimal server update carrying model weights."""
+    return SimpleNamespace(
+        client_id=client_id,
+        report=SimpleNamespace(
+            client_id=client_id,
+            num_samples=1,
+            accuracy=0.5,
+            processing_time=0.1,
+            comm_time=0.1,
+            training_time=0.1,
+            type="weights",
+        ),
+        payload=payload,
+    )
 
 
 @pytest.mark.integration
@@ -129,6 +180,111 @@ def test_diloco_lenet5_smoke_config_contract_loads():
             server.aggregation_strategy,
             diloco_aggregation.DiLoCoAggregationStrategy,
         )
+
+
+@pytest.mark.integration
+def test_diloco_lenet5_smoke_config_runs_faithful_path(monkeypatch):
+    """Exact DiLoCo smoke config exercises local work and outer aggregation."""
+    config_path = REPO_ROOT / "configs" / "MNIST" / "diloco_lenet5_smoke.toml"
+
+    with configure_environment_from_path(config_path) as config:
+        datasources_registry = import_module("plato.datasources.registry")
+        processor_registry = import_module("plato.processors.registry")
+        server_registry = reload(import_module("plato.servers.registry"))
+        client_mod = import_module("plato.clients.simple")
+        config_mod = import_module("plato.config")
+        diloco_server = import_module("plato.servers.diloco")
+        fedavg_algorithm = import_module("plato.algorithms.fedavg")
+        diloco_aggregation = import_module("plato.servers.strategies.aggregation")
+
+        fake_datasource = MNISTSmokeDatasource(train_size=32, test_size=4)
+        monkeypatch.setattr(
+            datasources_registry,
+            "get",
+            lambda *args, **kwargs: fake_datasource,
+        )
+        monkeypatch.setattr(
+            processor_registry,
+            "get",
+            lambda *args, **kwargs: (None, None),
+        )
+
+        server = server_registry.get()
+        server.configure()
+
+        assert isinstance(server, diloco_server.Server)
+        assert isinstance(server.algorithm, fedavg_algorithm.Algorithm)
+        assert isinstance(
+            server.aggregation_strategy,
+            diloco_aggregation.DiLoCoAggregationStrategy,
+        )
+        assert config.server.type == "diloco"
+        assert config.algorithm.type == "fedavg"
+        assert config.trainer.local_steps_per_round == 2
+        assert config.trainer.preserve_optimizer_state is True
+        assert config.data.sampler == "iid"
+
+        client = client_mod.Client()
+        client.client_id = 1
+        client._context.client_id = 1
+        client.current_round = 1
+        client._context.current_round = 1
+        client._load_data()
+        client.configure()
+        client._allocate_data()
+        client._load_payload(server.algorithm.extract_weights())
+
+        train_config = config.trainer._asdict()
+        train_config["run_id"] = config_mod.Config.params["run_id"]
+        client.trainer.current_round = client.current_round
+        client.trainer.train_model(train_config, client.trainset, client.sampler)
+        payload = client.algorithm.extract_weights()
+
+        assert client.sampler.num_samples() == config.data.partition_size
+        assert client.trainer.context.state["local_steps_per_round"] == 2
+        assert client.trainer.context.state["local_optimizer_steps"] == 2
+        assert client.trainer.current_epoch == 1
+        assert client.client_id in client.trainer._preserved_optimizer_states
+        assert client.trainer._preserved_optimizer_states[client.client_id][
+            "optimizer_state"
+        ]["state"]
+        _model_weight_payload(payload, client.trainer.model)
+
+        # Small-H mid-epoch stopping and round-aware sampler streaming are covered
+        # in TestComposableTrainerLocalSteps; this integration path verifies the
+        # exact smoke config enables those runtime flags with the supported sampler.
+        baseline = server.algorithm.extract_weights()
+        trainable_name = next(iter(dict(server.trainer.model.named_parameters())))
+        server.updates = [
+            _server_update(1, _shifted_payload(baseline, 1.0)),
+            _server_update(2, _shifted_payload(baseline, 3.0)),
+        ]
+        server.current_round = 1
+        server.context.current_round = 1
+
+        delta_calls = []
+        aggregate_deltas = server.aggregation_strategy.aggregate_deltas
+
+        async def record_delta_aggregation(updates, deltas_received, context):
+            delta_calls.append((updates, deltas_received))
+            return await aggregate_deltas(updates, deltas_received, context)
+
+        monkeypatch.setattr(
+            server.aggregation_strategy,
+            "aggregate_deltas",
+            record_delta_aggregation,
+        )
+
+        async_run(server._process_reports())
+
+        updated = server.algorithm.extract_weights()
+        ordinary_fedavg_value = baseline[trainable_name] + 2.0
+        faithful_diloco_value = baseline[trainable_name] + 2.0 * 1.9 * 0.7
+
+        assert len(delta_calls) == 1
+        assert len(delta_calls[0][1]) == 2
+        assert not torch.allclose(updated[trainable_name], ordinary_fedavg_value)
+        assert torch.allclose(updated[trainable_name], faithful_diloco_value)
 
 
 @pytest.mark.integration
