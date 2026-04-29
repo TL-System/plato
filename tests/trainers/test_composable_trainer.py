@@ -5,6 +5,8 @@ Tests the ComposableTrainer with various strategy combinations to ensure
 it works correctly in end-to-end training scenarios.
 """
 
+import logging
+
 import pytest
 import torch
 import torch.nn as nn
@@ -196,6 +198,13 @@ class TestComposableTrainerLocalSteps:
 
         def num_samples(self):
             return len(self.indices)
+
+    class NonMaterializableSampler(torch.utils.data.Sampler):
+        def __iter__(self):
+            raise NotImplementedError("This sampler cannot be materialized.")
+
+        def __len__(self):
+            return 10
 
     class CountingCallback(TrainerCallback):
         def __init__(self):
@@ -505,6 +514,27 @@ class TestComposableTrainerLocalSteps:
             repeat_trainer.train_model(config, dataset, sampler)
 
         assert repeat_step_strategy.samples_by_round == step_strategy.samples_by_round
+
+    def test_local_step_sampling_warns_for_non_materializable_sampler(
+        self, simple_dataset, caplog
+    ):
+        context = TrainingContext()
+        context.state["local_steps_per_round"] = 2
+        sampler = self.NonMaterializableSampler()
+
+        with caplog.at_level(logging.WARNING):
+            loader = DefaultDataLoaderStrategy().create_train_loader(
+                simple_dataset,
+                sampler,
+                batch_size=1,
+                context=context,
+            )
+
+        assert loader.sampler is sampler
+        assert (
+            "cannot be materialized for round-aware local-step sampling"
+            in caplog.text
+        )
 
     @pytest.mark.parametrize("local_steps_per_round", [0, -1, 1.5, "2", True])
     def test_invalid_local_steps_fail_clearly(

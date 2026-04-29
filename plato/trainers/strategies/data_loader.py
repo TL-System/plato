@@ -80,7 +80,7 @@ def _apply_local_step_sampling_stream(
 
     try:
         indices = list(iter(sampler_obj))
-    except TypeError:
+    except (TypeError, NotImplementedError):
         logging.warning(
             "Sampler %s cannot be materialized for round-aware local-step "
             "sampling; using it unchanged. Consecutive short local rounds may "
