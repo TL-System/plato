@@ -22,6 +22,18 @@ from plato.trainers.strategies import (
     StepLRSchedulerStrategy,
 )
 
+LOCAL_STATE_PAYLOAD_KEYS = {
+    "optimizer_state",
+    "scheduler_state",
+    "trainer_state",
+    "local_metadata",
+    "metadata",
+    "global_step",
+    "local_optimizer_steps",
+    "_optimizer_state_input_filename",
+    "_optimizer_state_output_filename",
+}
+
 
 @pytest.fixture
 def tiny_dataset():
@@ -136,6 +148,14 @@ def _cached_optimizer_step(trainer):
 def _cached_scheduler_last_epoch(trainer):
     payload = trainer._preserved_optimizer_states[trainer.client_id]
     return payload["scheduler_state"]["last_epoch"]
+
+
+def _assert_model_update_contains_only_model_weights(update, model):
+    model_state = model.state_dict()
+
+    assert set(update) == set(model_state)
+    assert LOCAL_STATE_PAYLOAD_KEYS.isdisjoint(update)
+    assert all(torch.is_tensor(value) for value in update.values())
 
 
 def test_adamw_moment_buffers_persist_between_rounds_for_same_client(
@@ -424,16 +444,19 @@ def test_preserved_state_stays_out_of_model_update_payload(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
         optimizer_strategy=AdamWOptimizerStrategy(lr=0.01),
+        lr_scheduler_strategy=StepLRSchedulerStrategy(step_size=1, gamma=0.5),
     )
+    trainer.set_client_id(5)
     config = {**one_step_config, "preserve_optimizer_state": True}
 
     update = trainer.obtain_model_update(
         config, tiny_dataset, list(range(len(tiny_dataset)))
     )
+    preserved_state = trainer._preserved_optimizer_states[trainer.client_id]
 
-    assert "optimizer_state" not in update
-    assert "scheduler_state" not in update
-    assert all(torch.is_tensor(value) for value in update.values())
+    assert preserved_state["optimizer_state"]["state"]
+    assert preserved_state["scheduler_state"]["last_epoch"] >= 1
+    _assert_model_update_contains_only_model_weights(update, trainer.model)
 
 
 def test_preserved_state_invalidates_when_parameter_order_changes(
