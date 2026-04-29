@@ -61,6 +61,17 @@ class PeftLikeAdapterModel(torch.nn.Module):
         )
 
 
+class AdapterAliasCollisionModel(torch.nn.Module):
+    """Model with a trainable parameter and separate payload key collision."""
+
+    def __init__(self):
+        super().__init__()
+        self.peft_config = {"default": object()}
+        self.foo = torch.nn.ModuleDict(
+            {"default": torch.nn.Linear(1, 1, bias=False)}
+        )
+
+
 def _context(baseline=None, model=None):
     context = ServerContext()
     if baseline is not None:
@@ -543,6 +554,40 @@ def test_parameters_policy_maps_peft_adapter_payload_names(temp_config):
     assert torch.allclose(
         strategy.momentum_state[payload_name], torch.full((1, 1), -4.0)
     )
+
+
+def test_parameters_policy_does_not_overmatch_adapter_alias_collisions(temp_config):
+    """Alias support should not optimize unrelated colliding payload names."""
+    strategy = DiLoCoAggregationStrategy(
+        outer_optimizer="sgdm",
+        outer_learning_rate=0.5,
+        outer_momentum=0.5,
+        aggregation_weighting="uniform",
+    )
+    model = AdapterAliasCollisionModel()
+    trainable_name = "foo.default.weight"
+    colliding_name = "foo.weight"
+    baseline = {
+        trainable_name: torch.zeros((1, 1)),
+        colliding_name: torch.zeros((1, 1)),
+    }
+
+    server_delta = _aggregate(
+        strategy,
+        [_update(1)],
+        [
+            {
+                trainable_name: torch.full((1, 1), 4.0),
+                colliding_name: torch.full((1, 1), 4.0),
+            }
+        ],
+        baseline,
+        model,
+    )
+
+    assert torch.allclose(server_delta[trainable_name], torch.full((1, 1), 2.0))
+    assert torch.allclose(server_delta[colliding_name], torch.full((1, 1), 4.0))
+    assert set(strategy.momentum_state) == {trainable_name}
 
 
 @pytest.mark.parametrize(

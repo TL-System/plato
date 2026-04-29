@@ -302,6 +302,9 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         payload_paths: set[str] | None,
     ) -> set[str]:
         candidates = {parameter_name}
+        if payload_paths is not None and parameter_name in payload_paths:
+            return candidates
+
         parts = parameter_name.split(".")
         for index, part in enumerate(parts):
             if part not in adapter_names:
