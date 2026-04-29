@@ -178,6 +178,29 @@ class ComposableTrainer(base.Trainer):
         return cast(nn.Module, self.model)
 
     @staticmethod
+    def _local_steps_per_round(config: dict[str, Any]) -> int | None:
+        """Return the optional local optimizer-step limit for one train run."""
+        value = config.get("local_steps_per_round")
+        if value is None:
+            return None
+
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            raise ValueError(
+                "trainer.local_steps_per_round must be a positive integer."
+            )
+
+        return value
+
+    def _record_local_optimizer_step(self, local_steps_per_round: int | None) -> bool:
+        """Record one completed optimizer step and report whether H was reached."""
+        if local_steps_per_round is None:
+            return False
+
+        completed_steps = int(self.context.state.get("local_optimizer_steps", 0)) + 1
+        self.context.state["local_optimizer_steps"] = completed_steps
+        return completed_steps >= local_steps_per_round
+
+    @staticmethod
     def _persisted_test_state_keys() -> tuple[str, ...]:
         """State keys that must survive spawned test subprocesses."""
         return (
@@ -397,6 +420,12 @@ class ComposableTrainer(base.Trainer):
         self.sampler = sampler
         self.context.config = config
         self.context.current_round = self.current_round
+        local_steps_per_round = self._local_steps_per_round(config)
+        self.context.state["local_optimizer_steps"] = 0
+        if local_steps_per_round is None:
+            self.context.state.pop("local_steps_per_round", None)
+        else:
+            self.context.state["local_steps_per_round"] = local_steps_per_round
 
         # Ensure training step strategy respects higher-order gradient settings
         if self.training_step_strategy is not None:
@@ -494,6 +523,7 @@ class ComposableTrainer(base.Trainer):
         total_epochs = config["epochs"]
         tic = time.perf_counter()
         training_stop_requested = False
+        local_step_limit_reached = False
         try:
             total_batches = len(self.train_loader)
         except (TypeError, AttributeError):
@@ -564,6 +594,9 @@ class ComposableTrainer(base.Trainer):
                     self.optimizer_strategy.on_optimizer_step(
                         self.optimizer, self.context
                     )
+                    local_step_limit_reached = self._record_local_optimizer_step(
+                        local_steps_per_round
+                    )
 
                     # Strategy hook: after_step
                     self.model_update_strategy.after_step(self.context)
@@ -591,7 +624,7 @@ class ComposableTrainer(base.Trainer):
                     ):
                         self._handle_control_log()
 
-                    if control_actions.get("stop_training"):
+                    if control_actions.get("stop_training") or local_step_limit_reached:
                         training_stop_requested = True
                         break
 
@@ -601,7 +634,11 @@ class ComposableTrainer(base.Trainer):
             finalize_loss = None
             finalize_step_done = False
             finalize_callable = getattr(self.training_step_strategy, "finalize", None)
-            if batches_seen and callable(finalize_callable):
+            if (
+                batches_seen
+                and callable(finalize_callable)
+                and not local_step_limit_reached
+            ):
                 finalize_loss = finalize_callable(
                     model=model,
                     optimizer=self.optimizer,
@@ -613,6 +650,9 @@ class ComposableTrainer(base.Trainer):
                 )
             if finalize_step_done:
                 self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
+                local_step_limit_reached = self._record_local_optimizer_step(
+                    local_steps_per_round
+                )
                 self.model_update_strategy.after_step(self.context)
                 self.callback_handler.call_event(
                     "on_train_step_end",
@@ -651,6 +691,9 @@ class ComposableTrainer(base.Trainer):
                 if control_actions.get("stop_epoch"):
                     # No batches remain, but respect control flag.
                     pass
+
+                if local_step_limit_reached:
+                    training_stop_requested = True
 
             self.context.state.pop("is_last_batch", None)
             self.context.state.pop("hf_optimizer_step_index", None)
