@@ -88,7 +88,9 @@ nav:
       - Servers: references/servers.md
       - Trainers: references/trainers.md
       - Evaluators: references/evaluators.md
-  - Developer's Guide: development.md
+  - Developer's Guide:
+      - Overview: development.md
+      - DiLoCo Design Contract: development/diloco.md
   - Deployment Guide: deployment.md
   - Digital Research Alliance of Canada: ccdb.md
   - Miscellaneous Notes: misc.md
