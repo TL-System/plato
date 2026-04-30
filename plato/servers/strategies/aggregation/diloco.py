@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import logging
 import numbers
 from collections.abc import Callable, Mapping
 from types import SimpleNamespace
@@ -85,6 +86,18 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         optimizer_paths = self._outer_optimizer_paths(avg_delta, context)
         server_delta, active_paths = self._apply_outer_optimizer(
             avg_delta, optimizer_paths
+        )
+        logging.info(
+            "[Server] DiLoCo outer optimizer applied: optimizer=%s "
+            "outer_lr=%g outer_momentum=%g weighting=%s apply_to=%s "
+            "eligible_updates=%d optimized_tensors=%d.",
+            self.outer_optimizer,
+            self.outer_learning_rate,
+            self.outer_momentum,
+            self.aggregation_weighting,
+            self.apply_outer_optimizer_to,
+            len(eligible),
+            len(optimizer_paths),
         )
         self._remove_stale_momentum(active_paths)
 
