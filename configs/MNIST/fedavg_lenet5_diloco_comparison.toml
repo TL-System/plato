@@ -28,20 +28,23 @@ partition_size = 1000
 type = "basic"
 
 # The maximum number of training rounds
-rounds = 20
+rounds = 63
 
 # The maximum number of clients running concurrently
 max_concurrency = 7
 
 # The target accuracy
-target_accuracy = 0.97
+target_accuracy = 0.99
 
 # The machine learning model
 model_name = "lenet5"
 
 # Match the DiLoCo paper-style inner optimizer settings used by the DiLoCo run.
+# 5 epochs over 1000 samples at batch size 32 gives 160 optimizer steps per
+# round. With 63 rounds, FedAvg gets 10,080 local steps, closely matching
+# DiLoCo's 20 * H=500 = 10,000-step total budget.
 epochs = 5
-batch_size = 512
+batch_size = 32
 optimizer = "AdamW"
 lr_scheduler = "LambdaLR"
 
