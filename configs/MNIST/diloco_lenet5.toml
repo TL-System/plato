@@ -4,10 +4,10 @@
 type = "simple"
 
 # The total number of clients
-total_clients = 2
+total_clients = 50
 
 # The number of clients selected in each round
-per_round = 2
+per_round = 50
 
 # Should the clients compute test accuracy locally?
 do_test = false
@@ -15,10 +15,9 @@ do_test = false
 [server]
 type = "diloco"
 address = "127.0.0.1"
-port = 8000
+port = 8001
 random_seed = 1
 simulate_wall_time = true
-do_test = false
 
 [server.diloco]
 outer_optimizer = "nesterov"
@@ -29,7 +28,7 @@ apply_outer_optimizer_to = "parameters"
 
 [data]
 include = "mnist_iid.toml"
-partition_size = 16
+partition_size = 1000
 
 [trainer]
 
@@ -37,21 +36,26 @@ partition_size = 16
 type = "basic"
 
 # The maximum number of training rounds
-rounds = 2
+rounds = 20
 
 # The maximum number of clients running concurrently
-max_concurrency = 1
+max_concurrency = 7
+
+# The target accuracy
+target_accuracy = 0.97
 
 # The machine learning model
 model_name = "lenet5"
 
-# DiLoCo local work H, counted in optimizer steps.
-local_steps_per_round = 2
+# Number of local optimizer steps per DiLoCo synchronization.
+local_steps_per_round = 500
 preserve_optimizer_state = true
 
-epochs = 1
-batch_size = 4
+# DiLoCo paper inner-optimizer settings.
+epochs = 250
+batch_size = 512
 optimizer = "AdamW"
+lr_scheduler = "LambdaLR"
 
 [algorithm]
 
@@ -64,5 +68,8 @@ type = "fedavg"
 num_classes = 10
 
 [parameters.optimizer]
-lr = 0.001
-weight_decay = 0.0
+lr = 0.0004
+weight_decay = 0.1
+
+[parameters.learning_rate]
+warmup_steps = "1000it"

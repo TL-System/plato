@@ -147,13 +147,14 @@
 
     `apply_outer_optimizer_to = "parameters"` applies the outer optimizer only to trainable floating parameters. Floating buffers are synchronized with the selected averaging rule but do not receive outer momentum. `apply_outer_optimizer_to = "all_floating"` is available for experiments that also apply the outer optimizer to floating buffers.
 
-    A runnable smoke configuration is available at `configs/MNIST/diloco_lenet5_smoke.toml`:
+    Runnable comparison configurations are available for MNIST/LeNet and CIFAR-10/ResNet-18:
 
     ```bash
-    uv run python plato.py --config configs/MNIST/diloco_lenet5_smoke.toml
+    uv run python plato.py --config configs/MNIST/diloco_lenet5.toml
+    uv run python plato.py --config configs/CIFAR10/diloco_resnet18.toml
     ```
 
-    The smoke configuration validates DiLoCo mechanics in Plato; it is not a C4/model/pretraining reproduction of the DiLoCo paper.
+    These configurations validate DiLoCo mechanics in Plato; they are not C4/model/pretraining reproductions of the DiLoCo paper.
 
 !!! example "edge_downlink_bandwidth"
     The edge server's estimated downlink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section).

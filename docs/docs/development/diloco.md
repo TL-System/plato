@@ -8,19 +8,21 @@ training loop inside Plato's federated runtime. It does not mean reproducing
 the paper's exact C4 dataset, model scale, tokenizer, hardware topology,
 pretraining duration, or final benchmark numbers.
 
-## Smoke Configuration
+## Example Configurations
 
-Plato includes a small MNIST/LeNet smoke configuration for checking the DiLoCo
-mechanics:
+Plato includes MNIST/LeNet and CIFAR-10/ResNet-18 comparison configurations
+for checking DiLoCo against matched FedAvg runs:
 
 ```bash
-uv run python plato.py --config configs/MNIST/diloco_lenet5_smoke.toml
+uv run python plato.py --config configs/MNIST/diloco_lenet5.toml
+uv run python plato.py --config configs/MNIST/fedavg_lenet5_diloco_comparison.toml
+uv run python plato.py --config configs/CIFAR10/diloco_resnet18.toml
+uv run python plato.py --config configs/CIFAR10/fedavg_resnet18_diloco_comparison.toml
 ```
 
-This smoke run validates configuration loading, DiLoCo server selection, local
-optimizer-step work, client-local optimizer-state persistence, and server-side
-outer aggregation. It is intentionally tiny and does not reproduce the C4
-language-model pretraining setup or the paper's reported metrics.
+These examples validate Plato's DiLoCo mechanics without reproducing the C4
+dataset, tokenizer, language-model scale, hardware topology, pretraining
+duration, or final benchmark numbers from the paper.
 
 ## Algorithm Contract
 
