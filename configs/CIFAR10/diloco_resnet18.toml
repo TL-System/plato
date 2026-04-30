@@ -49,15 +49,15 @@ rounds = 20
 max_concurrency = 7
 
 # The target accuracy
-target_accuracy = 0.8
+target_accuracy = 0.9
 
 # Number of local optimizer steps per DiLoCo synchronization.
 local_steps_per_round = 500
 preserve_optimizer_state = true
 
 # DiLoCo paper inner-optimizer settings.
-epochs = 250
-batch_size = 512
+epochs = 5
+batch_size = 10
 optimizer = "AdamW"
 lr_scheduler = "LambdaLR"
 

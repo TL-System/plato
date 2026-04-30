@@ -41,11 +41,12 @@ rounds = 20
 max_concurrency = 7
 
 # The target accuracy
-target_accuracy = 0.8
+target_accuracy = 0.9
 
-# Match the DiLoCo paper-style inner optimizer settings used by the DiLoCo run.
+# Match the original FedAvg local training shape while keeping 500 optimizer
+# steps per round, equal to DiLoCo's H.
 epochs = 5
-batch_size = 512
+batch_size = 10
 optimizer = "AdamW"
 lr_scheduler = "LambdaLR"
 
