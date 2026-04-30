@@ -14,6 +14,7 @@ from typing import Any, Optional
 import torch
 import torch.utils.data
 
+from plato.config import Config
 from plato.trainers.strategies.base import DataLoaderStrategy, TrainingContext
 
 CollateFn = Callable[[list[Any]], Any]
@@ -66,12 +67,35 @@ def _local_step_stream_start(
     return offset % stream_length
 
 
+def _enforce_diloco_full_participation_for_local_steps() -> None:
+    """Require DiLoCo workers to train once per outer synchronization."""
+    server_type = getattr(Config().server, "type", None)
+    if server_type != "diloco":
+        return
+
+    total_clients = int(Config().clients.total_clients)
+    clients_per_round = int(Config().clients.per_round)
+    if clients_per_round == total_clients:
+        return
+
+    raise ValueError(
+        "DiLoCo local-step data loading requires clients.per_round to equal "
+        "clients.total_clients so every worker advances its local data stream "
+        "once per outer round."
+    )
+
+
 def _apply_local_step_sampling_stream(
     sampler_obj, batch_size: int, context: TrainingContext
 ):
     """Advance deterministic samplers across short local-step rounds."""
     local_steps_per_round = context.state.get("local_steps_per_round")
-    if local_steps_per_round is None or sampler_obj is None:
+    if local_steps_per_round is None:
+        return sampler_obj
+
+    _enforce_diloco_full_participation_for_local_steps()
+
+    if sampler_obj is None:
         return sampler_obj
 
     samples_per_round = int(local_steps_per_round) * int(batch_size)

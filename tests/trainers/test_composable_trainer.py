@@ -24,6 +24,7 @@ from plato.trainers.strategies import (
     GradientAccumulationStepStrategy,
     NoOpUpdateStrategy,
     NoSchedulerStrategy,
+    StepLRSchedulerStrategy,
 )
 from plato.trainers.strategies.base import (
     LossCriterionStrategy,
@@ -535,6 +536,85 @@ class TestComposableTrainerLocalSteps:
             "cannot be materialized for round-aware local-step sampling"
             in caplog.text
         )
+
+    def test_diloco_local_steps_require_full_client_participation(
+        self, simple_dataset, temp_config
+    ):
+        Config().server.type = "diloco"
+        Config().clients.total_clients = 4
+        Config().clients.per_round = 2
+        context = TrainingContext()
+        context.state["local_steps_per_round"] = 2
+
+        with pytest.raises(
+            ValueError, match="clients\\.per_round.*clients\\.total_clients"
+        ):
+            DefaultDataLoaderStrategy().create_train_loader(
+                simple_dataset,
+                list(range(len(simple_dataset))),
+                batch_size=1,
+                context=context,
+            )
+
+    def test_partial_participation_still_allowed_without_diloco_local_steps(
+        self, simple_dataset, temp_config
+    ):
+        Config().server.type = "fedavg"
+        Config().clients.total_clients = 4
+        Config().clients.per_round = 2
+        context = TrainingContext()
+        context.state["local_steps_per_round"] = 2
+
+        loader = DefaultDataLoaderStrategy().create_train_loader(
+            simple_dataset,
+            list(range(len(simple_dataset))),
+            batch_size=1,
+            context=context,
+        )
+
+        assert len(loader.sampler) == len(simple_dataset)
+
+    def test_diloco_local_steps_advance_lr_scheduler_per_optimizer_step(
+        self, simple_model, simple_dataset, simple_config, temp_config
+    ):
+        Config().server.type = "diloco"
+        Config().clients.total_clients = 4
+        Config().clients.per_round = 4
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 3,
+        }
+        trainer = ComposableTrainer(
+            model=simple_model,
+            lr_scheduler_strategy=StepLRSchedulerStrategy(step_size=1, gamma=0.5),
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert trainer.context.state["local_optimizer_steps"] == 3
+        assert trainer.lr_scheduler.last_epoch == 3
+
+    def test_non_diloco_local_steps_keep_epoch_based_lr_scheduler(
+        self, simple_model, simple_dataset, simple_config, temp_config
+    ):
+        Config().server.type = "fedavg"
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 3,
+        }
+        trainer = ComposableTrainer(
+            model=simple_model,
+            lr_scheduler_strategy=StepLRSchedulerStrategy(step_size=1, gamma=0.5),
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert trainer.context.state["local_optimizer_steps"] == 3
+        assert trainer.lr_scheduler.last_epoch == 1
 
     @pytest.mark.parametrize("local_steps_per_round", [0, -1, 1.5, "2", True])
     def test_invalid_local_steps_fail_clearly(
