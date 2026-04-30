@@ -207,6 +207,21 @@ class ComposableTrainer(base.Trainer):
         return bool(config.get("preserve_optimizer_state", False))
 
     @staticmethod
+    def _step_lr_scheduler_per_optimizer_step(config: dict[str, Any]) -> bool:
+        """Return whether LR scheduling should follow optimizer steps."""
+        if config.get("local_steps_per_round") is None:
+            return False
+
+        return getattr(Config().server, "type", None) == "diloco"
+
+    def _step_lr_scheduler_after_optimizer_step(
+        self, step_lr_per_optimizer_step: bool
+    ) -> None:
+        """Advance step-based LR schedules after one completed optimizer step."""
+        if step_lr_per_optimizer_step:
+            self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
+
+    @staticmethod
     def _parameter_signature(name: str | None, parameter: torch.Tensor):
         """Build a compatibility signature for one model parameter."""
         return (name, tuple(parameter.shape), str(parameter.dtype))
@@ -801,6 +816,7 @@ class ComposableTrainer(base.Trainer):
 
         # Training epochs
         total_epochs = config["epochs"]
+        step_lr_per_optimizer_step = self._step_lr_scheduler_per_optimizer_step(config)
         tic = time.perf_counter()
         training_stop_requested = False
         local_step_limit_reached = False
@@ -874,6 +890,9 @@ class ComposableTrainer(base.Trainer):
                     self.optimizer_strategy.on_optimizer_step(
                         self.optimizer, self.context
                     )
+                    self._step_lr_scheduler_after_optimizer_step(
+                        step_lr_per_optimizer_step
+                    )
                     local_step_limit_reached = self._record_local_optimizer_step(
                         local_steps_per_round
                     )
@@ -930,6 +949,9 @@ class ComposableTrainer(base.Trainer):
                 )
             if finalize_step_done:
                 self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
+                self._step_lr_scheduler_after_optimizer_step(
+                    step_lr_per_optimizer_step
+                )
                 local_step_limit_reached = self._record_local_optimizer_step(
                     local_steps_per_round
                 )
@@ -979,7 +1001,8 @@ class ComposableTrainer(base.Trainer):
             self.context.state.pop("hf_optimizer_step_index", None)
 
             # LR scheduler step
-            self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
+            if not step_lr_per_optimizer_step:
+                self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
 
             # Handle optimizer params state update if needed
             if hasattr(self.optimizer, "params_state_update"):
