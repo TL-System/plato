@@ -1,6 +1,7 @@
 """Tests for DiLoCo server-side outer aggregation."""
 
 import asyncio
+import logging
 from types import SimpleNamespace
 
 import pytest
@@ -345,6 +346,41 @@ def test_sgd_uses_diloco_outer_gradient_sign(temp_config):
     )
 
     assert torch.allclose(server_delta["w"], torch.tensor([1.0]))
+
+
+def test_outer_optimizer_application_is_logged(temp_config, caplog):
+    """A DiLoCo aggregation should report the server-side outer optimizer."""
+    strategy = DiLoCoAggregationStrategy(
+        outer_optimizer="nesterov",
+        outer_learning_rate=0.7,
+        outer_momentum=0.9,
+        aggregation_weighting="uniform",
+        apply_outer_optimizer_to="parameters",
+    )
+    model = torch.nn.Linear(1, 1, bias=False)
+    baseline = {name: tensor.clone() for name, tensor in model.state_dict().items()}
+
+    with caplog.at_level(logging.INFO):
+        _aggregate(
+            strategy,
+            [_update(1), _update(1)],
+            [
+                {"weight": torch.tensor([[2.0]])},
+                {"weight": torch.tensor([[4.0]])},
+            ],
+            baseline,
+            model,
+        )
+
+    message = caplog.text
+    assert "DiLoCo outer optimizer applied" in message
+    assert "optimizer=nesterov" in message
+    assert "outer_lr=0.7" in message
+    assert "outer_momentum=0.9" in message
+    assert "weighting=uniform" in message
+    assert "apply_to=parameters" in message
+    assert "eligible_updates=2" in message
+    assert "optimized_tensors=1" in message
 
 
 def test_uniform_weighting_ignores_positive_sample_count_magnitude(temp_config):
