@@ -5,11 +5,14 @@ Tests the ComposableTrainer with various strategy combinations to ensure
 it works correctly in end-to-end training scenarios.
 """
 
+import logging
+
 import pytest
 import torch
 import torch.nn as nn
-from torch.utils.data import TensorDataset
+from torch.utils.data import SubsetRandomSampler, TensorDataset
 
+from plato.callbacks.trainer import TrainerCallback
 from plato.config import Config
 from plato.evaluators.runner import EVALUATION_PRIMARY_KEY, EVALUATION_RESULTS_KEY
 from plato.trainers.composable import ComposableTrainer
@@ -18,13 +21,16 @@ from plato.trainers.strategies import (
     CrossEntropyLossStrategy,
     DefaultDataLoaderStrategy,
     DefaultTrainingStepStrategy,
+    GradientAccumulationStepStrategy,
     NoOpUpdateStrategy,
     NoSchedulerStrategy,
+    StepLRSchedulerStrategy,
 )
 from plato.trainers.strategies.base import (
     LossCriterionStrategy,
     ModelUpdateStrategy,
     TrainingContext,
+    TrainingStepStrategy,
 )
 
 
@@ -176,6 +182,452 @@ class TestComposableTrainerTraining:
 
         assert trainer.current_epoch == 5
         assert len(trainer.run_history.get_metric_values("train_loss")) == 5
+
+
+class TestComposableTrainerLocalSteps:
+    """Test local optimizer-step limits for DiLoCo-style local work."""
+
+    class DeterministicPlatoSampler:
+        def __init__(self, indices, seed=47):
+            self.indices = list(indices)
+            self.seed = seed
+
+        def get(self):
+            generator = torch.Generator()
+            generator.manual_seed(self.seed)
+            return SubsetRandomSampler(self.indices, generator=generator)
+
+        def num_samples(self):
+            return len(self.indices)
+
+    class NonMaterializableSampler(torch.utils.data.Sampler):
+        def __iter__(self):
+            raise NotImplementedError("This sampler cannot be materialized.")
+
+        def __len__(self):
+            return 10
+
+    class CountingCallback(TrainerCallback):
+        def __init__(self):
+            self.train_run_end_called = False
+            self.train_step_end_count = 0
+
+        def on_train_step_end(self, trainer, config, batch, loss, **kwargs):
+            self.train_step_end_count += 1
+
+        def on_train_run_end(self, trainer, config, **kwargs):
+            self.train_run_end_called = True
+
+    class CountingUpdateStrategy(ModelUpdateStrategy):
+        def __init__(self):
+            self.after_step_count = 0
+            self.on_train_end_called = False
+
+        def after_step(self, context):
+            self.after_step_count += 1
+
+        def on_train_end(self, context):
+            self.on_train_end_called = True
+
+    class CountingStepStrategy(DefaultTrainingStepStrategy):
+        def __init__(self):
+            super().__init__()
+            self.batch_count = 0
+
+        def training_step(
+            self,
+            model,
+            optimizer,
+            examples,
+            labels,
+            loss_criterion,
+            context,
+        ):
+            self.batch_count += 1
+            return super().training_step(
+                model=model,
+                optimizer=optimizer,
+                examples=examples,
+                labels=labels,
+                loss_criterion=loss_criterion,
+                context=context,
+            )
+
+    class RecordingStepStrategy(DefaultTrainingStepStrategy):
+        def __init__(self):
+            super().__init__()
+            self.samples_by_round = {}
+
+        def training_step(
+            self,
+            model,
+            optimizer,
+            examples,
+            labels,
+            loss_criterion,
+            context,
+        ):
+            sample_ids = examples[:, 0].detach().cpu().int().tolist()
+            self.samples_by_round.setdefault(context.current_round, []).extend(
+                sample_ids
+            )
+            return super().training_step(
+                model=model,
+                optimizer=optimizer,
+                examples=examples,
+                labels=labels,
+                loss_criterion=loss_criterion,
+                context=context,
+            )
+
+    class DelayedOptimizerStepStrategy(TrainingStepStrategy):
+        def __init__(self, accumulation_steps=2, finalize_steps=True):
+            self.accumulation_steps = accumulation_steps
+            self.finalize_steps = finalize_steps
+            self.raw_batch_count = 0
+            self.optimizer_step_count = 0
+            self.finalize_calls = 0
+
+        def training_step(
+            self,
+            model,
+            optimizer,
+            examples,
+            labels,
+            loss_criterion,
+            context,
+        ):
+            outputs = model(examples)
+            loss = loss_criterion(outputs, labels)
+            (loss / self.accumulation_steps).backward()
+
+            self.raw_batch_count += 1
+            if self.raw_batch_count % self.accumulation_steps == 0:
+                optimizer.step()
+                optimizer.zero_grad()
+                self.optimizer_step_count += 1
+                context.state["optimizer_step_completed"] = True
+            else:
+                context.state["optimizer_step_completed"] = False
+
+            return loss
+
+        def finalize(self, model, optimizer, context):
+            self.finalize_calls += 1
+            if not self.finalize_steps:
+                return None
+
+            optimizer.step()
+            optimizer.zero_grad()
+            self.optimizer_step_count += 1
+            context.state["optimizer_step_completed"] = True
+            return torch.tensor(0.0)
+
+    class CountingGradientAccumulationStepStrategy(GradientAccumulationStepStrategy):
+        def __init__(self, accumulation_steps):
+            super().__init__(accumulation_steps=accumulation_steps)
+            self.raw_batch_count = 0
+
+        def training_step(
+            self,
+            model,
+            optimizer,
+            examples,
+            labels,
+            loss_criterion,
+            context,
+        ):
+            self.raw_batch_count += 1
+            return super().training_step(
+                model=model,
+                optimizer=optimizer,
+                examples=examples,
+                labels=labels,
+                loss_criterion=loss_criterion,
+                context=context,
+            )
+
+    def test_local_steps_stop_mid_epoch_and_run_cleanup(
+        self, simple_model, simple_dataset, simple_config
+    ):
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 3,
+        }
+        callback = self.CountingCallback()
+        update_strategy = self.CountingUpdateStrategy()
+        step_strategy = self.CountingStepStrategy()
+        trainer = ComposableTrainer(
+            model=simple_model,
+            callbacks=[callback],
+            model_update_strategy=update_strategy,
+            training_step_strategy=step_strategy,
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert step_strategy.batch_count == 3
+        assert update_strategy.after_step_count == 3
+        assert callback.train_step_end_count == 3
+        assert trainer.current_epoch == 1
+        assert trainer.context.state["local_optimizer_steps"] == 3
+        assert update_strategy.on_train_end_called
+        assert callback.train_run_end_called
+
+    def test_local_steps_count_optimizer_steps_not_raw_batches(
+        self, simple_model, simple_dataset, simple_config
+    ):
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 2,
+        }
+        update_strategy = self.CountingUpdateStrategy()
+        step_strategy = self.DelayedOptimizerStepStrategy(accumulation_steps=3)
+        trainer = ComposableTrainer(
+            model=simple_model,
+            model_update_strategy=update_strategy,
+            training_step_strategy=step_strategy,
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert step_strategy.raw_batch_count == 6
+        assert step_strategy.optimizer_step_count == 2
+        assert update_strategy.after_step_count == 2
+        assert trainer.context.state["local_optimizer_steps"] == 2
+
+    def test_local_steps_respect_builtin_gradient_accumulation(
+        self, simple_model, simple_dataset, simple_config
+    ):
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 2,
+        }
+        update_strategy = self.CountingUpdateStrategy()
+        step_strategy = self.CountingGradientAccumulationStepStrategy(
+            accumulation_steps=3
+        )
+        trainer = ComposableTrainer(
+            model=simple_model,
+            model_update_strategy=update_strategy,
+            training_step_strategy=step_strategy,
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert step_strategy.raw_batch_count == 6
+        assert update_strategy.after_step_count == 2
+        assert trainer.context.state["local_optimizer_steps"] == 2
+
+    def test_local_steps_skip_finalize_after_limit_is_reached(
+        self, simple_model, simple_dataset, simple_config
+    ):
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 2,
+            "local_steps_per_round": 1,
+        }
+        step_strategy = self.DelayedOptimizerStepStrategy(accumulation_steps=2)
+        update_strategy = self.CountingUpdateStrategy()
+        trainer = ComposableTrainer(
+            model=simple_model,
+            model_update_strategy=update_strategy,
+            training_step_strategy=step_strategy,
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert step_strategy.raw_batch_count == 2
+        assert step_strategy.optimizer_step_count == 1
+        assert step_strategy.finalize_calls == 0
+        assert update_strategy.after_step_count == 1
+        assert trainer.context.state["local_optimizer_steps"] == 1
+
+    def test_epoch_behavior_is_unchanged_when_local_steps_unset(
+        self, simple_model, simple_dataset, simple_config
+    ):
+        config = {
+            **simple_config,
+            "batch_size": 10,
+            "epochs": 2,
+        }
+        step_strategy = self.CountingStepStrategy()
+        trainer = ComposableTrainer(
+            model=simple_model,
+            training_step_strategy=step_strategy,
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert step_strategy.batch_count == 20
+        assert trainer.current_epoch == 2
+        assert len(trainer.run_history.get_metric_values("train_loss")) == 2
+
+    def test_local_steps_do_not_replay_same_deterministic_sampler_prefix(
+        self, simple_model, simple_config
+    ):
+        dataset_size = 10
+        features = torch.arange(dataset_size, dtype=torch.float32).view(-1, 1)
+        features = features.repeat(1, 10)
+        labels = torch.arange(dataset_size) % 2
+        dataset = TensorDataset(features, labels)
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 1,
+            "local_steps_per_round": 3,
+        }
+        sampler = self.DeterministicPlatoSampler(range(dataset_size))
+        step_strategy = self.RecordingStepStrategy()
+        trainer = ComposableTrainer(
+            model=simple_model,
+            training_step_strategy=step_strategy,
+        )
+        trainer.set_client_id(2)
+
+        for round_number in (1, 2):
+            trainer.current_round = round_number
+            trainer.train_model(config, dataset, sampler)
+
+        round_one_samples = step_strategy.samples_by_round[1]
+        round_two_samples = step_strategy.samples_by_round[2]
+
+        assert len(round_one_samples) == config["local_steps_per_round"]
+        assert len(round_two_samples) == config["local_steps_per_round"]
+        assert round_one_samples != round_two_samples
+
+        repeat_step_strategy = self.RecordingStepStrategy()
+        repeat_trainer = ComposableTrainer(
+            model=simple_model,
+            training_step_strategy=repeat_step_strategy,
+        )
+        repeat_trainer.set_client_id(2)
+
+        for round_number in (1, 2):
+            repeat_trainer.current_round = round_number
+            repeat_trainer.train_model(config, dataset, sampler)
+
+        assert repeat_step_strategy.samples_by_round == step_strategy.samples_by_round
+
+    def test_local_step_sampling_warns_for_non_materializable_sampler(
+        self, simple_dataset, caplog
+    ):
+        context = TrainingContext()
+        context.state["local_steps_per_round"] = 2
+        sampler = self.NonMaterializableSampler()
+
+        with caplog.at_level(logging.WARNING):
+            loader = DefaultDataLoaderStrategy().create_train_loader(
+                simple_dataset,
+                sampler,
+                batch_size=1,
+                context=context,
+            )
+
+        assert loader.sampler is sampler
+        assert (
+            "cannot be materialized for round-aware local-step sampling"
+            in caplog.text
+        )
+
+    def test_diloco_local_steps_require_full_client_participation(
+        self, simple_dataset, temp_config
+    ):
+        Config().server.type = "diloco"
+        Config().clients.total_clients = 4
+        Config().clients.per_round = 2
+        context = TrainingContext()
+        context.state["local_steps_per_round"] = 2
+
+        with pytest.raises(
+            ValueError, match="clients\\.per_round.*clients\\.total_clients"
+        ):
+            DefaultDataLoaderStrategy().create_train_loader(
+                simple_dataset,
+                list(range(len(simple_dataset))),
+                batch_size=1,
+                context=context,
+            )
+
+    def test_partial_participation_still_allowed_without_diloco_local_steps(
+        self, simple_dataset, temp_config
+    ):
+        Config().server.type = "fedavg"
+        Config().clients.total_clients = 4
+        Config().clients.per_round = 2
+        context = TrainingContext()
+        context.state["local_steps_per_round"] = 2
+
+        loader = DefaultDataLoaderStrategy().create_train_loader(
+            simple_dataset,
+            list(range(len(simple_dataset))),
+            batch_size=1,
+            context=context,
+        )
+
+        assert len(loader.sampler) == len(simple_dataset)
+
+    def test_diloco_local_steps_advance_lr_scheduler_per_optimizer_step(
+        self, simple_model, simple_dataset, simple_config, temp_config
+    ):
+        Config().server.type = "diloco"
+        Config().clients.total_clients = 4
+        Config().clients.per_round = 4
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 3,
+        }
+        trainer = ComposableTrainer(
+            model=simple_model,
+            lr_scheduler_strategy=StepLRSchedulerStrategy(step_size=1, gamma=0.5),
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert trainer.context.state["local_optimizer_steps"] == 3
+        assert trainer.lr_scheduler.last_epoch == 3
+
+    def test_non_diloco_local_steps_keep_epoch_based_lr_scheduler(
+        self, simple_model, simple_dataset, simple_config, temp_config
+    ):
+        Config().server.type = "fedavg"
+        config = {
+            **simple_config,
+            "batch_size": 1,
+            "epochs": 3,
+            "local_steps_per_round": 3,
+        }
+        trainer = ComposableTrainer(
+            model=simple_model,
+            lr_scheduler_strategy=StepLRSchedulerStrategy(step_size=1, gamma=0.5),
+        )
+
+        trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+
+        assert trainer.context.state["local_optimizer_steps"] == 3
+        assert trainer.lr_scheduler.last_epoch == 1
+
+    @pytest.mark.parametrize("local_steps_per_round", [0, -1, 1.5, "2", True])
+    def test_invalid_local_steps_fail_clearly(
+        self, simple_model, simple_dataset, simple_config, local_steps_per_round
+    ):
+        config = {
+            **simple_config,
+            "local_steps_per_round": local_steps_per_round,
+        }
+        trainer = ComposableTrainer(model=simple_model)
+
+        with pytest.raises(ValueError, match="local_steps_per_round"):
+            trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
 
 
 class TestComposableTrainerStrategies:
