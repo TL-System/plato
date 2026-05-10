@@ -91,7 +91,7 @@ class Server(fedavg.Server):
 
             self.phase = "gradient"
         elif report.type == "weights":
-            logging.warning("[%s] Weights received, start testing accuracy.", self)
+            logging.warning("[%s] Weights received, start testing.", self)
             weights = update.payload
 
             # The weights after cut layer are not trained by clients
@@ -112,17 +112,9 @@ class Server(fedavg.Server):
                         )
                     )
                 else:
-                    logging.warning(
-                        fonts.colourize(
-                            f"[{self}] Global model accuracy: {100 * self.test_accuracy:.2f}%\n"
-                        )
-                    )
+                    self._log_global_metric(self.test_accuracy)
             else:
-                logging.warning(
-                    fonts.colourize(
-                        f"[{self}] Global model accuracy: {100 * self.test_accuracy:.2f}%\n"
-                    )
-                )
+                self._log_global_metric(self.test_accuracy)
             self.phase = "prompt"
             # Change client in next round
             self.next_client = True

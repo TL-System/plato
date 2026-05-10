@@ -61,7 +61,6 @@ from torch.utils.data import Dataset
 
 from plato.config import Config
 
-
 # Exact column names from the Mendeley CSV
 _CSV_SEP = ";"
 _GARAGE_COL = "Garage_ID"
@@ -390,6 +389,14 @@ class DataSource:
 
         # Keep the full normalized array for inference scripts
         self.normalized_data = full_array
+        self.timestamps = user_df.index
+        self.user_id = user_key
+        self.feature_columns = list(_FEATURE_COLS)
+        self.split_window_starts = {
+            "train": list(train_starts),
+            "val": list(val_starts),
+            "test": list(test_starts),
+        }
 
         self._train_set = _EVChargingDataset(
             full_array,

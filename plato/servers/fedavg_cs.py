@@ -222,11 +222,7 @@ class Server(fedavg.Server):
                 self.average_accuracy,
                 self.std_accuracy,
             ) = self.get_accuracy_mean_std(self.updates)
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.",
-                self,
-                100 * self.average_accuracy,
-            )
+            self._log_average_client_metric(self.average_accuracy)
         elif Config().is_central_server() and Config().clients.do_test:
             # Compute the average accuracy from client reports
             total_samples = sum(update.report.num_samples for update in self.updates)
@@ -238,11 +234,7 @@ class Server(fedavg.Server):
                 / total_samples
             )
 
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.",
-                self,
-                100 * self.average_accuracy,
-            )
+            self._log_average_client_metric(self.average_accuracy)
 
         if (
             Config().is_central_server()
@@ -268,18 +260,8 @@ class Server(fedavg.Server):
                         f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
                     )
                 )
-            elif hasattr(Config().trainer, "target_perplexity"):
-                logging.info(
-                    fonts.colourize(
-                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
-                    )
-                )
             else:
-                logging.info(
-                    fonts.colourize(
-                        f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
-                    )
-                )
+                self._log_global_metric(self.accuracy)
         elif (
             Config().is_edge_server()
             and hasattr(Config().server, "edge_do_test")
@@ -304,18 +286,8 @@ class Server(fedavg.Server):
                         f"[{self}] Average Centered CORE benchmark metric: {100 * core_metric:.2f}%\n"
                     )
                 )
-            elif hasattr(Config().trainer, "target_perplexity"):
-                logging.info(
-                    fonts.colourize(
-                        f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
-                    )
-                )
             else:
-                logging.info(
-                    fonts.colourize(
-                        f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
-                    )
-                )
+                self._log_global_metric(self.accuracy)
         else:
             self.accuracy = self.average_accuracy
             self.accuracy_std = self.std_accuracy
