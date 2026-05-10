@@ -128,6 +128,9 @@ class GradientAccumulationStepStrategy(TrainingStepStrategy):
         if self.current_step % self.accumulation_steps == 0:
             optimizer.step()
             optimizer.zero_grad()
+            context.state["optimizer_step_completed"] = True
+        else:
+            context.state["optimizer_step_completed"] = False
 
         # Return unscaled loss for logging
         return loss

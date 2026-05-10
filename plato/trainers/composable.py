@@ -168,6 +168,7 @@ class ComposableTrainer(base.Trainer):
         self.current_epoch = 0
         self.training_start_time = time.time()
         self.model_state_dict = None
+        self._preserved_optimizer_states: dict[int, dict[str, Any]] = {}
 
     def _require_model(self) -> nn.Module:
         """Return the underlying model, ensuring it is available."""
@@ -176,6 +177,300 @@ class ComposableTrainer(base.Trainer):
                 "ComposableTrainer model has not been initialised correctly."
             )
         return cast(nn.Module, self.model)
+
+    @staticmethod
+    def _local_steps_per_round(config: dict[str, Any]) -> int | None:
+        """Return the optional local optimizer-step limit for one train run."""
+        value = config.get("local_steps_per_round")
+        if value is None:
+            return None
+
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            raise ValueError(
+                "trainer.local_steps_per_round must be a positive integer."
+            )
+
+        return value
+
+    def _record_local_optimizer_step(self, local_steps_per_round: int | None) -> bool:
+        """Record one completed optimizer step and report whether H was reached."""
+        if local_steps_per_round is None:
+            return False
+
+        completed_steps = int(self.context.state.get("local_optimizer_steps", 0)) + 1
+        self.context.state["local_optimizer_steps"] = completed_steps
+        return completed_steps >= local_steps_per_round
+
+    @staticmethod
+    def _preserve_optimizer_state(config: dict[str, Any]) -> bool:
+        """Return whether optimizer state should survive local train runs."""
+        return bool(config.get("preserve_optimizer_state", False))
+
+    @staticmethod
+    def _step_lr_scheduler_per_optimizer_step(config: dict[str, Any]) -> bool:
+        """Return whether LR scheduling should follow optimizer steps."""
+        if config.get("local_steps_per_round") is None:
+            return False
+
+        return getattr(Config().server, "type", None) == "diloco"
+
+    def _step_lr_scheduler_after_optimizer_step(
+        self, step_lr_per_optimizer_step: bool
+    ) -> None:
+        """Advance step-based LR schedules after one completed optimizer step."""
+        if step_lr_per_optimizer_step:
+            self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
+
+    @staticmethod
+    def _parameter_signature(name: str | None, parameter: torch.Tensor):
+        """Build a compatibility signature for one model parameter."""
+        return (name, tuple(parameter.shape), str(parameter.dtype))
+
+    @classmethod
+    def _model_parameter_signature(cls, model: nn.Module):
+        """Return parameter names, shapes, dtypes, and order for a model."""
+        return tuple(
+            cls._parameter_signature(name, parameter)
+            for name, parameter in model.named_parameters()
+        )
+
+    @classmethod
+    def _optimizer_parameter_signature(
+        cls, model: nn.Module, optimizer: torch.optim.Optimizer
+    ):
+        """Return optimizer parameter group ordering with model metadata."""
+        named_parameters = {
+            id(parameter): cls._parameter_signature(name, parameter)
+            for name, parameter in model.named_parameters()
+        }
+
+        group_signatures = []
+        for group in optimizer.param_groups:
+            group_signatures.append(
+                tuple(
+                    named_parameters.get(
+                        id(parameter),
+                        cls._parameter_signature(None, parameter),
+                    )
+                    for parameter in group.get("params", [])
+                )
+            )
+
+        return tuple(group_signatures)
+
+    @staticmethod
+    def _scheduler_type(scheduler: Any | None) -> type | None:
+        """Return the scheduler type used for compatibility checks."""
+        if scheduler is None:
+            return None
+        return type(scheduler)
+
+    def _preserved_state_is_compatible(
+        self,
+        payload: dict[str, Any],
+        model: nn.Module,
+        optimizer: torch.optim.Optimizer,
+        scheduler: Any | None,
+    ) -> bool:
+        """Return whether a cached optimizer bundle matches this train run."""
+        if payload.get("optimizer_type") is not type(optimizer):
+            return False
+
+        if payload.get("scheduler_type") is not self._scheduler_type(scheduler):
+            return False
+
+        if payload.get("model_parameters") != self._model_parameter_signature(model):
+            return False
+
+        if payload.get("optimizer_parameters") != self._optimizer_parameter_signature(
+            model, optimizer
+        ):
+            return False
+
+        if not callable(getattr(optimizer, "load_state_dict", None)):
+            return False
+
+        if payload.get("scheduler_state") is not None and not callable(
+            getattr(scheduler, "load_state_dict", None)
+        ):
+            return False
+
+        return True
+
+    def _restore_preserved_optimizer_state(self) -> None:
+        """Restore compatible optimizer and scheduler state for this client."""
+        payload = self._preserved_optimizer_states.get(self.client_id)
+        if payload is None or self.optimizer is None:
+            return
+
+        model = self._require_model()
+        if not self._preserved_state_is_compatible(
+            payload, model, self.optimizer, self.lr_scheduler
+        ):
+            logging.info(
+                "[Client #%d] Discarding incompatible optimizer state; "
+                "starting with fresh optimizer and scheduler state.",
+                self.client_id,
+            )
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            return
+
+        try:
+            scheduler_state = payload.get("scheduler_state")
+            if scheduler_state is not None:
+                self.lr_scheduler.load_state_dict(copy.deepcopy(scheduler_state))
+
+            self.optimizer.load_state_dict(copy.deepcopy(payload["optimizer_state"]))
+        except Exception as error:
+            logging.warning(
+                "[Client #%d] Discarding incompatible optimizer state; "
+                "starting with fresh optimizer and scheduler state: %s",
+                self.client_id,
+                error,
+            )
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            self.optimizer = self.optimizer_strategy.create_optimizer(
+                model, self.context
+            )
+            self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
+                self.optimizer, self.context
+            )
+
+    def _save_preserved_optimizer_state(self) -> None:
+        """Save optimizer and scheduler state locally for this logical client."""
+        if self.optimizer is None:
+            return
+
+        model = self._require_model()
+        scheduler_state = None
+        if self.lr_scheduler is not None:
+            state_dict_fn = getattr(self.lr_scheduler, "state_dict", None)
+            if callable(state_dict_fn):
+                scheduler_state = copy.deepcopy(state_dict_fn())
+
+        self._preserved_optimizer_states[self.client_id] = {
+            "optimizer_type": type(self.optimizer),
+            "optimizer_state": copy.deepcopy(self.optimizer.state_dict()),
+            "scheduler_type": self._scheduler_type(self.lr_scheduler),
+            "scheduler_state": scheduler_state,
+            "model_parameters": self._model_parameter_signature(model),
+            "optimizer_parameters": self._optimizer_parameter_signature(
+                model, self.optimizer
+            ),
+        }
+
+    def _optimizer_state_filename(self, run_id: str) -> str:
+        """Return the local optimizer-state handoff filename."""
+        model_name = Config().trainer.model_name
+        return f"{model_name}_{self.client_id}_{run_id}.optim.pkl"
+
+    def _optimizer_state_output_filename(self, run_id: str) -> str:
+        """Return a unique subprocess optimizer-state output filename."""
+        model_name = Config().trainer.model_name
+        token = time.time_ns()
+        return f"{model_name}_{self.client_id}_{run_id}_{os.getpid()}_{token}.optim.pkl"
+
+    def _optimizer_state_path(self, filename: str) -> str:
+        """Return the local optimizer-state handoff path."""
+        return os.path.join(Config().params["model_path"], filename)
+
+    def _save_preserved_optimizer_state_file(self, filename: str) -> bool:
+        """Persist preserved optimizer state for subprocess handoff."""
+        payload = self._preserved_optimizer_states.get(self.client_id)
+        if payload is None:
+            return False
+
+        model_path = Config().params["model_path"]
+        os.makedirs(model_path, exist_ok=True)
+        state_path = self._optimizer_state_path(filename)
+        tmp_path = f"{state_path}.{os.getpid()}.tmp"
+
+        try:
+            with open(tmp_path, "wb") as state_file:
+                pickle.dump(copy.deepcopy(payload), state_file)
+            os.replace(tmp_path, state_path)
+            return True
+        except Exception as error:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+            logging.warning(
+                "[Client #%d] Failed to persist optimizer state to %s: %s",
+                self.client_id,
+                state_path,
+                error,
+            )
+            return False
+
+    def _load_preserved_optimizer_state_file(
+        self, filename: str, *, clear_on_missing: bool = False
+    ) -> bool:
+        """Load preserved optimizer state from a subprocess handoff file."""
+        state_path = self._optimizer_state_path(filename)
+        if not os.path.exists(state_path):
+            if clear_on_missing:
+                self._preserved_optimizer_states.pop(self.client_id, None)
+            logging.info(
+                "[Client #%d] No persisted optimizer state found at %s; "
+                "starting with fresh optimizer and scheduler state.",
+                self.client_id,
+                state_path,
+            )
+            return False
+
+        try:
+            with open(state_path, "rb") as state_file:
+                payload = pickle.load(state_file)
+        except Exception as error:
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            logging.warning(
+                "[Client #%d] Discarding unreadable optimizer state at %s; "
+                "starting with fresh optimizer and scheduler state: %s",
+                self.client_id,
+                state_path,
+                error,
+            )
+            return False
+
+        if not isinstance(payload, dict):
+            self._preserved_optimizer_states.pop(self.client_id, None)
+            logging.warning(
+                "[Client #%d] Discarding invalid optimizer state at %s; "
+                "starting with fresh optimizer and scheduler state.",
+                self.client_id,
+                state_path,
+            )
+            return False
+
+        self._preserved_optimizer_states[self.client_id] = payload
+        return True
+
+    def _remove_preserved_optimizer_state_file(self, filename: str) -> None:
+        """Remove a local optimizer-state sidecar if it exists."""
+        state_path = self._optimizer_state_path(filename)
+        try:
+            os.remove(state_path)
+        except FileNotFoundError:
+            return
+        except OSError as error:
+            logging.warning(
+                "[Client #%d] Failed to remove optimizer state at %s: %s",
+                self.client_id,
+                state_path,
+                error,
+            )
+
+    def _finish_subprocess_optimizer_state(
+        self, input_filename: str, output_filename: str
+    ) -> None:
+        """Load the child output sidecar and promote it for the next round."""
+        loaded = self._load_preserved_optimizer_state_file(
+            output_filename, clear_on_missing=True
+        )
+        if loaded:
+            self._save_preserved_optimizer_state_file(input_filename)
+            self._remove_preserved_optimizer_state_file(output_filename)
+        else:
+            self._remove_preserved_optimizer_state_file(input_filename)
 
     @staticmethod
     def _persisted_test_state_keys() -> tuple[str, ...]:
@@ -384,7 +679,24 @@ class ComposableTrainer(base.Trainer):
 
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
+        preserve_optimizer_state = self._preserve_optimizer_state(config)
+        if preserve_optimizer_state:
+            optimizer_state_filename = config.get(
+                "_optimizer_state_input_filename",
+                self._optimizer_state_filename(config["run_id"]),
+            )
+            optimizer_state_output_filename = config.get(
+                "_optimizer_state_output_filename",
+                optimizer_state_filename,
+            )
+            self._load_preserved_optimizer_state_file(
+                optimizer_state_filename, clear_on_missing=True
+            )
+
         self.train_model(config, trainset, sampler, **kwargs)
+
+        if preserve_optimizer_state:
+            self._save_preserved_optimizer_state_file(optimizer_state_output_filename)
 
         model_name = Config().trainer.model_name
         filename = f"{model_name}_{self.client_id}_{config['run_id']}.safetensors"
@@ -397,6 +709,16 @@ class ComposableTrainer(base.Trainer):
         self.sampler = sampler
         self.context.config = config
         self.context.current_round = self.current_round
+        preserve_optimizer_state = self._preserve_optimizer_state(config)
+        if not preserve_optimizer_state:
+            self._preserved_optimizer_states.pop(self.client_id, None)
+
+        local_steps_per_round = self._local_steps_per_round(config)
+        self.context.state["local_optimizer_steps"] = 0
+        if local_steps_per_round is None:
+            self.context.state.pop("local_steps_per_round", None)
+        else:
+            self.context.state["local_steps_per_round"] = local_steps_per_round
 
         # Ensure training step strategy respects higher-order gradient settings
         if self.training_step_strategy is not None:
@@ -476,24 +798,28 @@ class ComposableTrainer(base.Trainer):
         self.context.state["grad_accum_loss_total"] = 0.0
         self.context.state["grad_accum_loss_count"] = 0
 
-        # Create optimizer using strategy
+        # Move the model before optimizer state restore so PyTorch maps restored
+        # state tensors onto the same device as the optimizer parameters.
         model = self._require_model()
+        model.to(self.device)
+        model.train()
+
+        # Create optimizer using strategy
         self.optimizer = self.optimizer_strategy.create_optimizer(model, self.context)
 
         # Create LR scheduler using strategy
         self.lr_scheduler = self.lr_scheduler_strategy.create_scheduler(
             self.optimizer, self.context
         )
-
-        # Move model to device
-        model = self._require_model()
-        model.to(self.device)
-        model.train()
+        if preserve_optimizer_state:
+            self._restore_preserved_optimizer_state()
 
         # Training epochs
         total_epochs = config["epochs"]
+        step_lr_per_optimizer_step = self._step_lr_scheduler_per_optimizer_step(config)
         tic = time.perf_counter()
         training_stop_requested = False
+        local_step_limit_reached = False
         try:
             total_batches = len(self.train_loader)
         except (TypeError, AttributeError):
@@ -569,6 +895,12 @@ class ComposableTrainer(base.Trainer):
                     self.optimizer_strategy.on_optimizer_step(
                         self.optimizer, self.context
                     )
+                    self._step_lr_scheduler_after_optimizer_step(
+                        step_lr_per_optimizer_step
+                    )
+                    local_step_limit_reached = self._record_local_optimizer_step(
+                        local_steps_per_round
+                    )
 
                     # Strategy hook: after_step
                     self.model_update_strategy.after_step(self.context)
@@ -596,7 +928,7 @@ class ComposableTrainer(base.Trainer):
                     ):
                         self._handle_control_log()
 
-                    if control_actions.get("stop_training"):
+                    if control_actions.get("stop_training") or local_step_limit_reached:
                         training_stop_requested = True
                         break
 
@@ -606,7 +938,11 @@ class ComposableTrainer(base.Trainer):
             finalize_loss = None
             finalize_step_done = False
             finalize_callable = getattr(self.training_step_strategy, "finalize", None)
-            if batches_seen and callable(finalize_callable):
+            if (
+                batches_seen
+                and callable(finalize_callable)
+                and not local_step_limit_reached
+            ):
                 finalize_loss = finalize_callable(
                     model=model,
                     optimizer=self.optimizer,
@@ -618,6 +954,12 @@ class ComposableTrainer(base.Trainer):
                 )
             if finalize_step_done:
                 self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
+                self._step_lr_scheduler_after_optimizer_step(
+                    step_lr_per_optimizer_step
+                )
+                local_step_limit_reached = self._record_local_optimizer_step(
+                    local_steps_per_round
+                )
                 self.model_update_strategy.after_step(self.context)
                 self.callback_handler.call_event(
                     "on_train_step_end",
@@ -657,11 +999,15 @@ class ComposableTrainer(base.Trainer):
                     # No batches remain, but respect control flag.
                     pass
 
+                if local_step_limit_reached:
+                    training_stop_requested = True
+
             self.context.state.pop("is_last_batch", None)
             self.context.state.pop("hf_optimizer_step_index", None)
 
             # LR scheduler step
-            self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
+            if not step_lr_per_optimizer_step:
+                self.lr_scheduler_strategy.step(self.lr_scheduler, self.context)
 
             # Handle optimizer params state update if needed
             if hasattr(self.optimizer, "params_state_update"):
@@ -706,6 +1052,9 @@ class ComposableTrainer(base.Trainer):
         # Callbacks: train run end
         self.callback_handler.call_event("on_train_run_end", self, config)
 
+        if preserve_optimizer_state:
+            self._save_preserved_optimizer_state()
+
     def train(self, trainset, sampler, **kwargs) -> float:
         """
         The main training loop in a federated learning workload.
@@ -726,6 +1075,21 @@ class ComposableTrainer(base.Trainer):
 
         if "max_concurrency" in config:
             tic = time.perf_counter()
+            preserve_optimizer_state = self._preserve_optimizer_state(config)
+            optimizer_state_filename = None
+            optimizer_state_output_filename = None
+            if preserve_optimizer_state:
+                optimizer_state_filename = self._optimizer_state_filename(
+                    config["run_id"]
+                )
+                optimizer_state_output_filename = self._optimizer_state_output_filename(
+                    config["run_id"]
+                )
+                config = {
+                    **config,
+                    "_optimizer_state_input_filename": optimizer_state_filename,
+                    "_optimizer_state_output_filename": optimizer_state_output_filename,
+                }
 
             if mp.get_start_method(allow_none=True) != "spawn":
                 mp.set_start_method("spawn", force=True)
@@ -777,6 +1141,14 @@ class ComposableTrainer(base.Trainer):
                 raise ValueError(
                     f"Training on client {self.client_id} failed."
                 ) from error
+
+            if (
+                optimizer_state_filename is not None
+                and optimizer_state_output_filename is not None
+            ):
+                self._finish_subprocess_optimizer_state(
+                    optimizer_state_filename, optimizer_state_output_filename
+                )
 
             toc = time.perf_counter()
             self.pause_training()

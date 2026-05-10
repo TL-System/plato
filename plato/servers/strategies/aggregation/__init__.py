@@ -4,6 +4,7 @@ Aggregation strategies package.
 Each strategy is defined in its own module for clarity.
 """
 
+from plato.servers.strategies.aggregation.diloco import DiLoCoAggregationStrategy
 from plato.servers.strategies.aggregation.fedasync import FedAsyncAggregationStrategy
 from plato.servers.strategies.aggregation.fedavg import FedAvgAggregationStrategy
 from plato.servers.strategies.aggregation.fedbuff import FedBuffAggregationStrategy
@@ -16,6 +17,7 @@ from plato.servers.strategies.aggregation.port import PortAggregationStrategy
 
 __all__ = [
     "FedAvgAggregationStrategy",
+    "DiLoCoAggregationStrategy",
     "FedBuffAggregationStrategy",
     "FedNovaAggregationStrategy",
     "FedAsyncAggregationStrategy",
