@@ -202,35 +202,64 @@ class TimesFmMultivariateWrapper(nn.Module):
 # ---------------------------------------------------------------------------
 
 
+def _create_timesfm_from_config(trainer_config, prediction_length: int) -> nn.Module:
+    """Instantiate a fresh TimesFmModelForPrediction from TOML trainer settings."""
+    if TimesFmConfig is None or TimesFmModelForPrediction is None:
+        raise ImportError(
+            "TimesFM models are not available. "
+            "Ensure you have transformers>=5.0.0 installed."
+        )
+    context_length = getattr(trainer_config, "context_length", 512)
+    config = TimesFmConfig(
+        context_length=context_length,
+        horizon_length=prediction_length,
+        patch_length=getattr(trainer_config, "patch_length", 32),
+        num_hidden_layers=getattr(trainer_config, "num_hidden_layers", 20),
+        hidden_size=getattr(trainer_config, "hidden_size", 1280),
+        intermediate_size=getattr(trainer_config, "intermediate_size", 1280),
+        num_attention_heads=getattr(trainer_config, "num_attention_heads", 16),
+        head_dim=getattr(trainer_config, "head_dim", 80),
+        attention_dropout=getattr(trainer_config, "dropout", 0.0),
+    )
+    return TimesFmModelForPrediction(config)
+
+
 def _load_timesfm(resolved_model_name: str, cache_dir: str, **kwargs) -> nn.Module:
     """Load or create a TimesFM model wrapped for batched multivariate use.
 
-    Supports two HuggingFace variants:
-    - ``*-transformers``: Uses ``TimesFm2_5ModelForPrediction`` from the
-      ``transformers`` library.  Forward call uses ``forecast_context_len``.
-    - ``*-pytorch`` (default): Uses ``TimesFmModelForPrediction``.
-      Forward call uses ``freq``.
+    Model class selection is based on version, not checkpoint format:
+
+    - TimesFM 2.5 (``2.5`` in the name): ``TimesFm2_5ModelForPrediction``.
+      Both ``*-pytorch`` and ``*-transformers`` checkpoints are supported by
+      this class.  The forward API differs by suffix:
+        - ``*-transformers``: uses ``forecast_context_len``
+        - ``*-pytorch`` (and others): uses ``freq``
+    - TimesFM 1.0 / unspecified: ``TimesFmModelForPrediction`` with ``freq``.
+      Falls back to config-based creation if the checkpoint is not found.
     """
-    use_transformers_api = "transformers" in resolved_model_name.lower()
+    name_lower = resolved_model_name.lower()
+    is_v25 = "2.5" in name_lower
+    # Controls which forward kwarg to use, not which class to load.
+    use_transformers_api = "transformers" in name_lower
 
     trainer_config = Config().trainer
     prediction_length = getattr(trainer_config, "prediction_length", 128)
     default_freq = getattr(trainer_config, "freq", 0)
 
-    if use_transformers_api:
+    if is_v25:
         if TimesFm2_5ModelForPrediction is None:
             raise ImportError(
                 "TimesFm2_5ModelForPrediction is not available. "
                 "Ensure you have a recent transformers version installed."
             )
         logging.info(
-            "Attempting to load pretrained TimesFM 2.5 (transformers) model: %s",
+            "Loading pretrained TimesFM 2.5 model: %s",
             resolved_model_name,
         )
         inner = TimesFm2_5ModelForPrediction.from_pretrained(
             resolved_model_name, cache_dir=cache_dir
         )
-        logging.info("Successfully loaded pretrained TimesFM 2.5 (transformers) model")
+        logging.info("Successfully loaded pretrained TimesFM 2.5 model")
     else:
         if TimesFmModelForPrediction is None:
             raise ImportError(
@@ -251,19 +280,7 @@ def _load_timesfm(resolved_model_name: str, cache_dir: str, **kwargs) -> nn.Modu
                 "TimesFM model '%s' not found as pretrained, creating from config",
                 resolved_model_name,
             )
-            context_length = getattr(trainer_config, "context_length", 512)
-            config = TimesFmConfig(
-                context_length=context_length,
-                horizon_length=prediction_length,
-                patch_length=getattr(trainer_config, "patch_length", 32),
-                num_hidden_layers=getattr(trainer_config, "num_hidden_layers", 20),
-                hidden_size=getattr(trainer_config, "hidden_size", 1280),
-                intermediate_size=getattr(trainer_config, "intermediate_size", 1280),
-                num_attention_heads=getattr(trainer_config, "num_attention_heads", 16),
-                head_dim=getattr(trainer_config, "head_dim", 80),
-                attention_dropout=getattr(trainer_config, "dropout", 0.0),
-            )
-            inner = TimesFmModelForPrediction(config)
+            inner = _create_timesfm_from_config(trainer_config, prediction_length)
 
     return TimesFmMultivariateWrapper(
         model=inner,
