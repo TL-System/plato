@@ -551,7 +551,12 @@ class ComposableTrainer(base.Trainer):
                 )
 
                 # Track loss
-                self._loss_tracker.update(loss, labels.size(0))
+                if labels is not None:
+                    batch_size = labels.size(0)
+                else:
+                    first_val = next(iter(examples.values())) if hasattr(examples, "values") else examples
+                    batch_size = first_val.size(0) if hasattr(first_val, "size") else 1
+                self._loss_tracker.update(loss, batch_size)
 
                 # Store last loss in context
                 self.context.state["last_loss"] = loss.item()

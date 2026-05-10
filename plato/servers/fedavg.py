@@ -63,6 +63,54 @@ class Server(base.Server):
             self.clients_per_round,
         )
 
+    def _primary_metric_name(self) -> str:
+        """Return the name of the primary testing metric."""
+        trainer = getattr(self, "trainer", None)
+        testing_strategy = getattr(trainer, "testing_strategy", None)
+        metric_name = getattr(testing_strategy, "metric_name", None)
+
+        if isinstance(metric_name, str) and metric_name:
+            metric_name = metric_name.lower()
+            if metric_name != "accuracy":
+                return metric_name
+
+        if hasattr(Config().trainer, "target_perplexity"):
+            return "perplexity"
+
+        return "accuracy"
+
+    def _log_average_client_metric(self, metric_value: float) -> None:
+        """Log the client-aggregated testing metric with the appropriate label."""
+        metric_name = self._primary_metric_name()
+
+        if metric_name == "mse":
+            logging.info("[%s] Average client MSE: %.6f.", self, metric_value)
+        elif metric_name == "perplexity":
+            logging.info("[%s] Average client perplexity: %.2f.", self, metric_value)
+        else:
+            logging.info("[%s] Average client accuracy: %.2f%%.", self, 100 * metric_value)
+
+    def _log_global_metric(self, metric_value: float) -> None:
+        """Log the server-tested metric with the appropriate label."""
+        metric_name = self._primary_metric_name()
+
+        if metric_name == "mse":
+            logging.info(
+                fonts.colourize(f"[{self}] Global model MSE: {metric_value:.6f}\n")
+            )
+        elif metric_name == "perplexity":
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Global model perplexity: {metric_value:.2f}\n"
+                )
+            )
+        else:
+            logging.info(
+                fonts.colourize(
+                    f"[{self}] Global model accuracy: {100 * metric_value:.2f}%\n"
+                )
+            )
+
     def configure(self) -> None:
         """
         Booting the federated learning server by setting up the data, model, and
@@ -133,7 +181,8 @@ class Server(base.Server):
             accuracy_csv_file = (
                 f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
             )
-            accuracy_headers = ["round", "client_id", "accuracy"]
+            metric_name = self._primary_metric_name()
+            accuracy_headers = ["round", "client_id", metric_name]
             csv_processor.initialize_csv(
                 accuracy_csv_file, accuracy_headers, Config().params["result_path"]
             )
@@ -243,9 +292,7 @@ class Server(base.Server):
         if hasattr(Config().server, "do_test") and not Config().server.do_test:
             # Compute the average accuracy from client reports
             self.accuracy, self.accuracy_std = self.get_accuracy_mean_std(self.updates)
-            logging.info(
-                "[%s] Average client accuracy: %.2f%%.", self, 100 * self.accuracy
-            )
+            self._log_average_client_metric(self.accuracy)
         else:
             # Testing the updated model directly at the server
             logging.info("[%s] Started model testing.", self)
@@ -270,17 +317,9 @@ class Server(base.Server):
                 )
             )
         elif hasattr(Config().trainer, "target_perplexity"):
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Global model perplexity: {self.accuracy:.2f}\n"
-                )
-            )
+            self._log_global_metric(self.accuracy)
         else:
-            logging.info(
-                fonts.colourize(
-                    f"[{self}] Global model accuracy: {100 * self.accuracy:.2f}%\n"
-                )
-            )
+            self._log_global_metric(self.accuracy)
 
         self.clients_processed()
         self.callback_handler.call_event("on_clients_processed", self)
@@ -344,6 +383,11 @@ class Server(base.Server):
         # Add core_metric if Nanochat CORE evaluation was performed
         if hasattr(self, "_core_metric"):
             logged["core_metric"] = self._core_metric
+
+        metric_name = self._primary_metric_name()
+        if metric_name != "accuracy":
+            logged[metric_name] = self.accuracy
+            logged[f"{metric_name}_std"] = self.accuracy_std
 
         logged.update(evaluation_logging.extract_logged_items(self.trainer))
 
