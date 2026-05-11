@@ -42,7 +42,13 @@ def test_lighteval_fast_preset_contains_expected_tasks(temp_config):
 
     preset = _resolve_preset("smollm_round_fast")
 
-    assert preset["tasks"] == ["ifeval", "hellaswag", "arc_easy", "arc_challenge", "piqa"]
+    assert preset["tasks"] == [
+        "ifeval",
+        "hellaswag",
+        "arc_easy",
+        "arc_challenge",
+        "piqa",
+    ]
     assert preset["primary_metric"] == "ifeval_avg"
 
 
@@ -72,7 +78,9 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
         ACCELERATE = auto()
 
     class FakePipelineParameters:
-        def __init__(self, launcher_type, custom_tasks_directory=None, max_samples=None):
+        def __init__(
+            self, launcher_type, custom_tasks_directory=None, max_samples=None
+        ):
             calls["launcher_type"] = launcher_type
             calls["custom_tasks_directory"] = custom_tasks_directory
             calls["max_samples"] = max_samples
@@ -228,7 +236,9 @@ def test_lighteval_pipeline_forwards_runtime_overrides(monkeypatch, temp_config)
         ACCELERATE = auto()
 
     class FakePipelineParameters:
-        def __init__(self, launcher_type, custom_tasks_directory=None, max_samples=None):
+        def __init__(
+            self, launcher_type, custom_tasks_directory=None, max_samples=None
+        ):
             del launcher_type, custom_tasks_directory, max_samples
 
     class FakeEvaluationTracker:
@@ -335,7 +345,9 @@ def test_lighteval_pipeline_uses_trainer_precision_for_default_dtype(
         ACCELERATE = auto()
 
     class FakePipelineParameters:
-        def __init__(self, launcher_type, custom_tasks_directory=None, max_samples=None):
+        def __init__(
+            self, launcher_type, custom_tasks_directory=None, max_samples=None
+        ):
             del launcher_type, custom_tasks_directory, max_samples
 
     class FakeEvaluationTracker:
@@ -425,7 +437,9 @@ def test_lighteval_pipeline_forwards_max_samples_to_each_task(monkeypatch, temp_
         ACCELERATE = auto()
 
     class FakePipelineParameters:
-        def __init__(self, launcher_type, custom_tasks_directory=None, max_samples=None):
+        def __init__(
+            self, launcher_type, custom_tasks_directory=None, max_samples=None
+        ):
             del launcher_type, custom_tasks_directory
             captured["max_samples"] = max_samples
 
@@ -605,9 +619,7 @@ def test_lighteval_evaluator_cleans_up_temp_exports(monkeypatch, temp_config):
 
     result = LightevalEvaluator(
         {"type": "lighteval", "preset": "smollm_round_fast"}
-    ).evaluate(
-        EvaluationInput(model=SaveableArtifact(), tokenizer=SaveableArtifact())
-    )
+    ).evaluate(EvaluationInput(model=SaveableArtifact(), tokenizer=SaveableArtifact()))
 
     assert result.metrics["ifeval_avg"] == pytest.approx(0.40)
     assert captured["model_name"]

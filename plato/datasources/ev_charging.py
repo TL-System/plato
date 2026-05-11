@@ -135,8 +135,7 @@ def _build_hourly_series(
         if missing:
             scope = "all garages" if use_all_garages else f"garage '{garage_name}'"
             raise ValueError(
-                f"Users not found in {scope}: {missing}. "
-                f"Available: {available}"
+                f"Users not found in {scope}: {missing}. Available: {available}"
             )
         users = list(user_ids)  # preserve config order
     else:

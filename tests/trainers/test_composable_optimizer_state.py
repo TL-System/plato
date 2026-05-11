@@ -287,9 +287,7 @@ def test_scheduler_state_and_lr_progress_persist_between_rounds(
 def test_subprocess_optimizer_state_parent_reloads_after_child(
     temp_config, monkeypatch, tmp_path, tiny_dataset
 ):
-    _configure_subprocess_training(
-        monkeypatch, tmp_path, preserve_optimizer_state=True
-    )
+    _configure_subprocess_training(monkeypatch, tmp_path, preserve_optimizer_state=True)
     trainer = ComposableTrainer(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
@@ -301,9 +299,8 @@ def test_subprocess_optimizer_state_parent_reloads_after_child(
 
     assert trainer.client_id in trainer._preserved_optimizer_states
     assert _cached_optimizer_step(trainer) == 1
-    state_path = (
-        Path(Config.params["model_path"])
-        / trainer._optimizer_state_filename(Config.params["run_id"])
+    state_path = Path(Config.params["model_path"]) / trainer._optimizer_state_filename(
+        Config.params["run_id"]
     )
     assert state_path.exists()
     assert "optimizer_state" not in trainer.obtain_model_update(
@@ -322,9 +319,7 @@ def test_subprocess_optimizer_state_parent_reloads_after_child(
 def test_subprocess_optimizer_state_persists_across_rounds_for_same_client(
     temp_config, monkeypatch, tmp_path, tiny_dataset
 ):
-    _configure_subprocess_training(
-        monkeypatch, tmp_path, preserve_optimizer_state=True
-    )
+    _configure_subprocess_training(monkeypatch, tmp_path, preserve_optimizer_state=True)
     trainer = ComposableTrainer(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
@@ -341,9 +336,7 @@ def test_subprocess_optimizer_state_persists_across_rounds_for_same_client(
 def test_subprocess_scheduler_state_persists_across_rounds(
     temp_config, monkeypatch, tmp_path, tiny_dataset
 ):
-    _configure_subprocess_training(
-        monkeypatch, tmp_path, preserve_optimizer_state=True
-    )
+    _configure_subprocess_training(monkeypatch, tmp_path, preserve_optimizer_state=True)
     trainer = ComposableTrainer(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
@@ -363,9 +356,7 @@ def test_subprocess_scheduler_state_persists_across_rounds(
 def test_subprocess_missing_sidecar_clears_inherited_parent_cache(
     temp_config, monkeypatch, tmp_path, tiny_dataset, one_step_config
 ):
-    _configure_subprocess_training(
-        monkeypatch, tmp_path, preserve_optimizer_state=True
-    )
+    _configure_subprocess_training(monkeypatch, tmp_path, preserve_optimizer_state=True)
     source_trainer = ComposableTrainer(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
@@ -390,9 +381,8 @@ def test_subprocess_missing_sidecar_clears_inherited_parent_cache(
         source_trainer._preserved_optimizer_states[7]
     )
 
-    state_path = (
-        Path(Config.params["model_path"])
-        / trainer._optimizer_state_filename(Config.params["run_id"])
+    state_path = Path(Config.params["model_path"]) / trainer._optimizer_state_filename(
+        Config.params["run_id"]
     )
     state_path.unlink(missing_ok=True)
 
@@ -404,9 +394,7 @@ def test_subprocess_missing_sidecar_clears_inherited_parent_cache(
 def test_missing_subprocess_output_removes_stale_input_sidecar(
     temp_config, monkeypatch, tmp_path, tiny_dataset, one_step_config
 ):
-    _configure_subprocess_training(
-        monkeypatch, tmp_path, preserve_optimizer_state=True
-    )
+    _configure_subprocess_training(monkeypatch, tmp_path, preserve_optimizer_state=True)
     trainer = ComposableTrainer(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
@@ -428,9 +416,7 @@ def test_missing_subprocess_output_removes_stale_input_sidecar(
     input_path = Path(Config.params["model_path"]) / input_filename
     assert input_path.exists()
 
-    trainer._finish_subprocess_optimizer_state(
-        input_filename, missing_output_filename
-    )
+    trainer._finish_subprocess_optimizer_state(input_filename, missing_output_filename)
 
     assert trainer.client_id not in trainer._preserved_optimizer_states
     assert not input_path.exists()
@@ -439,18 +425,15 @@ def test_missing_subprocess_output_removes_stale_input_sidecar(
 def test_subprocess_invalid_optimizer_state_resets_safely(
     temp_config, monkeypatch, tmp_path, tiny_dataset
 ):
-    _configure_subprocess_training(
-        monkeypatch, tmp_path, preserve_optimizer_state=True
-    )
+    _configure_subprocess_training(monkeypatch, tmp_path, preserve_optimizer_state=True)
     trainer = ComposableTrainer(
         model=_linear_model,
         loss_strategy=CrossEntropyLossStrategy(),
         optimizer_strategy=AdamWOptimizerStrategy(lr=0.01),
     )
     trainer.set_client_id(7)
-    state_path = (
-        Path(Config.params["model_path"])
-        / trainer._optimizer_state_filename(Config.params["run_id"])
+    state_path = Path(Config.params["model_path"]) / trainer._optimizer_state_filename(
+        Config.params["run_id"]
     )
     with open(state_path, "wb") as state_file:
         pickle.dump({"optimizer_type": torch.optim.SGD}, state_file)
@@ -479,9 +462,8 @@ def test_subprocess_optimizer_state_is_not_persisted_when_disabled(
     trainer.train(tiny_dataset, list(range(len(tiny_dataset))))
 
     assert trainer._preserved_optimizer_states == {}
-    state_path = (
-        Path(Config.params["model_path"])
-        / trainer._optimizer_state_filename(Config.params["run_id"])
+    state_path = Path(Config.params["model_path"]) / trainer._optimizer_state_filename(
+        Config.params["run_id"]
     )
     assert not state_path.exists()
 
@@ -602,9 +584,7 @@ def test_preserved_state_compatibility_rejects_shape_dtype_and_scheduler_changes
         payload, current_model, current_optimizer, changed_scheduler
     )
 
-    changed_shape_model = nn.Sequential(
-        OrderedDict([("linear", nn.Linear(2, 3))])
-    )
+    changed_shape_model = nn.Sequential(OrderedDict([("linear", nn.Linear(2, 3))]))
     changed_shape_optimizer = trainer.optimizer_strategy.create_optimizer(
         changed_shape_model, trainer.context
     )

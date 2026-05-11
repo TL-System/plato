@@ -319,8 +319,14 @@ def _resolve_tokenizer(model) -> Any:
 
 
 def _safe_evaluate_task(
-    model, tokenizer, data, device, task_meta, label,
-    evaluate_task_fn, evaluate_example_fn,
+    model,
+    tokenizer,
+    data,
+    device,
+    task_meta,
+    label,
+    evaluate_task_fn,
+    evaluate_example_fn,
 ):
     """Wrap upstream ``evaluate_task`` so that examples whose tokenized
     prompts exceed the model's ``max_seq_len`` are gracefully skipped
@@ -446,8 +452,14 @@ def run_core_evaluation(
             data = data[:max_per_task]
 
         accuracy = _safe_evaluate_task(
-            model, eval_tokenizer, data, model_device, task_meta, label,
-            evaluate_task, evaluate_example,
+            model,
+            eval_tokenizer,
+            data,
+            model_device,
+            task_meta,
+            label,
+            evaluate_task,
+            evaluate_example,
         )
         if accuracy is None:
             # All examples were skipped (too long for model's max_seq_len).

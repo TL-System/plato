@@ -66,7 +66,10 @@ def _ensure_numpy(value: Any) -> np.ndarray:
         if callable(cpu_fn):
             tensor = cpu_fn()
         torch_bfloat16 = getattr(torch, "bfloat16", None) if torch is not None else None
-        if torch_bfloat16 is not None and getattr(tensor, "dtype", None) == torch_bfloat16:
+        if (
+            torch_bfloat16 is not None
+            and getattr(tensor, "dtype", None) == torch_bfloat16
+        ):
             tensor = tensor.to(torch.float32)
         numpy_fn = getattr(tensor, "numpy", None)
         if callable(numpy_fn):

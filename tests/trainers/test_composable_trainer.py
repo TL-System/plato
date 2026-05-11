@@ -533,8 +533,7 @@ class TestComposableTrainerLocalSteps:
 
         assert loader.sampler is sampler
         assert (
-            "cannot be materialized for round-aware local-step sampling"
-            in caplog.text
+            "cannot be materialized for round-aware local-step sampling" in caplog.text
         )
 
     def test_diloco_local_steps_require_full_client_participation(
@@ -627,7 +626,9 @@ class TestComposableTrainerLocalSteps:
         trainer = ComposableTrainer(model=simple_model)
 
         with pytest.raises(ValueError, match="local_steps_per_round"):
-            trainer.train_model(config, simple_dataset, list(range(len(simple_dataset))))
+            trainer.train_model(
+                config, simple_dataset, list(range(len(simple_dataset)))
+            )
 
 
 class TestComposableTrainerStrategies:
@@ -920,9 +921,7 @@ class TestComposableTrainerEdgeCases:
             "metric": "ifeval_avg",
             "value": 0.31,
         }
-        assert trainer.context.state["nanochat_core_results"] == {
-            "core_metric": 0.9
-        }
+        assert trainer.context.state["nanochat_core_results"] == {"core_metric": 0.9}
 
     def test_test_state_restore_clears_stale_evaluation_metadata(self, temp_config):
         trainer = ComposableTrainer(model=nn.Linear(2, 1))

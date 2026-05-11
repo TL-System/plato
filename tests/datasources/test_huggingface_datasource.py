@@ -30,8 +30,7 @@ class DummyChatTokenizer:
     ):
         if not tokenize:
             return "".join(
-                f"<{message['role']}>{message['content']}|"
-                for message in messages
+                f"<{message['role']}>{message['content']}|" for message in messages
             )
 
         tokens = []
@@ -125,8 +124,12 @@ def test_huggingface_datasource_keeps_validation_split_for_corpus_mode(
         }
     )
 
-    monkeypatch.setattr(huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset)
-    monkeypatch.setattr(huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset)
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
     monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
     monkeypatch.setattr(
         huggingface_datasource.AutoConfig,
@@ -172,8 +175,12 @@ def test_huggingface_datasource_falls_back_to_test_split(temp_config, monkeypatc
         }
     )
 
-    monkeypatch.setattr(huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset)
-    monkeypatch.setattr(huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset)
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
     monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
     monkeypatch.setattr(
         huggingface_datasource.AutoConfig,
@@ -218,9 +225,7 @@ def test_huggingface_datasource_loads_legacy_cache_path_when_present(
         }
     )
 
-    legacy_path = (
-        f"{Config().params['data_path']}/{cfg.data.dataset_name}_{cfg.data.dataset_config}"
-    )
+    legacy_path = f"{Config().params['data_path']}/{cfg.data.dataset_name}_{cfg.data.dataset_config}"
     loaded_paths: list[str] = []
 
     monkeypatch.setattr(
@@ -260,7 +265,6 @@ class LargeContextDummyTokenizer(DummyTokenizer):
     model_max_length = 4096
 
 
-
 def test_huggingface_corpus_mode_keeps_legacy_default_block_size(
     temp_config, monkeypatch
 ):
@@ -283,8 +287,12 @@ def test_huggingface_corpus_mode_keeps_legacy_default_block_size(
         }
     )
 
-    monkeypatch.setattr(huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset)
-    monkeypatch.setattr(huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset)
+    monkeypatch.setattr(
+        huggingface_datasource, "load_dataset", lambda *args, **kwargs: dataset
+    )
+    monkeypatch.setattr(
+        huggingface_datasource, "load_from_disk", lambda *args, **kwargs: dataset
+    )
     monkeypatch.setattr(huggingface_datasource.os.path, "exists", lambda *args: False)
     monkeypatch.setattr(
         huggingface_datasource.AutoConfig,

@@ -109,7 +109,9 @@ def test_composable_trainer_runs_registered_evaluator_and_stores_results(temp_co
             testing_strategy=ConstantTestingStrategy(0.5),
         )
 
-        accuracy = trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+        accuracy = trainer.test_model(
+            config={"batch_size": 1}, testset=[], sampler=None
+        )
 
         assert accuracy == 0.5
         assert trainer.accuracy == 0.5
@@ -257,7 +259,9 @@ def test_composable_trainer_tolerates_evaluator_runtime_failure_by_default(
             testing_strategy=ConstantTestingStrategy(0.5),
         )
 
-        accuracy = trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+        accuracy = trainer.test_model(
+            config={"batch_size": 1}, testset=[], sampler=None
+        )
 
         assert accuracy == 0.5
         assert trainer.accuracy == 0.5
@@ -306,7 +310,9 @@ def test_composable_trainer_restores_grad_mode_after_evaluator_side_effect(
         )
 
         assert torch.is_grad_enabled() is True
-        accuracy = trainer.test_model(config={"batch_size": 1}, testset=[], sampler=None)
+        accuracy = trainer.test_model(
+            config={"batch_size": 1}, testset=[], sampler=None
+        )
 
         assert accuracy == 0.5
         assert torch.is_grad_enabled() is True

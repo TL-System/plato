@@ -97,6 +97,7 @@ def test_fedavg_lenet5_smoke(monkeypatch):
         async_run(server._process_reports())
         assert server.accuracy >= 0
 
+
 @pytest.mark.integration
 def test_split_learning_smoke(monkeypatch):
     """Smoke test for split-learning trainer orchestrating gradients."""

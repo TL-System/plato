@@ -37,7 +37,9 @@ class Algorithm(fedavg.Algorithm):
                 "FedDF teacher weighting must be either 'uniform' or 'samples'."
             )
 
-        total_samples = sum(getattr(update.report, "num_samples", 0) for update in updates)
+        total_samples = sum(
+            getattr(update.report, "num_samples", 0) for update in updates
+        )
         use_uniform_average = weighting_name == "uniform" or total_samples <= 0
 
         aggregated = torch.zeros_like(first_logits, dtype=torch.float32)
@@ -91,7 +93,9 @@ class Algorithm(fedavg.Algorithm):
             inputs.append(extract_batch_inputs(example))
 
         proxy_inputs = torch.stack(inputs)
-        distillation_dataset = TensorDataset(proxy_inputs, teacher_logits.detach().cpu())
+        distillation_dataset = TensorDataset(
+            proxy_inputs, teacher_logits.detach().cpu()
+        )
         dataloader = DataLoader(
             distillation_dataset,
             batch_size=distillation_batch_size,

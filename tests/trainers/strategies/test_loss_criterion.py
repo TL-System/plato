@@ -44,7 +44,6 @@ def test_loss_registry_core_loss_does_not_import_lightly(temp_config, monkeypatc
     assert isinstance(criterion, nn.CrossEntropyLoss)
 
 
-
 def test_loss_registry_ssl_loss_requires_optional_lightly(temp_config, monkeypatch):
     from plato.trainers import loss_criterion as loss_criterion_registry
 

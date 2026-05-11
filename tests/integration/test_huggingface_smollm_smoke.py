@@ -93,7 +93,9 @@ class SmokeHFModel(nn.Module):
 def test_smollm_smoltalk_config_smoke(monkeypatch, tmp_path):
     """Smoke test the SmolLM2 + smol-smoltalk config with mocked HF/Lighteval hooks."""
     repo_root = Path(__file__).resolve().parents[2]
-    config_path = repo_root / "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml"
+    config_path = (
+        repo_root / "configs/HuggingFace/fedavg_smol_smoltalk_smollm2_135m.toml"
+    )
     assert config_path.exists()
 
     dataset = DatasetDict(
