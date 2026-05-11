@@ -54,3 +54,7 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 - [Server-side Lighteval for SmolLM2](case-studies/4. Server-side Lighteval for SmolLM2.md)
 
 - [SmolVLA Trainer with LeRobot](case-studies/3. SmolVLA Trainer with LeRobot.md)
+
+- [Nanochat in Plato](case-studies/5. Nanochat in Plato.md)
+
+- [Time-Series Forecasting with TimesFM](case-studies/6. Time-Series Forecasting with TimesFM.md)
