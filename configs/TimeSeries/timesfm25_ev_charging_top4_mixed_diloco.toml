@@ -85,7 +85,7 @@ freq = 0
 stride = 1
 
 # Number of local optimizer steps per DiLoCo synchronization.
-local_steps_per_round = 10
+local_steps_per_round = 1500
 preserve_optimizer_state = true
 
 epochs     = 10
