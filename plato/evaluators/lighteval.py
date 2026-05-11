@@ -98,9 +98,7 @@ class _LightevalProgress:
 
     def advance(self, message: str) -> None:
         self._current += 1
-        logging.info(
-            "[Lighteval] %s (%d/%d).", message, self._current, self.total
-        )
+        logging.info("[Lighteval] %s (%d/%d).", message, self._current, self.total)
         if self._bar is not None:
             self._bar.set_postfix_str(message)
             self._bar.update(1)

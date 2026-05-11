@@ -122,9 +122,7 @@ class AdapterAliasCollisionModel(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.peft_config = {"default": object()}
-        self.foo = torch.nn.ModuleDict(
-            {"default": torch.nn.Linear(1, 1, bias=False)}
-        )
+        self.foo = torch.nn.ModuleDict({"default": torch.nn.Linear(1, 1, bias=False)})
 
 
 def _context(baseline=None, model=None):

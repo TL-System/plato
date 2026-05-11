@@ -206,10 +206,9 @@ def test_simple_client_subprocess_payload_excludes_local_state_sidecar(
     asyncio.run(client._handle_payload(server_payload))
 
     sent_payload = client._context.state["sent_payloads"][-1]
-    state_path = (
-        Path(Config.params["model_path"])
-        / client.trainer._optimizer_state_filename(Config.params["run_id"])
-    )
+    state_path = Path(
+        Config.params["model_path"]
+    ) / client.trainer._optimizer_state_filename(Config.params["run_id"])
     with state_path.open("rb") as state_file:
         sidecar_state = pickle.load(state_file)
 

@@ -880,7 +880,11 @@ class ComposableTrainer(base.Trainer):
                 if labels is not None:
                     batch_size = labels.size(0)
                 else:
-                    first_val = next(iter(examples.values())) if hasattr(examples, "values") else examples
+                    first_val = (
+                        next(iter(examples.values()))
+                        if hasattr(examples, "values")
+                        else examples
+                    )
                     batch_size = first_val.size(0) if hasattr(first_val, "size") else 1
                 self._loss_tracker.update(loss, batch_size)
 
@@ -954,9 +958,7 @@ class ComposableTrainer(base.Trainer):
                 )
             if finalize_step_done:
                 self.optimizer_strategy.on_optimizer_step(self.optimizer, self.context)
-                self._step_lr_scheduler_after_optimizer_step(
-                    step_lr_per_optimizer_step
-                )
+                self._step_lr_scheduler_after_optimizer_step(step_lr_per_optimizer_step)
                 local_step_limit_reached = self._record_local_optimizer_step(
                     local_steps_per_round
                 )

@@ -125,7 +125,10 @@ class HuggingFaceCollateWrapper:
         if not example_list:
             raise ValueError("HuggingFace collator received an empty batch.")
 
-        feature_rows = [{k: v for k, v in example.items() if k != "labels"} for example in example_list]
+        feature_rows = [
+            {k: v for k, v in example.items() if k != "labels"}
+            for example in example_list
+        ]
 
         padding_side = getattr(self.tokenizer, "padding_side", "right")
         batch = self.tokenizer.pad(
@@ -170,9 +173,7 @@ class TimeSeriesCollateWrapper:
     model computes its own loss from ``future_values``.
     """
 
-    def __call__(
-        self, examples: Iterable[dict]
-    ) -> tuple[HuggingFaceBatch, None]:
+    def __call__(self, examples: Iterable[dict]) -> tuple[HuggingFaceBatch, None]:
         example_list = list(examples)
         if not example_list:
             raise ValueError("TimeSeriesCollateWrapper received an empty batch.")
@@ -712,7 +713,10 @@ class Trainer(ComposableTrainer):
             ):
                 embeddings = embedding_getter()
                 embedding_size = getattr(embeddings, "num_embeddings", None)
-                if embedding_size is not None and embedding_size != tokenizer_vocab_size:
+                if (
+                    embedding_size is not None
+                    and embedding_size != tokenizer_vocab_size
+                ):
                     embedding_resizer(tokenizer_vocab_size)
 
         if self.training_args.gradient_checkpointing:

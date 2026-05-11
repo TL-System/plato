@@ -44,9 +44,7 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
     ):
         super().__init__()
         self.outer_optimizer = self._validate_outer_optimizer(outer_optimizer)
-        self.outer_learning_rate = self._validate_learning_rate(
-            outer_learning_rate
-        )
+        self.outer_learning_rate = self._validate_learning_rate(outer_learning_rate)
         self.outer_momentum = self._validate_momentum(outer_momentum)
         self.aggregation_weighting = self._validate_weighting_mode(
             aggregation_weighting
@@ -432,9 +430,7 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
 
     def _scale_tree(self, value: Any, scalar: float) -> Any:
         if isinstance(value, Mapping):
-            return {
-                key: self._scale_tree(item, scalar) for key, item in value.items()
-            }
+            return {key: self._scale_tree(item, scalar) for key, item in value.items()}
 
         if isinstance(value, list):
             return [self._scale_tree(item, scalar) for item in value]
@@ -488,10 +484,9 @@ class DiLoCoAggregationStrategy(FedAvgAggregationStrategy):
         left_shape = getattr(left, "shape", None)
         right_shape = getattr(right, "shape", None)
         if left_shape is not None or right_shape is not None:
-            return (
-                left_shape == right_shape
-                and getattr(left, "dtype", None) == getattr(right, "dtype", None)
-            )
+            return left_shape == right_shape and getattr(
+                left, "dtype", None
+            ) == getattr(right, "dtype", None)
 
         return isinstance(left, numbers.Number) and isinstance(right, numbers.Number)
 

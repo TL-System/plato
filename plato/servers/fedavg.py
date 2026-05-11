@@ -88,7 +88,9 @@ class Server(base.Server):
         elif metric_name == "perplexity":
             logging.info("[%s] Average client perplexity: %.2f.", self, metric_value)
         else:
-            logging.info("[%s] Average client accuracy: %.2f%%.", self, 100 * metric_value)
+            logging.info(
+                "[%s] Average client accuracy: %.2f%%.", self, 100 * metric_value
+            )
 
     def _log_global_metric(self, metric_value: float) -> None:
         """Log the server-tested metric with the appropriate label."""
@@ -271,8 +273,8 @@ class Server(base.Server):
             # Use delta aggregation (default path)
             # Computes the weight deltas by comparing the weights received with
             # the current global model weights
-            delta_updates, delta_weights_received = (
-                self._weight_updates_and_payloads(self.updates, weights_received)
+            delta_updates, delta_weights_received = self._weight_updates_and_payloads(
+                self.updates, weights_received
             )
             deltas_received = (
                 algorithm.compute_weight_deltas(
