@@ -5,7 +5,7 @@
     - `composable` the strategy-based trainer that exposes loss, optimiser, scheduler, data-loader, model-update, and testing strategies directly.
     - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
-    - `HuggingFace` a trainer for Hugging Face causal language models and tokenizers.
+    - `HuggingFace` a trainer for Hugging Face causal language models, tokenizers, and time-series models.
     - `nanochat` a trainer for Nanochat language-model workloads.
     - `lerobot` a trainer for LeRobot / SmolVLA workloads.
     - `split_learning` a trainer that supports the split learning framework.
@@ -179,6 +179,8 @@
     - `cnn_encoder` (for generating various encoders by extracting from CNN models such as ResNet models)
     - `general_multilayer` (for generating a multi-layer perceptron using a provided configuration)
     - `huggingface` (for [HuggingFace](https://huggingface.co/models) causal language models)
+    - `timesfm` (for Hugging Face TimesFM time-series forecasting models)
+    - `patchtsmixer` (for Hugging Face PatchTSMixer time-series models)
     - `torch_hub` (for models from [PyTorch Hub](https://pytorch.org/hub/))
     - `vit` (for Vision Transformer models from [HuggingFace](https://huggingface.co/models), [Tokens-to-Token ViT](https://github.com/yitu-opensource/T2T-ViT), and [Deep Vision Transformer](https://github.com/zhoudaquan/dvit_repo))
     - `smolvla` (for LeRobot / SmolVLA robotics policies)
@@ -204,6 +206,8 @@
     - `multilayer`
     - `nanochat`
     - `smolvla`
+    - `timesfm`
+    - `patchtsmixer`
 
     !!! note "Note"
         If the `model_type` above specified a model repository, supply the name of the model, such as `gpt2`, `HuggingFaceTB/SmolLM2-135M`, or `smolvla`, here.
@@ -214,3 +218,18 @@
     An optional tokenizer identifier to use instead of `trainer.model_name`.
 
     This is mainly useful for Hugging Face language-model workloads where the tokenizer/chat template comes from a separate repository.
+
+!!! tip "HuggingFace time-series models"
+    Set `trainer.type = "HuggingFace"` with `model_type = "timesfm"` or `model_type = "patchtsmixer"` to use Plato's time-series collator and MSE testing strategy instead of the tokenizer-based language-model path.
+
+    Common fields include:
+
+    - `context_length`: number of historical time steps in each input window.
+    - `prediction_length`: number of future time steps to forecast.
+    - `num_input_channels`: number of features in `past_values`.
+    - `prediction_channel_indices`: channels to keep/evaluate from model output.
+    - `stride`: sliding-window stride used by the datasource.
+    - `train_ratio` and `val_ratio`: temporal split ratios for per-user windows.
+    - `freq`: TimesFM frequency token (`0` for high-frequency/hourly data).
+
+    TimesFM models are wrapped channel-independently for multivariate tensors; PatchTSMixer configs can use model options such as `mode = "mix_channel"` to mix features jointly. See the [TimesFM case study](../examples/case-studies/6. Time-Series Forecasting with TimesFM.md) for complete configs.

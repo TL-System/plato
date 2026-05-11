@@ -39,6 +39,7 @@ Welcome to *Plato*, a software framework to facilitate scalable, reproducible, a
     - **[SmolVLA Trainer with LeRobot](examples/case-studies/3. SmolVLA Trainer with LeRobot.md)**
     - **[Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)**
     - **[Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md)**
+    - **[Time-Series Forecasting with TimesFM](examples/case-studies/6. Time-Series Forecasting with TimesFM.md)**
 
 ## Configuration Settings
 
