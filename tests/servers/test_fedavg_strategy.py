@@ -242,9 +242,7 @@ def test_fedavg_server_prefers_custom_delta_strategy_over_inherited_weights(
     assert torch.allclose(server.algorithm.current["bias"], torch.ones(1))
 
 
-def test_fedavg_server_logged_items_flatten_evaluator_metrics(
-    temp_config, tmp_path
-):
+def test_fedavg_server_logged_items_flatten_evaluator_metrics(temp_config, tmp_path):
     """FedAvg should keep accuracy while surfacing evaluator summary metrics."""
     from plato.config import Config
     from plato.servers import fedavg
@@ -309,9 +307,7 @@ def test_fedavg_server_logged_items_include_detailed_lighteval_metrics(
     assert logged_items["evaluation_arc_challenge_acc_stderr"] == 0.0701
 
 
-def test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar(
-    temp_config, tmp_path
-):
+def test_fedavg_server_does_not_persist_evaluator_jsonl_sidecar(temp_config, tmp_path):
     """FedAvg should rely on CSV logging instead of a JSONL sidecar."""
     from plato.config import Config
     from plato.servers import fedavg

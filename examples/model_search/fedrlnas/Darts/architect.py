@@ -140,10 +140,12 @@ class Architect(nn.Module):
                 weight_matrix = weights[start:end].copy()
                 edges = sorted(
                     range(i + 2),
-                    key=lambda x, wm=weight_matrix: -max(
-                        wm[x][k]
-                        for k in range(len(wm[x]))
-                        if k != PRIMITIVES.index("none")
+                    key=lambda x, wm=weight_matrix: (
+                        -max(
+                            wm[x][k]
+                            for k in range(len(wm[x]))
+                            if k != PRIMITIVES.index("none")
+                        )
                     ),
                 )[:2]
                 for j in edges:

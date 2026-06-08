@@ -43,7 +43,7 @@ def _import_smolvla_policy() -> type[Any]:
     except ImportError as exc:  # pragma: no cover - environment dependent
         raise ImportError(
             "SmolVLA requires optional LeRobot robotics dependencies. "
-            "Install the robotics stack in the active environment before using `model_type = \"smolvla\"`."
+            'Install the robotics stack in the active environment before using `model_type = "smolvla"`.'
         ) from exc
     return SmolVLAPolicy
 
@@ -273,7 +273,9 @@ class Model:
         setattr(policy, "plato_policy_path", policy_path)
         setattr(policy, "plato_finetune_mode", finetune_mode)
         setattr(policy, "plato_adapter_patterns", tuple(adapter_patterns))
-        setattr(policy, "plato_adapter_fallback_mode", trainable_metadata["fallback_mode"])
+        setattr(
+            policy, "plato_adapter_fallback_mode", trainable_metadata["fallback_mode"]
+        )
         setattr(policy, "plato_trainable_parameter_count", trainable_count)
         setattr(
             policy,

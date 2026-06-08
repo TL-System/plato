@@ -8,6 +8,7 @@
     - `fedavg_personalized` a Federated Averaging server that supports all-purpose personalized federated learning by controlling when and which group of clients are to perform local personalization.
     - `fedavg_mpc_additive` a Federated Averaging server that reconstructs additive MPC shares before aggregation. Requires clients of type `mpc` with the `mpc_model_encrypt_additive` processor.
     - `fedavg_mpc_shamir` a Federated Averaging server that reconstructs Shamir MPC shares before aggregation. Requires clients of type `mpc` with the `mpc_model_encrypt_shamir` processor.
+    - `diloco` a FedAvg-compatible server that applies DiLoCo outer aggregation. Use it with `algorithm.type = "fedavg"` and configure the outer optimizer under `[server.diloco]`.
     - `split_learning` a Split Learning server that supports training different kinds of models in split learning framework. When this server is used, the `clients.per_round` in the configuration should be set to 1. Users should define the rules for updating models weights before cut from the clients to the server in the callback function `on_update_weights_before_cut`, depending on the specific model they use.
     - `fedavg_personalized` a personalized federated learning server that starts from a number of regular rounds of federated learning. In these regular rounds, only a subset of the total clients can be selected to perform the local update (the ratio of which is a configuration setting). After all regular rounds are completed, it starts a final round of personalization, where a selected subset of clients perform local training using their local dataset.
     - `pfedgraph` a personalized federated learning server that aggregates models using an inferred collaboration graph and sends per-client aggregated weights.
@@ -123,6 +124,37 @@
     The server's estimated uplink capacity (server to clients or central server to edge servers in cross-silo training) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section).
 
     Default value: `100`
+
+!!! example "diloco"
+    Settings for `server.type = "diloco"`. DiLoCo reuses `algorithm.type = "fedavg"` for client weight extraction and global model loading, while the DiLoCo server turns client deltas into an outer-gradient update.
+
+    ```toml
+    [server]
+    type = "diloco"
+
+    [algorithm]
+    type = "fedavg"
+
+    [server.diloco]
+    outer_optimizer = "nesterov"
+    outer_learning_rate = 0.7
+    outer_momentum = 0.9
+    aggregation_weighting = "uniform"
+    apply_outer_optimizer_to = "parameters"
+    ```
+
+    `aggregation_weighting = "uniform"` matches balanced IID worker smoke runs. `aggregation_weighting = "num_samples"` matches Plato's traditional sample-weighted FedAvg behavior. With outer SGD and `outer_learning_rate = 1.0`, uniform weighting is equivalent to uniform model averaging; with `num_samples`, it is equivalent to Plato-style sample-weighted FedAvg.
+
+    `apply_outer_optimizer_to = "parameters"` applies the outer optimizer only to trainable floating parameters. Floating buffers are synchronized with the selected averaging rule but do not receive outer momentum. `apply_outer_optimizer_to = "all_floating"` is available for experiments that also apply the outer optimizer to floating buffers.
+
+    Runnable comparison configurations are available for MNIST/LeNet and CIFAR-10/ResNet-18:
+
+    ```bash
+    uv run python plato.py --config configs/MNIST/diloco_lenet5.toml
+    uv run python plato.py --config configs/CIFAR10/diloco_resnet18.toml
+    ```
+
+    These configurations validate DiLoCo mechanics in Plato; they are not C4/model/pretraining reproductions of the DiLoCo paper.
 
 !!! example "edge_downlink_bandwidth"
     The edge server's estimated downlink capacity (an edge server to its clients) in Mbps, used for computing the transmission time (see `compute_comm_time` in the `clients` section).

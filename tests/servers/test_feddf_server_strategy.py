@@ -16,9 +16,7 @@ from torch.utils.data import TensorDataset
 from plato.config import Config
 
 _TESTS_ROOT = Path(__file__).resolve().parent
-_FEDDF_DIR = (
-    _TESTS_ROOT.parent.parent / "examples" / "server_aggregation" / "feddf"
-)
+_FEDDF_DIR = _TESTS_ROOT.parent.parent / "examples" / "server_aggregation" / "feddf"
 if str(_FEDDF_DIR) not in sys.path:
     sys.path.insert(0, str(_FEDDF_DIR))
 
@@ -71,7 +69,9 @@ class SharedProxyDatasource:
         self._unlabeled = TensorDataset(proxy_inputs, torch.zeros(len(proxy_inputs)))
         self._test = TensorDataset(
             test_inputs if test_inputs is not None else proxy_inputs,
-            torch.zeros(len(test_inputs) if test_inputs is not None else len(proxy_inputs)),
+            torch.zeros(
+                len(test_inputs) if test_inputs is not None else len(proxy_inputs)
+            ),
         )
 
     def get_unlabeled_set(self):

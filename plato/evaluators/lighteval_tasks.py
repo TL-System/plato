@@ -15,7 +15,10 @@ def piqa_hf_prompt(line, task_name: str | None = None):
     query = "The following are multiple choice questions (with answers) about common sense.\n"
     query += f"Question: {line['goal']}\n"
     query += "".join(
-        [f"{key}. {choice}\n" for key, choice in zip(letters, [line["sol1"], line["sol2"]])]
+        [
+            f"{key}. {choice}\n"
+            for key, choice in zip(letters, [line["sol1"], line["sol2"]])
+        ]
     )
     query += "Answer: "
 

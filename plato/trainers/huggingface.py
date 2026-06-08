@@ -38,6 +38,7 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.timeseries_utils import is_timeseries_model
 
 
 class HuggingFaceBatch(dict):
@@ -124,7 +125,10 @@ class HuggingFaceCollateWrapper:
         if not example_list:
             raise ValueError("HuggingFace collator received an empty batch.")
 
-        feature_rows = [{k: v for k, v in example.items() if k != "labels"} for example in example_list]
+        feature_rows = [
+            {k: v for k, v in example.items() if k != "labels"}
+            for example in example_list
+        ]
 
         padding_side = getattr(self.tokenizer, "padding_side", "right")
         batch = self.tokenizer.pad(
@@ -159,6 +163,82 @@ class HuggingFaceCollateWrapper:
                     )
 
         return batch, labels
+
+
+class TimeSeriesCollateWrapper:
+    """Collate function for time-series datasets that return tensor dicts.
+
+    Stacks per-sample dicts (e.g. ``{"past_values": ..., "future_values": ...}``)
+    into a batched ``HuggingFaceBatch``.  Labels are always ``None`` because the
+    model computes its own loss from ``future_values``.
+    """
+
+    def __call__(self, examples: Iterable[dict]) -> tuple[HuggingFaceBatch, None]:
+        example_list = list(examples)
+        if not example_list:
+            raise ValueError("TimeSeriesCollateWrapper received an empty batch.")
+
+        keys = example_list[0].keys()
+        batch = HuggingFaceBatch(
+            {
+                key: torch.stack([torch.as_tensor(ex[key]) for ex in example_list])
+                for key in keys
+            }
+        )
+        return batch, None
+
+
+class TimeSeriesTestingStrategy(TestingStrategy):
+    """Evaluates time-series models and reports mean MSE loss."""
+
+    metric_name = "mse"
+
+    def __init__(self, collate_fn: TimeSeriesCollateWrapper):
+        self.collate_fn = collate_fn
+
+    def test_model(self, model, config, testset, sampler, context: TrainingContext):
+        batch_size = config.get("batch_size", 1)
+
+        if sampler is not None:
+            if isinstance(sampler, torch.utils.data.Sampler):
+                sampler_obj = sampler
+            elif isinstance(sampler, (list, range)):
+                sampler_obj = torch.utils.data.SubsetRandomSampler(sampler)
+            elif hasattr(sampler, "get"):
+                sampler_obj = sampler.get()
+            else:
+                sampler_obj = sampler
+        else:
+            sampler_obj = None
+
+        data_loader = torch.utils.data.DataLoader(
+            testset,
+            batch_size=batch_size,
+            shuffle=False,
+            sampler=sampler_obj,
+            collate_fn=self.collate_fn,
+        )
+
+        model.to(context.device)
+        model.eval()
+
+        total_loss = 0.0
+        num_batches = 0
+
+        with torch.no_grad():
+            for batch_inputs, _ in data_loader:
+                batch_inputs = batch_inputs.to(context.device)
+                batch_inputs.setdefault("return_dict", True)
+                outputs = model(**batch_inputs)
+                loss = _resolve_hf_loss(outputs, labels=None)
+                total_loss += loss.item()
+                num_batches += 1
+
+        model.train()
+
+        if num_batches == 0:
+            return float("inf")
+        return total_loss / num_batches
 
 
 def _resolve_hf_loss(outputs, labels, *, allow_fallback: bool = True):
@@ -520,45 +600,7 @@ class Trainer(ComposableTrainer):
         self.training_args = cast(TrainingArguments, training_args)
 
         model_name = Config().trainer.model_name
-        tokenizer_name = getattr(Config().trainer, "tokenizer_name", model_name)
-        if not isinstance(tokenizer_name, str) or not tokenizer_name:
-            tokenizer_name = model_name
-
-        config_kwargs = {
-            "cache_dir": None,
-            "revision": "main",
-            "use_auth_token": None,
-        }
-        self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
-
-        cache_dir = Config().params["data_path"]
-        use_fast_tokenizer = True
-        revision = "main"
-        auth_token = getattr(
-            getattr(Config(), "parameters", None), "huggingface_token", None
-        )
-
-        tokenizer_loader: Any = (
-            LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
-        )
-        tokenizer_kwargs: dict[str, Any] = {
-            "config": self.config,
-            "cache_dir": cache_dir,
-            "use_fast": use_fast_tokenizer,
-            "revision": revision,
-        }
-        if isinstance(auth_token, str) and auth_token:
-            tokenizer_kwargs["use_auth_token"] = auth_token
-        self.tokenizer: Any = tokenizer_loader.from_pretrained(
-            tokenizer_name,
-            **tokenizer_kwargs,
-        )
-
-        tokenizer = cast(Any, self.tokenizer)
-        if getattr(tokenizer, "pad_token_id", None) is None:
-            eos_token = getattr(tokenizer, "eos_token", None)
-            if eos_token is not None:
-                tokenizer.pad_token = eos_token
+        model_type = getattr(Config().trainer, "model_type", "")
 
         grad_accum_steps = getattr(Config().trainer, "gradient_accumulation_steps", 1)
         try:
@@ -566,7 +608,59 @@ class Trainer(ComposableTrainer):
         except (TypeError, ValueError):
             grad_accum_steps = 1
         self._gradient_accumulation_steps = max(grad_accum_steps, 1)
-        self._collate_wrapper = HuggingFaceCollateWrapper(tokenizer)
+
+        if is_timeseries_model(model_name=model_name, model_type=model_type):
+            # Time-series models have no tokenizer.  Use a simple tensor-stacking
+            # collator and return raw MSE from the testing strategy.
+            self.tokenizer = None
+            self.config = None
+            ts_collate = TimeSeriesCollateWrapper()
+            self._collate_wrapper = ts_collate
+            testing_strategy: TestingStrategy = TimeSeriesTestingStrategy(ts_collate)
+        else:
+            tokenizer_name = getattr(Config().trainer, "tokenizer_name", model_name)
+            if not isinstance(tokenizer_name, str) or not tokenizer_name:
+                tokenizer_name = model_name
+
+            config_kwargs = {
+                "cache_dir": None,
+                "revision": "main",
+                "use_auth_token": None,
+            }
+            self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
+
+            cache_dir = Config().params["data_path"]
+            use_fast_tokenizer = True
+            revision = "main"
+            auth_token = getattr(
+                getattr(Config(), "parameters", None), "huggingface_token", None
+            )
+
+            tokenizer_loader: Any = (
+                LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
+            )
+            tokenizer_kwargs: dict[str, Any] = {
+                "config": self.config,
+                "cache_dir": cache_dir,
+                "use_fast": use_fast_tokenizer,
+                "revision": revision,
+            }
+            if isinstance(auth_token, str) and auth_token:
+                tokenizer_kwargs["use_auth_token"] = auth_token
+            self.tokenizer: Any = tokenizer_loader.from_pretrained(
+                tokenizer_name,
+                **tokenizer_kwargs,
+            )
+
+            tokenizer = cast(Any, self.tokenizer)
+            if getattr(tokenizer, "pad_token_id", None) is None:
+                eos_token = getattr(tokenizer, "eos_token", None)
+                if eos_token is not None:
+                    tokenizer.pad_token = eos_token
+
+            self._collate_wrapper = HuggingFaceCollateWrapper(tokenizer)
+            testing_strategy = HuggingFaceTestingStrategy(self._collate_wrapper)
+
         self.training_args.gradient_accumulation_steps = (
             self._gradient_accumulation_steps
         )
@@ -593,7 +687,7 @@ class Trainer(ComposableTrainer):
                 num_workers=0,
                 pin_memory=True,
             ),
-            testing_strategy=HuggingFaceTestingStrategy(self._collate_wrapper),
+            testing_strategy=testing_strategy,
         )
 
         if hf_callbacks:
@@ -603,23 +697,27 @@ class Trainer(ComposableTrainer):
         if hasattr(model_instance, "loss_type"):
             setattr(model_instance, "loss_type", "ForCausalLM")
 
-        tokenizer_vocab_size = None
-        if hasattr(self.tokenizer, "__len__"):
-            try:
-                tokenizer_vocab_size = len(self.tokenizer)
-            except TypeError:
-                tokenizer_vocab_size = None
-        embedding_getter = getattr(model_instance, "get_input_embeddings", None)
-        embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
-        if (
-            tokenizer_vocab_size is not None
-            and callable(embedding_getter)
-            and callable(embedding_resizer)
-        ):
-            embeddings = embedding_getter()
-            embedding_size = getattr(embeddings, "num_embeddings", None)
-            if embedding_size is not None and embedding_size != tokenizer_vocab_size:
-                embedding_resizer(tokenizer_vocab_size)
+        if self.tokenizer is not None:
+            tokenizer_vocab_size = None
+            if hasattr(self.tokenizer, "__len__"):
+                try:
+                    tokenizer_vocab_size = len(self.tokenizer)
+                except TypeError:
+                    tokenizer_vocab_size = None
+            embedding_getter = getattr(model_instance, "get_input_embeddings", None)
+            embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
+            if (
+                tokenizer_vocab_size is not None
+                and callable(embedding_getter)
+                and callable(embedding_resizer)
+            ):
+                embeddings = embedding_getter()
+                embedding_size = getattr(embeddings, "num_embeddings", None)
+                if (
+                    embedding_size is not None
+                    and embedding_size != tokenizer_vocab_size
+                ):
+                    embedding_resizer(tokenizer_vocab_size)
 
         if self.training_args.gradient_checkpointing:
             model_config = getattr(model_instance, "config", None)

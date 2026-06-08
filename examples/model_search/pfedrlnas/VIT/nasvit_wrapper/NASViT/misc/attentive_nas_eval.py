@@ -77,8 +77,8 @@ def validate(
             top5_list.append(acc5)
 
             head_dim = 8
-            func = (
-                lambda x: x[0] ** 2
+            func = lambda x: (
+                x[0] ** 2
                 * (
                     x[1] ** 2 * 6
                     + x[1] ** 2 * 8

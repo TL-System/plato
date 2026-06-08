@@ -434,8 +434,8 @@ class AttentiveNasDynamicModel(MyNetwork):
                 return cfg
 
     def _sample_active_subnet(self, min_net=False, max_net=False):
-        sample_cfg = (
-            lambda candidates, sample_min, sample_max: min(candidates)
+        sample_cfg = lambda candidates, sample_min, sample_max: (
+            min(candidates)
             if sample_min
             else (max(candidates) if sample_max else random.choice(candidates))
         )
@@ -461,8 +461,8 @@ class AttentiveNasDynamicModel(MyNetwork):
 
     def mutate_and_reset(self, cfg, prob=0.1, keep_resolution=False):
         cfg = copy.deepcopy(cfg)
-        pick_another = (
-            lambda x, candidates: x
+        pick_another = lambda x, candidates: (
+            x
             if len(candidates) == 1
             else random.choice([v for v in candidates if v != x])
         )

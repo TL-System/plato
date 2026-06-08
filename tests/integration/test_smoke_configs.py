@@ -24,13 +24,14 @@ class MNISTSmokeDatasource:
     """Datasource returning image-shaped tensors for LeNet smoke tests."""
 
     def __init__(self, train_size: int = 4, test_size: int = 2):
+        generator = torch.Generator().manual_seed(13)
         self._train = TensorDataset(
-            torch.randn(train_size, 1, 28, 28),
-            torch.randint(0, 10, (train_size,)),
+            torch.randn(train_size, 1, 28, 28, generator=generator),
+            torch.randint(0, 10, (train_size,), generator=generator),
         )
         self._test = TensorDataset(
-            torch.randn(test_size, 1, 28, 28),
-            torch.randint(0, 10, (test_size,)),
+            torch.randn(test_size, 1, 28, 28, generator=generator),
+            torch.randint(0, 10, (test_size,), generator=generator),
         )
 
     def num_train_examples(self):

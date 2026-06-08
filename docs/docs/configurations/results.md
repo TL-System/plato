@@ -6,6 +6,8 @@
     - `round`
     - `accuracy`
     - `accuracy_std`
+    - `mse`
+    - `mse_std`
     - `elapsed_time`
     - `comm_time`
     - `processing_time`
@@ -19,6 +21,7 @@
 
     !!! note "Note"
         Use commas to separate them. The default is `round, accuracy, elapsed_time`.
+        Time-series configs commonly use `round, elapsed_time, mse` instead.
 
     !!! note "Structured evaluators"
         When `[evaluation]` is configured, Plato automatically appends any new `evaluation_*` columns that appear at runtime. You do **not** need to predeclare every Lighteval task metric in `results.types`, although predeclaring the summary columns can keep the CSV order stable.

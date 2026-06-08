@@ -10,6 +10,7 @@ import logging
 
 from plato.config import Config
 from plato.servers import (
+    diloco,
     fedavg,
     fedavg_cs,
     fedavg_gan,
@@ -30,6 +31,7 @@ else:
     registered_servers = {
         "fedavg": fedavg.Server,
         "fedavg_lora": fedavg.Server,
+        "diloco": diloco.Server,
         "fedavg_cross_silo": fedavg_cs.Server,
         "fedavg_gan": fedavg_gan.Server,
         "fedavg_personalized": fedavg_personalized.Server,

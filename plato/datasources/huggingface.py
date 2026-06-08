@@ -207,7 +207,9 @@ class DataSource(base.DataSource):
             if isinstance(tokenizer_name, str) and tokenizer_name
             else Config().trainer.model_name
         )
-        auth_token = getattr(getattr(Config(), "parameters", None), "huggingface_token", None)
+        auth_token = getattr(
+            getattr(Config(), "parameters", None), "huggingface_token", None
+        )
         config_kwargs = {
             "cache_dir": Config().params["model_path"],
             "revision": "main",
@@ -325,7 +327,11 @@ class DataSource(base.DataSource):
             )
 
         configured_block_size = getattr(Config().data, "block_size", None)
-        block_size = configured_block_size if configured_block_size is not None else self.block_size
+        block_size = (
+            configured_block_size
+            if configured_block_size is not None
+            else self.block_size
+        )
         block_size = int(block_size)
         if block_size > 1024:
             logging.warning(
@@ -364,9 +370,7 @@ class DataSource(base.DataSource):
         if self.label_strategy == "full_sequence":
             return list(input_ids)
         if self.label_strategy != "assistant_only":
-            raise ValueError(
-                f"Unsupported chat label strategy: {self.label_strategy}"
-            )
+            raise ValueError(f"Unsupported chat label strategy: {self.label_strategy}")
 
         if not hasattr(self.tokenizer, "apply_chat_template"):
             raise AttributeError(

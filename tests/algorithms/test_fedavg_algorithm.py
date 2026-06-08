@@ -39,9 +39,7 @@ class BFloat16ToyModel(torch.nn.Module):
 
     def __init__(self) -> None:
         super().__init__()
-        self.weight = torch.nn.Parameter(
-            torch.ones((2, 2), dtype=torch.bfloat16)
-        )
+        self.weight = torch.nn.Parameter(torch.ones((2, 2), dtype=torch.bfloat16))
 
 
 def _algorithm_for(model: torch.nn.Module) -> FedAvgAlgorithm:
@@ -114,9 +112,7 @@ def test_extract_weights_casts_bfloat16_payloads_for_transport():
     payload = algorithm.extract_weights()
     assert payload["weight"].dtype == torch.float32
 
-    inbound = OrderedDict(
-        {"weight": torch.full((2, 2), 3.5, dtype=torch.float32)}
-    )
+    inbound = OrderedDict({"weight": torch.full((2, 2), 3.5, dtype=torch.float32)})
     algorithm.load_weights(inbound)
 
     state = model.state_dict()
