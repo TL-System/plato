@@ -56,6 +56,20 @@
 !!! example "epochs"
     The total number of epochs in local training in each communication round.
 
+!!! example "local_steps_per_round"
+    The DiLoCo local work value `H`, counted as completed client-local optimizer steps between synchronizations.
+
+    `H` is not an epoch count, raw dataloader batch count, or gradient-accumulation micro-batch count. When gradient accumulation is enabled, only batches that trigger `optimizer.step()` increment `H`.
+
+    `H` may be smaller than one epoch. In that case, local training stops mid-epoch after exactly `H` optimizer steps while still running normal trainer cleanup, callback completion, state persistence, and reporting.
+
+    Small-`H` DiLoCo runs use round-aware sampling where supported so a logical client does not replay the same first `H` batches every round. Trainers or samplers that cannot count optimizer steps or advance the local stream faithfully must fail or warn clearly instead of silently approximating DiLoCo.
+
+!!! example "preserve_optimizer_state"
+    Whether client-local optimizer and scheduler state should persist across a logical client's local train runs.
+
+    DiLoCo should set this to `true` with a stateful inner optimizer such as `AdamW`. Optimizer and scheduler state remains client-local and is not transmitted in client-server payloads.
+
 !!! example "batch_size"
     The size of the mini-batch of data in each step (iteration) of the training loop.
 

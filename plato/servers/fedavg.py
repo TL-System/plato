@@ -222,13 +222,20 @@ class Server(base.Server):
             # Use delta aggregation (default path)
             # Computes the weight deltas by comparing the weights received with
             # the current global model weights
-            deltas_received = algorithm.compute_weight_deltas(
-                baseline_weights, weights_received
+            delta_updates, delta_weights_received = (
+                self._weight_updates_and_payloads(self.updates, weights_received)
+            )
+            deltas_received = (
+                algorithm.compute_weight_deltas(
+                    baseline_weights, delta_weights_received
+                )
+                if delta_weights_received
+                else []
             )
             # Runs a framework-agnostic server aggregation algorithm, such as
             # the federated averaging algorithm
             logging.info("[Server #%d] Aggregating model weight deltas.", os.getpid())
-            deltas = await self.aggregate_deltas(self.updates, deltas_received)
+            deltas = await self.aggregate_deltas(delta_updates, deltas_received)
             # Updates the existing model weights from the provided deltas
             updated_weights = algorithm.update_weights(deltas)
             # Loads the new model weights
@@ -298,6 +305,20 @@ class Server(base.Server):
             aggregate_weights_impl is FedAvgAggregationStrategy.aggregate_weights
             and aggregate_deltas_impl is not FedAvgAggregationStrategy.aggregate_deltas
         )
+
+    @staticmethod
+    def _weight_updates_and_payloads(updates, weights_received):
+        """Return update/payload pairs whose reports contain model weights."""
+        delta_updates = []
+        delta_weights_received = []
+
+        for update, weights in zip(updates, weights_received):
+            if getattr(update.report, "type", "weights") != "weights":
+                continue
+            delta_updates.append(update)
+            delta_weights_received.append(weights)
+
+        return delta_updates, delta_weights_received
 
     def clients_processed(self) -> None:
         """Additional work to be performed after client reports have been processed."""
