@@ -95,7 +95,7 @@ def pytest_addoption(parser):
         "--test-profile",
         choices=("base", "mandatory"),
         default=None,
-        help="base permits named optional omissions; full suites default to mandatory",
+        help="base permits named optional omissions; unfiltered suites default mandatory",
     )
 
 
@@ -109,7 +109,12 @@ class _ProfileChecks:
     def __init__(self, config):
         self.config = config
         self.full = _full_suite(config)
-        self.qualify = config.getoption("test_profile") is not None or self.full
+        selected = any(
+            config.getoption(option) for option in ("keyword", "markexpr", "deselect")
+        )
+        self.qualify = config.getoption("test_profile") is not None or (
+            self.full and not selected
+        )
         self.base = config.getoption("test_profile") == "base"
         self.native = False
         self.violations = []

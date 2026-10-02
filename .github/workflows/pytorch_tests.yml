@@ -130,9 +130,9 @@ jobs:
           uv run --no-sync --python "${{ matrix.python }}" ruff check . --select I > ci-artifacts/ruff.log 2>&1
           ty_status=0
           uv run --no-sync --python "${{ matrix.python }}" ty check --output-format concise > ci-artifacts/ty.log 2>&1 || ty_status=$?
-          test "$ty_status" -le 1
-          python - <<'PY'
+          python - "$ty_status" <<'PY'
           import re
+          import sys
           from pathlib import Path
           owned = {
               "tests/conftest.py", "tests/integration/utils.py",
@@ -148,8 +148,15 @@ jobs:
               ("tests/datasources/test_huggingface_datasource.py", "100", "5", "invalid-assignment"),
           }
           log = Path("ci-artifacts/ty.log").read_text()
-          assert "Found " in log, log
-          for match in re.finditer(r"^(.+?):(\d+):(\d+): (?:error|warning)\[([^]]+)\]", log, re.M):
+          status = int(sys.argv[1])
+          assert status in (0, 1), f"ty exited with status {status}: {log}"
+          matches = list(re.finditer(r"^(.+?):(\d+):(\d+): (?:error|warning)\[([^]]+)\]", log, re.M))
+          if status == 0:
+              assert log.strip() == "All checks passed!" and not matches, log
+          else:
+              report = re.search(r"^Found ([1-9][0-9]*) diagnostics?$", log, re.M)
+              assert report is not None and len(matches) == int(report[1]), log
+          for match in matches:
               assert match[1] not in owned or match.groups() in allowed, match[0]
           PY
 
