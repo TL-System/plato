@@ -21,7 +21,12 @@ from aiohttp import web
 
 from plato.callbacks.handler import CallbackHandler
 from plato.callbacks.server import LogProgressCallback
-from plato.client import run
+from plato.client import (
+    _current_startup_loop,
+    _startup_loop,
+    _startup_task,
+    run,
+)
 from plato.config import Config
 from plato.servers.strategies.base import ServerContext
 from plato.servers.strategies.client_selection import RandomSelectionStrategy
@@ -327,85 +332,88 @@ class Server:
 
     def run(self, client=None, edge_server=None, edge_client=None, trainer=None):
         """Starts a run loop for the server."""
-        self.client = client
-        self.configure()
+        with _startup_loop(_current_startup_loop()) as (loop, _):
+            self.client = client
+            self.configure()
 
-        if Config().args.resume:
-            self._resume_from_checkpoint()
+            if Config().args.resume:
+                self._resume_from_checkpoint()
 
-        client_kwargs = None
-        if getattr(Config().clients, "type", None) == "mpc":
-            client_kwargs = {
-                "round_store_lock": self._mpc_round_lock,
-                "debug_artifacts": getattr(
-                    Config().clients, "mpc_debug_artifacts", False
-                ),
-            }
+            client_kwargs = None
+            if getattr(Config().clients, "type", None) == "mpc":
+                client_kwargs = {
+                    "round_store_lock": self._mpc_round_lock,
+                    "debug_artifacts": getattr(
+                        Config().clients, "mpc_debug_artifacts", False
+                    ),
+                }
 
-        if Config().is_central_server():
-            # Start the edge servers as clients of the central server first
-            # Once all edge servers are live, clients will be initialized in the
-            # training_will_start() event call of the central server
-            Server._start_clients(
-                as_server=True,
-                client=self.client,
-                edge_server=edge_server,
-                edge_client=edge_client,
-                trainer=trainer,
-                client_kwargs=client_kwargs,
-            )
+            if Config().is_central_server():
+                # Start the edge servers as clients of the central server first
+                # Once all edge servers are live, clients will be initialized in the
+                # training_will_start() event call of the central server
+                Server._start_clients(
+                    as_server=True,
+                    client=self.client,
+                    edge_server=edge_server,
+                    edge_client=edge_client,
+                    trainer=trainer,
+                    client_kwargs=client_kwargs,
+                )
 
-            asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
-            if hasattr(Config().server, "random_seed"):
-                seed = Config().server.random_seed
-                logging.info("Setting the random seed for selecting clients: %s", seed)
-                random.seed(seed)
-                self.prng_state = random.getstate()
-            self.start()
+                with _startup_task(loop, self._periodic(self.periodic_interval)):
+                    if hasattr(Config().server, "random_seed"):
+                        seed = Config().server.random_seed
+                        logging.info(
+                            "Setting the random seed for selecting clients: %s", seed
+                        )
+                        random.seed(seed)
+                        self.prng_state = random.getstate()
+                    self.start()
 
-        else:
-            if self.disable_clients:
-                logging.info("No clients are launched (server:disable_clients = true)")
             else:
-                Server._start_clients(client=self.client, client_kwargs=client_kwargs)
-
-            asyncio.get_event_loop().create_task(self._periodic(self.periodic_interval))
-
-            if hasattr(Config().server, "random_seed"):
-                seed = Config().server.random_seed
-                logging.info("Setting the random seed for selecting clients: %s", seed)
-                random.seed(seed)
-                self.prng_state = random.getstate()
-
-            self.start()
+                if self.disable_clients:
+                    logging.info("No clients are launched (server:disable_clients = true)")
+                else:
+                    Server._start_clients(client=self.client, client_kwargs=client_kwargs)
+                with _startup_task(loop, self._periodic(self.periodic_interval)):
+                    if hasattr(Config().server, "random_seed"):
+                        seed = Config().server.random_seed
+                        logging.info(
+                            "Setting the random seed for selecting clients: %s", seed
+                        )
+                        random.seed(seed)
+                        self.prng_state = random.getstate()
+                    self.start()
 
     def start(self, port=Config().server.port):
         """Starts running the socket.io server."""
-        logging.info(
-            "Starting a server at address %s and port %s.",
-            Config().server.address,
-            port,
-        )
+        with _startup_loop(_current_startup_loop()) as (loop, _):
+            logging.info(
+                "Starting a server at address %s and port %s.",
+                Config().server.address,
+                port,
+            )
 
-        self.sio = socketio.AsyncServer(
-            ping_interval=self.ping_interval,
-            max_http_buffer_size=2**31,
-            ping_timeout=self.ping_timeout,
-        )
-        self.sio.register_namespace(ServerEvents(namespace="/", plato_server=self))
+            self.sio = socketio.AsyncServer(
+                ping_interval=self.ping_interval,
+                max_http_buffer_size=2**31,
+                ping_timeout=self.ping_timeout,
+            )
+            self.sio.register_namespace(ServerEvents(namespace="/", plato_server=self))
 
-        if hasattr(Config().server, "s3_endpoint_url"):
-            self.s3_client = s3.S3()
+            if hasattr(Config().server, "s3_endpoint_url"):
+                self.s3_client = s3.S3()
 
-        web_module = cast(Any, web)
-        app = web_module.Application()
-        self.sio.attach(app)
-        web_module.run_app(
-            app,
-            host=Config().server.address,
-            port=port,
-            loop=asyncio.get_event_loop(),
-        )
+            web_module = cast(Any, web)
+            app = web_module.Application()
+            self.sio.attach(app)
+            web_module.run_app(
+                app,
+                host=Config().server.address,
+                port=port,
+                loop=loop,
+            )
 
     async def register_client(self, sid, client_process_id, client_id):
         """Adds a newly arrived client to the list of clients."""
