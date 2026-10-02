@@ -1,0 +1,74 @@
+{
+  "title": "Fix workspace installation and Python 3.14 startup; establish the Phase 1 baseline.",
+  "body": "Example-targeted installs could omit or remove Plato, and fresh Python 3.14 startup failed without a current event loop. This change makes workspace installs reproducible and client/server startup execute scheduled work with explicit loop ownership and failure propagation.\n\n- Track `uv.lock`, refresh tested dependency bounds, and link all 15 workspace examples to local Plato. Separate base, test/dev, build/docs/audit and optional profiles; SSL and Lighteval require separate environments.\n- Keep Python 3.13 as default/minimum, with tested core 3.14 forward compatibility.\n- Enforce test prerequisites and exact omissions, restore fixture state after exceptions, and preserve focused pytest selections. Add bounded Ubuntu 3.13/3.14 CPU jobs with separate environments and retained logs.\n\n[Fresh root validation](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/phase1-integration-validation.json) after integrating `80539c3`, on Apple Silicon macOS:\n\n| Check | Python 3.13.16 | Python 3.14.8 |\n| --- | --- | --- |\n| Full mandatory, including startup | 298 passed; 1 skip | 298 passed; 1 skip |\n| Base, excluding startup | 246 passed; 4 skip reports | 246 passed; 4 skip reports |\n| Pytest warnings | 0 | 0 |\n\nMandatory executes all 48 startup cases plus DP/MPC and initialized Nanochat training; only the absent native tokenizer skips. Base omissions represent two DP and three Nanochat nodes. Fresh CPU socket rounds train separate clients on 2/6 samples; received payloads match independently recomputed weighted aggregates. Clients exit naturally. Five expected containments per interpreter leave no live survivors; cooperative lifecycle tests separately verify finalization. Watchdog termination does not establish graceful cleanup.\n\nLocked installation, Ruff, build and workflow typing checks pass; wheel runtime sources match the checkout. Typing retains 404 classified diagnostics, not a clean repository. Independent task reviews and the [Phase 1 gate](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/phase1-gate.json) passed; [focused-selection and clean-output typing corrections](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/phase1c-review2.json) are resolved. Linux execution remains pending publication and is required before Phase 2.\n\nThe authorized uv override selects NLTK 3.10.3 despite Lighteval's 3.9.1 pin, retaining the metadata conflict and unsuppressed PYSEC-2026-3740 / CVE-2026-81726 advisory. Tested BLEU/ROUGE pass; ordinary wheel/sdist dependency resolution still selects 3.9.1 without the override.\n\nOptional backends remain separately qualified. Core bug fixes, MLX, examples, archives and docs remain later phases under the [accepted addendum](https://github.com/TL-System/plato/blob/maintenance/2026-refresh-audit/evidence/2026-refresh/plan-addendum.json). ViT archival replaces repair; legacy archival is authorized. No files have moved.",
+  "current_validation": {
+    "accepted_commits": {
+      "dependencies": "7304703905189baf771032f1cd923a37f66ed97f",
+      "startup": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+      "test_ci": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b"
+    },
+    "integrated_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "integrated_tree": "2eaa46049fc0929938117f70c405adaabac1d6b5",
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "delivery_summary": "1A, 1B and final 1C are accepted; the local Phase 1 gate and fresh root integration validation PASS. Description is ready for publication. Published Linux CPU verification remains required before Phase 2 or cleanup.",
+    "evidence": [
+      "evidence/2026-refresh/phase1a-acceptance.json",
+      "evidence/2026-refresh/phase1b-acceptance.json",
+      "evidence/2026-refresh/phase1c-acceptance.json",
+      "evidence/2026-refresh/phase1c-review2.json",
+      "evidence/2026-refresh/phase1-gate.json",
+      "evidence/2026-refresh/phase1-integration-validation.json"
+    ],
+    "environment": "Root checkout, Apple Silicon macOS 27.0, Python 3.13.16 and 3.14.8, locked dev and test-base profiles. Python default/minimum remains 3.13; 3.14 evidence is core forward compatibility.",
+    "root_suites": [
+      {
+        "profile": "mandatory-313",
+        "passed": 298,
+        "skip_reports": 1,
+        "seconds": 433.938,
+        "deselected_runtime": 0
+      },
+      {
+        "profile": "mandatory-314",
+        "passed": 298,
+        "skip_reports": 1,
+        "seconds": 449.378,
+        "deselected_runtime": 0
+      },
+      {
+        "profile": "base-313",
+        "passed": 246,
+        "skip_reports": 4,
+        "seconds": 1.054,
+        "deselected_runtime": 48
+      },
+      {
+        "profile": "base-314",
+        "passed": 246,
+        "skip_reports": 4,
+        "seconds": 1.369,
+        "deselected_runtime": 48
+      }
+    ],
+    "warnings": "Zero pytest warnings in each fresh mandatory/base run; no fork-warning suppression.",
+    "skip_contract": "Mandatory permits only absent callable rustbpe.Tokenizer for its named round-trip test; DP/MPC and both initialized Nanochat trainer tests execute. Four base skip reports represent two DP nodes in one module plus three Nanochat nodes. Base partitions out 48 startup cases; full mandatory executes them all.",
+    "runtime": "48 fresh root runtime results per interpreter, including actual socket rounds with two trained clients and 2/6 sample weights. Root independently recomputed W0 + (2*(W1-W0)+6*(W2-W0))/8 from received tensors within rtol=1e-5/atol=1e-6. Both clients return naturally; five expected watchdog containments per interpreter, no live survivors.",
+    "lifecycle_boundary": "Production success retains os._exit; separate cooperative tests cover finalization. Forced containment does not prove graceful cleanup or original-error delivery from noncooperative extension code.",
+    "static_and_artifacts": "Locked syncs, Ruff, wheel/sdist build, diff check and workflow typing classification gate pass. Wheel plato/client.py and plato/servers/base.py match integrated runtime sources. Reviewed workflow syntax checks passed; no Linux execution is inferred.",
+    "typing": {
+      "diagnostics": 404,
+      "baseline": 384,
+      "accepted_startup_helpers": 20,
+      "raw_exit_code": 1,
+      "workflow_classification_gate_exit_code": 0
+    },
+    "review_corrections": "P1C-R01 and P1C-R02 independently resolved: ordinary focused selections retain pytest behavior while explicit profiles enforce qualification; typing checker accepts verified clean output and classified nonzero output while rejecting malformed/tool-failure/unexpected-owned diagnostics.",
+    "coverage": "Not recollected by root. Retained 1C mandatory-core coverage is about 43.30% on each interpreter, excluding startup subprocesses. Comparable 219 unchanged files improved from 44.175% to 44.965%; raw baseline/final denominators differ.",
+    "dependency_exception": "Authorized workspace uv override uses NLTK 3.10.3 against Lighteval 3.9.1 metadata. Expected metadata-check failure and PYSEC-2026-3740 / CVE-2026-81726 remain visible; no published fix in retained audit. Tested metrics do not qualify arbitrary tasks. Ordinary wheel/sdist resolution selects 3.9.1 without the override; optional artifact contents depend on submodule initialization.",
+    "evidence_boundary": "Fresh root full-suite/runtime results supersede retained candidate runtime results for final local validation. Gate and root validation are complete; Linux execution and later-phase support are not claimed."
+  },
+  "pending_final_inputs": [
+    "Post-publication GitHub Ubuntu CPU results for Python 3.13 and 3.14, required before Phase 2 or cleanup. No further local input is pending for publishing this description."
+  ],
+  "status": "ready_for_publication_linux_pending"
+}

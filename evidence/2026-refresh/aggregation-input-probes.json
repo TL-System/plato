@@ -1,0 +1,49 @@
+{
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "python": "3.13.16",
+  "status": "Confirmed current behavior; no fix implemented",
+  "owner": "2B aggregation/report validation",
+  "sample_count_probes": [
+    {
+      "sample_counts": [
+        "-1",
+        "2"
+      ],
+      "result": "[7.0]",
+      "rejected": false
+    },
+    {
+      "sample_counts": [
+        "nan",
+        "2"
+      ],
+      "result": null,
+      "rejected": false
+    },
+    {
+      "sample_counts": [
+        "inf",
+        "2"
+      ],
+      "result": "[nan]",
+      "rejected": false
+    },
+    {
+      "sample_counts": [
+        "1",
+        "1"
+      ],
+      "result": "[2.5]",
+      "rejected": false
+    }
+  ],
+  "payload_alignment_probe": {
+    "reports": 1,
+    "payloads": 2,
+    "result": "[1.0]",
+    "ignored_extra_payload": true
+  },
+  "acceptance": "Reject negative/nonfinite sample counts and mismatched report/payload cardinality before arithmetic; preserve valid weighting and documented zero-count/feature behavior. Do not infer new research equations or require integer-only weights without a justified compatibility contract.",
+  "related": "MR-01 malformed trees need validation on both direct-weight and delta paths; shared implementation must coordinate with 3A.",
+  "finding_id": "F18"
+}

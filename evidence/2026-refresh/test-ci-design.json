@@ -1,0 +1,342 @@
+{
+  "phase": "1C",
+  "status": "Design only; implementation and qualification remain pending.",
+  "date": "2026-10-02",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "current_user_policy_addendum": {
+    "precedence": "Latest user policy supersedes optional default promotion and prior archive restrictions in plan.md; leave that original plan unchanged.",
+    "optimization": "Necessary optimizations are authorized when backed by behavior and preserved acceptance; no unrelated stack changes.",
+    "python": "Root selects retaining .python-version = 3.13 and requires-python >=3.13. Python 3.14 core suites/startup/runtime are forward-compatibility evidence, never automatic default promotion or whole-stack qualification.",
+    "robotics_basis": "Candidate 1A records LeRobot 0.6.1 requiring torch<2.12, torchvision<0.27 and numpy<2.3; dataset/SmolVLA extras additionally constrain datasets<5 and transformers<5.6. Its Apple Silicon binary-only probe resolves on 3.13 and fails on 3.14 for permitted NumPy wheels. This is a concrete stack constraint, not a claim that robotics runtime has passed on 3.13 or that all Linux 3.14 stacks are impossible.",
+    "archive": "Root may retire obsolete/incompatible modules, examples and workflows into an archive, preserve references and dependency/reproduction notes, and remove active registry/workspace/CI/docs support claims with narrow dependency revalidation. Phase 1C performs no mass moves. Archived reproduction checks must be labeled separately from supported-path gates. Never turn failing active tests into skips to gain approval.",
+    "this_task": "Sole write: evidence/2026-refresh/test-ci-design.json. Candidate dependency worktree is read-only and still being finalized. No installs, code edits, commits, nested agents or extra process documents. All shell invocations use zsh -lc."
+  },
+  "evidence": {
+    "plan_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "core_type_triage_sha256": "2b4848f39865e52488c50fb1b5a6979ee7536cd8656640b21aa60f76e319f7d7",
+    "candidate_directory": "/tmp/plato-refresh-worktrees/dependencies",
+    "candidate_sha256": {
+      "pyproject.toml": "fecc507660f280019ccc6869bde5bd886f26685cfa2361fdab7f4ee60d7f4dfa",
+      "uv.lock": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6"
+    },
+    "candidate_caveat": "Moving read-only candidate, not an accepted lock. Re-read finalized 1A files: earlier policy/status text and recorded hashes can lag current edits.",
+    "observed_tests": "Inspected shared fixtures/helpers, smoke tests, optional imports, FedDF loaders, HuggingFace preprocessing and abstract-class negative tests. Pytest currently registers only integration; no profile enforcement or configured timeout.",
+    "historical_baseline": "Plan and candidate setup evidence report 248 passed/3 skipped/8 warnings on each Python. Candidate pytest-313.log: 4.63s. Pytest was not rerun here because it writes runtime/cache artifacts outside this task scope.",
+    "coverage": "baseline-coverage.json: 7257/16935 statements, 42.852081488042515% (43% displayed). Preserve measured scope and compare like-for-like; no arbitrary coverage threshold or new exclusions.",
+    "workflow_findings": "pytorch_tests.yml: recursive submodules, unlocked --all-extras, pytest and five unbounded MNIST/HuggingFace workloads; no Python matrix/deadline. Candidate ssl/llm_eval conflict makes --all-extras invalid. Publishing and cleanup workflows inspected; outside 1C."
+  },
+  "owned_changes": [
+    {
+      "file": ".python-version",
+      "owner": "1C/root",
+      "change": "Verify unchanged 3.13; no edit/promotion."
+    },
+    {
+      "file": "pyproject.toml",
+      "owner": "1C only after 1A handoff",
+      "change": "Register runtime marker and strict markers/testpaths=tests. Add test-base group containing the candidate pytest/pytest-cov requirements; make test include test-base plus existing plato-learn[dp,mpc,rl,nanochat], and keep dev including test. No dependency version churn, warning ignores or ty suppression changes."
+    },
+    {
+      "file": "uv.lock",
+      "owner": "root/1A explicit metadata handoff",
+      "change": "Refresh only group metadata for test-base/include-group after manifest handoff; require unchanged package selections unless independently justified. 1C must not race the current candidate owner."
+    },
+    {
+      "file": "tests/conftest.py",
+      "owner": "1C",
+      "change": "Add small --test-profile=base|mandatory option (default mandatory), prerequisite checks and exact skip enforcement, including collection-time skips and unexpected xfails/deselection. Isolate Config, RNG and runtime paths with exception-safe teardown; no event-loop creation or process-context override."
+    },
+    {
+      "file": "tests/integration/utils.py",
+      "owner": "1C after 1B helper handoff",
+      "change": "Keep configure_environment env/argv active through yield; restore Config and environment in finally even on setup/body failure. Set temporary base/data/model/checkpoint/result/mpc paths before Config construction. Reuse narrowly scoped isolation with temp_config; preserve fresh-process 1B smoke semantics."
+    },
+    {
+      "file": "tests/trainers/test_dp_data_loader_strategy.py",
+      "owner": "1C narrow collection fix",
+      "change": "Guard missing opacus before importing plato.trainers.diff_privacy. Base-only module skip must name dp; mandatory missing Opacus fails preflight/skip policy. Do not catch arbitrary import failures."
+    },
+    {
+      "file": "tests/test_nanochat_integration.py",
+      "owner": "1C prerequisite policy; 3B adapter behavior",
+      "change": "Replace import-time find_spec-only rustbpe test with restored-path capability check for callable rustbpe.Tokenizer. Explicit base omissions; require both synthetic trainer tests in mandatory. Missing torch/tiktoken/source in mandatory is failure, never importorskip success."
+    },
+    {
+      "file": "tests/clients/test_feddf_strategy.py",
+      "owner": "1C import isolation only",
+      "change": "Scope collection-time sys.path prepend to loader execution using try/finally; restore even on import error."
+    },
+    {
+      "file": "tests/servers/test_feddf_server_strategy.py",
+      "owner": "1C import isolation only",
+      "change": "Apply the same bounded path scope around both FedDF module loads; preserve existing assertions."
+    },
+    {
+      "file": "tests/datasources/test_huggingface_datasource.py",
+      "owner": "1C optimization only",
+      "change": "Set preprocessing_num_proc=1 in test_huggingface_corpus_mode_keeps_legacy_default_block_size; preserve real map/tokenization/grouping and block-size assertion. Do not change production defaults."
+    },
+    {
+      "file": ".github/workflows/pytorch_tests.yml",
+      "owner": "1C",
+      "change": "Replace all-extras and five download-heavy runs with bounded explicit profiles, 1B startup regressions and actual CPU socket round on 3.13/3.14; retain read-only permissions and pinned submodules. Upload existing test outputs on failure/success, without extra process paperwork."
+    }
+  ],
+  "profiles": {
+    "shell": "Run commands via zsh -lc; CI provides zsh. PY is 3.13 or 3.14. Use fresh, separate UV_PROJECT_ENVIRONMENT paths for base and mandatory.",
+    "base": {
+      "sync": "uv sync --locked --python $PY --no-default-groups --group test-base",
+      "collect": "uv run --no-sync python -m pytest tests --collect-only --test-profile=base -ra",
+      "run": "uv run --no-sync python -m pytest tests --test-profile=base -m \"not runtime\" -ra",
+      "contract": "Core plus pytest tooling; verify optional dependencies did not leak through dev/test. Keep local MPC and fake robotics/evaluation/Nanochat adapter tests active. No real optional-backend support claim.",
+      "allowed_omissions": [
+        "tests/trainers/test_dp_data_loader_strategy.py: missing opacus, module collection skip (two underlying tests)",
+        "tests/test_nanochat_integration.py::test_nanochat_tokenizer_processor_round_trip: explicit optional Nanochat profile",
+        "tests/test_nanochat_integration.py::test_nanochat_trainer_smoke: explicit optional Nanochat profile",
+        "tests/test_nanochat_integration.py::test_nanochat_trainer_selects_core_eval_strategy: explicit optional Nanochat profile"
+      ]
+    },
+    "mandatory": {
+      "sync": "uv sync --locked --python $PY --no-default-groups --group dev",
+      "test_only_equivalent": "uv sync --locked --python $PY --no-default-groups --group test",
+      "run": "uv run --no-sync python -m pytest tests --test-profile=mandatory -m \"not runtime\" -ra --cov=plato --cov-report=term --cov-report=json:coverage.json --junitxml=tests.xml",
+      "contract": "Require DP/MPC/RL imports and Nanochat synthetic training/evaluator-selection. Run unmarked and integration tests, with runtime invoked separately. No broad integration exclusion, --ignore, continue-on-error or --all-extras.",
+      "preflight": "Import opacus, kazoo, gymnasium, tiktoken; verify pinned external/nanochat and import real model/trainer under its source layout. Fail missing/incompatible prerequisites. Local MPC and RL imports do not qualify external services/research workflows.",
+      "allowed_skip": "Only tests/test_nanochat_integration.py::test_nanochat_tokenizer_processor_round_trip, only if callable rustbpe.Tokenizer is absent. Native tokenizer is explicitly optional/deferred to 3B; if available it must pass. Every other skip/xfail fails.",
+      "nanochat_blocker": "1A skipped both trainer tests in its uninitialized checkout; that cannot pass mandatory. Validate the real initialized checkout, not overlays. If synthetic imports need native setup, route the exact repair to 1A/3B; no fake modules or extra skips.",
+      "required_nodes": [
+        "tests/trainers/test_dp_data_loader_strategy.py (both tests)",
+        "tests/mpc/test_mpc.py (all three tests)",
+        "tests/integration/test_smoke_configs.py::test_mpc_training_smoke",
+        "tests/test_nanochat_integration.py::test_nanochat_trainer_smoke",
+        "tests/test_nanochat_integration.py::test_nanochat_trainer_selects_core_eval_strategy"
+      ]
+    },
+    "other_support": "Real native tokenizer, robotics, MLX, SSL and Lighteval require separate provisioned backend profiles/later owners; stub tests stay active. A support-claiming job must execute its real cases without dependency skips. Archived reproduction jobs are labeled archived and do not satisfy supported-path gates.",
+    "enforcement": "Small conftest hooks collect collection/setup/call/teardown skips and reject those outside exact node/reason/capability allowances, plus unexpected xfails. Qualification commands verify required nodes ran; only explicit runtime partition deselection is allowed. Prove mandatory-in-base and missing-Nanochat-source invocations fail. No generic profile framework."
+  },
+  "isolation_gaps": [
+    {
+      "evidence": "temp_config clears only Config._instance and args.id; params/optional class sections survive. It redirects only model/checkpoint paths after Config has already created directories.",
+      "repair": "Snapshot/restore known mutable Config state and remove test-added optional sections between tests; pass -b temporary_root before construction and route all six runtime paths there. F13 production A-reset-B behavior remains assigned to 2A and must be reproduced within one test, without a fixture reset between A and B."
+    },
+    {
+      "evidence": "configure_environment restores env/argv immediately after construction, clears params without restoring old state, and has no finally around yield.",
+      "repair": "Keep environment valid for the context lifetime and restore on construction failure, body exception and normal exit. Use nested-context/exception acceptance against prior values; do not wrap synchronous startup in asyncio.run."
+    },
+    {
+      "evidence": "FedDF modules permanently prepend their example directory at collection. ensure_nanochat_importable also prepends a cached source root; rustbpe namespace discovery depends on test order.",
+      "repair": "Restore sys.path around collection loaders and Nanochat test scopes; clear only relevant third-party path caches when testing absence. Keep real module imports honest. Lighteval tests already use restoring monkeypatch.setitem(sys.modules); no permanent fake-module leak was found."
+    },
+    {
+      "evidence": "FakeModel calls torch.manual_seed(0) globally; samplers and Config can mutate Python/NumPy/Torch RNG state. Helpers fix port 8000 and integration random tensors lack a local seed.",
+      "repair": "Save/restore Python, NumPy and CPU Torch RNG state between tests; fixed smoke seed and fresh port/runtime root in 1B subprocesses. Do not initialize accelerators in CPU fixtures. Verify selected config/FedDF/Nanochat modules in reversed order, without adding a random-order plugin."
+    }
+  ],
+  "fork_warnings": {
+    "source": "Candidate pytest-{313,314}.log: eight warnings at test_huggingface_corpus_mode_keeps_legacy_default_block_size, from multiprocess/popen_fork.py calling os.fork in a multithreaded parent.",
+    "cause": "huggingface.py:238 defaults preprocessing_num_proc=4. Corpus preprocessing maps tokenization/grouping over train/validation via datasets/multiprocess. Plato multiprocessing spawn settings do not configure this separate multiprocess package.",
+    "action": "Set one worker in the block-size test, preserving actual Dataset.map/output assertions. No warning suppression, global context override or production-default change. Parallel preprocessing safety remains with 3B.",
+    "acceptance": "Target test loses fork warnings without losing preprocessing assertions. Rerun mandatory suite; record/investigate any remaining warnings. Retain eight-warning historical baseline."
+  },
+  "typing": {
+    "source": "core-type-triage.json contains 362 entries: 38 first-party core, 306 DViT, 18 T2T-ViT; it explicitly leaves whole-repository classification incomplete.",
+    "read_only_check": "Executed .venv/bin/ty check --output-format concise on the baseline, ty 0.0.84: exit 1, 384 emitted diagnostics. No dependency installation or fixes.",
+    "reconciliation": "Read-only scan emitted 60 first-party messages at 59 distinct (file,line,column,code) locations: 38 core + 11 example + 10 test. KNOT 403:17 emits both ndarray and NumPy-scalar variants. The historical 59-message claim lacks a full-repository log; do not assert identical counting. Assignments cover every current location and both KNOT variants.",
+    "policy": "Assign, do not mass-fix. Preserve raw output/nonzero exit; no blanket clean-ty gate, new broad ignores, --exit-zero or vendor upgrades. Reconcile lock-driven changes and reject unexplained new findings in touched files. Assign 324 vendor messages separately to Phase 4 upstream/submodule compatibility.",
+    "assignments": [
+      {
+        "file": "plato/algorithms/lora.py",
+        "owner": "3B",
+        "action": "Narrow guarded PEFT callables and remove unused ignores; preserve missing-dependency errors.",
+        "count": 4,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/config.py",
+        "owner": "2A",
+        "action": "Correct annotation placement; F13 still needs a production reset regression.",
+        "count": 1,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/datasources/datalib/audio_extraction_tools.py",
+        "owner": "2A",
+        "action": "Preserve extraction arguments/error behavior when replacing deprecated process APIs during 2A.",
+        "count": 2,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/datasources/datalib/frames_extraction_tools.py",
+        "owner": "2A",
+        "action": "Preserve extraction arguments/error behavior when replacing deprecated process APIs during 2A.",
+        "count": 2,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+        "owner": "2A",
+        "action": "Annotate heterogeneous records accurately; independently reproduce filtering bugs before behavioral repair.",
+        "count": 23,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/datasources/torchvision.py",
+        "owner": "2A",
+        "action": "Type attached Subset classes/targets metadata and verify alignment; retain useful metadata.",
+        "count": 2,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/models/huggingface.py",
+        "owner": "3B",
+        "action": "Remove unused ignores during adapter work.",
+        "count": 2,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/trainers/diff_privacy.py",
+        "owner": "2C with 2D privacy review",
+        "action": "Exercise real make_private/optimizer/accounting before narrowing GradSampleModule versus GradSampleHooks.",
+        "count": 1,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "plato/trainers/huggingface.py",
+        "owner": "3B",
+        "action": "Remove redundant cast during adapter work; preserve F09 acceptance.",
+        "count": 1,
+        "source_entries": "core-type-triage.json: all entries matching this file"
+      },
+      {
+        "file": "examples/model_search/fedrlnas/fedrlnas_server.py",
+        "owner": "4 model-search owner",
+        "locations": [
+          "127:34 call-non-callable"
+        ],
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes."
+      },
+      {
+        "file": "examples/model_search/pfedrlnas/DARTS/fednas_server.py",
+        "owner": "4 model-search owner",
+        "locations": [
+          "164:34 call-non-callable"
+        ],
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes."
+      },
+      {
+        "file": "examples/model_search/pfedrlnas/VIT/fednas_server.py",
+        "owner": "4 model-search owner",
+        "locations": [
+          "148:34 call-non-callable"
+        ],
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes."
+      },
+      {
+        "file": "examples/model_search/fedtp/hypernetworks.py",
+        "owner": "4 model-search owner",
+        "locations": [
+          "87:32 redundant-cast"
+        ],
+        "action": "Remove redundant cast during example ownership."
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_algorithm.py",
+        "owner": "4 FedDF owner",
+        "locations": [
+          "78:16 invalid-argument-type"
+        ],
+        "action": "Specify the sized proxy-dataset contract; retain distillation behavior."
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_server.py",
+        "owner": "4 FedDF owner",
+        "locations": [
+          "45:25 unresolved-attribute"
+        ],
+        "action": "Narrow strategy exposing _resolve_proxy_dataset; preserve dispatch."
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_utils.py",
+        "owner": "4 FedDF owner",
+        "locations": [
+          "32:26 invalid-argument-type"
+        ],
+        "action": "Specify sized proxy-dataset contract; never invent iterable lengths."
+      },
+      {
+        "file": "examples/unlearning/knot/knot_server.py",
+        "owner": "4 unlearning owner",
+        "locations": [
+          "403:17 invalid-argument-type",
+          "776:17 invalid-argument-type",
+          "776:40 invalid-argument-type",
+          "802:31 invalid-argument-type"
+        ],
+        "action": "Reproduce scalar/array indexing and empty/None extrema; preserve unlearning semantics.",
+        "emitted_messages": 5
+      },
+      {
+        "file": "tests/datasources/test_huggingface_datasource.py",
+        "owner": "3B; 1C owns only worker-count optimization",
+        "locations": [
+          "99:5 invalid-assignment",
+          "100:5 invalid-assignment"
+        ],
+        "action": "Use restoring method monkeypatches; retain dispatch assertions."
+      },
+      {
+        "file": "tests/datasources/test_torchvision_datasource.py",
+        "owner": "2A",
+        "locations": [
+          "241:12 unresolved-attribute",
+          "243:16 unresolved-attribute"
+        ],
+        "action": "Assert subset presence before indices assertions."
+      },
+      {
+        "file": "tests/integration/test_smoke_configs.py",
+        "owner": "2C with 1C test coordination",
+        "locations": [
+          "115:9 invalid-assignment"
+        ],
+        "action": "Reconcile None/list cut_layer_grad with the trainer contract; keep this identified as a stub test."
+      },
+      {
+        "file": "tests/trainers/strategies/test_base.py",
+        "owner": "2C",
+        "locations": [
+          "153:13 call-non-callable",
+          "184:13 call-non-callable",
+          "240:13 call-non-callable",
+          "279:13 call-non-callable",
+          "448:13 call-non-callable"
+        ],
+        "action": "Keep pytest.raises(TypeError). Documented line-specific rule ignores are appropriate for intentional invalid calls; no broad suppression."
+      }
+    ]
+  },
+  "linux_cpu_ci": {
+    "prerequisites": "Accepted 1A manifest/lock with test-base handoff, then accepted 1B entrypoint tests and real socket harness. 1C wires their exact delivered paths; do not label existing fabricated-update tests as the new smoke.",
+    "matrix": "One ubuntu-24.04 CPU job with Python 3.13 and 3.14 matrix, fail-fast=false, max-parallel=2, timeout-minutes=25. Name 3.13 supported-default and 3.14 core-forward-compatibility. A 3.14 failure remains visible and blocks a forward-compatibility claim, not permission to retain 3.13 or a reason to rewrite robotics.",
+    "setup": "Pinned submodules; explicit Python and finalized 1A uv version (>=0.12.22). Fresh locked syncs with 10-minute step limits. No unreviewed CPU torch index override. Force CPU via config/CLI, empty CUDA_VISIBLE_DEVICES, OMP_NUM_THREADS=MKL_NUM_THREADS=1, TOKENIZERS_PARALLELISM=false. Package/submodule provisioning may use network; synthetic tests set HF_HUB_OFFLINE=HF_DATASETS_OFFLINE=1.",
+    "steps": [
+      "Record commit, lock SHA256, Python/uv/package versions and pinned submodule SHAs; uv lock --check.",
+      "Sync fresh base profile, collect and run it with exact omission reporting; apply a five-minute step limit.",
+      "Sync separate mandatory/dev profile; prerequisite/skip enforcement, mandatory suite with JUnit and coverage (five-minute limit). Existing integration adapter tests remain included.",
+      "Include 1B tests/integration/test_event_loop_startup.py and helpers: fresh interpreters, no fixture-created loop, success/error/edge/central/repeated-start and cleanup assertions.",
+      "Invoke delivered 1B runtime cases with --test-profile=mandatory -m runtime, five-minute step limit, nonempty collection and zero skips. Proposed path tests/integration/test_runtime_smoke.py is reserved to 1B; use its delivered path. 1C coordinates marker/invocation only.",
+      "Run uv run --no-sync ruff check . --select I. Capture ty concise output and actual nonzero baseline status; reject tool crashes/unexplained new findings in touched files.",
+      "Always upload JUnit, coverage, suite and 1B subprocess logs/markers with finite retention. Use runner artifacts/existing evidence destinations, not more process documents."
+    ],
+    "real_round_acceptance": "Use 1B actual FedAvg server.run and two spawned simple.Client processes, one CPU SGD round, comm_simulation=false, deterministic distinct local datasets of 2 and 6 samples, ordinary processors/serialization and sockets, no downloads/S3. Require two distinct IDs/PIDs, changed client parameters, matched actual received payloads and reports, and final tensors equal to W0 + sum(n_i*(Wi-W0))/sum(n_i), rtol=1e-5/atol=1e-6. Snapshot tensors before mutation. No fake reports, StaticTrainingStrategy or direct aggregation substitute.",
+    "bounds": "Keep 1B 90-second real-round deadline with per-run port/root and child PID/start-time tracking. Normal success requires natural process disappearance and released port; watchdog kills cannot pass. Failure/stall cases preserve original error markers, TERM then KILL owned group/descendants within 5+5 seconds, reap and assert no survivors. Keep 1B 30+5+5 containment bounds for deliberate teardown stalls. Process exit via existing os._exit is not proof of finally execution; separate entrypoint regressions prove cooperative loop cleanup."
+  },
+  "acceptance": [
+    "Fresh base collection succeeds; mandatory named tests execute. Negative missing-prerequisite probes fail. Only explicitly optional native-tokenizer omission is allowed in mandatory.",
+    "Fixture exception/reversed-order checks restore Config, environment, paths and RNG. F13 remains assigned to 2A, not declared fixed by fixture isolation.",
+    "1B fresh startup and real numerical socket round pass for each claimed Linux CPU profile, with bounded cleanup. Keep Python 3.13 default and label 3.14 core forward-compatibility.",
+    "Record commands, commit/lock/environment, actual counts including omissions, warnings, durations, Ruff/ty and comparable coverage. Explain changes from 248/3/8 and 43%; never drop tests to match counts.",
+    "All 59 distinct first-party locations/60 messages assigned; 324 vendor diagnostics separate. No broad suppressions, unrelated stack changes, mass archive moves or active-failure skips."
+  ]
+}

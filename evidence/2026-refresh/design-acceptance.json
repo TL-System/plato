@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-02",
+  "accepted_by": "root orchestrator",
+  "scope": "Design acceptance only; implementation and runtime qualification remain required.",
+  "review": "design-revision-review.json",
+  "review_sha256": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+  "artifacts": {
+    "startup-design.json": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47",
+    "mlx-roadmap.json": "76093b75c76e304117bd32f59d0eabf59bf726a2aaff051d82aa429761945ea9",
+    "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2"
+  },
+  "decision": "ACCEPTED",
+  "policies": [
+    "Python 3.13 remains default; Python 3.14 is forward compatibility where dependencies permit.",
+    "ViT examples are to be archived under explicit user direction, preserving shared dependencies needed by active examples."
+  ]
+}

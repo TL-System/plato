@@ -1,0 +1,3267 @@
+{
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "date": "2026-10-02",
+  "command": "uv run --extra dp --extra mpc --extra rl --extra nanochat ty check plato --output-format concise",
+  "result": "362 diagnostics after initializing pinned submodules: 38 first-party, 306 dvit, 18 t2tvit. Original first-party count unchanged.",
+  "limitations": "Initial triage only; future owners verify dispositions and complete the whole-repository 59-diagnostic first-party classification. Diagnostics alone are not proof of runtime bugs.",
+  "entries": [
+    {
+      "file": "plato/algorithms/lora.py",
+      "line": 14,
+      "column": 39,
+      "severity": "warning",
+      "code": "unused-type-ignore-comment",
+      "detail": "Unused blanket `type: ignore` directive",
+      "disposition": "Optional PEFT sentinel is guarded by _require_peft at runtime, but checker cannot narrow across method. Phase 3 owner should express callable narrowing without weakening missing-dependency behavior."
+    },
+    {
+      "file": "plato/algorithms/lora.py",
+      "line": 15,
+      "column": 39,
+      "severity": "warning",
+      "code": "unused-type-ignore-comment",
+      "detail": "Unused blanket `type: ignore` directive",
+      "disposition": "Optional PEFT sentinel is guarded by _require_peft at runtime, but checker cannot narrow across method. Phase 3 owner should express callable narrowing without weakening missing-dependency behavior."
+    },
+    {
+      "file": "plato/algorithms/lora.py",
+      "line": 44,
+      "column": 22,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Optional PEFT sentinel is guarded by _require_peft at runtime, but checker cannot narrow across method. Phase 3 owner should express callable narrowing without weakening missing-dependency behavior."
+    },
+    {
+      "file": "plato/algorithms/lora.py",
+      "line": 51,
+      "column": 9,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Optional PEFT sentinel is guarded by _require_peft at runtime, but checker cannot narrow across method. Phase 3 owner should express callable narrowing without weakening missing-dependency behavior."
+    },
+    {
+      "file": "plato/config.py",
+      "line": 321,
+      "column": 28,
+      "severity": "error",
+      "code": "invalid-type-form",
+      "detail": "Type annotations are not allowed on this attribute expression",
+      "disposition": "Invalid annotation syntax for an attribute inside method: move annotation to class or local assignment. Phase 2 Config owner."
+    },
+    {
+      "file": "plato/datasources/datalib/audio_extraction_tools.py",
+      "line": 47,
+      "column": 8,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `popen` is deprecated: Soft deprecated. Use the subprocess module instead.",
+      "disposition": "Legacy shell invocation for external extraction utility; phase 4 audit command quoting, failure handling and subprocess replacement as justified."
+    },
+    {
+      "file": "plato/datasources/datalib/audio_extraction_tools.py",
+      "line": 52,
+      "column": 12,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `popen` is deprecated: Soft deprecated. Use the subprocess module instead.",
+      "disposition": "Legacy shell invocation for external extraction utility; phase 4 audit command quoting, failure handling and subprocess replacement as justified."
+    },
+    {
+      "file": "plato/datasources/datalib/frames_extraction_tools.py",
+      "line": 116,
+      "column": 8,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `system` is deprecated: Soft deprecated. Use the subprocess module instead.",
+      "disposition": "Legacy shell invocation for external extraction utility; phase 4 audit command quoting, failure handling and subprocess replacement as justified."
+    },
+    {
+      "file": "plato/datasources/datalib/frames_extraction_tools.py",
+      "line": 149,
+      "column": 8,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `system` is deprecated: Soft deprecated. Use the subprocess module instead.",
+      "disposition": "Legacy shell invocation for external extraction utility; phase 4 audit command quoting, failure handling and subprocess replacement as justified."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 85,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 86,
+      "column": 23,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"image_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 86,
+      "column": 56,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"image_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 88,
+      "column": 13,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign to a subscript on an object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 88,
+      "column": 32,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"file_name\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 89,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 91,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 91,
+      "column": 31,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"name\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 98,
+      "column": 22,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"ref_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 99,
+      "column": 22,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"ann_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 100,
+      "column": 27,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"category_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 101,
+      "column": 24,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"image_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 111,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"sentences\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 144,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"category_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 146,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"ref_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 151,
+      "column": 69,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"split\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 155,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"split\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 158,
+      "column": 62,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"split\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 160,
+      "column": 52,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"split\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 164,
+      "column": 20,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"ref_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 173,
+      "column": 24,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 185,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"category_id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+      "line": 186,
+      "column": 24,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal[\"id\"]` on object of type `str`",
+      "disposition": "Likely dictionary type inference from dataset string entry; annotate structured data precisely. Separate known runtime reference-ID filtering bugs require behavioral tests."
+    },
+    {
+      "file": "plato/datasources/torchvision.py",
+      "line": 622,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Unresolved attribute `classes` on type `Subset[Unknown]`",
+      "disposition": "Intentional dynamic metadata on torch Subset not declared by upstream type. Express supported metadata type explicitly; preserve subset metadata behavior."
+    },
+    {
+      "file": "plato/datasources/torchvision.py",
+      "line": 626,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Unresolved attribute `targets` on type `Subset[Unknown]`",
+      "disposition": "Intentional dynamic metadata on torch Subset not declared by upstream type. Express supported metadata type explicitly; preserve subset metadata behavior."
+    },
+    {
+      "file": "plato/models/dvit/hubconf.py",
+      "line": 4,
+      "column": 18,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `timm.models.registry` has no member `_model_entrypoints`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/main.py",
+      "line": 267,
+      "column": 23,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `num_patches` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/main.py",
+      "line": 268,
+      "column": 28,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/main.py",
+      "line": 268,
+      "column": 28,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `-` is not supported between objects of type `int | Tensor | Unknown` and `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/main.py",
+      "line": 272,
+      "column": 24,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `**` is not supported between objects of type `Tensor | Module` and `float*`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/main.py",
+      "line": 343,
+      "column": 20,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `DistillationLoss.__init__` is incorrect: Expected `Module`, found `None | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/main.py",
+      "line": 373,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Iterable[Unknown]` has no attribute `set_epoch`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 32,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward_features`: Definition is incompatible with `VisionTransformer.forward_features`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 38,
+      "column": 22,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `expand` is not defined on `None` in union `Parameter | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 42,
+      "column": 13,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+` is not supported between objects of type `Tensor` and `Parameter | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 51,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `VisionTransformer.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 67,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 82,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 97,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 112,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 127,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 142,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 157,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/models.py",
+      "line": 172,
+      "column": 25,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/utils.py",
+      "line": 184,
+      "column": 5,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Object of type `def print(...) -> Unknown` is not assignable to attribute `print` of type `Overload[(*values: object, sep: str | None = \" \", end: str | None = \"\\n\", file: SupportsWrite[str] | None = None, flush: Literal[False] = False) -> None, (*values: object, sep: str | None = \" \", end: str | None = \"\\n\", file: _SupportsWriteAndFlush[str] | None = None, flush: bool) -> None]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/lib_deit/utils.py",
+      "line": 222,
+      "column": 5,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Object of type `def print(...) -> Unknown` is not assignable to attribute `print` of type `Overload[(*values: object, sep: str | None = \" \", end: str | None = \"\\n\", file: SupportsWrite[str] | None = None, flush: Literal[False] = False) -> None, (*values: object, sep: str | None = \" \", end: str | None = \"\\n\", file: _SupportsWriteAndFlush[str] | None = None, flush: bool) -> None]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/loss/cross_entropy.py",
+      "line": 19,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `mean` is not defined on `Literal[0]` in union `Literal[0] | Any`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 87,
+      "column": 38,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Literal[12]` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 89,
+      "column": 52,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `None` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 90,
+      "column": 32,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `len` is incorrect: Expected `Sized`, found `Unknown | Literal[12]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 163,
+      "column": 97,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `_conv_filter` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 176,
+      "column": 97,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `_conv_filter` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 189,
+      "column": 97,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `_conv_filter` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 201,
+      "column": 97,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `_conv_filter` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 213,
+      "column": 97,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `_conv_filter` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/models/deep_vision_transformer.py",
+      "line": 226,
+      "column": 97,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `_conv_filter` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/setup.py",
+      "line": 4,
+      "column": 20,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `open` is deprecated: Deprecated. Use `open()` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/setup.py",
+      "line": 10,
+      "column": 6,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `open` is deprecated: Deprecated. Use `open()` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/setup.py",
+      "line": 13,
+      "column": 6,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `open` is deprecated: Deprecated. Use `open()` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/setup.py",
+      "line": 16,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `__version__` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 34,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal[\"input_size\"]` on object of type `Tensor`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 34,
+      "column": 18,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 54,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal[\"input_size\"]` on object of type `Tensor`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 54,
+      "column": 18,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 80,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal[\"classifier\"]` on object of type `Tensor`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 80,
+      "column": 18,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 81,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal[\"first_conv\"]` on object of type `Tensor`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 81,
+      "column": 18,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 82,
+      "column": 17,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal[\"pool_size\"]` on object of type `Tensor`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 82,
+      "column": 17,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 83,
+      "column": 18,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal[\"input_size\"]` on object of type `Tensor`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 83,
+      "column": 18,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `Module` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 92,
+      "column": 19,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 96,
+      "column": 9,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 102,
+      "column": 9,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 110,
+      "column": 12,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+` is not supported between objects of type `Tensor | Unknown` and `Literal[\".weight\"]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 111,
+      "column": 12,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+` is not supported between objects of type `Tensor | Unknown` and `Literal[\".weight\"]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 167,
+      "column": 25,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/tests/test_models.py",
+      "line": 167,
+      "column": 25,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `channels` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 41,
+      "column": 26,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BILINEAR`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 41,
+      "column": 42,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BICUBIC`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 45,
+      "column": 44,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BILINEAR`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 60,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 65,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 71,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 77,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 82,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 87,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 117,
+      "column": 40,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `AFFINE`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 341,
+      "column": 35,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `>` is not supported between objects of type `(Unknown & ~AlwaysFalsy) | (int & ~AlwaysFalsy) | tuple[int, int, int]` and `Literal[0]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 342,
+      "column": 49,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to bound method `Random.gauss` is incorrect: Expected `float`, found `(Unknown & ~AlwaysFalsy) | (int & ~AlwaysFalsy) | tuple[int, int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/auto_augment.py",
+      "line": 605,
+      "column": 5,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `/=` is not supported between objects of type `list[float]` and `float64`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/dataset.py",
+      "line": 157,
+      "column": 15,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `read` is not defined on `None` in union `IO[bytes] | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/dataset.py",
+      "line": 157,
+      "column": 61,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `open` is incorrect: Expected `str | bytes | PathLike[str] | PathLike[bytes] | IO[bytes]`, found `IO[bytes] | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/dataset.py",
+      "line": 206,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `__getitem__`: Definition is incompatible with `Dataset.__getitem__`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/dataset.py",
+      "line": 211,
+      "column": 43,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/lmdb_dataset.py",
+      "line": 36,
+      "column": 27,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `pyarrow` has no member `deserialize`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/lmdb_dataset.py",
+      "line": 37,
+      "column": 25,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `pyarrow` has no member `deserialize`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/lmdb_dataset.py",
+      "line": 49,
+      "column": 20,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `pyarrow` has no member `deserialize`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/lmdb_dataset.py",
+      "line": 88,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `pyarrow` has no member `serialize`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/loader.py",
+      "line": 247,
+      "column": 20,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `len` is incorrect: Expected `Sized`, found `Unknown | Iterable[int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/loader.py",
+      "line": 247,
+      "column": 20,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `sampler` is not defined on `Iterable[list[Unknown]]`, `None` in union `_RepeatSampler | Iterable[list[Unknown]] | None | BatchSampler`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/mixup.py",
+      "line": 299,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `__call__`: Definition is incompatible with `Mixup.__call__`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/random_erasing.py",
+      "line": 90,
+      "column": 47,
+      "severity": "error",
+      "code": "too-many-positional-arguments",
+      "detail": "Too many positional arguments to bound method `RandomErasing._erase`: expected 6, got 7",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/tf_preprocessing.py",
+      "line": 25,
+      "column": 1,
+      "severity": "error",
+      "code": "invalid-syntax",
+      "detail": "__future__ imports must be at the top of the file",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/tf_preprocessing.py",
+      "line": 26,
+      "column": 1,
+      "severity": "error",
+      "code": "invalid-syntax",
+      "detail": "__future__ imports must be at the top of the file",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/tf_preprocessing.py",
+      "line": 27,
+      "column": 1,
+      "severity": "error",
+      "code": "invalid-syntax",
+      "detail": "__future__ imports must be at the top of the file",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/tf_preprocessing.py",
+      "line": 111,
+      "column": 17,
+      "severity": "error",
+      "code": "missing-argument",
+      "detail": "No argument provided for required parameter `resize_method` of function `_decode_and_center_crop`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 34,
+      "column": 5,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `NEAREST`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 35,
+      "column": 5,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BILINEAR`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 36,
+      "column": 5,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BICUBIC`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 37,
+      "column": 5,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `LANCZOS`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 38,
+      "column": 5,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `HAMMING`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 39,
+      "column": 5,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BOX`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 45,
+      "column": 16,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BICUBIC`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 47,
+      "column": 16,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `LANCZOS`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 49,
+      "column": 16,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `HAMMING`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 52,
+      "column": 16,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BILINEAR`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 55,
+      "column": 26,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BILINEAR`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 55,
+      "column": 42,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `PIL.Image` has no member `BICUBIC`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms.py",
+      "line": 145,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `resized_crop` is incorrect: Expected `list[int]`, found `(Unknown & tuple[Unknown, ...]) | tuple[Unknown, Unknown]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 33,
+      "column": 9,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToNumpy]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 35,
+      "column": 9,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToTensor | Normalize]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 74,
+      "column": 9,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+=` is not supported between objects of type `list[RandomResizedCropAndInterpolation]` and `list[RandomHorizontalFlip]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 76,
+      "column": 9,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+=` is not supported between objects of type `list[RandomResizedCropAndInterpolation]` and `list[RandomVerticalFlip]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 94,
+      "column": 13,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Invalid subscript assignment with key of type `Literal[\"translate_pct\"]` and value of type `float*` on object of type `dict[str, int | tuple[int, ...]]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 155,
+      "column": 9,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToNumpy]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/data/transforms_factory.py",
+      "line": 157,
+      "column": 9,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToTensor | Normalize]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/loss/asymmetric_loss.py",
+      "line": 40,
+      "column": 17,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `torch._C` has no member `set_grad_enabled`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/loss/asymmetric_loss.py",
+      "line": 47,
+      "column": 17,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Module `torch._C` has no member `set_grad_enabled`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/loss/cross_entropy.py",
+      "line": 52,
+      "column": 36,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `mean` is not defined on `Literal[0]` in union `Literal[0] | Any`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/loss/jsd.py",
+      "line": 36,
+      "column": 36,
+      "severity": "error",
+      "code": "no-matching-overload",
+      "detail": "No overload of bound method `TensorBase.mean` matches arguments",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/cspnet.py",
+      "line": 388,
+      "column": 21,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/densenet.py",
+      "line": 63,
+      "column": 29,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/densenet.py",
+      "line": 63,
+      "column": 40,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/densenet.py",
+      "line": 107,
+      "column": 24,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/densenet.py",
+      "line": 107,
+      "column": 35,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/dpn.py",
+      "line": 153,
+      "column": 23,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/dpn.py",
+      "line": 162,
+      "column": 20,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/efficientnet.py",
+      "line": 425,
+      "column": 59,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `FeatureInfo.__init__` is incorrect: Expected `tuple[int]`, found `Unknown | tuple[Literal[0], Literal[1], Literal[2], Literal[3], Literal[4]]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/efficientnet.py",
+      "line": 426,
+      "column": 68,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to constructor `enumerate.__new__` is incorrect: Expected `Iterable[Unknown]`, found `FeatureInfo`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/efficientnet_builder.py",
+      "line": 361,
+      "column": 46,
+      "severity": "error",
+      "code": "no-matching-overload",
+      "detail": "No overload of bound method `str.join` matches arguments",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/features.py",
+      "line": 115,
+      "column": 47,
+      "severity": "error",
+      "code": "invalid-type-form",
+      "detail": "Function `tensor` is not valid in a return type annotation",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/features.py",
+      "line": 231,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `FeatureDictNet.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/gluon_xception.py",
+      "line": 57,
+      "column": 19,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/gluon_xception.py",
+      "line": 83,
+      "column": 41,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/gluon_xception.py",
+      "line": 93,
+      "column": 37,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/helpers.py",
+      "line": 30,
+      "column": 12,
+      "severity": "warning",
+      "code": "redundant-condition",
+      "detail": "Nonempty string `state_dict_key` is always truthy (has type `Literal[\"state_dict\", \"state_dict_ema\"]`)",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/helpers.py",
+      "line": 268,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `None` is not assignable to annotated parameter type `dict[Unknown, Unknown]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/helpers.py",
+      "line": 269,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `None` is not assignable to annotated parameter type `dict[Unknown, Unknown]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/helpers.py",
+      "line": 271,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `None` is not assignable to annotated parameter type `(...) -> Unknown`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 568,
+      "column": 53,
+      "severity": "warning",
+      "code": "redundant-condition",
+      "detail": "`None` is always falsy",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 570,
+      "column": 26,
+      "severity": "warning",
+      "code": "redundant-condition",
+      "detail": "`None` is always falsy",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 717,
+      "column": 13,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `None` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 719,
+      "column": 17,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `None` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 749,
+      "column": 41,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `FeatureInfo.__init__` is incorrect: Expected `list[dict[Unknown, Unknown]]`, found `FeatureInfo | list[dict[str, int | str]]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 749,
+      "column": 60,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `FeatureInfo.__init__` is incorrect: Expected `tuple[int]`, found `Unknown | tuple[Literal[0], Literal[1], Literal[2], Literal[3], Literal[4]]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/hrnet.py",
+      "line": 755,
+      "column": 34,
+      "severity": "error",
+      "code": "invalid-type-form",
+      "detail": "Function `tensor` is not valid in a return type annotation",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/inception_v3.py",
+      "line": 252,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Object of type `float*` is not assignable to attribute `stddev` on type `Unknown | BasicConv2d`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/inception_v3.py",
+      "line": 254,
+      "column": 26,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Cannot assign object of type `float*` to attribute `stddev` on type `Linear`: Expected `Tensor | Module`, found `float*`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/inception_v3.py",
+      "line": 413,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/activations_me.py",
+      "line": 40,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/activations_me.py",
+      "line": 79,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/activations_me.py",
+      "line": 114,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/activations_me.py",
+      "line": 151,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/activations_me.py",
+      "line": 191,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/anti_aliasing.py",
+      "line": 56,
+      "column": 38,
+      "severity": "error",
+      "code": "no-matching-overload",
+      "detail": "No overload of bound method `TensorBase.repeat` matches arguments",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/anti_aliasing.py",
+      "line": 60,
+      "column": 16,
+      "severity": "error",
+      "code": "no-matching-overload",
+      "detail": "No overload of function `conv2d` matches arguments",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/blur_pool.py",
+      "line": 41,
+      "column": 43,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `ReflectionPad2d.__init__` is incorrect: Expected `int | tuple[int, int, int, int]`, found `list[int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/blur_pool.py",
+      "line": 49,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `_apply`: Definition is incompatible with `Module._apply`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 16,
+      "column": 21,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `pad_same` is incorrect: Expected `list[int]`, found `tuple[int, ...]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 16,
+      "column": 40,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `pad_same` is incorrect: Expected `list[int]`, found `tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 16,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `pad_same` is incorrect: Expected `list[int]`, found `tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 29,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `Conv2d.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 30,
+      "column": 55,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `conv2d_same` is incorrect: Expected `tuple[int, int]`, found `tuple[int, ...]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 30,
+      "column": 68,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `conv2d_same` is incorrect: Expected `tuple[int, int]`, found `str | tuple[int, ...]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/conv2d_same.py",
+      "line": 30,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `conv2d_same` is incorrect: Expected `tuple[int, int]`, found `tuple[int, ...]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/drop.py",
+      "line": 189,
+      "column": 29,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `drop_path` is incorrect: Expected `float`, found `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/drop.py",
+      "line": 199,
+      "column": 33,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `drop_path_mix` is incorrect: Expected `float`, found `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/evo_norm.py",
+      "line": 42,
+      "column": 13,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/evo_norm.py",
+      "line": 43,
+      "column": 64,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `*` is not supported between objects of type `Tensor | Module` and `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/evo_norm.py",
+      "line": 50,
+      "column": 24,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `+` is not supported between objects of type `Unknown | Tensor | Module` and `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/inplace_abn.py",
+      "line": 75,
+      "column": 27,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `constant_` is incorrect: Expected `Tensor`, found `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/inplace_abn.py",
+      "line": 76,
+      "column": 27,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `constant_` is incorrect: Expected `Tensor`, found `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/norm_act.py",
+      "line": 59,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `_BatchNorm.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/norm_act.py",
+      "line": 82,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `GroupNorm.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/padding.py",
+      "line": 28,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `tuple[Literal[1], Literal[1]]` is not assignable to annotated parameter type `list[int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/padding.py",
+      "line": 56,
+      "column": 12,
+      "severity": "error",
+      "code": "invalid-return-type",
+      "detail": "Return type does not match returned value: expected `tuple[tuple[Unknown, ...], bool]`, found `tuple[(Unknown & ~str) | int, bool]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 14,
+      "column": 67,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `tuple[Literal[0], Literal[0]]` is not assignable to annotated parameter type `list[int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 29,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `AvgPool2d.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 31,
+      "column": 16,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `avg_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 31,
+      "column": 34,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `avg_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 31,
+      "column": 47,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `avg_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 35,
+      "column": 55,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `tuple[Literal[0], Literal[0]]` is not assignable to annotated parameter type `list[int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 36,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `tuple[Literal[1], Literal[1]]` is not assignable to annotated parameter type `list[int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 50,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `MaxPool2d.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 51,
+      "column": 35,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 51,
+      "column": 53,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 51,
+      "column": 66,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/pool2d_same.py",
+      "line": 51,
+      "column": 80,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/test_time_pool.py",
+      "line": 28,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `data` is not defined on `None` in union `Tensor | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/layers/test_time_pool.py",
+      "line": 28,
+      "column": 60,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `size` is not defined on `None` in union `Tensor | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/mobilenetv3.py",
+      "line": 92,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument expression after ** must be a mapping type: Found `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/mobilenetv3.py",
+      "line": 173,
+      "column": 59,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `FeatureInfo.__init__` is incorrect: Expected `tuple[int]`, found `Unknown | tuple[Literal[0], Literal[1], Literal[2], Literal[3], Literal[4]]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/mobilenetv3.py",
+      "line": 174,
+      "column": 68,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to constructor `enumerate.__new__` is incorrect: Expected `Iterable[Unknown]`, found `FeatureInfo`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 119,
+      "column": 30,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 120,
+      "column": 31,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 123,
+      "column": 30,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 124,
+      "column": 31,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 127,
+      "column": 30,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 128,
+      "column": 31,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 131,
+      "column": 30,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 132,
+      "column": 31,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 135,
+      "column": 30,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/pnasnet.py",
+      "line": 137,
+      "column": 35,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/regnet.py",
+      "line": 277,
+      "column": 21,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/res2net.py",
+      "line": 66,
+      "column": 20,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/res2net.py",
+      "line": 74,
+      "column": 24,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/res2net.py",
+      "line": 84,
+      "column": 20,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/resnest.py",
+      "line": 124,
+      "column": 19,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `None` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/resnet.py",
+      "line": 595,
+      "column": 21,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/resnet.py",
+      "line": 610,
+      "column": 13,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/resnet.py",
+      "line": 611,
+      "column": 13,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/resnet.py",
+      "line": 612,
+      "column": 13,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/resnet.py",
+      "line": 613,
+      "column": 13,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/rexnet.py",
+      "line": 160,
+      "column": 22,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/rexnet.py",
+      "line": 212,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Invalid subscript assignment with key of type `Literal[\"feature_cls\"]` and value of type `Literal[\"hook\"]` on object of type `dict[str, bool]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/selecsls.py",
+      "line": 71,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `Sequential.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 97,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 98,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 99,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 101,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 102,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 103,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 105,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 106,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 109,
+      "column": 24,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 111,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/senet.py",
+      "line": 112,
+      "column": 15,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `Tensor` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/vision_transformer.py",
+      "line": 117,
+      "column": 24,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `WSLinear_fast` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/vision_transformer.py",
+      "line": 118,
+      "column": 24,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `WSLinear_fast` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/vovnet.py",
+      "line": 169,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-method-override",
+      "detail": "Invalid override of method `forward`: Definition is incompatible with `Sequential.forward`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/models/xception.py",
+      "line": 215,
+      "column": 13,
+      "severity": "error",
+      "code": "call-non-callable",
+      "detail": "Object of type `str` is not callable",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 67,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 67,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 67,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 67,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 70,
+      "column": 83,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 70,
+      "column": 83,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 70,
+      "column": 83,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 70,
+      "column": 83,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 72,
+      "column": 44,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adam.__init__` is incorrect: Expected `tuple[float | Tensor, float | Tensor]`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `AdamW.__init__` is incorrect: Expected `tuple[float | Tensor, float | Tensor]`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 84,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adadelta.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 84,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adadelta.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 84,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adadelta.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 84,
+      "column": 48,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Adadelta.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 92,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `RMSprop.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 92,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 92,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 92,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/optim_factory.py",
+      "line": 92,
+      "column": 82,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/radam.py",
+      "line": 77,
+      "column": 20,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `>=` is not supported between objects of type `None | Unknown` and `Literal[5]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/radam.py",
+      "line": 79,
+      "column": 42,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Unary operator `-` is not supported for object of type `None | Unknown`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/optim/radam.py",
+      "line": 81,
+      "column": 38,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Unary operator `-` is not supported for object of type `None | Unknown`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/scheduler/plateau_lr.py",
+      "line": 39,
+      "column": 13,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `verbose` does not match any known parameter of `ReduceLROnPlateau.__init__`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/scheduler/plateau_lr.py",
+      "line": 83,
+      "column": 36,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to bound method `ReduceLROnPlateau.step` is incorrect: Expected `SupportsFloat`, found `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/scheduler/scheduler.py",
+      "line": 67,
+      "column": 32,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `None` is not assignable to annotated parameter type `float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/scheduler/scheduler.py",
+      "line": 74,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-parameter-default",
+      "detail": "Default value of type `None` is not assignable to annotated parameter type `float`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/utils/checkpoint_saver.py",
+      "line": 73,
+      "column": 55,
+      "severity": "error",
+      "code": "not-subscriptable",
+      "detail": "Cannot subscript object of type `None` with no `__getitem__` method",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/utils/cuda.py",
+      "line": 19,
+      "column": 14,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `scale_loss` is not defined on `None` in union `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/utils/cuda.py",
+      "line": 22,
+      "column": 44,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `master_params` is not defined on `None` in union `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/utils/cuda.py",
+      "line": 27,
+      "column": 20,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `state_dict` is not defined on `None` in union `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/utils/cuda.py",
+      "line": 31,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `load_state_dict` is not defined on `None` in union `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/timm/utils/cuda.py",
+      "line": 38,
+      "column": 24,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `__init__` is deprecated: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 377,
+      "column": 39,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The class `autocast` is deprecated: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 470,
+      "column": 25,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `AugMixDataset` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 502,
+      "column": 9,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `repeated_aug` does not match any known parameter of function `create_loader`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 503,
+      "column": 9,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `world_size` does not match any known parameter of function `create_loader`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 504,
+      "column": 9,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `rank` does not match any known parameter of function `create_loader`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 548,
+      "column": 9,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `repeated_aug` does not match any known parameter of function `create_loader`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 549,
+      "column": 9,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `world_size` does not match any known parameter of function `create_loader`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/train.py",
+      "line": 550,
+      "column": 9,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `rank` does not match any known parameter of function `create_loader`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/grid.py",
+      "line": 54,
+      "column": 32,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `fromarray` is incorrect: Expected `SupportsArrayInterface`, found `unsignedinteger[_8Bit]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 54,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 55,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 57,
+      "column": 9,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 58,
+      "column": 9,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `flush` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 64,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 65,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 67,
+      "column": 9,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/logger.py",
+      "line": 68,
+      "column": 9,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `flush` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/ltutil.py",
+      "line": 21,
+      "column": 30,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `isinstance` is incorrect: Expected `_ClassInfo`, found `tuple[<class 'list'>, Overload[[ArrayT](object: ArrayT, dtype: None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = \"K\", subok: Literal[True], ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> ArrayT, [ArrayT](object: _SupportsArray[ArrayT], dtype: None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = \"K\", subok: Literal[True], ndmin: Literal[0] = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> ArrayT, [ScalarT](object: _ArrayLike[ScalarT], dtype: None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = \"K\", subok: bool = False, ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> NDArray[ScalarT], [ScalarT](object: Any, dtype: _DTypeLike[ScalarT], *, copy: bool | _CopyMode | None = True, order: _OrderKACF = \"K\", subok: bool = False, ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> NDArray[ScalarT], (object: Any, dtype: DTypeLike | None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = \"K\", subok: bool = False, ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> NDArray[Any]]]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/ltutil.py",
+      "line": 33,
+      "column": 45,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `linear` is incorrect: Expected `Tensor | None`, found `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 31,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@__init__` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 33,
+      "column": 49,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@__init__` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 34,
+      "column": 46,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@__init__` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 35,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@__init__` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 38,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@write` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 41,
+      "column": 39,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@write` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 43,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@write` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 46,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@finish` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 47,
+      "column": 45,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@finish` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 58,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@__init__` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 59,
+      "column": 45,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@__init__` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 62,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@clearln` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 63,
+      "column": 44,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@clearln` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 66,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@writeln` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 68,
+      "column": 38,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@writeln` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 69,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@writeln` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 72,
+      "column": 12,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@finish` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 73,
+      "column": 24,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@finish` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 75,
+      "column": 49,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@finish` has no attribute `file`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/progress/progress/helpers.py",
+      "line": 90,
+      "column": 9,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Object of type `Self@_sigint_handler` has no attribute `finish`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/visualize.py",
+      "line": 24,
+      "column": 31,
+      "severity": "error",
+      "code": "unknown-argument",
+      "detail": "Argument `out` does not match any known parameter of function `unsqueeze`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/visualize.py",
+      "line": 61,
+      "column": 13,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `upsampling` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/utils/visualize.py",
+      "line": 92,
+      "column": 17,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `upsampling` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/dvit/validate.py",
+      "line": 121,
+      "column": 39,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The class `autocast` is deprecated: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/huggingface.py",
+      "line": 17,
+      "column": 24,
+      "severity": "warning",
+      "code": "unused-type-ignore-comment",
+      "detail": "Unused blanket `type: ignore` directive",
+      "disposition": "Typing hygiene: unused ignore or redundant cast, low impact; remove during owned component cleanup without dedicated mirror tests."
+    },
+    {
+      "file": "plato/models/huggingface.py",
+      "line": 18,
+      "column": 28,
+      "severity": "warning",
+      "code": "unused-type-ignore-comment",
+      "detail": "Unused blanket `type: ignore` directive",
+      "disposition": "Typing hygiene: unused ignore or redundant cast, low impact; remove during owned component cleanup without dedicated mirror tests."
+    },
+    {
+      "file": "plato/models/t2tvit/main.py",
+      "line": 372,
+      "column": 39,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The class `autocast` is deprecated: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/main.py",
+      "line": 464,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to function `create_loader` is incorrect: Expected `ImageDataset | IterableImageDataset`, found `Unknown | AugMixDataset`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/models/token_transformer.py",
+      "line": 21,
+      "column": 35,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `*` is not supported between objects of type `Unknown | None` and `Literal[3]`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/models/token_transformer.py",
+      "line": 23,
+      "column": 31,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Linear.__init__` is incorrect: Expected `int`, found `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/models/token_transformer.py",
+      "line": 23,
+      "column": 39,
+      "severity": "error",
+      "code": "invalid-argument-type",
+      "detail": "Argument to `Linear.__init__` is incorrect: Expected `int`, found `Unknown | None`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/transfer_learning.py",
+      "line": 155,
+      "column": 30,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `parameters` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/transfer_learning.py",
+      "line": 155,
+      "column": 30,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `tokens_to_token` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/transfer_learning.py",
+      "line": 156,
+      "column": 30,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `blocks` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/transfer_learning.py",
+      "line": 156,
+      "column": 30,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `parameters` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/transfer_learning.py",
+      "line": 157,
+      "column": 29,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `head` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/transfer_learning.py",
+      "line": 157,
+      "column": 29,
+      "severity": "error",
+      "code": "unresolved-attribute",
+      "detail": "Attribute `parameters` is not defined on `Tensor` in union `Tensor | Module`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 36,
+      "column": 18,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `math` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 37,
+      "column": 18,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `math` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 40,
+      "column": 19,
+      "severity": "error",
+      "code": "unresolved-reference",
+      "detail": "Name `F` used when not defined",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 52,
+      "column": 12,
+      "severity": "warning",
+      "code": "redundant-condition",
+      "detail": "Nonempty string `state_dict_key` is always truthy (has type `Literal[\"state_dict\", \"state_dict_ema\"]`)",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 117,
+      "column": 20,
+      "severity": "warning",
+      "code": "deprecated",
+      "detail": "The function `popen` is deprecated: Soft deprecated. Use the subprocess module instead.",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 152,
+      "column": 20,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `-` is not supported between objects of type `str | int` and `int`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/models/t2tvit/utils.py",
+      "line": 156,
+      "column": 20,
+      "severity": "error",
+      "code": "unsupported-operator",
+      "detail": "Operator `-` is not supported between objects of type `str | int` and `int`",
+      "disposition": "Pinned third-party submodule: separate upstream compatibility inventory, no blanket suppressions or pointer upgrade."
+    },
+    {
+      "file": "plato/trainers/diff_privacy.py",
+      "line": 238,
+      "column": 9,
+      "severity": "error",
+      "code": "invalid-assignment",
+      "detail": "Object of type `AbstractGradSampleModule | GradSampleHooks` is not assignable to attribute `model` of type `Module | None`",
+      "disposition": "Opacus current return union includes GradSampleHooks; assess actual make_private wrapping modes with a real DP optimizer test before narrowing."
+    },
+    {
+      "file": "plato/trainers/huggingface.py",
+      "line": 557,
+      "column": 21,
+      "severity": "warning",
+      "code": "redundant-cast",
+      "detail": "Value is already of type `Any`",
+      "disposition": "Typing hygiene: unused ignore or redundant cast, low impact; remove during owned component cleanup without dedicated mirror tests."
+    }
+  ]
+}

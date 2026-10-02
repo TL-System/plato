@@ -1,0 +1,31 @@
+{
+  "reviewer": "plato-plan-review",
+  "model": "gpt-6.1-sol",
+  "reasoning_effort": "xhigh",
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "reviewed_plan_sha256": "c4c7f6a63eee9295c6e5ef3c71feb14086cf531118afe855969282ca4827a6c2",
+  "result": "changes_requested",
+  "findings": [
+    {
+      "priority": "high",
+      "topic": "Explicit acceptance for confirmed defects"
+    },
+    {
+      "priority": "high",
+      "topic": "Concrete trust, identity, payload and archive security criteria"
+    },
+    {
+      "priority": "high",
+      "topic": "Real socket exchange, parameter changes and aggregation smoke criteria"
+    },
+    {
+      "priority": "medium",
+      "topic": "Supported examples require executed validation and closure of internal defects"
+    },
+    {
+      "priority": "medium",
+      "topic": "Superseded GitHub publication blocker"
+    }
+  ],
+  "root_disposition": "All accepted; planner assigned revisions; fresh reviewer required."
+}

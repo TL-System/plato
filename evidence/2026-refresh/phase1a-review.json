@@ -1,0 +1,757 @@
+{
+  "schema_version": 1,
+  "phase": "1A",
+  "review_date": "2026-10-02",
+  "reviewed_at_utc": "2026-10-02T17:59:08.532202+00:00",
+  "reviewer": {
+    "role": "Independent exact-commit review",
+    "requested_model": "gpt-6.1-sol",
+    "requested_reasoning_effort": "xhigh",
+    "nested_agents": 0
+  },
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "reviewed_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+  "reviewed_tree": "862fed283336f488cb284dc2b0f47bd987946095",
+  "reviewed_diff": {
+    "command": "git diff --binary 5b8359bd40bbe65c7753e71f6627c490f9aa144f 7304703905189baf771032f1cd923a37f66ed97f",
+    "sha256": "54437cb6f9d753b5c728f061edbc99611aeca177b994c9d345150aa4ba38e8cf",
+    "changed_files": 20
+  },
+  "input_sha256": {
+    "AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+    "pyproject.toml": "fecc507660f280019ccc6869bde5bd886f26685cfa2361fdab7f4ee60d7f4dfa",
+    "uv.lock": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6",
+    "evidence/2026-refresh/dependency-decisions.json": "51a14c80686f36425eb4db85b5673fc2c29fdb6bc7fb62ab1344f2b923951791",
+    "evidence/2026-refresh/setup-validation.json": "6a3584cc5659a042e63ae14d11d36b9f105a5d94c6da4cbf6669bde8ebd19dca"
+  },
+  "plan": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+    "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "scope": "Phase 1A reproducible installation and dependency decisions.",
+    "authorization_precedence": "Apply latest user authorization: retain Python 3.13, allow necessary dependency optimizations and later archival, use the selected NLTK 3.10.3 uv override and explicit SSL/llm_eval exclusion, and suppress no advisories. Earlier pending-policy and default-promotion wording does not override that direction."
+  },
+  "decision": "pass",
+  "changes_requested": false,
+  "summary": "No critical, high or medium defect attributable to this manifest candidate was found. Accept Phase 1A for its recorded locked installation profiles and tested Apple Silicon environments. This does not establish complete research-example behavior, Python 3.14 runtime support, uniform artifacts across submodule states, or the selected evaluation stack through an ordinary outside-workspace package install.",
+  "findings_order": "Critical, high, medium, low.",
+  "findings": [],
+  "finding_counts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "assessments": {
+    "setup": {
+      "result": "pass",
+      "detail": "The detector setup failure is reproduced in the retained evidence: package-targeted sync omits Plato, and syncing detector after root installation removes Plato and 77 other packages. All 15 examples now require local plato-learn through workspace sources. The recorded isolated sync/import checks cover both interpreters; detector fit/predict exercises the repaired setup. Twelve missing README declarations and the nonexistent tools workspace entry are removed without placeholder packages or documentation churn.",
+      "locations": [
+        {
+          "path": "pyproject.toml",
+          "start_line": 95,
+          "end_line": 112
+        },
+        {
+          "path": "examples/detector/pyproject.toml",
+          "start_line": 7,
+          "end_line": 13
+        }
+      ],
+      "evidence_command_ids": [
+        "red-detector-sync",
+        "red-detector-import",
+        "red-detector-cwd-sync",
+        "red-detector-cwd-import",
+        "red-root-sync",
+        "red-detector-removal-dry-run",
+        "red-detector-removal-sync",
+        "red-detector-after-removal-import",
+        "green-detector-sync-313",
+        "green-detector-import-313",
+        "green-detector-cwd-sync-314",
+        "green-detector-cwd-import-314",
+        "green-example-retains-plato-dry-run"
+      ]
+    },
+    "workspace_relationships": {
+      "result": "pass",
+      "count": 15,
+      "members": [
+        {
+          "path": "examples/unlearning/fedunlearning/pyproject.toml",
+          "name": "fedunlearning",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/unlearning/knot/pyproject.toml",
+          "name": "Knot",
+          "python": ">=3.13,<3.15",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/client_selection/pisces/pyproject.toml",
+          "name": "pisces",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/client_selection/polaris/pyproject.toml",
+          "name": "polaris",
+          "python": ">=3.13,<3.15",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/split_learning/llm_split_learning/pyproject.toml",
+          "name": "llm-split-learning",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/ssl/calibre/pyproject.toml",
+          "name": "calibre",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            },
+            {
+              "name": "plato-learn",
+              "extra": [
+                "ssl"
+              ],
+              "marker": "extra == 'extra-11-plato-learn-ssl'"
+            }
+          ]
+        },
+        {
+          "path": "examples/ssl/smog/pyproject.toml",
+          "name": "smog",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            },
+            {
+              "name": "plato-learn",
+              "extra": [
+                "ssl"
+              ],
+              "marker": "extra == 'extra-11-plato-learn-ssl'"
+            }
+          ]
+        },
+        {
+          "path": "examples/model_search/anycostfl/pyproject.toml",
+          "name": "AnyCostFL",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/model_search/fedrolex/pyproject.toml",
+          "name": "fedrolex",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/VIT/pyproject.toml",
+          "name": "vit",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/model_search/pfedrlnas/MobileNetV3/pyproject.toml",
+          "name": "mobilenetv3",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/model_search/heterofl/pyproject.toml",
+          "name": "heterofl",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/detector/pyproject.toml",
+          "name": "detector",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/gradient_leakage_attacks/pyproject.toml",
+          "name": "gradient-leakage-attacks",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn"
+            }
+          ]
+        },
+        {
+          "path": "examples/nanochat/pyproject.toml",
+          "name": "plato-nanochat-examples",
+          "python": ">=3.13",
+          "lock_edges": [
+            {
+              "name": "plato-learn",
+              "extra": [
+                "nanochat"
+              ]
+            }
+          ]
+        }
+      ],
+      "detail": "Each declared member exists, uses its own workspace source, has a locked local Plato relationship, and has no unresolved README declaration. Calibre and SMoG request ssl; Nanochat requests nanochat. Conditional duplicate SSL edges are resolver branches, not duplicate manifest requirements. Retained evidence has isolated sync/import checks for every member on 3.13 and 3.14; final affected LLM split checks use NLTK 3.10.3. This is dependency setup acceptance, not full execution of every research algorithm."
+    },
+    "ranges_and_lock": {
+      "result": "pass",
+      "lock_sha256": "a7d30a4f7f2f824d656cf934b148d315fc1380817d3dd93e5070057b6cee58f6",
+      "package_count": 278,
+      "root_requires_python": ">=3.13",
+      "workspace_lock_requires_python": ">=3.13, <3.15",
+      "python_version_file": "3.13; unchanged from baseline",
+      "unrecorded_declared_requirements": [],
+      "direct_range_lock_mismatches": [],
+      "decision_inventory_count": 88,
+      "detail": "Every declared package/build/group requirement has a dated decision; all direct locked versions satisfy candidate ranges. The lock's narrower Python intersection follows MOSEK's constraint in Polaris and Knot and does not silently lower the root's Python minimum. Keeping Boto3/botocore 1.43.106 follows the demonstrated aiobotocore ceiling. Tested lower bounds and the universal lock are distinct from qualification of future range-permitted releases.",
+      "locations": [
+        {
+          "path": "pyproject.toml",
+          "start_line": 1,
+          "end_line": 69
+        },
+        {
+          "path": "pyproject.toml",
+          "start_line": 114,
+          "end_line": 148
+        },
+        {
+          "path": "examples/client_selection/polaris/pyproject.toml",
+          "start_line": 5,
+          "end_line": 9
+        },
+        {
+          "path": "examples/unlearning/knot/pyproject.toml",
+          "start_line": 5,
+          "end_line": 9
+        }
+      ]
+    },
+    "supported_profiles": {
+      "result": "pass within recorded limits",
+      "profiles": [
+        {
+          "name": "base",
+          "command": "uv sync --locked --no-default-groups"
+        },
+        {
+          "name": "test",
+          "command": "uv sync --locked --no-default-groups --group test"
+        },
+        {
+          "name": "dev",
+          "command": "uv sync --locked"
+        },
+        {
+          "name": "ssl",
+          "command": "uv sync --locked --no-default-groups --extra ssl"
+        },
+        {
+          "name": "mlx",
+          "command": "uv sync --locked --no-default-groups --extra mlx"
+        },
+        {
+          "name": "build",
+          "command": "uv export --locked --only-group build --no-hashes --no-emit-project --output-file /tmp/plato-build-constraints.txt && uv build --no-sources --build-constraint /tmp/plato-build-constraints.txt"
+        },
+        {
+          "name": "docs",
+          "command": "uv sync --locked --no-default-groups --group docs"
+        },
+        {
+          "name": "audit",
+          "command": "uv sync --locked --no-default-groups --group audit"
+        },
+        {
+          "name": "llm_eval",
+          "command": "uv sync --locked --no-default-groups --extra llm_eval"
+        },
+        {
+          "name": "robotics",
+          "command": null
+        }
+      ],
+      "detail": "Base is distinct from mandatory test/dev. Test/dev install Opacus with DP/MPC/RL/Nanochat prerequisites. Build tools are exported from the lock into isolated backend constraints. SSL uses stable Hydra/OmegaConf and is incompatible with evaluation; independent dry runs reject both explicit SSL+llm_eval and all-packages+llm_eval through the examples' transitive SSL extra. MLX evidence is native Apple Silicon arithmetic. Robotics is a separate deferred stack, not an accepted current-core profile.",
+      "scope_limits": "Executed installations cover Python 3.13.16 and 3.14.8 on Apple Silicon macOS. Universal resolution alone does not qualify Linux, Windows, other architectures, or every patch release."
+    },
+    "nltk_exception": {
+      "result": "Accepted explicitly authorized upstream metadata exception, limited to uv workspace resolution.",
+      "locations": [
+        {
+          "path": "pyproject.toml",
+          "start_line": 66,
+          "end_line": 69
+        },
+        {
+          "path": "pyproject.toml",
+          "start_line": 116,
+          "end_line": 121
+        },
+        {
+          "path": "evidence/2026-refresh/setup-validation.json",
+          "start_line": 21846,
+          "end_line": 21853
+        }
+      ],
+      "selected_version": "3.10.3",
+      "upstream_requirement": "Lighteval 0.13.0 requires nltk==3.9.1.",
+      "workspace_behavior": "Final evaluation installs select 3.10.3; their expected uv pip check failure remains visible. Neither installed metadata nor the advisory audit is altered. Split-learning also declares nltk>=3.10.3.",
+      "tested_behavior": "Final-lock evidence on both interpreters executes actual BLEU/ROUGE with private tokenizer resources, verifies real wrapper constructor keywords, formats the PIQA task, and passes 13 affected evaluation/DP tests per interpreter. Blocking the six advisory-affected persistence APIs still permits the tested text metrics. This proves only those paths.",
+      "outside_workspace_behavior": "Independently resolved the candidate wheel's llm_eval extra in a fresh scratch Python 3.13 environment using uv pip install --dry-run outside the workspace. It selects NLTK 3.9.1. Requesting nltk==3.10.3 alongside that artifact without an override is unsatisfiable. The source archive contains tool.uv settings, but ordinary wheel/sdist dependency installation does not apply them. The implementation evidence explicitly documents this limitation at setup-validation.json:21852; ordinary artifact evaluation installs are not covered by the accepted 3.10.3 profile.",
+      "remaining_advisory": {
+        "id": "PYSEC-2026-3740",
+        "aliases": [
+          "CVE-2026-81726",
+          "GHSA-8mgp-746c-j5xp"
+        ],
+        "upstream_severity": "high",
+        "published_fix": null,
+        "source": "https://github.com/nltk/nltk/security/advisories/GHSA-8mgp-746c-j5xp",
+        "scope": "Caller-controlled NLTK model import/export paths under pathsec enforcement; custom tasks and arbitrary transitive execution remain unqualified."
+      },
+      "disposition": "No blocker from the explicitly selected override or its disclosed installer boundary. Do not call evaluation audits clear, claim all tasks are safe, or present an ordinary artifact install as the tested 3.10.3 stack."
+    },
+    "artifact_behavior": {
+      "result": "pass for core installation and disclosed optional behavior",
+      "retained_artifacts": "All eight retained wheel/sdist files match their recorded SHA256. Authorized sdist pyproject.toml matches the exact candidate. Retained final wheel and sdist installations on both interpreters import from site-packages outside the checkout and execute the core numerical probes.",
+      "optional_absence": "Independently reran the core-only installed wheel's optional-absence probe: Nanochat adapter import succeeds, optional modules are absent, and requesting Nanochat raises ThirdPartyImportError. Independently invoked DeepViT and T2TVIT wrappers and observed their explicit optional-dependency ImportErrors. The missing-source Nanochat limitation is honestly retained; no optional model support is inferred from a core artifact smoke.",
+      "initialized_submodule_probe": "Built the exact candidate in task-owned scratch after copying the root's pinned DViT/T2T/Nanochat sources and existing bytecode. All three root SHAs match the candidate gitlinks. Both wheel and sdist exclude all .pyc, __pycache__, and nested Git paths, including 131 tracked legacy DViT bytecode files and 14 local Nanochat bytecode files. DViT/T2T sources and licenses enter both artifacts; Nanochat sources and license enter only the sdist. Artifact contents and size therefore depend on initialization, but no vendored-bytecode defect was reproduced.",
+      "inclusion": [
+        {
+          "variant": "absent-submodules",
+          "file": "/tmp/plato-phase1a-dependencies/authorized-dist/plato_learn-1.4.3-py3-none-any.whl",
+          "sha256": "23bc2df850f36ce107ba4177f5d82157768850674f3961cb7f6867897ca24108",
+          "bytes": 397053,
+          "file_count": 230,
+          "submodule_files": {
+            "plato/models/dvit/": 0,
+            "plato/models/t2tvit/": 0,
+            "external/nanochat/": 0
+          },
+          "bytecode_count": 0,
+          "bytecode_examples": [],
+          "nested_git_paths": [],
+          "licenses": []
+        },
+        {
+          "variant": "absent-submodules",
+          "file": "/tmp/plato-phase1a-dependencies/authorized-dist/plato_learn-1.4.3.tar.gz",
+          "sha256": "62f318a3a2bcdc9a670359b4d0dfd3a0a27eb3c2eb38c5746354106328680413",
+          "bytes": 1105637,
+          "file_count": 887,
+          "submodule_files": {
+            "plato/models/dvit/": 0,
+            "plato/models/t2tvit/": 0,
+            "external/nanochat/": 0
+          },
+          "bytecode_count": 0,
+          "bytecode_examples": [],
+          "nested_git_paths": [],
+          "licenses": []
+        },
+        {
+          "variant": "initialized-submodules",
+          "file": "/tmp/plato-phase1a-review-730470390518/initialized-dist/plato_learn-1.4.3-py3-none-any.whl",
+          "sha256": "093d3741ba7a3aff65e194f9883d4d6c1ecff08277342c07c5634ed982dd6e48",
+          "bytes": 8692243,
+          "file_count": 443,
+          "submodule_files": {
+            "plato/models/dvit/": 191,
+            "plato/models/t2tvit/": 22,
+            "external/nanochat/": 0
+          },
+          "bytecode_count": 0,
+          "bytecode_examples": [],
+          "nested_git_paths": [],
+          "licenses": [
+            "plato/models/dvit/LICENSE",
+            "plato/models/dvit/lib_deit/LICENSE",
+            "plato/models/dvit/utils/progress/LICENSE",
+            "plato/models/t2tvit/LICENSE"
+          ]
+        },
+        {
+          "variant": "initialized-submodules",
+          "file": "/tmp/plato-phase1a-review-730470390518/initialized-dist/plato_learn-1.4.3.tar.gz",
+          "sha256": "22f9fd63fce495ae4c39c0d3486b4d59a3d4f5f602cb32c65cd47d5639d2b327",
+          "bytes": 9575607,
+          "file_count": 1154,
+          "submodule_files": {
+            "plato/models/dvit/": 191,
+            "plato/models/t2tvit/": 22,
+            "external/nanochat/": 54
+          },
+          "bytecode_count": 0,
+          "bytecode_examples": [],
+          "nested_git_paths": [],
+          "licenses": [
+            "plato_learn-1.4.3/external/nanochat/LICENSE",
+            "plato_learn-1.4.3/plato/models/dvit/LICENSE",
+            "plato_learn-1.4.3/plato/models/dvit/lib_deit/LICENSE",
+            "plato_learn-1.4.3/plato/models/dvit/utils/progress/LICENSE",
+            "plato_learn-1.4.3/plato/models/t2tvit/LICENSE"
+          ]
+        }
+      ],
+      "attribution": "The wheel selection packages=[plato] and root __pycache__ exclusion are unchanged from baseline. Nanochat's external-source location and wheel omission are existing integration behavior. No submodule version changes, broader model restoration, or runtime rewrites are needed for this manifest review.",
+      "locations": [
+        {
+          "path": "pyproject.toml",
+          "start_line": 92,
+          "end_line": 93
+        },
+        {
+          "path": ".gitignore",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "path": "plato/utils/third_party.py",
+          "start_line": 17,
+          "end_line": 25
+        },
+        {
+          "path": "evidence/2026-refresh/setup-validation.json",
+          "start_line": 19785,
+          "end_line": 19794
+        }
+      ]
+    },
+    "acceptance_evidence": {
+      "result": "sufficient for Phase 1A within disclosed limits",
+      "retained_command_count": 223,
+      "integrity": "All full retained command outputs and probe sources match their recorded hashes; every final-lock command reference exists. Candidate blobs and both final manifest/lock identities match the checked tree. Earlier unsuccessful experiments are labeled and are not counted as final acceptance.",
+      "complete_suites": {
+        "python_versions": [
+          "3.13.16",
+          "3.14.8"
+        ],
+        "passed_each": 248,
+        "skipped_each": 3,
+        "warnings_each": 8,
+        "source": "setup-validation.json pytest-313 / pytest-314",
+        "reuse": "Accepted without rerunning: retained proof shows all 108 mandatory-test distribution versions unchanged after final locked sync; runtime and test source are unchanged. Final native prerequisites and affected evaluation/DP checks were rerun by the implementer.",
+        "limits": "Three missing Nanochat/Rust prerequisite skips and eight existing multiprocessing fork warnings remain visible. Failed source-overlay experiments are explicitly unqualified; they are not substituted for initialized native integration."
+      },
+      "installed_audits": [
+        {
+          "profile": "audit-core-313",
+          "distributions": 80,
+          "advisories": 0,
+          "affected": []
+        },
+        {
+          "profile": "audit-core-314",
+          "distributions": 80,
+          "advisories": 0,
+          "affected": []
+        },
+        {
+          "profile": "audit-final-eval-313",
+          "distributions": 184,
+          "advisories": 1,
+          "affected": [
+            {
+              "name": "nltk",
+              "version": "3.10.3",
+              "advisory_ids": [
+                "PYSEC-2026-3740"
+              ]
+            }
+          ]
+        },
+        {
+          "profile": "audit-final-eval-314",
+          "distributions": 183,
+          "advisories": 1,
+          "affected": [
+            {
+              "name": "nltk",
+              "version": "3.10.3",
+              "advisory_ids": [
+                "PYSEC-2026-3740"
+              ]
+            }
+          ]
+        },
+        {
+          "profile": "audit-final-workspace-313",
+          "distributions": 174,
+          "advisories": 1,
+          "affected": [
+            {
+              "name": "nltk",
+              "version": "3.10.3",
+              "advisory_ids": [
+                "PYSEC-2026-3740"
+              ]
+            }
+          ]
+        },
+        {
+          "profile": "audit-final-workspace-314",
+          "distributions": 174,
+          "advisories": 1,
+          "affected": [
+            {
+              "name": "nltk",
+              "version": "3.10.3",
+              "advisory_ids": [
+                "PYSEC-2026-3740"
+              ]
+            }
+          ]
+        },
+        {
+          "profile": "audit-ssl-313",
+          "distributions": 98,
+          "advisories": 0,
+          "affected": []
+        },
+        {
+          "profile": "audit-ssl-314",
+          "distributions": 98,
+          "advisories": 0,
+          "affected": []
+        },
+        {
+          "profile": "audit-test-313",
+          "distributions": 108,
+          "advisories": 0,
+          "affected": []
+        },
+        {
+          "profile": "audit-test-314",
+          "distributions": 108,
+          "advisories": 0,
+          "affected": []
+        }
+      ],
+      "historical_audits": "Earlier NLTK 3.9.1 scans contain 72 advisory records and are retained as historical data, not current 3.10.3 results. The older root evaluation experiment audited 145 distributions before further core installation and is not used to certify the expanded final environment.",
+      "independent_work": "Focused lock, graph, decision, hash, artifact metadata/resolution, profile exclusion and initialized-submodule checks. No repeat of dozens of successful installations or unchanged complete suites."
+    }
+  },
+  "independent_checks": [
+    {
+      "id": "lock-check-313",
+      "command": "uv lock --check --python 3.13",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "Using CPython 3.13.16\nResolved 278 packages in 10ms\n"
+    },
+    {
+      "id": "lock-check-314",
+      "command": "uv lock --check --python 3.14",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "Using CPython 3.14.8 interpreter at: /opt/homebrew/opt/python@3.14/bin/python3.14\nResolved 278 packages in 4ms\n"
+    },
+    {
+      "id": "diff-check",
+      "command": "git diff --check 5b8359bd40bbe65c7753e71f6627c490f9aa144f 7304703905189baf771032f1cd923a37f66ed97f",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": ""
+    },
+    {
+      "id": "base-locked-dry-run",
+      "command": "uv sync --locked --dry-run --no-default-groups",
+      "cwd": "/tmp/plato-phase1a-review-730470390518/initialized-source",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "Resolved 278 packages in 4ms\n + plato-learn @ file:///private/tmp/plato-phase1a-review-730470390518/initialized-source"
+    },
+    {
+      "id": "dev-locked-dry-run",
+      "command": "uv sync --locked --dry-run",
+      "cwd": "/tmp/plato-phase1a-review-730470390518/initialized-source",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "Resolved 278 packages in 4ms\n + opacus==1.6.0\n + plato-learn @ file:///private/tmp/plato-phase1a-review-730470390518/initialized-source"
+    },
+    {
+      "id": "ssl-llm-eval-rejection",
+      "command": "uv sync --locked --dry-run --no-default-groups --extra ssl --extra llm_eval",
+      "cwd": "/tmp/plato-phase1a-review-730470390518/initialized-source",
+      "exit_code": 2,
+      "result": "Expected rejection.",
+      "observed_output": "Using CPython 3.13.16\nWould create project environment at: .venv\nResolved 278 packages in 4ms\nerror: Extras `llm-eval` and `ssl` are incompatible with the declared conflicts: {`plato-learn[llm-eval]`, `plato-learn[ssl]`}\n"
+    },
+    {
+      "id": "workspace-llm-eval-rejection",
+      "command": "uv sync --locked --dry-run --no-default-groups --all-packages --extra llm_eval",
+      "cwd": "/tmp/plato-phase1a-review-730470390518/initialized-source",
+      "exit_code": 2,
+      "result": "Expected rejection.",
+      "observed_output": "Using CPython 3.13.16\nWould create project environment at: .venv\nResolved 278 packages in 4ms\nerror: Found conflicting extras `plato-learn[llm-eval]` and `plato-learn[ssl]` enabled simultaneously\n"
+    },
+    {
+      "id": "detector-retains-plato",
+      "command": "uv sync --locked --dry-run --package detector --no-default-groups",
+      "cwd": "/tmp/plato-phase1a-review-730470390518/initialized-source",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "Resolved 278 packages in 4ms\n + plato-learn @ file:///private/tmp/plato-phase1a-review-730470390518/initialized-source"
+    },
+    {
+      "id": "artifact-eval-resolution",
+      "command": "uv pip install --dry-run --python /tmp/plato-phase1a-review-730470390518/artifact-eval-313/bin/python '/tmp/plato-phase1a-dependencies/authorized-dist/plato_learn-1.4.3-py3-none-any.whl[llm_eval]'",
+      "cwd": "/tmp/plato-phase1a-review-730470390518",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "Resolved 164 packages in 151ms\n + lighteval==0.13.0\n + nltk==3.9.1\n + plato-learn==1.4.3 (from file:///tmp/plato-phase1a-dependencies/authorized-dist/plato_learn-1.4.3-py3-none-any.whl)"
+    },
+    {
+      "id": "artifact-eval-with-selected-nltk",
+      "command": "uv pip install --dry-run --python /tmp/plato-phase1a-review-730470390518/artifact-eval-313/bin/python '/tmp/plato-phase1a-dependencies/authorized-dist/plato_learn-1.4.3-py3-none-any.whl[llm_eval]' nltk==3.10.3",
+      "cwd": "/tmp/plato-phase1a-review-730470390518",
+      "exit_code": 1,
+      "result": "Expected rejection.",
+      "observed_output": "Using Python 3.13.16 environment at: /tmp/plato-phase1a-review-730470390518/artifact-eval-313\nerror: No solution found when resolving dependencies\n  cause: Because lighteval>=0.13.0 depends on nltk==3.9.1 and plato-learn[llm-eval]==1.4.3 depends on lighteval==0.13.0, we can conclude that plato-learn[llm-eval]==1.4.3 depends on nltk==3.9.1.\n         And because only plato-learn[llm-eval]==1.4.3 is available, we can conclude that all versions of plato-learn[llm-eval] depend on nltk==3.9.1.\n         And because you require nltk==3.10.3 and plato-learn[llm-eval], we can conclude that your requirements are unsatisfiable.\n"
+    },
+    {
+      "id": "absent-optional-submodule-behavior",
+      "command": "/tmp/plato-phase1a-dependencies/artifact-wheel-313/bin/python -I /tmp/plato-phase1a-dependencies/optional_absence.py",
+      "cwd": "/tmp/plato-phase1a-review-730470390518",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "PASS: core-only installed artifact imports Nanochat adapter without extras; missing submodule raises explicit ThirdPartyImportError: Nanochat submodule missing. Run `git submodule update --init --recursive`.\n"
+    },
+    {
+      "id": "absent-vit-submodule-errors",
+      "command": "/tmp/plato-phase1a-dependencies/artifact-wheel-313/bin/python -I -c 'from plato.models.vit import DeepViT,T2TVIT; import json; results={}; \nfor cls,name in [(DeepViT, \"deepvit_S\"),(T2TVIT, \"t2t_vit_7\")]:\n try: cls(name)\n except ImportError as error: results[cls.__name__]=str(error)\n else: raise AssertionError(cls.__name__)\nprint(json.dumps(results))'",
+      "cwd": "/tmp/plato-phase1a-review-730470390518",
+      "exit_code": 0,
+      "result": "Passed.",
+      "observed_output": "{\"DeepViT\": \"DeepViT models are optional. Install the dependencies to use them.\", \"T2TVIT\": \"T2T-ViT models are optional. Install the dependencies to use them.\"}\n"
+    },
+    {
+      "id": "initialized-build",
+      "command": "uv build --no-sources --build-constraint /tmp/plato-phase1a-dependencies/final-build-constraints.txt --out-dir /tmp/plato-phase1a-review-730470390518/initialized-dist",
+      "cwd": "/tmp/plato-phase1a-review-730470390518/initialized-source",
+      "exit_code": 0,
+      "output": "Building source distribution...\nBuilding wheel from source distribution...\nSuccessfully built /tmp/plato-phase1a-review-730470390518/initialized-dist/plato_learn-1.4.3.tar.gz\nSuccessfully built /tmp/plato-phase1a-review-730470390518/initialized-dist/plato_learn-1.4.3-py3-none-any.whl\n"
+    }
+  ],
+  "follow_up_ownership": [
+    {
+      "owner": "Phase 1B",
+      "item": "Fix fresh-process client/server startup and execute real socket rounds before claiming Python 3.14 runtime support.",
+      "blocks_this_manifest_review": false
+    },
+    {
+      "owner": "Phase 1C / Phase 3B",
+      "item": "Resolve Nanochat namespace/native-extension prerequisite detection and qualify initialized source/native behavior; retain existing warning and skip explanations.",
+      "locations": [
+        {
+          "path": "evidence/2026-refresh/setup-validation.json",
+          "start_line": 21835,
+          "end_line": 21844
+        }
+      ],
+      "blocks_this_manifest_review": false
+    },
+    {
+      "owner": "Phase 3B / Phase 5A",
+      "item": "Describe optional submodule availability in installed artifacts and the uv-only evaluation override in user-facing installation guidance. If ordinary artifact evaluation becomes a supported path, supply and validate the explicit override workflow. Preserve third-party licenses and the observed initialization-dependent inclusion policy.",
+      "blocks_this_manifest_review": false
+    },
+    {
+      "owner": "Later CI/platform qualification",
+      "item": "Move supported locked profiles onto relevant runners; do not infer platform execution from the universal lock or wheel inventory.",
+      "blocks_this_manifest_review": false
+    },
+    {
+      "owner": "Root / later authorized archival",
+      "item": "Archive obsolete research components under the latest authorization, then refresh only affected workspace/lock relationships and revalidate them. No submodule upgrade is requested by this review.",
+      "blocks_this_manifest_review": false
+    }
+  ],
+  "constraints_observed": {
+    "shell": "zsh -lc",
+    "implementation_edits": 0,
+    "commits": 0,
+    "pushes": 0,
+    "nested_agents": 0,
+    "worktree_clean": true,
+    "sole_review_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1a-review.json",
+    "scratch_root": "/tmp/plato-phase1a-review-730470390518",
+    "scratch_policy": "Task-owned scratch only; retained implementation evidence and initialized root sources were read without modification."
+  },
+  "sources": [
+    {
+      "title": "uv dependency overrides",
+      "url": "https://docs.astral.sh/uv/concepts/resolution/#dependency-overrides",
+      "supports": "Overrides replace dependency requirements without satisfying original installed metadata."
+    },
+    {
+      "title": "uv workspace Python constraints",
+      "url": "https://docs.astral.sh/uv/concepts/projects/workspaces/",
+      "supports": "Workspace requires-python is the intersection of member constraints."
+    },
+    {
+      "title": "Hatch build file selection",
+      "url": "https://hatch.pypa.io/latest/config/build/#vcs",
+      "supports": "Hatch respects root VCS ignore patterns; package selection governs wheel inclusion."
+    },
+    {
+      "title": "NLTK model-artifact advisory",
+      "url": "https://github.com/nltk/nltk/security/advisories/GHSA-8mgp-746c-j5xp",
+      "supports": "NLTK <=3.10.3 is affected; no patched version is listed; exposure involves model-path file access."
+    }
+  ]
+}

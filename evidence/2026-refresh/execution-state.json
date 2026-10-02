@@ -1,0 +1,38 @@
+{
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "delivery_branch": "maintenance/2026-refresh-audit",
+  "phase": 1,
+  "policies": {
+    "python_default": "3.13",
+    "python_314": "Core forward compatibility where dependencies permit",
+    "vit": "Archive under accepted plan-addendum; preserve MobileNetV3 shared NAS closure",
+    "legacy": "Evidence-based archives permitted; no active imports from archives",
+    "mlx": "Accepted bounded correctness/control improvements; broader support roadmap retained",
+    "questions": "Latest user: skip security-related questions and move on. Continue authorized modernization/correctness work; no new security questionnaire or approval detour."
+  },
+  "accepted": {
+    "plan": "plan.md + plan-addendum.json",
+    "designs": [
+      "startup-design.json",
+      "mlx-roadmap.json",
+      "test-ci-design.json"
+    ],
+    "phase_1a_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+    "phase_1b_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "phase_1c_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b"
+  },
+  "current_task": {
+    "id": "Phase 1 publication",
+    "status": "Astra gate passed; root fast-forward integration and full locked local validation passed on both interpreters.",
+    "candidate": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "validation": "phase1-integration-validation.json"
+  },
+  "phase_1_remaining": [
+    "Finalize PR description and essential evidence commit",
+    "Push and open draft PR; verify Linux CI before Phase 2",
+    "Clean task-owned resources after successful delivery"
+  ],
+  "platform_limit": "Available runtime host is Apple Silicon macOS. Linux CI execution follows reviewed phase publication; resolution alone is not runtime qualification.",
+  "known_dependency_exception": "Tested NLTK 3.10.3 uv override violates Lighteval 0.13.0 exact metadata; remaining advisory is unsuppressed. See Phase 1A evidence.",
+  "evidence_note": "Acceptance artifacts distinguish reviewed design/candidate commits from implementation, root integration, and whole-phase completion."
+}

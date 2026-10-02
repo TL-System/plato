@@ -1,0 +1,509 @@
+{
+  "schema_version": 1,
+  "reviewer": "Fresh independent MLX roadmap reviewer",
+  "requested_reviewer_profile": {
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "review_date": "2026-10-02",
+  "reviewed_path": "evidence/2026-refresh/mlx-roadmap.json",
+  "reviewed_sha256": "9599cf4031b98f2c8b638826ca17cfb05d36b2220f6a0a30c06edaa26ae1c2a8",
+  "reviewed_hash_matches_requested": true,
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "decision": "CHANGES_REQUESTED",
+  "result": "changes_requested",
+  "summary": "The factual inventory and version-sensitive API claims are substantially accurate, and optional feature scope is well contained. One high-severity supported-path acceptance gap and two medium planning gaps require changes. A low-severity array-ownership note is advisory. This review does not authorize implementation or select any optional proposal.",
+  "severity_counts": {
+    "critical": 0,
+    "high": 1,
+    "medium": 2,
+    "low": 1
+  },
+  "snapshot": {
+    "baseline_commit_at_start": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "baseline_commit_at_end": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+    "roadmap_sha256_at_start": "9599cf4031b98f2c8b638826ca17cfb05d36b2220f6a0a30c06edaa26ae1c2a8",
+    "roadmap_sha256_at_end": "9599cf4031b98f2c8b638826ca17cfb05d36b2220f6a0a30c06edaa26ae1c2a8",
+    "plan_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "startup_design_sha256": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876",
+    "unchanged_input_hashes_match": true,
+    "tracked_worktree_clean": true,
+    "prewrite_tracked_file_count": 883,
+    "prewrite_tracked_content_digest": "6cdee25221fbc485391a9a4ca8a243daa9b3b50cf774b934a4390d71c8bb34ef",
+    "prewrite_existing_evidence_file_count": 13,
+    "prewrite_existing_evidence_content_digest": "797549133d364e07a41add2b781debb0074faf2e82072cb82a277cdea1e748fa",
+    "digest_method": "SHA256 of JSON with sorted path-to-SHA256 mappings; tracked regular files and existing evidence regular files respectively. The review file is excluded from the evidence comparison."
+  },
+  "authorization": {
+    "sole_write": "evidence/2026-refresh/mlx-roadmap-review.json",
+    "runtime_or_design_edits": 0,
+    "package_installations_or_changes": 0,
+    "commits": 0,
+    "nested_agents": 0,
+    "shell": "zsh -lc",
+    "probes": "Existing interpreters invoked with -B; in-memory fixtures, no Config construction, no checkpoint writes, no downloads of datasets, no training entrypoint launch.",
+    "scope": "Planning review only. Existing environments were inspected and used for bounded isolated probes. Optional proposals remain unselected."
+  },
+  "findings": [
+    {
+      "id": "MR-01",
+      "severity": "high",
+      "disposition": "changes_requested",
+      "category": "Acceptance completeness and cross-owner correctness",
+      "title": "F17 acceptance misses malformed client trees on the default direct-weight aggregation path.",
+      "roadmap_locations": [
+        {
+          "pointer": "/approved_work/0",
+          "line": 56
+        },
+        {
+          "pointer": "/acceptance_experiments/E1",
+          "line": 117
+        },
+        {
+          "pointer": "/acceptance_experiments/E2",
+          "line": 118
+        },
+        {
+          "pointer": "/platform_and_integration/3",
+          "line": 132
+        }
+      ],
+      "evidence": [
+        {
+          "path": "plato/servers/fedavg.py",
+          "line": 191,
+          "detail": "The ordinary strategy directly averages received weights and calls algorithm.load_weights on the aggregate; compute_weight_deltas/update_weights are bypassed."
+        },
+        {
+          "path": "plato/servers/fedavg.py",
+          "line": 288,
+          "detail": "The standard FedAvg strategy is eligible for direct-weight averaging."
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/fedavg.py",
+          "line": 153,
+          "detail": "Dictionary leaves are accumulated independently without comparison to the baseline; a missing/None leaf still leaves that client's sample count in the common denominator."
+        },
+        {
+          "path": "plato/servers/strategies/aggregation/fedavg.py",
+          "line": 178,
+          "detail": "NumPy arithmetic broadcasts incompatible client leaf shapes. Matching reference dtypes later does not validate original shapes."
+        },
+        {
+          "check": "EC-05",
+          "detail": "Real LeNet conv1 weights shaped [6,5,5,1] and malformed [1,5,5,1] averaged with sample counts 8/24 to a correctly shaped [6,5,5,1] array containing 3.25, which the actual MLX algorithm loaded without error."
+        },
+        {
+          "check": "EC-04",
+          "detail": "A separate actual-strategy probe accepted a missing key or None leaf and returned 0.25 instead of rejecting the incomplete second client's tree."
+        }
+      ],
+      "impact": "Even a perfect validator in all four E1 entrypoints can pass while the default federated path silently corrupts a round. The malformed input has already been converted into a correctly shaped aggregate before load validation sees it. E2 tests valid clients and cannot catch this.",
+      "requested_change": "Add an explicit pre-aggregation validation requirement for every eligible received client tree against the captured baseline, covering both direct-weight and delta paths. Extend E1 or add a bounded E2 negative case with one valid and one malformed client, both arrival orders, broadcastable shapes, missing/extra keys, unequal sequences and array/None mismatches. Require rejection before weighted arithmetic and unchanged global state; retain valid 8/24 sample-weighted behavior.",
+      "ownership": "Root must assign the shared server ingress/aggregation integration to 2B or hand it off narrowly to 3A. Reuse the F17 validation contract with the MLX algorithm/trainer; do not put model-schema validation into the generic Safetensors codec or broaden this into a new protocol.",
+      "scope_effect": "An existing supported-path correctness/acceptance gap, not an optional feature. This is a newly reproduced observation, not a declaration that the approved F17 ledger entry is closed."
+    },
+    {
+      "id": "MR-02",
+      "severity": "medium",
+      "disposition": "changes_requested",
+      "category": "Compatibility and performance",
+      "title": "Device qualification omits the no-flag quickstart default, making a routing repair liable to move existing Metal workloads onto CPU.",
+      "roadmap_locations": [
+        {
+          "pointer": "/upstream_comparison/2",
+          "line": 36
+        },
+        {
+          "pointer": "/approved_work/1",
+          "line": 65
+        },
+        {
+          "pointer": "/acceptance_experiments/E5",
+          "line": 121
+        }
+      ],
+      "evidence": [
+        {
+          "path": "plato/config.py",
+          "line": 511,
+          "detail": "On this Apple host Config.device() returns cpu without --mps; explicit --cpu returns the same string."
+        },
+        {
+          "path": "plato/trainers/mlx.py",
+          "line": 771,
+          "detail": "The trainer resolves that string into context.device before constructing the model, but neither construction nor the numerical loops scope operations to it."
+        },
+        {
+          "path": "docs/docs/quickstart.md",
+          "line": 93,
+          "detail": "The documented MLX command supplies neither --cpu nor --mps."
+        },
+        {
+          "check": "EC-06",
+          "detail": "The installed MLX 0.32.3 default device is Device(gpu, 0), with Metal available. Thus the stored cpu context and actual default computation device disagree."
+        },
+        {
+          "source": "stream",
+          "detail": "The official stream context changes operation defaults; it does not retroactively move already-created lazy operations to a different stream."
+        }
+      ],
+      "impact": "Simply wrapping the existing loops in mx.stream(context.device) would change the default quickstart from native GPU execution to CPU. Tests of explicitly requested CPU/Metal alone can both pass while missing that regression. Model initialization can also remain on an unintended stream if only the train/test body is scoped.",
+      "requested_change": "State the MLX no-flag default policy and include the documented no-flag command alongside --cpu and --mps in E5. Verify operation placement during initialization, training, evaluation and model restoration, plus exception-safe restoration of caller defaults. Distinguish an explicit CPU request from the generic Config.device() fallback; preserve the current Metal default unless root explicitly accepts a behavior change.",
+      "ownership": "3A owns the MLX routing behavior; any shared Config/CLI change requires root/2A handoff. A new device configuration surface is unnecessary for this review.",
+      "scope_effect": "Clarify an existing-path repair and its acceptance matrix; no authorization for a new backend or performance-tuning feature."
+    },
+    {
+      "id": "MR-03",
+      "severity": "medium",
+      "disposition": "changes_requested",
+      "category": "Optional proposal contract and acceptance",
+      "title": "P4's full local resume promise does not define what happens inside an accumulation window.",
+      "roadmap_locations": [
+        {
+          "pointer": "/optional_proposals/3/design",
+          "line": 102
+        },
+        {
+          "pointer": "/acceptance_experiments/E9",
+          "line": 125
+        }
+      ],
+      "evidence": [
+        {
+          "path": "plato/trainers/mlx.py",
+          "line": 1023,
+          "detail": "The current loop resets an accumulation coordination counter at epoch start; delayed-update state belongs to the step strategy/context rather than the MLX optimizer alone."
+        },
+        {
+          "path": "plato/trainers/mlx.py",
+          "line": 1094,
+          "detail": "Step finalization can perform an additional update, so resume must distinguish consumed microbatches from committed optimizer updates."
+        },
+        {
+          "path": "plato/trainers/strategies/training_step.py",
+          "line": 96,
+          "detail": "The existing generic accumulation implementation has an independent current_step counter and parameter gradients outside optimizer state. This illustrates the shared F08 boundary, not an implemented MLX accumulation feature."
+        },
+        {
+          "source": "optimizer_source",
+          "detail": "Native optimizer state tracks optimizer updates/moments and scheduled values; it cannot reconstruct uncommitted gradients or the samples contributing to an accumulation window."
+        },
+        {
+          "path": "evidence/2026-refresh/mlx-roadmap.json",
+          "line": 125,
+          "detail": "Resume acceptance is expressed as K steps plus restart, without defining steps or testing the accumulation/resume interaction."
+        }
+      ],
+      "impact": "A resume test that checkpoints only after optimizer updates can pass while a batch-cursor checkpoint silently discards pending gradients or counts already-consumed samples twice. Conversely, demanding arbitrary microbatch recovery would inflate a feature that the user has not selected.",
+      "requested_change": "Choose an explicit boundary for a later P4 design: preferably restrict resumable checkpoints to completed optimizer updates/empty accumulation windows, or separately select persistence of pending gradient sums, contributing sample count, microbatch counter and strategy state. Define steps in E9 accordingly. If arbitrary microbatch resume is selected, test restart after 1 and 3 microbatches of a window of 4, including a partial tail and clipping/scheduler counts.",
+      "acceptance_note": "Use a deterministic, batch-independent model for the large-batch accumulation oracle. Test stochastic resume separately; Dropout masks and BatchNorm statistics generally prevent literal large-batch equivalence across different microbatch partitions.",
+      "ownership": "3A with F08/2C and checkpoint-schema/F12 handoffs. Keep the existing weight-only checkpoint promise unchanged.",
+      "scope_effect": "A planning clarification for an unselected proposal. It does not require implementation of resume or accumulation to finish A1/A2."
+    },
+    {
+      "id": "MR-04",
+      "severity": "low",
+      "disposition": "advisory",
+      "category": "Array ownership",
+      "title": "NumPy-backed extraction currently exposes writable views of live MLX parameters.",
+      "roadmap_locations": [
+        {
+          "pointer": "/current_support/aggregation",
+          "line": 15
+        },
+        {
+          "pointer": "/optional_proposals/2",
+          "line": 92
+        },
+        {
+          "pointer": "/acceptance_experiments/E1",
+          "line": 117
+        },
+        {
+          "pointer": "/acceptance_experiments/E3",
+          "line": 119
+        }
+      ],
+      "evidence": [
+        {
+          "path": "plato/trainers/mlx.py",
+          "line": 109,
+          "detail": "The installed array conversion path uses np.asarray(value), which can share the MLX buffer."
+        },
+        {
+          "path": "plato/algorithms/mlx_fedavg.py",
+          "line": 115,
+          "detail": "extract_weights uses that conversion for every parameter leaf."
+        },
+        {
+          "check": "EC-07",
+          "detail": "The actual helper returned an ndarray with owndata=false; an in-place host write changed the live nn.Linear weight. The corrected check compares float32 values and confirms the mutation."
+        },
+        {
+          "source": "numpy",
+          "detail": "Official NumPy interoperability documentation describes writable shared views."
+        }
+      ],
+      "impact": "Mutating a borrowed tree in a callback or a malformed-input fixture can modify the model before validation runs. Reducing conversions or adding in-place host aggregation could create further ownership regressions even when value round trips still pass.",
+      "requested_change": "Document whether extracted trees are borrowed read-only views or owned snapshots before P3 optimization. Deep-copy baselines and malformed-test fixtures when asserting failure atomicity. Add a mutation-isolation/ownership check if snapshot behavior is selected; do not automatically add copies to every hot path without measurement.",
+      "ownership": "3A's extraction contract and root-coordinated server consumers.",
+      "scope_effect": "Nonblocking advisory; neither a zero-copy optimization nor a mandatory copy-policy rewrite is selected."
+    }
+  ],
+  "assessments": {
+    "factual_accuracy": {
+      "status": "PASS_WITH_LIMITS",
+      "conclusion": "Repository inventory, LeNet architecture mismatch, default communication simulation, optimizer names, ignored clip/jit options, missing train/eval switching, weight-only persistence and retained Torch dependencies match inspected code. All three tagged-source hashes match independently fetched bytes.",
+      "limits": "The original Metal train/test/save result is root-provided evidence. This reviewer confirmed Metal availability and ran small native CPU probes, not a new Metal LeNet training qualification or a full socket round. Python 3.13 has no installed MLX and remains an unfulfilled qualification prerequisite."
+    },
+    "prioritization": {
+      "status": "PASS",
+      "conclusion": "A1/A2 first, bounded measurement before JIT, and demand-driven selection of controls/model/resume are practical. Preserving eager defaults and requiring cold-start break-even/full-round evidence avoids speculative optimization.",
+      "constraints": "Treat E8 baseline evidence as a bounded root-assigned measurement task, not automatic selection of a maintained P2 telemetry service. P4 features should remain independently selectable; P5's runner is an ongoing cost rather than an implied CI commitment."
+    },
+    "ownership": {
+      "status": "CHANGES_REQUESTED",
+      "conclusion": "The existing 1A/2A/2B/2C/2D/3A boundaries and registry serialization are otherwise consistent with the approved plan. MR-01 needs an explicit shared-server handoff; MR-02 needs a Config/MLX policy boundary. Serializer repair alone cannot validate client architecture.",
+      "retained_boundaries": "No new wire format, Torch-free packaging, checkpoint converter, research-equation change, distributed sharding, MLX-LM/LoRA or additional algorithm is justified by this roadmap review."
+    },
+    "acceptance_experiments": {
+      "status": "CHANGES_REQUESTED",
+      "strengths": "Independent parameter-changing clients, unequal real sample counts, per-leaf numerical references, both aggregation paths, real sockets, natural process exit, malformed late leaves, checkpoint predictions, disabled-feature baselines and explicit unavailable-profile failures are meaningful.",
+      "required_changes": [
+        "MR-01",
+        "MR-02",
+        "MR-03"
+      ],
+      "implementation_handoff_notes": [
+        "For E8, record actual physical worker count/max_concurrency separately from logical client count; the supplied max_concurrency=1 configuration launches one worker even when per_round=2. Use measured wall-clock elapsed time and explicitly record simulation flags. A two-logical-client run alone does not measure concurrent two-process memory pressure.",
+        "If P1 is later selected, include repeated logical-client reassignment in one worker in E7. ComposableClient.on_payload_to_arrive changes the logical client ID and reuses the trainer; launch-order/PID tests alone do not establish scheduling-independent RNG streams.",
+        "Keep float32 as the supported initial numerical/transport profile. The ordinary conversion probe rejects bfloat16; dtype widening/narrowing or nontrainable-state federation must be explicitly selected and qualified."
+      ]
+    },
+    "scope_inflation": {
+      "status": "PASS",
+      "conclusion": "Optional controls, compilation, resume, an additional model and sustained CI remain proposals. No optional feature was selected or built. Review changes strengthen boundaries and existing correctness checks; the suggested optimizer-boundary resume restriction reduces prospective scope."
+    }
+  },
+  "evidence_checks": [
+    {
+      "id": "EC-01",
+      "status": "PASS",
+      "kind": "Identity and guidance",
+      "detail": "Read the actual root AGENTS.md; rg found no nested AGENTS.md. SHA256 of the roadmap matches the exact requested hash at start and final prewrite check. HEAD matches the declared baseline, and both unchanged-input hashes match."
+    },
+    {
+      "id": "EC-02",
+      "status": "PASS",
+      "kind": "Repository inspection",
+      "paths": [
+        "evidence/2026-refresh/plan.md",
+        "evidence/2026-refresh/plan-review-3.json",
+        "evidence/2026-refresh/baseline-findings.json",
+        "plato/models/mlx/lenet5.py",
+        "plato/models/mlx/__init__.py",
+        "plato/models/lenet5.py",
+        "plato/trainers/mlx.py",
+        "plato/trainers/base.py",
+        "plato/algorithms/mlx_fedavg.py",
+        "plato/algorithms/base.py",
+        "plato/models/registry.py",
+        "plato/trainers/registry.py",
+        "plato/algorithms/registry.py",
+        "plato/processors/registry.py",
+        "plato/processors/safetensor_encode.py",
+        "plato/processors/safetensor_decode.py",
+        "plato/serialization/safetensor.py",
+        "plato/utils/tree.py",
+        "plato/servers/fedavg.py",
+        "plato/servers/strategies/aggregation/fedavg.py",
+        "plato/servers/strategies/base.py",
+        "plato/servers/base.py",
+        "plato/clients/base.py",
+        "plato/clients/simple.py",
+        "plato/clients/composable.py",
+        "plato/clients/strategies/defaults.py",
+        "plato/config.py",
+        "plato/samplers/iid.py",
+        "plato/samplers/base.py",
+        "plato/trainers/strategies/training_step.py",
+        "configs/MNIST/fedavg_lenet5_mlx.toml",
+        "configs/MNIST/mnist_iid.toml",
+        "pyproject.toml",
+        "docs/docs/quickstart.md",
+        "tests/models/test_model_registry.py",
+        "tests/utils/test_safetensor_serialization.py",
+        "tests/servers/test_fedavg_strategy.py"
+      ],
+      "detail": "Read the complete approved plan, complete roadmap and MLX implementation files; traced relevant shared runtime/source sections. Searched MLX references across configs/examples/tests/docs. Only the MNIST MLX config and LeNet registration were found; no dedicated MLX example or native MLX test reference was found."
+    },
+    {
+      "id": "EC-03",
+      "status": "PASS",
+      "kind": "Versioned upstream verification",
+      "detail": "Fetched tagged optimizer/module/random source and PyPI version metadata in memory with per-request 20-second timeouts. GitHub blob pages timed out in the web tool; raw tagged upstream sources succeeded. Installed optimizer and module source bytes equal tagged source. Official docs were checked for stream, compilation/state capture, RNG, NumPy, memory, installation and serialization semantics.",
+      "tagged_source_sha256": {
+        "optimizer_source": "25a57fe00ff9ae1fe836cd504506e16d0e9d890112daed05cef0e2bcb95f7714",
+        "module_source": "ec749e1d50fd1a5e57e0aedc8e6eb13fc697e630f59333a0e24aee62a8dc7f0f",
+        "random_source": "cef4536a58d36b49ced10945c764fd7534cb6046fa9284ca24d70d81c273a1f8"
+      },
+      "sources": [
+        "optimizer_source",
+        "module_source",
+        "random_source",
+        "mlx_metadata",
+        "mlx_metal_metadata",
+        "mlx_cpu_metadata",
+        "install",
+        "compile",
+        "stream",
+        "numpy",
+        "seed",
+        "memory",
+        "peak_memory",
+        "saving",
+        "unified_memory"
+      ],
+      "metadata_result": "Confirmed ordinary cp313/cp314 macOS arm64 wheels with 14/15/26 tags, matching mlx-metal==0.32.3, and Linux CPU manylinux_2_35 artifacts. Artifact existence was not treated as runtime or Windows support."
+    },
+    {
+      "id": "EC-04",
+      "status": "REPRODUCED",
+      "kind": "Actual shared aggregation, isolated",
+      "interpreter": "/tmp/plato-python314-env/bin/python -B",
+      "elapsed_seconds": 0.812,
+      "setup": "Actual FedAvgAggregationStrategy.aggregate_weights and ServerContext; generated float32 arrays only. Reports have sample counts 8/24. Baseline/first client w shape [2,3]; first-client values 1.",
+      "results": [
+        {
+          "malformed_second_client": "w shape [1,3], values 4",
+          "returned_shape": [
+            2,
+            3
+          ],
+          "returned_value": 3.25,
+          "rejected": false
+        },
+        {
+          "malformed_second_client": "missing w key",
+          "returned_shape": [
+            2,
+            3
+          ],
+          "returned_value": 0.25,
+          "rejected": false
+        },
+        {
+          "malformed_second_client": "w=None",
+          "returned_shape": [
+            2,
+            3
+          ],
+          "returned_value": 0.25,
+          "rejected": false
+        }
+      ],
+      "limits": "In-process numerical probe, no training and no transport; synthetic reports here are deliberately negative-input fixtures, not an attempt to satisfy E2/E4."
+    },
+    {
+      "id": "EC-05",
+      "status": "REPRODUCED",
+      "kind": "Actual MLX LeNet extraction/aggregation/loading, isolated",
+      "interpreter": "/tmp/plato-python314-env/bin/python -B",
+      "setup": "CPU-scoped actual LeNet5, MLX Algorithm, FedAvgAggregationStrategy and ServerContext. Deep-copied extracted trees; replaced valid conv1 weight by ones and second client's leaf by float32 4s of shape [1,5,5,1]. Reports 8/24. No Config or trainer constructor, no checkpoint write.",
+      "result": {
+        "baseline_shape": [
+          6,
+          5,
+          5,
+          1
+        ],
+        "malformed_shape": [
+          1,
+          5,
+          5,
+          1
+        ],
+        "aggregate_shape": [
+          6,
+          5,
+          5,
+          1
+        ],
+        "aggregate_all_values": 3.25,
+        "actual_algorithm_load_succeeded": true
+      },
+      "limits": "Confirms that pre-aggregation malformed structure can disappear before loading. It does not qualify trained two-client federation."
+    },
+    {
+      "id": "EC-06",
+      "status": "PASS_WITH_CONFIRMED_GAPS",
+      "kind": "Installed API and native trainer strategy probes",
+      "interpreter": "/tmp/plato-python314-env/bin/python -B",
+      "numerical_probe_duration_seconds": 0.013,
+      "profile": {
+        "python": "3.14.8",
+        "mlx": "0.32.3",
+        "mlx_metal": "0.32.3",
+        "numpy": "2.5.3",
+        "torch": "2.14.1",
+        "torchvision": "0.29.1",
+        "host": "macOS 27.0 arm64",
+        "default_device": "Device(gpu, 0)",
+        "metal_available": true
+      },
+      "results": [
+        "Native strict Module.update accepted a [1,3] replacement for an original [2,3] weight.",
+        "Native strict Module.update changed an earlier weight before rejecting a late nonexistent parameter.",
+        "Plato registers only adam, adamw, lion and sgd; native RMSprop exists and Momentum does not.",
+        "Actual conversion helper preserved float16/float32 host dtypes and raised ValueError for bfloat16.",
+        "Actual testing strategy left a Dropout model in training mode and consumed MLX RNG.",
+        "Actual default training step left a previously eval-mode model in eval mode while performing one SGD update."
+      ],
+      "limits": "Numerical probes explicitly scoped to mx.cpu. Metal availability and default-device observation are not evidence of new Metal training. The mode/API gaps are already identified as audit candidates in A2; this review does not repair them."
+    },
+    {
+      "id": "EC-07",
+      "status": "REPRODUCED",
+      "kind": "Host-array alias ownership, isolated",
+      "interpreter": "/tmp/plato-python314-env/bin/python -B",
+      "result": {
+        "numpy_owns_data": false,
+        "in_place_host_write_changed_model": true
+      },
+      "method": "Actual _to_host_array on a CPU-scoped nn.Linear weight; compared the live weight after a float32 host write with its prior value and float32 expected value.",
+      "limits": "An initial exact comparison with a Python double gave a false boolean despite the changed printed weight; the corrected float32 comparison was rerun and is the result used here."
+    },
+    {
+      "id": "EC-08",
+      "status": "PASS_WITH_PREREQUISITE_GAP",
+      "kind": "Existing environment metadata",
+      "detail": "Read distribution metadata without changing packages. Repository .venv has Python 3.13.16 and no MLX distribution. /tmp/plato-python314-env has Python 3.14.8 with mlx/mlx-metal 0.32.3 macosx_26_0_arm64 wheels. This confirms the roadmap's environment account and leaves native 3.13 MLX qualification outstanding."
+    },
+    {
+      "id": "EC-09",
+      "status": "NOT_EXECUTED",
+      "kind": "Acceptance qualification limits",
+      "detail": "No fresh socket round, cached-MNIST quickstart, full pytest suite, GPU training, benchmark, eager/JIT comparison, RNG replay campaign, scheduler/accumulation implementation or resume experiment was run. E1-E9 remain future acceptance experiments, not review results."
+    }
+  ],
+  "official_sources": {
+    "optimizer_source": "https://raw.githubusercontent.com/ml-explore/mlx/v0.32.3/python/mlx/optimizers/optimizers.py",
+    "module_source": "https://raw.githubusercontent.com/ml-explore/mlx/v0.32.3/python/mlx/nn/layers/base.py",
+    "random_source": "https://raw.githubusercontent.com/ml-explore/mlx/v0.32.3/python/src/random.cpp",
+    "mlx_metadata": "https://pypi.org/pypi/mlx/0.32.3/json",
+    "mlx_metal_metadata": "https://pypi.org/pypi/mlx-metal/0.32.3/json",
+    "mlx_cpu_metadata": "https://pypi.org/pypi/mlx-cpu/0.32.3/json",
+    "install": "https://ml-explore.github.io/mlx/build/html/install.html",
+    "compile": "https://ml-explore.github.io/mlx/build/html/usage/compile.html",
+    "stream": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.stream.html",
+    "numpy": "https://ml-explore.github.io/mlx/build/html/usage/numpy.html",
+    "seed": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.random.seed.html",
+    "memory": "https://ml-explore.github.io/mlx/build/html/python/memory_management.html",
+    "peak_memory": "https://ml-explore.github.io/mlx/build/html/python/_autosummary/mlx.core.get_peak_memory.html",
+    "saving": "https://ml-explore.github.io/mlx/build/html/usage/saving_and_loading.html",
+    "unified_memory": "https://ml-explore.github.io/mlx/build/html/usage/unified_memory.html"
+  },
+  "completion": "Review artifact only. Resolve MR-01/MR-02 in supported-path acceptance planning and clarify MR-03 before selecting P4. Optional features remain subject to a later user scope choice; no implementation approval is conferred."
+}

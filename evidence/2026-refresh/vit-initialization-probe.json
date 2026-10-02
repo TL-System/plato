@@ -1,0 +1,16 @@
+{
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "python": "3.13.16",
+  "transformers": "5.18.0",
+  "owner": "Archive work; remove from 2C repair scope.",
+  "probe": "Saved a tiny local real ViT checkpoint with all parameters 0.125, then constructed actual ResolutionAdjustedModel with Config.parameters.model.pretrained=false. No network or model mocks.",
+  "all_parameters_identical_to_saved_pretrained_weights": true,
+  "output_shape": [
+    1,
+    2
+  ],
+  "status": "Confirmed pretrained=false does not discard pretrained weights",
+  "acceptance": "A local saved checkpoint must be loaded exactly when pretrained=true; pretrained=false must create fresh weights from config without reading saved weight artifacts. Preserve resize and output behavior.",
+  "finding_id": "F19",
+  "disposition": "User explicitly prefers archiving ViT rather than upgrading/fixing it. Retain this historical bug evidence; do not repair F19. Inventory active references and retire ViT-specific configs/adapters/vendor integration into archives coherently."
+}

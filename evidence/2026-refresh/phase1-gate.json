@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "phase": "1",
+  "decision": "PASS",
+  "final_pass_issued": true,
+  "summary": "PASS for the exact local Phase 1 candidate 80539c3. Accepted 1A/1B and fresh independently accepted 1C review2 satisfy the local phase gate with no material findings. Authorizes root integration and, after full merged locked validation and factual description finalization, publication. Published Linux CPU 3.13/3.14 verification remains required before Phase 2 or cleanup.",
+  "identity": {
+    "commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "tree": "2eaa46049fc0929938117f70c405adaabac1d6b5",
+    "status": "",
+    "baseline_diff_sha256": "1b0fbcde61919c746100283f8273c31d3071392c54ddba5a7332d064ab3d2ba5",
+    "accepted_1b_diff_sha256": "cf9c51b445433ed2277ceb75b4bc2eb98c1aabbeb9fe39b2c8a5a88e3746817f",
+    "correction_diff_sha256": "a82debccacf0f7cfbe6c682207b12bd685bc32a8f8ac15a6431f671688eca450"
+  },
+  "review_boundary": {
+    "reviewer": "Fresh independent phase-level gate reviewer; no delegation",
+    "candidate_worktree": "/private/tmp/plato-refresh-worktrees/test-ci",
+    "task_review2": "Read exact fresh independent phase1c-review2.json: PASS, P1C-R01/R02 resolved, no material new findings. Root phase1c-acceptance.json ACCEPTED; explicit final gate clearance received.",
+    "prior_1c_review": "Historical CHANGES_REQUESTED on 845255; both P1C-R01/R02 resolved by exact 80539c3 and accepted through fresh root-created review2.",
+    "supplemental_nested_review": "Not used for acceptance",
+    "method": "Read-only exact-tree/diff, design/acceptance/evidence review and targeted source inspection; hash/JUnit checks and independent arithmetic over retained runtime events. No broad suite rerun or shared environment mutation."
+  },
+  "findings": [],
+  "acceptance_assessment": {
+    "dependencies": "Accepted 730470 is an ancestor. All 278 lock package records preserved except two root test-base metadata arrays. Reviewed workspace setup red/green, locked profiles and outside-checkout wheel/sdist acceptance. Python 3.13 remains default/minimum; 3.14 evidence is core forward compatibility.",
+    "startup": "Accepted 213b is an ancestor. Both production runtime files and all three startup helpers are byte-identical to accepted 1B; startup suite only gains markers. Public loop ownership, synchronous extension dispatch, active-task propagation and primary-error/cleanup precedence match the accepted design. Seven recorded fresh 3.14 baseline failures identify the actual missing-loop sites and missing scheduled bodies; green cooperative/containment evidence is differentiated.",
+    "real_socket_round": "Independently recomputed retained 3.13/3.14 final aggregates as W0 + (2*(W1-W0)+6*(W2-W0))/8 within rtol=1e-5/atol=1e-6. Actual received payloads match separate trained client weights; each changed parameters. Both rounds exited naturally. Each runtime partition has 48 result records, five expected watchdog containments and zero recorded survivors. No new runtime execution claimed.",
+    "profiles_fixtures_ci": "Explicit base/mandatory prerequisite, required-node, skip/xfail and partition guards preserved. Fixture state and import paths restore through exceptions; this does not close production F13. Corrected implicit -k/-m/--deselect eligibility and status-aware typing checker are bounded fixes consistent with P1C-R01/R02. Fresh independent review2 and root acceptance resolve both findings; 114 bounded independent command checks retained expected results. Ubuntu jobs use locked separate environments, full runtime partitions, finite step/job deadlines and retained outputs.",
+    "red_green": "Reviewed dependency setup failures/successes, seven startup baseline failure cases, fixture restoration red/green, prerequisite/omission negative probes, and both-interpreter selection/typing correction records. These exercise actual behavior rather than merely mirroring implementation. Recorded corrections rerun affected core/probes/collection while retaining unchanged 845255 runtime results.",
+    "claims": "Core on each interpreter: mandatory 250 passed/one absent-native-tokenizer skip; base 246 passed/four skip reports representing five omitted nodes. Runtime 48 passed/no skips per interpreter comes from 845255. 404 typing diagnostics remain classified: 384 baseline plus 20 accepted startup-helper diagnostics; no zero-error gate. Coverage is mandatory core only, approximately 43% raw, with 219 identical-denominator files compared separately; no arbitrary coverage gate. Fork warning correction is test-local Dataset.map worker configuration, not suppression.",
+    "scope": "No later F02-F20 repairs, MLX expansion, archive moves or documentation overhaul required here. ViT retirement remains authorized later work. NLTK 3.10.3 uv override, visible metadata conflict and unsuppressed advisory remain accepted; ordinary artifact resolution differs. Robotics remains separately provisioned and unqualified."
+  },
+  "verification": {
+    "accepted_ancestors": {
+      "7304703905189baf771032f1cd923a37f66ed97f": true,
+      "213b321c3cfb31d0f82c0b315efe50dcbf7dee20": true,
+      "845255cdf358869d260699a9ef0786e37514e9f4": true
+    },
+    "source_hashes_matched": 17,
+    "artifact_hash_checks": {
+      "count": 56,
+      "failures": []
+    },
+    "acceptance_references_verified": [
+      "phase1a-review.json",
+      "phase1b-review.json",
+      "design-revision-review.json",
+      "startup-design.json",
+      "mlx-roadmap.json",
+      "test-ci-design.json",
+      "plan-addendum-review.json",
+      "plan-addendum.json"
+    ],
+    "junit": [
+      {
+        "name": "base",
+        "python": "3.13",
+        "passed": 246,
+        "skipped": 4,
+        "failed": 0,
+        "source_commit": "80539c3"
+      },
+      {
+        "name": "mandatory",
+        "python": "3.13",
+        "passed": 250,
+        "skipped": 1,
+        "failed": 0,
+        "source_commit": "80539c3"
+      },
+      {
+        "name": "base",
+        "python": "3.14",
+        "passed": 246,
+        "skipped": 4,
+        "failed": 0,
+        "source_commit": "80539c3"
+      },
+      {
+        "name": "mandatory",
+        "python": "3.14",
+        "passed": 250,
+        "skipped": 1,
+        "failed": 0,
+        "source_commit": "80539c3"
+      },
+      {
+        "name": "runtime",
+        "python": "3.13",
+        "passed": 48,
+        "skipped": 0,
+        "failed": 0,
+        "source_commit": "845255cdf358869d260699a9ef0786e37514e9f4"
+      },
+      {
+        "name": "runtime",
+        "python": "3.14",
+        "passed": 48,
+        "skipped": 0,
+        "failed": 0,
+        "source_commit": "845255cdf358869d260699a9ef0786e37514e9f4"
+      }
+    ],
+    "lock_changed_fields": [
+      "/package/176/metadata/requires-dev/test-base",
+      "/package/176/dev-dependencies/test-base"
+    ],
+    "final_clearance_checks": "Exact commit/tree/correction diff, clean candidate worktree, all 17 candidate source hashes, acceptance-to-review hash and all eight referenced independent review2 artifacts verified. No suite rerun."
+  },
+  "delivery_draft_review": {
+    "disposition": "Accurate disclosed scope and pending statuses; factual finalization required before publication, not a new implementation blocker",
+    "required_updates": [
+      "Replace stale 845255 candidate identity and pending-review input with exact 80539c3 review2/acceptance identities, or the subsequently reviewed candidate.",
+      "Distinguish corrected core reruns from retained 845255 runtime/coverage results until root merged validation supersedes them; update suite durations/results from actual merged evidence.",
+      "Update final local gate and root integration/validation statuses only after completion. Keep Linux runtime pending until actual published job results exist."
+    ]
+  },
+  "remaining_conditions": [
+    {
+      "stage": "after local PASS",
+      "condition": "Root integrates into maintenance/2026-refresh-audit and runs full locked validation on the merged tree; preserve exact commit/lock/environment and truthful results. Implementers remain available."
+    },
+    {
+      "stage": "publication",
+      "condition": "Root finalizes factual PR description, commits essential phase evidence, pushes and opens draft PR in that order after merged validation."
+    },
+    {
+      "stage": "before Phase 2 or cleanup",
+      "condition": "Verify published GitHub Ubuntu CPU jobs on Python 3.13 and 3.14. Local macOS tests, lock resolution and workflow syntax are not Linux runtime evidence. No local Docker is available; this post-publication requirement does not itself prohibit a subsequent local candidate PASS authorizing integration/publication."
+    }
+  ],
+  "evidence_identities": {
+    "inputs": [
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan.md",
+        "sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json",
+        "sha256": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum-acceptance.json",
+        "sha256": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/design-acceptance.json",
+        "sha256": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/startup-design.json",
+        "sha256": "0a5e2c57102fa4beae7f4b4ceb6e091fd61e8af49b966f023bc57dfa6714ae47"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/test-ci-design.json",
+        "sha256": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1a-acceptance.json",
+        "sha256": "10c330d418d49a4ac43a0844290f272583232f9d7515d18dfc9cb31bf0c9beaf"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1a-review.json",
+        "sha256": "4a27a339a3bc174ca378bba80c8214f9dc5ac536417d7f64f38eff3eb58a26f1"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1b-acceptance.json",
+        "sha256": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1b-review.json",
+        "sha256": "f02507a3be88f1438143c24bf7921af907400d370d4bf7ccba6378ec4756ec2b"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review.json",
+        "sha256": "cf24369733c0d2270854998356ec1bca39d53ab8faa19517fe6b1c4bd8cc5d4d"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1-delivery-draft.json",
+        "sha256": "1c132f243d158f0d8806ad0fd41765fd6611851dc6094c785387194a51525fc4"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review2.json",
+        "sha256": "6613e301b458e20e8509af8c280121e350068db928364e42a0fdaa53a355f7b4"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-acceptance.json",
+        "sha256": "514355a2bdcd165a0f056a01c5d8bb19544a145bf640974e3c4119908323cc41"
+      }
+    ],
+    "candidate_evidence_sha256": {
+      "evidence/2026-refresh/test-ci-validation.json": "a19a62f7a5dce3e6caee4114caa4a8dcab013a98b257d1b97f1483052ed76f2e",
+      "evidence/2026-refresh/dependency-decisions.json": "51a14c80686f36425eb4db85b5673fc2c29fdb6bc7fb62ab1344f2b923951791",
+      "evidence/2026-refresh/setup-validation.json": "6a3584cc5659a042e63ae14d11d36b9f105a5d94c6da4cbf6669bde8ebd19dca",
+      "evidence/2026-refresh/startup-validation.json": "2dac190af80f522f9709502d1dc6b8e3f445ff4060d8f06f200a7768f5373b07"
+    },
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "inspection": {
+      "path": "/tmp/plato-phase1-gate/inspection.json",
+      "sha256": "646210fb58bc42e03137851432dc81ccf1e09095bebcbf88d0ecbbb12eea726b"
+    },
+    "runtime_arithmetic": {
+      "path": "/tmp/plato-phase1-gate/runtime-evidence-check.json",
+      "sha256": "0aa9bc7c538e4e81cc6fcb4d79427c66e143c5e64a449e2ab1d5d6fabb6d13c6"
+    }
+  },
+  "integrity": {
+    "sole_durable_write": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1-gate.json",
+    "scratch": "/tmp/plato-phase1-gate",
+    "source_edits": 0,
+    "commits_pushes": 0,
+    "agents_spawned": 0,
+    "shared_environment_mutations": 0,
+    "suite_reruns": 0
+  },
+  "clearance": {
+    "status": "SATISFIED",
+    "candidate_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "review_sha256": "6613e301b458e20e8509af8c280121e350068db928364e42a0fdaa53a355f7b4",
+    "acceptance_sha256": "514355a2bdcd165a0f056a01c5d8bb19544a145bf640974e3c4119908323cc41",
+    "resolved": [
+      "P1C-R01",
+      "P1C-R02"
+    ],
+    "reviewer_artifacts_hash_verified": 8,
+    "source_identity_rechecked": true,
+    "root_clearance": "User supplied root acceptance and explicitly requested final gate disposition."
+  }
+}

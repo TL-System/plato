@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-02",
+  "decision": "PASS",
+  "summary": "P1C-R01 and P1C-R02 resolved at the exact requested commit. No material new critical/high/medium defects or correction scope drift. Existing root merged validation, Linux execution and Phase 1 gate remain pending.",
+  "reviewer": {
+    "role": "Fresh independent root-created reviewer",
+    "delegation": 0,
+    "scope": "Correction delta against 845255 plus the prior full independent review; retained broad runtime evidence inspected, no broad runtime rerun."
+  },
+  "identity": {
+    "candidate_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "candidate_tree": "2eaa46049fc0929938117f70c405adaabac1d6b5",
+    "parent_commit": "845255cdf358869d260699a9ef0786e37514e9f4",
+    "parent_tree": "9dc04f712518f6a126395983d0675b15134a0626",
+    "diff_sha256": "a82debccacf0f7cfbe6c682207b12bd685bc32a8f8ac15a6431f671688eca450",
+    "diff_stat": ".github/workflows/pytorch_tests.yml           |  15 +-\n evidence/2026-refresh/test-ci-validation.json | 279 +++++++++++++++++++-------\n tests/conftest.py                             |   9 +-\n 3 files changed, 223 insertions(+), 80 deletions(-)",
+    "changed_paths": [
+      ".github/workflows/pytorch_tests.yml",
+      "evidence/2026-refresh/test-ci-validation.json",
+      "tests/conftest.py"
+    ],
+    "worktree_status": "",
+    "accepted_startup_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "accepted_startup_tree": "77d6110e57346f6f01b427f418a9bb24ad79a2a9",
+    "runtime_tree_unchanged_from_accepted_startup": true,
+    "accepted_startup_helpers_identical": true,
+    "startup_suite_diff_from_accepted": "Exactly eight added marker/spacing lines; no assertion changes.",
+    "correction_runtime_helpers_startup_manifest_lock_unchanged": true,
+    "accepted_dependency_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+    "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "lock_git_blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4",
+    "lock_packages": 278,
+    "accepted_lock_equal_after_two_test_base_metadata_arrays_removed": true,
+    "accepted_manifest_equal_after_already_reviewed_profile_metadata_removed": true,
+    "default_python": "3.13",
+    "requires_python": ">=3.13",
+    "submodules": [
+      " c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)",
+      " 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)",
+      " 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)"
+    ],
+    "accepted_dependency_tree": "862fed283336f488cb284dc2b0f47bd987946095"
+  },
+  "prior_review": {
+    "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review.json",
+    "sha256": "cf24369733c0d2270854998356ec1bca39d53ab8faa19517fe6b1c4bd8cc5d4d"
+  },
+  "prior_findings": [
+    {
+      "id": "P1C-R01",
+      "severity": "medium",
+      "resolution": "RESOLVED",
+      "file": "tests/conftest.py",
+      "line": 112,
+      "change": "Implicit qualification requires an unfiltered root/full invocation. Ordinary keyword, marker and deselect selections opt out; an explicit profile always qualifies.",
+      "independent_result": "On both interpreters and in base/mandatory: root -k executes the actual MPC test and exits 0; ordinary root -m integration collects nine tests and --deselect collection exits 0. File-focused keyword execution passes one test and the whole MPC file passes three. Explicit-profile counterparts reject omissions. Unfiltered root and no-positional-argument default retain mandatory preflight and full inventory.",
+      "acceptance_preserved": "Every existing profile enforcement method except __init__ has identical AST to 845255; runtime inventory, prerequisites, named allowances, exclusions, skips and xfail/xpass checks retain their original implementations."
+    },
+    {
+      "id": "P1C-R02",
+      "severity": "medium",
+      "resolution": "RESOLVED",
+      "file": ".github/workflows/pytorch_tests.yml",
+      "line": 134,
+      "change": "Captured ty_status is passed to the exact embedded checker. Status 0 requires verified clean output; status 1 requires a recognized positive summary matching parsed diagnostics, then the retained owned-file allowance check.",
+      "independent_result": "Both interpreters: actual clean ty exits 0 and its checker replay exits 0; actual full repository ty exits 1 with 404 classified diagnostics, byte-identical to retained baseline, and its checker replay exits 0. An actual new-owned diagnostic, actual tool failure, wrong statuses, absent/unrecognized output, absent diagnostics, summary count mismatch and injected unexpected owned diagnostic all fail the checker.",
+      "acceptance_preserved": "The 404 diagnostics remain accepted assigned triage, not a zero-error gate. No new suppression, dependency change or baseline relabeling."
+    }
+  ],
+  "findings": [],
+  "verification": {
+    "execution": "All shell commands use /bin/zsh -lc. Reused all four existing environments with uv run --no-sync or their existing executables; no installs. Pytest cache disabled, bytecode disabled, offline/CPU environment and basetemp under reviewer scratch. Runtime suites not rerun.",
+    "profiles": {
+      "base-313": {
+        "python": "3.13.16",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_modules": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false
+        }
+      },
+      "base-314": {
+        "python": "3.14.8",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_modules": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false
+        }
+      },
+      "mandatory-313": {
+        "python": "3.13.16",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_modules": {
+          "opacus": true,
+          "kazoo": true,
+          "gymnasium": true,
+          "tiktoken": true
+        }
+      },
+      "mandatory-314": {
+        "python": "3.14.8",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_modules": {
+          "opacus": true,
+          "kazoo": true,
+          "gymnasium": true,
+          "tiktoken": true
+        }
+      }
+    },
+    "command_prefix": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/<profile>-<313|314> uv run --no-sync --python <3.13|3.14> python -B -m pytest",
+    "pytest_common_arguments": "-q -ra -p no:cacheprovider --basetemp=/tmp/plato-phase1c-review2/<case>-tmp",
+    "focused_success": [
+      {
+        "arguments": "tests -k test_round_info_store_local",
+        "exit": 0,
+        "each_interpreter": {
+          "base": "1 passed, 1 honest collection DP skip, 296 deselected",
+          "mandatory": "1 passed, 298 deselected"
+        }
+      },
+      {
+        "arguments": "tests --collect-only -m integration",
+        "exit": 0,
+        "each_interpreter": "9 selected; base 297 / mandatory 299 total nodes"
+      },
+      {
+        "arguments": "tests --collect-only --deselect tests/mpc/test_mpc.py::test_round_info_store_local",
+        "exit": 0,
+        "each_interpreter": "base 296 / mandatory 298 selected; exactly one deselected"
+      },
+      {
+        "arguments": "tests/mpc/test_mpc.py -k test_round_info_store_local",
+        "exit": 0,
+        "each_profile_each_interpreter": "1 passed, 2 deselected"
+      },
+      {
+        "arguments": "tests/mpc/test_mpc.py",
+        "exit": 0,
+        "each_profile_each_interpreter": "3 passed"
+      }
+    ],
+    "qualification_regressions": [
+      {
+        "arguments": "tests --collect-only, and --collect-only with no positional path",
+        "each_interpreter": "base exits 4 on missing mandatory Opacus; mandatory exits 0 with all 299 tests"
+      },
+      {
+        "arguments": "tests --collect-only --test-profile=<base|mandatory> plus -k, -m integration, or --deselect",
+        "each_profile_each_interpreter": "exit 1 with expected deselection/exclusion/required-inventory violations"
+      },
+      {
+        "arguments": "tests --collect-only --test-profile=<base|mandatory> -m \"not runtime\"",
+        "exit": 0,
+        "each_interpreter": "base 249 collected, mandatory 251 collected"
+      },
+      {
+        "arguments": "tests --collect-only --test-profile=<base|mandatory> -m runtime",
+        "exit": 0,
+        "each_interpreter": "48 startup cases; exact nodes identical to retained parent collection"
+      },
+      {
+        "arguments": "tests --collect-only --test-profile=<base|mandatory> -m runtime --ignore=tests/integration/test_event_loop_startup.py",
+        "each_profile_each_interpreter": "exit 1; omitted startup partition and collection exclusions rejected"
+      },
+      {
+        "arguments": "tests --collect-only --test-profile=mandatory in base environment",
+        "each_interpreter": "exit 4; unrelated missing Opacus still fails mandatory preflight"
+      },
+      {
+        "arguments": "Unfiltered root and no-positional-path --collect-only --ignore=tests/trainers/test_dp_data_loader_strategy.py in mandatory",
+        "each_interpreter": "exit 1; implicit full/default collection exclusions and missing required DP tests rejected"
+      },
+      {
+        "arguments": "-p prerequisite_blocker tests --collect-only --test-profile=mandatory, with one in-memory blocker per opacus/kazoo/gymnasium/tiktoken/Nanochat source",
+        "each_interpreter": "five expected exit-4 prerequisite failures; no filesystem or package changes"
+      },
+      {
+        "arguments": "-p tests.conftest <reviewer scratch outcome module> --test-profile=<base|mandatory>",
+        "each_profile_each_interpreter": "exit 1; unexpected setup/call/teardown skips and xfail/xpass all rejected"
+      },
+      {
+        "arguments": "-p tests.conftest <reviewer scratch collection module> --collect-only --test-profile=<base|mandatory>",
+        "each_profile_each_interpreter": "exit 1; collection skip rejected"
+      },
+      {
+        "arguments": "tests <reviewer scratch collection module> --collect-only without profile in mandatory",
+        "each_interpreter": "exit 1; implicit full-suite collection skip rejected"
+      }
+    ],
+    "typing": {
+      "actual_commands": [
+        "uv run --no-sync --python <version> ty check /tmp/plato-phase1c-review2/clean_typing.py --output-format concise",
+        "uv run --no-sync --python <version> ty check --output-format concise",
+        "<mandatory environment>/bin/ty check tests/conftest.py --output-format concise (independent scratch source with assignment error)",
+        "uv run --no-sync --python <version> ty check --definitely-invalid-option"
+      ],
+      "checker_command": "<mandatory environment>/bin/python -B /tmp/plato-phase1c-review2/ty_gate.py <captured status>; cwd contains each input at ci-artifacts/ty.log",
+      "checker_source": "Exact de-indented embedded Python from candidate workflow; no replacement of its assertions or allowance set.",
+      "actual_results_each_interpreter": "Clean status 0, baseline status 1/404 diagnostics, owned-diagnostic status 1, tool-failure status 2. Checker accepts only the clean and classified baseline positive cases.",
+      "negative_checker_cases_each_interpreter": 12,
+      "baseline_sha256": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4",
+      "probe_correction": "An initial reviewer PYTHONPATH injection altered ty import resolution (395 diagnostics); typing was rerun without it and reproduced the exact 404-diagnostic baseline. Only final corrected runs are acceptance evidence."
+    },
+    "syntax_and_import_order": {
+      "actionlint_command": "/tmp/plato-phase1c-test-ci/actionlint -shellcheck= .github/workflows/pytorch_tests.yml",
+      "actionlint_exit": 0,
+      "shell_syntax": "All seven zsh run blocks parse; provisioning Python and exact changed checker compile.",
+      "ruff_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 uv run --no-sync --python 3.13 ruff check . --select I --no-cache",
+      "ruff_exit": 0
+    },
+    "bounded_command_checks": {
+      "selections": 54,
+      "typing_tools_and_replays": 36,
+      "prerequisites_and_outcomes": 20,
+      "implicit_omissions": 4,
+      "total": 114,
+      "all_expected_results": true
+    }
+  },
+  "retained_evidence": {
+    "source_identity": "All 17 recorded candidate source hashes match exact 80539c3f files. The correction changes only conftest eligibility and typing output validation; runtime, helpers, startup source/markers, manifest, lock and Python policy are byte-identical to 845255.",
+    "referenced_artifact_hashes_checked": 56,
+    "all_referenced_artifact_hashes_match": true,
+    "core_results": "Implementer correction reruns, inspected rather than independently rerun: each interpreter base 246 passed/4 skip reports; mandatory 250 passed/1 native-tokenizer skip; zero pytest warnings. JUnit counts and artifact hashes verified against exact candidate source hashes.",
+    "runtime": "Retained actual 845255 executions: 48 passed per interpreter, no skips/failures/errors. All original fields equal parent evidence; source_commit=845255 and retained_without_rerun=true. Both log/JUnit hashes and all 48 JUnit cases verified. Startup result evidence unchanged. No runtime execution claimed by this reviewer.",
+    "independent_startup_collections": [
+      {
+        "python": "313",
+        "nodes": 48,
+        "identical_to_retained_parent_collection": true,
+        "sorted_node_sha256": "c138151c0015dff46a5aaf4f863334da6643aedd42a010acd828f431122e2903"
+      },
+      {
+        "python": "314",
+        "nodes": 48,
+        "identical_to_retained_parent_collection": true,
+        "sorted_node_sha256": "c138151c0015dff46a5aaf4f863334da6643aedd42a010acd828f431122e2903"
+      }
+    ],
+    "acceptance_boundary": "Explicit profiles still qualify regardless of selection. All eight other profile methods have identical AST to 845255. Accepted 213b runtime tree and three startup helpers are identical; startup suite has only its already-reviewed eight added marker/spacing lines. Accepted 730470 package records remain identical after the two already-reviewed test-base metadata arrays are removed."
+  },
+  "reviewer_artifacts": {
+    "commands": {
+      "path": "/tmp/plato-phase1c-review2/final-command-records.json",
+      "sha256": "956af280531b84b702eaf864f900043375d5e698f66eb015ce0b6b8264ef14d4"
+    },
+    "identity_and_retained_evidence": {
+      "path": "/tmp/plato-phase1c-review2/identity.json",
+      "sha256": "ed8acf4bcf76455082d4cf8ab63147dc3e36a8c19c5014d27234b3e8a1e80999"
+    },
+    "profiles_and_counts": {
+      "path": "/tmp/plato-phase1c-review2/profiles-and-retained-counts.json",
+      "sha256": "069adda399f27c635b7d30d6db250e57a509986b613ed88688758a29c662bfa7"
+    },
+    "replay_source": {
+      "path": "/tmp/plato-phase1c-review2/replay.py",
+      "sha256": "41414f88b2083b71480a488835b6e597f73ea2aeb6eed449a954235b3749f838"
+    },
+    "regression_source": {
+      "path": "/tmp/plato-phase1c-review2/regressions.py",
+      "sha256": "7d03e34f2629368af04aadd03a0a42c08cf439740381548facb4dffdf89970e1"
+    },
+    "exact_typing_checker": {
+      "path": "/tmp/plato-phase1c-review2/ty_gate.py",
+      "sha256": "41648b30bf4127eb394e4b80c53e699ea21b8454a10ff3a61b0ad19c12d7fe8b"
+    },
+    "actionlint": {
+      "path": "/tmp/plato-phase1c-review2/actionlint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ruff": {
+      "path": "/tmp/plato-phase1c-review2/ruff-no-cache.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  "input_sha256": {
+    "/private/tmp/plato-refresh-worktrees/test-ci/AGENTS.md": "b50f87f31ea3d87076952d8b7d2d8af067132fbf877d80f8780c208fb45527ec",
+    "/private/tmp/plato-refresh-worktrees/test-ci/evidence/2026-refresh/test-ci-validation.json": "a19a62f7a5dce3e6caee4114caa4a8dcab013a98b257d1b97f1483052ed76f2e",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review.json": "cf24369733c0d2270854998356ec1bca39d53ab8faa19517fe6b1c4bd8cc5d4d",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/design-acceptance.json": "ff4d6acde0d0312b49b9767be5210b55fb4db0e8fb5727203c148b63d123693a",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/plan-addendum-acceptance.json": "5f5d5a8e22e14072b5d031c19a27be14bda9bdbc2a157d14af78845daac6c56b",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/phase1a-acceptance.json": "10c330d418d49a4ac43a0844290f272583232f9d7515d18dfc9cb31bf0c9beaf",
+    "/Users/bli/Playground/plato/evidence/2026-refresh/phase1b-acceptance.json": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444"
+  },
+  "integrity": {
+    "sole_requested_durable_output": "/Users/bli/Playground/plato/evidence/2026-refresh/phase1c-review2.json",
+    "scratch_root": "/tmp/plato-phase1c-review2",
+    "worktree_source_and_manifest_edits": 0,
+    "package_installs_or_environment_mutations": 0,
+    "commits_or_pushes": 0,
+    "agents_spawned_or_collaboration_calls": 0,
+    "worktree_status_before_and_after": "clean, HEAD exactly 80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+    "incidental_cache_write": "An initial Ruff invocation refreshed a pre-existing ignored .ruff_cache entry. Final Ruff validation used --no-cache. No source/package changes; this incidental write is disclosed rather than claiming a strictly untouched filesystem."
+  },
+  "remaining": [
+    "Root full merged validation and existing Phase 1 acceptance gate.",
+    "Published GitHub Ubuntu execution remains pending root publication and is required before Phase 2; local macOS results are not Linux runtime qualification."
+  ],
+  "needed_corrections": []
+}

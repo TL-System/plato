@@ -1,0 +1,109 @@
+{
+  "phase": "1B / F01",
+  "status": "Revised after accepted SDR-01/02/03; ready for fresh independent review. Design only; implementation remains after 1A acceptance.",
+  "baseline": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "plan_sha256": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+  "authority": "Read AGENTS.md and the approved plan; latest user/root instructions govern the scope and Python default where they supersede that plan. This revision writes only startup-design.json and mlx-roadmap.json; no runtime edits, installs, commits or nested agents.",
+  "observed": {
+    "environments": [
+      ".venv/bin/python: CPython 3.13.16, aiohttp 3.14.3",
+      "/tmp/plato-python314-env/bin/python: CPython 3.14.8, aiohttp 3.14.3"
+    ],
+    "probes": [
+      "Executed with zsh -lc and PYTHONDONTWRITEBYTECODE=1, python -B, inline scripts. In-memory Config and minimal synchronous subclasses avoided Config filesystem setup and training. No probe installed a loop before an entrypoint.",
+      "Fresh 3.14 process: actual client.run(custom_client) configured the client then failed at plato/client.py:89; actual Server.run(disable_clients=True) configured the server then failed at plato/servers/base.py:372. Both raised RuntimeError: There is no current event loop in thread 'MainThread'. Neither scheduled body executed.",
+      "Separate fresh 3.14 process: actual Server.start(port=0), with real Socket.IO/aiohttp setup, failed at base.py:407 with the same RuntimeError, before binding a socket.",
+      "Separate fresh 3.14 process: actual client.run with custom edge_server/edge_client and cross_silo=true failed at client.py:57 in ensure_future with the same RuntimeError, plus an unawaited start_client coroutine warning. Server.start and the client coroutine did not execute.",
+      "Fresh 3.13 get_event_loop() implicitly returned an open _UnixSelectorEventLoop with a DeprecationWarning; probe then closed it. This control is not a green runtime qualification."
+    ],
+    "ownership": [
+      "client.py:15-90: ordinary/default and supplied-custom clients share one branch; configure is synchronous. Edge branch configures server/client, schedules start_client, then synchronously calls server.start(port), bypassing server.run.",
+      "base.py:328-407: run synchronously configures, launches children, queues _periodic in either central/ordinary branch, then dynamically dispatches self.start(). start passes the current loop to web.run_app. Moving everything into a running coroutine would break synchronous overrides that drive the current loop themselves.",
+      "fedavg_cs.py constructs asyncio Events shared with the edge client; both sides must execute on the same loop. Existing normal edge startup does not schedule the server.run periodic task; retain that distinction.",
+      "base.py:480 and trainers/composable.py:726,814 explicitly select spawn. Audio/frame extraction utilities use implicit Pool contexts. Do not alter either process policy in F01.",
+      "base.py:1465-1476 saves, invokes close hooks, emits disconnect, then os._exit(0). It bypasses Python finally blocks. Process termination and graceful loop finalization are separate acceptance observations."
+    ],
+    "installed_api": [
+      "Inspected asyncio.events, Runner initialization/close and aiohttp.web.run_app locally. 3.14 get_event_loop raises when no loop is set. Runner initialization installs its loop before run(), allowing synchronous configuration with a current, non-running loop.",
+      "Both installed run_app implementations have source SHA256 4a70706234546281916480949fe4ad51bc314278264872831556011dfd4701f3. run_app creates a loop only when none is supplied; finally cancels tasks, shuts down async generators and closes even a supplied loop. It does not await shutdown_default_executor.",
+      "Runner.close subsequently tries run_until_complete(shutdown_asyncgens()) and executor shutdown. Nesting run_app inside a Runner owning that same loop therefore attempts work on a closed loop. Do not use this combination."
+    ],
+    "references": [
+      "https://docs.python.org/3.14/library/asyncio-eventloop.html",
+      "https://docs.python.org/3.14/library/asyncio-runner.html",
+      "https://docs.aiohttp.org/en/stable/_modules/aiohttp/web.html",
+      "https://docs.python.org/3.14/library/asyncio-task.html#asyncio.Task.cancelling"
+    ]
+  },
+  "design": {
+    "files": [
+      "plato/client.py: run and small private loop/task cleanup helpers",
+      "plato/servers/base.py: run/start bootstrap and their two startup-task call sites only",
+      "tests/integration/test_event_loop_startup.py and test-only subprocess helpers"
+    ],
+    "ownership_rule": "Reject an already running loop using get_running_loop before constructing coroutines/resources. Otherwise obtain the current loop with public get_event_loop: reuse any open, non-running result; RuntimeError or a closed result means create a fresh owned loop. Never replace a usable current loop, including resources captured by a supplied client/server constructor. Python 3.13 may lazily supply a loop on this query; public APIs cannot reliably distinguish it from a caller-installed loop, so conservatively treat every returned open loop as borrowed/policy-owned. Preserve that legacy case instead of inspecting policy internals or using warning-based ownership detection.",
+    "ordinary_client": "With a borrowed loop, preserve configure/factory/ID synchronization order and drive start_client with loop.run_until_complete. Do not give that loop to Runner, close it, cancel unrelated caller tasks, finalize caller async generators or shut down its executor. Clean up only an explicitly retained entrypoint-owned task if necessary; client-owned resource cleanup remains in start_client/finally. With no usable current loop, use a fresh asyncio.Runner, initialize it before synchronous construction/configure, and runner.run(start_client(), context=copy_context()) after configure. Preserve the primary configure/start_client exception if Runner.close itself fails; report the latter as secondary. Do not use Runner private state.",
+    "server_run_start": "Use the same public acquisition rule before synchronous configure/factories. Fresh server/edge paths explicitly new_event_loop/set_event_loop; no Runner around aiohttp. Queue periodic on that loop, preserve launch/seed/order and self.start() dispatch. base.start obtains the already installed loop (or creates one for a direct call) and passes it to unchanged web.run_app. No ContextVar framework, new required argument or replacement of an external start override is needed: normal current-loop registration shares the loop across nested synchronous calls.",
+    "edge": "Acquire/reuse the loop before edge server/client construction and configure. Retain the queued client.start_client task and call server.start(port=...) synchronously, preserving external factory signatures, trainer factory and missing-edge_client ValueError. Preserve the baseline absence of the server.run periodic task on this direct-start branch.",
+    "close_ownership": "run_app retains its existing ownership contract: it closes even a supplied loop, including a caller-supplied server loop. Do not promise borrowed-server survival through base.start; preserve the same loop for its preconstructed resources. An external override that returns/raises without run_app must leave a borrowed loop open. On open borrowed loops cancel/join only F01-owned periodic/edge tasks, never all_tasks. Only a scope that explicitly created an open loop performs full fallback cancel/gather, async-generator and executor shutdown, then closes. Before each stage check is_closed; never create shutdown coroutines after aiohttp closed the loop. Avoid a second cancel when task.cancelling()>0 so an awaiting finalizer can finish. Restore the originally observed open loop registration after success/error; if it was consumed/closed, or this invocation created the loop, set_event_loop(None). Do not restore a closed loop.",
+    "scheduled_failures": "Limit monitoring to the existing periodic and edge start_client task handles. Their done callbacks first handle cancelled(), retrieve exception() for completed failures, then inspect public Task.cancelling(). A positive cancellation count classifies a failure as teardown/cancellation-related even if finally replaced CancelledError with another exception: retain diagnostic, never stop the loop. This guard runs inside aiohttp internal cancellation, before start returns. Also disarm the local monitor before our own cleanup. For an active uncancelled failure, retain the first exception and request loop.stop once; after start unwinds propagate it according to the precedence rule. No task factory, global exception-policy change, private aiohttp state or general process supervisor. Extensions that suppress cancellation or erase cancellation history with uncancel are not guaranteed bounded/natural cleanup.",
+    "exception_precedence": "Independent synchronous configure/start/setup/bind errors take precedence over managed active-task failures; both precede teardown-only failures. Do not replace a primary error with cleanup errors: retrieve/log secondary errors with task identity and attach an exception note where useful. Replace only the specific run_until_complete loop-stopped RuntimeError caused by our recorded stop request with the retained active-task exception; do not treat arbitrary RuntimeError as a stop consequence. If no primary exists, propagate the retained active failure after cleanup; if only a retained F01 cleanup failure exists, report/raise it after cleanup without stopping cleanup mid-flight. Preserve normal cancellation and KeyboardInterrupt/SystemExit control flow, recording cleanup failures without replacing them. Public task cancellation state and local exception variables suffice.",
+    "cleanup_limits": "Natural cleanup assumes cooperative extension code. Runner.close, aiohttp task cancellation/gather and shutdown_asyncgens can wait indefinitely; a finite executor timeout does not bound these stages, and Runner permits up to 300 seconds for executor shutdown. A fallback owned-loop executor timeout of 5 seconds bounds only its wait and cannot kill a running thread. Do not rewrite Runner/run_app or add production-wide cancellation deadlines in F01. The acceptance harness owns the hard wall-clock/process bound; forced termination is containment, never graceful completion or proof of caller exception delivery.",
+    "boundaries": "Fix demonstrated bootstrap/compatibility failures proportionately. Keep synchronous extension points, os._exit, Socket.IO/auth, algorithms, spawn policy, checkpoint cleanup and unrelated examples unchanged. No AppRunner rewrite, global lifecycle framework or new task/process API. Report any separate noncooperative-production lifecycle requirement to root rather than expanding F01."
+  },
+  "tests": {
+    "execution": "After 1A acceptance run actual entrypoints in separate fresh interpreter subprocesses with an importable main-guarded helper and isolated TOML/runtime paths. Python 3.13 is the selected default; run matching Python 3.14 core probes as forward-compatibility evidence and record incompatibilities without blocking the entire refresh on optional robotics support. Raw fresh-process probes have no fixture-created loop or mocked asyncio/Runner/run_app. Separate explicit borrowing tests deliberately install a loop and preconstruct resources: they test compatibility and must not substitute for raw startup probes. Record interpreter/lock/diff identity, commands, markers and status. Hard bootstrap budget 30s plus 5s TERM and 5s KILL/reap containment; tiny real round 90s plus the same cleanup budget.",
+    "red": "Retain baseline subprocess failures for default-registry and supplied-custom client.run, ordinary and central Server.run, direct Server.start, and default/custom edge branches. Lightweight factories/configure/child-launch substitutes may isolate startup, but the actual entrypoint and real asyncio execute. Assert failure site and missing coroutine marker on 3.14, not any nonzero exit. Execute 3.13 controls separately; do not label unexecuted cases confirmed.",
+    "green": [
+      "Fresh default-registry/supplied clients execute actual coroutine and configure-queued work; success and sentinel failures return naturally. On an explicitly owned Runner path assert task/generator finalization and closed loop. On fresh 3.13 distinguish the conservatively borrowed policy-created loop and release it in the subprocess harness only after ownership assertions; do not claim entrypoint closure. Separately exercise an explicitly absent registration (set_event_loop(None), no created loop) and repeated entrypoints on both interpreters.",
+      "SDR-01: on both interpreters install a non-running caller loop before constructing a supplied client with a pending Future. configure queues its completion; actual client.run receives the result on that same loop. Both success and sentinel failure leave the loop open/current and unrelated caller task/Future/executor usable. Test post-configure ContextVars. External synchronous server overrides capture a Future before run; test their unchanged signatures, configure loop use and natural return/error with borrowed-loop preservation. Delegating super().start uses that same loop and is allowed to close it as baseline aiohttp does.",
+      "Ordinary/central Server.run execute exactly one periodic body; edge default/custom factories execute server work and client coroutine on one loop without adding a periodic task. Retain launch arguments, seed order, trainer factory and missing edge_client error. Cover direct base.start, returning/raising external start overrides, real aiohttp signal shutdown/on_startup sentinel and occupied-port bind failure. Owned fallback loop closes; borrowed override loop survives; run_app closure is not followed by a second shutdown attempt.",
+      "SDR-02: with real run_app combine an independent on_startup/bind failure, a managed task that raises a distinct exception from its cancellation finalizer, and a sibling awaiting in its own finalizer. Caller receives the original setup error, secondary error is retained diagnostically, sibling finishes and loop closes with no loop-stopped replacement or unawaited coroutine. Test active uncancelled periodic/edge failure separately, independent start error versus active failure, and cleanup-only failure; do not silently erase a failed task or interrupt cleanup.",
+      "Reject running-loop invocation before coroutine/resource creation. Cooperative success/error cases must finish naturally, with relevant task/generator/executor completion markers; borrowed-loop cases must not cancel caller work."
+    ],
+    "real_socket_smoke": [
+      "Use actual FedAvg server.run spawning two simple.Client processes, one CPU round, fixed seeds, clients.comm_simulation=false, do_test=false, no S3 or downloads. Provide only tiny test model/datasource factories: float-only torch model, deterministic distinct local TensorDatasets of 2 and 6 samples, all_inclusive sampler, real basic/composable SGD training and ordinary processors/serialization. Omit max_concurrency for this minimal smoke; existing spawn context stays intact.",
+      "Observe baseline weights, client IDs/PIDs, sample counts and before/after client parameters via test callbacks/hooks; require each independently trained client to change at least one parameter. Capture actual server-received payloads and final aggregate through existing hooks, without replacing aggregation. Assert received payloads match trained client weights and all floating tensors satisfy W_final = W_initial + sum(n_i * (W_i - W_initial))/sum(n_i), rtol=1e-5, atol=1e-6. Require two distinct reports with counts 2 and 6. Fabricated updates, FakeModel/StaticTrainingStrategy and direct aggregation calls do not qualify. Deep-copy/clone baseline and received tensors at observation hooks before later model updates; map each received payload/report to its logical client ID.",
+      "Use a per-run loopback port with bounded collision retry and a unique runtime root. Launch under a dedicated process session/group; track spawned clients and any descendants before they can be orphaned, using PID/start-time identity and test-only process-start observation. Record JSON markers durably before os._exit. Deadline 90 seconds; normal server/client exits and released port must occur without watchdog termination. Exit code zero alone is insufficient.",
+      "Separately exercise post-launch startup/periodic sentinel failure and a deliberately stalled client. Parent harness always drains output, waits, then terminates and kills only its owned process group/recorded descendants within 5+5 seconds, reaps direct children and verifies no survivors. Timeout is an expected result only for the explicit timeout test, never a successful round. Record natural exits versus forced cleanup; cleanup must not hide the original error.",
+      "Production os._exit means the successful real round proves transport, training, aggregation and process disappearance, not Python finally execution. Returning/signal/error bootstrap tests above independently prove loop cleanup. F01 does not promise new production child supervision; if normal round children survive, acceptance fails and root scopes the repair rather than counting harness kills as success."
+    ],
+    "teardown_containment": "SDR-03: separate subprocess variants deliberately stall (a) a task that catches cancellation, (b) an async-generator finalizer, and (c) an executor job. Include the real-run_app startup-failure/cancellation-stall variant. Before the stall, test hooks flush original failure identity and the exact entered stage to stderr/pipe. The parent records elapsed deadline and last marker, TERM/KILLs only its owned group/recorded descendants within the 30+5+5 second bound, reaps and verifies no survivors. Classify each forced exit as expected containment only in these negative tests, with natural cleanup and caller-delivery not achieved. Never count a watchdog kill as a passing regular regression or real round."
+  },
+  "handoff": {
+    "assumptions": [
+      "Recheck 1A-selected asyncio/aiohttp versions and close semantics before implementation.",
+      "Caller-provided non-running loops and preconstructed loop-bound resources are supported. Client borrowing preserves caller ownership; base server run_app consumes the same supplied loop under its existing contract.",
+      "No green implementation/real-round test has run in this design revision. Accepted review API probes are evidence of design requirements, not implementation acceptance."
+    ],
+    "default_policy": "Root selects Python 3.13 default due robotics dependency constraints; minimum remains 3.13. Python 3.14 core startup/runtime checks are forward-compatibility evidence, not a condition for finishing the entire refresh. Original planner owns the later plan.md amendment. This instruction supersedes the earlier prospective 3.14 default-promotion gate.",
+    "acceptance": "Root assigns the two runtime files and bounded tests to Sol after 1A acceptance and fresh design review. Preserve substantive default-version bootstrap/compatibility and real-round acceptance. Report 3.14 results and any limitations separately; do not widen F01 into general task/process supervision to force universal support.",
+    "archival_policy": "Separate user authorization: after evidence review, root may archive genuinely obsolete external integrations/algorithms when modernization is not worthwhile. Preserve dependency/compatibility notes and paper references; clean active registry, config, documentation and workspace references coherently. This does not authorize silently dropping supported startup/MLX paths or expanding these repair scopes."
+  },
+  "revision": {
+    "review": "startup-design-review.json",
+    "review_sha256": "697071e23864656339b2cf4dfbef5b5c982bbf2809b7b0666f9e77def4ec94f9",
+    "supersedes_sha256": "f807adc5806fd5ac382176c60a8208e6516c3333ce4561bc61be6f44d0f58876",
+    "policy": "Latest user/root steering selects Python 3.13 default because of robotics constraints. Python 3.14 core checks are forward-compatibility evidence, not a gate blocking the full refresh. The original planner will amend plan.md; this design does not edit it."
+  },
+  "finding_dispositions": [
+    {
+      "id": "SDR-01",
+      "severity": "high",
+      "disposition": "Addressed in design; implementation/regression pending.",
+      "resolution": "Borrow usable current loops, preserve preconstructed Futures and borrowed-client ownership; explicit caller/current registration and aiohttp consume behavior; separate fresh and borrowing tests."
+    },
+    {
+      "id": "SDR-02",
+      "severity": "medium",
+      "disposition": "Addressed in design; implementation/regression pending.",
+      "resolution": "Public Task.cancelling guard handles cancellation converted to a finalizer error before aiohttp returns; local cleanup disarming, single cancellation and deterministic setup/active/teardown precedence; real mixed-failure/sibling-finalizer regression."
+    },
+    {
+      "id": "SDR-03",
+      "severity": "medium",
+      "disposition": "Addressed as an explicit cooperative-cleanup limit with bounded containment, not a production hard-shutdown guarantee.",
+      "resolution": "Document unbounded library stages and Runner executor budget; add stage-marked task/generator/executor stall subprocesses and 30+5+5s parent containment. Preserve meaningful natural-return/real-round requirements without a general lifecycle framework."
+    }
+  ]
+}

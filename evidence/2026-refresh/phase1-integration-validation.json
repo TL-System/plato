@@ -1,0 +1,1445 @@
+{
+  "date": "2026-10-02",
+  "decision": "PASS",
+  "candidate_commit": "80539c3f5bfd3f56acfd67d61fba291ea3315f3b",
+  "candidate_tree": "2eaa46049fc0929938117f70c405adaabac1d6b5",
+  "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+  "platform_scope": "Root checkout on Apple Silicon macOS; Linux execution pending publication.",
+  "commands": [
+    {
+      "profile": {
+        "id": "mandatory-313",
+        "python": "3.13",
+        "env": "/Users/bli/Playground/plato/.venv",
+        "group": "dev"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bli/Playground/plato/.venv uv sync --locked --python 3.13 --no-default-groups --group dev > /tmp/plato-phase1-integration/sync-mandatory-313.log 2>&1",
+      "start": "2026-10-02T20:47:47.356Z",
+      "end": "2026-10-02T20:47:48.020Z",
+      "exit_code": 0,
+      "kind": "sync"
+    },
+    {
+      "profile": {
+        "id": "mandatory-313",
+        "python": "3.13",
+        "env": "/Users/bli/Playground/plato/.venv",
+        "group": "dev"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/Users/bli/Playground/plato/.venv HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -ra --basetemp=/tmp/plato-phase1-integration/pytest-mandatory-313 --junitxml=/tmp/plato-phase1-integration/mandatory-313.xml > /tmp/plato-phase1-integration/mandatory-313.log 2>&1",
+      "start": "2026-10-02T20:48:43.873Z",
+      "end": "2026-10-02T20:56:05.112Z",
+      "exit_code": 0,
+      "kind": "tests"
+    },
+    {
+      "profile": {
+        "id": "mandatory-314",
+        "python": "3.14",
+        "env": "/tmp/plato-phase1-integration/mandatory-314",
+        "group": "dev"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1-integration/mandatory-314 uv sync --locked --python 3.14 --no-default-groups --group dev > /tmp/plato-phase1-integration/sync-mandatory-314.log 2>&1",
+      "start": "2026-10-02T20:47:47.360Z",
+      "end": "2026-10-02T20:47:48.900Z",
+      "exit_code": 0,
+      "kind": "sync"
+    },
+    {
+      "profile": {
+        "id": "mandatory-314",
+        "python": "3.14",
+        "env": "/tmp/plato-phase1-integration/mandatory-314",
+        "group": "dev"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1-integration/mandatory-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -ra --basetemp=/tmp/plato-phase1-integration/pytest-mandatory-314 --junitxml=/tmp/plato-phase1-integration/mandatory-314.xml > /tmp/plato-phase1-integration/mandatory-314.log 2>&1",
+      "start": "2026-10-02T20:48:43.874Z",
+      "end": "2026-10-02T20:56:43.154Z",
+      "exit_code": 0,
+      "kind": "tests"
+    },
+    {
+      "profile": {
+        "id": "base-313",
+        "python": "3.13",
+        "env": "/tmp/plato-phase1-integration/base-313",
+        "group": "test-base"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1-integration/base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base > /tmp/plato-phase1-integration/sync-base-313.log 2>&1",
+      "start": "2026-10-02T20:47:47.360Z",
+      "end": "2026-10-02T20:47:48.852Z",
+      "exit_code": 0,
+      "kind": "sync"
+    },
+    {
+      "profile": {
+        "id": "base-313",
+        "python": "3.13",
+        "env": "/tmp/plato-phase1-integration/base-313",
+        "group": "test-base"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1-integration/base-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false uv run --no-sync --python 3.13 python -m pytest tests --test-profile=base -m \"not runtime\" -ra --basetemp=/tmp/plato-phase1-integration/pytest-base-313 --junitxml=/tmp/plato-phase1-integration/base-313.xml > /tmp/plato-phase1-integration/base-313.log 2>&1",
+      "start": "2026-10-02T20:48:43.874Z",
+      "end": "2026-10-02T20:49:12.302Z",
+      "exit_code": 0,
+      "kind": "tests"
+    },
+    {
+      "profile": {
+        "id": "base-314",
+        "python": "3.14",
+        "env": "/tmp/plato-phase1-integration/base-314",
+        "group": "test-base"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1-integration/base-314 uv sync --locked --python 3.14 --no-default-groups --group test-base > /tmp/plato-phase1-integration/sync-base-314.log 2>&1",
+      "start": "2026-10-02T20:47:47.360Z",
+      "end": "2026-10-02T20:47:48.899Z",
+      "exit_code": 0,
+      "kind": "sync"
+    },
+    {
+      "profile": {
+        "id": "base-314",
+        "python": "3.14",
+        "env": "/tmp/plato-phase1-integration/base-314",
+        "group": "test-base"
+      },
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1-integration/base-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false uv run --no-sync --python 3.14 python -m pytest tests --test-profile=base -m \"not runtime\" -ra --basetemp=/tmp/plato-phase1-integration/pytest-base-314 --junitxml=/tmp/plato-phase1-integration/base-314.xml > /tmp/plato-phase1-integration/base-314.log 2>&1",
+      "start": "2026-10-02T20:48:43.874Z",
+      "end": "2026-10-02T20:49:13.445Z",
+      "exit_code": 0,
+      "kind": "tests"
+    },
+    {
+      "id": "ruff",
+      "command": "uv run --no-sync ruff check . --select I > /tmp/plato-phase1-integration/ruff.log 2>&1",
+      "start": "2026-10-02T20:50:15.145Z",
+      "end": "2026-10-02T20:50:15.319Z",
+      "exit_code": 0,
+      "kind": "static"
+    },
+    {
+      "id": "typing",
+      "command": "uv run --no-sync ty check --output-format concise > /tmp/plato-phase1-integration/typing.log 2>&1",
+      "start": "2026-10-02T20:50:15.145Z",
+      "end": "2026-10-02T20:50:17.454Z",
+      "exit_code": 1,
+      "kind": "static"
+    },
+    {
+      "id": "build",
+      "command": "uv build --out-dir /tmp/plato-phase1-integration/dist > /tmp/plato-phase1-integration/build.log 2>&1",
+      "start": "2026-10-02T20:50:15.145Z",
+      "end": "2026-10-02T20:50:17.382Z",
+      "exit_code": 0,
+      "kind": "static"
+    },
+    {
+      "id": "diff",
+      "command": "git diff --check 5b8359bd40bbe65c7753e71f6627c490f9aa144f HEAD > /tmp/plato-phase1-integration/diff.log 2>&1",
+      "start": "2026-10-02T20:50:15.145Z",
+      "end": "2026-10-02T20:50:15.220Z",
+      "exit_code": 0,
+      "kind": "static"
+    }
+  ],
+  "suites": [
+    {
+      "profile": "mandatory-313",
+      "passed": 298,
+      "skip_reports": 1,
+      "skips": [
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "message": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+        }
+      ],
+      "seconds": 433.938,
+      "deselected_runtime": 0,
+      "junit_sha256": "809579e3a419df160a982780b7ee61973430322495b5222b1ca544105dd84910",
+      "log_sha256": "a294b28920f7445c405930e643f59dcfa09548f12286cef49484444c8d6c5edc",
+      "summary": "================== 298 passed, 1 skipped in 431.21s (0:07:11) ==================",
+      "environment": {
+        "packages": {
+          "Farama-Notifications": "0.0.6",
+          "Jinja2": "3.1.6",
+          "MarkupSafe": "3.0.3",
+          "PySocks": "1.7.1",
+          "PyYAML": "6.0.3",
+          "Pygments": "2.21.0",
+          "accelerate": "1.15.0",
+          "aiohappyeyeballs": "2.7.1",
+          "aiohttp": "3.14.3",
+          "aiosignal": "1.4.0",
+          "annotated-doc": "0.0.5",
+          "annotated-types": "0.8.0",
+          "anyio": "4.15.1",
+          "attrs": "26.1.0",
+          "beautifulsoup4": "4.15.0",
+          "bidict": "0.24.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "cloudpickle": "3.1.2",
+          "coverage": "7.16.2",
+          "datasets": "5.0.1",
+          "dill": "0.4.1",
+          "evaluate": "0.4.6",
+          "filelock": "4.0.9",
+          "frozenlist": "1.8.0",
+          "fsspec": "2026.6.0",
+          "gdown": "6.4.1",
+          "googleapis-common-protos": "1.75.5",
+          "gymnasium": "1.3.0",
+          "h11": "0.16.0",
+          "hf-xet": "1.6.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface_hub": "1.33.0",
+          "idna": "3.20",
+          "iniconfig": "2.3.0",
+          "jmespath": "1.1.0",
+          "kazoo": "2.11.0",
+          "markdown-it-py": "4.2.0",
+          "mdurl": "0.1.2",
+          "mpmath": "1.3.0",
+          "multidict": "6.9.1",
+          "multiprocess": "0.70.19",
+          "munch": "4.0.0",
+          "networkx": "3.7",
+          "numpy": "2.5.3",
+          "opacus": "1.6.0",
+          "opentelemetry-api": "1.45.0",
+          "opentelemetry-exporter-http-transport": "0.66b0",
+          "opentelemetry-exporter-otlp-common": "0.66b0",
+          "opentelemetry-exporter-otlp-proto-common": "1.45.0",
+          "opentelemetry-exporter-otlp-proto-http": "1.45.0",
+          "opentelemetry-proto": "1.45.0",
+          "opentelemetry-sdk": "1.45.0",
+          "opentelemetry-semantic-conventions": "0.66b0",
+          "opt_einsum": "3.4.0",
+          "packaging": "26.3",
+          "pandas": "3.0.6",
+          "peft": "0.21.2",
+          "pillow": "12.3.0",
+          "platformdirs": "4.12.2",
+          "plato-learn": "1.4.3",
+          "pluggy": "1.6.0",
+          "propcache": "0.5.4",
+          "protobuf": "7.36.2",
+          "psutil": "7.2.2",
+          "pyarrow": "25.0.1",
+          "pydantic": "2.13.5",
+          "pydantic_core": "2.46.5",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "python-dateutil": "2.9.0.post0",
+          "python-engineio": "4.14.0",
+          "python-socketio": "5.17.0",
+          "pytorch-ranger": "0.1.1",
+          "regex": "2026.9.29",
+          "requests": "2.34.2",
+          "rich": "15.0.0",
+          "ruff": "0.16.10",
+          "s3transfer": "0.19.2",
+          "safetensors": "0.8.0",
+          "scipy": "1.18.1",
+          "setuptools": "84.0.0",
+          "shellingham": "1.5.4",
+          "simple-websocket": "1.1.0",
+          "six": "1.17.0",
+          "soupsieve": "2.10",
+          "sympy": "1.14.0",
+          "tenseal": "0.3.18",
+          "tiktoken": "0.14.0",
+          "timm": "1.0.30",
+          "tokenizers": "0.23.2",
+          "torch": "2.14.1",
+          "torch-optimizer": "0.3.0",
+          "torchvision": "0.29.1",
+          "tqdm": "4.70.1",
+          "transformers": "5.18.0",
+          "ty": "0.0.84",
+          "typer": "0.27.2",
+          "typing-inspection": "0.4.4",
+          "typing_extensions": "4.16.0",
+          "urllib3": "2.8.0",
+          "wandb": "0.30.0",
+          "wsproto": "1.3.2",
+          "xxhash": "4.0.1",
+          "yarl": "1.25.1",
+          "zstd": "1.5.7.2"
+        },
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "plato_import": "/Users/bli/Playground/plato/plato/__init__.py",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]"
+      }
+    },
+    {
+      "profile": "mandatory-314",
+      "passed": 298,
+      "skip_reports": 1,
+      "skips": [
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "message": "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+        }
+      ],
+      "seconds": 449.378,
+      "deselected_runtime": 0,
+      "junit_sha256": "40d82d400b402f42ea2f33e74ccaca25f6ecb47b85470469869d6c71b7f05527",
+      "log_sha256": "4684085b0ec7e6302f7b0dd0e0cfafd4338eb462b571e34b4dee55049f208ccf",
+      "summary": "================== 298 passed, 1 skipped in 444.01s (0:07:24) ==================",
+      "environment": {
+        "packages": {
+          "Farama-Notifications": "0.0.6",
+          "Jinja2": "3.1.6",
+          "MarkupSafe": "3.0.3",
+          "PySocks": "1.7.1",
+          "PyYAML": "6.0.3",
+          "Pygments": "2.21.0",
+          "accelerate": "1.15.0",
+          "aiohappyeyeballs": "2.7.1",
+          "aiohttp": "3.14.3",
+          "aiosignal": "1.4.0",
+          "annotated-doc": "0.0.5",
+          "annotated-types": "0.8.0",
+          "anyio": "4.15.1",
+          "attrs": "26.1.0",
+          "beautifulsoup4": "4.15.0",
+          "bidict": "0.24.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "cloudpickle": "3.1.2",
+          "coverage": "7.16.2",
+          "datasets": "5.0.1",
+          "dill": "0.4.1",
+          "evaluate": "0.4.6",
+          "filelock": "4.0.9",
+          "frozenlist": "1.8.0",
+          "fsspec": "2026.6.0",
+          "gdown": "6.4.1",
+          "googleapis-common-protos": "1.75.5",
+          "gymnasium": "1.3.0",
+          "h11": "0.16.0",
+          "hf-xet": "1.6.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface_hub": "1.33.0",
+          "idna": "3.20",
+          "iniconfig": "2.3.0",
+          "jmespath": "1.1.0",
+          "kazoo": "2.11.0",
+          "markdown-it-py": "4.2.0",
+          "mdurl": "0.1.2",
+          "mpmath": "1.3.0",
+          "multidict": "6.9.1",
+          "multiprocess": "0.70.19",
+          "munch": "4.0.0",
+          "networkx": "3.7",
+          "numpy": "2.5.3",
+          "opacus": "1.6.0",
+          "opentelemetry-api": "1.45.0",
+          "opentelemetry-exporter-http-transport": "0.66b0",
+          "opentelemetry-exporter-otlp-common": "0.66b0",
+          "opentelemetry-exporter-otlp-proto-common": "1.45.0",
+          "opentelemetry-exporter-otlp-proto-http": "1.45.0",
+          "opentelemetry-proto": "1.45.0",
+          "opentelemetry-sdk": "1.45.0",
+          "opentelemetry-semantic-conventions": "0.66b0",
+          "opt_einsum": "3.4.0",
+          "packaging": "26.3",
+          "pandas": "3.0.6",
+          "peft": "0.21.2",
+          "pillow": "12.3.0",
+          "platformdirs": "4.12.2",
+          "plato-learn": "1.4.3",
+          "pluggy": "1.6.0",
+          "propcache": "0.5.4",
+          "protobuf": "7.36.2",
+          "psutil": "7.2.2",
+          "pyarrow": "25.0.1",
+          "pydantic": "2.13.5",
+          "pydantic_core": "2.46.5",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "python-dateutil": "2.9.0.post0",
+          "python-engineio": "4.14.0",
+          "python-socketio": "5.17.0",
+          "pytorch-ranger": "0.1.1",
+          "regex": "2026.9.29",
+          "requests": "2.34.2",
+          "rich": "15.0.0",
+          "ruff": "0.16.10",
+          "s3transfer": "0.19.2",
+          "safetensors": "0.8.0",
+          "scipy": "1.18.1",
+          "setuptools": "84.0.0",
+          "shellingham": "1.5.4",
+          "simple-websocket": "1.1.0",
+          "six": "1.17.0",
+          "soupsieve": "2.10",
+          "sympy": "1.14.0",
+          "tenseal": "0.3.18",
+          "tiktoken": "0.14.0",
+          "timm": "1.0.30",
+          "tokenizers": "0.23.2",
+          "torch": "2.14.1",
+          "torch-optimizer": "0.3.0",
+          "torchvision": "0.29.1",
+          "tqdm": "4.70.1",
+          "transformers": "5.18.0",
+          "ty": "0.0.84",
+          "typer": "0.27.2",
+          "typing-inspection": "0.4.4",
+          "typing_extensions": "4.16.0",
+          "urllib3": "2.8.0",
+          "wandb": "0.30.0",
+          "wsproto": "1.3.2",
+          "xxhash": "4.0.1",
+          "yarl": "1.25.1",
+          "zstd": "1.5.7.2"
+        },
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "plato_import": "/Users/bli/Playground/plato/plato/__init__.py",
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]"
+      }
+    },
+    {
+      "profile": "base-313",
+      "passed": 246,
+      "skip_reports": 4,
+      "skips": [
+        {
+          "node": {
+            "classname": "",
+            "name": "tests.trainers.test_dp_data_loader_strategy",
+            "time": "0.000"
+          },
+          "message": "collection skipped"
+        },
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "message": "base profile omits optional nanochat integration"
+        },
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_smoke",
+            "time": "0.000"
+          },
+          "message": "base profile omits optional nanochat integration"
+        },
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_selects_core_eval_strategy",
+            "time": "0.000"
+          },
+          "message": "base profile omits optional nanochat integration"
+        }
+      ],
+      "seconds": 1.054,
+      "deselected_runtime": 48,
+      "junit_sha256": "7daaf865be28231afabd4b5253b2b30d667c24d18e9ec2b0b396da6e029df59e",
+      "log_sha256": "019da7bf14478e5b39eeb31b97a2f73cc330a52a55f9cccce4d348674533afa7",
+      "summary": "================ 246 passed, 4 skipped, 48 deselected in 1.06s =================",
+      "environment": {
+        "packages": {
+          "Jinja2": "3.1.6",
+          "MarkupSafe": "3.0.3",
+          "PySocks": "1.7.1",
+          "PyYAML": "6.0.3",
+          "Pygments": "2.21.0",
+          "accelerate": "1.15.0",
+          "aiohappyeyeballs": "2.7.1",
+          "aiohttp": "3.14.3",
+          "aiosignal": "1.4.0",
+          "annotated-doc": "0.0.5",
+          "anyio": "4.15.1",
+          "attrs": "26.1.0",
+          "beautifulsoup4": "4.15.0",
+          "bidict": "0.24.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "coverage": "7.16.2",
+          "datasets": "5.0.1",
+          "dill": "0.4.1",
+          "evaluate": "0.4.6",
+          "filelock": "4.0.9",
+          "frozenlist": "1.8.0",
+          "fsspec": "2026.6.0",
+          "gdown": "6.4.1",
+          "h11": "0.16.0",
+          "hf-xet": "1.6.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface_hub": "1.33.0",
+          "idna": "3.20",
+          "iniconfig": "2.3.0",
+          "jmespath": "1.1.0",
+          "markdown-it-py": "4.2.0",
+          "mdurl": "0.1.2",
+          "mpmath": "1.3.0",
+          "multidict": "6.9.1",
+          "multiprocess": "0.70.19",
+          "munch": "4.0.0",
+          "networkx": "3.7",
+          "numpy": "2.5.3",
+          "packaging": "26.3",
+          "pandas": "3.0.6",
+          "peft": "0.21.2",
+          "pillow": "12.3.0",
+          "plato-learn": "1.4.3",
+          "pluggy": "1.6.0",
+          "propcache": "0.5.4",
+          "psutil": "7.2.2",
+          "pyarrow": "25.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "python-dateutil": "2.9.0.post0",
+          "python-engineio": "4.14.0",
+          "python-socketio": "5.17.0",
+          "pytorch-ranger": "0.1.1",
+          "regex": "2026.9.29",
+          "requests": "2.34.2",
+          "rich": "15.0.0",
+          "s3transfer": "0.19.2",
+          "safetensors": "0.8.0",
+          "scipy": "1.18.1",
+          "setuptools": "84.0.0",
+          "shellingham": "1.5.4",
+          "simple-websocket": "1.1.0",
+          "six": "1.17.0",
+          "soupsieve": "2.10",
+          "sympy": "1.14.0",
+          "tenseal": "0.3.18",
+          "timm": "1.0.30",
+          "tokenizers": "0.23.2",
+          "torch": "2.14.1",
+          "torch-optimizer": "0.3.0",
+          "torchvision": "0.29.1",
+          "tqdm": "4.70.1",
+          "transformers": "5.18.0",
+          "typer": "0.27.2",
+          "typing_extensions": "4.16.0",
+          "urllib3": "2.8.0",
+          "wsproto": "1.3.2",
+          "xxhash": "4.0.1",
+          "yarl": "1.25.1",
+          "zstd": "1.5.7.2"
+        },
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "plato_import": "/Users/bli/Playground/plato/plato/__init__.py",
+        "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]"
+      }
+    },
+    {
+      "profile": "base-314",
+      "passed": 246,
+      "skip_reports": 4,
+      "skips": [
+        {
+          "node": {
+            "classname": "",
+            "name": "tests.trainers.test_dp_data_loader_strategy",
+            "time": "0.000"
+          },
+          "message": "collection skipped"
+        },
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_tokenizer_processor_round_trip",
+            "time": "0.000"
+          },
+          "message": "base profile omits optional nanochat integration"
+        },
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_smoke",
+            "time": "0.000"
+          },
+          "message": "base profile omits optional nanochat integration"
+        },
+        {
+          "node": {
+            "classname": "tests.test_nanochat_integration",
+            "name": "test_nanochat_trainer_selects_core_eval_strategy",
+            "time": "0.000"
+          },
+          "message": "base profile omits optional nanochat integration"
+        }
+      ],
+      "seconds": 1.369,
+      "deselected_runtime": 48,
+      "junit_sha256": "ecbf714fa094763816becf947445d52f758b33fd1f27aa92dcb73ea716ec5983",
+      "log_sha256": "0cfff3a8a75176fd9abc37f913ab7fd7015d8f0442a85853dec3a8e187825770",
+      "summary": "================ 246 passed, 4 skipped, 48 deselected in 1.37s =================",
+      "environment": {
+        "packages": {
+          "Jinja2": "3.1.6",
+          "MarkupSafe": "3.0.3",
+          "PySocks": "1.7.1",
+          "PyYAML": "6.0.3",
+          "Pygments": "2.21.0",
+          "accelerate": "1.15.0",
+          "aiohappyeyeballs": "2.7.1",
+          "aiohttp": "3.14.3",
+          "aiosignal": "1.4.0",
+          "annotated-doc": "0.0.5",
+          "anyio": "4.15.1",
+          "attrs": "26.1.0",
+          "beautifulsoup4": "4.15.0",
+          "bidict": "0.24.1",
+          "boto3": "1.43.106",
+          "botocore": "1.43.106",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.2",
+          "click": "8.5.0",
+          "coverage": "7.16.2",
+          "datasets": "5.0.1",
+          "dill": "0.4.1",
+          "evaluate": "0.4.6",
+          "filelock": "4.0.9",
+          "frozenlist": "1.8.0",
+          "fsspec": "2026.6.0",
+          "gdown": "6.4.1",
+          "h11": "0.16.0",
+          "hf-xet": "1.6.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface_hub": "1.33.0",
+          "idna": "3.20",
+          "iniconfig": "2.3.0",
+          "jmespath": "1.1.0",
+          "markdown-it-py": "4.2.0",
+          "mdurl": "0.1.2",
+          "mpmath": "1.3.0",
+          "multidict": "6.9.1",
+          "multiprocess": "0.70.19",
+          "munch": "4.0.0",
+          "networkx": "3.7",
+          "numpy": "2.5.3",
+          "packaging": "26.3",
+          "pandas": "3.0.6",
+          "peft": "0.21.2",
+          "pillow": "12.3.0",
+          "plato-learn": "1.4.3",
+          "pluggy": "1.6.0",
+          "propcache": "0.5.4",
+          "psutil": "7.2.2",
+          "pyarrow": "25.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "python-dateutil": "2.9.0.post0",
+          "python-engineio": "4.14.0",
+          "python-socketio": "5.17.0",
+          "pytorch-ranger": "0.1.1",
+          "regex": "2026.9.29",
+          "requests": "2.34.2",
+          "rich": "15.0.0",
+          "s3transfer": "0.19.2",
+          "safetensors": "0.8.0",
+          "scipy": "1.18.1",
+          "setuptools": "84.0.0",
+          "shellingham": "1.5.4",
+          "simple-websocket": "1.1.0",
+          "six": "1.17.0",
+          "soupsieve": "2.10",
+          "sympy": "1.14.0",
+          "tenseal": "0.3.18",
+          "timm": "1.0.30",
+          "tokenizers": "0.23.2",
+          "torch": "2.14.1",
+          "torch-optimizer": "0.3.0",
+          "torchvision": "0.29.1",
+          "tqdm": "4.70.1",
+          "transformers": "5.18.0",
+          "typer": "0.27.2",
+          "typing_extensions": "4.16.0",
+          "urllib3": "2.8.0",
+          "wsproto": "1.3.2",
+          "xxhash": "4.0.1",
+          "yarl": "1.25.1",
+          "zstd": "1.5.7.2"
+        },
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "plato_import": "/Users/bli/Playground/plato/plato/__init__.py",
+        "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]"
+      }
+    }
+  ],
+  "runtime": [
+    {
+      "profile": "mandatory-313",
+      "cases": 48,
+      "intentional_watchdog_timeouts": [
+        "client_lifecycle",
+        "client_lifecycle",
+        "client_lifecycle",
+        "ordinary",
+        "socket_stall"
+      ],
+      "live_survivors": 0,
+      "artifacts": [
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-313/test_active_edge_failure_unwin0/edge/result.json",
+          "sha256": "81c4971ee4c9c8498619e690b37f5c09065ae4c4892c844dda2043839d6dd76e"
+        },
+        {
+          "case": "client_custom",
+          "path": "pytest-mandatory-313/test_active_failure_reaches_sy0/client_custom/result.json",
+          "sha256": "f0fca406829bc70ae9bd2dc2f1ca18a352ab47db8d913b9430ebc211aa8ca298"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_active_failure_reaches_sy1/ordinary/result.json",
+          "sha256": "358560356bc53847780c74239afd7de2c9f6bf132ce810582eb2f06c6d2620b2"
+        },
+        {
+          "case": "central",
+          "path": "pytest-mandatory-313/test_active_failure_reaches_sy2/central/result.json",
+          "sha256": "f7c5c6ca1063fca0cae1bd251af249ca042aadfaf592d74b9e0179c87050b205"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-313/test_active_failure_reaches_sy3/edge_custom/result.json",
+          "sha256": "5f3872279bd8510fe10955bbff2eb0b83a188aeee5f3f7c8d249a89b1ba2e84e"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_cancellation_already_fina0/cancelling/result.json",
+          "sha256": "ff1956062b968265477dcbcf53b7250081fd3feb6d0ace41bec20e66d4347486"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_client_control_flow_keeps0/interrupt/result.json",
+          "sha256": "d8d2db7582728d804ea6e84c06fbfb8651b6e37c563cc93b0b1d3259f99d8a19"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_client_control_flow_keeps1/exit/result.json",
+          "sha256": "e56e690ff9cd77a07d3012cf2dab61b4920afc7c5739252000342de466f04818"
+        },
+        {
+          "case": "client_custom",
+          "path": "pytest-mandatory-313/test_closed_current_client_loo0/closed/result.json",
+          "sha256": "51a5b52522915527efdc92669dfbc9ebac2d223f8c3ae4749a6ae6acc914b8d6"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_configure_failure_is_pres0/configure/result.json",
+          "sha256": "f62dfa31f7e9f135339113753b6a25ecaf2bcfd6ffc2349f5cc3345cb538c718"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_delegating_server_consume0/delegated/result.json",
+          "sha256": "a4412e8a261a33e72bd5d7a4ea8e02858d427de9348c7c108a9a1e2b8e66d657"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-313/test_edge_cancellation_error_k0/edge/result.json",
+          "sha256": "0f30fe4b02a20cfe8f5a2796bcfc498ef6c5f1b744f7f0e7b38744c5a02a2b26"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_explicitly_absent_loop_on0/ordinary/result.json",
+          "sha256": "d592501a0abb3e4941e74218142f7cd5a708b0072e0270602ff0fda7b023dc12"
+        },
+        {
+          "case": "central",
+          "path": "pytest-mandatory-313/test_explicitly_absent_loop_on1/central/result.json",
+          "sha256": "2a48c1bf0de80670cc6eea678ef31e9cf0567d1accac765bf0c87db828148d6a"
+        },
+        {
+          "case": "edge_default",
+          "path": "pytest-mandatory-313/test_explicitly_absent_loop_on2/edge_default/result.json",
+          "sha256": "034c286f749e082465a65a635f97824ca8091eaaf5bb7353a70acb2b6e4e0329"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-313/test_explicitly_absent_loop_on3/edge_custom/result.json",
+          "sha256": "2bb28c76da2248713c9aa57a61b52c88bcf09a218e9e8413b6f338d12d2583d9"
+        },
+        {
+          "case": "client_default",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes0/client_default/result.json",
+          "sha256": "6f237e4f22139c3189c07f893b51537a8f71d4ba98e71664abf4c3ce28d08b12"
+        },
+        {
+          "case": "client_custom",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes1/client_custom/result.json",
+          "sha256": "9f0aa9b0ba9829b90651d2cce56e023263c27f4c29a527aad0b9d113e5faa36b"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes2/ordinary/result.json",
+          "sha256": "860efaf32b77912794f3396a14ecdc1005b5aa23ad6c66afa760d29c65d35304"
+        },
+        {
+          "case": "central",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes3/central/result.json",
+          "sha256": "e9072d6b6c421db51ba00b29ceee0e6ca6540e432ef612a2f7ff501c75903f77"
+        },
+        {
+          "case": "direct",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes4/direct/result.json",
+          "sha256": "de30e77ccd0e7892a83173ea985b225d4ab8116d115c3bfd06071e31ca085688"
+        },
+        {
+          "case": "edge_default",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes5/edge_default/result.json",
+          "sha256": "6eb1c8854c5eb1554d6f88462d5711bb6ccead2c8436ce380c50e2ab8ac446ef"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-313/test_fresh_entrypoint_executes6/edge_custom/result.json",
+          "sha256": "42d5704fad624fbf553a299b33f95a2912e7cd052b673c057e52110dad0c2906"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_independent_runtime_error0/independent/result.json",
+          "sha256": "792bdf148f048d401f806a1fb53f4341499be64c31f0d56e3891e6fd2f8aba11"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-313/test_missing_external_edge_cli0/edge/result.json",
+          "sha256": "eca42d3b07589b8829527e70fae7320693beddd101fc8b4dead2fa0d5cbe10b5"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_noncooperative_teardown_i0/task/result.json",
+          "sha256": "23b2b541642e4304cd59163346e1775d89d3719b1f310a830c243b2e68e381b0"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_noncooperative_teardown_i1/generator/result.json",
+          "sha256": "d4a3fab38055e21c24684c1141ee33d567280fde23d26ff2007916eb156532ae"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_noncooperative_teardown_i2/executor/result.json",
+          "sha256": "555178db8e81f6814295eb5038becb77a28b4c86c1aa363ee43295e495195133"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "sha256": "ebc12122bcbc488b8edcb63c96de487d0be3245d5944b2ddaddac73176828a30"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_owned_client_finalizes_ta0/client/result.json",
+          "sha256": "1f3b0a49134686954f99b57118053e868253fcec79cedd4aede36c6d4f69f050"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_owned_client_finalizes_ta1/client/result.json",
+          "sha256": "a894307caafa25d0dfd3aa10c50bea8cd42479a03a0c7a2eaf1443d172672a96"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_owned_server_fallback_fin0/fallback/result.json",
+          "sha256": "3992de5874e5a0e907f2638bbec46f9ad8240ebf2151aee67d2c5a19ef89d068"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_owned_server_fallback_fin1/fallback/result.json",
+          "sha256": "47cdc7cf416ca35dadfd67785cd14ebfb63524caee75311a02eb184629d0dc81"
+        },
+        {
+          "case": "socket_failure",
+          "path": "pytest-mandatory-313/test_post_launch_failure_keeps0/failure/result.json",
+          "sha256": "2329edbb5d8e3b8122091f73641045f180b4386fb44c364ae1c2e2ddfb049835"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+          "sha256": "0a200a4a7631815420a80155a2f1f286c377c335923fb9bf2d4c058f724ffd9b"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+          "sha256": "37bc2953b8b2414d914bdbf2197b713e5507b03442ad5e90f9faedf8fbe4caaf"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_preconstructed_borrowed_l2/ordinary/result.json",
+          "sha256": "d523f4710e52392467b2dc058a9e8596ac1fa98ce7caa606c1bf3133d2d3a36f"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_preconstructed_borrowed_l3/ordinary/result.json",
+          "sha256": "5035314cf64ac089112182a45ddccac10ea1c96c93e1bfbb6e7787b933186efb"
+        },
+        {
+          "case": "socket_round",
+          "path": "pytest-mandatory-313/test_real_two_client_cpu_socke0/round/result.json",
+          "sha256": "d9a8ccf9b1c71000b43acbcdb096660b5e27df6477cfe3c740ac745465f0615b"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_repeated_owned_client_ent0/client/result.json",
+          "sha256": "83ce20afa507fa36f4eb06f60229aaddf87c76d08c1f1a516e09ceb92083265d"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-313/test_runner_cleanup_error_keep0/cleanup/result.json",
+          "sha256": "32edc32ea295ce1910893cbdb8b9ada5e13137874fb6993d30dcc3a17ee382f5"
+        },
+        {
+          "case": "running",
+          "path": "pytest-mandatory-313/test_running_loop_rejected_bef0/running/result.json",
+          "sha256": "03354f8a27aafdde5e6438f725bc3476590a2890148fd013bd44bc819b152d2c"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_server_error_precedence_a0/server/result.json",
+          "sha256": "f0aaecd1820460fb67be9751780eeaaa4fcfd7e4adec850fa2ea076b6698b99c"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_server_error_precedence_a1/server/result.json",
+          "sha256": "81f5601389cd75feaa7b2e6158dece9b68ef1def66a30dea081be0084825e84f"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_server_error_precedence_a2/server/result.json",
+          "sha256": "485d6aec7fbdda2e626d9c2d07375c9034831256ab0b4b45ac95e54a69699418"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_server_error_precedence_a3/server/result.json",
+          "sha256": "588266735261b96376a15edc93abe2a197b2465f0941abf531a9c0fefc3b0b93"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-313/test_server_error_precedence_a4/server/result.json",
+          "sha256": "c9c88232f620c714a2e6699415d0d7c5def670502ba103bd5965c41e189b53ab"
+        },
+        {
+          "case": "socket_stall",
+          "path": "pytest-mandatory-313/test_stalled_real_client_is_co0/stalled/result.json",
+          "sha256": "34c61c6c2e1dd19ef0f2c162b75e6877e5231ad483d4a0ccbd13a4ffb8754709"
+        }
+      ],
+      "socket_round": {
+        "result_sha256": "d9a8ccf9b1c71000b43acbcdb096660b5e27df6477cfe3c740ac745465f0615b",
+        "elapsed": 14.556334916967899,
+        "natural_client_returns": 2,
+        "forced": [],
+        "received_samples": [
+          2,
+          6
+        ],
+        "baseline": {
+          "linear.weight": [
+            [
+              0.20000000298023224,
+              -0.10000000149011612
+            ],
+            [
+              -0.30000001192092896,
+              0.4000000059604645
+            ]
+          ],
+          "linear.bias": [
+            0.0,
+            0.0
+          ]
+        },
+        "received": [
+          {
+            "event": "server_received",
+            "pid": 21630,
+            "client_id": 2,
+            "samples": 2,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "server_received",
+            "pid": 21630,
+            "client_id": 1,
+            "samples": 6,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "actual_aggregate": {
+          "linear.weight": [
+            [
+              0.18379171192646027,
+              -0.0930701196193695
+            ],
+            [
+              -0.283791720867157,
+              0.39307013154029846
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066117495298,
+            0.005870074965059757
+          ]
+        },
+        "independent_weighted_reference": {
+          "linear.weight": [
+            [
+              0.18379170820116997,
+              -0.0930701196193695
+            ],
+            [
+              -0.2837917059659958,
+              0.39307013899087906
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066175702959,
+            0.005870075256098062
+          ]
+        },
+        "tolerance": {
+          "rtol": 1e-05,
+          "atol": 1e-06
+        }
+      },
+      "lifecycle_boundary": "Normal production server exit retains os._exit. Cooperative finalizer tests are separate; watchdog containment is not graceful finalization."
+    },
+    {
+      "profile": "mandatory-314",
+      "cases": 48,
+      "intentional_watchdog_timeouts": [
+        "client_lifecycle",
+        "client_lifecycle",
+        "client_lifecycle",
+        "ordinary",
+        "socket_stall"
+      ],
+      "live_survivors": 0,
+      "artifacts": [
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-314/test_active_edge_failure_unwin0/edge/result.json",
+          "sha256": "b1c7a289c0f5b8ce927fd760af93475f670563573c99124c0499981da37af60f"
+        },
+        {
+          "case": "client_custom",
+          "path": "pytest-mandatory-314/test_active_failure_reaches_sy0/client_custom/result.json",
+          "sha256": "d90229ce0c662cac12973c11388f2261c2892f869f6764d12a3cfd8d7f4ce281"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_active_failure_reaches_sy1/ordinary/result.json",
+          "sha256": "8a7a0e9ce3212c8cec693c910f27ca6c45c4ad8de6132024e5780ef387aeb45d"
+        },
+        {
+          "case": "central",
+          "path": "pytest-mandatory-314/test_active_failure_reaches_sy2/central/result.json",
+          "sha256": "a5451e9eae15eb55232ba975fb573500875d7d027a0f68a761784995642a39ce"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-314/test_active_failure_reaches_sy3/edge_custom/result.json",
+          "sha256": "202c88b088cb40dadd32546116461d1776c2ab207f546714538683f3fa9efc60"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_cancellation_already_fina0/cancelling/result.json",
+          "sha256": "95bf32183a6cb6f28422bd8fca9b624c0a10cf1b6111a47cb8731c3d1f601a3f"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_client_control_flow_keeps0/interrupt/result.json",
+          "sha256": "ca929a085a12a15b8aca08da5bd7f79ff92756d776a1a8f93992a6364866804c"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_client_control_flow_keeps1/exit/result.json",
+          "sha256": "06568bf8296894a918130b244a0c4f8a04e2d8c0a9330f84b7c8e41c7bcde3c6"
+        },
+        {
+          "case": "client_custom",
+          "path": "pytest-mandatory-314/test_closed_current_client_loo0/closed/result.json",
+          "sha256": "ecd90aaad9d95897db7c0e8b3c94a7f9c7d7a56689e1177b8cf9835dcc9d28d5"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_configure_failure_is_pres0/configure/result.json",
+          "sha256": "963baa88eb4508cf050001b1b695f92bdf2b1301c5a1a1a386524e6afd40ab96"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_delegating_server_consume0/delegated/result.json",
+          "sha256": "ca2eb5c7ad0e2ea9f7fb8f5a3f0fea6aa5b061dedaaa23380ee78573a119cccd"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-314/test_edge_cancellation_error_k0/edge/result.json",
+          "sha256": "32b3aae141b4a1dc2f760262c3e30f66d8aac7e1dfe7fea8e1e9bedcc52be0ca"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_explicitly_absent_loop_on0/ordinary/result.json",
+          "sha256": "68024151377e6efcbfeb3620fe1af4086cc38e07752ee1c1d11da5a008787ded"
+        },
+        {
+          "case": "central",
+          "path": "pytest-mandatory-314/test_explicitly_absent_loop_on1/central/result.json",
+          "sha256": "fc41ce2a4eb01078d35c7bd8dd2dd9ff35a6d16e13c377377b7285f277cdeb87"
+        },
+        {
+          "case": "edge_default",
+          "path": "pytest-mandatory-314/test_explicitly_absent_loop_on2/edge_default/result.json",
+          "sha256": "c66ea6b6ac4b119bda2f5a09156ccba2c438779879c8b4671c172e7d0bbe6e05"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-314/test_explicitly_absent_loop_on3/edge_custom/result.json",
+          "sha256": "44cc60ce08a249e242936c9e12d78fdc7cc6f47bb7bf0cc7bb5669a26cc174d6"
+        },
+        {
+          "case": "client_default",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes0/client_default/result.json",
+          "sha256": "32ad8d6e3376c5f8b1d8eff9e8b318fc8c072d328fc42494a76f2f9cca7cda42"
+        },
+        {
+          "case": "client_custom",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes1/client_custom/result.json",
+          "sha256": "6ca46172ad2d0e9a7a8412940f8e6f12b458bb2f544192969a7877104f6319e5"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes2/ordinary/result.json",
+          "sha256": "5ce886396c50f98a4f1e232d1d13e9238d8ee48aa94e1361c273ec772f420f57"
+        },
+        {
+          "case": "central",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes3/central/result.json",
+          "sha256": "2f3e35342eae3b989aa8d4d2a23298e30a43873152a921c6d736e576ded92ac4"
+        },
+        {
+          "case": "direct",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes4/direct/result.json",
+          "sha256": "04a20128342312be6df12387802eafd11ae75e0eda32721e2a881a088f1ff7a4"
+        },
+        {
+          "case": "edge_default",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes5/edge_default/result.json",
+          "sha256": "d40710edd19f30290da6d13b991ae0200b3f5ddd26eaaf3ab52c195f6cbdb24f"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-314/test_fresh_entrypoint_executes6/edge_custom/result.json",
+          "sha256": "90520cb9cf21d141787f1b199fb0f571f491daf4805d87b4374a41392899a29a"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_independent_runtime_error0/independent/result.json",
+          "sha256": "9ded640f13031f46ddaab729733e21ceab69675e6b7ad3be997d2fd833517e2f"
+        },
+        {
+          "case": "edge_custom",
+          "path": "pytest-mandatory-314/test_missing_external_edge_cli0/edge/result.json",
+          "sha256": "32eba379cc40b1525ee33f024c149a522927b579180b36793a6b20e460d70221"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_noncooperative_teardown_i0/task/result.json",
+          "sha256": "224196b706cd40ffba926801c3a5e78f68ff0c288bc2b4f0207357d1c88ea06e"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_noncooperative_teardown_i1/generator/result.json",
+          "sha256": "759ca4b7935d76f5ee54f79b29a78d651e47221be243101373fa716660674f9a"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_noncooperative_teardown_i2/executor/result.json",
+          "sha256": "bcc2f66a41bde47da52350fc79325766b4f25c3d2d8e8119b956a14d6e7710e0"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+          "sha256": "b66c2c10edf243e8955edc5049b8cac0cb2428e491501a9c7045e38d4f109f63"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_owned_client_finalizes_ta0/client/result.json",
+          "sha256": "9459a33069f429889ffa31e9f865d25de5feacd733d7e35fd469947f36281c4e"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_owned_client_finalizes_ta1/client/result.json",
+          "sha256": "ed08be5a065bc1c24bd872de125b9275b07baf4e232fea2add22c0b4e1b7f591"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_owned_server_fallback_fin0/fallback/result.json",
+          "sha256": "f19fd077d7bd3dce2cfc0d8b361d757de614c6f82b4b0150e9a6b8333050154d"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_owned_server_fallback_fin1/fallback/result.json",
+          "sha256": "7374f0c2769b0f0a87f10e4a83649f7b16110e8d7e9b1f8ea9d7b509e17953c4"
+        },
+        {
+          "case": "socket_failure",
+          "path": "pytest-mandatory-314/test_post_launch_failure_keeps0/failure/result.json",
+          "sha256": "a9342b360f6b9948d30d7de793cb2f4607376307db2960a606ef3fcbbed54fa0"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+          "sha256": "1ec2c79fd803237c65bdec96396347d0b6ebe472191cf67ce67eb46cd9856b3c"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+          "sha256": "e35dac6e0056eb77323059f1f2cee58c0e09b8162c6b45c84ab20088698ddccb"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_preconstructed_borrowed_l2/ordinary/result.json",
+          "sha256": "e9a3815f5d08f91ef119df236b7dfeaf85db804dd59a2271bbfc7b857b006712"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_preconstructed_borrowed_l3/ordinary/result.json",
+          "sha256": "45d724365d46c6c9a481d61b51aa914b8fd76c9ed998b28813a81aa5a63c08f6"
+        },
+        {
+          "case": "socket_round",
+          "path": "pytest-mandatory-314/test_real_two_client_cpu_socke0/round/result.json",
+          "sha256": "8a262ba496cfda5a10b3c8344eb8b2610f63fc903bfd04b2ffc1c2b782084932"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_repeated_owned_client_ent0/client/result.json",
+          "sha256": "6a4a2355fa861bb4943a9a5383c3fbb8d4a2a4f565dfeeeb2e5606d96ddce6bb"
+        },
+        {
+          "case": "client_lifecycle",
+          "path": "pytest-mandatory-314/test_runner_cleanup_error_keep0/cleanup/result.json",
+          "sha256": "86d3281fc3c0941cbc0dcf1fce4c632356b931e7f3ec39e6be5a2b05fa7ae08d"
+        },
+        {
+          "case": "running",
+          "path": "pytest-mandatory-314/test_running_loop_rejected_bef0/running/result.json",
+          "sha256": "f5614880ccd03a70c294291412ad0c664e0cf7088903ceb1e82fbcad63d08864"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_server_error_precedence_a0/server/result.json",
+          "sha256": "83af804e46987fb0a6b6d0888b8e43db750f461fa4cdf7f2fb566b4d98481ad3"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_server_error_precedence_a1/server/result.json",
+          "sha256": "91c619f5645085e30149f64650d2df646c7fadda4e24d93cd9317510f1006a54"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_server_error_precedence_a2/server/result.json",
+          "sha256": "aeb7a611d9e1acf28c639649a6a0af1b997b656a4a4cf86835277877094b80b9"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_server_error_precedence_a3/server/result.json",
+          "sha256": "0afd936cf84f8d96c64441aef075517e7b4d4c163f6f9f5d2554e71dce74786f"
+        },
+        {
+          "case": "ordinary",
+          "path": "pytest-mandatory-314/test_server_error_precedence_a4/server/result.json",
+          "sha256": "a564c9ad17bf7f6c5a72ee34e8b7c173a3dbbe2fc7c7b991c819f65bac916380"
+        },
+        {
+          "case": "socket_stall",
+          "path": "pytest-mandatory-314/test_stalled_real_client_is_co0/stalled/result.json",
+          "sha256": "878c2944ee84c6bb78a2bc8488b5a9474e8fcabfab8d51d74d7f5dbeedafa7d6"
+        }
+      ],
+      "socket_round": {
+        "result_sha256": "8a262ba496cfda5a10b3c8344eb8b2610f63fc903bfd04b2ffc1c2b782084932",
+        "elapsed": 14.758040125016123,
+        "natural_client_returns": 2,
+        "forced": [],
+        "received_samples": [
+          2,
+          6
+        ],
+        "baseline": {
+          "linear.weight": [
+            [
+              0.20000000298023224,
+              -0.10000000149011612
+            ],
+            [
+              -0.30000001192092896,
+              0.4000000059604645
+            ]
+          ],
+          "linear.bias": [
+            0.0,
+            0.0
+          ]
+        },
+        "received": [
+          {
+            "event": "server_received",
+            "pid": 21643,
+            "client_id": 2,
+            "samples": 2,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "server_received",
+            "pid": 21643,
+            "client_id": 1,
+            "samples": 6,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "actual_aggregate": {
+          "linear.weight": [
+            [
+              0.18379171192646027,
+              -0.0930701196193695
+            ],
+            [
+              -0.283791720867157,
+              0.39307013154029846
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066117495298,
+            0.005870074965059757
+          ]
+        },
+        "independent_weighted_reference": {
+          "linear.weight": [
+            [
+              0.18379170820116997,
+              -0.0930701196193695
+            ],
+            [
+              -0.2837917059659958,
+              0.39307013899087906
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066175702959,
+            0.005870075256098062
+          ]
+        },
+        "tolerance": {
+          "rtol": 1e-05,
+          "atol": 1e-06
+        }
+      },
+      "lifecycle_boundary": "Normal production server exit retains os._exit. Cooperative finalizer tests are separate; watchdog containment is not graceful finalization."
+    }
+  ],
+  "static": {
+    "typing_gate_exit_code": 0,
+    "typing_gate_stdout": "",
+    "typing_gate_stderr": "",
+    "typing_gate_program_sha256": "00848cf8a0e6e64da9c14a9389d53265bed48f526a13d8dcba117210019df09f",
+    "wheel_generator": "Wheel-Version: 1.0\nGenerator: hatchling 1.32.4\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+    "wheel_runtime_matches": {
+      "plato/client.py": true,
+      "plato/servers/base.py": true
+    },
+    "artifacts": {
+      "plato_learn-1.4.3-py3-none-any.whl": "118b4205672f973725d3f22d5d37ddd71a59c4d9587e904a7cf5765e363433d9",
+      "plato_learn-1.4.3.tar.gz": "e3248e8f2c9139e9bfc0520f718569b554e2de427337fc85945e50f9446211eb"
+    }
+  },
+  "typing": {
+    "diagnostics": 404,
+    "baseline": 384,
+    "accepted_startup_helpers": 20,
+    "raw_exit_code": 1,
+    "workflow_classification_gate_exit_code": 0
+  },
+  "boundary": "These are fresh full root-checkout runs after fast-forward integration. They supersede retained candidate runtime results for local final validation. Coverage was not recollected. Phase 2 and Linux support are not claimed."
+}

@@ -1,0 +1,2282 @@
+{
+  "baseline_commit": "5b8359bd40bbe65c7753e71f6627c490f9aa144f",
+  "python": "3.13.16",
+  "command": "COVERAGE_FILE=/tmp/plato-baseline-coverage uv run --with pytest-cov --extra dp --extra mpc --extra rl --extra nanochat pytest tests -q --cov=plato",
+  "tests": {
+    "passed": 248,
+    "skipped": 3,
+    "warnings": 8
+  },
+  "totals": {
+    "covered_lines": 7257,
+    "num_statements": 16935,
+    "percent_covered": 42.852081488042515,
+    "percent_covered_display": "43",
+    "missing_lines": 9678,
+    "excluded_lines": 192,
+    "percent_statements_covered": 42.852081488042515,
+    "percent_statements_covered_display": "43"
+  },
+  "files": {
+    "plato/__init__.py": {
+      "covered_lines": 1,
+      "num_statements": 1,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/algorithms/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/algorithms/base.py": {
+      "covered_lines": 25,
+      "num_statements": 31,
+      "percent_covered": 80.64516129032258,
+      "percent_covered_display": "81",
+      "missing_lines": 6,
+      "excluded_lines": 0,
+      "percent_statements_covered": 80.64516129032258,
+      "percent_statements_covered_display": "81"
+    },
+    "plato/algorithms/fedavg.py": {
+      "covered_lines": 130,
+      "num_statements": 165,
+      "percent_covered": 78.78787878787878,
+      "percent_covered_display": "79",
+      "missing_lines": 35,
+      "excluded_lines": 0,
+      "percent_statements_covered": 78.78787878787878,
+      "percent_statements_covered_display": "79"
+    },
+    "plato/algorithms/fedavg_gan.py": {
+      "covered_lines": 11,
+      "num_statements": 52,
+      "percent_covered": 21.153846153846153,
+      "percent_covered_display": "21",
+      "missing_lines": 41,
+      "excluded_lines": 0,
+      "percent_statements_covered": 21.153846153846153,
+      "percent_statements_covered_display": "21"
+    },
+    "plato/algorithms/fedavg_personalized.py": {
+      "covered_lines": 9,
+      "num_statements": 31,
+      "percent_covered": 29.032258064516128,
+      "percent_covered_display": "29",
+      "missing_lines": 22,
+      "excluded_lines": 0,
+      "percent_statements_covered": 29.032258064516128,
+      "percent_statements_covered_display": "29"
+    },
+    "plato/algorithms/lora.py": {
+      "covered_lines": 12,
+      "num_statements": 28,
+      "percent_covered": 42.857142857142854,
+      "percent_covered_display": "43",
+      "missing_lines": 16,
+      "excluded_lines": 3,
+      "percent_statements_covered": 42.857142857142854,
+      "percent_statements_covered_display": "43"
+    },
+    "plato/algorithms/mlx_fedavg.py": {
+      "covered_lines": 15,
+      "num_statements": 68,
+      "percent_covered": 22.058823529411764,
+      "percent_covered_display": "22",
+      "missing_lines": 53,
+      "excluded_lines": 7,
+      "percent_statements_covered": 22.058823529411764,
+      "percent_statements_covered_display": "22"
+    },
+    "plato/algorithms/pfedgraph.py": {
+      "covered_lines": 2,
+      "num_statements": 2,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/algorithms/registry.py": {
+      "covered_lines": 22,
+      "num_statements": 26,
+      "percent_covered": 84.61538461538461,
+      "percent_covered_display": "85",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 84.61538461538461,
+      "percent_statements_covered_display": "85"
+    },
+    "plato/algorithms/split_learning.py": {
+      "covered_lines": 14,
+      "num_statements": 46,
+      "percent_covered": 30.434782608695652,
+      "percent_covered_display": "30",
+      "missing_lines": 32,
+      "excluded_lines": 14,
+      "percent_statements_covered": 30.434782608695652,
+      "percent_statements_covered_display": "30"
+    },
+    "plato/callbacks/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/callbacks/client.py": {
+      "covered_lines": 13,
+      "num_statements": 13,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/callbacks/handler.py": {
+      "covered_lines": 20,
+      "num_statements": 27,
+      "percent_covered": 74.07407407407408,
+      "percent_covered_display": "74",
+      "missing_lines": 7,
+      "excluded_lines": 0,
+      "percent_statements_covered": 74.07407407407408,
+      "percent_statements_covered_display": "74"
+    },
+    "plato/callbacks/server.py": {
+      "covered_lines": 46,
+      "num_statements": 52,
+      "percent_covered": 88.46153846153847,
+      "percent_covered_display": "88",
+      "missing_lines": 6,
+      "excluded_lines": 0,
+      "percent_statements_covered": 88.46153846153847,
+      "percent_statements_covered_display": "88"
+    },
+    "plato/callbacks/trainer.py": {
+      "covered_lines": 67,
+      "num_statements": 94,
+      "percent_covered": 71.27659574468085,
+      "percent_covered_display": "71",
+      "missing_lines": 27,
+      "excluded_lines": 0,
+      "percent_statements_covered": 71.27659574468085,
+      "percent_statements_covered_display": "71"
+    },
+    "plato/client.py": {
+      "covered_lines": 9,
+      "num_statements": 49,
+      "percent_covered": 18.367346938775512,
+      "percent_covered_display": "18",
+      "missing_lines": 40,
+      "excluded_lines": 0,
+      "percent_statements_covered": 18.367346938775512,
+      "percent_statements_covered_display": "18"
+    },
+    "plato/clients/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/clients/base.py": {
+      "covered_lines": 107,
+      "num_statements": 181,
+      "percent_covered": 59.11602209944751,
+      "percent_covered_display": "59",
+      "missing_lines": 74,
+      "excluded_lines": 2,
+      "percent_statements_covered": 59.11602209944751,
+      "percent_statements_covered_display": "59"
+    },
+    "plato/clients/composable.py": {
+      "covered_lines": 112,
+      "num_statements": 194,
+      "percent_covered": 57.7319587628866,
+      "percent_covered_display": "58",
+      "missing_lines": 82,
+      "excluded_lines": 0,
+      "percent_statements_covered": 57.7319587628866,
+      "percent_statements_covered_display": "58"
+    },
+    "plato/clients/edge.py": {
+      "covered_lines": 4,
+      "num_statements": 7,
+      "percent_covered": 57.142857142857146,
+      "percent_covered_display": "57",
+      "missing_lines": 3,
+      "excluded_lines": 0,
+      "percent_statements_covered": 57.142857142857146,
+      "percent_statements_covered_display": "57"
+    },
+    "plato/clients/fedavg_personalized.py": {
+      "covered_lines": 4,
+      "num_statements": 6,
+      "percent_covered": 66.66666666666667,
+      "percent_covered_display": "67",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 66.66666666666667,
+      "percent_statements_covered_display": "67"
+    },
+    "plato/clients/mpc.py": {
+      "covered_lines": 16,
+      "num_statements": 19,
+      "percent_covered": 84.21052631578948,
+      "percent_covered_display": "84",
+      "missing_lines": 3,
+      "excluded_lines": 0,
+      "percent_statements_covered": 84.21052631578948,
+      "percent_statements_covered_display": "84"
+    },
+    "plato/clients/pfedgraph.py": {
+      "covered_lines": 2,
+      "num_statements": 2,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/clients/registry.py": {
+      "covered_lines": 45,
+      "num_statements": 59,
+      "percent_covered": 76.27118644067797,
+      "percent_covered_display": "76",
+      "missing_lines": 14,
+      "excluded_lines": 0,
+      "percent_statements_covered": 76.27118644067797,
+      "percent_statements_covered_display": "76"
+    },
+    "plato/clients/self_supervised_learning.py": {
+      "covered_lines": 5,
+      "num_statements": 13,
+      "percent_covered": 38.46153846153846,
+      "percent_covered_display": "38",
+      "missing_lines": 8,
+      "excluded_lines": 0,
+      "percent_statements_covered": 38.46153846153846,
+      "percent_statements_covered_display": "38"
+    },
+    "plato/clients/simple.py": {
+      "covered_lines": 51,
+      "num_statements": 53,
+      "percent_covered": 96.22641509433963,
+      "percent_covered_display": "96",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 96.22641509433963,
+      "percent_statements_covered_display": "96"
+    },
+    "plato/clients/split_learning.py": {
+      "covered_lines": 44,
+      "num_statements": 45,
+      "percent_covered": 97.77777777777777,
+      "percent_covered_display": "98",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 97.77777777777777,
+      "percent_statements_covered_display": "98"
+    },
+    "plato/clients/strategies/__init__.py": {
+      "covered_lines": 6,
+      "num_statements": 6,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/clients/strategies/base.py": {
+      "covered_lines": 85,
+      "num_statements": 88,
+      "percent_covered": 96.5909090909091,
+      "percent_covered_display": "97",
+      "missing_lines": 3,
+      "excluded_lines": 0,
+      "percent_statements_covered": 96.5909090909091,
+      "percent_statements_covered_display": "97"
+    },
+    "plato/clients/strategies/defaults.py": {
+      "covered_lines": 113,
+      "num_statements": 273,
+      "percent_covered": 41.391941391941394,
+      "percent_covered_display": "41",
+      "missing_lines": 160,
+      "excluded_lines": 0,
+      "percent_statements_covered": 41.391941391941394,
+      "percent_statements_covered_display": "41"
+    },
+    "plato/clients/strategies/edge.py": {
+      "covered_lines": 16,
+      "num_statements": 53,
+      "percent_covered": 30.18867924528302,
+      "percent_covered_display": "30",
+      "missing_lines": 37,
+      "excluded_lines": 0,
+      "percent_statements_covered": 30.18867924528302,
+      "percent_statements_covered_display": "30"
+    },
+    "plato/clients/strategies/fedavg_personalized.py": {
+      "covered_lines": 7,
+      "num_statements": 18,
+      "percent_covered": 38.888888888888886,
+      "percent_covered_display": "39",
+      "missing_lines": 11,
+      "excluded_lines": 0,
+      "percent_statements_covered": 38.888888888888886,
+      "percent_statements_covered_display": "39"
+    },
+    "plato/clients/strategies/mpc.py": {
+      "covered_lines": 30,
+      "num_statements": 34,
+      "percent_covered": 88.23529411764706,
+      "percent_covered_display": "88",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 88.23529411764706,
+      "percent_statements_covered_display": "88"
+    },
+    "plato/clients/strategies/split_learning.py": {
+      "covered_lines": 28,
+      "num_statements": 82,
+      "percent_covered": 34.146341463414636,
+      "percent_covered_display": "34",
+      "missing_lines": 54,
+      "excluded_lines": 0,
+      "percent_statements_covered": 34.146341463414636,
+      "percent_statements_covered_display": "34"
+    },
+    "plato/config.py": {
+      "covered_lines": 237,
+      "num_statements": 300,
+      "percent_covered": 79.0,
+      "percent_covered_display": "79",
+      "missing_lines": 63,
+      "excluded_lines": 0,
+      "percent_statements_covered": 79.0,
+      "percent_statements_covered_display": "79"
+    },
+    "plato/datasources/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/datasources/base.py": {
+      "covered_lines": 45,
+      "num_statements": 148,
+      "percent_covered": 30.405405405405407,
+      "percent_covered_display": "30",
+      "missing_lines": 103,
+      "excluded_lines": 0,
+      "percent_statements_covered": 30.405405405405407,
+      "percent_statements_covered_display": "30"
+    },
+    "plato/datasources/cinic10.py": {
+      "covered_lines": 9,
+      "num_statements": 21,
+      "percent_covered": 42.857142857142854,
+      "percent_covered_display": "43",
+      "missing_lines": 12,
+      "excluded_lines": 0,
+      "percent_statements_covered": 42.857142857142854,
+      "percent_statements_covered_display": "43"
+    },
+    "plato/datasources/datalib/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/datasources/datalib/audio_extraction_tools.py": {
+      "covered_lines": 0,
+      "num_statements": 60,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 60,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/data_utils.py": {
+      "covered_lines": 0,
+      "num_statements": 82,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 82,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/flickr30kE_utils.py": {
+      "covered_lines": 0,
+      "num_statements": 202,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 202,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/frames_extraction_tools.py": {
+      "covered_lines": 0,
+      "num_statements": 71,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 71,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/gym_utils/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/datasources/datalib/gym_utils/gym_trim.py": {
+      "covered_lines": 0,
+      "num_statements": 98,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 98,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/modality_data_anntation_tools.py": {
+      "covered_lines": 0,
+      "num_statements": 91,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 91,
+      "excluded_lines": 4,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/modality_extraction_base.py": {
+      "covered_lines": 0,
+      "num_statements": 25,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 25,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/parse_datasets.py": {
+      "covered_lines": 0,
+      "num_statements": 97,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 97,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/refer_utils/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/datasources/datalib/refer_utils/referitgame_utils.py": {
+      "covered_lines": 0,
+      "num_statements": 166,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 166,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/tiny_data_tools.py": {
+      "covered_lines": 0,
+      "num_statements": 40,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 40,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/datalib/video_transform.py": {
+      "covered_lines": 0,
+      "num_statements": 23,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 23,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/feature.py": {
+      "covered_lines": 39,
+      "num_statements": 40,
+      "percent_covered": 97.5,
+      "percent_covered_display": "98",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 97.5,
+      "percent_statements_covered_display": "98"
+    },
+    "plato/datasources/feature_dataset.py": {
+      "covered_lines": 22,
+      "num_statements": 22,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/datasources/femnist.py": {
+      "covered_lines": 21,
+      "num_statements": 54,
+      "percent_covered": 38.888888888888886,
+      "percent_covered_display": "39",
+      "missing_lines": 33,
+      "excluded_lines": 0,
+      "percent_statements_covered": 38.888888888888886,
+      "percent_statements_covered_display": "39"
+    },
+    "plato/datasources/huggingface.py": {
+      "covered_lines": 168,
+      "num_statements": 214,
+      "percent_covered": 78.50467289719626,
+      "percent_covered_display": "79",
+      "missing_lines": 46,
+      "excluded_lines": 0,
+      "percent_statements_covered": 78.50467289719626,
+      "percent_statements_covered_display": "79"
+    },
+    "plato/datasources/lerobot.py": {
+      "covered_lines": 259,
+      "num_statements": 434,
+      "percent_covered": 59.67741935483871,
+      "percent_covered_display": "60",
+      "missing_lines": 175,
+      "excluded_lines": 2,
+      "percent_statements_covered": 59.67741935483871,
+      "percent_statements_covered_display": "60"
+    },
+    "plato/datasources/lora.py": {
+      "covered_lines": 13,
+      "num_statements": 64,
+      "percent_covered": 20.3125,
+      "percent_covered_display": "20",
+      "missing_lines": 51,
+      "excluded_lines": 0,
+      "percent_statements_covered": 20.3125,
+      "percent_statements_covered_display": "20"
+    },
+    "plato/datasources/nanochat.py": {
+      "covered_lines": 63,
+      "num_statements": 130,
+      "percent_covered": 48.46153846153846,
+      "percent_covered_display": "48",
+      "missing_lines": 67,
+      "excluded_lines": 4,
+      "percent_statements_covered": 48.46153846153846,
+      "percent_statements_covered_display": "48"
+    },
+    "plato/datasources/purchase.py": {
+      "covered_lines": 19,
+      "num_statements": 60,
+      "percent_covered": 31.666666666666668,
+      "percent_covered_display": "32",
+      "missing_lines": 41,
+      "excluded_lines": 0,
+      "percent_statements_covered": 31.666666666666668,
+      "percent_statements_covered_display": "32"
+    },
+    "plato/datasources/registry.py": {
+      "covered_lines": 25,
+      "num_statements": 48,
+      "percent_covered": 52.083333333333336,
+      "percent_covered_display": "52",
+      "missing_lines": 23,
+      "excluded_lines": 0,
+      "percent_statements_covered": 52.083333333333336,
+      "percent_statements_covered_display": "52"
+    },
+    "plato/datasources/self_supervised_learning.py": {
+      "covered_lines": 0,
+      "num_statements": 63,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 63,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/datasources/texas.py": {
+      "covered_lines": 19,
+      "num_statements": 62,
+      "percent_covered": 30.64516129032258,
+      "percent_covered_display": "31",
+      "missing_lines": 43,
+      "excluded_lines": 0,
+      "percent_statements_covered": 30.64516129032258,
+      "percent_statements_covered_display": "31"
+    },
+    "plato/datasources/tiny_imagenet.py": {
+      "covered_lines": 9,
+      "num_statements": 21,
+      "percent_covered": 42.857142857142854,
+      "percent_covered_display": "43",
+      "missing_lines": 12,
+      "excluded_lines": 0,
+      "percent_statements_covered": 42.857142857142854,
+      "percent_statements_covered_display": "43"
+    },
+    "plato/datasources/torchvision.py": {
+      "covered_lines": 266,
+      "num_statements": 354,
+      "percent_covered": 75.14124293785311,
+      "percent_covered_display": "75",
+      "missing_lines": 88,
+      "excluded_lines": 0,
+      "percent_statements_covered": 75.14124293785311,
+      "percent_statements_covered_display": "75"
+    },
+    "plato/evaluators/__init__.py": {
+      "covered_lines": 3,
+      "num_statements": 3,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/evaluators/base.py": {
+      "covered_lines": 37,
+      "num_statements": 38,
+      "percent_covered": 97.36842105263158,
+      "percent_covered_display": "97",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 97.36842105263158,
+      "percent_statements_covered_display": "97"
+    },
+    "plato/evaluators/lighteval.py": {
+      "covered_lines": 213,
+      "num_statements": 251,
+      "percent_covered": 84.86055776892431,
+      "percent_covered_display": "85",
+      "missing_lines": 38,
+      "excluded_lines": 10,
+      "percent_statements_covered": 84.86055776892431,
+      "percent_statements_covered_display": "85"
+    },
+    "plato/evaluators/lighteval_tasks.py": {
+      "covered_lines": 0,
+      "num_statements": 14,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 14,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/evaluators/nanochat_core.py": {
+      "covered_lines": 62,
+      "num_statements": 269,
+      "percent_covered": 23.04832713754647,
+      "percent_covered_display": "23",
+      "missing_lines": 207,
+      "excluded_lines": 2,
+      "percent_statements_covered": 23.04832713754647,
+      "percent_statements_covered_display": "23"
+    },
+    "plato/evaluators/registry.py": {
+      "covered_lines": 31,
+      "num_statements": 38,
+      "percent_covered": 81.57894736842105,
+      "percent_covered_display": "82",
+      "missing_lines": 7,
+      "excluded_lines": 0,
+      "percent_statements_covered": 81.57894736842105,
+      "percent_statements_covered_display": "82"
+    },
+    "plato/evaluators/runner.py": {
+      "covered_lines": 53,
+      "num_statements": 57,
+      "percent_covered": 92.98245614035088,
+      "percent_covered_display": "93",
+      "missing_lines": 4,
+      "excluded_lines": 7,
+      "percent_statements_covered": 92.98245614035088,
+      "percent_statements_covered_display": "93"
+    },
+    "plato/models/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/models/cnn_encoder.py": {
+      "covered_lines": 12,
+      "num_statements": 50,
+      "percent_covered": 24.0,
+      "percent_covered_display": "24",
+      "missing_lines": 38,
+      "excluded_lines": 0,
+      "percent_statements_covered": 24.0,
+      "percent_statements_covered_display": "24"
+    },
+    "plato/models/dcgan.py": {
+      "covered_lines": 18,
+      "num_statements": 45,
+      "percent_covered": 40.0,
+      "percent_covered_display": "40",
+      "missing_lines": 27,
+      "excluded_lines": 0,
+      "percent_statements_covered": 40.0,
+      "percent_statements_covered_display": "40"
+    },
+    "plato/models/general_multilayer.py": {
+      "covered_lines": 8,
+      "num_statements": 70,
+      "percent_covered": 11.428571428571429,
+      "percent_covered_display": "11",
+      "missing_lines": 62,
+      "excluded_lines": 0,
+      "percent_statements_covered": 11.428571428571429,
+      "percent_statements_covered_display": "11"
+    },
+    "plato/models/huggingface.py": {
+      "covered_lines": 11,
+      "num_statements": 38,
+      "percent_covered": 28.94736842105263,
+      "percent_covered_display": "29",
+      "missing_lines": 27,
+      "excluded_lines": 3,
+      "percent_statements_covered": 28.94736842105263,
+      "percent_statements_covered_display": "29"
+    },
+    "plato/models/lenet5.py": {
+      "covered_lines": 71,
+      "num_statements": 71,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/models/mlx/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/models/mlx/lenet5.py": {
+      "covered_lines": 4,
+      "num_statements": 33,
+      "percent_covered": 12.121212121212121,
+      "percent_covered_display": "12",
+      "missing_lines": 29,
+      "excluded_lines": 5,
+      "percent_statements_covered": 12.121212121212121,
+      "percent_statements_covered_display": "12"
+    },
+    "plato/models/multilayer.py": {
+      "covered_lines": 11,
+      "num_statements": 46,
+      "percent_covered": 23.91304347826087,
+      "percent_covered_display": "24",
+      "missing_lines": 35,
+      "excluded_lines": 0,
+      "percent_statements_covered": 23.91304347826087,
+      "percent_statements_covered_display": "24"
+    },
+    "plato/models/nanochat.py": {
+      "covered_lines": 14,
+      "num_statements": 69,
+      "percent_covered": 20.28985507246377,
+      "percent_covered_display": "20",
+      "missing_lines": 55,
+      "excluded_lines": 4,
+      "percent_statements_covered": 20.28985507246377,
+      "percent_statements_covered_display": "20"
+    },
+    "plato/models/registry.py": {
+      "covered_lines": 59,
+      "num_statements": 74,
+      "percent_covered": 79.72972972972973,
+      "percent_covered_display": "80",
+      "missing_lines": 15,
+      "excluded_lines": 4,
+      "percent_statements_covered": 79.72972972972973,
+      "percent_statements_covered_display": "80"
+    },
+    "plato/models/resnet.py": {
+      "covered_lines": 95,
+      "num_statements": 122,
+      "percent_covered": 77.8688524590164,
+      "percent_covered_display": "78",
+      "missing_lines": 27,
+      "excluded_lines": 0,
+      "percent_statements_covered": 77.8688524590164,
+      "percent_statements_covered_display": "78"
+    },
+    "plato/models/smolvla.py": {
+      "covered_lines": 91,
+      "num_statements": 127,
+      "percent_covered": 71.65354330708661,
+      "percent_covered_display": "72",
+      "missing_lines": 36,
+      "excluded_lines": 4,
+      "percent_statements_covered": 71.65354330708661,
+      "percent_statements_covered_display": "72"
+    },
+    "plato/models/torch_hub.py": {
+      "covered_lines": 4,
+      "num_statements": 9,
+      "percent_covered": 44.44444444444444,
+      "percent_covered_display": "44",
+      "missing_lines": 5,
+      "excluded_lines": 0,
+      "percent_statements_covered": 44.44444444444444,
+      "percent_statements_covered_display": "44"
+    },
+    "plato/models/vgg.py": {
+      "covered_lines": 12,
+      "num_statements": 45,
+      "percent_covered": 26.666666666666668,
+      "percent_covered_display": "27",
+      "missing_lines": 33,
+      "excluded_lines": 0,
+      "percent_statements_covered": 26.666666666666668,
+      "percent_statements_covered_display": "27"
+    },
+    "plato/models/vit.py": {
+      "covered_lines": 18,
+      "num_statements": 72,
+      "percent_covered": 25.0,
+      "percent_covered_display": "25",
+      "missing_lines": 54,
+      "excluded_lines": 4,
+      "percent_statements_covered": 25.0,
+      "percent_statements_covered_display": "25"
+    },
+    "plato/mpc/__init__.py": {
+      "covered_lines": 2,
+      "num_statements": 2,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/mpc/round_store.py": {
+      "covered_lines": 112,
+      "num_statements": 156,
+      "percent_covered": 71.7948717948718,
+      "percent_covered_display": "72",
+      "missing_lines": 44,
+      "excluded_lines": 8,
+      "percent_statements_covered": 71.7948717948718,
+      "percent_statements_covered_display": "72"
+    },
+    "plato/processors/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/processors/base.py": {
+      "covered_lines": 11,
+      "num_statements": 14,
+      "percent_covered": 78.57142857142857,
+      "percent_covered_display": "79",
+      "missing_lines": 3,
+      "excluded_lines": 0,
+      "percent_statements_covered": 78.57142857142857,
+      "percent_statements_covered_display": "79"
+    },
+    "plato/processors/compress.py": {
+      "covered_lines": 7,
+      "num_statements": 22,
+      "percent_covered": 31.818181818181817,
+      "percent_covered_display": "32",
+      "missing_lines": 15,
+      "excluded_lines": 0,
+      "percent_statements_covered": 31.818181818181817,
+      "percent_statements_covered_display": "32"
+    },
+    "plato/processors/decompress.py": {
+      "covered_lines": 8,
+      "num_statements": 25,
+      "percent_covered": 32.0,
+      "percent_covered_display": "32",
+      "missing_lines": 17,
+      "excluded_lines": 0,
+      "percent_statements_covered": 32.0,
+      "percent_statements_covered_display": "32"
+    },
+    "plato/processors/feature.py": {
+      "covered_lines": 0,
+      "num_statements": 24,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 24,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/processors/feature_additive_noise.py": {
+      "covered_lines": 0,
+      "num_statements": 18,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 18,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/processors/model.py": {
+      "covered_lines": 22,
+      "num_statements": 24,
+      "percent_covered": 91.66666666666667,
+      "percent_covered_display": "92",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 91.66666666666667,
+      "percent_statements_covered_display": "92"
+    },
+    "plato/processors/model_compress.py": {
+      "covered_lines": 15,
+      "num_statements": 16,
+      "percent_covered": 93.75,
+      "percent_covered_display": "94",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 93.75,
+      "percent_statements_covered_display": "94"
+    },
+    "plato/processors/model_decompress.py": {
+      "covered_lines": 14,
+      "num_statements": 15,
+      "percent_covered": 93.33333333333333,
+      "percent_covered_display": "93",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 93.33333333333333,
+      "percent_statements_covered_display": "93"
+    },
+    "plato/processors/model_decrypt.py": {
+      "covered_lines": 0,
+      "num_statements": 23,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 23,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/processors/model_deepcopy.py": {
+      "covered_lines": 6,
+      "num_statements": 8,
+      "percent_covered": 75.0,
+      "percent_covered_display": "75",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 75.0,
+      "percent_statements_covered_display": "75"
+    },
+    "plato/processors/model_dequantize.py": {
+      "covered_lines": 4,
+      "num_statements": 5,
+      "percent_covered": 80.0,
+      "percent_covered_display": "80",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 80.0,
+      "percent_statements_covered_display": "80"
+    },
+    "plato/processors/model_dequantize_qsgd.py": {
+      "covered_lines": 7,
+      "num_statements": 27,
+      "percent_covered": 25.925925925925927,
+      "percent_covered_display": "26",
+      "missing_lines": 20,
+      "excluded_lines": 0,
+      "percent_statements_covered": 25.925925925925927,
+      "percent_statements_covered_display": "26"
+    },
+    "plato/processors/model_encrypt.py": {
+      "covered_lines": 0,
+      "num_statements": 22,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 22,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/processors/model_quantize.py": {
+      "covered_lines": 5,
+      "num_statements": 5,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/processors/model_quantize_qsgd.py": {
+      "covered_lines": 8,
+      "num_statements": 43,
+      "percent_covered": 18.6046511627907,
+      "percent_covered_display": "19",
+      "missing_lines": 35,
+      "excluded_lines": 0,
+      "percent_statements_covered": 18.6046511627907,
+      "percent_statements_covered_display": "19"
+    },
+    "plato/processors/model_randomized_response.py": {
+      "covered_lines": 7,
+      "num_statements": 16,
+      "percent_covered": 43.75,
+      "percent_covered_display": "44",
+      "missing_lines": 9,
+      "excluded_lines": 0,
+      "percent_statements_covered": 43.75,
+      "percent_statements_covered_display": "44"
+    },
+    "plato/processors/mpc_model_encrypt_additive.py": {
+      "covered_lines": 49,
+      "num_statements": 60,
+      "percent_covered": 81.66666666666667,
+      "percent_covered_display": "82",
+      "missing_lines": 11,
+      "excluded_lines": 0,
+      "percent_statements_covered": 81.66666666666667,
+      "percent_statements_covered_display": "82"
+    },
+    "plato/processors/mpc_model_encrypt_shamir.py": {
+      "covered_lines": 73,
+      "num_statements": 94,
+      "percent_covered": 77.65957446808511,
+      "percent_covered_display": "78",
+      "missing_lines": 21,
+      "excluded_lines": 0,
+      "percent_statements_covered": 77.65957446808511,
+      "percent_statements_covered_display": "78"
+    },
+    "plato/processors/nanochat_tokenizer.py": {
+      "covered_lines": 0,
+      "num_statements": 63,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 63,
+      "excluded_lines": 4,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/processors/pipeline.py": {
+      "covered_lines": 10,
+      "num_statements": 10,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/processors/registry.py": {
+      "covered_lines": 32,
+      "num_statements": 50,
+      "percent_covered": 64.0,
+      "percent_covered_display": "64",
+      "missing_lines": 18,
+      "excluded_lines": 0,
+      "percent_statements_covered": 64.0,
+      "percent_statements_covered_display": "64"
+    },
+    "plato/processors/safetensor_decode.py": {
+      "covered_lines": 10,
+      "num_statements": 15,
+      "percent_covered": 66.66666666666667,
+      "percent_covered_display": "67",
+      "missing_lines": 5,
+      "excluded_lines": 0,
+      "percent_statements_covered": 66.66666666666667,
+      "percent_statements_covered_display": "67"
+    },
+    "plato/processors/safetensor_encode.py": {
+      "covered_lines": 8,
+      "num_statements": 9,
+      "percent_covered": 88.88888888888889,
+      "percent_covered_display": "89",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 88.88888888888889,
+      "percent_statements_covered_display": "89"
+    },
+    "plato/processors/structured_pruning.py": {
+      "covered_lines": 26,
+      "num_statements": 31,
+      "percent_covered": 83.87096774193549,
+      "percent_covered_display": "84",
+      "missing_lines": 5,
+      "excluded_lines": 0,
+      "percent_statements_covered": 83.87096774193549,
+      "percent_statements_covered_display": "84"
+    },
+    "plato/processors/unstructured_pruning.py": {
+      "covered_lines": 29,
+      "num_statements": 32,
+      "percent_covered": 90.625,
+      "percent_covered_display": "91",
+      "missing_lines": 3,
+      "excluded_lines": 0,
+      "percent_statements_covered": 90.625,
+      "percent_statements_covered_display": "91"
+    },
+    "plato/samplers/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/samplers/all_inclusive.py": {
+      "covered_lines": 7,
+      "num_statements": 20,
+      "percent_covered": 35.0,
+      "percent_covered_display": "35",
+      "missing_lines": 13,
+      "excluded_lines": 0,
+      "percent_statements_covered": 35.0,
+      "percent_statements_covered_display": "35"
+    },
+    "plato/samplers/base.py": {
+      "covered_lines": 11,
+      "num_statements": 12,
+      "percent_covered": 91.66666666666667,
+      "percent_covered_display": "92",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 91.66666666666667,
+      "percent_statements_covered_display": "92"
+    },
+    "plato/samplers/dirichlet.py": {
+      "covered_lines": 32,
+      "num_statements": 42,
+      "percent_covered": 76.19047619047619,
+      "percent_covered_display": "76",
+      "missing_lines": 10,
+      "excluded_lines": 0,
+      "percent_statements_covered": 76.19047619047619,
+      "percent_statements_covered_display": "76"
+    },
+    "plato/samplers/distribution_noniid.py": {
+      "covered_lines": 10,
+      "num_statements": 33,
+      "percent_covered": 30.303030303030305,
+      "percent_covered_display": "30",
+      "missing_lines": 23,
+      "excluded_lines": 1,
+      "percent_statements_covered": 30.303030303030305,
+      "percent_statements_covered_display": "30"
+    },
+    "plato/samplers/iid.py": {
+      "covered_lines": 27,
+      "num_statements": 30,
+      "percent_covered": 90.0,
+      "percent_covered_display": "90",
+      "missing_lines": 3,
+      "excluded_lines": 0,
+      "percent_statements_covered": 90.0,
+      "percent_statements_covered_display": "90"
+    },
+    "plato/samplers/label_quantity_noniid.py": {
+      "covered_lines": 11,
+      "num_statements": 38,
+      "percent_covered": 28.94736842105263,
+      "percent_covered_display": "29",
+      "missing_lines": 27,
+      "excluded_lines": 1,
+      "percent_statements_covered": 28.94736842105263,
+      "percent_statements_covered_display": "29"
+    },
+    "plato/samplers/mixed.py": {
+      "covered_lines": 5,
+      "num_statements": 18,
+      "percent_covered": 27.77777777777778,
+      "percent_covered_display": "28",
+      "missing_lines": 13,
+      "excluded_lines": 0,
+      "percent_statements_covered": 27.77777777777778,
+      "percent_statements_covered_display": "28"
+    },
+    "plato/samplers/mixed_label_quantity_noniid.py": {
+      "covered_lines": 11,
+      "num_statements": 47,
+      "percent_covered": 23.404255319148938,
+      "percent_covered_display": "23",
+      "missing_lines": 36,
+      "excluded_lines": 1,
+      "percent_statements_covered": 23.404255319148938,
+      "percent_statements_covered_display": "23"
+    },
+    "plato/samplers/modality_iid.py": {
+      "covered_lines": 6,
+      "num_statements": 15,
+      "percent_covered": 40.0,
+      "percent_covered_display": "40",
+      "missing_lines": 9,
+      "excluded_lines": 0,
+      "percent_statements_covered": 40.0,
+      "percent_statements_covered_display": "40"
+    },
+    "plato/samplers/modality_quantity_noniid.py": {
+      "covered_lines": 7,
+      "num_statements": 18,
+      "percent_covered": 38.888888888888886,
+      "percent_covered_display": "39",
+      "missing_lines": 11,
+      "excluded_lines": 0,
+      "percent_statements_covered": 38.888888888888886,
+      "percent_statements_covered_display": "39"
+    },
+    "plato/samplers/orthogonal.py": {
+      "covered_lines": 33,
+      "num_statements": 40,
+      "percent_covered": 82.5,
+      "percent_covered_display": "82",
+      "missing_lines": 7,
+      "excluded_lines": 0,
+      "percent_statements_covered": 82.5,
+      "percent_statements_covered_display": "82"
+    },
+    "plato/samplers/registry.py": {
+      "covered_lines": 14,
+      "num_statements": 14,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/samplers/sample_quantity_noniid.py": {
+      "covered_lines": 11,
+      "num_statements": 39,
+      "percent_covered": 28.205128205128204,
+      "percent_covered_display": "28",
+      "missing_lines": 28,
+      "excluded_lines": 1,
+      "percent_statements_covered": 28.205128205128204,
+      "percent_statements_covered_display": "28"
+    },
+    "plato/samplers/sampler_utils.py": {
+      "covered_lines": 6,
+      "num_statements": 77,
+      "percent_covered": 7.792207792207792,
+      "percent_covered_display": "8",
+      "missing_lines": 71,
+      "excluded_lines": 0,
+      "percent_statements_covered": 7.792207792207792,
+      "percent_statements_covered_display": "8"
+    },
+    "plato/serialization/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/serialization/safetensor.py": {
+      "covered_lines": 28,
+      "num_statements": 30,
+      "percent_covered": 93.33333333333333,
+      "percent_covered_display": "93",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 93.33333333333333,
+      "percent_statements_covered_display": "93"
+    },
+    "plato/servers/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/servers/base.py": {
+      "covered_lines": 159,
+      "num_statements": 613,
+      "percent_covered": 25.938009787928223,
+      "percent_covered_display": "26",
+      "missing_lines": 454,
+      "excluded_lines": 3,
+      "percent_statements_covered": 25.938009787928223,
+      "percent_statements_covered_display": "26"
+    },
+    "plato/servers/evaluation_logging.py": {
+      "covered_lines": 55,
+      "num_statements": 59,
+      "percent_covered": 93.22033898305085,
+      "percent_covered_display": "93",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 93.22033898305085,
+      "percent_statements_covered_display": "93"
+    },
+    "plato/servers/fedavg.py": {
+      "covered_lines": 134,
+      "num_statements": 156,
+      "percent_covered": 85.8974358974359,
+      "percent_covered_display": "86",
+      "missing_lines": 22,
+      "excluded_lines": 0,
+      "percent_statements_covered": 85.8974358974359,
+      "percent_statements_covered_display": "86"
+    },
+    "plato/servers/fedavg_cs.py": {
+      "covered_lines": 0,
+      "num_statements": 140,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 140,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/fedavg_gan.py": {
+      "covered_lines": 0,
+      "num_statements": 23,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 23,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/fedavg_he.py": {
+      "covered_lines": 0,
+      "num_statements": 55,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 55,
+      "excluded_lines": 4,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/fedavg_mpc_additive.py": {
+      "covered_lines": 0,
+      "num_statements": 16,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 16,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/fedavg_mpc_shamir.py": {
+      "covered_lines": 0,
+      "num_statements": 17,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 17,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/fedavg_personalized.py": {
+      "covered_lines": 0,
+      "num_statements": 22,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 22,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/pfedgraph.py": {
+      "covered_lines": 0,
+      "num_statements": 34,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 34,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/registry.py": {
+      "covered_lines": 0,
+      "num_statements": 15,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 15,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/split_learning.py": {
+      "covered_lines": 0,
+      "num_statements": 61,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 61,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/servers/strategies/__init__.py": {
+      "covered_lines": 5,
+      "num_statements": 5,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/servers/strategies/aggregation/__init__.py": {
+      "covered_lines": 10,
+      "num_statements": 10,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/servers/strategies/aggregation/fedasync.py": {
+      "covered_lines": 13,
+      "num_statements": 86,
+      "percent_covered": 15.116279069767442,
+      "percent_covered_display": "15",
+      "missing_lines": 73,
+      "excluded_lines": 0,
+      "percent_statements_covered": 15.116279069767442,
+      "percent_statements_covered_display": "15"
+    },
+    "plato/servers/strategies/aggregation/fedavg.py": {
+      "covered_lines": 77,
+      "num_statements": 174,
+      "percent_covered": 44.252873563218394,
+      "percent_covered_display": "44",
+      "missing_lines": 97,
+      "excluded_lines": 4,
+      "percent_statements_covered": 44.252873563218394,
+      "percent_statements_covered_display": "44"
+    },
+    "plato/servers/strategies/aggregation/fedbuff.py": {
+      "covered_lines": 9,
+      "num_statements": 21,
+      "percent_covered": 42.857142857142854,
+      "percent_covered_display": "43",
+      "missing_lines": 12,
+      "excluded_lines": 0,
+      "percent_statements_covered": 42.857142857142854,
+      "percent_statements_covered_display": "43"
+    },
+    "plato/servers/strategies/aggregation/fednova.py": {
+      "covered_lines": 8,
+      "num_statements": 22,
+      "percent_covered": 36.36363636363637,
+      "percent_covered_display": "36",
+      "missing_lines": 14,
+      "excluded_lines": 0,
+      "percent_statements_covered": 36.36363636363637,
+      "percent_statements_covered_display": "36"
+    },
+    "plato/servers/strategies/aggregation/gan.py": {
+      "covered_lines": 27,
+      "num_statements": 28,
+      "percent_covered": 96.42857142857143,
+      "percent_covered_display": "96",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 96.42857142857143,
+      "percent_statements_covered_display": "96"
+    },
+    "plato/servers/strategies/aggregation/he.py": {
+      "covered_lines": 24,
+      "num_statements": 31,
+      "percent_covered": 77.41935483870968,
+      "percent_covered_display": "77",
+      "missing_lines": 7,
+      "excluded_lines": 0,
+      "percent_statements_covered": 77.41935483870968,
+      "percent_statements_covered_display": "77"
+    },
+    "plato/servers/strategies/aggregation/hermes.py": {
+      "covered_lines": 54,
+      "num_statements": 78,
+      "percent_covered": 69.23076923076923,
+      "percent_covered_display": "69",
+      "missing_lines": 24,
+      "excluded_lines": 0,
+      "percent_statements_covered": 69.23076923076923,
+      "percent_statements_covered_display": "69"
+    },
+    "plato/servers/strategies/aggregation/pfedgraph.py": {
+      "covered_lines": 119,
+      "num_statements": 143,
+      "percent_covered": 83.21678321678321,
+      "percent_covered_display": "83",
+      "missing_lines": 24,
+      "excluded_lines": 0,
+      "percent_statements_covered": 83.21678321678321,
+      "percent_statements_covered_display": "83"
+    },
+    "plato/servers/strategies/aggregation/port.py": {
+      "covered_lines": 16,
+      "num_statements": 78,
+      "percent_covered": 20.512820512820515,
+      "percent_covered_display": "21",
+      "missing_lines": 62,
+      "excluded_lines": 0,
+      "percent_statements_covered": 20.512820512820515,
+      "percent_statements_covered_display": "21"
+    },
+    "plato/servers/strategies/base.py": {
+      "covered_lines": 28,
+      "num_statements": 34,
+      "percent_covered": 82.3529411764706,
+      "percent_covered_display": "82",
+      "missing_lines": 6,
+      "excluded_lines": 3,
+      "percent_statements_covered": 82.3529411764706,
+      "percent_statements_covered_display": "82"
+    },
+    "plato/servers/strategies/client_selection/__init__.py": {
+      "covered_lines": 4,
+      "num_statements": 4,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/servers/strategies/client_selection/personalized.py": {
+      "covered_lines": 20,
+      "num_statements": 22,
+      "percent_covered": 90.9090909090909,
+      "percent_covered_display": "91",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 90.9090909090909,
+      "percent_statements_covered_display": "91"
+    },
+    "plato/servers/strategies/client_selection/random_selection.py": {
+      "covered_lines": 15,
+      "num_statements": 15,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/servers/strategies/client_selection/split_learning.py": {
+      "covered_lines": 43,
+      "num_statements": 43,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/servers/strategies/mpc.py": {
+      "covered_lines": 127,
+      "num_statements": 141,
+      "percent_covered": 90.0709219858156,
+      "percent_covered_display": "90",
+      "missing_lines": 14,
+      "excluded_lines": 0,
+      "percent_statements_covered": 90.0709219858156,
+      "percent_statements_covered_display": "90"
+    },
+    "plato/trainers/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/trainers/base.py": {
+      "covered_lines": 28,
+      "num_statements": 62,
+      "percent_covered": 45.16129032258065,
+      "percent_covered_display": "45",
+      "missing_lines": 34,
+      "excluded_lines": 0,
+      "percent_statements_covered": 45.16129032258065,
+      "percent_statements_covered_display": "45"
+    },
+    "plato/trainers/basic.py": {
+      "covered_lines": 15,
+      "num_statements": 30,
+      "percent_covered": 50.0,
+      "percent_covered_display": "50",
+      "missing_lines": 15,
+      "excluded_lines": 0,
+      "percent_statements_covered": 50.0,
+      "percent_statements_covered_display": "50"
+    },
+    "plato/trainers/composable.py": {
+      "covered_lines": 289,
+      "num_statements": 464,
+      "percent_covered": 62.28448275862069,
+      "percent_covered_display": "62",
+      "missing_lines": 175,
+      "excluded_lines": 0,
+      "percent_statements_covered": 62.28448275862069,
+      "percent_statements_covered_display": "62"
+    },
+    "plato/trainers/diff_privacy.py": {
+      "covered_lines": 43,
+      "num_statements": 199,
+      "percent_covered": 21.608040201005025,
+      "percent_covered_display": "22",
+      "missing_lines": 156,
+      "excluded_lines": 0,
+      "percent_statements_covered": 21.608040201005025,
+      "percent_statements_covered_display": "22"
+    },
+    "plato/trainers/gan.py": {
+      "covered_lines": 33,
+      "num_statements": 180,
+      "percent_covered": 18.333333333333332,
+      "percent_covered_display": "18",
+      "missing_lines": 147,
+      "excluded_lines": 0,
+      "percent_statements_covered": 18.333333333333332,
+      "percent_statements_covered_display": "18"
+    },
+    "plato/trainers/huggingface.py": {
+      "covered_lines": 251,
+      "num_statements": 582,
+      "percent_covered": 43.12714776632303,
+      "percent_covered_display": "43",
+      "missing_lines": 331,
+      "excluded_lines": 0,
+      "percent_statements_covered": 43.12714776632303,
+      "percent_statements_covered_display": "43"
+    },
+    "plato/trainers/lerobot.py": {
+      "covered_lines": 229,
+      "num_statements": 401,
+      "percent_covered": 57.1072319201995,
+      "percent_covered_display": "57",
+      "missing_lines": 172,
+      "excluded_lines": 2,
+      "percent_statements_covered": 57.1072319201995,
+      "percent_statements_covered_display": "57"
+    },
+    "plato/trainers/loss_criterion.py": {
+      "covered_lines": 30,
+      "num_statements": 40,
+      "percent_covered": 75.0,
+      "percent_covered_display": "75",
+      "missing_lines": 10,
+      "excluded_lines": 2,
+      "percent_statements_covered": 75.0,
+      "percent_statements_covered_display": "75"
+    },
+    "plato/trainers/lr_schedulers.py": {
+      "covered_lines": 80,
+      "num_statements": 137,
+      "percent_covered": 58.394160583941606,
+      "percent_covered_display": "58",
+      "missing_lines": 57,
+      "excluded_lines": 0,
+      "percent_statements_covered": 58.394160583941606,
+      "percent_statements_covered_display": "58"
+    },
+    "plato/trainers/mlx.py": {
+      "covered_lines": 119,
+      "num_statements": 642,
+      "percent_covered": 18.53582554517134,
+      "percent_covered_display": "19",
+      "missing_lines": 523,
+      "excluded_lines": 17,
+      "percent_statements_covered": 18.53582554517134,
+      "percent_statements_covered_display": "19"
+    },
+    "plato/trainers/nanochat.py": {
+      "covered_lines": 92,
+      "num_statements": 151,
+      "percent_covered": 60.9271523178808,
+      "percent_covered_display": "61",
+      "missing_lines": 59,
+      "excluded_lines": 10,
+      "percent_statements_covered": 60.9271523178808,
+      "percent_statements_covered_display": "61"
+    },
+    "plato/trainers/optimizers.py": {
+      "covered_lines": 21,
+      "num_statements": 26,
+      "percent_covered": 80.76923076923077,
+      "percent_covered_display": "81",
+      "missing_lines": 5,
+      "excluded_lines": 0,
+      "percent_statements_covered": 80.76923076923077,
+      "percent_statements_covered_display": "81"
+    },
+    "plato/trainers/pfedgraph.py": {
+      "covered_lines": 5,
+      "num_statements": 6,
+      "percent_covered": 83.33333333333333,
+      "percent_covered_display": "83",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 83.33333333333333,
+      "percent_statements_covered_display": "83"
+    },
+    "plato/trainers/registry.py": {
+      "covered_lines": 25,
+      "num_statements": 35,
+      "percent_covered": 71.42857142857143,
+      "percent_covered_display": "71",
+      "missing_lines": 10,
+      "excluded_lines": 0,
+      "percent_statements_covered": 71.42857142857143,
+      "percent_statements_covered_display": "71"
+    },
+    "plato/trainers/self_supervised_learning.py": {
+      "covered_lines": 0,
+      "num_statements": 256,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 256,
+      "excluded_lines": 2,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/trainers/split_learning.py": {
+      "covered_lines": 75,
+      "num_statements": 164,
+      "percent_covered": 45.73170731707317,
+      "percent_covered_display": "46",
+      "missing_lines": 89,
+      "excluded_lines": 0,
+      "percent_statements_covered": 45.73170731707317,
+      "percent_statements_covered_display": "46"
+    },
+    "plato/trainers/strategies/__init__.py": {
+      "covered_lines": 8,
+      "num_statements": 8,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/trainers/strategies/algorithms/__init__.py": {
+      "covered_lines": 11,
+      "num_statements": 11,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/trainers/strategies/algorithms/apfl_strategy.py": {
+      "covered_lines": 24,
+      "num_statements": 129,
+      "percent_covered": 18.6046511627907,
+      "percent_covered_display": "19",
+      "missing_lines": 105,
+      "excluded_lines": 0,
+      "percent_statements_covered": 18.6046511627907,
+      "percent_statements_covered_display": "19"
+    },
+    "plato/trainers/strategies/algorithms/ditto_strategy.py": {
+      "covered_lines": 20,
+      "num_statements": 124,
+      "percent_covered": 16.129032258064516,
+      "percent_covered_display": "16",
+      "missing_lines": 104,
+      "excluded_lines": 0,
+      "percent_statements_covered": 16.129032258064516,
+      "percent_statements_covered_display": "16"
+    },
+    "plato/trainers/strategies/algorithms/fedala_strategy.py": {
+      "covered_lines": 37,
+      "num_statements": 297,
+      "percent_covered": 12.457912457912458,
+      "percent_covered_display": "12",
+      "missing_lines": 260,
+      "excluded_lines": 8,
+      "percent_statements_covered": 12.457912457912458,
+      "percent_statements_covered_display": "12"
+    },
+    "plato/trainers/strategies/algorithms/feddyn_strategy.py": {
+      "covered_lines": 24,
+      "num_statements": 146,
+      "percent_covered": 16.438356164383563,
+      "percent_covered_display": "16",
+      "missing_lines": 122,
+      "excluded_lines": 0,
+      "percent_statements_covered": 16.438356164383563,
+      "percent_statements_covered_display": "16"
+    },
+    "plato/trainers/strategies/algorithms/fedmos_strategy.py": {
+      "covered_lines": 28,
+      "num_statements": 151,
+      "percent_covered": 18.543046357615893,
+      "percent_covered_display": "19",
+      "missing_lines": 123,
+      "excluded_lines": 6,
+      "percent_statements_covered": 18.543046357615893,
+      "percent_statements_covered_display": "19"
+    },
+    "plato/trainers/strategies/algorithms/fedprox_strategy.py": {
+      "covered_lines": 13,
+      "num_statements": 63,
+      "percent_covered": 20.634920634920636,
+      "percent_covered_display": "21",
+      "missing_lines": 50,
+      "excluded_lines": 0,
+      "percent_statements_covered": 20.634920634920636,
+      "percent_statements_covered_display": "21"
+    },
+    "plato/trainers/strategies/algorithms/lgfedavg_strategy.py": {
+      "covered_lines": 18,
+      "num_statements": 100,
+      "percent_covered": 18.0,
+      "percent_covered_display": "18",
+      "missing_lines": 82,
+      "excluded_lines": 0,
+      "percent_statements_covered": 18.0,
+      "percent_statements_covered_display": "18"
+    },
+    "plato/trainers/strategies/algorithms/personalized_fl_strategy.py": {
+      "covered_lines": 78,
+      "num_statements": 120,
+      "percent_covered": 65.0,
+      "percent_covered_display": "65",
+      "missing_lines": 42,
+      "excluded_lines": 0,
+      "percent_statements_covered": 65.0,
+      "percent_statements_covered_display": "65"
+    },
+    "plato/trainers/strategies/algorithms/pfedgraph_strategy.py": {
+      "covered_lines": 46,
+      "num_statements": 63,
+      "percent_covered": 73.01587301587301,
+      "percent_covered_display": "73",
+      "missing_lines": 17,
+      "excluded_lines": 0,
+      "percent_statements_covered": 73.01587301587301,
+      "percent_statements_covered_display": "73"
+    },
+    "plato/trainers/strategies/algorithms/scaffold_strategy.py": {
+      "covered_lines": 23,
+      "num_statements": 182,
+      "percent_covered": 12.637362637362637,
+      "percent_covered_display": "13",
+      "missing_lines": 159,
+      "excluded_lines": 0,
+      "percent_statements_covered": 12.637362637362637,
+      "percent_statements_covered_display": "13"
+    },
+    "plato/trainers/strategies/base.py": {
+      "covered_lines": 55,
+      "num_statements": 62,
+      "percent_covered": 88.70967741935483,
+      "percent_covered_display": "89",
+      "missing_lines": 7,
+      "excluded_lines": 5,
+      "percent_statements_covered": 88.70967741935483,
+      "percent_statements_covered_display": "89"
+    },
+    "plato/trainers/strategies/data_loader.py": {
+      "covered_lines": 62,
+      "num_statements": 137,
+      "percent_covered": 45.25547445255474,
+      "percent_covered_display": "45",
+      "missing_lines": 75,
+      "excluded_lines": 2,
+      "percent_statements_covered": 45.25547445255474,
+      "percent_statements_covered_display": "45"
+    },
+    "plato/trainers/strategies/loss_criterion.py": {
+      "covered_lines": 100,
+      "num_statements": 106,
+      "percent_covered": 94.33962264150944,
+      "percent_covered_display": "94",
+      "missing_lines": 6,
+      "excluded_lines": 0,
+      "percent_statements_covered": 94.33962264150944,
+      "percent_statements_covered_display": "94"
+    },
+    "plato/trainers/strategies/lr_scheduler.py": {
+      "covered_lines": 55,
+      "num_statements": 166,
+      "percent_covered": 33.13253012048193,
+      "percent_covered_display": "33",
+      "missing_lines": 111,
+      "excluded_lines": 0,
+      "percent_statements_covered": 33.13253012048193,
+      "percent_statements_covered_display": "33"
+    },
+    "plato/trainers/strategies/model_update.py": {
+      "covered_lines": 27,
+      "num_statements": 57,
+      "percent_covered": 47.36842105263158,
+      "percent_covered_display": "47",
+      "missing_lines": 30,
+      "excluded_lines": 0,
+      "percent_statements_covered": 47.36842105263158,
+      "percent_statements_covered_display": "47"
+    },
+    "plato/trainers/strategies/optimizer.py": {
+      "covered_lines": 56,
+      "num_statements": 127,
+      "percent_covered": 44.09448818897638,
+      "percent_covered_display": "44",
+      "missing_lines": 71,
+      "excluded_lines": 0,
+      "percent_statements_covered": 44.09448818897638,
+      "percent_statements_covered_display": "44"
+    },
+    "plato/trainers/strategies/testing.py": {
+      "covered_lines": 27,
+      "num_statements": 35,
+      "percent_covered": 77.14285714285714,
+      "percent_covered_display": "77",
+      "missing_lines": 8,
+      "excluded_lines": 0,
+      "percent_statements_covered": 77.14285714285714,
+      "percent_statements_covered_display": "77"
+    },
+    "plato/trainers/strategies/training_step.py": {
+      "covered_lines": 45,
+      "num_statements": 151,
+      "percent_covered": 29.801324503311257,
+      "percent_covered_display": "30",
+      "missing_lines": 106,
+      "excluded_lines": 1,
+      "percent_statements_covered": 29.801324503311257,
+      "percent_statements_covered_display": "30"
+    },
+    "plato/trainers/tracking.py": {
+      "covered_lines": 37,
+      "num_statements": 39,
+      "percent_covered": 94.87179487179488,
+      "percent_covered_display": "95",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 94.87179487179488,
+      "percent_statements_covered_display": "95"
+    },
+    "plato/utils/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/utils/count_parameters.py": {
+      "covered_lines": 0,
+      "num_statements": 33,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 33,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/csv_processor.py": {
+      "covered_lines": 27,
+      "num_statements": 31,
+      "percent_covered": 87.09677419354838,
+      "percent_covered_display": "87",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 87.09677419354838,
+      "percent_statements_covered_display": "87"
+    },
+    "plato/utils/data_loaders.py": {
+      "covered_lines": 48,
+      "num_statements": 52,
+      "percent_covered": 92.3076923076923,
+      "percent_covered_display": "92",
+      "missing_lines": 4,
+      "excluded_lines": 0,
+      "percent_statements_covered": 92.3076923076923,
+      "percent_statements_covered_display": "92"
+    },
+    "plato/utils/decorators.py": {
+      "covered_lines": 0,
+      "num_statements": 14,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 14,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/fonts.py": {
+      "covered_lines": 6,
+      "num_statements": 7,
+      "percent_covered": 85.71428571428571,
+      "percent_covered_display": "86",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 85.71428571428571,
+      "percent_statements_covered_display": "86"
+    },
+    "plato/utils/homo_enc.py": {
+      "covered_lines": 47,
+      "num_statements": 105,
+      "percent_covered": 44.76190476190476,
+      "percent_covered_display": "45",
+      "missing_lines": 58,
+      "excluded_lines": 0,
+      "percent_statements_covered": 44.76190476190476,
+      "percent_statements_covered_display": "45"
+    },
+    "plato/utils/reinforcement_learning/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/utils/reinforcement_learning/policies/__init__.py": {
+      "covered_lines": 0,
+      "num_statements": 0,
+      "percent_covered": 100.0,
+      "percent_covered_display": "100",
+      "missing_lines": 0,
+      "excluded_lines": 0,
+      "percent_statements_covered": 100.0,
+      "percent_statements_covered_display": "100"
+    },
+    "plato/utils/reinforcement_learning/policies/base.py": {
+      "covered_lines": 0,
+      "num_statements": 106,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 106,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/reinforcement_learning/policies/ddpg.py": {
+      "covered_lines": 0,
+      "num_statements": 34,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 34,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/reinforcement_learning/policies/registry.py": {
+      "covered_lines": 0,
+      "num_statements": 12,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 12,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/reinforcement_learning/policies/sac.py": {
+      "covered_lines": 0,
+      "num_statements": 202,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 202,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/reinforcement_learning/policies/td3.py": {
+      "covered_lines": 0,
+      "num_statements": 277,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 277,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/reinforcement_learning/rl_agent.py": {
+      "covered_lines": 0,
+      "num_statements": 85,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 85,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/reinforcement_learning/rl_server.py": {
+      "covered_lines": 0,
+      "num_statements": 56,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 56,
+      "excluded_lines": 4,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/rl_env.py": {
+      "covered_lines": 0,
+      "num_statements": 73,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 73,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/s3.py": {
+      "covered_lines": 13,
+      "num_statements": 72,
+      "percent_covered": 18.055555555555557,
+      "percent_covered_display": "18",
+      "missing_lines": 59,
+      "excluded_lines": 0,
+      "percent_statements_covered": 18.055555555555557,
+      "percent_statements_covered_display": "18"
+    },
+    "plato/utils/third_party.py": {
+      "covered_lines": 17,
+      "num_statements": 18,
+      "percent_covered": 94.44444444444444,
+      "percent_covered_display": "94",
+      "missing_lines": 1,
+      "excluded_lines": 0,
+      "percent_statements_covered": 94.44444444444444,
+      "percent_statements_covered_display": "94"
+    },
+    "plato/utils/toml_writer.py": {
+      "covered_lines": 69,
+      "num_statements": 107,
+      "percent_covered": 64.48598130841121,
+      "percent_covered_display": "64",
+      "missing_lines": 38,
+      "excluded_lines": 0,
+      "percent_statements_covered": 64.48598130841121,
+      "percent_statements_covered_display": "64"
+    },
+    "plato/utils/trainer_utils.py": {
+      "covered_lines": 0,
+      "num_statements": 12,
+      "percent_covered": 0.0,
+      "percent_covered_display": "0",
+      "missing_lines": 12,
+      "excluded_lines": 0,
+      "percent_statements_covered": 0.0,
+      "percent_statements_covered_display": "0"
+    },
+    "plato/utils/tree.py": {
+      "covered_lines": 129,
+      "num_statements": 154,
+      "percent_covered": 83.76623376623377,
+      "percent_covered_display": "84",
+      "missing_lines": 25,
+      "excluded_lines": 12,
+      "percent_statements_covered": 83.76623376623377,
+      "percent_statements_covered_display": "84"
+    },
+    "plato/utils/unary_encoding.py": {
+      "covered_lines": 13,
+      "num_statements": 21,
+      "percent_covered": 61.904761904761905,
+      "percent_covered_display": "62",
+      "missing_lines": 8,
+      "excluded_lines": 0,
+      "percent_statements_covered": 61.904761904761905,
+      "percent_statements_covered_display": "62"
+    },
+    "plato/utils/zstd_helpers.py": {
+      "covered_lines": 16,
+      "num_statements": 18,
+      "percent_covered": 88.88888888888889,
+      "percent_covered_display": "89",
+      "missing_lines": 2,
+      "excluded_lines": 0,
+      "percent_statements_covered": 88.88888888888889,
+      "percent_statements_covered_display": "89"
+    }
+  }
+}
