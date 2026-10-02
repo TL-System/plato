@@ -1,5 +1,11 @@
+import importlib.util
+
+import pytest
 import torch
 from torch.utils.data import SubsetRandomSampler, TensorDataset
+
+if importlib.util.find_spec("opacus") is None:
+    pytest.skip("base profile optional dp: opacus not installed", allow_module_level=True)
 
 from plato.trainers.diff_privacy import DPDataLoaderStrategy
 from plato.trainers.strategies.base import TrainingContext

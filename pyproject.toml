@@ -125,10 +125,13 @@ conflicts = [
 plato-learn = { workspace = true }
 
 [dependency-groups]
-# Mandatory DP, MPC, RL and Nanochat imports for the full test suite.
-test = [
+test-base = [
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
+]
+# Mandatory DP, MPC, RL and Nanochat imports for the full test suite.
+test = [
+    { include-group = "test-base" },
     "plato-learn[dp,mpc,rl,nanochat]",
 ]
 dev = [
@@ -165,6 +168,9 @@ exclude = [
 "unresolved-import" = "ignore"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers"
 markers = [
+    "runtime: real CPU socket rounds and their failure/containment regressions.",
     "integration: marks tests that require end-to-end config smoke runs.",
 ]

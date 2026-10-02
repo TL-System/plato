@@ -3261,6 +3261,10 @@ test = [
     { name = "pytest" },
     { name = "pytest-cov" },
 ]
+test-base = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -3322,6 +3326,10 @@ docs = [
 ]
 test = [
     { name = "plato-learn", extras = ["dp", "mpc", "rl", "nanochat"], editable = "." },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+]
+test-base = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]

@@ -1,0 +1,755 @@
+{
+  "phase": "1C",
+  "date": "2026-10-02",
+  "status": "Provisional independent implementation, ready for accepted 1B handoff. Final 1C qualification/acceptance and Linux execution pending.",
+  "accepted_dependency_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+  "accepted_startup_commit": null,
+  "scope": "Only declared test fixtures/profile/import/worker-count files, test group metadata/lock, minimal PyTorch workflow and this evidence. No runtime changes, archive moves, push or PR.",
+  "default_python": "3.13 unchanged; 3.14.8 core forward-compatibility only",
+  "shell": "All local shell invocations use zsh -lc. CI bootstraps zsh via Python subprocess argv, then uses zsh -lc for every shell block.",
+  "scratch_root": "/tmp/plato-phase1c-test-ci",
+  "input_sha256": {
+    "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+    "design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+    "plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+    "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+  },
+  "tested_files_sha256": {
+    "tests/conftest.py": "9ee5eb2a359c4381b5d41e43af31ba416e7afc91ced9749235b066cc32bd8a56",
+    "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+    "tests/trainers/test_dp_data_loader_strategy.py": "ab2ed2a9664d1986dcb2cdebd815cdaa052f25efe1b38be63c3f412bd64c2d8f",
+    "tests/test_nanochat_integration.py": "34fdfb009134f0b909a4e5cda1ccdcd51babf601f12c5ac428339647ec7fb37d",
+    "tests/clients/test_feddf_strategy.py": "00dfde39c13bfbbe7a842266ada0e77419c609ba2d3bf82008d5985f5d08a930",
+    "tests/servers/test_feddf_server_strategy.py": "41d065daf85092ecb46bdea3a6fe3526d5daeabfcc920e8b63edd035b9408b62",
+    "tests/datasources/test_huggingface_datasource.py": "938341526e228318590d8f5591232d1653a9e33a99f0a3c48780a4ffbc583137",
+    "pyproject.toml": "e5da0b46234b036d7b1fbb8b2804668bca92c9be68d193ecc631350bbfaaee29",
+    "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    ".github/workflows/pytorch_tests.yml": "430bed86538c8afd228367452e57beed88a78be1d084841734d7a6345b82993e"
+  },
+  "lock": {
+    "packages": 278,
+    "package_selections_unchanged": true,
+    "all_package_records_unchanged_except_two_test_base_group_metadata_arrays": true,
+    "check": "uv lock --check: exit 0; eight added metadata lines",
+    "necessary_dependency_conflicts": []
+  },
+  "submodules": [
+    " c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)",
+    " 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)",
+    " 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)"
+  ],
+  "runs": [
+    {
+      "profile": "base",
+      "versions": {
+        "python": "3.13.16",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0"
+        }
+      },
+      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.13 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/base-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/base-313.xml",
+      "exit": 0,
+      "summary": "246 passed, 4 skipped in 1.06s",
+      "warning_count": 0,
+      "log": "/tmp/plato-phase1c-test-ci/base-313.log",
+      "log_sha256": "b1797444940dd9a356665f6d9feff1344a1eebb955d40568fa0cdce19c481103",
+      "optional_imports": {
+        "opacus": false,
+        "kazoo": false,
+        "gymnasium": false,
+        "tiktoken": false
+      }
+    },
+    {
+      "profile": "mandatory",
+      "versions": {
+        "python": "3.13.16",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0"
+        }
+      },
+      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 uv sync --locked --python 3.13 --no-default-groups --group dev",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/mandatory-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/mandatory-313.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/coverage-313.json",
+      "exit": 0,
+      "summary": "250 passed, 1 skipped in 5.65s",
+      "warning_count": 0,
+      "log": "/tmp/plato-phase1c-test-ci/mandatory-313.log",
+      "log_sha256": "703b67136faaaea2f9139c98c903fb5d892ec61e516230bdd2a3aef5b5325942",
+      "optional_imports": {
+        "opacus": true,
+        "kazoo": true,
+        "gymnasium": true,
+        "tiktoken": true
+      },
+      "coverage": {
+        "covered_lines": 7378,
+        "num_statements": 16935,
+        "percent_covered": 43.56657809270741,
+        "percent_covered_display": "44",
+        "missing_lines": 9557,
+        "excluded_lines": 192,
+        "percent_statements_covered": 43.56657809270741,
+        "percent_statements_covered_display": "44"
+      }
+    },
+    {
+      "profile": "base",
+      "versions": {
+        "python": "3.14.8",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0"
+        }
+      },
+      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.14 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/base-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/base-314.xml",
+      "exit": 0,
+      "summary": "246 passed, 4 skipped in 1.08s",
+      "warning_count": 0,
+      "log": "/tmp/plato-phase1c-test-ci/base-314.log",
+      "log_sha256": "b1150a031cca7c297e48c0075fe8c98f4ef79b74946948499294902273507c02",
+      "optional_imports": {
+        "opacus": false,
+        "kazoo": false,
+        "gymnasium": false,
+        "tiktoken": false
+      }
+    },
+    {
+      "profile": "mandatory",
+      "versions": {
+        "python": "3.14.8",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0"
+        }
+      },
+      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-314 uv sync --locked --python 3.14 --no-default-groups --group dev",
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/mandatory-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/mandatory-314.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/coverage-314.json",
+      "exit": 0,
+      "summary": "250 passed, 1 skipped in 4.77s",
+      "warning_count": 0,
+      "log": "/tmp/plato-phase1c-test-ci/mandatory-314.log",
+      "log_sha256": "c721d7e83bbdaaf85f6bf3a2bb844444e8269915a9ec08b533d3619f40aa34b9",
+      "optional_imports": {
+        "opacus": true,
+        "kazoo": true,
+        "gymnasium": true,
+        "tiktoken": true
+      },
+      "coverage": {
+        "covered_lines": 7372,
+        "num_statements": 16924,
+        "percent_covered": 43.55944221224297,
+        "percent_covered_display": "44",
+        "missing_lines": 9552,
+        "excluded_lines": 192,
+        "percent_statements_covered": 43.55944221224297,
+        "percent_statements_covered_display": "44"
+      }
+    }
+  ],
+  "count_reconciliation": {
+    "historical": "248 passed, 3 skipped, 8 warnings; Nanochat source uninitialized",
+    "mandatory": "250 passed, 1 skipped; the two initialized real synthetic trainer tests now execute",
+    "base": "249 collected test items: 246 passed plus three explicit Nanochat skips; one DP module skip report represents two underlying tests. Four reported skips correspond to five omitted test nodes.",
+    "mandatory_required_passes": [
+      "both DP sampler tests",
+      "all three local MPC tests",
+      "MPC training smoke",
+      "initialized Nanochat synthetic trainer",
+      "initialized Nanochat CORE-strategy selection"
+    ],
+    "allowed_mandatory_skip": "Only the tokenizer round-trip node, callable rustbpe.Tokenizer unavailable (source namespace is importable); real native tokenizer/CORE evaluation qualification remains with 3B"
+  },
+  "red_green": {
+    "fixtures": "Accepted dependency baseline: 5 failed, 1 passed; candidate: 6 passed on each interpreter. Real Config construction, nested body/setup exceptions, six temporary runtime paths, optional section removal and Python/NumPy/CPU Torch RNG restoration.",
+    "collection": "Baseline base collection: 249 collected plus Opacus import error, exit 2. Candidate: 249 collected, named DP module omission, exit 0.",
+    "feddf": "Baseline loaders leak sys.path for both client/server; candidate path/error probes: 4 passed. Real importlib loader failure and Nanochat body exception restore paths.",
+    "negative_probes": [
+      {
+        "name": "mandatory-in-base-313",
+        "environment": "base-313",
+        "args": [
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "mandatory prerequisite failed: No module named"
+      },
+      {
+        "name": "missing-opacus-313",
+        "environment": "mandatory-313",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'opacus'"
+      },
+      {
+        "name": "missing-kazoo-313",
+        "environment": "mandatory-313",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'kazoo'"
+      },
+      {
+        "name": "missing-gymnasium-313",
+        "environment": "mandatory-313",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'gymnasium'"
+      },
+      {
+        "name": "missing-tiktoken-313",
+        "environment": "mandatory-313",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'tiktoken'"
+      },
+      {
+        "name": "mandatory-in-base-314",
+        "environment": "base-314",
+        "args": [
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "mandatory prerequisite failed: No module named"
+      },
+      {
+        "name": "missing-opacus-314",
+        "environment": "mandatory-314",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'opacus'"
+      },
+      {
+        "name": "missing-kazoo-314",
+        "environment": "mandatory-314",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'kazoo'"
+      },
+      {
+        "name": "missing-gymnasium-314",
+        "environment": "mandatory-314",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'gymnasium'"
+      },
+      {
+        "name": "missing-tiktoken-314",
+        "environment": "mandatory-314",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "No module named 'tiktoken'"
+      },
+      {
+        "name": "missing-source-313",
+        "environment": "mandatory-313",
+        "args": [
+          "tests/test_nanochat_integration.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "Initialized Nanochat source required"
+      },
+      {
+        "name": "missing-source-314",
+        "environment": "mandatory-314",
+        "args": [
+          "tests/test_nanochat_integration.py",
+          "--collect-only",
+          "--test-profile=mandatory"
+        ],
+        "exit": 4,
+        "required_message": "Initialized Nanochat source required"
+      },
+      {
+        "name": "setup-skip",
+        "environment": "mandatory-313",
+        "args": [
+          "-p",
+          "tests.conftest",
+          "/tmp/plato-phase1c-test-ci/test_negative_setup_skip.py",
+          "--test-profile=mandatory"
+        ],
+        "exit": 1,
+        "required_message": "test profile violations"
+      },
+      {
+        "name": "xpass",
+        "environment": "mandatory-313",
+        "args": [
+          "-p",
+          "tests.conftest",
+          "/tmp/plato-phase1c-test-ci/test_negative_xpass.py",
+          "--test-profile=mandatory"
+        ],
+        "exit": 1,
+        "required_message": "test profile violations"
+      },
+      {
+        "name": "skip",
+        "environment": "mandatory-313",
+        "args": [
+          "-p",
+          "tests.conftest",
+          "/tmp/plato-phase1c-test-ci/test_negative_skip.py",
+          "--test-profile=mandatory"
+        ],
+        "exit": 1,
+        "required_message": "test profile violations"
+      },
+      {
+        "name": "xfail",
+        "environment": "mandatory-313",
+        "args": [
+          "-p",
+          "tests.conftest",
+          "/tmp/plato-phase1c-test-ci/test_negative_xfail.py",
+          "--test-profile=mandatory"
+        ],
+        "exit": 1,
+        "required_message": "test profile violations"
+      },
+      {
+        "name": "collection-skip",
+        "environment": "mandatory-313",
+        "args": [
+          "-p",
+          "tests.conftest",
+          "/tmp/plato-phase1c-test-ci/test_negative_collection_skip.py",
+          "--test-profile=mandatory"
+        ],
+        "exit": 1,
+        "required_message": "test profile violations"
+      },
+      {
+        "name": "teardown-skip",
+        "environment": "mandatory-313",
+        "args": [
+          "-p",
+          "tests.conftest",
+          "/tmp/plato-phase1c-test-ci/test_negative_teardown_skip.py",
+          "--test-profile=mandatory"
+        ],
+        "exit": 1,
+        "required_message": "test profile violations"
+      },
+      {
+        "name": "ignored-required",
+        "environment": "mandatory-313",
+        "args": [
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "--ignore=tests/trainers/test_dp_data_loader_strategy.py"
+        ],
+        "exit": 1,
+        "required_message": "required tests omitted"
+      },
+      {
+        "name": "unexpected-deselection",
+        "environment": "mandatory-313",
+        "args": [
+          "tests/mpc/test_mpc.py",
+          "--test-profile=mandatory",
+          "-k",
+          "round_info"
+        ],
+        "exit": 1,
+        "required_message": "unexpected deselection"
+      },
+      {
+        "name": "empty-runtime-partition-before-handoff",
+        "environment": "mandatory-313",
+        "args": [
+          "tests",
+          "--collect-only",
+          "--test-profile=mandatory",
+          "-m",
+          "runtime"
+        ],
+        "exit": 1,
+        "required_message": "required tests omitted"
+      }
+    ],
+    "probe_sources": {
+      "test_isolation.py": "import os\nimport random\nimport sys\nfrom pathlib import Path\n\nimport numpy as np\nimport pytest\nimport torch\n\nfrom plato.config import Config\nfrom tests.integration.utils import build_minimal_config, configure_environment\nfrom tests.test_utils.fakes import FakeModel\n\n\ndef test_context_keeps_config_environment_and_nested_exception_restores():\n    original_env = os.environ.get(\"config_file\")\n    original_argv = sys.argv\n    with configure_environment(build_minimal_config()) as outer:\n        outer_env = os.environ.get(\"config_file\")\n        assert outer_env == str(Config.config_path)\n        assert Path(outer_env).is_file()\n        outer_params = Config.params\n        with pytest.raises(RuntimeError, match=\"body sentinel\"):\n            with configure_environment(build_minimal_config()):\n                assert Config() is not outer\n                raise RuntimeError(\"body sentinel\")\n        assert Config() is outer\n        assert Config.params is outer_params\n        assert os.environ[\"config_file\"] == outer_env\n    assert os.environ.get(\"config_file\") == original_env\n    assert sys.argv is original_argv\n\n\ndef test_setup_failure_restores_outer_config():\n    with configure_environment(build_minimal_config()) as outer:\n        params = Config.params\n        env = os.environ.get(\"config_file\")\n        argv = sys.argv\n        with pytest.raises(AttributeError):\n            with configure_environment({\"clients\": {}}):\n                pytest.fail(\"invalid config entered\")\n        assert Config() is outer\n        assert Config.params is params\n        assert os.environ.get(\"config_file\") == env\n        assert sys.argv is argv\n\n\ndef test_all_runtime_paths_are_temporary_before_construction(temp_config, tmp_path):\n    for name in [\"base\", \"data\", \"model\", \"checkpoint\", \"result\", \"mpc_data\"]:\n        assert Path(Config.params[f\"{name}_path\"]).is_relative_to(tmp_path)\n\n\ndef test_optional_sections_do_not_leak_between_contexts():\n    first = build_minimal_config()\n    first[\"evaluation\"] = {\"type\": \"sentinel\"}\n    with configure_environment(first):\n        assert Config.evaluation.type == \"sentinel\"\n    with configure_environment(build_minimal_config()):\n        assert not hasattr(Config, \"evaluation\")\n\n\n_rng = (random.getstate(), np.random.get_state(), torch.get_rng_state().clone())\n\n\ndef test_rng_mutation_uses_real_fake_model():\n    random.random()\n    np.random.random()\n    FakeModel()\n\n\ndef test_rng_state_is_restored_between_tests():\n    assert random.getstate() == _rng[0]\n    actual = np.random.get_state()\n    assert actual[0] == _rng[1][0] and np.array_equal(actual[1], _rng[1][1])\n    assert actual[2:] == _rng[1][2:]\n    assert torch.equal(torch.get_rng_state(), _rng[2])\n",
+      "test_paths.py": "import importlib\nimport importlib.util\nimport sys\nfrom pathlib import Path\nfrom unittest.mock import patch\n\nimport pytest\n\nfrom tests.integration.utils import nanochat_source\n\n\ndef test_feddf_collection_restores_import_path():\n    previous = sys.path[:]\n    for name in [\"tests.clients.test_feddf_strategy\", \"tests.servers.test_feddf_server_strategy\"]:\n        importlib.import_module(name)\n        assert sys.path == previous\n\n\ndef test_feddf_client_failed_real_loader_restores_import_path(tmp_path):\n    module = importlib.import_module(\"tests.clients.test_feddf_strategy\")\n    original_spec = importlib.util.spec_from_file_location\n    def missing_source(name, path, *args, **kwargs):\n        if name == \"feddf_client_module\":\n            path = tmp_path / \"missing.py\"\n        return original_spec(name, path, *args, **kwargs)\n    previous = sys.path[:]\n    with patch.object(importlib.util, \"spec_from_file_location\", side_effect=missing_source):\n        with pytest.raises(FileNotFoundError):\n            importlib.reload(module)\n    assert sys.path == previous\n    importlib.reload(module)\n\n\ndef test_feddf_server_failed_real_loader_restores_import_path(tmp_path):\n    module = importlib.import_module(\"tests.servers.test_feddf_server_strategy\")\n    previous = sys.path[:]\n    with pytest.raises(FileNotFoundError):\n        module._load_module(\"feddf_missing\", tmp_path / \"missing.py\")\n    assert sys.path == previous\n\n\ndef test_nanochat_body_exception_restores_source_path():\n    previous = sys.path[:]\n    with pytest.raises(RuntimeError, match=\"path sentinel\"):\n        with nanochat_source() as source:\n            assert (source / \"nanochat/gpt.py\").is_file()\n            assert str(source) in sys.path\n            raise RuntimeError(\"path sentinel\")\n    assert sys.path == previous\n",
+      "negative_probes.py": "import json\nimport os\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nscratch = Path(\"/tmp/plato-phase1c-test-ci\")\nrepository = Path.cwd()\nresults = []\n\n\ndef probe(name, environment, args, expected, message):\n    env = os.environ | {\"UV_PROJECT_ENVIRONMENT\": str(scratch / environment), \"PYTHONPATH\": str(repository)}\n    command = [\"uv\", \"run\", \"--no-sync\", \"python\", \"-m\", \"pytest\", *args]\n    completed = subprocess.run(command, env=env, capture_output=True, text=True)\n    log = completed.stdout + completed.stderr\n    (scratch / f\"negative-{name}.log\").write_text(log)\n    assert completed.returncode == expected, (name, completed.returncode, log)\n    assert message in log, (name, log)\n    results.append({\"name\": name, \"environment\": environment, \"args\": args, \"exit\": completed.returncode, \"required_message\": message})\n\n\nfor py in (\"313\", \"314\"):\n    probe(f\"mandatory-in-base-{py}\", f\"base-{py}\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"mandatory prerequisite failed: No module named\")\n    site = next((scratch / f\"mandatory-{py}\" / \"lib\").glob(\"python*/site-packages\"))\n    for package in (\"opacus\", \"kazoo\", \"gymnasium\", \"tiktoken\"):\n        source = site / package\n        hidden = source.with_name(package + \".phase1c-disabled\")\n        source.rename(hidden)\n        try:\n            probe(f\"missing-{package}-{py}\", f\"mandatory-{py}\", [\"tests/mpc/test_mpc.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, f\"No module named '{package}'\")\n        finally:\n            hidden.rename(source)\n\nsource = repository / \"external/nanochat/nanochat\"\nhidden = source.with_name(\"nanochat.phase1c-disabled\")\nsource.rename(hidden)\ntry:\n    for py in (\"313\", \"314\"):\n        probe(f\"missing-source-{py}\", f\"mandatory-{py}\", [\"tests/test_nanochat_integration.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"Initialized Nanochat source required\")\nfinally:\n    hidden.rename(source)\n\nfixtures = {\n    \"setup-skip\": \"import pytest\\n@pytest.mark.skip(reason='unexpected setup omission')\\ndef test_setup_skip():\\n    pass\\n\",\n    \"xpass\": \"import pytest\\n@pytest.mark.xfail(reason='unexpected xpass', strict=False)\\ndef test_xpass():\\n    pass\\n\",\n    \"skip\": \"import pytest\\ndef test_skip():\\n    pytest.skip(\\\"unexpected omission\\\")\\n\",\n    \"xfail\": \"import pytest\\n@pytest.mark.xfail(reason=\\\"unexpected xfail\\\")\\ndef test_xfail():\\n    assert False\\n\",\n    \"collection-skip\": \"import pytest\\npytest.skip(\\\"unexpected collection omission\\\", allow_module_level=True)\\n\",\n    \"teardown-skip\": \"import pytest\\n@pytest.fixture\\ndef resource():\\n    yield\\n    pytest.skip(\\\"unexpected teardown omission\\\")\\ndef test_teardown(resource):\\n    pass\\n\",\n}\nfor name, text in fixtures.items():\n    target = scratch / (\"test_negative_\" + name.replace(\"-\", \"_\") + \".py\")\n    target.write_text(text)\n    probe(name, \"mandatory-313\", [\"-p\", \"tests.conftest\", str(target), \"--test-profile=mandatory\"], 1, \"test profile violations\")\nprobe(\"ignored-required\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"--ignore=tests/trainers/test_dp_data_loader_strategy.py\"], 1, \"required tests omitted\")\nprobe(\"unexpected-deselection\", \"mandatory-313\", [\"tests/mpc/test_mpc.py\", \"--test-profile=mandatory\", \"-k\", \"round_info\"], 1, \"unexpected deselection\")\nprobe(\"empty-runtime-partition-before-handoff\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"-m\", \"runtime\"], 1, \"required tests omitted\")\n(scratch / \"negative-results.json\").write_text(json.dumps(results, indent=2) + \"\\n\")\nprint(f\"{len(results)} negative probes rejected as expected\")\n",
+      "path_red.py": "import subprocess\nimport sys\nfrom pathlib import Path\n\nroot = Path.cwd()\nfailed = []\nfor relative in [\"tests/clients/test_feddf_strategy.py\", \"tests/servers/test_feddf_server_strategy.py\"]:\n    previous = sys.path[:]\n    source = subprocess.check_output([\"git\", \"show\", \"7304703905189baf771032f1cd923a37f66ed97f:\" + relative], text=True)\n    scope = {\"__file__\": str(root / relative), \"__name__\": \"phase1c_baseline_path_probe\"}\n    try:\n        exec(compile(source, str(root / relative), \"exec\"), scope)\n        assert sys.path == previous, relative\n    except AssertionError:\n        failed.append(relative)\n    finally:\n        sys.path[:] = previous\nassert len(failed) == 2, failed\nprint(\"2 baseline FedDF collection loaders leaked sys.path\")\n"
+    },
+    "replay": "Write probe_sources into scratch_root. Run negative_probes.py from the worktree after syncs, with no concurrent tests in those environments. Run test_isolation.py and test_paths.py with PYTHONPATH=., uv run --no-sync python -m pytest -p tests.conftest <path> --test-profile=base|mandatory. Helpers restore deliberate package/source renames in finally.",
+    "reversed_order": {
+      "313": "15 passed, 1 skipped in 1.18s",
+      "314": "15 passed, 1 skipped in 1.14s"
+    }
+  },
+  "warnings": {
+    "historical": 8,
+    "candidate": 0,
+    "necessary_design_adjustment": "Setting preprocessing_num_proc=1 as designed still emitted eight fork DeprecationWarnings. Accepted datasets 5.0.1 arrow_dataset.py:3619-3620 starts mp.Pool for every num_proc>=1. Set None in the owned block-size test to run genuine Dataset.map/tokenization/grouping in-process; no production defaults, dependencies, process context or warning filters changed.",
+    "other_output": "Torch elastic prints its MacOS redirect limitation to stderr. Final commands explicitly select --python 3.14 for forward checks against retained .python-version=3.13. Nanochat tests set NANOCHAT_BASE_DIR to a per-test temporary cache and restore the prior environment; final runs use the owned scratch basetemp."
+  },
+  "coverage": {
+    "historical": {
+      "covered": 7257,
+      "statements": 16935,
+      "percent": 42.852081488042515
+    },
+    "comparison": "3.13 keeps identical 16935-statement Plato scope and improves to 7378/16935 = 43.566578%; no new exclusions. 3.14 analyzes 16924 statements and covers 7372 = 43.559442%. Coverage 7.1.0 Python-version statement analysis differs by 11 across five unchanged files; do not compare rounded percentages as identical denominator measurements.",
+    "statement_count_differences_313_314": {
+      "plato/trainers/huggingface.py": [
+        582,
+        581
+      ],
+      "plato/servers/fedavg_he.py": [
+        55,
+        54
+      ],
+      "plato/algorithms/split_learning.py": [
+        46,
+        44
+      ],
+      "plato/utils/reinforcement_learning/policies/sac.py": [
+        202,
+        198
+      ],
+      "plato/models/registry.py": [
+        74,
+        71
+      ]
+    }
+  },
+  "typing": {
+    "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-{313,314} uv run --no-sync ty check --output-format concise",
+    "exit": 1,
+    "messages_each_interpreter": 384,
+    "first_party_messages": 60,
+    "first_party_distinct_locations": 59,
+    "vendor": {
+      "dvit": 306,
+      "t2tvit": 18,
+      "owner": "Phase 4 vendor/archive owner; pinned history, no vendor modernization in 1C"
+    },
+    "classifications": [
+      {
+        "file": "plato/algorithms/lora.py",
+        "owner": "3B",
+        "action": "Narrow guarded PEFT callables and remove unused ignores; preserve missing-dependency errors.",
+        "locations": [
+          "14:39 warning[unused-type-ignore-comment]",
+          "15:39 warning[unused-type-ignore-comment]",
+          "44:22 error[call-non-callable]",
+          "51:9 error[call-non-callable]"
+        ],
+        "messages": 4
+      },
+      {
+        "file": "plato/config.py",
+        "owner": "2A",
+        "action": "Correct annotation placement; F13 still needs a production reset regression.",
+        "locations": [
+          "321:28 error[invalid-type-form]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "plato/datasources/datalib/audio_extraction_tools.py",
+        "owner": "2A",
+        "action": "2A verifies the unused dependency closure and archives this bundle per plan-addendum; retain diagnostic history. No repair or archival claimed by 1C.",
+        "locations": [
+          "47:8 warning[deprecated]",
+          "52:12 warning[deprecated]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/datasources/datalib/frames_extraction_tools.py",
+        "owner": "2A",
+        "action": "2A verifies the unused dependency closure and archives this bundle per plan-addendum; retain diagnostic history. No repair or archival claimed by 1C.",
+        "locations": [
+          "116:8 warning[deprecated]",
+          "149:8 warning[deprecated]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/datasources/datalib/refer_utils/referitgame_utils.py",
+        "owner": "2A",
+        "action": "2A verifies the unused dependency closure and archives this bundle per plan-addendum; retain diagnostic history. No repair or archival claimed by 1C.",
+        "locations": [
+          "100:27 error[invalid-argument-type]",
+          "101:24 error[invalid-argument-type]",
+          "111:25 error[invalid-argument-type]",
+          "144:48 error[invalid-argument-type]",
+          "146:48 error[invalid-argument-type]",
+          "151:69 error[invalid-argument-type]",
+          "155:48 error[invalid-argument-type]",
+          "158:62 error[invalid-argument-type]",
+          "160:52 error[invalid-argument-type]",
+          "164:20 error[invalid-argument-type]",
+          "173:24 error[invalid-argument-type]",
+          "185:48 error[invalid-argument-type]",
+          "186:24 error[invalid-argument-type]",
+          "85:18 error[invalid-argument-type]",
+          "86:23 error[invalid-argument-type]",
+          "86:56 error[invalid-argument-type]",
+          "88:13 error[invalid-assignment]",
+          "88:32 error[invalid-argument-type]",
+          "89:18 error[invalid-argument-type]",
+          "91:18 error[invalid-argument-type]",
+          "91:31 error[invalid-argument-type]",
+          "98:22 error[invalid-argument-type]",
+          "99:22 error[invalid-argument-type]"
+        ],
+        "messages": 23
+      },
+      {
+        "file": "plato/datasources/torchvision.py",
+        "owner": "2A",
+        "action": "Type attached Subset classes/targets metadata and verify alignment; retain useful metadata.",
+        "locations": [
+          "622:13 error[unresolved-attribute]",
+          "626:13 error[unresolved-attribute]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/models/huggingface.py",
+        "owner": "3B",
+        "action": "Remove unused ignores during adapter work.",
+        "locations": [
+          "17:24 warning[unused-type-ignore-comment]",
+          "18:28 warning[unused-type-ignore-comment]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "plato/trainers/diff_privacy.py",
+        "owner": "2C with 2D privacy review",
+        "action": "Exercise real make_private/optimizer/accounting before narrowing GradSampleModule versus GradSampleHooks.",
+        "locations": [
+          "238:9 error[invalid-assignment]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "plato/trainers/huggingface.py",
+        "owner": "3B",
+        "action": "Remove redundant cast during adapter work; preserve F09 acceptance.",
+        "locations": [
+          "557:21 warning[redundant-cast]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/fedrlnas/fedrlnas_server.py",
+        "owner": "4 model-search owner",
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes.",
+        "locations": [
+          "127:34 error[call-non-callable]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/pfedrlnas/DARTS/fednas_server.py",
+        "owner": "4 model-search owner",
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes.",
+        "locations": [
+          "164:34 error[call-non-callable]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/pfedrlnas/VIT/fednas_server.py",
+        "owner": "4 model-search owner",
+        "action": "Verify and narrow the actual factory; root may archive obsolete paths with reproduction notes.",
+        "locations": [
+          "148:34 error[call-non-callable]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/model_search/fedtp/hypernetworks.py",
+        "owner": "4 model-search owner",
+        "action": "Remove redundant cast during example ownership.",
+        "locations": [
+          "87:32 warning[redundant-cast]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_algorithm.py",
+        "owner": "4 FedDF owner",
+        "action": "Specify the sized proxy-dataset contract; retain distillation behavior.",
+        "locations": [
+          "78:16 error[invalid-argument-type]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_server.py",
+        "owner": "4 FedDF owner",
+        "action": "Narrow strategy exposing _resolve_proxy_dataset; preserve dispatch.",
+        "locations": [
+          "45:25 error[unresolved-attribute]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/server_aggregation/feddf/feddf_utils.py",
+        "owner": "4 FedDF owner",
+        "action": "Specify sized proxy-dataset contract; never invent iterable lengths.",
+        "locations": [
+          "32:26 error[invalid-argument-type]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "examples/unlearning/knot/knot_server.py",
+        "owner": "4 unlearning owner",
+        "action": "Reproduce scalar/array indexing and empty/None extrema; preserve unlearning semantics.",
+        "locations": [
+          "403:17 error[invalid-argument-type]",
+          "776:17 error[invalid-argument-type]",
+          "776:40 error[invalid-argument-type]",
+          "802:31 error[invalid-argument-type]"
+        ],
+        "messages": 5
+      },
+      {
+        "file": "tests/datasources/test_huggingface_datasource.py",
+        "owner": "3B; 1C owns only worker-count optimization",
+        "action": "Use restoring method monkeypatches; retain dispatch assertions.",
+        "locations": [
+          "100:5 error[invalid-assignment]",
+          "99:5 error[invalid-assignment]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "tests/datasources/test_torchvision_datasource.py",
+        "owner": "2A",
+        "action": "Assert subset presence before indices assertions.",
+        "locations": [
+          "241:12 error[unresolved-attribute]",
+          "243:16 error[unresolved-attribute]"
+        ],
+        "messages": 2
+      },
+      {
+        "file": "tests/integration/test_smoke_configs.py",
+        "owner": "2C with 1C test coordination",
+        "action": "Reconcile None/list cut_layer_grad with the trainer contract; keep this identified as a stub test.",
+        "locations": [
+          "115:9 error[invalid-assignment]"
+        ],
+        "messages": 1
+      },
+      {
+        "file": "tests/trainers/strategies/test_base.py",
+        "owner": "2C",
+        "action": "Keep pytest.raises(TypeError). Documented line-specific rule ignores are appropriate for intentional invalid calls; no broad suppression.",
+        "locations": [
+          "153:13 error[call-non-callable]",
+          "184:13 error[call-non-callable]",
+          "240:13 error[call-non-callable]",
+          "279:13 error[call-non-callable]",
+          "448:13 error[call-non-callable]"
+        ],
+        "messages": 5
+      }
+    ],
+    "logs": {
+      "313": {
+        "path": "/tmp/plato-phase1c-test-ci/ty-full-313.log",
+        "sha256": "8d70ec0159d4827d5b341b9f4450a895599d3ed4b2077c25e79d0a2df74b113c"
+      },
+      "314": {
+        "path": "/tmp/plato-phase1c-test-ci/ty-full-314.log",
+        "sha256": "8d70ec0159d4827d5b341b9f4450a895599d3ed4b2077c25e79d0a2df74b113c"
+      }
+    },
+    "new_diagnostics_in_touched_files": 0,
+    "policy": "No new suppression. Existing two HF test assignment findings remain assigned to 3B; five abstract-class calls are deliberate negative tests owned by 2C. Raw nonzero output retained. F13 is still open with 2A; fixture reset does not repair production Config reset."
+  },
+  "workflow": {
+    "actionlint": "1.7.12, -shellcheck=, exit 0",
+    "commands": "All shell run blocks parse under zsh; embedded Python compiles; custom zsh -lc source shell executes locally. Runner provisioning/install/startup/socket commands await actual Linux execution and accepted 1B.",
+    "bounds": "45-minute overall job; 10-minute installs, 12-minute base and mandatory partitions (seven-minute full-suite measurement supplied by root), five-minute socket partition. Preserve delivered 30+5+5 and 90+5+5 process deadlines; no omitted negative cases.",
+    "runtime_nodes": [
+      "test_real_two_client_cpu_socket_round",
+      "test_post_launch_failure_keeps_primary_error_and_contains_children",
+      "test_stalled_real_client_is_contained_without_round_success"
+    ],
+    "runtime_wiring_status": "Read-only draft interfaces inspected; no startup implementation/helpers copied or edited. Confirm exact delivered cases/counts after accepted 1B handoff before final qualification.",
+    "official_action_sources": {
+      "checkout v7.0.1": "https://github.com/actions/checkout/releases/tag/v7.0.1",
+      "setup-python v7.0.0": "https://github.com/actions/setup-python/releases/tag/v7.0.0",
+      "setup-uv v10.2.0": "https://github.com/astral-sh/setup-uv/releases/tag/v10.2.0",
+      "upload-artifact v7.0.1": "https://github.com/actions/upload-artifact/releases/tag/v7.0.1"
+    },
+    "linux_runtime": "Unavailable locally (macOS Apple Silicon, no Docker). Root must verify GitHub Linux after reviewed Phase 1 publication and before Phase 2; resolution/syntax checks are not runtime qualification."
+  },
+  "ruff": "uv run --no-sync ruff check . --select I: exit 0",
+  "independent_review": "Fresh exact provisional-commit review pending; no final 1C candidate committed before independently accepted 1B handoff.",
+  "remaining": [
+    "accepted exact 1B commit integration",
+    "confirm and enforce delivered startup/runtime nodes including containment cases",
+    "local 3.13/3.14 delivered startup/socket qualification",
+    "fresh independent exact final-commit review",
+    "root GitHub Linux execution and Phase 1 gate"
+  ]
+}

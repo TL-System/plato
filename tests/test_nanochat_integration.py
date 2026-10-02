@@ -2,28 +2,16 @@
 
 from __future__ import annotations
 
-import importlib.util
 import os
 
 import pytest
 
 from plato.config import Config, ConfigNode
-from plato.utils.third_party import ensure_nanochat_importable
 
 pytestmark = pytest.mark.integration
 
-_RUSTBPE_AVAILABLE = importlib.util.find_spec("rustbpe") is not None
-
-
-@pytest.mark.skipif(
-    not _RUSTBPE_AVAILABLE,
-    reason="Nanochat tokenizer tests require rustbpe extension (install nanochat extras).",
-)
-def test_nanochat_tokenizer_processor_round_trip(tmp_path):
+def test_nanochat_tokenizer_processor_round_trip(initialized_nanochat, tmp_path):
     """Train a tiny tokenizer via rustbpe and encode a sample string."""
-    pytest.importorskip(
-        "tiktoken", reason="Nanochat tokenizer tests require tiktoken (nanochat extra)."
-    )
     from plato.processors.nanochat_tokenizer import NanochatTokenizerProcessor
 
     corpus = ["hello nanochat", "minimal tokenizer exercise"]
@@ -37,16 +25,8 @@ def test_nanochat_tokenizer_processor_round_trip(tmp_path):
     assert len(encoded) > 0
 
 
-def test_nanochat_trainer_smoke(temp_config, tmp_path):
+def test_nanochat_trainer_smoke(temp_config, initialized_nanochat, tmp_path):
     """Run one training step with synthetic Nanochat data on CPU."""
-    _ = pytest.importorskip(
-        "torch", reason="Nanochat trainer smoke requires torch (nanochat extra)."
-    )
-    ensure_nanochat_importable()
-    _ = pytest.importorskip(
-        "nanochat",
-        reason="Nanochat trainer smoke requires the nanochat package (nanochat extra).",
-    )
     from plato.datasources.nanochat import DataSource as NanochatDataSource
     from plato.models.nanochat import Model as NanochatModel
     from plato.trainers.nanochat import Trainer as NanochatTrainer
@@ -100,16 +80,10 @@ def test_nanochat_trainer_smoke(temp_config, tmp_path):
     assert os.path.exists(os.path.join(model_dir, checkpoint_name))
 
 
-def test_nanochat_trainer_selects_core_eval_strategy(temp_config, monkeypatch):
+def test_nanochat_trainer_selects_core_eval_strategy(
+    temp_config, initialized_nanochat, monkeypatch
+):
     """Ensure evaluation config triggers the CORE testing strategy."""
-    _ = pytest.importorskip(
-        "torch", reason="Nanochat trainer requires torch (nanochat extra)."
-    )
-    ensure_nanochat_importable()
-    _ = pytest.importorskip(
-        "nanochat",
-        reason="Nanochat trainer requires the nanochat package (nanochat extra).",
-    )
     from plato.models.nanochat import Model as NanochatModel
     from plato.trainers.nanochat import (
         NanochatCoreTestingStrategy,
