@@ -77,7 +77,7 @@ jobs:
         run: |
           set -eu
           uv sync --locked --python "${{ matrix.python }}" --no-default-groups --group test-base
-          uv pip freeze > ci-artifacts/base-packages.txt
+          uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/base-packages.txt
 
       - name: Base collection, suite and missing-extra probe
         timeout-minutes: 12
@@ -87,7 +87,7 @@ jobs:
           HF_DATASETS_OFFLINE: "1"
         run: |
           set -eu
-          uv run --no-sync python -m pytest tests --collect-only --test-profile=base -ra > ci-artifacts/base-collection.log 2>&1
+          uv run --no-sync python -m pytest tests --collect-only --test-profile=base -m "not runtime" -ra > ci-artifacts/base-collection.log 2>&1
           uv run --no-sync python -m pytest tests --test-profile=base -m "not runtime" -ra --basetemp=ci-artifacts/base-tmp --junitxml=ci-artifacts/base.xml > ci-artifacts/base.log 2>&1
           if uv run --no-sync python -m pytest tests --collect-only --test-profile=mandatory > ci-artifacts/missing-extra.log 2>&1; then
             exit 1
@@ -103,9 +103,9 @@ jobs:
         run: |
           set -eu
           uv sync --locked --python "${{ matrix.python }}" --no-default-groups --group dev
-          uv pip freeze > ci-artifacts/mandatory-packages.txt
+          uv pip freeze --python "$UV_PROJECT_ENVIRONMENT/bin/python" > ci-artifacts/mandatory-packages.txt
 
-      - name: Mandatory suite including fresh startup regressions
+      - name: Mandatory initialized core suite
         timeout-minutes: 12
         env:
           HF_HUB_OFFLINE: "1"
@@ -114,8 +114,8 @@ jobs:
           set -eu
           uv run --no-sync python -m pytest tests --test-profile=mandatory -m "not runtime" -ra --basetemp=ci-artifacts/mandatory-tmp --junitxml=ci-artifacts/mandatory.xml --cov=plato --cov-report=term --cov-report=json:ci-artifacts/coverage.json > ci-artifacts/mandatory.log 2>&1
 
-      - name: Real CPU socket round and failure containment
-        timeout-minutes: 5
+      - name: Fresh startup, real CPU socket round and failure containment
+        timeout-minutes: 12
         env:
           HF_HUB_OFFLINE: "1"
           HF_DATASETS_OFFLINE: "1"

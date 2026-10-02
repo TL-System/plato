@@ -1,9 +1,10 @@
 {
   "phase": "1C",
   "date": "2026-10-02",
-  "status": "Provisional independent implementation, ready for accepted 1B handoff. Final 1C qualification/acceptance and Linux execution pending.",
+  "status": "Provisional independent checkpoint; stop editing for root to merge accepted 1B and issue final qualification clearance. Final 1C qualification/acceptance and Linux execution pending.",
   "accepted_dependency_commit": "7304703905189baf771032f1cd923a37f66ed97f",
-  "accepted_startup_commit": null,
+  "accepted_startup_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+  "startup_integration": "Root ACCEPTED exact 213b321c after phase1b-review.json PASS; phase1b-acceptance.json confirms. Read-only inspection only here. Root will merge this accepted commit into this branch after the clean WIP checkpoint, then send final qualification clearance. No concurrent merge or final qualification performed here.",
   "scope": "Only declared test fixtures/profile/import/worker-count files, test group metadata/lock, minimal PyTorch workflow and this evidence. No runtime changes, archive moves, push or PR.",
   "default_python": "3.13 unchanged; 3.14.8 core forward-compatibility only",
   "shell": "All local shell invocations use zsh -lc. CI bootstraps zsh via Python subprocess argv, then uses zsh -lc for every shell block.",
@@ -12,19 +13,21 @@
     "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
     "design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
     "plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
-    "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15"
+    "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+    "phase1b-review.json": "f02507a3be88f1438143c24bf7921af907400d370d4bf7ccba6378ec4756ec2b",
+    "phase1b-acceptance.json": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444"
   },
   "tested_files_sha256": {
-    "tests/conftest.py": "9ee5eb2a359c4381b5d41e43af31ba416e7afc91ced9749235b066cc32bd8a56",
+    "tests/conftest.py": "3b7adbefb8a906848fab07abda444d79a116c8a30410ae052154b35f479db2bb",
     "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
     "tests/trainers/test_dp_data_loader_strategy.py": "ab2ed2a9664d1986dcb2cdebd815cdaa052f25efe1b38be63c3f412bd64c2d8f",
-    "tests/test_nanochat_integration.py": "34fdfb009134f0b909a4e5cda1ccdcd51babf601f12c5ac428339647ec7fb37d",
+    "tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
     "tests/clients/test_feddf_strategy.py": "00dfde39c13bfbbe7a842266ada0e77419c609ba2d3bf82008d5985f5d08a930",
     "tests/servers/test_feddf_server_strategy.py": "41d065daf85092ecb46bdea3a6fe3526d5daeabfcc920e8b63edd035b9408b62",
     "tests/datasources/test_huggingface_datasource.py": "938341526e228318590d8f5591232d1653a9e33a99f0a3c48780a4ffbc583137",
-    "pyproject.toml": "e5da0b46234b036d7b1fbb8b2804668bca92c9be68d193ecc631350bbfaaee29",
+    "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
     "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
-    ".github/workflows/pytorch_tests.yml": "430bed86538c8afd228367452e57beed88a78be1d084841734d7a6345b82993e"
+    ".github/workflows/pytorch_tests.yml": "ad004247e3f71bfb1ceebd428a052204476d7bee99031c52a116b8edac156fe4"
   },
   "lock": {
     "packages": 278,
@@ -48,16 +51,17 @@
           "torch": "2.14.1",
           "datasets": "5.0.1",
           "pytest": "9.1.1",
-          "pytest-cov": "7.1.0"
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
         }
       },
       "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base",
       "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.13 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/base-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/base-313.xml",
       "exit": 0,
-      "summary": "246 passed, 4 skipped in 1.06s",
+      "summary": "246 passed, 4 skipped in 1.29s",
       "warning_count": 0,
       "log": "/tmp/plato-phase1c-test-ci/base-313.log",
-      "log_sha256": "b1797444940dd9a356665f6d9feff1344a1eebb955d40568fa0cdce19c481103",
+      "log_sha256": "b739dd1ad8be0605f9ada82f6b6b773af13c9105f03a4bed10d00bc661934e42",
       "optional_imports": {
         "opacus": false,
         "kazoo": false,
@@ -74,16 +78,17 @@
           "torch": "2.14.1",
           "datasets": "5.0.1",
           "pytest": "9.1.1",
-          "pytest-cov": "7.1.0"
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
         }
       },
       "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 uv sync --locked --python 3.13 --no-default-groups --group dev",
       "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/mandatory-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/mandatory-313.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/coverage-313.json",
       "exit": 0,
-      "summary": "250 passed, 1 skipped in 5.65s",
+      "summary": "250 passed, 1 skipped in 5.77s",
       "warning_count": 0,
       "log": "/tmp/plato-phase1c-test-ci/mandatory-313.log",
-      "log_sha256": "703b67136faaaea2f9139c98c903fb5d892ec61e516230bdd2a3aef5b5325942",
+      "log_sha256": "e175e48b78ecc7dcd5eb328bdc2524008fe07fedab5c59e67bceb67d2133a6fe",
       "optional_imports": {
         "opacus": true,
         "kazoo": true,
@@ -110,16 +115,17 @@
           "torch": "2.14.1",
           "datasets": "5.0.1",
           "pytest": "9.1.1",
-          "pytest-cov": "7.1.0"
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
         }
       },
       "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
       "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.14 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/base-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/base-314.xml",
       "exit": 0,
-      "summary": "246 passed, 4 skipped in 1.08s",
+      "summary": "246 passed, 4 skipped in 1.30s",
       "warning_count": 0,
       "log": "/tmp/plato-phase1c-test-ci/base-314.log",
-      "log_sha256": "b1150a031cca7c297e48c0075fe8c98f4ef79b74946948499294902273507c02",
+      "log_sha256": "66e1e5f32ee26483ab3071cb86c136f737639397affd87586ef312204867120f",
       "optional_imports": {
         "opacus": false,
         "kazoo": false,
@@ -136,16 +142,17 @@
           "torch": "2.14.1",
           "datasets": "5.0.1",
           "pytest": "9.1.1",
-          "pytest-cov": "7.1.0"
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
         }
       },
       "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-314 uv sync --locked --python 3.14 --no-default-groups --group dev",
       "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/mandatory-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/mandatory-314.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/coverage-314.json",
       "exit": 0,
-      "summary": "250 passed, 1 skipped in 4.77s",
+      "summary": "250 passed, 1 skipped in 4.89s",
       "warning_count": 0,
       "log": "/tmp/plato-phase1c-test-ci/mandatory-314.log",
-      "log_sha256": "c721d7e83bbdaaf85f6bf3a2bb844444e8269915a9ec08b533d3619f40aa34b9",
+      "log_sha256": "bfca11a51d4087e7d6343ccb7082cdaa42670b78a0ad92ca8ffbecf3807924c2",
       "optional_imports": {
         "opacus": true,
         "kazoo": true,
@@ -175,11 +182,18 @@
       "initialized Nanochat synthetic trainer",
       "initialized Nanochat CORE-strategy selection"
     ],
+    "nanochat_preflight": "Compare initialized checkout HEAD to the repository gitlink and verify nanochat.gpt imports from that source. Actual pinned source target: 7 passed, 1 permitted native skip; no overlay/fake synthetic trainer qualification.",
     "allowed_mandatory_skip": "Only the tokenizer round-trip node, callable rustbpe.Tokenizer unavailable (source namespace is importable); real native tokenizer/CORE evaluation qualification remains with 3B"
   },
   "red_green": {
+    "focused_developer_commands": {
+      "red": "656952d WIP forces mandatory prerequisites on an ordinary focused base-environment command: uv run --no-sync python -m pytest tests/mpc/test_mpc.py -k round_info exits 4 for missing opacus.",
+      "green": "Current candidate preserves that focused command without profile selection on both interpreters: 1 passed, 2 deselected. Explicit --test-profile and full-suite qualification retain prerequisite, omission, skip/xfail enforcement; no entire-suite node requirement on focused paths.",
+      "policy": "No profile flag on a focused invocation uses ordinary pytest skip/xfail/deselection behavior. Full-suite invocations default to mandatory qualification; explicit profiles request qualification auditing even on focused paths.",
+      "native": "A focused tokenizer round-trip invocation in the base environment reports one honest optional skip when callable rustbpe.Tokenizer is absent, without requiring every mandatory extra; initialized source is still required by the test fixture."
+    },
     "fixtures": "Accepted dependency baseline: 5 failed, 1 passed; candidate: 6 passed on each interpreter. Real Config construction, nested body/setup exceptions, six temporary runtime paths, optional section removal and Python/NumPy/CPU Torch RNG restoration.",
-    "collection": "Baseline base collection: 249 collected plus Opacus import error, exit 2. Candidate: 249 collected, named DP module omission, exit 0.",
+    "collection": "Baseline base collection: 249 collected plus Opacus import error, exit 2. Candidate base core collection with -m 'not runtime': 249 collected, named DP module omission, exit 0. Whole-suite startup collection awaits accepted 1B integration.",
     "feddf": "Baseline loaders leak sys.path for both client/server; candidate path/error probes: 4 passed. Real importlib loader failure and Nanochat body exception restore paths.",
     "negative_probes": [
       {
@@ -393,6 +407,8 @@
           "tests",
           "--collect-only",
           "--test-profile=mandatory",
+          "-m",
+          "not runtime",
           "--ignore=tests/trainers/test_dp_data_loader_strategy.py"
         ],
         "exit": 1,
@@ -427,7 +443,7 @@
     "probe_sources": {
       "test_isolation.py": "import os\nimport random\nimport sys\nfrom pathlib import Path\n\nimport numpy as np\nimport pytest\nimport torch\n\nfrom plato.config import Config\nfrom tests.integration.utils import build_minimal_config, configure_environment\nfrom tests.test_utils.fakes import FakeModel\n\n\ndef test_context_keeps_config_environment_and_nested_exception_restores():\n    original_env = os.environ.get(\"config_file\")\n    original_argv = sys.argv\n    with configure_environment(build_minimal_config()) as outer:\n        outer_env = os.environ.get(\"config_file\")\n        assert outer_env == str(Config.config_path)\n        assert Path(outer_env).is_file()\n        outer_params = Config.params\n        with pytest.raises(RuntimeError, match=\"body sentinel\"):\n            with configure_environment(build_minimal_config()):\n                assert Config() is not outer\n                raise RuntimeError(\"body sentinel\")\n        assert Config() is outer\n        assert Config.params is outer_params\n        assert os.environ[\"config_file\"] == outer_env\n    assert os.environ.get(\"config_file\") == original_env\n    assert sys.argv is original_argv\n\n\ndef test_setup_failure_restores_outer_config():\n    with configure_environment(build_minimal_config()) as outer:\n        params = Config.params\n        env = os.environ.get(\"config_file\")\n        argv = sys.argv\n        with pytest.raises(AttributeError):\n            with configure_environment({\"clients\": {}}):\n                pytest.fail(\"invalid config entered\")\n        assert Config() is outer\n        assert Config.params is params\n        assert os.environ.get(\"config_file\") == env\n        assert sys.argv is argv\n\n\ndef test_all_runtime_paths_are_temporary_before_construction(temp_config, tmp_path):\n    for name in [\"base\", \"data\", \"model\", \"checkpoint\", \"result\", \"mpc_data\"]:\n        assert Path(Config.params[f\"{name}_path\"]).is_relative_to(tmp_path)\n\n\ndef test_optional_sections_do_not_leak_between_contexts():\n    first = build_minimal_config()\n    first[\"evaluation\"] = {\"type\": \"sentinel\"}\n    with configure_environment(first):\n        assert Config.evaluation.type == \"sentinel\"\n    with configure_environment(build_minimal_config()):\n        assert not hasattr(Config, \"evaluation\")\n\n\n_rng = (random.getstate(), np.random.get_state(), torch.get_rng_state().clone())\n\n\ndef test_rng_mutation_uses_real_fake_model():\n    random.random()\n    np.random.random()\n    FakeModel()\n\n\ndef test_rng_state_is_restored_between_tests():\n    assert random.getstate() == _rng[0]\n    actual = np.random.get_state()\n    assert actual[0] == _rng[1][0] and np.array_equal(actual[1], _rng[1][1])\n    assert actual[2:] == _rng[1][2:]\n    assert torch.equal(torch.get_rng_state(), _rng[2])\n",
       "test_paths.py": "import importlib\nimport importlib.util\nimport sys\nfrom pathlib import Path\nfrom unittest.mock import patch\n\nimport pytest\n\nfrom tests.integration.utils import nanochat_source\n\n\ndef test_feddf_collection_restores_import_path():\n    previous = sys.path[:]\n    for name in [\"tests.clients.test_feddf_strategy\", \"tests.servers.test_feddf_server_strategy\"]:\n        importlib.import_module(name)\n        assert sys.path == previous\n\n\ndef test_feddf_client_failed_real_loader_restores_import_path(tmp_path):\n    module = importlib.import_module(\"tests.clients.test_feddf_strategy\")\n    original_spec = importlib.util.spec_from_file_location\n    def missing_source(name, path, *args, **kwargs):\n        if name == \"feddf_client_module\":\n            path = tmp_path / \"missing.py\"\n        return original_spec(name, path, *args, **kwargs)\n    previous = sys.path[:]\n    with patch.object(importlib.util, \"spec_from_file_location\", side_effect=missing_source):\n        with pytest.raises(FileNotFoundError):\n            importlib.reload(module)\n    assert sys.path == previous\n    importlib.reload(module)\n\n\ndef test_feddf_server_failed_real_loader_restores_import_path(tmp_path):\n    module = importlib.import_module(\"tests.servers.test_feddf_server_strategy\")\n    previous = sys.path[:]\n    with pytest.raises(FileNotFoundError):\n        module._load_module(\"feddf_missing\", tmp_path / \"missing.py\")\n    assert sys.path == previous\n\n\ndef test_nanochat_body_exception_restores_source_path():\n    previous = sys.path[:]\n    with pytest.raises(RuntimeError, match=\"path sentinel\"):\n        with nanochat_source() as source:\n            assert (source / \"nanochat/gpt.py\").is_file()\n            assert str(source) in sys.path\n            raise RuntimeError(\"path sentinel\")\n    assert sys.path == previous\n",
-      "negative_probes.py": "import json\nimport os\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nscratch = Path(\"/tmp/plato-phase1c-test-ci\")\nrepository = Path.cwd()\nresults = []\n\n\ndef probe(name, environment, args, expected, message):\n    env = os.environ | {\"UV_PROJECT_ENVIRONMENT\": str(scratch / environment), \"PYTHONPATH\": str(repository)}\n    command = [\"uv\", \"run\", \"--no-sync\", \"python\", \"-m\", \"pytest\", *args]\n    completed = subprocess.run(command, env=env, capture_output=True, text=True)\n    log = completed.stdout + completed.stderr\n    (scratch / f\"negative-{name}.log\").write_text(log)\n    assert completed.returncode == expected, (name, completed.returncode, log)\n    assert message in log, (name, log)\n    results.append({\"name\": name, \"environment\": environment, \"args\": args, \"exit\": completed.returncode, \"required_message\": message})\n\n\nfor py in (\"313\", \"314\"):\n    probe(f\"mandatory-in-base-{py}\", f\"base-{py}\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"mandatory prerequisite failed: No module named\")\n    site = next((scratch / f\"mandatory-{py}\" / \"lib\").glob(\"python*/site-packages\"))\n    for package in (\"opacus\", \"kazoo\", \"gymnasium\", \"tiktoken\"):\n        source = site / package\n        hidden = source.with_name(package + \".phase1c-disabled\")\n        source.rename(hidden)\n        try:\n            probe(f\"missing-{package}-{py}\", f\"mandatory-{py}\", [\"tests/mpc/test_mpc.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, f\"No module named '{package}'\")\n        finally:\n            hidden.rename(source)\n\nsource = repository / \"external/nanochat/nanochat\"\nhidden = source.with_name(\"nanochat.phase1c-disabled\")\nsource.rename(hidden)\ntry:\n    for py in (\"313\", \"314\"):\n        probe(f\"missing-source-{py}\", f\"mandatory-{py}\", [\"tests/test_nanochat_integration.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"Initialized Nanochat source required\")\nfinally:\n    hidden.rename(source)\n\nfixtures = {\n    \"setup-skip\": \"import pytest\\n@pytest.mark.skip(reason='unexpected setup omission')\\ndef test_setup_skip():\\n    pass\\n\",\n    \"xpass\": \"import pytest\\n@pytest.mark.xfail(reason='unexpected xpass', strict=False)\\ndef test_xpass():\\n    pass\\n\",\n    \"skip\": \"import pytest\\ndef test_skip():\\n    pytest.skip(\\\"unexpected omission\\\")\\n\",\n    \"xfail\": \"import pytest\\n@pytest.mark.xfail(reason=\\\"unexpected xfail\\\")\\ndef test_xfail():\\n    assert False\\n\",\n    \"collection-skip\": \"import pytest\\npytest.skip(\\\"unexpected collection omission\\\", allow_module_level=True)\\n\",\n    \"teardown-skip\": \"import pytest\\n@pytest.fixture\\ndef resource():\\n    yield\\n    pytest.skip(\\\"unexpected teardown omission\\\")\\ndef test_teardown(resource):\\n    pass\\n\",\n}\nfor name, text in fixtures.items():\n    target = scratch / (\"test_negative_\" + name.replace(\"-\", \"_\") + \".py\")\n    target.write_text(text)\n    probe(name, \"mandatory-313\", [\"-p\", \"tests.conftest\", str(target), \"--test-profile=mandatory\"], 1, \"test profile violations\")\nprobe(\"ignored-required\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"--ignore=tests/trainers/test_dp_data_loader_strategy.py\"], 1, \"required tests omitted\")\nprobe(\"unexpected-deselection\", \"mandatory-313\", [\"tests/mpc/test_mpc.py\", \"--test-profile=mandatory\", \"-k\", \"round_info\"], 1, \"unexpected deselection\")\nprobe(\"empty-runtime-partition-before-handoff\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"-m\", \"runtime\"], 1, \"required tests omitted\")\n(scratch / \"negative-results.json\").write_text(json.dumps(results, indent=2) + \"\\n\")\nprint(f\"{len(results)} negative probes rejected as expected\")\n",
+      "negative_probes.py": "import json\nimport os\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nscratch = Path(\"/tmp/plato-phase1c-test-ci\")\nrepository = Path.cwd()\nresults = []\n\n\ndef probe(name, environment, args, expected, message):\n    env = os.environ | {\"UV_PROJECT_ENVIRONMENT\": str(scratch / environment), \"PYTHONPATH\": str(repository)}\n    command = [\"uv\", \"run\", \"--no-sync\", \"python\", \"-m\", \"pytest\", *args]\n    completed = subprocess.run(command, env=env, capture_output=True, text=True)\n    log = completed.stdout + completed.stderr\n    (scratch / f\"negative-{name}.log\").write_text(log)\n    assert completed.returncode == expected, (name, completed.returncode, log)\n    assert message in log, (name, log)\n    results.append({\"name\": name, \"environment\": environment, \"args\": args, \"exit\": completed.returncode, \"required_message\": message})\n\n\nfor py in (\"313\", \"314\"):\n    probe(f\"mandatory-in-base-{py}\", f\"base-{py}\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"mandatory prerequisite failed: No module named\")\n    site = next((scratch / f\"mandatory-{py}\" / \"lib\").glob(\"python*/site-packages\"))\n    for package in (\"opacus\", \"kazoo\", \"gymnasium\", \"tiktoken\"):\n        source = site / package\n        hidden = source.with_name(package + \".phase1c-disabled\")\n        source.rename(hidden)\n        try:\n            probe(f\"missing-{package}-{py}\", f\"mandatory-{py}\", [\"tests/mpc/test_mpc.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, f\"No module named '{package}'\")\n        finally:\n            hidden.rename(source)\n\nsource = repository / \"external/nanochat/nanochat\"\nhidden = source.with_name(\"nanochat.phase1c-disabled\")\nsource.rename(hidden)\ntry:\n    for py in (\"313\", \"314\"):\n        probe(f\"missing-source-{py}\", f\"mandatory-{py}\", [\"tests/test_nanochat_integration.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"Initialized Nanochat source required\")\nfinally:\n    hidden.rename(source)\n\nfixtures = {\n    \"setup-skip\": \"import pytest\\n@pytest.mark.skip(reason='unexpected setup omission')\\ndef test_setup_skip():\\n    pass\\n\",\n    \"xpass\": \"import pytest\\n@pytest.mark.xfail(reason='unexpected xpass', strict=False)\\ndef test_xpass():\\n    pass\\n\",\n    \"skip\": \"import pytest\\ndef test_skip():\\n    pytest.skip(\\\"unexpected omission\\\")\\n\",\n    \"xfail\": \"import pytest\\n@pytest.mark.xfail(reason=\\\"unexpected xfail\\\")\\ndef test_xfail():\\n    assert False\\n\",\n    \"collection-skip\": \"import pytest\\npytest.skip(\\\"unexpected collection omission\\\", allow_module_level=True)\\n\",\n    \"teardown-skip\": \"import pytest\\n@pytest.fixture\\ndef resource():\\n    yield\\n    pytest.skip(\\\"unexpected teardown omission\\\")\\ndef test_teardown(resource):\\n    pass\\n\",\n}\nfor name, text in fixtures.items():\n    target = scratch / (\"test_negative_\" + name.replace(\"-\", \"_\") + \".py\")\n    target.write_text(text)\n    probe(name, \"mandatory-313\", [\"-p\", \"tests.conftest\", str(target), \"--test-profile=mandatory\"], 1, \"test profile violations\")\nprobe(\"ignored-required\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"-m\", \"not runtime\", \"--ignore=tests/trainers/test_dp_data_loader_strategy.py\"], 1, \"required tests omitted\")\nprobe(\"unexpected-deselection\", \"mandatory-313\", [\"tests/mpc/test_mpc.py\", \"--test-profile=mandatory\", \"-k\", \"round_info\"], 1, \"unexpected deselection\")\nprobe(\"empty-runtime-partition-before-handoff\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"-m\", \"runtime\"], 1, \"required tests omitted\")\n(scratch / \"negative-results.json\").write_text(json.dumps(results, indent=2) + \"\\n\")\nprint(f\"{len(results)} negative probes rejected as expected\")\n",
       "path_red.py": "import subprocess\nimport sys\nfrom pathlib import Path\n\nroot = Path.cwd()\nfailed = []\nfor relative in [\"tests/clients/test_feddf_strategy.py\", \"tests/servers/test_feddf_server_strategy.py\"]:\n    previous = sys.path[:]\n    source = subprocess.check_output([\"git\", \"show\", \"7304703905189baf771032f1cd923a37f66ed97f:\" + relative], text=True)\n    scope = {\"__file__\": str(root / relative), \"__name__\": \"phase1c_baseline_path_probe\"}\n    try:\n        exec(compile(source, str(root / relative), \"exec\"), scope)\n        assert sys.path == previous, relative\n    except AssertionError:\n        failed.append(relative)\n    finally:\n        sys.path[:] = previous\nassert len(failed) == 2, failed\nprint(\"2 baseline FedDF collection loaders leaked sys.path\")\n"
     },
     "replay": "Write probe_sources into scratch_root. Run negative_probes.py from the worktree after syncs, with no concurrent tests in those environments. Run test_isolation.py and test_paths.py with PYTHONPATH=., uv run --no-sync python -m pytest -p tests.conftest <path> --test-profile=base|mandatory. Helpers restore deliberate package/source renames in finally.",
@@ -448,7 +464,7 @@
       "statements": 16935,
       "percent": 42.852081488042515
     },
-    "comparison": "3.13 keeps identical 16935-statement Plato scope and improves to 7378/16935 = 43.566578%; no new exclusions. 3.14 analyzes 16924 statements and covers 7372 = 43.559442%. Coverage 7.1.0 Python-version statement analysis differs by 11 across five unchanged files; do not compare rounded percentages as identical denominator measurements.",
+    "comparison": "3.13 keeps identical 16935-statement Plato scope and improves to 7378/16935 = 43.566578%; no new exclusions. 3.14 analyzes 16924 statements and covers 7372 = 43.559442%. Coverage 7.16.2 (pytest-cov 7.1.0) Python-version statement analysis differs by 11 across five unchanged files; do not compare rounded percentages as identical denominator measurements.",
     "statement_count_differences_313_314": {
       "plato/trainers/huggingface.py": [
         582,
@@ -728,13 +744,14 @@
   "workflow": {
     "actionlint": "1.7.12, -shellcheck=, exit 0",
     "commands": "All shell run blocks parse under zsh; embedded Python compiles; custom zsh -lc source shell executes locally. Runner provisioning/install/startup/socket commands await actual Linux execution and accepted 1B.",
-    "bounds": "45-minute overall job; 10-minute installs, 12-minute base and mandatory partitions (seven-minute full-suite measurement supplied by root), five-minute socket partition. Preserve delivered 30+5+5 and 90+5+5 process deadlines; no omitted negative cases.",
+    "bounds": "45-minute overall job; 10-minute installs, 12-minute base/mandatory core and startup/runtime steps. Root reports delivered 48 startup cases sum to 431/444 seconds on 3.13/3.14. All startup/socket/containment cases run once in the mandatory runtime partition per interpreter; base and mandatory core use -m 'not runtime'. Preserve delivered 30+5+5 and 90+5+5 process deadlines; no omitted negative cases.",
     "runtime_nodes": [
       "test_real_two_client_cpu_socket_round",
       "test_post_launch_failure_keeps_primary_error_and_contains_children",
       "test_stalled_real_client_is_contained_without_round_success"
     ],
-    "runtime_wiring_status": "Read-only draft interfaces inspected; no startup implementation/helpers copied or edited. Confirm exact delivered cases/counts after accepted 1B handoff before final qualification.",
+    "runtime_wiring_status": "Read-only accepted commit interfaces inspected; no startup implementation/helpers copied, edited or integrated. Fixed expected per-function inventory sums to 48 cases from accepted commit AST. Register runtime, startup_runtime, startup_containment; whole startup module belongs to runtime, socket cases carry startup_runtime, watchdog/child-failure cases carry startup_containment. Root merge and final qualification clearance remain required before actual integrated execution.",
+    "package_inventory": "Both uv pip freeze calls now name --python environment/bin/python; own four profile inventories checked. UV_PROJECT_ENVIRONMENT alone is insufficient for uv pip commands.",
     "official_action_sources": {
       "checkout v7.0.1": "https://github.com/actions/checkout/releases/tag/v7.0.1",
       "setup-python v7.0.0": "https://github.com/actions/setup-python/releases/tag/v7.0.0",
@@ -744,12 +761,22 @@
     "linux_runtime": "Unavailable locally (macOS Apple Silicon, no Docker). Root must verify GitHub Linux after reviewed Phase 1 publication and before Phase 2; resolution/syntax checks are not runtime qualification."
   },
   "ruff": "uv run --no-sync ruff check . --select I: exit 0",
-  "independent_review": "Fresh exact provisional-commit review pending; no final 1C candidate committed before independently accepted 1B handoff.",
+  "independent_review": {
+    "status": "Required root-created fresh exact-commit review in separate herdr workspace remains pending. No final 1C candidate committed before independently accepted 1B handoff.",
+    "nested_reviewers": "Two reviewers were mistakenly started here contrary to the no-nested-agents instruction. Both were interrupted on user clarification; no delegation will continue. Their partial results are supplemental observations only, not a completed required independent review or acceptance.",
+    "preliminary_sha": "656952d740a78e27b09e7df729788d7db0486be8",
+    "preserved_results": [
+      "Evidence/source/four suite-log hashes match; lock has 278 identical package records after removing only the two added test-base metadata arrays; Python default remains 3.13.",
+      "Fresh archived-source probes reproduced 3.13 mandatory 250 passed/1 allowed skip and 7378/16935 coverage, 3.14 mandatory 250 passed/1 allowed skip, 3.13 base 246 passed/4 declared skip reports; no pytest warnings. Ruff and zsh/Python workflow syntax passed. This is preliminary local evidence, not Linux qualification.",
+      "CI uv pip freeze ignores UV_PROJECT_ENVIRONMENT and can list the default interpreter's packages. Fixed both workflow calls with explicit --python environment/bin/python and independently checked own profile package inventories.",
+      "Coverage analyzer was mislabeled 7.1.0 (the pytest-cov version). Corrected to coverage 7.16.2 and added analyzer versions; raw measured counts/denominators unchanged."
+    ]
+  },
   "remaining": [
-    "accepted exact 1B commit integration",
-    "confirm and enforce delivered startup/runtime nodes including containment cases",
+    "root merge of accepted exact 1B commit and final qualification clearance",
+    "confirm integrated 48-case startup/runtime inventory including all five watchdog cases",
     "local 3.13/3.14 delivered startup/socket qualification",
-    "fresh independent exact final-commit review",
+    "root-created fresh independent exact final-commit review in separate herdr workspace",
     "root GitHub Linux execution and Phase 1 gate"
   ]
 }

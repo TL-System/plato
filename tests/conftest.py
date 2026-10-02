@@ -3,7 +3,9 @@
 import importlib
 import importlib.util
 import random
+import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -52,14 +54,48 @@ _RUNTIME = {
     _STARTUP + "test_post_launch_failure_keeps_primary_error_and_contains_children",
     _STARTUP + "test_stalled_real_client_is_contained_without_round_success",
 }
+# Fixed delivered 1B cases; update only with the accepted startup test handoff.
+_STARTUP_CASES = {
+    "test_fresh_entrypoint_executes_scheduled_work": 7,
+    "test_active_failure_reaches_synchronous_caller": 4,
+    "test_preconstructed_borrowed_loop_resources_survive": 4,
+    "test_owned_client_finalizes_tasks_generators_and_executor": 2,
+    "test_repeated_owned_client_entrypoints": 1,
+    "test_explicitly_absent_loop_on_server_and_edge": 4,
+    "test_closed_current_client_loop_is_replaced": 1,
+    "test_running_loop_rejected_before_entrypoint_resources": 1,
+    "test_delegating_server_consumes_same_borrowed_loop": 1,
+    "test_owned_server_fallback_finalizes_its_resources": 2,
+    "test_cancellation_already_finalizing_is_not_interrupted": 1,
+    "test_runner_cleanup_error_keeps_original_client_exception": 1,
+    "test_configure_failure_is_preserved_before_main_coroutine": 1,
+    "test_missing_external_edge_client_preserves_value_error": 1,
+    "test_client_control_flow_keeps_original_exception": 2,
+    "test_active_edge_failure_unwinds_real_aiohttp": 1,
+    "test_edge_cancellation_error_keeps_independent_setup_error": 1,
+    "test_independent_runtime_error_is_not_mistaken_for_monitor_stop": 1,
+    "test_server_error_precedence_and_cooperative_teardown": 5,
+    "test_noncooperative_teardown_is_watchdog_containment": 4,
+    "test_real_two_client_cpu_socket_round": 1,
+    "test_post_launch_failure_keeps_primary_error_and_contains_children": 1,
+    "test_stalled_real_client_is_contained_without_round_success": 1,
+}
+
+
+def _full_suite(config) -> bool:
+    roots = (config.rootpath.resolve(), (config.rootpath / "tests").resolve())
+    return any(
+        "::" not in str(arg) and Path(str(arg)).resolve() in roots
+        for arg in config.args
+    )
 
 
 def pytest_addoption(parser):
     parser.addoption(
         "--test-profile",
         choices=("base", "mandatory"),
-        default="mandatory",
-        help="base permits only named optional omissions; mandatory requires extras",
+        default=None,
+        help="base permits named optional omissions; full suites default to mandatory",
     )
 
 
@@ -72,6 +108,8 @@ class _ProfileChecks:
 
     def __init__(self, config):
         self.config = config
+        self.full = _full_suite(config)
+        self.qualify = config.getoption("test_profile") is not None or self.full
         self.base = config.getoption("test_profile") == "base"
         self.native = False
         self.violations = []
@@ -79,23 +117,57 @@ class _ProfileChecks:
         self.allowed_skips = set()
 
     def pytest_sessionstart(self):
-        if self.base:
+        if not self.qualify or self.base:
             return
         try:
             for name in ("opacus", "kazoo", "gymnasium", "tiktoken"):
                 importlib.import_module(name)
-            with nanochat_source():
-                importlib.import_module("nanochat.gpt")
+            with nanochat_source() as source:
+                repository = Path(__file__).resolve().parents[1]
+                expected_pin = subprocess.check_output(
+                    ["git", "ls-tree", "HEAD", "external/nanochat"],
+                    cwd=repository,
+                    text=True,
+                ).split()[2]
+                actual_pin = subprocess.check_output(
+                    ["git", "rev-parse", "HEAD"],
+                    cwd=source,
+                    text=True,
+                ).strip()
+                if actual_pin != expected_pin:
+                    raise ImportError(
+                        "Nanochat checkout does not match its gitlink pin"
+                    )
+                model = importlib.import_module("nanochat.gpt")
+                filename = getattr(model, "__file__", None)
+                if filename is None or (
+                    Path(filename).resolve()
+                    != (source / "nanochat/gpt.py").resolve()
+                ):
+                    raise ImportError(
+                        "Nanochat model must import from the pinned source"
+                    )
                 importlib.import_module("plato.models.nanochat")
                 importlib.import_module("plato.trainers.nanochat")
             self.native = native_tokenizer_available()
-        except ImportError as exc:
+        except (ImportError, subprocess.CalledProcessError) as exc:
             raise pytest.UsageError(f"mandatory prerequisite failed: {exc}") from exc
 
     def pytest_collection_modifyitems(self, items):
         for item in items:
-            if item.nodeid in _RUNTIME:
+            if item.nodeid.startswith(_STARTUP):
                 item.add_marker(pytest.mark.runtime)
+            if item.nodeid in _RUNTIME:
+                item.add_marker(pytest.mark.startup_runtime)
+            if (
+                item.originalname
+                == "test_noncooperative_teardown_is_watchdog_containment"
+                or item.nodeid
+                in _RUNTIME - {_STARTUP + "test_real_two_client_cpu_socket_round"}
+            ):
+                item.add_marker(pytest.mark.startup_containment)
+            if not self.qualify:
+                continue
             if self.base and item.nodeid in _NANOCHAT_TESTS:
                 item.add_marker(pytest.mark.skip(reason=_BASE_NANOCHAT_REASON))
             elif (
@@ -106,7 +178,7 @@ class _ProfileChecks:
                 item.add_marker(pytest.mark.skip(reason=_NATIVE_REASON))
 
     def _check_skip(self, report):
-        if not report.skipped:
+        if not self.qualify or not report.skipped:
             return
         reason = report.longrepr[2].removeprefix("Skipped: ")
         allowed = (
@@ -138,6 +210,8 @@ class _ProfileChecks:
         self._check_skip(report)
 
     def pytest_runtest_logreport(self, report):
+        if not self.qualify:
+            return
         if hasattr(report, "wasxfail"):
             self.violations.append(f"unexpected xfail/xpass: {report.nodeid}")
         else:
@@ -146,6 +220,8 @@ class _ProfileChecks:
             self.passed.add(report.nodeid)
 
     def pytest_deselected(self, items):
+        if not self.qualify:
+            return
         partition = self.config.getoption("markexpr")
         for item in items:
             runtime = item.get_closest_marker("runtime") is not None
@@ -156,22 +232,17 @@ class _ProfileChecks:
                 self.violations.append(f"unexpected deselection: {item.nodeid}")
 
     def pytest_sessionfinish(self, session, exitstatus):
+        if not self.qualify:
+            return
         if any(
             self.config.getoption(option)
             for option in ("ignore", "ignore_glob", "deselect")
         ):
             self.violations.append("test profiles do not permit collection exclusions")
-        full = any(
-            Path(str(arg).split("::", 1)[0]).resolve()
-            in (
-                self.config.rootpath.resolve(),
-                (self.config.rootpath / "tests").resolve(),
-            )
-            for arg in self.config.args
-        )
-        if full:
+        if self.full:
             nodes = {item.nodeid for item in session.items}
-            runtime = self.config.getoption("markexpr") == "runtime"
+            partition = self.config.getoption("markexpr")
+            runtime = partition == "runtime"
             required = _RUNTIME if runtime else _REQUIRED
             if self.base:
                 required = required - {
@@ -188,6 +259,19 @@ class _ProfileChecks:
                 if missing:
                     self.violations.append(
                         "required tests did not pass: " + ", ".join(sorted(missing))
+                    )
+            if partition != "not runtime":
+                actual = Counter(
+                    node.split("[", 1)[0] for node in nodes if node.startswith(_STARTUP)
+                )
+                expected = {
+                    _STARTUP + name: count for name, count in _STARTUP_CASES.items()
+                }
+                if actual != expected:
+                    self.violations.append(
+                        "required startup cases omitted or changed: expected 48 "
+                        f"cases, collected {sum(actual.values())}; "
+                        f"mismatched functions: {sorted(name for name in actual.keys() | expected.keys() if actual[name] != expected.get(name, 0))}"
                     )
         if self.violations:
             session.exitstatus = pytest.ExitCode.TESTS_FAILED

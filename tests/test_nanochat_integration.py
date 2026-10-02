@@ -7,11 +7,16 @@ import os
 import pytest
 
 from plato.config import Config, ConfigNode
+from tests.integration.utils import native_tokenizer_available
 
 pytestmark = pytest.mark.integration
 
 def test_nanochat_tokenizer_processor_round_trip(initialized_nanochat, tmp_path):
     """Train a tiny tokenizer via rustbpe and encode a sample string."""
+    if not native_tokenizer_available():
+        pytest.skip(
+            "optional native nanochat tokenizer: callable rustbpe.Tokenizer absent"
+        )
     from plato.processors.nanochat_tokenizer import NanochatTokenizerProcessor
 
     corpus = ["hello nanochat", "minimal tokenizer exercise"]

@@ -171,6 +171,8 @@ exclude = [
 testpaths = ["tests"]
 addopts = "--strict-markers"
 markers = [
-    "runtime: real CPU socket rounds and their failure/containment regressions.",
+    "runtime: fresh startup, CPU socket rounds and containment regressions.",
+    "startup_runtime: real CPU socket round and socket failure cases.",
+    "startup_containment: deliberate noncooperative teardown and child containment.",
     "integration: marks tests that require end-to-end config smoke runs.",
 ]
