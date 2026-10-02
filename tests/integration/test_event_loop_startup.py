@@ -7,6 +7,8 @@ import pytest
 
 from tests.integration.startup_harness import run_probe
 
+pytestmark = pytest.mark.runtime
+
 BOOTSTRAPS = [
     ("client_default", "client_body"),
     ("client_custom", "client_body"),
@@ -275,6 +277,7 @@ def test_server_error_precedence_and_cooperative_teardown(tmp_path, options, mes
 
 
 @pytest.mark.parametrize("stall", ["task", "generator", "executor", "aiohttp_task"])
+@pytest.mark.startup_containment
 def test_noncooperative_teardown_is_watchdog_containment(tmp_path, stall):
     if stall == "aiohttp_task":
         result = run_probe(
@@ -308,6 +311,7 @@ def test_noncooperative_teardown_is_watchdog_containment(tmp_path, stall):
 
 
 @pytest.mark.integration
+@pytest.mark.startup_runtime
 def test_real_two_client_cpu_socket_round(tmp_path):
     result = run_probe(tmp_path / "round", "socket_round", timeout=90)
     assert_natural(result)
@@ -358,6 +362,8 @@ def test_real_two_client_cpu_socket_round(tmp_path):
         sock.listen()
 
 
+@pytest.mark.startup_runtime
+@pytest.mark.startup_containment
 def test_post_launch_failure_keeps_primary_error_and_contains_children(tmp_path):
     result = run_probe(tmp_path / "failure", "socket_failure", timeout=30)
     assert not result["timed_out"] and not result["survivors"], result
@@ -366,6 +372,8 @@ def test_post_launch_failure_keeps_primary_error_and_contains_children(tmp_path)
     assert sum(e["event"] == "child_started" for e in result["events"]) == 2
 
 
+@pytest.mark.startup_runtime
+@pytest.mark.startup_containment
 def test_stalled_real_client_is_contained_without_round_success(tmp_path):
     result = run_probe(tmp_path / "stalled", "socket_stall", timeout=90)
     assert result["timed_out"] and result["forced"], result

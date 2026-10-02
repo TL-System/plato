@@ -87,9 +87,9 @@ jobs:
           HF_DATASETS_OFFLINE: "1"
         run: |
           set -eu
-          uv run --no-sync python -m pytest tests --collect-only --test-profile=base -m "not runtime" -ra > ci-artifacts/base-collection.log 2>&1
-          uv run --no-sync python -m pytest tests --test-profile=base -m "not runtime" -ra --basetemp=ci-artifacts/base-tmp --junitxml=ci-artifacts/base.xml > ci-artifacts/base.log 2>&1
-          if uv run --no-sync python -m pytest tests --collect-only --test-profile=mandatory > ci-artifacts/missing-extra.log 2>&1; then
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --collect-only --test-profile=base -m "not runtime" -ra > ci-artifacts/base-collection.log 2>&1
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=base -m "not runtime" -ra --basetemp=ci-artifacts/base-tmp --junitxml=ci-artifacts/base.xml > ci-artifacts/base.log 2>&1
+          if uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --collect-only --test-profile=mandatory > ci-artifacts/missing-extra.log 2>&1; then
             exit 1
           fi
           python - <<'PY'
@@ -112,7 +112,7 @@ jobs:
           HF_DATASETS_OFFLINE: "1"
         run: |
           set -eu
-          uv run --no-sync python -m pytest tests --test-profile=mandatory -m "not runtime" -ra --basetemp=ci-artifacts/mandatory-tmp --junitxml=ci-artifacts/mandatory.xml --cov=plato --cov-report=term --cov-report=json:ci-artifacts/coverage.json > ci-artifacts/mandatory.log 2>&1
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m "not runtime" -ra --basetemp=ci-artifacts/mandatory-tmp --junitxml=ci-artifacts/mandatory.xml --cov=plato --cov-report=term --cov-report=json:ci-artifacts/coverage.json > ci-artifacts/mandatory.log 2>&1
 
       - name: Fresh startup, real CPU socket round and failure containment
         timeout-minutes: 12
@@ -121,15 +121,15 @@ jobs:
           HF_DATASETS_OFFLINE: "1"
         run: |
           set -eu
-          uv run --no-sync python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=ci-artifacts/runtime-tmp --junitxml=ci-artifacts/runtime.xml > ci-artifacts/runtime.log 2>&1
+          uv run --no-sync --python "${{ matrix.python }}" python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=ci-artifacts/runtime-tmp --junitxml=ci-artifacts/runtime.xml > ci-artifacts/runtime.log 2>&1
 
       - name: Ruff and classified typing baseline
         timeout-minutes: 3
         run: |
           set -eu
-          uv run --no-sync ruff check . --select I > ci-artifacts/ruff.log 2>&1
+          uv run --no-sync --python "${{ matrix.python }}" ruff check . --select I > ci-artifacts/ruff.log 2>&1
           ty_status=0
-          uv run --no-sync ty check --output-format concise > ci-artifacts/ty.log 2>&1 || ty_status=$?
+          uv run --no-sync --python "${{ matrix.python }}" ty check --output-format concise > ci-artifacts/ty.log 2>&1 || ty_status=$?
           test "$ty_status" -le 1
           python - <<'PY'
           import re
@@ -141,6 +141,7 @@ jobs:
               "tests/clients/test_feddf_strategy.py",
               "tests/servers/test_feddf_server_strategy.py",
               "tests/datasources/test_huggingface_datasource.py",
+              "tests/integration/test_event_loop_startup.py",
           }
           allowed = {
               ("tests/datasources/test_huggingface_datasource.py", "99", "5", "invalid-assignment"),

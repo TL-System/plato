@@ -155,17 +155,6 @@ class _ProfileChecks:
 
     def pytest_collection_modifyitems(self, items):
         for item in items:
-            if item.nodeid.startswith(_STARTUP):
-                item.add_marker(pytest.mark.runtime)
-            if item.nodeid in _RUNTIME:
-                item.add_marker(pytest.mark.startup_runtime)
-            if (
-                item.originalname
-                == "test_noncooperative_teardown_is_watchdog_containment"
-                or item.nodeid
-                in _RUNTIME - {_STARTUP + "test_real_two_client_cpu_socket_round"}
-            ):
-                item.add_marker(pytest.mark.startup_containment)
             if not self.qualify:
                 continue
             if self.base and item.nodeid in _NANOCHAT_TESTS:

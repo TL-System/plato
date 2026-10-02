@@ -1,499 +1,572 @@
 {
   "phase": "1C",
   "date": "2026-10-02",
-  "status": "Provisional independent checkpoint; stop editing for root to merge accepted 1B and issue final qualification clearance. Final 1C qualification/acceptance and Linux execution pending.",
-  "accepted_dependency_commit": "7304703905189baf771032f1cd923a37f66ed97f",
-  "accepted_startup_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
-  "startup_integration": "Root ACCEPTED exact 213b321c after phase1b-review.json PASS; phase1b-acceptance.json confirms. Read-only inspection only here. Root will merge this accepted commit into this branch after the clean WIP checkpoint, then send final qualification clearance. No concurrent merge or final qualification performed here.",
-  "scope": "Only declared test fixtures/profile/import/worker-count files, test group metadata/lock, minimal PyTorch workflow and this evidence. No runtime changes, archive moves, push or PR.",
-  "default_python": "3.13 unchanged; 3.14.8 core forward-compatibility only",
-  "shell": "All local shell invocations use zsh -lc. CI bootstraps zsh via Python subprocess argv, then uses zsh -lc for every shell block.",
-  "scratch_root": "/tmp/plato-phase1c-test-ci",
-  "input_sha256": {
-    "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
-    "design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
-    "plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
-    "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
-    "phase1b-review.json": "f02507a3be88f1438143c24bf7921af907400d370d4bf7ccba6378ec4756ec2b",
-    "phase1b-acceptance.json": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444"
-  },
-  "tested_files_sha256": {
-    "tests/conftest.py": "3b7adbefb8a906848fab07abda444d79a116c8a30410ae052154b35f479db2bb",
-    "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
-    "tests/trainers/test_dp_data_loader_strategy.py": "ab2ed2a9664d1986dcb2cdebd815cdaa052f25efe1b38be63c3f412bd64c2d8f",
-    "tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
-    "tests/clients/test_feddf_strategy.py": "00dfde39c13bfbbe7a842266ada0e77419c609ba2d3bf82008d5985f5d08a930",
-    "tests/servers/test_feddf_server_strategy.py": "41d065daf85092ecb46bdea3a6fe3526d5daeabfcc920e8b63edd035b9408b62",
-    "tests/datasources/test_huggingface_datasource.py": "938341526e228318590d8f5591232d1653a9e33a99f0a3c48780a4ffbc583137",
-    "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
-    "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
-    ".github/workflows/pytorch_tests.yml": "ad004247e3f71bfb1ceebd428a052204476d7bee99031c52a116b8edac156fe4"
+  "status": "Final local macOS qualification complete; candidate awaits root-created fresh exact-commit review and GitHub Linux execution. No final Phase 1C acceptance claimed.",
+  "source": {
+    "accepted_dependency_commit": "7304703905189baf771032f1cd923a37f66ed97f",
+    "accepted_startup_commit": "213b321c3cfb31d0f82c0b315efe50dcbf7dee20",
+    "integrated_parent_commit": "1178afe954d6df2cc74eed54b1813b6a299f70dc",
+    "identity": "Qualified source = integrated parent plus the listed final file SHA256 values; final candidate commit includes this evidence. Runtime/helpers remain byte-identical to accepted 1B; startup test changes are marker annotations only.",
+    "files_sha256": {
+      "tests/conftest.py": "9383b322605b9440dab9313a274ac6489803190feebdc92bb67b94817bf7b482",
+      "tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+      "tests/trainers/test_dp_data_loader_strategy.py": "ab2ed2a9664d1986dcb2cdebd815cdaa052f25efe1b38be63c3f412bd64c2d8f",
+      "tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
+      "tests/clients/test_feddf_strategy.py": "00dfde39c13bfbbe7a842266ada0e77419c609ba2d3bf82008d5985f5d08a930",
+      "tests/servers/test_feddf_server_strategy.py": "41d065daf85092ecb46bdea3a6fe3526d5daeabfcc920e8b63edd035b9408b62",
+      "tests/datasources/test_huggingface_datasource.py": "938341526e228318590d8f5591232d1653a9e33a99f0a3c48780a4ffbc583137",
+      "pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      ".github/workflows/pytorch_tests.yml": "9301dac98e6b1a916ec4f900a9373ca9e1ee282d89e7fd13ed8b17e3b815d5a4",
+      "tests/integration/test_event_loop_startup.py": "a92c9ee2347e2113cd65b7949c922ac5bbf1846f4caeca30a128db580c79751e",
+      "plato/client.py": "81395fb7c485a23e875bd160fff466674badc833a9fbec6d441a5937c421fa3f",
+      "plato/servers/base.py": "51d2353b0c928e04416c73c08fc24ac926bc8ed81ae7d95e9ee1181b377973fb",
+      "tests/integration/startup_harness.py": "988f216f9367b1e9e8156bad62d3c03a813e26d32f919981ae227f5d8754642e",
+      "tests/integration/startup_probe.py": "e6c9bb2bf39616fe3a6745da528690a578e7416837e0914578ec688d2851b34f",
+      "tests/integration/startup_socket.py": "64d04c2ab0e041f35f5e5aca88aa46a436507cb76f54ef4ca3c3df702666720f",
+      ".python-version": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398"
+    },
+    "sorted_source_manifest_sha256": "1a4becd0add36e9aa2e582149606e7332709cba9e5fc3818f8e86a58cece8515",
+    "input_sha256": {
+      "test-ci-design.json": "13f3d272e921d05afd2b3457ff977374528ea4653ff1ca8c238b5b945f5b9ef2",
+      "design-revision-review.json": "0535b3ccbac91a264317bd8fb9314465a0379155bc7113de99a27a9b66b7be39",
+      "plan-addendum.json": "5b51b0fb7ed6f68d9fce7176335b3e7be5e5f178a2788590912aa2396a487709",
+      "plan.md": "edb9a58cc7915a940854f16d5029fe97434703bf2f75eca0dcb96de2d0f0eb15",
+      "phase1b-review.json": "f02507a3be88f1438143c24bf7921af907400d370d4bf7ccba6378ec4756ec2b",
+      "phase1b-acceptance.json": "b6f1a35ed1b54499d2e3c1a8d5ab3bee5a3e47a2c967b73a6b909ba1e09d0444",
+      "baseline-coverage.json": "9f82f36144f849c3b23f7575843234394f8fa3cee59923a230b58d5e632daea1"
+    },
+    "submodules": [
+      "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)",
+      " 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)",
+      " 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)"
+    ],
+    "default_python": "3.13 unchanged; 3.14 core forward compatibility"
   },
   "lock": {
+    "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
     "packages": 278,
-    "package_selections_unchanged": true,
-    "all_package_records_unchanged_except_two_test_base_group_metadata_arrays": true,
-    "check": "uv lock --check: exit 0; eight added metadata lines",
-    "necessary_dependency_conflicts": []
+    "comparison": "Every accepted dependency package record is identical after removing only two added test-base metadata arrays; eight metadata lines added. No dependency selection churn or necessary conflicts.",
+    "check": {
+      "path": "/tmp/plato-phase1c-test-ci/final/lock.log",
+      "sha256": "03d94a2abcb8f0d49637582669845317c0b5cacf55d6c5ef64231dca55e7937d"
+    }
   },
-  "submodules": [
-    " c75fe54aa7c1fa881701c246f9427bcbe4eee5a4 external/nanochat (c75fe54)",
-    " 1ccb152cea43fcbc3cd517a45c12c65734f8ace3 plato/models/dvit (heads/master)",
-    " 0f63dc9558f4d192de926504dbddfa1b3f5db6ca plato/models/t2tvit (main-28-g0f63dc9)"
-  ],
+  "environment": {
+    "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)",
+    "shell": "zsh -lc for all local shell commands",
+    "profiles": [
+      {
+        "name": "base-313",
+        "path": "/tmp/plato-phase1c-test-ci/base-313",
+        "python": "3.13.16",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-base-313.txt",
+          "sha256": "a32b48fedd19d747e4d90fae435d56e2210072a9c79a070a439169b25c1ddb4b"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-base-313.log",
+          "sha256": "15ef5fa2e3d7dc5f2a186b4104a2c73f1b8ada04a049519a69c54412122152e2"
+        }
+      },
+      {
+        "name": "mandatory-313",
+        "path": "/tmp/plato-phase1c-test-ci/mandatory-313",
+        "python": "3.13.16",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": true,
+          "kazoo": true,
+          "gymnasium": true,
+          "tiktoken": true
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-mandatory-313.txt",
+          "sha256": "a035ff61bca8ef720e425afe5bc5872c648eccb4fac591467df15b52ef742556"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-mandatory-313.log",
+          "sha256": "53b8f4f77253c53fe44028c7673b3ede0f708330d9aab0aa330fdb5f6190b2b3"
+        }
+      },
+      {
+        "name": "base-314",
+        "path": "/tmp/plato-phase1c-test-ci/base-314",
+        "python": "3.14.8",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": false,
+          "kazoo": false,
+          "gymnasium": false,
+          "tiktoken": false
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-base-314.txt",
+          "sha256": "a32b48fedd19d747e4d90fae435d56e2210072a9c79a070a439169b25c1ddb4b"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-base-314.log",
+          "sha256": "e6ff28a18f789e18e7fd1c2e529ad0d02a70e90f004580a1c53f3228251da102"
+        }
+      },
+      {
+        "name": "mandatory-314",
+        "path": "/tmp/plato-phase1c-test-ci/mandatory-314",
+        "python": "3.14.8",
+        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+        "versions": {
+          "torch": "2.14.1",
+          "datasets": "5.0.1",
+          "pytest": "9.1.1",
+          "pytest-cov": "7.1.0",
+          "coverage": "7.16.2"
+        },
+        "optional_imports": {
+          "opacus": true,
+          "kazoo": true,
+          "gymnasium": true,
+          "tiktoken": true
+        },
+        "freeze": {
+          "path": "/tmp/plato-phase1c-test-ci/final/freeze-mandatory-314.txt",
+          "sha256": "a035ff61bca8ef720e425afe5bc5872c648eccb4fac591467df15b52ef742556"
+        },
+        "sync": {
+          "path": "/tmp/plato-phase1c-test-ci/final/sync-mandatory-314.log",
+          "sha256": "7c6b4184ba366c7683b0750837ae271b122f60353df79d0d3db49c3be7dc3687"
+        }
+      }
+    ],
+    "scratch_root": "/tmp/plato-phase1c-test-ci",
+    "retention": "Own four environments, probes, full raw logs and startup process/event results remain intact for root review.",
+    "qualification_env": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "HF_HUB_OFFLINE": "1",
+      "HF_DATASETS_OFFLINE": "1",
+      "COVERAGE_FILE": "/tmp/plato-phase1c-test-ci/final/.coverage-{313,314}"
+    }
+  },
   "runs": [
     {
-      "profile": "base",
-      "versions": {
-        "python": "3.13.16",
-        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
-        "versions": {
-          "torch": "2.14.1",
-          "datasets": "5.0.1",
-          "pytest": "9.1.1",
-          "pytest-cov": "7.1.0",
-          "coverage": "7.16.2"
-        }
-      },
-      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base",
-      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.13 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/base-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/base-313.xml",
+      "name": "base",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase1c-test-ci/base-313",
+      "command": "uv run --no-sync --python 3.13 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/final/base-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/final/base-313.xml",
       "exit": 0,
-      "summary": "246 passed, 4 skipped in 1.29s",
-      "warning_count": 0,
-      "log": "/tmp/plato-phase1c-test-ci/base-313.log",
-      "log_sha256": "b739dd1ad8be0605f9ada82f6b6b773af13c9105f03a4bed10d00bc661934e42",
-      "optional_imports": {
-        "opacus": false,
-        "kazoo": false,
-        "gymnasium": false,
-        "tiktoken": false
+      "wall_seconds": 5.235,
+      "passed": 246,
+      "skip_reports": 4,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "246 passed, 4 skipped, 48 deselected in 0.99s",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/base-313.log",
+        "sha256": "edb0f1b478c558c89124e63049ac0feb2bab0cbe423e89830bf21b6e9ed3c722"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/base-313.xml",
+        "sha256": "d2f042642da434448e7f7b3a688c724c01f83c7477222f9a9edcde260abc7161"
       }
     },
     {
-      "profile": "mandatory",
-      "versions": {
-        "python": "3.13.16",
-        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
-        "versions": {
-          "torch": "2.14.1",
-          "datasets": "5.0.1",
-          "pytest": "9.1.1",
-          "pytest-cov": "7.1.0",
-          "coverage": "7.16.2"
-        }
-      },
-      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 uv sync --locked --python 3.13 --no-default-groups --group dev",
-      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-313 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/mandatory-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/mandatory-313.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/coverage-313.json",
+      "name": "mandatory",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-313",
+      "command": "uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/final/mandatory-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/final/mandatory-313.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/final/coverage-313.json",
       "exit": 0,
-      "summary": "250 passed, 1 skipped in 5.77s",
-      "warning_count": 0,
-      "log": "/tmp/plato-phase1c-test-ci/mandatory-313.log",
-      "log_sha256": "e175e48b78ecc7dcd5eb328bdc2524008fe07fedab5c59e67bceb67d2133a6fe",
-      "optional_imports": {
-        "opacus": true,
-        "kazoo": true,
-        "gymnasium": true,
-        "tiktoken": true
+      "wall_seconds": 13.676,
+      "passed": 250,
+      "skip_reports": 1,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "250 passed, 1 skipped, 48 deselected in 5.70s",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/mandatory-313.log",
+        "sha256": "de7792f6d2b33b89ebb8471a72b87056d8a9f7f7cd3fd189b472ede2820df0d4"
       },
-      "coverage": {
-        "covered_lines": 7378,
-        "num_statements": 16935,
-        "percent_covered": 43.56657809270741,
-        "percent_covered_display": "44",
-        "missing_lines": 9557,
-        "excluded_lines": 192,
-        "percent_statements_covered": 43.56657809270741,
-        "percent_statements_covered_display": "44"
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/mandatory-313.xml",
+        "sha256": "422ee218e427b5e39f1c34755fb646413528141d3aff23e2ea57edcce09682b1"
       }
     },
     {
-      "profile": "base",
-      "versions": {
-        "python": "3.14.8",
-        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
-        "versions": {
-          "torch": "2.14.1",
-          "datasets": "5.0.1",
-          "pytest": "9.1.1",
-          "pytest-cov": "7.1.0",
-          "coverage": "7.16.2"
-        }
-      },
-      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-314 uv sync --locked --python 3.14 --no-default-groups --group test-base",
-      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/base-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.14 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/base-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/base-314.xml",
+      "name": "runtime",
+      "python": "3.13",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-313",
+      "command": "uv run --no-sync --python 3.13 python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=/tmp/plato-phase1c-test-ci/final/runtime-tmp-313 --junitxml=/tmp/plato-phase1c-test-ci/final/runtime-313.xml",
       "exit": 0,
-      "summary": "246 passed, 4 skipped in 1.30s",
-      "warning_count": 0,
-      "log": "/tmp/plato-phase1c-test-ci/base-314.log",
-      "log_sha256": "66e1e5f32ee26483ab3071cb86c136f737639397affd87586ef312204867120f",
-      "optional_imports": {
-        "opacus": false,
-        "kazoo": false,
-        "gymnasium": false,
-        "tiktoken": false
+      "wall_seconds": 435.424,
+      "passed": 48,
+      "skip_reports": 0,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "48 passed, 251 deselected in 429.60s (0:07:09)",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-313.log",
+        "sha256": "fecd42b46d2d481974496ea44213362d1b4eda531df4d8c0c86907cd5c3f89d3"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-313.xml",
+        "sha256": "ded6ff7fb8e36a5f5e12af51ac6281be870f72933939e421613ca50522d40b34"
       }
     },
     {
-      "profile": "mandatory",
-      "versions": {
-        "python": "3.14.8",
-        "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
-        "versions": {
-          "torch": "2.14.1",
-          "datasets": "5.0.1",
-          "pytest": "9.1.1",
-          "pytest-cov": "7.1.0",
-          "coverage": "7.16.2"
-        }
-      },
-      "sync_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-314 uv sync --locked --python 3.14 --no-default-groups --group dev",
-      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-314 HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/mandatory-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/mandatory-314.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/coverage-314.json",
+      "name": "base",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase1c-test-ci/base-314",
+      "command": "uv run --no-sync --python 3.14 python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/final/base-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/final/base-314.xml",
       "exit": 0,
-      "summary": "250 passed, 1 skipped in 4.89s",
-      "warning_count": 0,
-      "log": "/tmp/plato-phase1c-test-ci/mandatory-314.log",
-      "log_sha256": "bfca11a51d4087e7d6343ccb7082cdaa42670b78a0ad92ca8ffbecf3807924c2",
-      "optional_imports": {
-        "opacus": true,
-        "kazoo": true,
-        "gymnasium": true,
-        "tiktoken": true
+      "wall_seconds": 5.565,
+      "passed": 246,
+      "skip_reports": 4,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "246 passed, 4 skipped, 48 deselected in 1.07s",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/base-314.log",
+        "sha256": "8fb1e2e46668c84175f80ddb413d1708c1208bee76e9111f856655c418960cbb"
       },
-      "coverage": {
-        "covered_lines": 7372,
-        "num_statements": 16924,
-        "percent_covered": 43.55944221224297,
-        "percent_covered_display": "44",
-        "missing_lines": 9552,
-        "excluded_lines": 192,
-        "percent_statements_covered": 43.55944221224297,
-        "percent_statements_covered_display": "44"
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/base-314.xml",
+        "sha256": "377c9288ec3ff21e99b3ace23de1f593d40dceaa1ee23eb865ff6204f038baab"
+      }
+    },
+    {
+      "name": "mandatory",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-314",
+      "command": "uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -m 'not runtime' -ra --basetemp=/tmp/plato-phase1c-test-ci/final/mandatory-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/final/mandatory-314.xml --cov=plato --cov-report=term --cov-report=json:/tmp/plato-phase1c-test-ci/final/coverage-314.json",
+      "exit": 0,
+      "wall_seconds": 11.936,
+      "passed": 250,
+      "skip_reports": 1,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "250 passed, 1 skipped, 48 deselected in 4.86s",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/mandatory-314.log",
+        "sha256": "1dbf7b9424d983b16c197400f0d1ee9bc590d2132eeb5996269f531210268aea"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/mandatory-314.xml",
+        "sha256": "05c51278bdcaf25038e8caab61cd9d5886b5eaac0eeb78eabb941b5164fa1d94"
+      }
+    },
+    {
+      "name": "runtime",
+      "python": "3.14",
+      "environment": "/tmp/plato-phase1c-test-ci/mandatory-314",
+      "command": "uv run --no-sync --python 3.14 python -m pytest tests --test-profile=mandatory -m runtime -ra --basetemp=/tmp/plato-phase1c-test-ci/final/runtime-tmp-314 --junitxml=/tmp/plato-phase1c-test-ci/final/runtime-314.xml",
+      "exit": 0,
+      "wall_seconds": 448.504,
+      "passed": 48,
+      "skip_reports": 0,
+      "failed": 0,
+      "pytest_warning_count": 0,
+      "summary": "48 passed, 251 deselected in 442.08s (0:07:22)",
+      "log": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-314.log",
+        "sha256": "f9a593674b68dbad1c3457cef2a6f4becf2493369f8c362c871eeac8cb223993"
+      },
+      "junit": {
+        "path": "/tmp/plato-phase1c-test-ci/final/runtime-314.xml",
+        "sha256": "878d8e1aa6bae626dbf1f889dd6ff2e129488e35202167a94f8dff5355b8a05b"
       }
     }
   ],
-  "count_reconciliation": {
-    "historical": "248 passed, 3 skipped, 8 warnings; Nanochat source uninitialized",
-    "mandatory": "250 passed, 1 skipped; the two initialized real synthetic trainer tests now execute",
-    "base": "249 collected test items: 246 passed plus three explicit Nanochat skips; one DP module skip report represents two underlying tests. Four reported skips correspond to five omitted test nodes.",
-    "mandatory_required_passes": [
-      "both DP sampler tests",
-      "all three local MPC tests",
-      "MPC training smoke",
-      "initialized Nanochat synthetic trainer",
-      "initialized Nanochat CORE-strategy selection"
-    ],
-    "nanochat_preflight": "Compare initialized checkout HEAD to the repository gitlink and verify nanochat.gpt imports from that source. Actual pinned source target: 7 passed, 1 permitted native skip; no overlay/fake synthetic trainer qualification.",
-    "allowed_mandatory_skip": "Only the tokenizer round-trip node, callable rustbpe.Tokenizer unavailable (source namespace is importable); real native tokenizer/CORE evaluation qualification remains with 3B"
+  "collection": {
+    "313": {
+      "base": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-base-313.log",
+        "sha256": "4410d4b0f15ded4aea4390def2c6ead7079c295fb133a3d3ba0aa4abea7e5318"
+      },
+      "mandatory": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-mandatory-313.log",
+        "sha256": "550ef66bb05407e0a000758ae2e9fa1fd76849a2e93796106911101cb2a9b319"
+      },
+      "runtime": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-runtime-313.log",
+        "sha256": "beb5e0c8a1b282021311f73a1aa933fd3b00d8795fbc0f41e37c753cb8898a51"
+      }
+    },
+    "314": {
+      "base": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-base-314.log",
+        "sha256": "58dc22eb44ca2e3fbd79a1d1cb26ceb834e72cf05a895d456a6277639cec80e1"
+      },
+      "mandatory": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-mandatory-314.log",
+        "sha256": "0fcdfabb425180ef5262a983b91fac4417815a357078a90020093d6193bf836e"
+      },
+      "runtime": {
+        "path": "/tmp/plato-phase1c-test-ci/final/collect-runtime-314.log",
+        "sha256": "35ebb2d345d249b95a3db3254bf13cd01decdb49c037c6db0f46a06ddc195bf5"
+      }
+    }
+  },
+  "required_counts": {
+    "base": "249 core test items, 246 passed, three named Nanochat test skips; one missing-Opacus module skip represents two optional DP nodes. Four skip reports represent five omitted core nodes. All 48 startup cases deliberately partitioned out.",
+    "mandatory": "251 core test items, 250 passed, one permitted native tokenizer node skip. Both DP sampler tests, all three MPC tests, MPC training smoke and both initialized real Nanochat trainer tests pass.",
+    "runtime": "All 48 accepted startup cases pass once per interpreter, including three real socket cases and all five watchdog cases. Zero required runtime skips or xfails. 251 core items deliberately partitioned out.",
+    "native": "Only callable rustbpe.Tokenizer availability permits the exact tokenizer round-trip skip; initialized pinned Nanochat source/model/trainer remain mandatory. CORE strategy-selection test is not real CORE evaluation qualification.",
+    "policy": "Full-suite runs default to mandatory; explicit --test-profile requests prerequisite and exact omission/skip/xfail checks. Ordinary focused invocations retain pytest behavior and do not require entire-suite nodes. Full qualification permits only runtime/not runtime partitions."
+  },
+  "startup_results": {
+    "313": {
+      "cases": 48,
+      "watchdog_timeouts": 5,
+      "forced_containment_results": 5,
+      "survivors": [],
+      "subprocess_warning_lines": {},
+      "retained_results": "/tmp/plato-phase1c-test-ci/final/runtime-tmp-313",
+      "result_manifest_sha256": "3606f66c6bd4a55a93a4980ca4236a4d8ca3215b678bd23517ab90e1f826e188"
+    },
+    "314": {
+      "cases": 48,
+      "watchdog_timeouts": 5,
+      "forced_containment_results": 5,
+      "survivors": [],
+      "subprocess_warning_lines": {},
+      "retained_results": "/tmp/plato-phase1c-test-ci/final/runtime-tmp-314",
+      "result_manifest_sha256": "9706bb22be6ca67344916a02a447309ed320cdc855257bfe760c01908424149a"
+    }
   },
   "red_green": {
-    "focused_developer_commands": {
-      "red": "656952d WIP forces mandatory prerequisites on an ordinary focused base-environment command: uv run --no-sync python -m pytest tests/mpc/test_mpc.py -k round_info exits 4 for missing opacus.",
-      "green": "Current candidate preserves that focused command without profile selection on both interpreters: 1 passed, 2 deselected. Explicit --test-profile and full-suite qualification retain prerequisite, omission, skip/xfail enforcement; no entire-suite node requirement on focused paths.",
-      "policy": "No profile flag on a focused invocation uses ordinary pytest skip/xfail/deselection behavior. Full-suite invocations default to mandatory qualification; explicit profiles request qualification auditing even on focused paths.",
-      "native": "A focused tokenizer round-trip invocation in the base environment reports one honest optional skip when callable rustbpe.Tokenizer is absent, without requiring every mandatory extra; initialized source is still required by the test fixture."
-    },
     "fixtures": "Accepted dependency baseline: 5 failed, 1 passed; candidate: 6 passed on each interpreter. Real Config construction, nested body/setup exceptions, six temporary runtime paths, optional section removal and Python/NumPy/CPU Torch RNG restoration.",
-    "collection": "Baseline base collection: 249 collected plus Opacus import error, exit 2. Candidate base core collection with -m 'not runtime': 249 collected, named DP module omission, exit 0. Whole-suite startup collection awaits accepted 1B integration.",
     "feddf": "Baseline loaders leak sys.path for both client/server; candidate path/error probes: 4 passed. Real importlib loader failure and Nanochat body exception restore paths.",
-    "negative_probes": [
-      {
-        "name": "mandatory-in-base-313",
-        "environment": "base-313",
-        "args": [
-          "tests",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "mandatory prerequisite failed: No module named"
+    "collection": "Accepted dependency base collection errors on absent Opacus; final locked base core collection succeeds with the exact named omission. Mandatory missing-extra collection fails before tests.",
+    "focused_boundary": "Prior WIP rejected ordinary focused base commands for absent Opacus; final source passes focused files and -k selection on both interpreters without mandatory preflight. The AGENTS example tests/test_strategies_simple.py does not exist in this checkout; exercised existing tests/servers/test_fedavg_strategy.py and tests/mpc/test_mpc.py instead.",
+    "negative_probes": {
+      "count": 21,
+      "expected_nonzero_failures": 21,
+      "cases": [
+        "missing mandatory extras in base (both interpreters)",
+        "each absent opacus/kazoo/gymnasium/tiktoken (both interpreters)",
+        "absent initialized Nanochat source (both interpreters)",
+        "unexpected setup/call/teardown/collection skips",
+        "xfail/xpass",
+        "ignored required DP module",
+        "unexpected explicit-profile deselection",
+        "omitted entire 48-case startup partition"
+      ],
+      "exact_arguments_and_expected_messages": {
+        "path": "/tmp/plato-phase1c-test-ci/negative-results.json",
+        "sha256": "4c9bfce9bcf32ca9d56264335678f34504ed9979698ef72cf8e154e0e0c186e3"
       },
-      {
-        "name": "missing-opacus-313",
-        "environment": "mandatory-313",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'opacus'"
-      },
-      {
-        "name": "missing-kazoo-313",
-        "environment": "mandatory-313",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'kazoo'"
-      },
-      {
-        "name": "missing-gymnasium-313",
-        "environment": "mandatory-313",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'gymnasium'"
-      },
-      {
-        "name": "missing-tiktoken-313",
-        "environment": "mandatory-313",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'tiktoken'"
-      },
-      {
-        "name": "mandatory-in-base-314",
-        "environment": "base-314",
-        "args": [
-          "tests",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "mandatory prerequisite failed: No module named"
-      },
-      {
-        "name": "missing-opacus-314",
-        "environment": "mandatory-314",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'opacus'"
-      },
-      {
-        "name": "missing-kazoo-314",
-        "environment": "mandatory-314",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'kazoo'"
-      },
-      {
-        "name": "missing-gymnasium-314",
-        "environment": "mandatory-314",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'gymnasium'"
-      },
-      {
-        "name": "missing-tiktoken-314",
-        "environment": "mandatory-314",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "No module named 'tiktoken'"
-      },
-      {
-        "name": "missing-source-313",
-        "environment": "mandatory-313",
-        "args": [
-          "tests/test_nanochat_integration.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "Initialized Nanochat source required"
-      },
-      {
-        "name": "missing-source-314",
-        "environment": "mandatory-314",
-        "args": [
-          "tests/test_nanochat_integration.py",
-          "--collect-only",
-          "--test-profile=mandatory"
-        ],
-        "exit": 4,
-        "required_message": "Initialized Nanochat source required"
-      },
-      {
-        "name": "setup-skip",
-        "environment": "mandatory-313",
-        "args": [
-          "-p",
-          "tests.conftest",
-          "/tmp/plato-phase1c-test-ci/test_negative_setup_skip.py",
-          "--test-profile=mandatory"
-        ],
-        "exit": 1,
-        "required_message": "test profile violations"
-      },
-      {
-        "name": "xpass",
-        "environment": "mandatory-313",
-        "args": [
-          "-p",
-          "tests.conftest",
-          "/tmp/plato-phase1c-test-ci/test_negative_xpass.py",
-          "--test-profile=mandatory"
-        ],
-        "exit": 1,
-        "required_message": "test profile violations"
-      },
-      {
-        "name": "skip",
-        "environment": "mandatory-313",
-        "args": [
-          "-p",
-          "tests.conftest",
-          "/tmp/plato-phase1c-test-ci/test_negative_skip.py",
-          "--test-profile=mandatory"
-        ],
-        "exit": 1,
-        "required_message": "test profile violations"
-      },
-      {
-        "name": "xfail",
-        "environment": "mandatory-313",
-        "args": [
-          "-p",
-          "tests.conftest",
-          "/tmp/plato-phase1c-test-ci/test_negative_xfail.py",
-          "--test-profile=mandatory"
-        ],
-        "exit": 1,
-        "required_message": "test profile violations"
-      },
-      {
-        "name": "collection-skip",
-        "environment": "mandatory-313",
-        "args": [
-          "-p",
-          "tests.conftest",
-          "/tmp/plato-phase1c-test-ci/test_negative_collection_skip.py",
-          "--test-profile=mandatory"
-        ],
-        "exit": 1,
-        "required_message": "test profile violations"
-      },
-      {
-        "name": "teardown-skip",
-        "environment": "mandatory-313",
-        "args": [
-          "-p",
-          "tests.conftest",
-          "/tmp/plato-phase1c-test-ci/test_negative_teardown_skip.py",
-          "--test-profile=mandatory"
-        ],
-        "exit": 1,
-        "required_message": "test profile violations"
-      },
-      {
-        "name": "ignored-required",
-        "environment": "mandatory-313",
-        "args": [
-          "tests",
-          "--collect-only",
-          "--test-profile=mandatory",
-          "-m",
-          "not runtime",
-          "--ignore=tests/trainers/test_dp_data_loader_strategy.py"
-        ],
-        "exit": 1,
-        "required_message": "required tests omitted"
-      },
-      {
-        "name": "unexpected-deselection",
-        "environment": "mandatory-313",
-        "args": [
-          "tests/mpc/test_mpc.py",
-          "--test-profile=mandatory",
-          "-k",
-          "round_info"
-        ],
-        "exit": 1,
-        "required_message": "unexpected deselection"
-      },
-      {
-        "name": "empty-runtime-partition-before-handoff",
-        "environment": "mandatory-313",
-        "args": [
-          "tests",
-          "--collect-only",
-          "--test-profile=mandatory",
-          "-m",
-          "runtime"
-        ],
-        "exit": 1,
-        "required_message": "required tests omitted"
+      "log_sha256": {
+        "mandatory-in-base-313": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-opacus-313": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-kazoo-313": "b3b903fe30f4f618701aa0da5537fb8478207a65cb4c6159320a28de72f7f6c0",
+        "missing-gymnasium-313": "03554da49ee8bccdcea32f4772bc1fe114f646730b4f25b68bda3b86ac0eb3e8",
+        "missing-tiktoken-313": "ce2547fab5a778d05b861f252d87a90e86097b8c26f4eee856f92e2904a2314b",
+        "mandatory-in-base-314": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-opacus-314": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "missing-kazoo-314": "f36640ffcca9884739a7a8610726236ad599f277ce867506808d3972f6a8bf44",
+        "missing-gymnasium-314": "641e497eb2715125b495a6a5fecf232f7afdb0c8d33c6c78d411c606981c1155",
+        "missing-tiktoken-314": "eb8acb1987351a7d42c9faef15bdc8302232eb2385ce169f028ca5a51e24005f",
+        "missing-source-313": "c83bd56f830ff6bce4b0096585f717ba1530de52b307167d2fbe19f9624d2975",
+        "missing-source-314": "aaa145586a0f82c424db9b3baff449b8a2d7cc0f8d85651442bff0fffd39afcd",
+        "setup-skip": "ad391a45690d673b851f2d74898e59f1244785d27ac65571aa4d3fb1022333e6",
+        "xpass": "92ccbb5e00d70675922d8a7aa2aecee6131fa5a8ced71d56fa2e618b7b371a58",
+        "skip": "41555338edfa0897e57bf2c6696e44b3d8696fcf931ca435d2118e7e593c6377",
+        "xfail": "09eea8e7d72c66255ce1689e4c8c224d061c0463ba630fc9211b90b729e23a46",
+        "collection-skip": "782a52aa5ec6d4553baad7258270ef0b324d2e7689801794bedcd102127c18e8",
+        "teardown-skip": "8148c6572c89f3e85631025dc9e30d5b618edab6f83c4c9f6bf98f6a1dcb6b38",
+        "ignored-required": "f22cf6ab9bdd659a42cbee9590896110f27a32c8d224ceac9c809215d2de3c5d",
+        "unexpected-deselection": "ad6cbb05de2c4d4cf06b181582cba5c1baac178bc7c305a86ae5cde6d6e8ae45",
+        "ignored-startup-runtime": "67c7d61758713b4e9d848c23eea8148242b5e0578e8061aaad6d877ea12b5c10"
       }
-    ],
-    "probe_sources": {
-      "test_isolation.py": "import os\nimport random\nimport sys\nfrom pathlib import Path\n\nimport numpy as np\nimport pytest\nimport torch\n\nfrom plato.config import Config\nfrom tests.integration.utils import build_minimal_config, configure_environment\nfrom tests.test_utils.fakes import FakeModel\n\n\ndef test_context_keeps_config_environment_and_nested_exception_restores():\n    original_env = os.environ.get(\"config_file\")\n    original_argv = sys.argv\n    with configure_environment(build_minimal_config()) as outer:\n        outer_env = os.environ.get(\"config_file\")\n        assert outer_env == str(Config.config_path)\n        assert Path(outer_env).is_file()\n        outer_params = Config.params\n        with pytest.raises(RuntimeError, match=\"body sentinel\"):\n            with configure_environment(build_minimal_config()):\n                assert Config() is not outer\n                raise RuntimeError(\"body sentinel\")\n        assert Config() is outer\n        assert Config.params is outer_params\n        assert os.environ[\"config_file\"] == outer_env\n    assert os.environ.get(\"config_file\") == original_env\n    assert sys.argv is original_argv\n\n\ndef test_setup_failure_restores_outer_config():\n    with configure_environment(build_minimal_config()) as outer:\n        params = Config.params\n        env = os.environ.get(\"config_file\")\n        argv = sys.argv\n        with pytest.raises(AttributeError):\n            with configure_environment({\"clients\": {}}):\n                pytest.fail(\"invalid config entered\")\n        assert Config() is outer\n        assert Config.params is params\n        assert os.environ.get(\"config_file\") == env\n        assert sys.argv is argv\n\n\ndef test_all_runtime_paths_are_temporary_before_construction(temp_config, tmp_path):\n    for name in [\"base\", \"data\", \"model\", \"checkpoint\", \"result\", \"mpc_data\"]:\n        assert Path(Config.params[f\"{name}_path\"]).is_relative_to(tmp_path)\n\n\ndef test_optional_sections_do_not_leak_between_contexts():\n    first = build_minimal_config()\n    first[\"evaluation\"] = {\"type\": \"sentinel\"}\n    with configure_environment(first):\n        assert Config.evaluation.type == \"sentinel\"\n    with configure_environment(build_minimal_config()):\n        assert not hasattr(Config, \"evaluation\")\n\n\n_rng = (random.getstate(), np.random.get_state(), torch.get_rng_state().clone())\n\n\ndef test_rng_mutation_uses_real_fake_model():\n    random.random()\n    np.random.random()\n    FakeModel()\n\n\ndef test_rng_state_is_restored_between_tests():\n    assert random.getstate() == _rng[0]\n    actual = np.random.get_state()\n    assert actual[0] == _rng[1][0] and np.array_equal(actual[1], _rng[1][1])\n    assert actual[2:] == _rng[1][2:]\n    assert torch.equal(torch.get_rng_state(), _rng[2])\n",
-      "test_paths.py": "import importlib\nimport importlib.util\nimport sys\nfrom pathlib import Path\nfrom unittest.mock import patch\n\nimport pytest\n\nfrom tests.integration.utils import nanochat_source\n\n\ndef test_feddf_collection_restores_import_path():\n    previous = sys.path[:]\n    for name in [\"tests.clients.test_feddf_strategy\", \"tests.servers.test_feddf_server_strategy\"]:\n        importlib.import_module(name)\n        assert sys.path == previous\n\n\ndef test_feddf_client_failed_real_loader_restores_import_path(tmp_path):\n    module = importlib.import_module(\"tests.clients.test_feddf_strategy\")\n    original_spec = importlib.util.spec_from_file_location\n    def missing_source(name, path, *args, **kwargs):\n        if name == \"feddf_client_module\":\n            path = tmp_path / \"missing.py\"\n        return original_spec(name, path, *args, **kwargs)\n    previous = sys.path[:]\n    with patch.object(importlib.util, \"spec_from_file_location\", side_effect=missing_source):\n        with pytest.raises(FileNotFoundError):\n            importlib.reload(module)\n    assert sys.path == previous\n    importlib.reload(module)\n\n\ndef test_feddf_server_failed_real_loader_restores_import_path(tmp_path):\n    module = importlib.import_module(\"tests.servers.test_feddf_server_strategy\")\n    previous = sys.path[:]\n    with pytest.raises(FileNotFoundError):\n        module._load_module(\"feddf_missing\", tmp_path / \"missing.py\")\n    assert sys.path == previous\n\n\ndef test_nanochat_body_exception_restores_source_path():\n    previous = sys.path[:]\n    with pytest.raises(RuntimeError, match=\"path sentinel\"):\n        with nanochat_source() as source:\n            assert (source / \"nanochat/gpt.py\").is_file()\n            assert str(source) in sys.path\n            raise RuntimeError(\"path sentinel\")\n    assert sys.path == previous\n",
-      "negative_probes.py": "import json\nimport os\nimport subprocess\nimport sys\nfrom pathlib import Path\n\nscratch = Path(\"/tmp/plato-phase1c-test-ci\")\nrepository = Path.cwd()\nresults = []\n\n\ndef probe(name, environment, args, expected, message):\n    env = os.environ | {\"UV_PROJECT_ENVIRONMENT\": str(scratch / environment), \"PYTHONPATH\": str(repository)}\n    command = [\"uv\", \"run\", \"--no-sync\", \"python\", \"-m\", \"pytest\", *args]\n    completed = subprocess.run(command, env=env, capture_output=True, text=True)\n    log = completed.stdout + completed.stderr\n    (scratch / f\"negative-{name}.log\").write_text(log)\n    assert completed.returncode == expected, (name, completed.returncode, log)\n    assert message in log, (name, log)\n    results.append({\"name\": name, \"environment\": environment, \"args\": args, \"exit\": completed.returncode, \"required_message\": message})\n\n\nfor py in (\"313\", \"314\"):\n    probe(f\"mandatory-in-base-{py}\", f\"base-{py}\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"mandatory prerequisite failed: No module named\")\n    site = next((scratch / f\"mandatory-{py}\" / \"lib\").glob(\"python*/site-packages\"))\n    for package in (\"opacus\", \"kazoo\", \"gymnasium\", \"tiktoken\"):\n        source = site / package\n        hidden = source.with_name(package + \".phase1c-disabled\")\n        source.rename(hidden)\n        try:\n            probe(f\"missing-{package}-{py}\", f\"mandatory-{py}\", [\"tests/mpc/test_mpc.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, f\"No module named '{package}'\")\n        finally:\n            hidden.rename(source)\n\nsource = repository / \"external/nanochat/nanochat\"\nhidden = source.with_name(\"nanochat.phase1c-disabled\")\nsource.rename(hidden)\ntry:\n    for py in (\"313\", \"314\"):\n        probe(f\"missing-source-{py}\", f\"mandatory-{py}\", [\"tests/test_nanochat_integration.py\", \"--collect-only\", \"--test-profile=mandatory\"], 4, \"Initialized Nanochat source required\")\nfinally:\n    hidden.rename(source)\n\nfixtures = {\n    \"setup-skip\": \"import pytest\\n@pytest.mark.skip(reason='unexpected setup omission')\\ndef test_setup_skip():\\n    pass\\n\",\n    \"xpass\": \"import pytest\\n@pytest.mark.xfail(reason='unexpected xpass', strict=False)\\ndef test_xpass():\\n    pass\\n\",\n    \"skip\": \"import pytest\\ndef test_skip():\\n    pytest.skip(\\\"unexpected omission\\\")\\n\",\n    \"xfail\": \"import pytest\\n@pytest.mark.xfail(reason=\\\"unexpected xfail\\\")\\ndef test_xfail():\\n    assert False\\n\",\n    \"collection-skip\": \"import pytest\\npytest.skip(\\\"unexpected collection omission\\\", allow_module_level=True)\\n\",\n    \"teardown-skip\": \"import pytest\\n@pytest.fixture\\ndef resource():\\n    yield\\n    pytest.skip(\\\"unexpected teardown omission\\\")\\ndef test_teardown(resource):\\n    pass\\n\",\n}\nfor name, text in fixtures.items():\n    target = scratch / (\"test_negative_\" + name.replace(\"-\", \"_\") + \".py\")\n    target.write_text(text)\n    probe(name, \"mandatory-313\", [\"-p\", \"tests.conftest\", str(target), \"--test-profile=mandatory\"], 1, \"test profile violations\")\nprobe(\"ignored-required\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"-m\", \"not runtime\", \"--ignore=tests/trainers/test_dp_data_loader_strategy.py\"], 1, \"required tests omitted\")\nprobe(\"unexpected-deselection\", \"mandatory-313\", [\"tests/mpc/test_mpc.py\", \"--test-profile=mandatory\", \"-k\", \"round_info\"], 1, \"unexpected deselection\")\nprobe(\"empty-runtime-partition-before-handoff\", \"mandatory-313\", [\"tests\", \"--collect-only\", \"--test-profile=mandatory\", \"-m\", \"runtime\"], 1, \"required tests omitted\")\n(scratch / \"negative-results.json\").write_text(json.dumps(results, indent=2) + \"\\n\")\nprint(f\"{len(results)} negative probes rejected as expected\")\n",
-      "path_red.py": "import subprocess\nimport sys\nfrom pathlib import Path\n\nroot = Path.cwd()\nfailed = []\nfor relative in [\"tests/clients/test_feddf_strategy.py\", \"tests/servers/test_feddf_server_strategy.py\"]:\n    previous = sys.path[:]\n    source = subprocess.check_output([\"git\", \"show\", \"7304703905189baf771032f1cd923a37f66ed97f:\" + relative], text=True)\n    scope = {\"__file__\": str(root / relative), \"__name__\": \"phase1c_baseline_path_probe\"}\n    try:\n        exec(compile(source, str(root / relative), \"exec\"), scope)\n        assert sys.path == previous, relative\n    except AssertionError:\n        failed.append(relative)\n    finally:\n        sys.path[:] = previous\nassert len(failed) == 2, failed\nprint(\"2 baseline FedDF collection loaders leaked sys.path\")\n"
     },
-    "replay": "Write probe_sources into scratch_root. Run negative_probes.py from the worktree after syncs, with no concurrent tests in those environments. Run test_isolation.py and test_paths.py with PYTHONPATH=., uv run --no-sync python -m pytest -p tests.conftest <path> --test-profile=base|mandatory. Helpers restore deliberate package/source renames in finally.",
-    "reversed_order": {
+    "focused_and_markers": {
+      "count": 10,
+      "exit": 0,
+      "each_interpreter": [
+        "existing focused FedAvg strategy file passes",
+        "ordinary MPC -k round_info: 1 pass/2 deselected",
+        "native tokenizer target: 1 honest optional skip",
+        "startup_runtime: 3/48 collected, no execution",
+        "startup_containment: 6/48 collected, no execution"
+      ],
+      "exact_commands": {
+        "path": "/tmp/plato-phase1c-test-ci/final/focused-results.json",
+        "sha256": "c0c1ab2b5a8ff105173650d193dedd1a77f22e4233cd55080e421ad9dfac4674"
+      },
+      "log_sha256": {
+        "focused-strategies-3.13": "bdf154f903249cd270e44f7e511ef11afa126c9a49a6e471038f5bf6a2286b2e",
+        "focused-selection-3.13": "e006afc5439b9676f3fb07d2c7aff065d605a1816c7ace2b1b4902f5bcb86d7c",
+        "focused-native-3.13": "9ccc4f247e7650b91266385d2eeb0e9219fc43f703fbd1ae669202f55f0632e0",
+        "marker-sockets-3.13": "757526a9445bbe0879097fa46beaea6d6117ab1bad56e2b099a931aa37a649ef",
+        "marker-containment-3.13": "d299e93e3426e470b45bd08d3fdaab1d27faf2162c565deb0594614dc56d7aa7",
+        "focused-strategies-3.14": "a7315c9a0f66b213f7cf849076131e42ca87f7d2fa6a89be4833293f5aa03a2d",
+        "focused-selection-3.14": "8518d8f3379bca6e7eaf84fe4e34da9de5fa01d8d2f910b11c77fc7843c439b9",
+        "focused-native-3.14": "0989079a941a776dff7a20a63373429f9826a1cfd0fbea3038df7be06a22d517",
+        "marker-sockets-3.14": "a7d27ab84f0555d1ae2c1f453b65091a10c59f6a2cd4c036401bcea4b9ea5b30",
+        "marker-containment-3.14": "dc7466603567723854e3bac98fd7a6b067ff35eec7b4d9062f12a1a1d91e545c"
+      }
+    },
+    "probe_sources": {
+      "test_isolation.py": {
+        "path": "/tmp/plato-phase1c-test-ci/test_isolation.py",
+        "sha256": "cc0b922725a044acf48094a9f0a6fa4d06acca6a844262113deaa79dfb5b9fd7"
+      },
+      "test_paths.py": {
+        "path": "/tmp/plato-phase1c-test-ci/test_paths.py",
+        "sha256": "c965e12a5976991d0c3a4f3a932b77395d78bfbf195a4e9809c1db589f429e68"
+      },
+      "path_red.py": {
+        "path": "/tmp/plato-phase1c-test-ci/path_red.py",
+        "sha256": "1154827b942645ee8d673404bea5eafa6d108dc04c5fad0136f3afc5f38dfa3d"
+      },
+      "negative_probes.py": {
+        "path": "/tmp/plato-phase1c-test-ci/negative_probes.py",
+        "sha256": "a0c5d47b444a4ca9f69bee914861b676cf3503993af0707a85417b8bca7dfa62"
+      },
+      "focused_checks.py": {
+        "path": "/tmp/plato-phase1c-test-ci/final/focused_checks.py",
+        "sha256": "44e83d95416ed3f01ecd91be1418422f9eb9e97c8763c2f52e29f0e3ad6a3a95"
+      }
+    },
+    "replay": "Sync the two named locked groups for each interpreter. From the worktree run the retained negative_probes.py via zsh -lc with no concurrent environment users (deliberate package/source renames restore in finally). Probe arguments and expected failures are listed above. Qualification runner source and commands are retained below.",
+    "prior_reversed_order": {
       "313": "15 passed, 1 skipped in 1.18s",
       "314": "15 passed, 1 skipped in 1.14s"
+    },
+    "qualification_runner": {
+      "path": "/tmp/plato-phase1c-test-ci/final/run_qualification.py",
+      "sha256": "995260f6734222e2569c25a9d50a321ac01a334af7f14461bcdfae4f63e5abab"
     }
   },
   "warnings": {
-    "historical": 8,
-    "candidate": 0,
-    "necessary_design_adjustment": "Setting preprocessing_num_proc=1 as designed still emitted eight fork DeprecationWarnings. Accepted datasets 5.0.1 arrow_dataset.py:3619-3620 starts mp.Pool for every num_proc>=1. Set None in the owned block-size test to run genuine Dataset.map/tokenization/grouping in-process; no production defaults, dependencies, process context or warning filters changed.",
-    "other_output": "Torch elastic prints its MacOS redirect limitation to stderr. Final commands explicitly select --python 3.14 for forward checks against retained .python-version=3.13. Nanochat tests set NANOCHAT_BASE_DIR to a per-test temporary cache and restore the prior environment; final runs use the owned scratch basetemp."
+    "historical_pytest": 8,
+    "final_pytest_each_partition": 0,
+    "investigation": "Setting preprocessing_num_proc=1 as designed still emitted eight fork DeprecationWarnings. Accepted datasets 5.0.1 arrow_dataset.py:3619-3620 starts mp.Pool for every num_proc>=1. Set None in the owned block-size test to run genuine Dataset.map/tokenization/grouping in-process; no production defaults, dependencies, process context or warning filters changed.",
+    "subprocess": "Startup raw stderr is retained and explicit Python warning lines are counted above; Torch elastic macOS redirect notices are platform logging, not pytest warning reports."
   },
   "coverage": {
+    "scope": "--cov=plato on mandatory core; separate startup subprocess execution is not included. No new coverage exclusions or filters.",
     "historical": {
-      "covered": 7257,
-      "statements": 16935,
-      "percent": 42.852081488042515
+      "artifact": {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/baseline-coverage.json",
+        "sha256": "9f82f36144f849c3b23f7575843234394f8fa3cee59923a230b58d5e632daea1"
+      },
+      "totals": {
+        "covered_lines": 7257,
+        "num_statements": 16935,
+        "percent_covered": 42.852081488042515,
+        "percent_covered_display": "43",
+        "missing_lines": 9678,
+        "excluded_lines": 192,
+        "percent_statements_covered": 42.852081488042515,
+        "percent_statements_covered_display": "43"
+      },
+      "files": 226
     },
-    "comparison": "3.13 keeps identical 16935-statement Plato scope and improves to 7378/16935 = 43.566578%; no new exclusions. 3.14 analyzes 16924 statements and covers 7372 = 43.559442%. Coverage 7.16.2 (pytest-cov 7.1.0) Python-version statement analysis differs by 11 across five unchanged files; do not compare rounded percentages as identical denominator measurements.",
-    "statement_count_differences_313_314": {
-      "plato/trainers/huggingface.py": [
-        582,
-        581
+    "final_raw": {
+      "313": {
+        "artifact": {
+          "path": "/tmp/plato-phase1c-test-ci/final/coverage-313.json",
+          "sha256": "90bad192e0319c92318db9ea2686ae048435f616be20584936d0cb40d89a11d6"
+        },
+        "totals": {
+          "covered_lines": 7387,
+          "num_statements": 17060,
+          "percent_covered": 43.30011723329426,
+          "percent_covered_display": "43",
+          "missing_lines": 9673,
+          "excluded_lines": 192,
+          "percent_statements_covered": 43.30011723329426,
+          "percent_statements_covered_display": "43"
+        },
+        "files": 226
+      },
+      "314": {
+        "artifact": {
+          "path": "/tmp/plato-phase1c-test-ci/final/coverage-314.json",
+          "sha256": "efdda3d671d28209b1ef68c6ba99621694bf0d525fe1cc9c0f2d67c7a86625bb"
+        },
+        "totals": {
+          "covered_lines": 7381,
+          "num_statements": 17049,
+          "percent_covered": 43.29286175142237,
+          "percent_covered_display": "43",
+          "missing_lines": 9668,
+          "excluded_lines": 192,
+          "percent_statements_covered": 43.29286175142237,
+          "percent_statements_covered_display": "43"
+        },
+        "files": 226
+      }
+    },
+    "vendor_denominator": "Historical coverage predates ViT submodule initialization. Both are now initialized at accepted pins, but the final raw coverage JSON still measures zero DViT/T2T files/statements and the same 226 first-party file paths. Source discovery does not report these unimported vendor namespaces; no new exclusion was configured.",
+    "denominator_changes": "Accepted 1B adds 123 statements in plato/client.py and two in plato/servers/base.py on 3.13. Coverage analyzer 7.16.2 reports eleven fewer statements across five unchanged files on 3.14. Raw final percentages therefore use different denominators from the historical baseline.",
+    "comparable_first_party": {
+      "counts": {
+        "baseline": {
+          "files": 219,
+          "covered": 6765,
+          "statements": 15314,
+          "percent": 44.17526446388925
+        },
+        "313": {
+          "files": 219,
+          "covered": 6886,
+          "statements": 15314,
+          "percent": 44.965391145357195
+        },
+        "314": {
+          "files": 219,
+          "covered": 6886,
+          "statements": 15314,
+          "percent": 44.965391145357195
+        }
+      },
+      "reporting_only_omissions": [
+        "plato/algorithms/split_learning.py",
+        "plato/client.py",
+        "plato/models/registry.py",
+        "plato/servers/base.py",
+        "plato/servers/fedavg_he.py",
+        "plato/trainers/huggingface.py",
+        "plato/utils/reinforcement_learning/policies/sac.py"
       ],
-      "plato/servers/fedavg_he.py": [
-        55,
-        54
-      ],
-      "plato/algorithms/split_learning.py": [
-        46,
-        44
-      ],
-      "plato/utils/reinforcement_learning/policies/sac.py": [
-        202,
-        198
-      ],
-      "plato/models/registry.py": [
-        74,
-        71
-      ]
+      "method": "Sum raw file summaries over the 219 unchanged files with identical statement counts in baseline/3.13/3.14. These reporting omissions do not alter measured raw coverage or configured exclusions."
     }
   },
   "typing": {
-    "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase1c-test-ci/mandatory-{313,314} uv run --no-sync ty check --output-format concise",
-    "exit": 1,
-    "messages_each_interpreter": 384,
-    "first_party_messages": 60,
-    "first_party_distinct_locations": 59,
+    "messages_each_interpreter": 404,
+    "first_party_messages": 80,
+    "first_party_distinct_locations": 79,
     "vendor": {
       "dvit": 306,
       "t2tvit": 18,
@@ -728,55 +801,135 @@
         "messages": 5
       }
     ],
+    "policy": "No new suppression. Existing two HF test assignment findings remain assigned to 3B; five abstract-class calls are deliberate negative tests owned by 2C. Raw nonzero output retained. F13 is still open with 2A; fixture reset does not repair production Config reset.",
+    "exit": 1,
+    "new_diagnostics_in_touched_files": 0,
+    "comparison": "All 384 pre-integration diagnostics persist unchanged; 20 additions are confined to the byte-identical accepted 1B helpers. Both interpreter outputs match. No suppressions added.",
+    "accepted_1b_additions": [
+      {
+        "file": "tests/integration/startup_harness.py",
+        "diagnostic": "invalid-argument-type",
+        "locations": [
+          "78:36",
+          "78:53",
+          "78:68"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Nested configuration literal inference treats the algorithm map as string-valued before adding bool/int cross-silo values; explicit heterogeneous mapping typing is follow-up work. Actual TOML construction and cross-silo probes pass."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "invalid-assignment",
+        "locations": [
+          "85:17",
+          "307:9",
+          "317:9",
+          "320:9",
+          "347:13",
+          "348:13",
+          "373:9",
+          "375:9"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Test-only exception/entrypoint/Application/launcher substitution has intentionally narrower callable or class types than production attributes. Declare typed probe interfaces or local mutation wrappers in a follow-up; no suppression or accepted helper edit in 1C."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "invalid-method-override",
+        "locations": [
+          "231:19",
+          "275:13"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Probe _periodic/start overrides narrow the base callable signature. Actual accepted invocation cases pass; preserve their intended no-argument dispatch while reviewing annotations/signatures with the original 1B owner."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "unresolved-attribute",
+        "locations": [
+          "237:40"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "asyncio.current_task() is typed optional; this branch runs inside the scheduled coroutine. Follow-up explicit non-None narrowing."
+      },
+      {
+        "file": "tests/integration/startup_probe.py",
+        "diagnostic": "call-non-callable",
+        "locations": [
+          "323:18",
+          "323:67",
+          "341:9"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "ProbeServer inherits abstract-decorated _process_reports without implementing it; base.Server has no ABCMeta, so the actual startup-only cases instantiate and pass. These probes do not process reports. An explicit probe implementation is follow-up work with the original 1B owner."
+      },
+      {
+        "file": "tests/integration/startup_socket.py",
+        "diagnostic": "invalid-method-override",
+        "locations": [
+          "103:15"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "FailingServer periodic override narrows the base signature; annotate or align the helper interface in follow-up without altering the failure assertion."
+      },
+      {
+        "file": "tests/integration/startup_socket.py",
+        "diagnostic": "invalid-assignment",
+        "locations": [
+          "146:5",
+          "147:5"
+        ],
+        "owner": "Root / original accepted 1B startup test-helper owner",
+        "classification": "Test-only observation wrappers replace Process.start and the real client entrypoint; callable assignment types differ. Preserve actual startup/round behavior and review typed instrumentation with the original 1B owner."
+      }
+    ],
     "logs": {
       "313": {
-        "path": "/tmp/plato-phase1c-test-ci/ty-full-313.log",
-        "sha256": "8d70ec0159d4827d5b341b9f4450a895599d3ed4b2077c25e79d0a2df74b113c"
+        "path": "/tmp/plato-phase1c-test-ci/final/ty-313.log",
+        "sha256": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4"
       },
       "314": {
-        "path": "/tmp/plato-phase1c-test-ci/ty-full-314.log",
-        "sha256": "8d70ec0159d4827d5b341b9f4450a895599d3ed4b2077c25e79d0a2df74b113c"
+        "path": "/tmp/plato-phase1c-test-ci/final/ty-314.log",
+        "sha256": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4"
       }
-    },
-    "new_diagnostics_in_touched_files": 0,
-    "policy": "No new suppression. Existing two HF test assignment findings remain assigned to 3B; five abstract-class calls are deliberate negative tests owned by 2C. Raw nonzero output retained. F13 is still open with 2A; fixture reset does not repair production Config reset."
+    }
   },
   "workflow": {
-    "actionlint": "1.7.12, -shellcheck=, exit 0",
-    "commands": "All shell run blocks parse under zsh; embedded Python compiles; custom zsh -lc source shell executes locally. Runner provisioning/install/startup/socket commands await actual Linux execution and accepted 1B.",
-    "bounds": "45-minute overall job; 10-minute installs, 12-minute base/mandatory core and startup/runtime steps. Root reports delivered 48 startup cases sum to 431/444 seconds on 3.13/3.14. All startup/socket/containment cases run once in the mandatory runtime partition per interpreter; base and mandatory core use -m 'not runtime'. Preserve delivered 30+5+5 and 90+5+5 process deadlines; no omitted negative cases.",
-    "runtime_nodes": [
-      "test_real_two_client_cpu_socket_round",
-      "test_post_launch_failure_keeps_primary_error_and_contains_children",
-      "test_stalled_real_client_is_contained_without_round_success"
-    ],
-    "runtime_wiring_status": "Read-only accepted commit interfaces inspected; no startup implementation/helpers copied, edited or integrated. Fixed expected per-function inventory sums to 48 cases from accepted commit AST. Register runtime, startup_runtime, startup_containment; whole startup module belongs to runtime, socket cases carry startup_runtime, watchdog/child-failure cases carry startup_containment. Root merge and final qualification clearance remain required before actual integrated execution.",
-    "package_inventory": "Both uv pip freeze calls now name --python environment/bin/python; own four profile inventories checked. UV_PROJECT_ENVIRONMENT alone is insufficient for uv pip commands.",
+    "partitions": "Base core and initialized mandatory core use -m not runtime; all 48 startup/socket/containment cases execute once per interpreter using mandatory -m runtime. Registered startup_runtime selects three socket cases; startup_containment selects six cases including five watchdogs and post-launch child failure.",
+    "bounds": "45-minute overall job; 10-minute installs, 12-minute base/core/runtime steps. Delivered 30+5+5 and 90+5+5 process deadlines preserved; measured local runtime partition durations appear in runs.",
+    "syntax": "actionlint 1.7.12 -shellcheck= exits 0; every zsh block parses and both embedded Python blocks compile. Matrix interpreter is explicit in every uv run; package inventories explicitly identify each environment/bin/python.",
+    "actionlint": {
+      "path": "/tmp/plato-phase1c-test-ci/final/actionlint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
     "official_action_sources": {
       "checkout v7.0.1": "https://github.com/actions/checkout/releases/tag/v7.0.1",
       "setup-python v7.0.0": "https://github.com/actions/setup-python/releases/tag/v7.0.0",
       "setup-uv v10.2.0": "https://github.com/astral-sh/setup-uv/releases/tag/v10.2.0",
       "upload-artifact v7.0.1": "https://github.com/actions/upload-artifact/releases/tag/v7.0.1"
     },
-    "linux_runtime": "Unavailable locally (macOS Apple Silicon, no Docker). Root must verify GitHub Linux after reviewed Phase 1 publication and before Phase 2; resolution/syntax checks are not runtime qualification."
+    "linux_runtime": "Not locally executed: macOS Apple Silicon, no Docker. Root must verify published GitHub Ubuntu execution before Phase 2; lock resolution and syntax are not Linux runtime evidence."
   },
-  "ruff": "uv run --no-sync ruff check . --select I: exit 0",
+  "ruff": {
+    "command": "uv run --no-sync --python 3.13 ruff check . --select I",
+    "exit": 0,
+    "log": {
+      "path": "/tmp/plato-phase1c-test-ci/final/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
   "independent_review": {
-    "status": "Required root-created fresh exact-commit review in separate herdr workspace remains pending. No final 1C candidate committed before independently accepted 1B handoff.",
-    "nested_reviewers": "Two reviewers were mistakenly started here contrary to the no-nested-agents instruction. Both were interrupted on user clarification; no delegation will continue. Their partial results are supplemental observations only, not a completed required independent review or acceptance.",
-    "preliminary_sha": "656952d740a78e27b09e7df729788d7db0486be8",
-    "preserved_results": [
+    "status": "Required fresh root-created exact-final-commit review in separate herdr workspace remains pending.",
+    "supplemental_nested_observations_only": [
       "Evidence/source/four suite-log hashes match; lock has 278 identical package records after removing only the two added test-base metadata arrays; Python default remains 3.13.",
       "Fresh archived-source probes reproduced 3.13 mandatory 250 passed/1 allowed skip and 7378/16935 coverage, 3.14 mandatory 250 passed/1 allowed skip, 3.13 base 246 passed/4 declared skip reports; no pytest warnings. Ruff and zsh/Python workflow syntax passed. This is preliminary local evidence, not Linux qualification.",
       "CI uv pip freeze ignores UV_PROJECT_ENVIRONMENT and can list the default interpreter's packages. Fixed both workflow calls with explicit --python environment/bin/python and independently checked own profile package inventories.",
       "Coverage analyzer was mislabeled 7.1.0 (the pytest-cov version). Corrected to coverage 7.16.2 and added analyzer versions; raw measured counts/denominators unchanged."
-    ]
+    ],
+    "delegation": "Earlier nested reviewers were stopped; no nested delegation resumed. Their observations do not constitute the required independent review."
   },
   "remaining": [
-    "root merge of accepted exact 1B commit and final qualification clearance",
-    "confirm integrated 48-case startup/runtime inventory including all five watchdog cases",
-    "local 3.13/3.14 delivered startup/socket qualification",
-    "root-created fresh independent exact final-commit review in separate herdr workspace",
-    "root GitHub Linux execution and Phase 1 gate"
+    "Root-created fresh exact-final-commit review",
+    "Root GitHub Linux execution and Phase 1 acceptance gate"
   ]
 }
