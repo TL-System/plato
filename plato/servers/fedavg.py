@@ -160,7 +160,7 @@ class Server(base.Server):
         validate_aggregation_inputs(updates, payloads)
         algorithm = self.algorithm
         validator = getattr(algorithm, "validate_weights", None)
-        if callable(validator):
+        if algorithm is not None and callable(validator):
             baseline = (
                 algorithm.extract_weights()
                 if baseline_weights is None else baseline_weights

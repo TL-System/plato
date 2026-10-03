@@ -11,6 +11,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from typing import Any
 
 import psutil
 
@@ -38,7 +39,7 @@ def run_probe(
     """Drain output, retain process identities, and contain only owned processes."""
     directory.mkdir(parents=True)
     port = available_port()
-    config = {
+    config: dict[str, dict[str, Any]] = {
         "clients": {
             "type": "simple",
             "total_clients": 2,

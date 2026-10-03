@@ -2,6 +2,7 @@
 
 import asyncio
 import copy
+from typing import cast
 
 import mlx.core as mx
 import numpy as np
@@ -29,22 +30,30 @@ class DeltaOnly(FedAvgAggregationStrategy):
 
 
 class ObservedWeights(FedAvgAggregationStrategy):
-    async def aggregate_weights(self, updates, baseline, weights, context):
+    async def aggregate_weights(
+        self, updates, baseline_weights, weights_received, context
+    ):
         context.state["arithmetic_called"] = True
-        return await super().aggregate_weights(updates, baseline, weights, context)
+        return await super().aggregate_weights(
+            updates, baseline_weights, weights_received, context
+        )
 
 
 def server_for(trainer, kind):
     from plato.servers import fedavg
 
-    class Legacy(fedavg.Server):
+    class FixtureServer(fedavg.Server):
+        def clients_processed(self) -> None:
+            return None
+
+    class Legacy(FixtureServer):
         async def aggregate_weights(self, updates, baseline, weights):
             self.context.state["arithmetic_called"] = True
             return await FedAvgAggregationStrategy().aggregate_weights(
                 updates, baseline, weights, self.context
             )
 
-    server = (Legacy if kind == "legacy" else fedavg.Server)(
+    server = (Legacy if kind == "legacy" else FixtureServer)(
         aggregation_strategy=DeltaOnly()
         if kind in ("delta", "legacy")
         else ObservedWeights()
@@ -54,7 +63,6 @@ def server_for(trainer, kind):
     server.context.trainer = trainer
     server.context.algorithm = server.algorithm
     server.context.server = server
-    server.clients_processed = lambda: None
     return server
 
 
@@ -232,12 +240,14 @@ def test_native_checkpoint_codec_prediction_equality_and_next_update(tmp_path):
         trainer.train_model(trainer_config(trainer), samples, None)
         snapshot = algorithm.extract_weights()
         batch = mx.array(np.stack([x for x, _ in samples]))
-        prediction = np.array(trainer.model(batch), copy=True)
+        prediction = np.array(cast(LeNet5, trainer.model)(batch), copy=True)
         trainer.save_model("round.safetensors", str(tmp_path))
         restored = ComposableMLXTrainer(model=LeNet5)
         restored.load_model("round.safetensors", str(tmp_path))
         assert_tree_equal(Algorithm(restored).extract_weights(), snapshot)
-        np.testing.assert_array_equal(np.asarray(restored.model(batch)), prediction)
+        np.testing.assert_array_equal(
+            np.asarray(cast(LeNet5, restored.model)(batch)), prediction
+        )
         decoded = Decode().process(Encode().process(snapshot))
         assert_tree_equal(decoded, snapshot)
         malformed = copy.deepcopy(snapshot)

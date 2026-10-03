@@ -3,7 +3,9 @@
 import json
 import sys
 from pathlib import Path
+from typing import cast
 
+import mlx.core as mx
 import mlx.nn as nn
 import numpy as np
 import torch
@@ -53,8 +55,12 @@ def replay(root: Path, identities: list[list[int]], master_seed: int = 29):
             return transformed.astype(np.float32), index % 2
 
     class Losses(TrainerCallback):
-        def on_train_step_end(self, trainer, config, batch=None, loss=None):
-            recordings["losses"].append(float(loss.item()))
+        def on_train_step_end(
+            self, trainer, config, batch=None, loss=None, **kwargs
+        ):
+            recordings["losses"].append(
+                float(cast(float, cast(mx.array, loss).item()))
+            )
 
     with native_config(root, model_seed=17, training_seed=master_seed, batch_size=4):
         no_device_flags()

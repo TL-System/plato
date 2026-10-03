@@ -5,7 +5,9 @@ import os
 import random
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
+from typing import cast
 
 import mlx.core as mx
 import numpy as np
@@ -74,7 +76,7 @@ def test_seeded_factory_and_training_restore_all_caller_rngs(tmp_path, failure):
     before_python = random.getstate()
     before_numpy = np.random.get_state()
     before_torch = torch.get_rng_state().clone()
-    before_mlx = np.array(mx.random.state[0], copy=True)
+    before_mlx = np.array(cast(Sequence[mx.array], mx.random.state)[0], copy=True)
     with native_config(tmp_path, model_seed=17, training_seed=29):
         trainer = ComposableMLXTrainer(model=LeNet5)
         samples = dataset()
@@ -101,7 +103,9 @@ def test_seeded_factory_and_training_restore_all_caller_rngs(tmp_path, failure):
         np.testing.assert_array_equal(after_numpy[1], before_numpy[1])
         assert after_numpy[2:] == before_numpy[2:]
         assert torch.equal(torch.get_rng_state(), before_torch)
-        np.testing.assert_array_equal(np.asarray(mx.random.state[0]), before_mlx)
+        np.testing.assert_array_equal(
+            np.asarray(cast(Sequence[mx.array], mx.random.state)[0]), before_mlx
+        )
 
 
 def test_initialization_seed_replays_and_unseeded_initialization_remains_legacy(
@@ -112,8 +116,10 @@ def test_initialization_seed_replays_and_unseeded_initialization_remains_legacy(
         second = Algorithm(ComposableMLXTrainer(model=LeNet5)).extract_weights()
         assert_tree_equal(first, second)
     with native_config(tmp_path / "unseeded"):
-        before = np.array(mx.random.state[0], copy=True)
+        before = np.array(cast(Sequence[mx.array], mx.random.state)[0], copy=True)
         first = Algorithm(ComposableMLXTrainer(model=LeNet5)).extract_weights()
         second = Algorithm(ComposableMLXTrainer(model=LeNet5)).extract_weights()
         assert not np.array_equal(first["conv1"]["weight"], second["conv1"]["weight"])
-        assert not np.array_equal(np.asarray(mx.random.state[0]), before)
+        assert not np.array_equal(
+            np.asarray(cast(Sequence[mx.array], mx.random.state)[0]), before
+        )
