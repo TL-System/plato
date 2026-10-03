@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03T20:39:49.552244+00:00",
+  "finding": "ASD-I01",
+  "status": "Narrow documentation correction complete; fresh independent review and final integrated runtime qualification remain pending.",
+  "authorization": "Root explicitly authorized editing only the combined/full-core qualification instructions in docs/docs/mlx.md, with dedicated retained command if useful, as an exception to the earlier protected-MLX-guide rule.",
+  "source": {
+    "base_commit": "1983590373603f286dbef314677c6c57c0654372",
+    "docs_commit": "5d05186a9fb5d099df59a3d5ccd203a4aed9f846",
+    "tree": "c1aea4a528df86acb9121a21e1dbf2d461c786d7",
+    "changed_files": [
+      "docs/docs/mlx.md"
+    ],
+    "guide": {
+      "path": "docs/docs/mlx.md",
+      "before_sha256": "d30fddc8ffbbd7dfc59670622fbb2a566a70cf58c145617e73b16cd5e3921c8b",
+      "after_sha256": "0cb74d054b3448a42083dae73a790a81fb3eb6da041691474ffe419328d42ae7"
+    },
+    "dependency_contract_sources_sha256": {
+      "pyproject.toml": "0b67376a5ead6bc1a50b30303d7a4f5f2963baef82d7a3ef027d31c3f2389c46",
+      "tests/integration/test_retained_model_search.py": "ff902a9a34c97ce4842f0dd35b2bc396da5c2998381a66f52d4c5d1142e4fe0d",
+      "tests/integration/model_search_retention_worker.py": "949e087b68296d4b372ebf4a2369c9b0dbaa4a5606b483a91bab8faed2683e55",
+      "examples/model_search/anycostfl/anycostfl_algorithm.py": "e6c02606aca9780a9c4caa66ba5075e0b4083bf030dadf95ebfb72e7c7486faa",
+      "examples/model_search/fedrolex/fedrolex_algorithm.py": "58ce0df5c4b370f2fb139137803ce82f2f9a8ca12df4c34a8bd6c33af0af4f02",
+      "examples/model_search/heterofl/heterofl_algorithm.py": "0658d268eba1e803568fecd3639ed606f5da7d657416a0c3608a719984655c80",
+      "examples/model_search/sysheterofl/sysheterofl_algorithm.py": "7e48b6aba02c5a517078761fb724c1b8d2f96676175aacd3a4d27668fb66f0c0"
+    },
+    "review": {
+      "path": "/tmp/plato-archive-shortlist-docs-review.json",
+      "sha256": "2aa7fefe0ee33642a8d6e7bbb8f967e0b984a5e2dab552672fc1550913f10be4"
+    }
+  },
+  "prior_receipt": {
+    "path": "evidence/2026-refresh/archive-shortlist-docs.json",
+    "sha256": "f88bb9e2f3e597256aaf34ea0316f1e29e86f7482bd2d50fcd86c34053f17ccf",
+    "interpretation": "Its protected-MLX byte-identity statement remains historical evidence for docs commit fb37e491. This addendum records the explicitly authorized later change; it does not claim continued byte identity for docs/docs/mlx.md."
+  },
+  "validation": {
+    "interpreter": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "environment": "/tmp/plato-llm-integration/tooling-313 reused read only; no dependency mutations",
+    "mkdocs_versions": {
+      "mkdocs": "1.6.1",
+      "mkdocs-material": "9.7.7"
+    },
+    "strict_build": {
+      "command": [
+        "/tmp/plato-llm-integration/tooling-313/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-model-search-docs-command-correction/site"
+      ],
+      "returncode": 0,
+      "log": "\n\u001b[31m \u2502  \u26a0  Warning from the Material for MkDocs team\u001b[0m\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  MkDocs 2.0, the underlying framework of Material for MkDocs,\n\u001b[31m \u2502\u001b[0m  will introduce backward-incompatible changes, including:\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502  \u00d7 \u001b[0mAll plugins will stop working \u2013 the plugin system has been removed\n\u001b[31m \u2502  \u00d7 \u001b[0mAll theme overrides will break \u2013 the theming system has been rewritten\n\u001b[31m \u2502  \u00d7 \u001b[0mNo migration path exists \u2013 existing projects cannot be upgraded\n\u001b[31m \u2502  \u00d7 \u001b[0mClosed contribution model \u2013 community members can't report bugs\n\u001b[31m \u2502  \u00d7 \u001b[0mCurrently unlicensed \u2013 unsuitable for production use\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  Our full analysis:\n\u001b[31m \u2502\u001b[0m\n\u001b[31m \u2502\u001b[0m  \u001b[4mhttps://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/\u001b[0m\n\u001b[0m\nINFO    -  Cleaning site directory\nINFO    -  Building documentation to directory: /tmp/plato-model-search-docs-command-correction/site\nINFO    -  The following pages exist in the docs directory, but are not included in the \"nav\" configuration:\n  - examples/case-studies/3. SmolVLA Trainer with LeRobot.md\n  - examples/case-studies/5. Nanochat in Plato.md\nINFO    -  Documentation built in 0.47 seconds\n"
+    },
+    "focused_checks": {
+      "commands": [
+        {
+          "command": "uv run --extra mlx --group test python -m pytest tests/mlx_native --test-profile=mlx-native -ra",
+          "target": "tests/mlx_native",
+          "dependency_group": "test",
+          "expanded_dependencies": [
+            "pytest>=9.1.1",
+            "pytest-cov>=7.1.0",
+            "plato-learn[dp,mpc,rl]"
+          ],
+          "native_extra": true,
+          "executed": false
+        },
+        {
+          "command": "uv run --extra mlx --group test-model-search python -m pytest tests --test-profile=mlx-native -ra",
+          "target": "tests",
+          "dependency_group": "test-model-search",
+          "expanded_dependencies": [
+            "pytest>=9.1.1",
+            "pytest-cov>=7.1.0",
+            "plato-learn[dp,mpc,rl]",
+            "ptflops>=0.7.5"
+          ],
+          "native_extra": true,
+          "executed": false
+        },
+        {
+          "command": "uv run --extra mlx --group test python -m pytest tests/mlx_native/test_phase3_controls.py -k clipping -ra",
+          "target": "tests/mlx_native/test_phase3_controls.py",
+          "dependency_group": "test",
+          "expanded_dependencies": [
+            "pytest>=9.1.1",
+            "pytest-cov>=7.1.0",
+            "plato-learn[dp,mpc,rl]"
+          ],
+          "native_extra": true,
+          "executed": false
+        },
+        {
+          "command": "uv run --group test-model-search python -m pytest tests --test-profile=mandatory -ra",
+          "target": "tests",
+          "dependency_group": "test-model-search",
+          "expanded_dependencies": [
+            "pytest>=9.1.1",
+            "pytest-cov>=7.1.0",
+            "plato-learn[dp,mpc,rl]",
+            "ptflops>=0.7.5"
+          ],
+          "native_extra": false,
+          "executed": false
+        },
+        {
+          "command": "uv run --group test-model-search python -m pytest tests/integration/test_retained_model_search.py --test-profile=mandatory -m retained_model_search -ra",
+          "target": "tests/integration/test_retained_model_search.py",
+          "dependency_group": "test-model-search",
+          "expanded_dependencies": [
+            "pytest>=9.1.1",
+            "pytest-cov>=7.1.0",
+            "plato-learn[dp,mpc,rl]",
+            "ptflops>=0.7.5"
+          ],
+          "native_extra": false,
+          "executed": false
+        }
+      ],
+      "dependency_import_sources": [
+        "examples/model_search/anycostfl/anycostfl_algorithm.py",
+        "examples/model_search/fedrolex/fedrolex_algorithm.py",
+        "examples/model_search/heterofl/heterofl_algorithm.py",
+        "examples/model_search/sysheterofl/sysheterofl_algorithm.py"
+      ],
+      "dependency_analysis": "Source analysis only; no collection, model workers or complete suite executed.",
+      "native_only_commands_unchanged": true,
+      "protected_files": 313,
+      "protected_all_unchanged_except_authorized_mlx_guide": true,
+      "authorized_exception": {
+        "path": "docs/docs/mlx.md",
+        "before_sha256": "d30fddc8ffbbd7dfc59670622fbb2a566a70cf58c145617e73b16cd5e3921c8b",
+        "after_sha256": "0cb74d054b3448a42083dae73a790a81fb3eb6da041691474ffe419328d42ae7"
+      },
+      "focused_rendered_links_checked": 55,
+      "link_errors": []
+    },
+    "checker_source": "from pathlib import Path\nfrom html.parser import HTMLParser\nfrom urllib.parse import unquote,urlsplit\nimport hashlib,json,re,shlex,subprocess,tomllib\nroot=Path.cwd();base='1983590373603f286dbef314677c6c57c0654372'\nold=subprocess.check_output(['git','show',base+':docs/docs/mlx.md'],text=True)\nnew=Path('docs/docs/mlx.md').read_text()\nmetadata=tomllib.loads(Path('pyproject.toml').read_text());groups=metadata['dependency-groups']\ndef expand(name):\n result=[]\n for item in groups[name]:\n  result.extend(expand(item['include-group']) if isinstance(item,dict) else [item])\n return result\nassert not any(s.startswith('ptflops') for s in expand('test'))\nassert set(expand('test')).issubset(set(expand('test-model-search')))\nassert any(s.startswith('ptflops>=0.7.5') for s in expand('test-model-search'))\nassert 'mlx' in metadata['project']['optional-dependencies']\nassert 'plato-learn[dp,mpc,rl]' in expand('test')\ncommands=[]\nfor line in new.splitlines():\n if not line.startswith('uv run ') or '-m pytest ' not in line:continue\n args=shlex.split(line);target=args[args.index('pytest')+1];group=args[args.index('--group')+1]\n native=target.startswith('tests/mlx_native')\n expected='test' if native else 'test-model-search'\n assert group==expected,(line,group,expected)\n if native:\n  assert line in old\n  assert '--extra' in args and args[args.index('--extra')+1]=='mlx'\n elif '--test-profile=mlx-native' in args:\n  assert target=='tests' and args[args.index('--extra')+1]=='mlx'\n elif target=='tests':assert '--test-profile=mandatory' in args\n else:\n  assert target=='tests/integration/test_retained_model_search.py'\n  assert '--test-profile=mandatory' in args and args[args.index('-m',args.index('pytest'))+1]=='retained_model_search'\n  assert Path(target).is_file()\n commands.append({'command':line,'target':target,'dependency_group':group,'expanded_dependencies':expand(group),'native_extra':'--extra' in args,'executed':False})\nassert len(commands)==5\nretained=Path('tests/integration/test_retained_model_search.py').read_text()\nassert 'pytestmark = [pytest.mark.runtime, pytest.mark.retained_model_search]' in retained\nimports=[]\nfor family in ['anycostfl','fedrolex','heterofl','sysheterofl']:\n file=Path(f'examples/model_search/{family}/{family}_algorithm.py')\n assert '\\nimport ptflops\\n' in file.read_text();imports.append(str(file))\nprior=json.loads(Path('/tmp/plato-model-search-docs-validation/before.json').read_text())['protected_sha256']\nexception='docs/docs/mlx.md';prior.pop(exception)\nfor path in ['docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md','configs/HuggingFace/fedavg_qwen3_06b_lora.toml']:\n prior[path]=hashlib.sha256(subprocess.check_output(['git','show',base+':'+path])).hexdigest()\nassert all(hashlib.sha256(Path(p).read_bytes()).hexdigest()==h for p,h in prior.items())\nclass HTML(HTMLParser):\n def __init__(self,path):super().__init__();self.links=[];self.ids=set();self.feed(path.read_text())\n def handle_starttag(self,tag,attrs):\n  a=dict(attrs)\n  if a.get('id'):self.ids.add(a['id'])\n  if tag=='a' and a.get('href'):self.links.append(a['href'])\nsite=Path('/tmp/plato-model-search-docs-command-correction/site');page=site/'mlx/index.html'\nchecked=0;errors=[]\nfor href in HTML(page).links:\n parsed=urlsplit(href)\n if parsed.scheme or parsed.netloc:continue\n target=page if not parsed.path else (site/unquote(parsed.path).lstrip('/') if parsed.path.startswith('/') else page.parent/unquote(parsed.path))\n target=target.resolve()\n if target.is_dir():target/='index.html'\n checked+=1\n if not target.exists():errors.append([href,'missing target'])\n elif parsed.fragment and target.suffix=='.html' and unquote(parsed.fragment) not in HTML(target).ids:errors.append([href,'missing anchor'])\nassert not errors\nresult={'commands':commands,'dependency_import_sources':imports,'dependency_analysis':'Source analysis only; no collection, model workers or complete suite executed.','native_only_commands_unchanged':True,'protected_files':len(prior),'protected_all_unchanged_except_authorized_mlx_guide':True,'authorized_exception':{'path':exception,'before_sha256':hashlib.sha256(old.encode()).hexdigest(),'after_sha256':hashlib.sha256(new.encode()).hexdigest()},'focused_rendered_links_checked':checked,'link_errors':errors}\nPath('/tmp/plato-model-search-docs-command-correction/checks.json').write_text(json.dumps(result,indent=2)+'\\n')\nprint(json.dumps(result,indent=2))\n",
+    "checker_sha256": "33737f35a3722815fc95732cd9bf27db0a534692d75c300db7d349101cb62504",
+    "diff_check": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "1983590373603f286dbef314677c6c57c0654372",
+        "5d05186a9fb5d099df59a3d5ccd203a4aed9f846"
+      ],
+      "returncode": 0
+    }
+  },
+  "scope_limits": [
+    "Metadata and production import-source analysis verifies test-model-search includes test and ptflops; test alone omits ptflops. No collection/full-core/combined-native/retained-worker execution performed.",
+    "The strict native-only and focused native commands retain --extra mlx --group test verbatim.",
+    "All 313 other protected archive/outdated/Qwen files remain unchanged. Full git diff against the correction base changes only the authorized MLX guide before this receipt.",
+    "No claim that pending archive CI/profile guards or final integrated training gates are delivered.",
+    "The previously accepted archive originals, manifests, source and metadata are untouched."
+  ]
+}
