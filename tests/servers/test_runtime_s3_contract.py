@@ -189,6 +189,74 @@ def test_actual_s3_writer_to_bounded_reader(
     assert len(local_object_store.requests) == 4
 
 
+@pytest.mark.parametrize("minimal_adapter", [False, True])
+@pytest.mark.parametrize("kind", ["oversize", "deadline"])
+def test_actual_s3_client_failure_clears_transfer(
+    temp_config, local_object_store, minimal_adapter, kind
+):
+    """The actual client owner releases state before test teardown on failure."""
+    storage = S3(
+        endpoint=local_object_store.endpoint,
+        access_key="local-test-key",
+        secret_key="local-test-secret",
+        bucket="s3://bucket/nested/prefix/",
+    )
+    logical_key = "server_payload_1_1"
+    storage.send_to_s3(logical_key, {"w": [1.0, 2.0, 3.0]})
+    physical_key = f"bucket/nested/prefix/{logical_key}"
+    assert set(local_object_store.objects) == {physical_key}
+    raw = local_object_store.objects[physical_key]
+    if minimal_adapter:
+        storage = SimpleNamespace(
+            key_prefix="nested/prefix/",
+            bucket=storage.bucket,
+            s3_client=storage.s3_client,
+        )
+    Config().server.max_payload_bytes = len(raw) - 1 if kind == "oversize" else 1024
+    Config().server.payload_timeout = 1.0 if kind == "deadline" else 5.0
+    if kind == "deadline":
+        local_object_store.state.update(slow=True, trickle_interval=0.05)
+
+    async def scenario():
+        context = ClientContext()
+        context.client_id = 7
+        context.current_round = 1
+        context.comm_simulation = False
+        context.s3_client = storage
+        strategy = DefaultPayloadStrategy()
+        strategy.reset_payload(context)
+        transfer = context.state["inbound_transfer"]
+        started = asyncio.get_running_loop().time()
+        try:
+            async with asyncio.timeout(5.0):
+                with pytest.raises(
+                    ValueError if kind == "oversize" else TimeoutError,
+                    match="maximum byte limit" if kind == "oversize" else None,
+                ):
+                    await strategy.finalise_inbound_payload(
+                        context, 7, s3_key=logical_key
+                    )
+            # Assert production failure cleanup before the test's finally block.
+            assert "inbound_transfer" not in context.state
+            assert context.chunks == [] and context.server_payload is None
+            assert transfer.closed and transfer.timer.cancelled()
+            assert transfer.payload is None
+            if kind == "oversize":
+                assert transfer.byte_count == 0
+            else:
+                assert asyncio.get_running_loop().time() - started < 2.0
+                assert 1 < transfer.byte_count < len(raw)
+            await asyncio.sleep(0)
+            assert asyncio.all_tasks() == {asyncio.current_task()}
+        finally:
+            strategy.teardown(context)
+            local_object_store.stop_trickle.set()
+
+    asyncio.run(scenario(), debug=True)
+    assert local_object_store.get_finished.wait(timeout=2)
+    assert local_object_store.requests[-1] == ("GET", physical_key)
+
+
 @pytest.mark.parametrize("prefix", ["", "prefix", "nested/prefix", "/prefix/"])
 @pytest.mark.parametrize("qualified", [False, True])
 def test_minimal_s3_adapter_prefixes_exactly_once(
