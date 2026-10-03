@@ -1,0 +1,1 @@
+uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)
