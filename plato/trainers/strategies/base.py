@@ -425,6 +425,13 @@ class ModelUpdateStrategy(Strategy):
     def on_train_cleanup(self, context: TrainingContext, successful: bool) -> None:
         """Release run hooks, including after an interrupted training run."""
 
+    def on_train_result_accepted(self, context: TrainingContext) -> None:
+        """Commit staged state after the complete local result is accepted.
+
+        Direct training calls this after run-end callbacks. Spawned training
+        calls it in the parent after the current model and strategy handoff load.
+        """
+
     def get_worker_state(self, context: TrainingContext) -> Any:
         """Return state that must accompany a successful spawned training result."""
         return None

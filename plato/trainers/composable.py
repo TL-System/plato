@@ -408,7 +408,8 @@ class ComposableTrainer(base.Trainer):
     def train_process(self, config, trainset, sampler, **kwargs):
         """The training process in a federated learning workload."""
         try:
-            self.train_model(config, trainset, sampler, **kwargs)
+            process_config = {**config, "_defer_strategy_commit": True}
+            self.train_model(process_config, trainset, sampler, **kwargs)
             model_name = Config().trainer.model_name
             filename = checkpoint_name(
                 model_name, self.client_id, config["run_id"], suffix=".safetensors"
@@ -422,6 +423,8 @@ class ComposableTrainer(base.Trainer):
                 }
                 with open(self._training_state_path(config["run_id"]), "wb") as state_file:
                     pickle.dump(state, state_file)
+            if token is None:
+                self.model_update_strategy.on_train_result_accepted(self.context)
         except BaseException:
             self.model_update_strategy.on_train_cleanup(self.context, successful=False)
             raise
@@ -442,6 +445,8 @@ class ComposableTrainer(base.Trainer):
         try:
             self.training_step_strategy.on_train_start(self.context)
             result = self._train_model(config, trainset, sampler, **kwargs)
+            if not config.get("_defer_strategy_commit"):
+                self.model_update_strategy.on_train_result_accepted(self.context)
             successful = True
             return result
         finally:
@@ -857,6 +862,7 @@ class ComposableTrainer(base.Trainer):
                     self.model_update_strategy.load_worker_state(
                         worker_state.get("state"), self.context
                     )
+                self.model_update_strategy.on_train_result_accepted(self.context)
             except OSError as error:
                 self.model_update_strategy.on_train_cleanup(self.context, successful=False)
                 logging.error(

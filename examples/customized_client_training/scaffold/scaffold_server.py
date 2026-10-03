@@ -7,9 +7,11 @@ Reference: https://arxiv.org/pdf/1910.06378v4.
 """
 
 from collections import OrderedDict
+from collections.abc import Mapping
 
 import torch
 
+from plato.algorithms.fedavg import Algorithm
 from plato.config import Config
 from plato.servers import fedavg
 from plato.trainers.strategies.algorithms.scaffold_strategy import (
@@ -51,7 +53,11 @@ class Server(fedavg.Server):
         return validate_control_variates(model, controls)
 
     def weights_received(self, weights_received):
-        """Stage c+sum(delta_ci)/N, rejecting malformed deltas before mutation."""
+        """Validate both payload halves, then stage c+sum(delta_ci)/N.
+
+        The inherited report path validates all sample counts before this hook,
+        including zero-weight reports. No model half bypasses schema validation.
+        """
         self._pending_control_variate = None
         self.received_client_control_variates = None
         controls = self._controls()
@@ -59,13 +65,40 @@ class Server(fedavg.Server):
         if not isinstance(population, int) or population <= 0:
             raise ValueError("SCAFFOLD requires a positive total client population.")
         deltas, weights = [], []
+        expected = self.require_algorithm().extract_weights()
+        reference = self._model().state_dict()
         for payload in weights_received:
             if not isinstance(payload, (list, tuple)) or len(payload) != 2:
                 raise ValueError(
                     "SCAFFOLD requires every participating [weights, delta_ci] payload."
                 )
+            model_weights = payload[0]
+            if (
+                not isinstance(model_weights, Mapping)
+                or set(model_weights) != set(expected)
+            ):
+                raise ValueError("SCAFFOLD model keys must match the transport state.")
+            owned_weights = OrderedDict()
+            for name, value in model_weights.items():
+                if (
+                    not isinstance(value, torch.Tensor)
+                    or value.shape != reference[name].shape
+                    or not torch.isfinite(value).all()
+                ):
+                    raise ValueError(
+                        f"SCAFFOLD model tensor {name} must be finite "
+                        "with its exact shape."
+                    )
+                casted = Algorithm._cast_tensor_like(value, reference[name], name)
+                if not torch.isfinite(casted).all():
+                    raise ValueError(
+                        f"SCAFFOLD model tensor {name} overflows its dtype."
+                    )
+                # Keep incoming buffer dtypes/values for inherited aggregation:
+                # integer/bool conversion still occurs when weights are loaded.
+                owned_weights[name] = value.detach().cpu().clone()
             deltas.append(validate_control_variates(self._model(), payload[1]))
-            weights.append(payload[0])
+            weights.append(owned_weights)
         if not deltas:
             raise ValueError("SCAFFOLD cannot aggregate an empty participating set.")
         staged = OrderedDict(
