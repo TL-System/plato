@@ -1,7 +1,6 @@
 """Numerical and ownership regressions from the independent Phase 2C review."""
 
 import copy
-import subprocess
 import types
 import warnings
 from pathlib import Path
@@ -128,11 +127,10 @@ def test_actual_worker_cleanup_full_names_and_unrelated_owners(tmp_path, name):
 def test_actual_accepted_b_feddyn_writer_migration(
     tmp_path, custom_root, trailing_slash
 ):
-    command = (
-        "git show 00eeb9dcdd2b513e64db9408969356037e09bb8e:"
-        "plato/trainers/strategies/algorithms/feddyn_strategy.py"
-    )
-    source = subprocess.check_output(["zsh", "-lc", command], text=True)
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures/feddyn_accepted_b.py"
+    ).read_text()
     old = types.ModuleType("accepted_b_feddyn_writer")
     exec(compile(source, "accepted_b_feddyn_writer", "exec"), old.__dict__)
     with configure_environment(build_minimal_config(), runtime_root=tmp_path):
