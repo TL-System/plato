@@ -160,6 +160,8 @@ def _dataset_defaults(dataset_name: str, data_cfg) -> dict[str, Any]:
             "train_transform": train_transform,
             "test_transform": test_transform,
             "dataset_kwargs": {"split": "balanced"},
+            "train_kwargs": {"train": True},
+            "test_kwargs": {"train": False},
         }
 
     if name in {"cifar10", "cifar100"}:

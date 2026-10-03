@@ -183,3 +183,34 @@ def test_torchvision_alias_selection_with_real_local_idx_files(temp_config, tmp_
     assert fashion.targets() == [7, 8, 9]
     assert fashion.trainset[0][0].shape == (1, 28, 28)
     assert mnist.num_train_examples() == fashion.num_test_examples() == 3
+
+
+@pytest.mark.parametrize("variant", [None, "digits"])
+def test_emnist_variant_keeps_distinct_training_and_test_data(
+    temp_config, tmp_path, variant
+):
+    Config.params["data_path"] = str(tmp_path)
+    Config.data.download = False
+    if variant is not None:
+        Config.data.dataset_kwargs = {"split": variant}
+    selected_variant = variant or "balanced"
+    raw = tmp_path / "EMNIST/raw"
+    raw.mkdir(parents=True)
+    for split, labels in [("train", [0, 1, 2]), ("test", [7, 8])]:
+        prefix = f"emnist-{selected_variant}-{split}"
+        (raw / (prefix + "-images-idx3-ubyte")).write_bytes(
+            struct.pack(">IIII", 2051, len(labels), 28, 28) + bytes(len(labels) * 784)
+        )
+        (raw / (prefix + "-labels-idx1-ubyte")).write_bytes(
+            struct.pack(">II", 2049, len(labels)) + bytes(labels)
+        )
+
+    source = registry.get(datasource_name="EMNIST")
+    assert source.trainset.targets.tolist() == [0, 1, 2]
+    assert source.testset.targets.tolist() == [7, 8]
+    assert source.num_train_examples() == 3
+    assert source.num_test_examples() == 2
+    assert source.trainset.train is True
+    assert source.testset.train is False
+    assert source.trainset.split == source.testset.split == selected_variant
+    assert source.testset[0][0].shape == (1, 28, 28)
