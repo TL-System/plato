@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import stat
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -49,6 +51,19 @@ def prefer_token(model, token_id: int) -> None:
             parameter.zero_()
         model.transformer.ln_f.bias.fill_(1)
         model.transformer.wte.weight[token_id].fill_(1)
+
+
+def snapshot_directory(root: Path) -> dict[str, dict[str, Any]]:
+    """Record source names, modes, link targets, and regular file contents."""
+    entries = {}
+    for path in [root, *sorted(root.rglob("*"))]:
+        entry: dict[str, Any] = {"mode": stat.S_IMODE(path.lstat().st_mode)}
+        if path.is_symlink():
+            entry["link"] = str(path.readlink())
+        elif path.is_file():
+            entry["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        entries[str(path.relative_to(root))] = entry
+    return entries
 
 
 def make_offline_tasks(root: Path) -> list[tuple[Any, Any]]:

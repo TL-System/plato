@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import logging
+import shutil
+import stat
 import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
 from numbers import Real
+from pathlib import Path
 from typing import Any, Iterator, Protocol, cast
 
 from plato.config import Config
@@ -315,6 +318,11 @@ def _materialize_model_reference(
     request: EvaluationInput,
     progress: _ProgressReporter | None = None,
 ) -> Iterator[LightevalModelReference]:
+    """Export current artifacts or independently copy configured local trees.
+
+    Whole local directories are copied once per distinct source. This fallback
+    can require substantial temporary storage for large checkpoints.
+    """
     model = request.model
     tokenizer = request.tokenizer
     save_model = getattr(model, "save_pretrained", None)
@@ -329,7 +337,45 @@ def _materialize_model_reference(
             yield _resolve_model_reference(request, export_dir=export_dir)
         return
 
-    yield _resolve_model_reference(request)
+    reference = _resolve_model_reference(request)
+    local_references = {
+        name: Path(value)
+        for name, value in (
+            ("model_name", reference.model_name),
+            ("tokenizer_name", reference.tokenizer_name),
+        )
+        if value is not None and Path(value).is_dir()
+    }
+    if not local_references:
+        yield reference
+        return
+
+    # Lighteval 0.13 hashes configuration, not local weight bytes, and places
+    # response caches inside absolute model paths. Independent copies keep each
+    # run fresh without modifying configured source artifacts or private APIs.
+    with tempfile.TemporaryDirectory(prefix="plato-lighteval-") as export_dir:
+        if progress is not None:
+            progress.note("Copying configured local artifacts for evaluation.")
+        copies: dict[Path, str] = {}
+        materialized = {
+            "model_name": reference.model_name,
+            "tokenizer_name": reference.tokenizer_name,
+        }
+        for name, source in local_references.items():
+            identity = source.resolve()
+            if identity not in copies:
+                destination = Path(export_dir) / name.removesuffix("_name")
+                shutil.copytree(identity, destination)
+                copies[identity] = str(destination)
+            materialized[name] = copies[identity]
+
+        if "model_name" in local_references:
+            model_copy = Path(materialized["model_name"])
+            model_copy.chmod(model_copy.stat().st_mode | stat.S_IWUSR | stat.S_IXUSR)
+        yield LightevalModelReference(
+            model_name=materialized["model_name"],
+            tokenizer_name=materialized["tokenizer_name"],
+        )
 
 
 def _resolve_launcher_type(backend: str, parallelism_manager: Any) -> Any:
@@ -395,6 +441,7 @@ def _run_lighteval_pipeline(
             model_parallel=model_parallel,
             dtype=dtype,
             device=device,
+            cache_dir=str(Path(output_dir) / "sample-cache"),
         )
         pipeline = Pipeline(
             tasks=",".join(resolved_tasks),
