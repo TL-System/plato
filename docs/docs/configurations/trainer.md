@@ -1,7 +1,12 @@
+Trainer settings are backend-specific. The optimizer, scheduler, and loss lists
+below describe the PyTorch path unless stated otherwise. See
+[Native MLX](../mlx.md) for the native LeNet-5/MNIST configuration and limits.
+
 !!! example "type"
     The type of the trainer. The following types are available:
 
     - `basic` a basic trainer with a standard training loop.
+    - `mlx` the native Apple Silicon trainer for the LeNet-5/MNIST reference.
     - `composable` the strategy-based trainer that exposes loss, optimiser, scheduler, data-loader, model-update, and testing strategies directly.
     - `timm_basic` a basic trainer with the [timm](https://timm.fast.ai/) learning rate scheduler.
     - `diff_privacy` a trainer that supports local differential privacy in its training loop by adding noise to the gradients during each step of training.
@@ -210,3 +215,12 @@
     The dtype used when loading a Hugging Face model. The
     [Qwen3 reference](../examples/case-studies/6. Qwen3 Federated LoRA.md) uses
     `float32` and the `--cpu` command-line flag for its CPU execution path.
+
+!!! example "model_seed / training_seed (MLX)"
+    Optional seeds for native model construction and local training respectively.
+    Training streams are scoped by logical client, round, and epoch. Omitted seeds
+    retain legacy unseeded behavior. See [reproducibility controls](../mlx.md#reproducibility-and-training-controls).
+
+!!! example "clip_grad_norm (MLX)"
+    Optional global gradient norm limit for the default native training step.
+    Must be finite and nonnegative; omitted means no clipping. Zero is valid.

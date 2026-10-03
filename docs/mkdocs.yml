@@ -49,6 +49,7 @@ nav:
   - Home: index.md
   - Installation: install.md
   - Quick Start: quickstart.md
+  - Native MLX: mlx.md
   - Examples:
       - Getting Started: examples/Getting Started.md
       - Algorithms:
