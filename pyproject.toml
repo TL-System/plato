@@ -80,7 +80,7 @@ lint.select = ["I"]
 
 [tool.hatch.build]
 exclude = [
-    "archives/retired/**",
+    "archives/**",
     "evidence/2026-refresh/reproductions/**",
 ]
 
