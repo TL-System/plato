@@ -494,12 +494,22 @@ def activated_budget(module: Any) -> None:
     queries: list[dict[str, Any]] = []
     original_profile = ptflops.get_model_complexity_info
 
-    def observe_profile(model: Any, *args: Any, **kwargs: Any) -> Any:
+    def observe_profile(
+        model: Any, *args: Any, **kwargs: Any
+    ) -> tuple[str | int | None, str | int | None]:
         result = original_profile(model, *args, **kwargs)
-        queries.append({"model_rate": model.scaler.rate, "macs": float(result[0])})
+        macs = result[0]
+        if macs is None:
+            raise RuntimeError("Unable to compute retained-budget model complexity.")
+        numeric_macs = float(macs)
+        if not math.isfinite(numeric_macs) or numeric_macs <= 0:
+            raise ValueError(
+                "Retained-budget model complexity must be finite and positive."
+            )
+        queries.append({"model_rate": model.scaler.rate, "macs": numeric_macs})
         return result
 
-    ptflops.get_model_complexity_info = observe_profile
+    cast(Any, ptflops).get_model_complexity_info = observe_profile
     for candidate_rate in (1.0, 0.75 if family != "heterofl" else 0.5):
         candidate = model(
             model_rate=candidate_rate, **Config().parameters.client_model._asdict()
