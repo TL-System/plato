@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "backend": "fedrlnas",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "files": [
+    {
+      "git_mode": "100644",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "original_path": "examples/model_search/fedrlnas/Darts/__init__.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/__init__.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "22660d3a848814227f84459ec64cf1a715ccb320",
+      "sha256": "6cf49d520a4d7bee4f1310856aba617ee0915c29862bf72a8f8b780eca95284d",
+      "bytes": 6273,
+      "original_path": "examples/model_search/fedrlnas/Darts/architect.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/architect.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "10d083824416d4760ef4fa909c106e8e2e67d045",
+      "sha256": "f0c041d3aa2bb066dd4e45084de57c25f042f91bc1badb677269ba4ebbbf9302",
+      "bytes": 41145,
+      "original_path": "examples/model_search/fedrlnas/Darts/genotypes.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/genotypes.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "bcc89807c8616f07227e902815be530376fc79ce",
+      "sha256": "ce8dbaee3c42d9504d443439bff3a0923be34c1eac108ed5f5989bc97593e271",
+      "bytes": 4954,
+      "original_path": "examples/model_search/fedrlnas/Darts/model_search.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/model_search.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "4966cfc02a9cfb254f970e531f6663dc656dde5c",
+      "sha256": "0237dad319bc5725f6535a7ee8d97fbd7dfac974d0b9f5f81feac177b81c2003",
+      "bytes": 5734,
+      "original_path": "examples/model_search/fedrlnas/Darts/model_search_local.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/model_search_local.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "48bba9a032ca06c14a921b5975b8be21daa617de",
+      "sha256": "840682fcfaffdb11dfb268fc0a022b08aef11657c255a4d88745e18c6cf252ad",
+      "bytes": 4495,
+      "original_path": "examples/model_search/fedrlnas/Darts/operations.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/operations.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "8bd780c2060204c9a1d82cd59eda01a316bb6e94",
+      "sha256": "079db95aaaf2438fca6973e27f48542533370bd78b140b52982f04669c4bbde1",
+      "bytes": 1581,
+      "original_path": "examples/model_search/fedrlnas/Darts/stale.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/stale.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "3393b1e57f34a79a01defe4b7ddb50760de1aeca",
+      "sha256": "4734ed350ff9ade76ff5ac3d89b83fd5cdcfb8f1b1683ae1786d3c0a7306bd2c",
+      "bytes": 3458,
+      "original_path": "examples/model_search/fedrlnas/Darts/utils.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/Darts/utils.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "70feac84a314532e8fbb7b55da6940e183b779d7",
+      "sha256": "c02d4f818def08dabbf3f47ba08d28aef266407963649d04778439e721006c41",
+      "bytes": 1394,
+      "original_path": "examples/model_search/fedrlnas/FedRLNAS_MNIST_DARTS.toml",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/FedRLNAS_MNIST_DARTS.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "a39d75015f57ab17b2b86ca226441a0d88fa9305",
+      "sha256": "3ec5e101038008cb8f457b118d80965143aeb9d87ce7c8971480059119e833b5",
+      "bytes": 979,
+      "original_path": "examples/model_search/fedrlnas/fedrlnas.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/fedrlnas.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "b653918d05bb87378d921d201a72f645530deecb",
+      "sha256": "7f791468c8a97ae7f33c478e988874022643788b17e5a52b1950a8690d499bde",
+      "bytes": 4751,
+      "original_path": "examples/model_search/fedrlnas/fedrlnas_algorithm.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/fedrlnas_algorithm.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "39f097aeb94b11eb409430b1c0309f43f8bb6388",
+      "sha256": "f63624e938359396d301398abbcadfc9ae3d3c7d6edf2fbd19810bec76eb74ec",
+      "bytes": 3600,
+      "original_path": "examples/model_search/fedrlnas/fedrlnas_client.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/fedrlnas_client.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "3d3bd88e4825e3a027b6c4d9d486daaa4b54e318",
+      "sha256": "4fd7ce9899ebbc715bafd18d889d39b5510386920af22fd750b3d2ec62d1d82c",
+      "bytes": 4890,
+      "original_path": "examples/model_search/fedrlnas/fedrlnas_server.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/fedrlnas_server.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "42fe7f5b65ae03a5a29650dca8bade6871446924",
+      "sha256": "817b549b667f67089483cc810d9c037054c8218f2463c7b0ab5fb5762d3ed236",
+      "bytes": 4984,
+      "original_path": "examples/model_search/fedrlnas/fedrlnas_tools.py",
+      "archive_path": "archives/retired/fedrlnas/original/examples/model_search/fedrlnas/fedrlnas_tools.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/fedrlnas/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071,
+      "original_path": "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "archive_path": "archives/retired/fedrlnas/original/docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "27327e8d425507edb819417f1480269c70419960",
+      "sha256": "7db6095669c00208d69f3e12e59eba32765b49d9542811ea09609d803cc30c89",
+      "bytes": 10042,
+      "original_path": "docs/docs/references/clients.md",
+      "archive_path": "archives/retired/fedrlnas/original/docs/docs/references/clients.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006,
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/fedrlnas/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368,
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/fedrlnas/original/uv.lock",
+      "disposition": "copied_context"
+    }
+  ],
+  "vendored_upstream_revision": "unknown",
+  "supplemental_licenses": [
+    {
+      "component": "darts",
+      "archive_path": "archives/retired/fedrlnas/licenses/darts-LICENSE",
+      "source_url": "https://raw.githubusercontent.com/quark0/darts/f276dd346a09ae3160f8e3aca5c7b193fda1da37/LICENSE",
+      "observed_upstream_revision": "f276dd346a09ae3160f8e3aca5c7b193fda1da37",
+      "retrieved_at": "2026-10-03",
+      "sha256": "06c9338b4787f3d6983cb323585edc8a5817122d2ec7b32ec363985dea9d639d",
+      "bytes": 11418,
+      "original_vendored_revision": "unknown",
+      "provenance_caveat": "This supplemental notice receipt does not identify the original vendored source revision."
+    }
+  ]
+}

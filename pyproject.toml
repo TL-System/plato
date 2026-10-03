@@ -66,8 +66,6 @@ Documentation = "https://platodocs.netlify.app/"
 exclude = [
     "archives/retired",
     ".venv",
-    "plato/models/dvit",
-    "plato/models/t2tvit",
 ]
 include = [
     "pyproject.toml",
@@ -98,8 +96,6 @@ members = [
     "examples/ssl/smog",
     "examples/model_search/anycostfl",
     "examples/model_search/fedrolex",
-    "examples/model_search/pfedrlnas/VIT",
-    "examples/model_search/pfedrlnas/MobileNetV3",
     "examples/model_search/heterofl",
     "examples/detector",
     "examples/gradient_leakage_attacks",
@@ -128,6 +124,10 @@ test = [
     { include-group = "test-base" },
     "plato-learn[dp,mpc,rl]",
 ]
+test-model-search = [
+    { include-group = "test" },
+    "ptflops>=0.7.5",
+]
 dev = [
     { include-group = "test" },
     "ruff>=0.16.10",
@@ -152,10 +152,6 @@ audit = [
 exclude = [
     "examples/outdated",
     "archives/retired",
-    "examples/model_search/pfedrlnas/VIT/nasvit_wrapper", 
-    "examples/model_search/pfedrlnas/DARTS/Darts",
-    "examples/model_search/pfedrlnas/MobileNetV3/model",
-    "examples/model_search/fedrlnas/Darts/",
 ]
 
 [tool.ty.rules]
@@ -170,6 +166,7 @@ norecursedirs = [
 addopts = "--strict-markers"
 markers = [
     "mlx_native: explicit Apple Silicon native MLX qualification cases.",
+    "retained_model_search: isolated retained model-search behavior requiring ptflops.",
     "runtime: fresh startup, CPU socket rounds and containment regressions.",
     "startup_runtime: real CPU socket round and socket failure cases.",
     "startup_containment: deliberate noncooperative teardown and child containment.",

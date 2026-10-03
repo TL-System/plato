@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "backend": "fedrolex-vit",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "files": [
+    {
+      "git_mode": "100644",
+      "git_blob": "3d633bb253f56fc11b5f343381ac3b664d097927",
+      "sha256": "b8197573f0b9fcc6ddbe1231037e05defe287c6cdd17502559f5fef3c7bb78bb",
+      "bytes": 1779,
+      "original_path": "examples/model_search/fedrolex/example_ViT.toml",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/example_ViT.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "64ed175cd62186f9ac0ca53cbe8bae2660f8b18f",
+      "sha256": "b115f091a4efefd237c9eb4bbb86351d9be09c44443d010bad3f1f83c2821ba7",
+      "bytes": 7234,
+      "original_path": "examples/model_search/fedrolex/vit.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/vit.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/fedrolex-vit/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071,
+      "original_path": "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "archive_path": "archives/retired/fedrolex-vit/original/docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "0217f0b11b9583b8d3a999f2f58c46324ecddd96",
+      "sha256": "4a74ee96d86be5786c935e3454cec0a1ea2861010d82112699ab01d77a07cbb5",
+      "bytes": 1664,
+      "original_path": "examples/model_search/fedrolex/example_ResNet.toml",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/example_ResNet.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "3bbe3f5f2812f6f4a29fa1f80b6d83e7221f084d",
+      "sha256": "ff83a2a6572734076f8b412bb50d6d0411f97022e20a40178c0c32f5c9ad9cde",
+      "bytes": 862,
+      "original_path": "examples/model_search/fedrolex/fedrolex.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/fedrolex.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "5e54e7983ee44deabfa94508aa3ec72bd629efdb",
+      "sha256": "58ce0df5c4b370f2fb139137803ce82f2f9a8ca12df4c34a8bd6c33af0af4f02",
+      "bytes": 9711,
+      "original_path": "examples/model_search/fedrolex/fedrolex_algorithm.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/fedrolex_algorithm.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "c2771acfeed8e83018b88dbe24c2c5f24d52c018",
+      "sha256": "98afa276d7b46cd5ab6d726017a2e942a97c0980db64e7cc75105c951fb2aab2",
+      "bytes": 2569,
+      "original_path": "examples/model_search/fedrolex/fedrolex_client.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/fedrolex_client.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "5b8a4b55504fef998100350ea84f7b43617c897b",
+      "sha256": "9ec31158f69f8a0a7038f95904ca5b5e57c042998ff4881fa914ef9dd5d4b0bd",
+      "bytes": 3092,
+      "original_path": "examples/model_search/fedrolex/fedrolex_server.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/fedrolex_server.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "a3ac3fe62a88cbd6898c3915420bbb0a6e233654",
+      "sha256": "bfde98e2c7dbaa60ac15542c880e4703a370275ecb2463f0c838c6c9fa70331c",
+      "bytes": 2136,
+      "original_path": "examples/model_search/fedrolex/fedrolex_trainer.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/fedrolex_trainer.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "291e0527b8f5d3293d416863311224489c76ded4",
+      "sha256": "cc648da6c8b3cc8856fc69acebf6cbeb6bf0e8eb5b7a37bc7eeb9b5454e7a68a",
+      "bytes": 303,
+      "original_path": "examples/model_search/fedrolex/pyproject.toml",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "e9266157114a14737ceeaa83665054ce8db073e4",
+      "sha256": "66b3de34ce836c7493e3e6106c54828828dcaae27f0737503993892d9e8c3571",
+      "bytes": 7832,
+      "original_path": "examples/model_search/fedrolex/resnet.py",
+      "archive_path": "archives/retired/fedrolex-vit/original/examples/model_search/fedrolex/resnet.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006,
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/fedrolex-vit/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368,
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/fedrolex-vit/original/uv.lock",
+      "disposition": "copied_context"
+    }
+  ],
+  "vendored_upstream_revision": "unknown",
+  "supplemental_licenses": []
+}
