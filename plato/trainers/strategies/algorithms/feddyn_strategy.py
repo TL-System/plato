@@ -426,7 +426,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         self._lr = None
 
     def setup(self, context: TrainingContext) -> None:
-        self.schema = model_schema(context.model)
+        self.schema = model_schema(context_model(context))
         root = (
             self.save_path
             if self.save_path is not None
@@ -496,7 +496,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         )
 
     def before_step(self, context: TrainingContext) -> None:
-        if model_schema(context.model) != self.schema:
+        if model_schema(context_model(context)) != self.schema:
             raise ValueError("FedDyn model trainability/schema changed.")
         validate_endpoint(
             context_model(context),
@@ -567,7 +567,9 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             (k, v + y[k] - self.global_model_weights[k])
             for k, v in self.cumulative_grad_vector.items()
         )
-        h = validate_tensors(h, trainable_reference(context.model), "next history")
+        h = validate_tensors(
+            h, trainable_reference(context_model(context)), "next history"
+        )
         self.result = dict(
             dispatch=copy.deepcopy(self.dispatch),
             endpoint=y,
@@ -615,7 +617,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             not torch.equal(v, self.dispatch["baseline"][k]) for k, v in x.items()
         ) or any(not torch.equal(v, original["history"][k]) for k, v in h.items()):
             raise ValueError("FedDyn worker changed immutable baseline/history.")
-        y = validate_endpoint(context.model, state["endpoint"], x, d["schema"])
+        y = validate_endpoint(context_model(context), state["endpoint"], x, d["schema"])
         if any(
             not torch.equal(v, context_model(context).state_dict()[k].detach().cpu())
             for k, v in y.items()
@@ -625,6 +627,11 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         if any(not torch.equal(v, h[k] + y[k] - x[k]) for k, v in hn.items()):
             raise ValueError("FedDyn worker history disagrees with endpoint.")
         count = positive_integer(state["num_samples"], "worker sample count")
+        attempt_count = positive_integer(
+            context.state.get("feddyn_attempt_count"), "current attempt partition count"
+        )
+        if count != attempt_count:
+            raise ValueError("FedDyn worker count disagrees with current partition.")
         if (
             original["expected_count_or_null"] is not None
             and count != original["expected_count_or_null"]
@@ -679,7 +686,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
         if not path.is_file():
             return None
         values = torch.load(path, weights_only=True, map_location="cpu")
-        q = trainable_reference(context.model)
+        q = trainable_reference(context_model(context))
         frozen = {
             n: p
             for n, p in context_model(context).named_parameters()

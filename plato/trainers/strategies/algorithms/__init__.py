@@ -12,7 +12,7 @@ Available Strategies:
 
     SCAFFOLD:
         - SCAFFOLDUpdateStrategy: Control variate management
-        - SCAFFOLDUpdateStrategyV2: Alternative implementation (Option 1)
+        - SCAFFOLDUpdateStrategyV2: Compatibility subclass using Option II
 
     FedDyn:
         - FedDynLossStrategy: Dynamic regularization loss
