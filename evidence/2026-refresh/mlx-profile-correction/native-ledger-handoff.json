@@ -1,0 +1,2354 @@
+{
+  "schema_version": 1,
+  "node_count": 383,
+  "nodes": [
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_changes_native_sgd_update",
+    "tests/mlx_native/test_phase3_controls.py::test_native_optimizer_aliases[momentum]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_optimizer_aliases[rmsprop]",
+    "tests/mlx_native/test_phase3_controls.py::test_no_flag_factory_uses_caller_native_device",
+    "tests/mlx_native/test_phase3_controls.py::test_evaluation_restores_submodule_modes_on_error",
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[disabled]",
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[below-threshold]",
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[zero-gradient]",
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[zero-threshold]",
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[clipped]",
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[negative]",
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[nan]",
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[positive-infinity]",
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[negative-infinity]",
+    "tests/mlx_native/test_phase3_controls.py::test_nonfinite_clipped_gradients_do_not_update[nan-gradient]",
+    "tests/mlx_native/test_phase3_controls.py::test_nonfinite_clipped_gradients_do_not_update[infinite-gradient]",
+    "tests/mlx_native/test_phase3_controls.py::test_requested_jit_is_not_silently_ignored",
+    "tests/mlx_native/test_phase3_controls.py::test_custom_training_strategy_retains_clipping_control",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-normal-metal]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-cpu]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-mps]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-cpu-precedence]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-normal-metal]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-cpu]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-mps]",
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-cpu-precedence]",
+    "tests/mlx_native/test_phase3_controls.py::test_factory_failure_restores_device_streams_and_rngs",
+    "tests/mlx_native/test_phase3_controls.py::test_unavailable_explicit_metal_is_clear",
+    "tests/mlx_native/test_phase3_controls.py::test_repeated_evaluation_is_deterministic_and_preserves_statistics",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-delta]",
+    "tests/mlx_native/test_phase3_rng.py::test_fresh_and_reassigned_workers_replay_same_logical_streams",
+    "tests/mlx_native/test_phase3_rng.py::test_seeded_factory_and_training_restore_all_caller_rngs[success]",
+    "tests/mlx_native/test_phase3_rng.py::test_seeded_factory_and_training_restore_all_caller_rngs[dataset-failure]",
+    "tests/mlx_native/test_phase3_rng.py::test_initialization_seed_replays_and_unseeded_initialization_remains_legacy",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-direct]",
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-delta]",
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-legacy]",
+    "tests/mlx_native/test_phase3_runtime.py::test_native_checkpoint_codec_prediction_equality_and_next_update",
+    "tests/mlx_native/test_phase3_runtime.py::test_float16_transport_and_explicit_bfloat16_rejection",
+    "tests/mlx_native/test_phase3_runtime.py::test_cpu_and_metal_equal_work_training_agree_with_tolerance",
+    "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[unsupported-native-model]",
+    "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[torch-trainer-with-mlx]",
+    "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[torch-algorithm-with-mlx]",
+    "tests/mlx_native/test_phase3_selection.py::test_missing_native_model_dependency_diagnosed",
+    "tests/mlx_native/test_phase3_selection.py::test_conflicting_model_framework_diagnosed",
+    "tests/mlx_native/test_phase3_selection.py::test_native_model_name_cannot_override_explicit_torch_backend",
+    "tests/mlx_native/test_phase3_selection.py::test_native_model_name_shortcut_scopes_factory_to_cpu",
+    "tests/mlx_native/test_phase3_socket.py::test_real_native_lenet_two_client_socket_round",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-delta]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-update]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-trainer_load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-delta]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-update]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-trainer_load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-delta]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-update]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-trainer_load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-delta]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-update]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-trainer_load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-delta]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-update]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-trainer_load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-delta]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-update]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-trainer_load]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[short]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[long]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[tuple-for-list]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[none-for-array]",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_extracted_host_weights_own_snapshots",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_array_cannot_replace_none_leaf",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_matching_nested_none_and_sequences",
+    "tests/mlx_native/test_phase3_tree_contract.py::test_all_received_trees_preflight_before_first_subtraction"
+  ],
+  "added_node_count": 100,
+  "added_nodes": [
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-legacy]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-delta]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-direct]",
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-delta]"
+  ],
+  "experiments": {
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_changes_native_sgd_update": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_optimizer_aliases[momentum]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_optimizer_aliases[rmsprop]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_no_flag_factory_uses_caller_native_device": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_evaluation_restores_submodule_modes_on_error": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[disabled]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[below-threshold]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[zero-gradient]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[zero-threshold]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_clipping_native_update_count_and_original_norm[clipped]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[negative]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[nan]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[positive-infinity]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_invalid_clipping_rejected_before_updates[negative-infinity]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_nonfinite_clipped_gradients_do_not_update[nan-gradient]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_nonfinite_clipped_gradients_do_not_update[infinite-gradient]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_requested_jit_is_not_silently_ignored": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_custom_training_strategy_retains_clipping_control": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-normal-metal]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-cpu]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-mps]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[normal-caller-cpu-precedence]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-normal-metal]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-cpu]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-mps]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_native_device_stream_scopes_factory_train_eval_load[cpu-custom-stream-cpu-precedence]": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_factory_failure_restores_device_streams_and_rngs": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_unavailable_explicit_metal_is_clear": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_controls.py::test_repeated_evaluation_is_deterministic_and_preserves_statistics": [
+      "E5",
+      "E6"
+    ],
+    "tests/mlx_native/test_phase3_rng.py::test_fresh_and_reassigned_workers_replay_same_logical_streams": [
+      "E7"
+    ],
+    "tests/mlx_native/test_phase3_rng.py::test_seeded_factory_and_training_restore_all_caller_rngs[success]": [
+      "E7"
+    ],
+    "tests/mlx_native/test_phase3_rng.py::test_seeded_factory_and_training_restore_all_caller_rngs[dataset-failure]": [
+      "E7"
+    ],
+    "tests/mlx_native/test_phase3_rng.py::test_initialization_seed_replays_and_unseeded_initialization_remains_legacy": [
+      "E7"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-weighted-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[broadcast-zero-weight-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-weighted-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[missing-zero-weight-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-weighted-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[extra-zero-weight-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-weighted-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[none-zero-weight-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-weighted-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-raw-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-hook-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_every_eligible_tree_before_arithmetic[container-zero-weight-callback-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[short-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[long-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-valid-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_exact_native_sequence_tree[tuple-malformed-first-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_server_rejects_observable_hook_reordering[legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[sgd-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-direct]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-delta]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_actual_unequal_client_training_matches_float64_weighted_reference[adam-legacy]": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_native_checkpoint_codec_prediction_equality_and_next_update": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_float16_transport_and_explicit_bfloat16_rejection": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_runtime.py::test_cpu_and_metal_equal_work_training_agree_with_tolerance": [
+      "E1",
+      "E2",
+      "E3",
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[unsupported-native-model]": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[torch-trainer-with-mlx]": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_explicit_mlx_cannot_fall_back[torch-algorithm-with-mlx]": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_missing_native_model_dependency_diagnosed": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_conflicting_model_framework_diagnosed": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_native_model_name_cannot_override_explicit_torch_backend": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_selection.py::test_native_model_name_shortcut_scopes_factory_to_cpu": [
+      "E5"
+    ],
+    "tests/mlx_native/test_phase3_socket.py::test_real_native_lenet_two_client_socket_round": [
+      "E2",
+      "E3",
+      "E4"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-delta]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-update]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[missing-trainer_load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-delta]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-update]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[extra-trainer_load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-delta]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-update]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[broadcast-trainer_load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-delta]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-update]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[shape-trainer_load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-delta]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-update]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[none-trainer_load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-delta]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-update]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_lenet_rejects_tree_before_mutation[container-trainer_load]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[short]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[long]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[tuple-for-list]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_exact_sequence_and_none_contract[none-for-array]": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_extracted_host_weights_own_snapshots": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_array_cannot_replace_none_leaf": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_matching_nested_none_and_sequences": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_tree_contract.py::test_all_received_trees_preflight_before_first_subtraction": [
+      "E1",
+      "E3"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-legacy]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-direct]": [
+      "E1",
+      "E2"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-delta]": [
+      "E1",
+      "E2"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-legacy]": [
+      "E1",
+      "E2"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-direct]": [
+      "E1",
+      "E2"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-delta]": [
+      "E1",
+      "E2"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-legacy]": [
+      "E1",
+      "E2"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-delta]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-direct]": [
+      "E1"
+    ],
+    "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-delta]": [
+      "E1"
+    ]
+  },
+  "source_hashes": {
+    "plato/servers/fedavg.py": "026225563a04beaf2536b026850e089f82a4378341506fefe4ccb4ba117ba0d8",
+    "tests/mlx_native/test_phase3_controls.py": "9d25d316df0482e3cb705c82b34a06ab8b1b03aa94c985505e38670b595ce633",
+    "tests/mlx_native/test_phase3_dispatch.py": "f1a6929ef580c4220c833cb2b1d17a04489266ac5554f23fb20b37fa7165ff88",
+    "tests/mlx_native/test_phase3_rng.py": "9ff37ccf9e97291ea752d25e845cff0a840187e2ef68a4289bdb9442459f4df3",
+    "tests/mlx_native/test_phase3_runtime.py": "946706274e10bae70aa60fe0b7267366e5f77c95fc610f127661d1f6eefd2a6f",
+    "tests/mlx_native/test_phase3_selection.py": "aec3efc41b2473c23dec71662902d8f97c093158eb296809b3e3dbd62f2fd13b",
+    "tests/mlx_native/test_phase3_socket.py": "e4fcad87330ce9923eba2f7b05e87e6cf3eeb4fbe06ed0089742d0d53d3797a7",
+    "tests/mlx_native/test_phase3_tree_contract.py": "923f280aecf4b151545e177048a9490f9b94c3772d79f60bdd683542b30b1389"
+  },
+  "previous_ledger_sha256": "5785a7464aa8f66235fe077615a0953c35bf25fffe03bbff2cb2786aaf9ddd6c",
+  "prerequisites": "Native Apple Silicon; Python 3.13; locked mlx/mlx-metal 0.32.3; actual Metal available; socket/process resources; no datasets/downloads in pytest cases."
+}

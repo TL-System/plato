@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_IMPLEMENTATION_CONTRACT_CLARIFICATION",
+  "accepted_plan_sha256": "81a5a557b1ad018384da9b9290e0648048696af244c486849c653a09f0bea32b",
+  "accepted_contract": "They never import/probe MLX just because it happens to be installed.",
+  "allowed": "An upstream Transformers metadata-only importlib.util.find_spec(\"mlx\") presence query that does not import or execute any MLX module or backend/device code.",
+  "required": "No imported MLX modules or native test modules, no dotted mlx.* resolution that imports a backend, and no MLX device/stream/RNG/compute operations before native preflight. Preserve actual filesystem native selection and fail-fast prerequisite semantics.",
+  "prohibited": "Do not intercept/modify Transformers or broadly change the Hugging Face/test graph merely to suppress its top-level package-presence lookup.",
+  "evidence_language": "Report zero backend imports/operations; explicitly disclose allowed metadata presence query. Do not report zero MLX-related lookups.",
+  "regression": "Preserve meaningful real production-conftest installed, absent, sentinel and preflight-order regressions. Initial zero-any-lookup assertion was stronger than required and remains historical red evidence, not an implementation defect.",
+  "fresh_review": "Fresh reviewer must inspect this distinction and actual trace. No implementation acceptance is implied."
+}

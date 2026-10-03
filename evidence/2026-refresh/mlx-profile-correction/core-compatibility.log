@@ -1,0 +1,16 @@
+.............................................................            [100%]
+=============================== warnings summary ===============================
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+tests/test_huggingface_artifacts.py::test_all_hf_loaders_propagate_exact_revisions_with_real_local_artifacts
+  /tmp/plato-llm-integration/base-313/lib/python3.13/site-packages/multiprocess/popen_fork.py:67: DeprecationWarning: This process (pid=98729) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+test profile: core scope (native excluded)
+61 passed, 8 warnings in 1.17s
