@@ -1,0 +1,60 @@
+{
+  "status": "MERGED_WITH_EXACT_SOURCE_LINUX_QUALIFICATION",
+  "pr": "https://github.com/TL-System/plato/pull/419",
+  "published_head": "a8bdf23d775ce159ad44f6737309057acb1ff0a4",
+  "merge_commit": "b9a8735f4a604500d3f2bb232d2fe91ab0ce5401",
+  "tree": "87e57de47463bed19c54de548b749798f17dcf09",
+  "merged_at": "2026-10-03T21:37:31Z",
+  "run": 37152498454,
+  "linux_python": "3.13.15",
+  "base": {
+    "passed": 1382,
+    "expected_optional_DP_skip": 1
+  },
+  "mandatory_core": {
+    "passed": 1389,
+    "skipped": 0
+  },
+  "runtime": {
+    "passed": 51,
+    "skipped": 0,
+    "worker_records_verified": 55
+  },
+  "coverage_percent_display": "73",
+  "typing": {
+    "historical_total": 661,
+    "changed_path_diagnostics": 0
+  },
+  "native": {
+    "passed": 383,
+    "source": "6311960cdd00955d4777e269ebee460be591065e",
+    "published_non_evidence_source_identical": true
+  },
+  "artifact_source_verification": {
+    "status": "PASS_ARTIFACT_BYTES_AND_SOURCE_BINDING",
+    "published_head": "a8bdf23d775ce159ad44f6737309057acb1ff0a4",
+    "ci_merge": "e87e64ce95a73dc3805816d8087bd96ad892cc75",
+    "tree": "87e57de47463bed19c54de548b749798f17dcf09",
+    "run": 37152498454,
+    "artifact_files": 3431,
+    "summary": {
+      "included_files": 3431,
+      "included_bytes": 10711979,
+      "omitted_entries": 7667,
+      "omitted_regular_bytes": 508721260,
+      "omitted_reasons": {
+        "reproducible_unit_fixture": 6840,
+        "symlink_not_followed": 827
+      }
+    },
+    "manifest_sha256": "43cf9e26a3de5add58c9b1b586272d1d57b4c7d430fa4cfc64d7d84856c024c7"
+  },
+  "retained_bundle": {
+    "file": "phase3-mlx-final-linux-qualification.tar.gz",
+    "sha256": "21c6005fbc90adc897552bce2e7ff47e80ea8a3ac331e634f4f3ca8c60176731",
+    "bytes": 3636259,
+    "files": 3438,
+    "manifest_sha256": "769065137a752b1e99de340709bafb174874420c8b399e5c6f09d58d69bcac69"
+  },
+  "limits": "Historical native timing retains original benchmark source; broad Phase4 family audit and optional evaluator completion remain separate."
+}
