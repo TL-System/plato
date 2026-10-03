@@ -1,5 +1,6 @@
 """Active RL policy training, batch isolation, and persistence regressions."""
 
+from importlib.util import find_spec
 from types import SimpleNamespace
 
 import numpy as np
@@ -8,12 +9,14 @@ import torch
 
 from plato.config import Config
 from plato.utils.reinforcement_learning.policies import ddpg, sac, td3
+from tests.conftest import pytest_configure
 
 
 @pytest.fixture
 def action_space(request):
-    """Keep the numeric contract in base and qualify real Box in mandatory."""
-    if request.config.getoption("test_profile") == "mandatory":
+    """Use effective mandatory Box or the optional numeric contract."""
+    profile = request.config.pluginmanager.get_plugin("plato-profile-checks")
+    if profile.qualify and not profile.base:
         from gymnasium import spaces
 
         return spaces.Box(-1, 1, shape=(2,), dtype=np.float32)
@@ -22,6 +25,50 @@ def action_space(request):
         low=np.full(2, -1, dtype=np.float32),
         high=np.full(2, 1, dtype=np.float32),
     )
+
+
+@pytest.mark.parametrize(
+    "scope, options, required",
+    [
+        pytest.param("tests", [], True, id="implicit-mandatory"),
+        pytest.param(
+            "tests", ["--test-profile=mandatory"], True, id="explicit-mandatory"
+        ),
+        pytest.param("tests", ["--test-profile=base"], False, id="explicit-base"),
+        pytest.param(
+            "tests/utils/test_rl_payload_utilities.py",
+            [],
+            False,
+            id="unprofiled-scoped",
+        ),
+    ],
+)
+def test_action_space_follows_effective_pytest_profile(
+    request, scope, options, required
+):
+    config = pytest.Config.fromdictargs(
+        {}, [str(request.config.rootpath / scope), "-p", "no:cacheprovider", *options]
+    )
+    try:
+        pytest_configure(config)
+        probe_request = SimpleNamespace(config=config)
+        if required and find_spec("gymnasium") is None:
+            with pytest.raises(ModuleNotFoundError, match="gymnasium"):
+                action_space.__wrapped__(probe_request)
+            return
+        space = action_space.__wrapped__(probe_request)
+        if required:
+            from gymnasium.spaces import Box
+
+            assert isinstance(space, Box)
+        else:
+            assert isinstance(space, SimpleNamespace)
+        assert space.shape == (2,)
+        assert space.low.dtype == space.high.dtype == np.dtype("float32")
+        np.testing.assert_array_equal(space.low, [-1, -1])
+        np.testing.assert_array_equal(space.high, [1, 1])
+    finally:
+        config._ensure_unconfigure()
 
 
 @pytest.fixture

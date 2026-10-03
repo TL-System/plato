@@ -1,5 +1,6 @@
 """MPC storage errors and distributed-lock cleanup through public store calls."""
 
+from importlib.util import find_spec
 from types import SimpleNamespace
 
 import pytest
@@ -8,16 +9,57 @@ from plato.config import Config
 from plato.mpc import RoundInfoStore
 from plato.mpc import round_store as module
 from plato.utils import s3
+from tests.conftest import pytest_configure
 
 
 @pytest.fixture
 def lock_timeout_type(request):
-    """Use the real Kazoo exception for mandatory library qualification."""
-    if request.config.getoption("test_profile") == "mandatory":
+    """Use the real Kazoo exception for effective mandatory qualification."""
+    profile = request.config.pluginmanager.get_plugin("plato-profile-checks")
+    if profile.qualify and not profile.base:
         from kazoo.exceptions import LockTimeout
 
         return LockTimeout
     return TimeoutError
+
+
+@pytest.mark.parametrize(
+    "scope, options, required",
+    [
+        pytest.param("tests", [], True, id="implicit-mandatory"),
+        pytest.param(
+            "tests", ["--test-profile=mandatory"], True, id="explicit-mandatory"
+        ),
+        pytest.param("tests", ["--test-profile=base"], False, id="explicit-base"),
+        pytest.param(
+            "tests/mpc/test_round_store_contracts.py",
+            [],
+            False,
+            id="unprofiled-scoped",
+        ),
+    ],
+)
+def test_lock_timeout_follows_effective_pytest_profile(
+    request, scope, options, required
+):
+    config = pytest.Config.fromdictargs(
+        {}, [str(request.config.rootpath / scope), "-p", "no:cacheprovider", *options]
+    )
+    try:
+        # Use the real registration hook and policy, without collecting the full suite.
+        pytest_configure(config)
+        probe_request = SimpleNamespace(config=config)
+        if required and find_spec("kazoo") is None:
+            with pytest.raises(ModuleNotFoundError, match="kazoo"):
+                lock_timeout_type.__wrapped__(probe_request)
+        elif required:
+            from kazoo.exceptions import LockTimeout
+
+            assert lock_timeout_type.__wrapped__(probe_request) is LockTimeout
+        else:
+            assert lock_timeout_type.__wrapped__(probe_request) is TimeoutError
+    finally:
+        config._ensure_unconfigure()
 
 
 @pytest.fixture
