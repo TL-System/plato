@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "Bounded R1/R3 retirement candidate validated; root integration and independent review pending.",
+  "baseline_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "candidate_branch": "maintenance/2026-retire-llm-backends",
+  "plan_sha256": "c2a5a34a32bc3f41228efb61e542e575fcd863861c68ead856b5d6453208b62e",
+  "plan_review_sha256": "ba20ec92c2d1323203edf081218c317fe3dd7ba7e175a2cc4997d0806a0aca1a",
+  "environment": {
+    "python": "3.13.16",
+    "uv": "0.12.22",
+    "platform": "macOS aarch64",
+    "shell": "zsh -lc",
+    "mandatory": "/tmp/plato-retirement-mandatory-313",
+    "base": "/tmp/plato-retirement-base-313",
+    "packages_freeze_path": "/tmp/plato-retirement-packages.txt",
+    "packages_freeze_sha256": "e36293515dc4c10bfe6b5c4fe8ac4d2a083e2ab6496cbbb8afffb69e8ce9b3fb",
+    "network_free_tests": true,
+    "root_virtual_environment_modified": false
+  },
+  "source_hashes": {
+    ".gitattributes": "8aa0ac639d30f11631290d009202e5d75c8036efac949b3833fd62506f484e5b",
+    ".github/workflows/pytorch_tests.yml": "7e14083ae07937c2d5af5dfb67b168da71a032c28047aa574f0ce5b48df91b3d",
+    ".gitmodules": "df62d800fe0b6c27c924cdba64e6bcdd9fae3957d1efe613b01e1f51752e3428",
+    "archives/retired/lerobot/manifest.json": "06735f7c441f86aaec6208b5dd67fd6a36a55a6aa009267bbd8b6900bc4818f5",
+    "archives/retired/lerobot/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "archives/retired/lerobot/original/configs/LeRobot/lerobot_datasource_base.toml": "01acba088dbfcf153abf035dc283863dd83091028cbe7cd7853319da0e95c514",
+    "archives/retired/lerobot/original/configs/LeRobot/smolvla_fedavg_two_client_smoke.toml": "06860652a1c2d989fb46f2b6933842de9c0bd6a3e89a2e2f3ef51865a211aa37",
+    "archives/retired/lerobot/original/configs/LeRobot/smolvla_full_finetune.toml": "769fe7e03c579bf4866315c1f8c1e1d0d7bc0fb834d8015da4cf9ffaf880532d",
+    "archives/retired/lerobot/original/configs/LeRobot/smolvla_single_client_smoke.toml": "b25188870533826549161ac1b50c6b7d3855024edb1f0b10f7d065e7e2766824",
+    "archives/retired/lerobot/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+    "archives/retired/lerobot/original/plato/datasources/lerobot.py": "fb6399418c5174415d0ba02a51fcfbcd5d04b555bd5190924fc228a605edc95d",
+    "archives/retired/lerobot/original/plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+    "archives/retired/lerobot/original/plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+    "archives/retired/lerobot/original/plato/models/smolvla.py": "6a082410a12b839e6064e4829568a55af54ce194a3f190c75f109772f83c35e1",
+    "archives/retired/lerobot/original/plato/trainers/lerobot.py": "1f647426a85df75df3ff2e9a7a90a8e8bb96d93e93d39f79729b7ff9d2f31ba8",
+    "archives/retired/lerobot/original/plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+    "archives/retired/lerobot/original/pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "archives/retired/lerobot/original/tests/algorithms/test_fedavg_algorithm.py": "61ef08d248c464655ed9b9894c0c212d917a101b4a48ddce5a14571e55ea2028",
+    "archives/retired/lerobot/original/tests/datasources/test_lerobot_datasource.py": "e75e9443328356f981036a43aab54a53d7999c14f73ff9f0f33f96bca14156e1",
+    "archives/retired/lerobot/original/tests/integration/test_lerobot_smolvla_smoke.py": "b7719295cc7ed036dff590a9d30ebdd0bcdc49a2220cfd476b0d8f4754932e85",
+    "archives/retired/lerobot/original/tests/models/test_smolvla_model.py": "2b34362cf27409903d3ab55b425c67dad011fdae578bb3a3959ef275cfea24d8",
+    "archives/retired/lerobot/original/tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+    "archives/retired/lerobot/original/tests/test_utils/lerobot_stubs.py": "08977f6cc155faabf24cb30b48f91e8568a3a6bf2a944236b7068231c67d973d",
+    "archives/retired/lerobot/original/tests/trainers/test_lerobot_trainer.py": "c4ebc5e2d83bd356357c287572d14d2210caa3af8280a2ad3a4f5ef8525710ff",
+    "archives/retired/lerobot/original/uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "archives/retired/nanochat/UPSTREAM_LICENSE": "42bb09f339a8af8b90d3b4969b6f6e4ba4aff3b5c614103b031fccdf71c8f772",
+    "archives/retired/nanochat/manifest.json": "4f923c1a60c1153290ab0c024066a4d113a2e077059b80424f42f526ff5711e9",
+    "archives/retired/nanochat/original/.github/workflows/pytorch_tests.yml": "7c0c144730cbb0d38bb00e10c390e2ab60d6df0a6086de75fcd675bcc0fdc683",
+    "archives/retired/nanochat/original/.gitmodules": "d39136e1bfba768da1b969c651ef669a569df5d128b03c9c705780c21151d721",
+    "archives/retired/nanochat/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "archives/retired/nanochat/original/configs/Nanochat/parquet_micro.toml": "0fdf774ab9d17161bbe2de59c303a24a5d648e1e8db7c99a906c35a9cf514872",
+    "archives/retired/nanochat/original/configs/Nanochat/synthetic_micro.toml": "c4706d5d1422242a1c7408ad22aadad74d148ef2f33f2f2d01cac3d52fe4c9b0",
+    "archives/retired/nanochat/original/docs/docs/configurations/evaluation.md": "eace2f95f3352db4b950a518030e2b4627bde4bb91e28f917b0e143fe8180c45",
+    "archives/retired/nanochat/original/docs/docs/configurations/overview.md": "480ec3ab01fc7d384ef3c6f50ba5183ef0533aaaad7cb090ce9f4348bce6254e",
+    "archives/retired/nanochat/original/docs/docs/configurations/parameters.md": "9ffd51f87319bd2876add84e2ed83a28583e480be2438e1c43037d19674b2e94",
+    "archives/retired/nanochat/original/docs/docs/configurations/server.md": "c846b23e0ed08eb1a4cc9b728145d0fc1d42889bce4acbc7e1efb5f6a1e3535a",
+    "archives/retired/nanochat/original/docs/docs/configurations/trainer.md": "e6199390ab2acc69155a6827c0023be3e4cb349c75058bfa7db76dd56ad39e86",
+    "archives/retired/nanochat/original/docs/docs/development.md": "00b48e27a3b9142763c3ea4566044380ae10e9dcda3baedb4b566842dc71e6dd",
+    "archives/retired/nanochat/original/docs/docs/examples/Getting Started.md": "05f98d2c9ed43d48b11dd4ffd2b0a6ae321f881e4350487f62126be3d11693d5",
+    "archives/retired/nanochat/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+    "archives/retired/nanochat/original/docs/docs/examples/case-studies/5. Nanochat in Plato.md": "fdd566296869bb7cda391557636d14690c211cd939b7530138852b5581dda030",
+    "archives/retired/nanochat/original/docs/docs/index.md": "c7e0b74f19b23b43f99e1476125dcaeb1d207cf3fefc20131e00f9cfed24d2e0",
+    "archives/retired/nanochat/original/docs/docs/install.md": "dfcdccaab917a6590a6d9464af9b991e9dd7c6611e7e94e2695f2d965734a505",
+    "archives/retired/nanochat/original/docs/docs/quickstart.md": "eabcf5510b39f6bf84acfb809bd29537cf16588e4f9e4aed7e8db224c804ac3b",
+    "archives/retired/nanochat/original/docs/docs/references/evaluators.md": "dd9ad9537bd81ca3231c5972366f8762a37af83817c65108c7dbd967ad2fed17",
+    "archives/retired/nanochat/original/docs/docs/references/trainers.md": "a94acea1fcd607b07324ac941d6ac250b4444822019a4ea90370c4d429ebd73f",
+    "archives/retired/nanochat/original/docs/mkdocs.yml": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+    "archives/retired/nanochat/original/docs/nanochat_integration_checklist.md": "4a1ecb52df41db299f38d9b6dea28e9c5dbe4bede194cf438d8467848e004fd3",
+    "archives/retired/nanochat/original/docs/third_party.md": "a19c39846c81f1919a891ced33836613f0881e743a82ddd2f30e9c98ecfd2692",
+    "archives/retired/nanochat/original/examples/nanochat/README.md": "c30bc624a7780c7f9f3257c9b1f7fb7f450a31b3d4556e2bb47573e24b17c6d2",
+    "archives/retired/nanochat/original/examples/nanochat/pyproject.toml": "3931bdaa18658efb828aba8b3d19d5640788ea5bda1eba24fb454207b8bc38b8",
+    "archives/retired/nanochat/original/plato/datasources/nanochat.py": "b5ab5a5417aee22d426453a59c28ea5878cb430905b348e1dbb7ffb912752c64",
+    "archives/retired/nanochat/original/plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+    "archives/retired/nanochat/original/plato/evaluators/nanochat_core.py": "7d05e824b09521d0d51a9f6481a95c0b3943c6f4f4ed81f144f6eb95739477f1",
+    "archives/retired/nanochat/original/plato/evaluators/registry.py": "e661fc199bd2f84ec23b17eea348493cf903a1d7d34c5b34fb3e623639a1f642",
+    "archives/retired/nanochat/original/plato/evaluators/runner.py": "9cb2125f3c03924a8e73f8b62e1e4044a55f9222f38aa01ec8dfaac56588955f",
+    "archives/retired/nanochat/original/plato/models/nanochat.py": "9e2ff36d559b80b3e1feb33c9ba7ac818c5fad337e1b3f77bfd40833bd703e77",
+    "archives/retired/nanochat/original/plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+    "archives/retired/nanochat/original/plato/processors/nanochat_tokenizer.py": "e8961791065027bb7840671e6a8109b3856ddb3f473e482c8d35cce19b1f5e8b",
+    "archives/retired/nanochat/original/plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+    "archives/retired/nanochat/original/plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+    "archives/retired/nanochat/original/plato/servers/split_learning.py": "fa4da694a332ce496b75b753bfb9cd91900ccf80db93f1321cbc3c282cae7abc",
+    "archives/retired/nanochat/original/plato/trainers/composable.py": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5",
+    "archives/retired/nanochat/original/plato/trainers/nanochat.py": "57e2d1167157aea1fe88703c85f4c8fc39daeaa0a53fc4e73f9ed40f99fe78b1",
+    "archives/retired/nanochat/original/plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+    "archives/retired/nanochat/original/plato/utils/third_party.py": "fdf0bebe7a33023412b039f963e0acf31429f9ce29c1de20c1b8194521bfeb5c",
+    "archives/retired/nanochat/original/pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "archives/retired/nanochat/original/tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+    "archives/retired/nanochat/original/tests/evaluators/test_registry_runner.py": "55bc828845b057a8f95fd4b4479f4b968cc19be84b6cb3d77022347d3a702007",
+    "archives/retired/nanochat/original/tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+    "archives/retired/nanochat/original/tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+    "archives/retired/nanochat/original/tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
+    "archives/retired/nanochat/original/tests/trainers/test_composable_trainer.py": "491c30fba4858571430430ac52cc63f632c683b10de35c1420fb6a77324ac440",
+    "archives/retired/nanochat/original/tests/trainers/test_nanochat_trainer.py": "84a5eb97d6c9c9f35931bc9d02b208905e45bc28bebc985898a2c4321b6e1680",
+    "archives/retired/nanochat/original/uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "archives/retired/nanochat/upstream-c75fe54aa7c1fa881701c246f9427bcbe4eee5a4.tar.gz": "6fa7ddcccbe290af3fbf1abddf04478e3589aa5d37a83dc498ffed1e05081a8a",
+    "external/nanochat": null,
+    "plato/datasources/registry.py": "286e2b8c4656a8bdd1c799fb6b42193d7998995675ab3bced9040104ef710db1",
+    "plato/evaluators/registry.py": "7c520ffe359c3ebd12966c7941e021bef2b65b5705b7b03a30e7e1a837ebaf70",
+    "plato/evaluators/runner.py": "e08bae291acdcbefee340b8d7c8f41c168a0e00a2d257ff74932514a186985f3",
+    "plato/models/registry.py": "56a16880680d64f6da5d2f3020aaf183228710c7946541c8604e67b2cd6482da",
+    "plato/servers/fedavg.py": "d00689ab30d59200fd6de2d46625f222ce78b6aa64e51d64f053a2f1ab8487fc",
+    "plato/servers/fedavg_cs.py": "27b9448081279b8268d492ad8957f6bee32e0b8d76293ec1b438e42b3a664b6a",
+    "plato/servers/split_learning.py": "a1783ab501488a805b781f2c9eef12d1995359b37fff2424a6fdebb0305e4e6e",
+    "plato/trainers/composable.py": "74d899af91f8dc0482bbc3f38d25753ffbd7a8f0ea8852d9181b3eb29ae87e69",
+    "plato/trainers/registry.py": "6b4d5ba8e324a217b7b25e85f57750eca98a5534aa2d401fbe771b50c58e4f33",
+    "plato/utils/retired_backends.py": "8f5638edaf1636734d1ae293748f6518addbf05568ffd77d24faa7f88e554d40",
+    "pyproject.toml": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+    "tests/algorithms/test_fedavg_algorithm.py": "4b1723c2aeefe33fd11ebf0e34eea5401b5685b90ac206e77ae4c2f5327ee2b1",
+    "tests/conftest.py": "24798dced0175024ca57cc08c331b7671faefd6f19883ea4df4e245ba7273de5",
+    "tests/evaluators/test_registry_runner.py": "04f9dce40f78d2670de5da049c2e8585da7f0ab14488e129c7f0b374410c236a",
+    "tests/integration/utils.py": "7e8700b8aaee12506e8e6f919d96165a6990d7a4a50e9a8a1af2e2214769c49b",
+    "tests/test_config_loader.py": "65bfde989f4b248c20fc613d7de05c01fd982cfc4f0bd1264e1e3726e0c8e22f",
+    "tests/test_retired_backends.py": "ce44c103af562a9567be99fdbd5bc3696b59275ba4156a94e43a5e77550343fb",
+    "tests/trainers/test_composable_trainer.py": "c230883e2525ada3962c222059d394e917b0716ee7408cc6db3e9417278ca0e4",
+    "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89"
+  },
+  "archive_hashes": {
+    "archives/retired/lerobot/manifest.json": "06735f7c441f86aaec6208b5dd67fd6a36a55a6aa009267bbd8b6900bc4818f5",
+    "archives/retired/lerobot/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "archives/retired/lerobot/original/configs/LeRobot/lerobot_datasource_base.toml": "01acba088dbfcf153abf035dc283863dd83091028cbe7cd7853319da0e95c514",
+    "archives/retired/lerobot/original/configs/LeRobot/smolvla_fedavg_two_client_smoke.toml": "06860652a1c2d989fb46f2b6933842de9c0bd6a3e89a2e2f3ef51865a211aa37",
+    "archives/retired/lerobot/original/configs/LeRobot/smolvla_full_finetune.toml": "769fe7e03c579bf4866315c1f8c1e1d0d7bc0fb834d8015da4cf9ffaf880532d",
+    "archives/retired/lerobot/original/configs/LeRobot/smolvla_single_client_smoke.toml": "b25188870533826549161ac1b50c6b7d3855024edb1f0b10f7d065e7e2766824",
+    "archives/retired/lerobot/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+    "archives/retired/lerobot/original/plato/datasources/lerobot.py": "fb6399418c5174415d0ba02a51fcfbcd5d04b555bd5190924fc228a605edc95d",
+    "archives/retired/lerobot/original/plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+    "archives/retired/lerobot/original/plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+    "archives/retired/lerobot/original/plato/models/smolvla.py": "6a082410a12b839e6064e4829568a55af54ce194a3f190c75f109772f83c35e1",
+    "archives/retired/lerobot/original/plato/trainers/lerobot.py": "1f647426a85df75df3ff2e9a7a90a8e8bb96d93e93d39f79729b7ff9d2f31ba8",
+    "archives/retired/lerobot/original/plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+    "archives/retired/lerobot/original/pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "archives/retired/lerobot/original/tests/algorithms/test_fedavg_algorithm.py": "61ef08d248c464655ed9b9894c0c212d917a101b4a48ddce5a14571e55ea2028",
+    "archives/retired/lerobot/original/tests/datasources/test_lerobot_datasource.py": "e75e9443328356f981036a43aab54a53d7999c14f73ff9f0f33f96bca14156e1",
+    "archives/retired/lerobot/original/tests/integration/test_lerobot_smolvla_smoke.py": "b7719295cc7ed036dff590a9d30ebdd0bcdc49a2220cfd476b0d8f4754932e85",
+    "archives/retired/lerobot/original/tests/models/test_smolvla_model.py": "2b34362cf27409903d3ab55b425c67dad011fdae578bb3a3959ef275cfea24d8",
+    "archives/retired/lerobot/original/tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+    "archives/retired/lerobot/original/tests/test_utils/lerobot_stubs.py": "08977f6cc155faabf24cb30b48f91e8568a3a6bf2a944236b7068231c67d973d",
+    "archives/retired/lerobot/original/tests/trainers/test_lerobot_trainer.py": "c4ebc5e2d83bd356357c287572d14d2210caa3af8280a2ad3a4f5ef8525710ff",
+    "archives/retired/lerobot/original/uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "archives/retired/nanochat/UPSTREAM_LICENSE": "42bb09f339a8af8b90d3b4969b6f6e4ba4aff3b5c614103b031fccdf71c8f772",
+    "archives/retired/nanochat/manifest.json": "4f923c1a60c1153290ab0c024066a4d113a2e077059b80424f42f526ff5711e9",
+    "archives/retired/nanochat/original/.github/workflows/pytorch_tests.yml": "7c0c144730cbb0d38bb00e10c390e2ab60d6df0a6086de75fcd675bcc0fdc683",
+    "archives/retired/nanochat/original/.gitmodules": "d39136e1bfba768da1b969c651ef669a569df5d128b03c9c705780c21151d721",
+    "archives/retired/nanochat/original/LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "archives/retired/nanochat/original/configs/Nanochat/parquet_micro.toml": "0fdf774ab9d17161bbe2de59c303a24a5d648e1e8db7c99a906c35a9cf514872",
+    "archives/retired/nanochat/original/configs/Nanochat/synthetic_micro.toml": "c4706d5d1422242a1c7408ad22aadad74d148ef2f33f2f2d01cac3d52fe4c9b0",
+    "archives/retired/nanochat/original/docs/docs/configurations/evaluation.md": "eace2f95f3352db4b950a518030e2b4627bde4bb91e28f917b0e143fe8180c45",
+    "archives/retired/nanochat/original/docs/docs/configurations/overview.md": "480ec3ab01fc7d384ef3c6f50ba5183ef0533aaaad7cb090ce9f4348bce6254e",
+    "archives/retired/nanochat/original/docs/docs/configurations/parameters.md": "9ffd51f87319bd2876add84e2ed83a28583e480be2438e1c43037d19674b2e94",
+    "archives/retired/nanochat/original/docs/docs/configurations/server.md": "c846b23e0ed08eb1a4cc9b728145d0fc1d42889bce4acbc7e1efb5f6a1e3535a",
+    "archives/retired/nanochat/original/docs/docs/configurations/trainer.md": "e6199390ab2acc69155a6827c0023be3e4cb349c75058bfa7db76dd56ad39e86",
+    "archives/retired/nanochat/original/docs/docs/development.md": "00b48e27a3b9142763c3ea4566044380ae10e9dcda3baedb4b566842dc71e6dd",
+    "archives/retired/nanochat/original/docs/docs/examples/Getting Started.md": "05f98d2c9ed43d48b11dd4ffd2b0a6ae321f881e4350487f62126be3d11693d5",
+    "archives/retired/nanochat/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+    "archives/retired/nanochat/original/docs/docs/examples/case-studies/5. Nanochat in Plato.md": "fdd566296869bb7cda391557636d14690c211cd939b7530138852b5581dda030",
+    "archives/retired/nanochat/original/docs/docs/index.md": "c7e0b74f19b23b43f99e1476125dcaeb1d207cf3fefc20131e00f9cfed24d2e0",
+    "archives/retired/nanochat/original/docs/docs/install.md": "dfcdccaab917a6590a6d9464af9b991e9dd7c6611e7e94e2695f2d965734a505",
+    "archives/retired/nanochat/original/docs/docs/quickstart.md": "eabcf5510b39f6bf84acfb809bd29537cf16588e4f9e4aed7e8db224c804ac3b",
+    "archives/retired/nanochat/original/docs/docs/references/evaluators.md": "dd9ad9537bd81ca3231c5972366f8762a37af83817c65108c7dbd967ad2fed17",
+    "archives/retired/nanochat/original/docs/docs/references/trainers.md": "a94acea1fcd607b07324ac941d6ac250b4444822019a4ea90370c4d429ebd73f",
+    "archives/retired/nanochat/original/docs/mkdocs.yml": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+    "archives/retired/nanochat/original/docs/nanochat_integration_checklist.md": "4a1ecb52df41db299f38d9b6dea28e9c5dbe4bede194cf438d8467848e004fd3",
+    "archives/retired/nanochat/original/docs/third_party.md": "a19c39846c81f1919a891ced33836613f0881e743a82ddd2f30e9c98ecfd2692",
+    "archives/retired/nanochat/original/examples/nanochat/README.md": "c30bc624a7780c7f9f3257c9b1f7fb7f450a31b3d4556e2bb47573e24b17c6d2",
+    "archives/retired/nanochat/original/examples/nanochat/pyproject.toml": "3931bdaa18658efb828aba8b3d19d5640788ea5bda1eba24fb454207b8bc38b8",
+    "archives/retired/nanochat/original/plato/datasources/nanochat.py": "b5ab5a5417aee22d426453a59c28ea5878cb430905b348e1dbb7ffb912752c64",
+    "archives/retired/nanochat/original/plato/datasources/registry.py": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+    "archives/retired/nanochat/original/plato/evaluators/nanochat_core.py": "7d05e824b09521d0d51a9f6481a95c0b3943c6f4f4ed81f144f6eb95739477f1",
+    "archives/retired/nanochat/original/plato/evaluators/registry.py": "e661fc199bd2f84ec23b17eea348493cf903a1d7d34c5b34fb3e623639a1f642",
+    "archives/retired/nanochat/original/plato/evaluators/runner.py": "9cb2125f3c03924a8e73f8b62e1e4044a55f9222f38aa01ec8dfaac56588955f",
+    "archives/retired/nanochat/original/plato/models/nanochat.py": "9e2ff36d559b80b3e1feb33c9ba7ac818c5fad337e1b3f77bfd40833bd703e77",
+    "archives/retired/nanochat/original/plato/models/registry.py": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+    "archives/retired/nanochat/original/plato/processors/nanochat_tokenizer.py": "e8961791065027bb7840671e6a8109b3856ddb3f473e482c8d35cce19b1f5e8b",
+    "archives/retired/nanochat/original/plato/servers/fedavg.py": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+    "archives/retired/nanochat/original/plato/servers/fedavg_cs.py": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+    "archives/retired/nanochat/original/plato/servers/split_learning.py": "fa4da694a332ce496b75b753bfb9cd91900ccf80db93f1321cbc3c282cae7abc",
+    "archives/retired/nanochat/original/plato/trainers/composable.py": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5",
+    "archives/retired/nanochat/original/plato/trainers/nanochat.py": "57e2d1167157aea1fe88703c85f4c8fc39daeaa0a53fc4e73f9ed40f99fe78b1",
+    "archives/retired/nanochat/original/plato/trainers/registry.py": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+    "archives/retired/nanochat/original/plato/utils/third_party.py": "fdf0bebe7a33023412b039f963e0acf31429f9ce29c1de20c1b8194521bfeb5c",
+    "archives/retired/nanochat/original/pyproject.toml": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "archives/retired/nanochat/original/tests/conftest.py": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+    "archives/retired/nanochat/original/tests/evaluators/test_registry_runner.py": "55bc828845b057a8f95fd4b4479f4b968cc19be84b6cb3d77022347d3a702007",
+    "archives/retired/nanochat/original/tests/integration/utils.py": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+    "archives/retired/nanochat/original/tests/test_config_loader.py": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+    "archives/retired/nanochat/original/tests/test_nanochat_integration.py": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
+    "archives/retired/nanochat/original/tests/trainers/test_composable_trainer.py": "491c30fba4858571430430ac52cc63f632c683b10de35c1420fb6a77324ac440",
+    "archives/retired/nanochat/original/tests/trainers/test_nanochat_trainer.py": "84a5eb97d6c9c9f35931bc9d02b208905e45bc28bebc985898a2c4321b6e1680",
+    "archives/retired/nanochat/original/uv.lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+    "archives/retired/nanochat/upstream-c75fe54aa7c1fa881701c246f9427bcbe4eee5a4.tar.gz": "6fa7ddcccbe290af3fbf1abddf04478e3589aa5d37a83dc498ffed1e05081a8a"
+  },
+  "archive_containment_configuration": {
+    "build": "archives/retired/** excluded from Hatch targets",
+    "lint": "archives/retired excluded from maintained Ruff/ty scans",
+    "tests": "archives/retired excluded from recursion; original pytest recursion exclusions preserved",
+    "git_attributes": "archives/retired/*/original/** -text -whitespace preserves raw originals and inherited whitespace; active source retains checks"
+  },
+  "archive_integrity_and_distribution_containment": {
+    "nanochat": {
+      "original_files": 48,
+      "all_match_original_git_blobs": true,
+      "upstream_tracked_files": 54,
+      "upstream_git_blobs_and_executable_modes_match": true
+    },
+    "lerobot": {
+      "original_files": 21,
+      "all_match_original_git_blobs": true
+    },
+    "plato_learn-1.4.3-py3-none-any.whl": {
+      "entries": 426,
+      "archive_or_retired_runtime_entries": 0,
+      "sha256": "13a78a2b2b8d7bdeab9cd7d02951b314672a78eb522a04877441d3023093ba87"
+    },
+    "plato_learn-1.4.3.tar.gz": {
+      "entries": 1351,
+      "archive_or_retired_runtime_entries": 0,
+      "sha256": "012781c2e11375d2ec0a2c4b09975272468d71cfff3ba580871e62f07fde36ae"
+    }
+  },
+  "archive_integrity_validation_script": {
+    "path": "/tmp/plato-retirement-validate-integrity.py",
+    "sha256": "e571e1ab60c970d355a0d6a33bf1566aacf30025d6db9e16a80e011965215cac",
+    "source": "from pathlib import Path\nimport hashlib\nimport json\nimport subprocess\nimport tarfile\nimport zipfile\n\nroot = Path.cwd()\nresults = {}\nfor backend in ('nanochat', 'lerobot'):\n    manifest = json.loads((root / 'archives/retired' / backend / 'manifest.json').read_text())\n    for entry in manifest['files']:\n        original = subprocess.check_output(['git', 'show', f\"{manifest['pre_retirement_plato_commit']}:{entry['original_path']}\"])\n        archived = (root / entry['archive_path']).read_bytes()\n        assert original == archived\n        assert hashlib.sha256(original).hexdigest() == entry['sha256']\n    results[backend] = {'original_files': len(manifest['files']), 'all_match_original_git_blobs': True}\n    if backend == 'nanochat':\n        upstream = manifest['upstream']\n        with tarfile.open(root / upstream['archive_path']) as source:\n            for entry in upstream['files']:\n                file = source.extractfile(entry['path'])\n                assert file is not None\n                data = file.read()\n                git_blob = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\\0' + data).hexdigest()\n                assert git_blob == entry['git_blob']\n                # Git records executable bits, not Unix group-write permissions.\n                assert source.getmember(entry['path']).mode & 0o111 == int(entry['git_mode'][-3:], 8) & 0o111\n        results[backend]['upstream_tracked_files'] = len(upstream['files'])\n        results[backend]['upstream_git_blobs_and_executable_modes_match'] = True\nfor path in Path('/tmp/plato-retirement-dist').glob('*'):\n    if path.suffix == '.whl':\n        with zipfile.ZipFile(path) as package:\n            names = package.namelist()\n    elif path.name.endswith('.tar.gz'):\n        with tarfile.open(path) as package:\n            names = package.getnames()\n    else:\n        continue\n    assert not any('/archives/retired/' in '/' + name or '/external/nanochat/' in '/' + name for name in names)\n    assert not any('/plato/' in '/' + name and any(term in name.lower() for term in ('nanochat', 'lerobot', 'smolvla')) for name in names)\n    results[path.name] = {'entries': len(names), 'archive_or_retired_runtime_entries': 0, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}\nPath('/tmp/plato-retirement-integrity-and-build.json').write_text(json.dumps(results, indent=2) + '\\n')\nprint(json.dumps(results, indent=2))\n"
+  },
+  "collection_ledger": {
+    "baseline_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+    "baseline_cases": 1303,
+    "candidate_cases": 1308,
+    "removed": [
+      "tests/datasources/test_lerobot_datasource.py::test_lerobot_constructor_is_deterministic_and_maps_samples",
+      "tests/datasources/test_lerobot_datasource.py::test_lerobot_is_registered_as_partitioned_datasource",
+      "tests/datasources/test_lerobot_datasource.py::test_registry_constructs_lerobot_datasource_for_client",
+      "tests/evaluators/test_registry_runner.py::test_composable_trainer_without_evaluator_keeps_legacy_test_behavior[None]",
+      "tests/evaluators/test_registry_runner.py::test_composable_trainer_without_evaluator_keeps_legacy_test_behavior[evaluation_config1]",
+      "tests/integration/test_lerobot_smolvla_smoke.py::test_lerobot_smolvla_end_to_end_smoke",
+      "tests/models/test_smolvla_model.py::test_model_registry_constructs_smolvla_wrapper",
+      "tests/models/test_smolvla_model.py::test_smolvla_adapter_metadata_filters_fedavg_payload",
+      "tests/test_config_loader.py::test_config_loads_smolvla_lerobot_parameter_contract",
+      "tests/test_nanochat_integration.py::test_nanochat_tokenizer_processor_round_trip",
+      "tests/test_nanochat_integration.py::test_nanochat_trainer_selects_core_eval_strategy",
+      "tests/test_nanochat_integration.py::test_nanochat_trainer_smoke",
+      "tests/trainers/test_lerobot_trainer.py::test_lerobot_trainer_consumes_policy_precision_and_device",
+      "tests/trainers/test_lerobot_trainer.py::test_lerobot_trainer_rejects_unavailable_cuda_device",
+      "tests/trainers/test_lerobot_trainer.py::test_lerobot_trainer_train_model_runs_on_tiny_synthetic_batch",
+      "tests/trainers/test_nanochat_trainer.py::test_nanochat_core_evaluator_reuses_precomputed_results_from_context",
+      "tests/trainers/test_nanochat_trainer.py::test_nanochat_trainer_core_eval_populates_generic_evaluation_state",
+      "tests/trainers/test_nanochat_trainer.py::test_nanochat_trainer_does_not_register_core_evaluator_globally",
+      "tests/trainers/test_nanochat_trainer.py::test_nanochat_trainer_refreshes_evaluation_mode_between_test_calls"
+    ],
+    "added": [
+      "tests/evaluators/test_registry_runner.py::test_composable_trainer_without_evaluator_keeps_legacy_test_behavior",
+      "tests/test_retired_backends.py::test_nanochat_upstream_archive_preserves_pinned_source_and_notice",
+      "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[False-LeRobot]",
+      "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[False-Nanochat]",
+      "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[True-LeRobot]",
+      "tests/test_retired_backends.py::test_retired_datasource_selection_fails_with_archive_guidance[True-Nanochat]",
+      "tests/test_retired_backends.py::test_retired_evaluator_cannot_run_via_override",
+      "tests/test_retired_backends.py::test_retired_evaluator_cannot_silently_disappear[False]",
+      "tests/test_retired_backends.py::test_retired_evaluator_cannot_silently_disappear[True]",
+      "tests/test_retired_backends.py::test_retired_model_selection_fails_with_archive_guidance[nanochat]",
+      "tests/test_retired_backends.py::test_retired_model_selection_fails_with_archive_guidance[smolvla]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.datasources.lerobot]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.datasources.nanochat]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.evaluators.nanochat_core]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.models.nanochat]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.models.smolvla]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.processors.nanochat_tokenizer]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.trainers.lerobot]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.trainers.nanochat]",
+      "tests/test_retired_backends.py::test_retired_runtime_modules_are_unavailable[plato.utils.third_party]",
+      "tests/test_retired_backends.py::test_retired_trainer_selection_fails_with_archive_guidance[lerobot]",
+      "tests/test_retired_backends.py::test_retired_trainer_selection_fails_with_archive_guidance[nanochat]",
+      "tests/test_retired_backends.py::test_retirement_archive_preserves_original_bytes[lerobot]",
+      "tests/test_retired_backends.py::test_retirement_archive_preserves_original_bytes[nanochat]"
+    ],
+    "preserved": 1284,
+    "removed_by_module": {
+      "tests/datasources/test_lerobot_datasource.py": 3,
+      "tests/evaluators/test_registry_runner.py": 2,
+      "tests/integration/test_lerobot_smolvla_smoke.py": 1,
+      "tests/models/test_smolvla_model.py": 2,
+      "tests/test_config_loader.py": 1,
+      "tests/test_nanochat_integration.py": 3,
+      "tests/trainers/test_lerobot_trainer.py": 3,
+      "tests/trainers/test_nanochat_trainer.py": 4
+    },
+    "added_by_module": {
+      "tests/evaluators/test_registry_runner.py": 1,
+      "tests/test_retired_backends.py": 23
+    },
+    "identity_changes": [
+      {
+        "before": "tests/evaluators/test_registry_runner.py::test_composable_trainer_without_evaluator_keeps_legacy_test_behavior[None]",
+        "after": "tests/evaluators/test_registry_runner.py::test_composable_trainer_without_evaluator_keeps_legacy_test_behavior",
+        "reason": "Preserved assertions for no evaluation config, removing obsolete permissive nanochat_core parameter."
+      }
+    ],
+    "removed_classification": {
+      "archived_backend_specific_cases": 17,
+      "removed_silent_retired_evaluator_fallback": 1,
+      "preserved_no_evaluator_case_identity_change": 1
+    },
+    "added_classification": {
+      "retirement_archive_and_failure_regressions": 23,
+      "preserved_no_evaluator_case_identity_change": 1
+    },
+    "base_profile": {
+      "collected": 1301,
+      "omitted_mandatory_nodes": [
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_memory_splitting_matches_logical_batch_parameter_reference",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_plato_sampler_get",
+        "tests/trainers/test_dp_data_loader_strategy.py::test_dp_strategy_handles_torch_sampler_directly"
+      ],
+      "reason": "Only existing DP module omission when opacus is absent; no retirement skip allowances."
+    }
+  },
+  "dependency_delta": {
+    "before_packages": 277,
+    "after_packages": 267,
+    "removed": {
+      "googleapis-common-protos": "1.75.5",
+      "opentelemetry-exporter-http-transport": "0.66b0",
+      "opentelemetry-exporter-otlp-common": "0.66b0",
+      "opentelemetry-exporter-otlp-proto-common": "1.45.0",
+      "opentelemetry-exporter-otlp-proto-http": "1.45.0",
+      "opentelemetry-proto": "1.45.0",
+      "opentelemetry-sdk": "1.45.0",
+      "opentelemetry-semantic-conventions": "0.66b0",
+      "plato-nanochat-examples": "0.1.0",
+      "wandb": "0.30.0"
+    },
+    "added": {},
+    "retained_version_changes": {},
+    "active_consumer_audit": "No active WandB/OTEL imports found. WANDB_DISABLED environment variable in examples/async/port/port.py and GAN reference URL do not consume the removed package. Shared HF/PEFT/Lighteval packages and other active model-family dependencies retained.",
+    "consumer_audit_sha256": "47a794219b40626d6ec83a22cd09898028e76f88264f1f139e8f106c5165c55f"
+  },
+  "commands": [
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-phase2-integration/final-mandatory-313/bin/python -m pytest tests --collect-only -q --test-profile=mandatory",
+      "exit_code": 0,
+      "result": "Baseline 1303 cases; initialized exact Nanochat gitlink required by original profile."
+    },
+    {
+      "command": "uv lock --python 3.13",
+      "exit_code": 0,
+      "result": "Resolved 268 packages; no retained package versions changed."
+    },
+    {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-retirement-mandatory-313 uv sync --locked --python 3.13 --no-default-groups --group dev --group build",
+      "exit_code": 0,
+      "result": "Fresh isolated locked mandatory/build environment."
+    },
+    {
+      "command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-retirement-base-313 uv sync --locked --python 3.13 --no-default-groups --group test-base",
+      "exit_code": 0,
+      "result": "Fresh isolated locked base environment; opacus absent."
+    },
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-retirement-mandatory-313/bin/python -m pytest tests/test_retired_backends.py tests/test_config_loader.py tests/evaluators tests/trainers/test_composable_trainer.py tests/algorithms/test_fedavg_algorithm.py tests/servers/test_fedavg_strategy.py tests/servers/test_split_learning_selection_strategy.py tests/integration/test_smoke_configs.py --test-profile=mandatory -q",
+      "exit_code": 0,
+      "result": "161 passed in 0.77s; no skips."
+    },
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-retirement-mandatory-313/bin/python -m pytest tests/trainers/test_dp_data_loader_strategy.py tests/mpc/test_mpc.py --test-profile=mandatory -q",
+      "exit_code": 0,
+      "result": "10 passed in 18.26s; 17 existing DP/MPC library warnings; no skips."
+    },
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-retirement-base-313/bin/python -m pytest tests/test_retired_backends.py tests/test_config_loader.py tests/evaluators tests/trainers/test_composable_trainer.py tests/algorithms/test_fedavg_algorithm.py tests/servers/test_fedavg_strategy.py tests/servers/test_split_learning_selection_strategy.py tests/integration/test_smoke_configs.py tests/trainers/test_dp_data_loader_strategy.py tests/mpc/test_mpc.py --test-profile=base -q -ra",
+      "exit_code": 0,
+      "result": "164 passed, 1 skipped in 0.68s; exactly tests/trainers/test_dp_data_loader_strategy.py module skip with reason base profile optional dp: opacus not installed."
+    },
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-retirement-mandatory-313/bin/python -m pytest tests --collect-only -q --test-profile=mandatory",
+      "exit_code": 0,
+      "result": "1308 cases; remaining mandatory requirements and all startup counts enforced."
+    },
+    {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 /tmp/plato-retirement-base-313/bin/python -m pytest tests --collect-only -q --test-profile=base",
+      "exit_code": 0,
+      "result": "1301 cases; precisely seven DP cases absent via the original named module omission."
+    },
+    {
+      "command": "uv build --no-build-isolation --python /tmp/plato-retirement-mandatory-313/bin/python --sdist --wheel --out-dir /tmp/plato-retirement-dist",
+      "exit_code": 0,
+      "result": "Built wheel and sdist with hatchling from isolated locked build group."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/python /tmp/plato-retirement-validate-integrity.py",
+      "exit_code": 0,
+      "result": "All 69 archived originals equal baseline Git bytes; 54 upstream Nanochat blobs and executable bits verified; wheel/sdist have no archive/retired runtime payload entries."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/ruff check . --select I --fix",
+      "exit_code": 0,
+      "result": "Three import-order corrections applied, followed by clean check."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/ruff check . --select I",
+      "exit_code": 0,
+      "result": "All checks passed."
+    },
+    {
+      "command": "/tmp/plato-retirement-mandatory-313/bin/ty check --output-format concise",
+      "exit_code": 1,
+      "result": "664 existing diagnostics, matching Phase 2 recorded baseline. CI classified guard passed, zero diagnostics in changed active production sources or archived source."
+    },
+    {
+      "command": "uv lock --check --python 3.13",
+      "exit_code": 0,
+      "result": "268 packages; lock current."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "Clean, including staged files. Byte-preserved historical originals disable whitespace normalization/checks via scoped .gitattributes; active changes retain checks."
+    }
+  ],
+  "logs": {
+    "before-collection": {
+      "path": "/tmp/plato-retirement-before-collection.log",
+      "sha256": "c0bfa1f3dd249e58096a54fd58c5c647116af538b4de003456216d5288128ecd"
+    },
+    "after-collection-locked": {
+      "path": "/tmp/plato-retirement-after-collection-locked.log",
+      "sha256": "b8fbb4bcbc3010499e9828de61ddebc7f2a52f5507ab4ba792ef2ea7a82e36fc"
+    },
+    "base-collection": {
+      "path": "/tmp/plato-retirement-base-collection.log",
+      "sha256": "56cadc0539151f6d98353604af44206517a59eb99e0c041a2392f00532fae8f1"
+    },
+    "sync": {
+      "path": "/tmp/plato-retirement-sync.log",
+      "sha256": "c3bbd00d6beabb32c4c4973d049b7642b3c621553d61125cf1843454462d5760"
+    },
+    "base-sync": {
+      "path": "/tmp/plato-retirement-base-sync.log",
+      "sha256": "1f0dc84829e17cc988cccd78c2a2d4c5b45757129b4ea80341cb88e95c6425ed"
+    },
+    "targeted-locked": {
+      "path": "/tmp/plato-retirement-targeted-locked.log",
+      "sha256": "2df3bf5337d6785e5cdf4d01c0f510222c08434105bbdf8c874c2c277d39fd38"
+    },
+    "required-locked": {
+      "path": "/tmp/plato-retirement-required-locked.log",
+      "sha256": "ea4fa38ef91f0dde26c24e2667da26f48077ebdf5337239114ceab695e36bc4d"
+    },
+    "targeted-base": {
+      "path": "/tmp/plato-retirement-targeted-base.log",
+      "sha256": "1622ff51017fcd717cbdd9d02632634084df939d7ac91bd248118a2a11c75946"
+    },
+    "ruff": {
+      "path": "/tmp/plato-retirement-ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    "ty": {
+      "path": "/tmp/plato-retirement-ty.log",
+      "sha256": "d641972a7254bbae308fe4b75a16e10323ccee4be1040c49b2704c6cf6223a2a"
+    },
+    "lock-check": {
+      "path": "/tmp/plato-retirement-lock-check.log",
+      "sha256": "7774956de13430ebbcb0a6c1ce1a37fd5e08185bf227744fff55300108b971b9"
+    },
+    "build": {
+      "path": "/tmp/plato-retirement-build.log",
+      "sha256": "18efc1409578cbd8439880baa2c00389e480fcac59be87e17700238470be03aa"
+    }
+  },
+  "corrected_initial_failures": [
+    "Initial targeted invocation named three nonexistent server test paths; corrected to actual existing suites.",
+    "Initial helper cleanup removed sys while configure_environment still used it; restored sys and all fresh locked regression tests passed.",
+    "uv build does not accept --locked; used locked build-group installation and --no-build-isolation with the exact isolated interpreter.",
+    "Integrity probe initially compared full Unix permissions; corrected to Git executable-bit semantics. Distribution probe filtered only wheel/sdist artifacts."
+  ],
+  "remaining_name_references": {
+    "active_runtime": "Only explicit retirement diagnostic map in plato/utils/retired_backends.py.",
+    "active_tests": "Only tests/test_retired_backends.py archive/unsupported-selection checks.",
+    "docs": "Active prose/nav intentionally unchanged for separately owned Astra docs branch; original snapshots preserved before edits.",
+    "historical_evidence": "Existing evidence/2026-refresh artifacts left immutable."
+  },
+  "limits": [
+    "No full 1308-case execution performed here; root owns full integrated qualification and review.",
+    "No Python 3.14 probe or CI matrix change performed.",
+    "No Qwen/HF runtime/config/fixture changes or pretrained weights qualification; separate HF owner handles R2 and replacement acceptance.",
+    "New archive READMEs and active retirement/migration documentation are separately owned; diagnostic README targets become complete after those commits integrate.",
+    "Distribution hashes cover this pre-receipt source state; root must rebuild final integrated distribution after documentation and HF changes.",
+    "LeRobot upstream source/model/dataset revisions were not pinned in original integration; no weights/datasets or LeRobot upstream code vendored and no historical environment reproduction claimed."
+  ]
+}

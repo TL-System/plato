@@ -1,0 +1,46 @@
+{
+  "status": "ACCEPT_PHASE2_EXACT_SOURCE_LINUX_QUALIFICATION_FOR_MERGE",
+  "utc": "2026-10-03T17:45:26.759576+00:00",
+  "published_head": "7beda2a8257e5c1e2a7aeef45314f01f143fd6b4",
+  "ci_merge_commit": "80facb7b07f5511481a1283ef0e6d8dd59ff3dfd",
+  "ci_run": 37138041927,
+  "ci_url": "https://github.com/TL-System/plato/actions/runs/37138041927",
+  "profiles": [
+    {
+      "profile": "base",
+      "passed": 1242,
+      "skipped": 4,
+      "warnings": 0
+    },
+    {
+      "profile": "mandatory",
+      "passed": 1251,
+      "skipped": 1,
+      "warnings": 17
+    },
+    {
+      "profile": "runtime",
+      "passed": 51,
+      "skipped": 0,
+      "warnings": 0
+    }
+  ],
+  "runtime_records": 55,
+  "numeric": "Independent actual weighted FedAvg and four-round Fraction FedDyn/control/resume endpoint, history and full CPU RNG audit passed.",
+  "typing": {
+    "total": 664,
+    "groups": {
+      "inactive_archive": 27,
+      "retained_reproduction": 33,
+      "active_source_unchanged": 19,
+      "pinned_vendor": 324,
+      "tests_changed": 232,
+      "tests_unchanged": 29
+    }
+  },
+  "artifact_audit_sha256": "e2e2caae7ecfba0d494b0c1f2477b427dec9dd235427af865c4c416e4c3edc10",
+  "gate_sha256": "8dd517b666e48c45df3d925e1ee12fd805c5bf4d6d7bd1f8339a525cc663e926",
+  "retained_bundle_sha256": "b2b55e28447c0e6b3e8653868adc039ad378e84ac6257f791004c3c6057d9411",
+  "security_scope": "Aggregate CodeQL check reports five unresolved alerts; analysis jobs passed. User deferred security questions. No alerts dismissed, no all-checks-green or security-clean claim, no admin bypass. Ordinary merge authorization applies.",
+  "python_policy": "3.13 is sole CI/default; prior3.14 local results remain historical."
+}

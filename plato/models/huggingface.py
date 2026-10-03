@@ -5,17 +5,19 @@ Obtaining a model from HuggingFace with optional parameter-efficient fine-tuning
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict
+from typing import Any
 
+import torch
 from transformers import AutoConfig, AutoModelForCausalLM
 
 from plato.config import Config
+from plato.utils.huggingface import artifact_identity, pretrained_kwargs
 
 try:
     from peft import LoraConfig, get_peft_model
 except ImportError:  # pragma: no cover - handled at runtime with friendly message.
-    LoraConfig = None  # type: ignore
-    get_peft_model = None  # type: ignore
+    LoraConfig = None
+    get_peft_model = None
 
 
 def _lora_config_dict(lora_config: Any) -> dict[str, Any]:
@@ -41,12 +43,6 @@ class Model:
     @staticmethod
     def get(model_name=None, **kwargs):  # pylint: disable=unused-argument
         """Returns a named model from HuggingFace."""
-        config_kwargs = {
-            "cache_dir": None,
-            "revision": "main",
-            "use_auth_token": None,
-        }
-
         resolved_model_name = (
             model_name
             if isinstance(model_name, str) and model_name
@@ -55,12 +51,31 @@ class Model:
         if not isinstance(resolved_model_name, str) or not resolved_model_name:
             raise ValueError("A valid HuggingFace model name must be provided.")
 
-        config = AutoConfig.from_pretrained(resolved_model_name, **config_kwargs)
+        identity = artifact_identity(resolved_model_name)
+        seed = getattr(Config().trainer, "random_seed", None)
+        if seed is not None:
+            torch.manual_seed(int(seed))
+        load_kwargs = pretrained_kwargs(
+            revision=identity["model_revision"],
+            cache_dir=Config().params["model_path"] + "/huggingface",
+        )
+        config = AutoConfig.from_pretrained(resolved_model_name, **load_kwargs)
+        dtype = getattr(Config().trainer, "model_dtype", None)
+        model_kwargs = dict(load_kwargs)
+        if dtype is not None:
+            supported_dtypes = {
+                "float32": torch.float32,
+                "float16": torch.float16,
+                "bfloat16": torch.bfloat16,
+            }
+            if dtype not in supported_dtypes:
+                raise ValueError(f"Unsupported HuggingFace model_dtype: {dtype}")
+            model_kwargs["dtype"] = supported_dtypes[dtype]
 
         model = AutoModelForCausalLM.from_pretrained(
             resolved_model_name,
             config=config,
-            cache_dir=Config().params["model_path"] + "/huggingface",
+            **model_kwargs,
         )
 
         lora_params = getattr(getattr(Config(), "parameters", None), "lora", None)
@@ -74,7 +89,7 @@ class Model:
             params_dict = _lora_config_dict(lora_params)
             logging.info("Configuring LoRA with parameters: %s", params_dict)
             lora_cfg = LoraConfig(**params_dict)
-            model = get_peft_model(model, lora_cfg)
+            model = get_peft_model(model, lora_cfg, revision=identity["model_revision"])
             model.print_trainable_parameters()
 
         if hasattr(model, "loss_type"):

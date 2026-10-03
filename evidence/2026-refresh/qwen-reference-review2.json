@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "review_type": "Fresh independent read-only final exact-candidate Qwen/HF/PEFT review",
+  "reviewer": "/root/qwen_reference_review2",
+  "date": "2026-10-03",
+  "decision": "ACCEPT",
+  "reviewed_commit": "bca1f6ec3541090dccb838197206fee2d6412516",
+  "reviewed_tree": "ad54c4f9b3001a5572b16d8e6a998d5a49c4521b",
+  "baseline_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "first_candidate_commit": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+  "frozen_checkout": "/tmp/plato-refresh-worktrees/qwen-reference-review2",
+  "checkout_clean_before_and_after_checks": true,
+  "unresolved_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": [],
+  "resolved_findings": [
+    {
+      "id": "QWEN-01",
+      "prior_severity": "medium",
+      "status": "RESOLVED",
+      "title": "Supplied pre-expanded PEFT model embedding state now survives federated payloads and checkpoints",
+      "source": "plato/trainers/huggingface.py:646",
+      "resolution": "Trainer compares actual current embedding size with self.config.vocab_size from its independently loaded exact configured original model revision. This also marks already-resized supplied models, whose own config has already changed. Existing in-Trainer growth remains marked. Neither branch adds a new Hub lookup.",
+      "independent_reproduction": [
+        {
+          "resize_when": "inside_trainer",
+          "tokenizer_size": 257,
+          "embedding_size": 257,
+          "plato_save_embedding_layers": true,
+          "payload_embedding_keys": [
+            "model.model.embed_tokens.weight",
+            "model.lm_head.weight"
+          ],
+          "native_peft_embedding_keys": [
+            "base_model.model.model.embed_tokens.weight",
+            "base_model.model.lm_head.weight"
+          ],
+          "checkpoint_embedding_keys": [
+            "base_model.model.lm_head.weight",
+            "base_model.model.model.embed_tokens.weight"
+          ],
+          "logits_restored": true,
+          "max_logit_error_after_reload": 0.0
+        },
+        {
+          "resize_when": "before_trainer",
+          "tokenizer_size": 257,
+          "embedding_size": 257,
+          "plato_save_embedding_layers": true,
+          "payload_embedding_keys": [
+            "model.model.embed_tokens.weight",
+            "model.lm_head.weight"
+          ],
+          "native_peft_embedding_keys": [
+            "base_model.model.model.embed_tokens.weight",
+            "base_model.model.lm_head.weight"
+          ],
+          "checkpoint_embedding_keys": [
+            "base_model.model.lm_head.weight",
+            "base_model.model.model.embed_tokens.weight"
+          ],
+          "logits_restored": true,
+          "max_logit_error_after_reload": 0.0
+        }
+      ],
+      "actual_new_regression": "tests/integration/test_qwen3_lora.py::test_supplied_preexpanded_peft_model_preserves_embedding_snapshots_and_logits",
+      "actual_new_regression_result": "PASS in independent 25-test run, including payload independence, Algorithm load, checkpoint load and exact restored logits."
+    }
+  ],
+  "verified_passes": [
+    "Exact frozen commit/tree remained clean. All 15 source SHA256 entries in the correction receipt match; original historical receipt remains byte-identical to d3569ec and only the two corrected source paths differ from its original hashes.",
+    "Original edge reproducer independently rerun against this candidate: both in-Trainer and caller-preexpanded vocabulary 256 to 257 paths include input/output embedding weights in real PEFT payloads and checkpoints and restore logits exactly (maximum error 0). Config reloads forbidden during extraction/export.",
+    "Independent 48-case float64 SGD/momentum accumulation oracle passed with maximum parameter error0: steps 1/2/3/4, counts 1/2/3/5/6/7, both last-batch and finalize tail paths. Optimizer counts, pre/post callbacks, scheduler advancement, counter clearing and repeated-finalize idleness all match.",
+    "Independent actual PEFT tiny native Qwen3 payload probe passed q/v, saved head, embedding-LoRA and explicit expanded-vocabulary variants. No CPU aliases, changed snapshots, hidden config reloads or payload round-trip errors; required modules/embeddings retained and ordinary frozen base excluded.",
+    "Six additional independent actual PEFT mutation-and-reload variants passed: q/v, modules_to_save head, modules_to_save input embedding, embedding-LoRA list target, embedding-LoRA regex target and trainable token indices. Both production payload load and checkpoint load restore logits exactly; malformed checkpoint shapes reject before any active-state mutation.",
+    "All 25 focused new tests passed with 10 visible warnings and no skips/xfails/deselections. Includes offline real tiny Qwen/PEFT 2/3 weighted updates through production server aggregation, every-tensor oracle, unchanged frozen base, checkpoints/snapshots, exact artifact revisions and bad-pin failure, dataset cache identity, configured seed and actual HF tail callback/control/scheduler integration.",
+    "Source review confirms explicitly configured model/tokenizer revisions flow to every maintained loader and PEFT revision. trust_remote_code=False and supported token/dtype arguments are used. Failures have no retry-main/random fallback. Legacy unspecified revision defaults are explicit in artifact_identity and distinct from failure fallback.",
+    "Raw HF dataset cache identity includes explicit dataset revision and resolved local file path plus streaming content SHA256. Pinned/local inputs cannot use legacy unpinned caches.",
+    "Configured trainer seed drives actual adapter initialization and client-specific training Torch seed. An independent actual no-seed initialization check preserves incoming RNG variation; configurations without trainer.random_seed are not newly forced to a seed.",
+    "Fresh official pretrained qualification JSON and log match committed correction evidence. All reported numerical/hash fields plus client losses exactly equal original qualification. Official cached config/model file sizes and streaming SHA256 match original evidence; original vocabulary and actual checkpoint input embedding header are both 151936.",
+    "Historical actual-transport CLI JSON, wrapper and log hashes verified, including all 8 transfer lines, 2.22 MB each direction/client, both comm_simulation=false, exit 0, natural shutdown and no survivors. Exactly one visible resource_tracker semaphore warning remains. It is correctly presented as d3569ec history.",
+    "Ordinary Qwen correction predicate is false because current embedding size equals pinned original 151936. Config, transport/checkpoint interfaces and remaining source hashes are unchanged, and fresh real qualification is numerically identical. This supports ordinary behavior equivalence without claiming a fresh CLI rerun."
+  ],
+  "independent_execution": {
+    "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+    "environment": "/tmp/plato-phase2-integration/final-mandatory-313",
+    "package_versions": {
+      "torch": "2.14.1",
+      "transformers": "5.18.0",
+      "peft": "0.21.2",
+      "datasets": "5.0.1",
+      "huggingface-hub": "1.33.0",
+      "safetensors": "0.8.0"
+    },
+    "focused_tests": {
+      "argv": [
+        "/tmp/plato-phase2-integration/final-mandatory-313/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_huggingface_artifacts.py",
+        "tests/integration/test_qwen3_lora.py",
+        "tests/trainers/test_huggingface_accumulation.py",
+        "-q"
+      ],
+      "env": {
+        "PYTHONPATH": "/tmp/plato-refresh-worktrees/qwen-reference-review2",
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1"
+      },
+      "result": "25 passed, 10 warnings; no skips, xfails, deselections."
+    },
+    "accumulation_cases": 48,
+    "accumulation_max_error": 0.0,
+    "payload_variants": [
+      "qv",
+      "saved_head",
+      "embedding_lora",
+      "expanded_vocabulary"
+    ],
+    "persistence_variants": [
+      "qv",
+      "saved_head",
+      "saved_input",
+      "embedding_lora",
+      "regex_embedding_lora",
+      "trainable_tokens"
+    ],
+    "reviewer_scratch_adaptation": "Only scratch was changed. The edge reproducer differs only in output directory. The standalone Algorithm payload fixture has no Trainer, so its expanded-vocabulary case establishes plato_save_embedding_layers from its explicitly preserved original vocabulary and actual pre-wrapper embedding size. Trainer detection itself is independently exercised by the unchanged edge logic and the actual new regression. One initial scratch attempt read num_embeddings through the embedding-LoRA wrapper and failed; the scratch fixture was corrected to capture the embedding size before wrapping, then all 48 accumulation and 4 payload cases passed."
+  },
+  "evidence_checks": {
+    "source_hashes_match_correction": true,
+    "source_hash_count": 15,
+    "original_receipt_expected_source_hash_mismatches": [
+      "plato/trainers/huggingface.py",
+      "tests/integration/test_qwen3_lora.py"
+    ],
+    "fresh_qualification_matches_committed_result": true,
+    "fresh_numerical_fields_equal_original": [
+      "configured_artifacts",
+      "seed",
+      "dtype",
+      "device",
+      "trainable_parameters",
+      "total_parameters",
+      "optimizer_updates",
+      "client_sample_counts",
+      "before_adapter_sha256",
+      "after_adapter_sha256",
+      "frozen_base_sha256",
+      "before_perplexity",
+      "global_perplexity",
+      "weighted_oracle_all_tensors",
+      "payloads_independent",
+      "adapter_only_checkpoint",
+      "reload_logits_match",
+      "frozen_base_unchanged",
+      "client_train_losses"
+    ],
+    "historical_cli_json_matches_committed_observation": true,
+    "accumulation_cases": 48,
+    "accumulation_max_error": 0.0,
+    "all_accumulation_callbacks_scheduler_and_finalization_match": true,
+    "all_adapter_variants_pass": true,
+    "original_receipt_byte_identical_to_d3569ec": true,
+    "official_checkpoint_files_match_size_and_sha256": true,
+    "official_original_vocabulary": 151936,
+    "official_pretrained_input_embedding_shape": [
+      151936,
+      1024
+    ],
+    "correction_preserve_embeddings_predicate_for_shipped_qwen": false,
+    "historical_cli_transfer_lines_verified": 8,
+    "historical_cli_visible_semaphore_cleanup_warnings": 1,
+    "historical_cli_log_and_wrapper_sha256_verified": true,
+    "current_real_qualification_log_sha256_verified": true,
+    "current_real_and_historical_cli_logs_have_no_main_revision_paths": true,
+    "cli_wrapper_path": "/tmp/plato-qwen-validation/run_cli_transport.py",
+    "current_real_log_path": "/tmp/plato-qwen-validation/preexpanded-fix-real.log"
+  },
+  "evidence_bindings": {
+    "original_d3569ec_validation_receipt": {
+      "path": "/tmp/plato-refresh-worktrees/qwen-reference-review2/evidence/2026-refresh/qwen-reference-validation.json",
+      "sha256": "3d351576d92a9302237b10c6f223de172a8b2cc7cbc40b1b2b4cf8e7e734fe06"
+    },
+    "current_expanded_embedding_correction_receipt": {
+      "path": "/tmp/plato-refresh-worktrees/qwen-reference-review2/evidence/2026-refresh/qwen-reference-expanded-embeddings-validation.json",
+      "sha256": "741816d489fe473159eb84e26760d7704ed6cf2cec7b9814fe1d4256d41fe64c"
+    },
+    "original_review_finding": {
+      "path": "/tmp/plato-qwen-review/qwen-reference-review-d3569ec.json",
+      "sha256": "4f8766af24b117f84f48bf63c8500b60ebc7e442351ae8c0993bf7c468e61a11"
+    },
+    "original_edge_reproducer": {
+      "path": "/tmp/plato-qwen-review/edge_cases.py",
+      "sha256": "74cb923ca887e6fbc1c80a0afc06da36c1e102ff03cf4fca5741b989b1c53df4"
+    },
+    "independent_current_edge_reproducer": {
+      "path": "/tmp/plato-qwen-review2/edge_cases.py",
+      "sha256": "d667a0b124b428c4dda7968122dc0ea4adf72f02dce743683adcba6038971c80"
+    },
+    "independent_current_edge_receipt": {
+      "path": "/tmp/plato-qwen-review2/edges/receipt.json",
+      "sha256": "ecaba635c0fc61291dcacb3c6e031255b5ff7f1c5b7698bfa9bddae1daf442ed"
+    },
+    "independent_current_edge_log": {
+      "path": "/tmp/plato-qwen-review2/edge-cases.log",
+      "sha256": "7af3228253ecec95225415834e24c68f5d2272db6bbd4d688479a93df13fd98d"
+    },
+    "original_accumulation_payload_probe": {
+      "path": "/tmp/plato-qwen-review/independent_probe.py",
+      "sha256": "9a49bc18d846da099174c1fa4e4a75f137ce293d3f656c7c92b7708636d92bc3"
+    },
+    "independent_current_accumulation_payload_probe": {
+      "path": "/tmp/plato-qwen-review2/independent_probe.py",
+      "sha256": "893e4bd35aa4b1c03644487aceef555701f786db7c63488c6d7b4de61f09b22c"
+    },
+    "independent_current_accumulation_payload_receipt": {
+      "path": "/tmp/plato-qwen-review2/final-probe.json",
+      "sha256": "03145fe2224572a7087d564c1a0c7f5aad31d1d0db9f472b5f09dd0154cf627a"
+    },
+    "independent_current_accumulation_payload_log": {
+      "path": "/tmp/plato-qwen-review2/final-probe.log",
+      "sha256": "63363fa15f4861a17d9860ea907257679418f02ac5f08858c9a7dce55420c7d9"
+    },
+    "independent_mutation_persistence_probe": {
+      "path": "/tmp/plato-qwen-review2/persistence_probe.py",
+      "sha256": "aab0ccdebe2e3502cbee598a64ca50fb8f82f5662a2ff2c1a8875c9fd706091a"
+    },
+    "independent_mutation_persistence_receipt": {
+      "path": "/tmp/plato-qwen-review2/persistence/receipt.json",
+      "sha256": "16d1b49fbe507ccda47018bf539f549cf5e2e14276bbf7ef74bc335bbf9c92d3"
+    },
+    "independent_mutation_persistence_log": {
+      "path": "/tmp/plato-qwen-review2/persistence-probe.log",
+      "sha256": "d845a56e3bc83c7d0d6573e9dd0e7f875ef3d0c348e4661fced67149849c953a"
+    },
+    "focused_tests_log": {
+      "path": "/tmp/plato-qwen-review2/focused-tests.log",
+      "sha256": "23819ced3025af227ab3916a041c7a110b87ef59077e5d688657a99640139237"
+    },
+    "evidence_checks": {
+      "path": "/tmp/plato-qwen-review2/evidence-checks.json",
+      "sha256": "7d42caed1ec4e97212a5af7b6739eda93188148cec2891e8a18036ed9307fb33"
+    },
+    "fresh_real_pretrained_qualification": {
+      "path": "/tmp/plato-qwen-validation/preexpanded-fix-real/qualification.json",
+      "sha256": "10c9b5957121bf6ce2fc616df706145786f89b2aef8fb428cb9e296f823e7799"
+    },
+    "fresh_real_pretrained_log": {
+      "path": "/tmp/plato-qwen-validation/preexpanded-fix-real.log",
+      "sha256": "5e671dead8eab43b39d6d76476b419a0c148a47aab42d3e4ae3784689317d895"
+    },
+    "historical_actual_transport_cli_receipt": {
+      "path": "/tmp/plato-qwen-validation/cli-transport/cli-result.json",
+      "sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43"
+    },
+    "historical_actual_transport_cli_log": {
+      "path": "/tmp/plato-qwen-validation/cli-transport/plato.log",
+      "sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693"
+    },
+    "historical_actual_transport_cli_wrapper": {
+      "path": "/tmp/plato-qwen-validation/run_cli_transport.py",
+      "sha256": "63066deb5f4e98747f8e374378f5722cefe142400e51ec3765e4415e9b9a1992"
+    }
+  },
+  "reviewed_source_sha256": {
+    "plato/algorithms/lora.py": "e1247014cbb04e9ded2255c5656d73b1225d36decc70c9ab8d8c328aae614cf1",
+    "plato/models/huggingface.py": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+    "plato/datasources/lora.py": "ebb9b28c64811bde575dd9834240348afc5cc602d2dffa7d462de3f4f48713a8",
+    "plato/datasources/huggingface.py": "a50701c37c680c07ff35e43cd9b6ad9a3650364a14697f06e4329b6c1db7629d",
+    "plato/trainers/huggingface.py": "cde9f121c4358be7da12f34167a9b313debc2969fd598b743acf022adaef3102",
+    "plato/utils/huggingface.py": "91b687453fc318a8fdfc27d75ac432b83a1ac04b1fcbdc67426b820efb683c9b",
+    "tests/test_huggingface_artifacts.py": "872a798ee7a4b2c50c0bc52931b54ca7c24a72694a784a158d0a5d352744858d",
+    "tests/test_utils/qwen3.py": "6e9aac5dab0dfb3133da450683681f60ef27c4d79fd15830c98acd73a52842a1",
+    "tests/integration/test_qwen3_lora.py": "dfb7b2bd0ec532fc5093e3a800fedf0539ebec2fa8f5853fab7fe477951766c9",
+    "tests/trainers/test_huggingface_accumulation.py": "cbd9dbf88147085e2ea4b08dec0f8b971c86d706a56b4c2fe9532d8a1f6086bc",
+    "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8",
+    "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1",
+    "tests/fixtures/qwen3/train.json": "88cc392157d66d757cb1efad53e41859b782f0f8637e611fb0bebf8c422c2748",
+    "tests/fixtures/qwen3/validation.json": "149d0717e6c88626ad9eb5927c82e66508c160e2e228f0b54edce79e646d83cc",
+    "tests/fixtures/qwen3/PROVENANCE.txt": "aa890d67099e9ec249c14bc22df241a5d040158f9185e3e02636a80585520a3c"
+  },
+  "limitations": [
+    "No source edits, nested agents, commits or external service calls. Scratch reports/scripts only; existing model cache read without download or mutation.",
+    "This reviewer independently reran offline focused tests and numerical/persistence probes, but did not rerun the 596M official qualification or socket CLI. Both supplied runs were read and hash-bound to committed evidence.",
+    "Actual-transport CLI remains a historical d3569ec observation. Source equivalence for the ordinary reference and fresh real numerical qualification support its applicability; no claim of a current-correction CLI execution.",
+    "Tiny native random Qwen tests establish architecture/runtime behavior, separate from official pretrained qualification. Fixture metrics are not benchmark quality/convergence evidence; no full optimizer resume or Python 3.14 qualification claim.",
+    "CLI used two serial logical clients with max_concurrency 1. Its aggregate RSS is sampled process-group RSS; qualification peak RSS is single-process and not directly comparable.",
+    "The historical CLI has one visible semaphore-cleanup warning. Its cause is not conclusively attributed to new HF/LoRA code; natural exit and absence of survivors are verified and warning was not suppressed.",
+    "Retirement archives/docs, packaging/hosted CI, combined repository suites and overall task acceptance remain root review/integration scope."
+  ]
+}

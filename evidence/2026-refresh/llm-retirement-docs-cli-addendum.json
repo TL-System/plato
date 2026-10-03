@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "PASS_DOCUMENTATION_ADDENDUM_SCOPE",
+  "documentation_source_identity": {
+    "parent_commit": "f4898e5f8cbf3a8a92c28d1227c4b03c17429773",
+    "changed_files_sha256": {
+      "docs/docs/examples/case-studies/6. Qwen3 Federated LoRA.md": "51b07e0c07c75b2d166cba91d283e2d05e5e494184f82452433a01ba7410052d"
+    },
+    "note": "Parent commit plus the changed guide SHA256 binds the prose validated by this same-commit receipt."
+  },
+  "prior_independent_review": {
+    "path": "/tmp/plato-llm-docs-review/review.json",
+    "sha256": "f235a92726404f61dcd57d7c5bb5bf85aa4c82272e1d2832b4f8c157b8c25ddb",
+    "decision": "ACCEPT_DOCUMENTATION_SCOPE"
+  },
+  "implementation_identity": {
+    "commit": "d3569ec98e64fb83ef43c2b50db4543cfe6a3bc6",
+    "branch": "maintenance/2026-qwen-reference",
+    "worktree": "/tmp/plato-refresh-worktrees/qwen-reference",
+    "worktree_clean": true,
+    "receipt_path": "evidence/2026-refresh/qwen-reference-validation.json",
+    "receipt_sha256": "3d351576d92a9302237b10c6f223de172a8b2cc7cbc40b1b2b4cf8e7e734fe06",
+    "inspected_sources_sha256": {
+      "configs/HuggingFace/fedavg_qwen3_06b_lora.toml": "17347b1c0c3e8d297baf174581a09f0db18f97948303d3137b43cfb7f822dbf1",
+      "plato/models/huggingface.py": "9e6f97fbf6a9eee00794868ab0aade6ad34dd153793f689c2e9c9f6315cc5f50",
+      "plato/trainers/huggingface.py": "96f2f8dad5d2b24c559594717d081ecbdb345a7d778a71ae2ae152d4912b41b7",
+      "tests/test_utils/qwen3.py": "6e9aac5dab0dfb3133da450683681f60ef27c4d79fd15830c98acd73a52842a1",
+      "examples/huggingface/qualify_qwen3.py": "2e1d3b6f9fa04ecdf2ddbf5e04957f39a00f7599c6ca4bf14d8f3af7ae8490c8"
+    },
+    "all_receipt_source_hashes_verified": true
+  },
+  "normal_entrypoint_actual_transport": {
+    "raw_receipt_path": "/tmp/plato-qwen-validation/cli-transport/cli-result.json",
+    "raw_receipt_sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43",
+    "result": {
+      "command": [
+        "/tmp/plato-phase2-integration/final-mandatory-313/bin/python",
+        "plato.py",
+        "--config",
+        "configs/HuggingFace/fedavg_qwen3_06b_lora.toml",
+        "--cpu",
+        "--base",
+        "/tmp/plato-qwen-validation/cli-transport",
+        "--port",
+        "53648"
+      ],
+      "cwd": "/tmp/plato-refresh-worktrees/qwen-reference",
+      "port": 53648,
+      "returncode": 0,
+      "watchdog_containment": false,
+      "natural_exit": true,
+      "elapsed_seconds": 48.70834687515162,
+      "peak_combined_rss_bytes_observed": 11497668608,
+      "rss_sampling_seconds": 0.5,
+      "maximum_group_processes": 4,
+      "survivors_after_exit": [],
+      "descendant_shutdown_grace_seconds": 10,
+      "log": "/tmp/plato-qwen-validation/cli-transport/plato.log",
+      "status": "PASS",
+      "clients_comm_simulation": false,
+      "server_comm_simulation": false,
+      "logical_clients": 2,
+      "rounds": 1,
+      "server_perplexity_logged": 131.19,
+      "transport": "Actual socket payloads using safetensor_encode/safetensor_decode.",
+      "payload_size_logged_mb_each_direction_each_client": 2.22,
+      "actual_transfer_log_lines": [
+        "[INFO][13:16:49]: [Server #60524] Sent 2.22 MB of payload data to client #2.",
+        "[INFO][13:16:51]: [Client #2] Received 2.22 MB of payload data from the server.",
+        "[INFO][13:16:57]: [Client #2] Sent 2.22 MB of payload data to the server.",
+        "[INFO][13:16:57]: [Server #60524] Received 2.22 MB of payload data from client #2.",
+        "[INFO][13:16:57]: [Server #60524] Sent 2.22 MB of payload data to client #1.",
+        "[INFO][13:16:57]: [Client #1] Received 2.22 MB of payload data from the server.",
+        "[INFO][13:17:02]: [Client #1] Sent 2.22 MB of payload data to the server.",
+        "[INFO][13:17:02]: [Server #60524] Received 2.22 MB of payload data from client #1."
+      ],
+      "env": {
+        "PYTHONPATH": "/tmp/plato-refresh-worktrees/qwen-reference",
+        "HF_HOME": "/tmp/plato-qwen-validation/huggingface",
+        "OMP_NUM_THREADS": "4",
+        "MKL_NUM_THREADS": "4",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "rss_scope": "Observed sum of RSS for the CLI process group at 0.5s intervals, including server/client/worker/tracker processes. Not an exact global peak.",
+      "log_sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693",
+      "wrapper_sha256": "63066deb5f4e98747f8e374378f5722cefe142400e51ec3765e4415e9b9a1992"
+    },
+    "log_sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693",
+    "shutdown_warning_count": 1,
+    "shutdown_warning_text": "/Users/bli/.local/share/uv/python/cpython-3.13.16-macos-aarch64-none/lib/python3.13/multiprocessing/resource_tracker.py:479: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-tvzrmh6w'}",
+    "cause": "Not established; documentation makes no causal attribution.",
+    "independently_executed_by_docs_author": false
+  },
+  "single_process_qualification": {
+    "raw_receipt_path": "/tmp/plato-qwen-validation/real-pretrained/qualification.json",
+    "raw_receipt_sha256": "e3e335d8b81ac9677fe5cee3e3ac392f2a973933153348e74813a1bce4946a1b",
+    "result": {
+      "model_class": "Qwen3ForCausalLM",
+      "configured_artifacts": {
+        "model_name": "Qwen/Qwen3-0.6B-Base",
+        "model_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+        "tokenizer_name": "Qwen/Qwen3-0.6B-Base",
+        "tokenizer_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
+      },
+      "device": "cpu",
+      "dtype": "torch.float32",
+      "seed": 17,
+      "max_length": 64,
+      "trainable_parameters": 573440,
+      "total_parameters": 596623360,
+      "optimizer_updates": 5,
+      "client_sample_counts": [
+        2,
+        3
+      ],
+      "client_train_losses": [
+        5.03812313079834,
+        5.50519323348999
+      ],
+      "before_perplexity": 133.13561616044146,
+      "global_perplexity": 130.5305123025955,
+      "before_adapter_sha256": "ce48664afb003bfea5401d278722bfc828572a0b1a14171497ca4659b9503a76",
+      "after_adapter_sha256": "935a7defc6170d2d57b7e2a31f9bc6475b61ba2652e5d8aa8ce24379b352cece",
+      "frozen_base_sha256": "01a101efc877aa13198937c42a8b136c7c80f4675e9ec5d1f3350bb923eb3199",
+      "frozen_base_unchanged": true,
+      "finite_nonzero_gradients": true,
+      "payloads_independent": true,
+      "adapter_only_checkpoint": true,
+      "reload_logits_match": true,
+      "weighted_oracle_all_tensors": true,
+      "weighted_vs_unweighted_max_difference": 5.005608545616269e-05,
+      "elapsed_seconds": 14.175929667195305,
+      "resolved_model_revision": "da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+      "resolved_checkpoint_directory": "/private/tmp/plato-qwen-validation/real-pretrained/models/huggingface/models--Qwen--Qwen3-0.6B-Base/snapshots/da87bfb608c14b7cf20ba1ce41287e8de496c0cd",
+      "status": "PASS",
+      "scope": "Real official pretrained Qwen3; serial CPU 2/3-client update, production server aggregation, held-out perplexity, adapter checkpoint/reload.",
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "package_versions": {
+        "torch": "2.14.1",
+        "transformers": "5.18.0",
+        "peft": "0.21.2",
+        "datasets": "5.0.1",
+        "huggingface-hub": "1.33.0",
+        "safetensors": "0.8.0"
+      },
+      "peak_rss_bytes": 4258398208,
+      "peak_rss_scope": "Single qualification process with one shared frozen base, serial logical clients and the production server object."
+    },
+    "independently_executed_by_docs_author": false
+  },
+  "checks": {
+    "strict_mkdocs": {
+      "command": [
+        "/tmp/plato-llm-docs-venv/bin/python",
+        "-m",
+        "mkdocs",
+        "build",
+        "--strict",
+        "--config-file",
+        "docs/mkdocs.yml",
+        "--site-dir",
+        "/tmp/plato-llm-docs-cli-site"
+      ],
+      "exit_code": 0,
+      "log_path": "/tmp/plato-llm-docs-cli-build.log",
+      "log_sha256": "712a980f2fc1ebd0159ae6ad31766b1f5ebabdaaaeda86b3eae475d8bcd468a2"
+    },
+    "whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    "source_and_receipt_binding": "Final implementation source hashes, raw CLI result, qualification result, and CLI log hash agree with the committed implementation receipt.",
+    "config": {
+      "trainer_random_seed": 17,
+      "clients_comm_simulation": false,
+      "server_comm_simulation": false
+    }
+  },
+  "supersession": "Guide measurements now bind the final seeded implementation and actual-transport CLI. Earlier shared-base and simulated-payload observations remain historical evidence in the original docs/code receipts; no prior receipt was rewritten.",
+  "limitations": [
+    "Documentation-only addendum; no runtime, CI, test, dependency, or lockfile edits.",
+    "Runtime results were read and source-correlated, not independently rerun by the documentation author.",
+    "CLI memory is sampled aggregate RSS over a process group; qualification memory is one shared-base process. Neither measurement is a hardware guarantee.",
+    "The semaphore cleanup warning persisted and was neither suppressed nor conclusively attributed.",
+    "Root owns combined integration qualification and independent addendum review."
+  ]
+}

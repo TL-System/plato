@@ -189,7 +189,6 @@ class ComposableTrainer(base.Trainer):
         return (
             EVALUATION_RESULTS_KEY,
             EVALUATION_PRIMARY_KEY,
-            "nanochat_core_results",
         )
 
     def _test_accuracy_filename(self, run_id: str) -> str:

@@ -11,14 +11,13 @@ from plato.datasources import (
     feature,
     femnist,
     huggingface,
-    lerobot,
     lora,
-    nanochat,
     purchase,
     texas,
     tiny_imagenet,
     torchvision,
 )
+from plato.utils.retired_backends import raise_if_retired
 
 registered_datasources = {
     "HuggingFace": huggingface,
@@ -29,10 +28,9 @@ registered_datasources = {
     "Texas": texas,
     "TinyImageNet": tiny_imagenet,
     "Feature": feature,
-    "Nanochat": nanochat,
 }
 
-registered_partitioned_datasources = {"FEMNIST": femnist, "LeRobot": lerobot}
+registered_partitioned_datasources = {"FEMNIST": femnist}
 
 _datasource_aliases = {
     "STL10": ("Torchvision", {"dataset_name": "STL10"}),
@@ -52,6 +50,7 @@ def get(client_id: int = 0, **kwargs):
     else:
         datasource_name = Config().data.datasource
 
+    raise_if_retired(datasource_name, category="datasource")
     logging.info("Data source: %s", datasource_name)
 
     if datasource_name in _datasource_aliases:
@@ -85,6 +84,7 @@ def get_input_shape():
     """Get the input shape of data source with the provided name."""
     datasource_name = Config().data.datasource
 
+    raise_if_retired(datasource_name, category="datasource")
     logging.info("Data source: %s", Config().data.datasource)
 
     if datasource_name in _datasource_aliases:

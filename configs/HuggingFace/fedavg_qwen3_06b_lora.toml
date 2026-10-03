@@ -1,0 +1,62 @@
+# Bounded CPU integration reference. Run from the repository root with --cpu.
+# These original prose fixtures are not a benchmark or a convergence example.
+[clients]
+type = "simple"
+total_clients = 2
+per_round = 2
+do_test = false
+comm_simulation = false
+
+[server]
+address = "127.0.0.1"
+port = 8000
+random_seed = 17
+do_test = true
+comm_simulation = false
+
+[data]
+datasource = "LoRA"
+dataset_name = "json"
+text_field = "text"
+max_length = 64
+partition_size = 2
+sampler = "iid"
+random_seed = 17
+shuffle_seed = 17
+
+[data.data_files]
+train = "tests/fixtures/qwen3/train.json"
+validation = "tests/fixtures/qwen3/validation.json"
+
+[trainer]
+type = "HuggingFace"
+model_type = "huggingface"
+model_name = "Qwen/Qwen3-0.6B-Base"
+model_revision = "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
+tokenizer_name = "Qwen/Qwen3-0.6B-Base"
+tokenizer_revision = "da87bfb608c14b7cf20ba1ce41287e8de496c0cd"
+model_dtype = "float32"
+random_seed = 17
+rounds = 1
+# Report perplexity; the fixed round budget determines when this reference stops.
+target_perplexity = { null = true }
+epochs = 1
+batch_size = 1
+gradient_accumulation_steps = 1
+max_concurrency = 1
+optimizer = "AdamW"
+
+[algorithm]
+type = "fedavg_lora"
+
+[parameters.optimizer]
+lr = 0.0001
+weight_decay = 0.0
+
+[parameters.lora]
+r = 4
+lora_alpha = 8
+target_modules = ["q_proj", "v_proj"]
+lora_dropout = 0.0
+bias = "none"
+task_type = "CAUSAL_LM"

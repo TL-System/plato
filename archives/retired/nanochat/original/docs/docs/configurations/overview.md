@@ -1,0 +1,4 @@
+In Plato, all configuration settings are read from a configuration file when the clients and the servers launch, and the configuration file follows the TOML format for the sake of simplicity and readability. This section introduces all the possible settings in the configuration file, including the optional `[evaluation]` block for structured benchmark integrations such as Lighteval and Nanochat CORE.
+
+!!! note "Note"
+    Attributes in **bold** must be included in a configuration file, while attributes in *italic* only need to be included under certain conditions.

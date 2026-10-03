@@ -192,24 +192,13 @@ def test_composable_trainer_replaces_stale_evaluator_payloads(temp_config):
         _clear_evaluation_config()
 
 
-@pytest.mark.parametrize(
-    "evaluation_config",
-    [
-        None,
-        {"type": "nanochat_core"},
-    ],
-)
-def test_composable_trainer_without_evaluator_keeps_legacy_test_behavior(
-    temp_config, evaluation_config
-):
+def test_composable_trainer_without_evaluator_keeps_legacy_test_behavior(temp_config):
     from plato.evaluators.runner import (
         EVALUATION_PRIMARY_KEY,
         EVALUATION_RESULTS_KEY,
     )
 
     _clear_evaluation_config()
-    if evaluation_config is not None:
-        Config().evaluation = ConfigNode.from_object(evaluation_config)
     trainer = ComposableTrainer(
         model=nn.Linear(2, 1),
         testing_strategy=ConstantTestingStrategy(0.5),

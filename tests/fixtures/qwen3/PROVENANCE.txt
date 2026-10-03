@@ -1,0 +1,9 @@
+Original prose written for Plato's bounded Qwen3 integration reference on
+2026-10-03. No third-party dataset passages were copied. These five training
+and two validation records are disjoint and serve runtime validation only;
+they do not establish model quality, convergence, or benchmark performance.
+
+The fixture text is provided under Plato's repository license. The separately
+downloaded Qwen/Qwen3-0.6B-Base checkpoint has its own Apache-2.0 license and is
+not bundled here. Model and tokenizer revision:
+da87bfb608c14b7cf20ba1ce41287e8de496c0cd.

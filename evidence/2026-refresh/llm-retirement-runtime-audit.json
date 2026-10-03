@@ -1,0 +1,706 @@
+{
+  "status": "PASS_ACTUAL_INTEGRATED_RUNTIME_AUDIT",
+  "runtime_observations": [
+    {
+      "path": "test_active_edge_failure_unwin0/edge/result.json",
+      "sha256": "d682a7f4e9254c75446299648fcd9b6b4b889f145f3c13db3f92395f0b0a7749",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_active_failure_reaches_sy0/client_custom/result.json",
+      "sha256": "a4ae7e4606faf1843d7a1e8032ac382defa31fceec9449631fc66cccddbe691f",
+      "case": "client_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_active_failure_reaches_sy1/ordinary/result.json",
+      "sha256": "d0ec3a67f81a86c6e7dd26bc556d1e7856478323b83e611a8bd0b5b088c2ea73",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_active_failure_reaches_sy2/central/result.json",
+      "sha256": "59b04dc4a2a3813dd785dd6eb36232663c02e467e02235c70dc431c778f45e14",
+      "case": "central",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_active_failure_reaches_sy3/edge_custom/result.json",
+      "sha256": "efdb382f14f60f176ae0fdd3c97174d55bf8f9846b6c1dc24862b723c1aa3e2a",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_actual_shipped_run_resume0/control/run/result.json",
+      "sha256": "26c14b9f55cd302bc126825345fefd61391735df6a8bbbf74d9be1f5fd0a7701",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_actual_shipped_run_resume0/split/first/result.json",
+      "sha256": "9e63340dd5bbb128f6a072ca5bc0d13992cdcded19a8616cf4f1657506675953",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_actual_shipped_run_resume0/split/resumed/result.json",
+      "sha256": "0871a2370dc3075499b7a0f2b6e0ea9ad4a0a0599e2329d0f1cddf33fbc50a1f",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_actual_shipped_run_resume1/control/run/result.json",
+      "sha256": "0074b388413b07323a0bb9c72d3fad03ec84f5f86a97e4157daf05b02a296515",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_actual_shipped_run_resume1/split/first/result.json",
+      "sha256": "93fb74a21d258844bfcbd216f2459fd25d3c1c56211ba2496d53428a2038dcc2",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_actual_shipped_run_resume1/split/resumed/result.json",
+      "sha256": "380f6b7141f8c990607ceddcf6573aa49f2db2f0e89364b85520ace8c5cf8b20",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_cancellation_already_fina0/cancelling/result.json",
+      "sha256": "1128096dcadeb3f60ffcd2e78d70ac0b64d5c48ee2f56f1a5272c2b8d622773f",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_client_control_flow_keeps0/interrupt/result.json",
+      "sha256": "b2e2390010dafd605b81345f75553ea96f5882ce68bb3dc37d20afd76cc4fb9a",
+      "case": "client_lifecycle",
+      "returncode": -2,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_client_control_flow_keeps1/exit/result.json",
+      "sha256": "d06baa449bc4cd4caabe5154d05f2ea7f820505c8641fa7ddba7621fa00be718",
+      "case": "client_lifecycle",
+      "returncode": 7,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_closed_current_client_loo0/closed/result.json",
+      "sha256": "8197832fc793f6a2819d7863cc9fdb86a4cd15775055c6f3f40737f52ff68f4a",
+      "case": "client_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_configure_failure_is_pres0/configure/result.json",
+      "sha256": "578a6fbddb134a66b18e802c0d2ca7bddbbab6b75ceac43e5e6fea10ab6f2467",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_delegating_server_consume0/delegated/result.json",
+      "sha256": "e0676714f9af15e44c7f18b97bea2cb52140fc9fb7479359cb019309731c6438",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_edge_cancellation_error_k0/edge/result.json",
+      "sha256": "cac5d4c4596895eb1a4ac694d48163b2bd1398a55fe41d045984100701426c7f",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_explicitly_absent_loop_on0/ordinary/result.json",
+      "sha256": "d8a6e4cecb37c3c5f70f78cae9e498b7d5f3ed616c55fef7b06c4c9479f524d2",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_explicitly_absent_loop_on1/central/result.json",
+      "sha256": "9eca6d46b5a8a6d5395e9c8c2a268a9e12b5bf5be6fd55fa8638e3f1e69fd6a8",
+      "case": "central",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_explicitly_absent_loop_on2/edge_default/result.json",
+      "sha256": "3b14c74bbae2604e10dc04c8014fb46a7d7de82401fd82d77a10e0671d900c24",
+      "case": "edge_default",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_explicitly_absent_loop_on3/edge_custom/result.json",
+      "sha256": "722bc50d4ac38eac6aba949110a67d9c431d566eae4407465c01f11912e520c3",
+      "case": "edge_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes0/client_default/result.json",
+      "sha256": "080fc2cd5b215936051854fbb1d60650454bcbf5f434cb77591515560d62dd5c",
+      "case": "client_default",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes1/client_custom/result.json",
+      "sha256": "1d25341e75256b06d39794d3e8ed7ecb50b607370461c3959f07f81e67dad542",
+      "case": "client_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes2/ordinary/result.json",
+      "sha256": "c2ace6afacc2be14b6f081921a62d932a1ee2640b534afbccf38b989a27d6bc6",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes3/central/result.json",
+      "sha256": "c03d185d230ffb5ed25ee12a78d9e9d3fc7f988eeefef9027bcdfd347a5a1cef",
+      "case": "central",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes4/direct/result.json",
+      "sha256": "05c4b8583af0cf4758f760594dd64340093d4184897bf284796f8ad2ab9863b8",
+      "case": "direct",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes5/edge_default/result.json",
+      "sha256": "0a9de6cee8279aa0d3861e50e18bdbb43c489482e430e2f924cc4a34374250f0",
+      "case": "edge_default",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_fresh_entrypoint_executes6/edge_custom/result.json",
+      "sha256": "6db3b5da88727490d698be8c50615519b8916e7772ad3a9e1a9119683d4d7094",
+      "case": "edge_custom",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_independent_runtime_error0/independent/result.json",
+      "sha256": "b3893e94af133623266147f9851bc6a5537f98702c001820675d77b682ae34cb",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_missing_external_edge_cli0/edge/result.json",
+      "sha256": "ce20c1d4fab8a143e07bc28aac42e7a37576d49000a25d4ff52cdf1d4947ac51",
+      "case": "edge_custom",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_noncooperative_teardown_i0/task/result.json",
+      "sha256": "3e904fef13b1f914e47f95cc534563b748244e7c17bcc3dd99dbdcf56afbf854",
+      "case": "client_lifecycle",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "test_noncooperative_teardown_i1/generator/result.json",
+      "sha256": "a0af7430f9dde37da4b789f7b93940e77f9ddce06fc334f983270f62d5356de9",
+      "case": "client_lifecycle",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "test_noncooperative_teardown_i2/executor/result.json",
+      "sha256": "912cdd35a0c3f3ed037642c3df265d600cfacdbec86f43c79cc689d3779ecdee",
+      "case": "client_lifecycle",
+      "returncode": -15,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "test_noncooperative_teardown_i3/aiohttp_task/result.json",
+      "sha256": "23f60f8ed15b787600e7783a7bff5aab75103ab473fd8c6cade5e22b0ca46b7a",
+      "case": "ordinary",
+      "returncode": -9,
+      "timed_out": true,
+      "forced": [
+        "TERM",
+        "KILL"
+      ],
+      "survivors": []
+    },
+    {
+      "path": "test_owned_client_finalizes_ta0/client/result.json",
+      "sha256": "14e63b604956d4310c5c2d4092a64e4291811579377836de5aba927dee4015c3",
+      "case": "client_lifecycle",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_owned_client_finalizes_ta1/client/result.json",
+      "sha256": "5366914b4759d249c289953cd13f1fe9c567a83ab364abb1a269d768bbb1e0f6",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_owned_server_fallback_fin0/fallback/result.json",
+      "sha256": "ae8ab363fa4ed0bd4799e2f2623d3206ae08bbf9be96e795df86e8cca2188f47",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_owned_server_fallback_fin1/fallback/result.json",
+      "sha256": "1ebb9090fa2b521cf715b3de75365bc063c5226d5d411ccb74ffce20e220c856",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_post_launch_failure_keeps0/failure/result.json",
+      "sha256": "a9dcd6ee870497c74e6fad438f41ef65ad98b9e222e5577ff37fbb98bda19787",
+      "case": "socket_failure",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+      "sha256": "f10a14c4c33bfbc535924073675a58e41f363168b2353bda5dbc3cb48a668437",
+      "case": "client_lifecycle",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+      "sha256": "56b26b5d48303cbe3f538b65bc0f8e66dda4df711c800e6b43124b37809a396e",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_preconstructed_borrowed_l2/ordinary/result.json",
+      "sha256": "1edd5a06d1686d998e5c3da654fe59fb23cd508a50a4dce398ba22d3317555a9",
+      "case": "ordinary",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_preconstructed_borrowed_l3/ordinary/result.json",
+      "sha256": "0418ce3b805c17dc3a68077945f725ca22849d0e486d774b8cd6619e3a11b1d2",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_real_two_client_cpu_socke0/round/result.json",
+      "sha256": "2eb1be2645c109adb1bf7b6ad23b69f3ed3c5f94b44124acb7435beae004953d",
+      "case": "socket_round",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_repeated_owned_client_ent0/client/result.json",
+      "sha256": "0781f0da0413c019375de1f5b025a678be5c793fa843b8c661574330f3915ae2",
+      "case": "client_lifecycle",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_runner_cleanup_error_keep0/cleanup/result.json",
+      "sha256": "7b77f3707ff7a6f88bd33b17590d218a43b9258d36742778afe193180506b9ac",
+      "case": "client_lifecycle",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_running_loop_rejected_bef0/running/result.json",
+      "sha256": "b9fd9cdcccae7fcddc855fa708de7afeedbc18d7bb8c88992aa7f01b5e43558f",
+      "case": "running",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_server_error_precedence_a0/server/result.json",
+      "sha256": "7ebd6eec6aeb8fcfcef9c6bf4542ceb303dbb6f4f96809ce5d268d6004803b7b",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_server_error_precedence_a1/server/result.json",
+      "sha256": "d9a3108479e90b52f57065a921a8c7c41bd0804ba54148871ff37ed3af096e88",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_server_error_precedence_a2/server/result.json",
+      "sha256": "4bfa0f0782fdd5b1e64aa3cf6aa5164806ff13e81b070fbbf0db7d0b8f4fc093",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_server_error_precedence_a3/server/result.json",
+      "sha256": "89f43f494ff8ebfe4ea340d9a565d6ed65f5ba753581542c88c8049cd9949cf0",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_server_error_precedence_a4/server/result.json",
+      "sha256": "e630e63d777b7609005f9d2f961e3d24b4f7df39dbf2e84403fffebb116f7548",
+      "case": "ordinary",
+      "returncode": 1,
+      "timed_out": false,
+      "forced": [],
+      "survivors": []
+    },
+    {
+      "path": "test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "sha256": "95bd3e57d1bfcab4a16c079173b4d0ac9a6fabde9cfb8dc3605b1d3e11fdeb38",
+      "case": "feddyn_entrypoint",
+      "returncode": 0,
+      "timed_out": false,
+      "forced": false,
+      "survivors": []
+    },
+    {
+      "path": "test_stalled_real_client_is_co0/stalled/result.json",
+      "sha256": "c2a3abf9905fdc286280586efea04fca082a52fb47357bc8a79b9c1bb93e64e5",
+      "case": "socket_stall",
+      "returncode": 0,
+      "timed_out": true,
+      "forced": [
+        "TERM"
+      ],
+      "survivors": []
+    }
+  ],
+  "runtime_duplicate_paths": [],
+  "fedavg": {
+    "samples": [
+      2,
+      6
+    ],
+    "max_absolute_error": 1.4901161193847656e-08,
+    "per_key_error": {
+      "linear.weight": 1.4901161193847656e-08,
+      "linear.bias": 2.9103830456733704e-10
+    },
+    "natural_completion": true
+  },
+  "feddyn_scalar": [
+    {
+      "mode": "uniform",
+      "rows": [
+        {
+          "round": 1,
+          "selected": [
+            9,
+            7
+          ],
+          "cloud_exact": "4201/1250",
+          "cloud": 3.3608,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "189/200",
+            "0",
+            "1323/1000",
+            "0"
+          ]
+        },
+        {
+          "round": 2,
+          "selected": [
+            5,
+            6
+          ],
+          "cloud_exact": "1590926/390625",
+          "cloud": 4.07277056,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "387261/1250000",
+            "623511/1250000",
+            "189/200",
+            "0",
+            "1323/1000",
+            "0"
+          ]
+        },
+        {
+          "round": 3,
+          "selected": [
+            5,
+            3
+          ],
+          "cloud_exact": "10901036813/2500000000",
+          "cloud": 4.3604147252,
+          "histories_exact": [
+            "0",
+            "0",
+            "-79200639/390625000",
+            "0",
+            "5989997223/12500000000",
+            "623511/1250000",
+            "189/200",
+            "0",
+            "1323/1000",
+            "0"
+          ]
+        },
+        {
+          "round": 4,
+          "selected": [
+            9,
+            5
+          ],
+          "cloud_exact": "3276850758902459/625000000000000",
+          "cloud": 5.242961214243935,
+          "histories_exact": [
+            "0",
+            "0",
+            "-79200639/390625000",
+            "0",
+            "73878064872003/125000000000000",
+            "623511/1250000",
+            "189/200",
+            "0",
+            "5437192292343/2500000000000",
+            "0"
+          ]
+        }
+      ],
+      "full_cpu_rng_resume_equal": true
+    },
+    {
+      "mode": "sample",
+      "rows": [
+        {
+          "round": 1,
+          "selected": [
+            9,
+            7
+          ],
+          "cloud_exact": "353123/105000",
+          "cloud": 3.3630761904761903,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "2649/2800",
+            "0",
+            "23863/18000",
+            "0"
+          ]
+        },
+        {
+          "round": 2,
+          "selected": [
+            5,
+            6
+          ],
+          "cloud_exact": "128360720449/31500000000",
+          "cloud": 4.07494350631746,
+          "histories_exact": [
+            "0",
+            "0",
+            "0",
+            "0",
+            "324675653/1050000000",
+            "628233913/1260000000",
+            "2649/2800",
+            "0",
+            "23863/18000",
+            "0"
+          ]
+        },
+        {
+          "round": 3,
+          "selected": [
+            5,
+            3
+          ],
+          "cloud_exact": "68709908479515937/15750000000000000",
+          "cloud": 4.362533871715297,
+          "histories_exact": [
+            "0",
+            "0",
+            "-38228753386921/189000000000000",
+            "0",
+            "1504228643537329/3150000000000000",
+            "628233913/1260000000",
+            "2649/2800",
+            "0",
+            "23863/18000",
+            "0"
+          ]
+        },
+        {
+          "round": 4,
+          "selected": [
+            9,
+            5
+          ],
+          "cloud_exact": "2233056172986945054199069/425250000000000000000000",
+          "cloud": 5.251160900615979,
+          "histories_exact": [
+            "0",
+            "0",
+            "-38228753386921/189000000000000",
+            "0",
+            "1852286934197154740849/3150000000000000000000",
+            "628233913/1260000000",
+            "2649/2800",
+            "0",
+            "797767729653031648129/364500000000000000000",
+            "0"
+          ]
+        }
+      ],
+      "full_cpu_rng_resume_equal": true
+    }
+  ]
+}

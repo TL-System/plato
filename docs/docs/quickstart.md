@@ -53,16 +53,19 @@ This configuration performs Hugging Face training locally while the server evalu
 
 See [Evaluation](configurations/evaluation.md) for the available evaluator options and [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md) for the full example.
 
-## Running Nanochat in Plato
+## Running Qwen3 Federated LoRA
 
-Nanochat requires additional setup beyond `uv sync --extra nanochat`:
+The bounded Qwen3 example fine-tunes LoRA adapters on a small local text fixture:
 
-- initialize the `external/nanochat` submodule
-- install `maturin` and build the `rustbpe` extension
-- prepare a tokenizer if you want to run CORE evaluation
-- use `--cpu` for the synthetic smoke-test path if you want the run to stay on CPU
+```bash
+uv run python plato.py --config configs/HuggingFace/fedavg_qwen3_06b_lora.toml --cpu
+```
 
-See [Nanochat in Plato](examples/case-studies/5. Nanochat in Plato.md) for the full step-by-step instructions.
+Run from the repository root. The model and tokenizer download from a fixed
+Hugging Face revision on first use. See
+[Qwen3 Federated LoRA](examples/case-studies/6. Qwen3 Federated LoRA.md)
+for setup, memory considerations, and the distinction between offline tests
+and pretrained-model qualification.
 
 ## Using MLX as a Backend
 

@@ -59,7 +59,7 @@ same strategy stack in every round.
 Structured evaluators are layered **after** the testing strategy. In other
 words, `TestingStrategy` still returns the trainer's scalar metric (accuracy,
 perplexity, loss, and so on), and an optional `[evaluation]` section can then
-run a named benchmark adapter such as Lighteval or Nanochat CORE. See
+run a named benchmark adapter such as Lighteval. See
 [Evaluators](evaluators.md) for that layer.
 
 Each concrete strategy inherits optional `setup`/`teardown` hooks. To fire

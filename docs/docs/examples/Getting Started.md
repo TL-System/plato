@@ -47,10 +47,10 @@ Plato supports both Linux with NVIDIA GPUs and macOS with M1/M2/M4/M4 GPUs. It w
 
 ## Case Studies
 
+- [Qwen3 Federated LoRA](case-studies/6. Qwen3 Federated LoRA.md)
+
 - [Federated LoRA Fine-Tuning](case-studies/1. LoRA.md)
 
 - [Composable Trainer API](case-studies/2. Composable Trainer.md)
 
 - [Server-side Lighteval for SmolLM2](case-studies/4. Server-side Lighteval for SmolLM2.md)
-
-- [SmolVLA Trainer with LeRobot](case-studies/3. SmolVLA Trainer with LeRobot.md)

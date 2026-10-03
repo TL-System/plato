@@ -11,10 +11,10 @@ from plato.config import Config
 from plato.evaluators import registry
 from plato.evaluators.base import EvaluationInput, EvaluationResult
 from plato.trainers.strategies.base import TrainingContext
+from plato.utils.retired_backends import raise_if_retired
 
 EVALUATION_RESULTS_KEY = "evaluation_results"
 EVALUATION_PRIMARY_KEY = "evaluation_primary"
-LEGACY_OPTIONAL_EVALUATORS = {"nanochat_core"}
 
 
 def _configured_evaluator_type() -> str | None:
@@ -62,6 +62,8 @@ def run_configured_evaluation(
         context.state.pop(EVALUATION_PRIMARY_KEY, None)
         return None
 
+    raise_if_retired(evaluator_type, category="evaluator")
+
     evaluator = None
     if evaluator_override is not None:
         override_config = getattr(evaluator_override, "config", None)
@@ -74,9 +76,7 @@ def run_configured_evaluation(
             evaluator = evaluator_override
 
     if evaluator is None:
-        evaluator = registry.get(
-            allow_missing=evaluator_type in LEGACY_OPTIONAL_EVALUATORS,
-        )
+        evaluator = registry.get()
 
     if evaluator is None:
         context.state.pop(EVALUATION_RESULTS_KEY, None)

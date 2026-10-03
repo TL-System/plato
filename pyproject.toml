@@ -46,18 +46,6 @@ dp = [
 mlx = [
     "mlx>=0.32.3",
 ]
-nanochat = [
-    "datasets>=5.0.1",
-    "numpy>=2.5.3",
-    "psutil>=7.2.2",
-    "regex>=2026.9.29",
-    "tiktoken>=0.14.0",
-    "tokenizers>=0.23.2",
-    "torch>=2.14.1",
-    "wandb>=0.30.0",
-    "jinja2>=3.1.6",
-    "PyYAML>=6.0.3",
-]
 ssl = [
     "lightly>=1.5.26",
     "hydra-core>=1.3.7",
@@ -76,6 +64,7 @@ Documentation = "https://platodocs.netlify.app/"
 # Basic tool configuration
 [tool.ruff]
 exclude = [
+    "archives/retired",
     ".venv",
     "plato/models/dvit",
     "plato/models/t2tvit",
@@ -88,6 +77,9 @@ include = [
 ]
 line-length = 88
 lint.select = ["I"]
+
+[tool.hatch.build]
+exclude = ["archives/retired/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["plato"]
@@ -108,7 +100,6 @@ members = [
     "examples/model_search/heterofl",
     "examples/detector",
     "examples/gradient_leakage_attacks",
-    "examples/nanochat",
 ]
 
 [tool.uv]
@@ -129,10 +120,10 @@ test-base = [
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
 ]
-# Mandatory DP, MPC, RL and Nanochat imports for the full test suite.
+# Mandatory DP, MPC and RL imports for the full test suite.
 test = [
     { include-group = "test-base" },
-    "plato-learn[dp,mpc,rl,nanochat]",
+    "plato-learn[dp,mpc,rl]",
 ]
 dev = [
     { include-group = "test" },
@@ -157,7 +148,7 @@ audit = [
 # Remove `build` from the excluded directories.
 exclude = [
     "examples/outdated",
-    "external/nanochat",
+    "archives/retired",
     "examples/model_search/pfedrlnas/VIT/nasvit_wrapper", 
     "examples/model_search/pfedrlnas/DARTS/Darts",
     "examples/model_search/pfedrlnas/MobileNetV3/model",
@@ -169,6 +160,10 @@ exclude = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+norecursedirs = [
+    ".*", "_darcs", "build", "CVS", "dist", "node_modules", "venv",
+    "{arch}", "*.egg", "archives/retired",
+]
 addopts = "--strict-markers"
 markers = [
     "runtime: fresh startup, CPU socket rounds and containment regressions.",

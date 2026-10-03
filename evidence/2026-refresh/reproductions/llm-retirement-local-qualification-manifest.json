@@ -1,0 +1,2828 @@
+{
+  "artifact": "llm-retirement-local-qualification.tar.gz",
+  "bytes": 4293395,
+  "sha256": "35cb7d055f36f9ae3463eb2ae4bc22d919f9e6f4c931924ead5c37a4ed3e7c33",
+  "files": [
+    {
+      "path": "actual-runtime/test_active_edge_failure_unwin0/edge/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_edge_failure_unwin0/edge/config.toml",
+      "bytes": 668,
+      "sha256": "a939f9840ad4bb0cf97e0c28cea6fa921ee0a01fbac37cbcfe89757d998566b5"
+    },
+    {
+      "path": "actual-runtime/test_active_edge_failure_unwin0/edge/events-69831.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_edge_failure_unwin0/edge/events-69831.jsonl",
+      "bytes": 697,
+      "sha256": "fb2372dcfe1c597ef13f2607b1c3e30003338c0c46314974ed2d0d41448f78f6"
+    },
+    {
+      "path": "actual-runtime/test_active_edge_failure_unwin0/edge/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_edge_failure_unwin0/edge/result.json",
+      "bytes": 5361,
+      "sha256": "d682a7f4e9254c75446299648fcd9b6b4b889f145f3c13db3f92395f0b0a7749"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy0/client_custom/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy0/client_custom/config.toml",
+      "bytes": 626,
+      "sha256": "b7d0d1e40bf657076b502b00309f9cdda06fd763b062e232cb8365d61f91f012"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy0/client_custom/events-68052.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy0/client_custom/events-68052.jsonl",
+      "bytes": 417,
+      "sha256": "7809f962a5dcd6d796099b832282640e7e00fc804b912d93c7b5b23d29c25aad"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy0/client_custom/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy0/client_custom/result.json",
+      "bytes": 2849,
+      "sha256": "a4ae7e4606faf1843d7a1e8032ac382defa31fceec9449631fc66cccddbe691f"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy1/ordinary/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy1/ordinary/config.toml",
+      "bytes": 621,
+      "sha256": "25ff608a9c6002e329065e9f3fbc9ad0c1b0a87092d2405ab3b6a7732b4d06f2"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy1/ordinary/events-68069.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy1/ordinary/events-68069.jsonl",
+      "bytes": 628,
+      "sha256": "4031071311ff19f85a1705e282c9a62596a57ed0eea7c9dd4c7e45c5e26033f7"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy1/ordinary/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy1/ordinary/result.json",
+      "bytes": 4425,
+      "sha256": "d0ec3a67f81a86c6e7dd26bc556d1e7856478323b83e611a8bd0b5b088c2ea73"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy2/central/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy2/central/config.toml",
+      "bytes": 671,
+      "sha256": "2401382721eab118c28e25252b3032c6a979de84376748a6eb96fe6fd1959576"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy2/central/events-68086.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy2/central/events-68086.jsonl",
+      "bytes": 681,
+      "sha256": "8ed8341b8d9b6233344bfddbfdf387ab57fedfaddb8dd06c1b98e9546cc625a6"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy2/central/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy2/central/result.json",
+      "bytes": 4493,
+      "sha256": "59b04dc4a2a3813dd785dd6eb36232663c02e467e02235c70dc431c778f45e14"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy3/edge_custom/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy3/edge_custom/config.toml",
+      "bytes": 675,
+      "sha256": "bb800b35b0842472af84eb9d50e64be423f5bd9b0483fff8833343835614bbc4"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy3/edge_custom/events-68115.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy3/edge_custom/events-68115.jsonl",
+      "bytes": 698,
+      "sha256": "4686b99aa3204732045bd5879034a12cff480d20b08254a15ae557dfbc828bb2"
+    },
+    {
+      "path": "actual-runtime/test_active_failure_reaches_sy3/edge_custom/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_active_failure_reaches_sy3/edge_custom/result.json",
+      "bytes": 4742,
+      "sha256": "efdb382f14f60f176ae0fdd3c97174d55bf8f9846b6c1dc24862b723c1aa3e2a"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 20732,
+      "sha256": "ff7dadd0863283ff4c96938cadad3816fb28f194f703eab38066254110953f3b"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "bytes": 350,
+      "sha256": "5babe452795f1c85ea1cd07fb7afe421b336609c6d7777cf2d5570525580c831"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/results/71772.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/results/71772.csv",
+      "bytes": 130,
+      "sha256": "d74865ae382fc00b0c878f8d2a32857c4d6e20f905091a0be05cce0cf3f27cf8"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/committed-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/committed-1.pth",
+      "bytes": 20552,
+      "sha256": "82047e0f362f2cbbb9bc0b612fd4f12c197b1dc8c4db7e7cc306ce6f95c6fd3e"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/committed-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/committed-2.pth",
+      "bytes": 20616,
+      "sha256": "ed05828e9838e809fbc19e81c7b32557ce12cb2ce835771420cfc26fea059caf"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/committed-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/committed-3.pth",
+      "bytes": 20680,
+      "sha256": "f4f026e9d6a0cec1d4fc31d09b36610e4ca3ef364222c8163b99f789ee1bbb78"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/committed-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/committed-4.pth",
+      "bytes": 20808,
+      "sha256": "16439a2d0a8a997160f6f4d569790c6488f5a0cd774ca91a7c57e229c8095f98"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/config.toml",
+      "bytes": 1070,
+      "sha256": "b7d14e36f471833c8efddd25c50bf1072b901845232f962c8577fe14d82b13fb"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/events-71772.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/events-71772.jsonl",
+      "bytes": 596,
+      "sha256": "8f3023eb98607197093a6a1afe59e1742c121a37f3672087c619411bf84e114e"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/events-71823.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/events-71823.jsonl",
+      "bytes": 58,
+      "sha256": "301c29ceecee51194b6d05d49596f8f037ff64d3465c548326762033fd4f5837"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/events-71824.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/events-71824.jsonl",
+      "bytes": 58,
+      "sha256": "00daeb96d5242f2e7f0f6ef73603e3b6a362e59dcda4a48dd727410cef279ef8"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/received-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/received-1.pth",
+      "bytes": 5237,
+      "sha256": "2c67f83060dcb877c2791f96eae5d125995cc0b19176e7f8ceae48a57f56b932"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/received-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/received-2.pth",
+      "bytes": 5237,
+      "sha256": "acfdd641bbb3681453d982c9583cfe8710d72f1484802683e7edfa8148a19f6d"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/received-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/received-3.pth",
+      "bytes": 5237,
+      "sha256": "2935744b24ebec0cbb72dafcfd9c36335b48cd78b1095360c97e7c421278cb66"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/received-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/received-4.pth",
+      "bytes": 5237,
+      "sha256": "5e7d85427186dbdb7f6cc4b081c2008b92c9b4316d61579285475ac02938f185"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/result.json",
+      "bytes": 24249,
+      "sha256": "26c14b9f55cd302bc126825345fefd61391735df6a8bbbf74d9be1f5fd0a7701"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/control/run/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/control/run/start.pth",
+      "bytes": 20885,
+      "sha256": "22b484d0f0e676067d324d9bb37473e37e2c94305ef9b3ef1f91ada4a22e32d3"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 20732,
+      "sha256": "27265df35ce17e8484b09c5734cf9d52015441e11ef7f4ed384a5c8063d23087"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/committed-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/committed-1.pth",
+      "bytes": 20552,
+      "sha256": "45da55c217a6bbd425bf7140f6ed4592cc45f40443889ac3e94a786285f03278"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/committed-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/committed-2.pth",
+      "bytes": 20616,
+      "sha256": "1a73f34256ab3e953c0fde73c2a30ed8f45d8a71273c4b1c855deafc67df6b46"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/config.toml",
+      "bytes": 1064,
+      "sha256": "5c409d666f0cf535e79d44abf47fab9742207b2ee3a34f4c4389ac113cc2054e"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/events-72165.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/events-72165.jsonl",
+      "bytes": 458,
+      "sha256": "0580c9afe53fc4b78aa815c4b6bf83607b612af9174340abc78e985f1aec5e28"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/events-72186.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/events-72186.jsonl",
+      "bytes": 58,
+      "sha256": "54973986d0ec84c25f53998d37c1193751b4a0a904b513c8e45f84e39fcf207a"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/events-72187.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/events-72187.jsonl",
+      "bytes": 58,
+      "sha256": "6f64eb9bd59bf1bc13e8519b885b3d7f76b8c2960e9dff03d259a462b27765c8"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/received-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/received-1.pth",
+      "bytes": 5237,
+      "sha256": "a516f140cf9c9483ab2ccbac4fedf81877c123e018bdffbb2f4ad4c9add3470f"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/received-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/received-2.pth",
+      "bytes": 5237,
+      "sha256": "139f9b6b890e761757098195a7ff166c55cf6c4782ac2252015e76fd55f8becd"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/result.json",
+      "bytes": 14424,
+      "sha256": "9e63340dd5bbb128f6a072ca5bc0d13992cdcded19a8616cf4f1657506675953"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/first/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/first/start.pth",
+      "bytes": 20885,
+      "sha256": "e2c7e588f525d1ae469f478544363aed3515e1ce22d0d218a4a5489d5778718c"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "bytes": 350,
+      "sha256": "5babe452795f1c85ea1cd07fb7afe421b336609c6d7777cf2d5570525580c831"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/results/72165.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/results/72165.csv",
+      "bytes": 80,
+      "sha256": "82ba4e35d10f1823bbb7e2373778431fd4987337c088c9c9a1d47226554f42ef"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/results/72348.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/results/72348.csv",
+      "bytes": 80,
+      "sha256": "0a0232adf0e8bd43eb3868e78ac3ac8faeb9f1a782e979966dafc9549ad26dfe"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/committed-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/committed-3.pth",
+      "bytes": 20744,
+      "sha256": "d266a2c4b001efe6ad6046c350facfbdc411b87c8b1bbda1ac56937289bdc204"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/committed-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/committed-4.pth",
+      "bytes": 20808,
+      "sha256": "ea06ea2457b8e4a548ecf92eebd445dc46468b1df4ed236d30188ef9b3467a05"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/config.toml",
+      "bytes": 1064,
+      "sha256": "ebdd34594f2aa0000a325103496d061e2343a3c286b64088943277f52d847559"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/events-72348.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/events-72348.jsonl",
+      "bytes": 459,
+      "sha256": "b1c1ee4c346508dbaad82dda84a08fabf0c10e11a8b7e09cb5ffc330a97f1bde"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/events-72389.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/events-72389.jsonl",
+      "bytes": 58,
+      "sha256": "30a38a1285570652ca93dd9b615400d912345b84b6151220478c01fcd4efe40c"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/events-72390.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/events-72390.jsonl",
+      "bytes": 58,
+      "sha256": "db8e6bbcab71c96077afef70053167dd2703d542a947bd2cd485b3ca955464ac"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/received-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/received-3.pth",
+      "bytes": 5237,
+      "sha256": "4ce039565f67e2f5050144ba0b55fa80978364753d6298dec33968987961f128"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/received-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/received-4.pth",
+      "bytes": 5237,
+      "sha256": "e1f11d9bff8ec60bcf79231b54bb06d9dd1c330a3b30ccebd075a74ba859ccaf"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/result.json",
+      "bytes": 14371,
+      "sha256": "0871a2370dc3075499b7a0f2b6e0ea9ad4a0a0599e2329d0f1cddf33fbc50a1f"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume0/split/resumed/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume0/split/resumed/start.pth",
+      "bytes": 17045,
+      "sha256": "d8eccc8d4319a25f7b0d72b83cda55e51c202e94951e767229d1ae7bede367e1"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 20732,
+      "sha256": "af65fe2c2fb32801e92501b5bfb7cdcace9d46ed4664f5a95a14aeecb1001e38"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "bytes": 350,
+      "sha256": "6d924a934598bdc247ea994b668a2fde10bfc7bbaf32231967f5542338b1d63c"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/results/72489.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/results/72489.csv",
+      "bytes": 130,
+      "sha256": "0ce7f2b6230ce97caa7e4564288e26801cd901709fe208d62562fd70b913a88d"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/committed-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/committed-1.pth",
+      "bytes": 20552,
+      "sha256": "25b0a33e52e13d599420cfe3b6300e5350c1dacdbfddce191251f20a70881d2a"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/committed-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/committed-2.pth",
+      "bytes": 20616,
+      "sha256": "79900b46faf04701618a7acb197a60488ffc76d923d852c97f386545103a1864"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/committed-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/committed-3.pth",
+      "bytes": 20744,
+      "sha256": "6d703d101b6f519ed8f793d841222b7c69185140875304eb5995b4eb5d0a3d72"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/committed-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/committed-4.pth",
+      "bytes": 20808,
+      "sha256": "3fc4452f8efe20028d0c6521715fe847f360f98a74d677d280b25b605c24e5d5"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/config.toml",
+      "bytes": 1124,
+      "sha256": "ee117af52537aded44da794a3750e796b1ad768e48029604d49b090ba71e643f"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/events-72489.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/events-72489.jsonl",
+      "bytes": 597,
+      "sha256": "8e2aafdfdbe8676a54d0cff1b37003bd0b467d5c8a224b8d93349c40a1c57a40"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/events-72511.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/events-72511.jsonl",
+      "bytes": 58,
+      "sha256": "bec26b82c7eb7598488391b8a7fa625d6db312e9401b9366a5000d19225d56fa"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/events-72512.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/events-72512.jsonl",
+      "bytes": 58,
+      "sha256": "b4a12f2a612445251faffc66a3272f585c74cf88bb32ae9a95c3d1451f8a7275"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/received-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/received-1.pth",
+      "bytes": 5237,
+      "sha256": "81d3e8de24c21e40d51612e77e7c61d3c9240e89232a67e21356ed4b8c06431b"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/received-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/received-2.pth",
+      "bytes": 5237,
+      "sha256": "fc91d17b44ceee5265475439d3bd28653bcf4a97b82b99ee1bf15a3953d660b9"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/received-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/received-3.pth",
+      "bytes": 5237,
+      "sha256": "4d783891bfb9d1ccba595b2bddb1f8e08a2d598ba8ccaaed5842fdfb2af3acc0"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/received-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/received-4.pth",
+      "bytes": 5237,
+      "sha256": "075ae7fdeb08948d3827a89ca580e764a0ce99ba114b5da1cffff040e05cb991"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/result.json",
+      "bytes": 24254,
+      "sha256": "0074b388413b07323a0bb9c72d3fad03ec84f5f86a97e4157daf05b02a296515"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/control/run/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/control/run/start.pth",
+      "bytes": 20885,
+      "sha256": "bb440055e3be7bbd0736e46dfdad6f09b7c0b622fc33d31c5eee708ed38df078"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/checkpoints/feddyn_~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.pth",
+      "bytes": 20732,
+      "sha256": "ca2b7da9d7fee6ee08f022e8a1e5d3c47529d1a8de974a452f14ab24a0f832f2"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/committed-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/committed-1.pth",
+      "bytes": 20552,
+      "sha256": "2f16c1cf7fa9806f262a630063ae991d0e471c8bd2db99d4125b2cfe83b1216d"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/committed-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/committed-2.pth",
+      "bytes": 20616,
+      "sha256": "92d830dc42383738f3b45ea9c8244cb43bd921a8f962802993f25cb8a98c0e5b"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/config.toml",
+      "bytes": 1118,
+      "sha256": "bf46b43900a8283f10dcd4be8656fdcf999b5055f7ee19748642778add6527cf"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/events-72807.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/events-72807.jsonl",
+      "bytes": 459,
+      "sha256": "3c175f49f82ed24680411d6db8de3d997e43b4b2c14cbe8b1583947d7b2c329b"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/events-72860.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/events-72860.jsonl",
+      "bytes": 58,
+      "sha256": "53b033cf8ce2398dc2fd851583f1a258d06acf02a8a59c6fd91f51baabdf46c7"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/events-72861.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/events-72861.jsonl",
+      "bytes": 58,
+      "sha256": "fd6840891e7565b452dd7042257ffbf8e9f0686e751e6f3e9c2aec3299cccb64"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/received-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/received-1.pth",
+      "bytes": 5237,
+      "sha256": "68da455fd5a7a930b3061b4bf33ae097aaf0cafa12749f9cbcd3efea62e193bf"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/received-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/received-2.pth",
+      "bytes": 5237,
+      "sha256": "3bd55ab0aa063eb939f90699ccf92a92ed239e0f189ffce6000f27ff95af22cd"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/result.json",
+      "bytes": 14427,
+      "sha256": "93fb74a21d258844bfcbd216f2459fd25d3c1c56211ba2496d53428a2038dcc2"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/first/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/first/start.pth",
+      "bytes": 20885,
+      "sha256": "cf79539646d720f4c841e5f59a72f73a55fce8d0dbb106501b0b5b0c31692bcf"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors",
+      "bytes": 350,
+      "sha256": "6d924a934598bdc247ea994b668a2fde10bfc7bbaf32231967f5542338b1d63c"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/models/~c87c0c64d2fb215b38496b07952d86526559fee390c98b0f383fef0d230107f4.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/results/72807.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/results/72807.csv",
+      "bytes": 81,
+      "sha256": "c6362ed9d9a5f0250d4edb6e79c2b2a3c2a1d46fda096bedb51c79dba36b8093"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/results/73012.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/results/73012.csv",
+      "bytes": 79,
+      "sha256": "0392493780fe09cb98a7f3dd60e52810858ece42a2c7a17ad662a2c6797779a4"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/committed-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/committed-3.pth",
+      "bytes": 20744,
+      "sha256": "6f0b71f6547f3b4283442daa3e7d0cb27a722ef7d6020d7e33dccd3b55645ac4"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/committed-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/committed-4.pth",
+      "bytes": 20808,
+      "sha256": "f36bbf575832a01c963410156cb3852beb627ac374daafdb614a66b3bf01a19a"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/config.toml",
+      "bytes": 1118,
+      "sha256": "42494ec0337cf20c8384a5d1d212d475ea6cac2b08605492ffe679328471f820"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/events-73012.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/events-73012.jsonl",
+      "bytes": 459,
+      "sha256": "e798107c9b21507bdcd129685b1916b495be7816d34720b7473443b2eaf99e5a"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/events-73036.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/events-73036.jsonl",
+      "bytes": 58,
+      "sha256": "ffec6d64aaf785689784f4c45745696ee66095acba207b26ca0a60ee02ed2031"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/events-73037.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/events-73037.jsonl",
+      "bytes": 58,
+      "sha256": "853c45d3a72315eb48fbf407c35e6fa4c22239fa7b9fb350151c6f44ef7e55f9"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/received-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/received-3.pth",
+      "bytes": 5237,
+      "sha256": "76348dec12853127827ddb6a090fad7997430e4dd6c6f1d3c12d4e90df213de9"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/received-4.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/received-4.pth",
+      "bytes": 5237,
+      "sha256": "0d15a033a2657397d8d6828cf7157a48e79c50a53acc663ede8373e9ffbd444b"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/result.json",
+      "bytes": 14372,
+      "sha256": "380f6b7141f8c990607ceddcf6573aa49f2db2f0e89364b85520ace8c5cf8b20"
+    },
+    {
+      "path": "actual-runtime/test_actual_shipped_run_resume1/split/resumed/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_actual_shipped_run_resume1/split/resumed/start.pth",
+      "bytes": 17045,
+      "sha256": "557c14e7413cad07bc3768a32cbd3962ca5033c86babb4a80a039cfa2754632a"
+    },
+    {
+      "path": "actual-runtime/test_cancellation_already_fina0/cancelling/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_cancellation_already_fina0/cancelling/config.toml",
+      "bytes": 623,
+      "sha256": "2bdf0dc19e01a6e3dd63165e3520617a2dc86913dd26ffbadde63605fad186a1"
+    },
+    {
+      "path": "actual-runtime/test_cancellation_already_fina0/cancelling/events-69531.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_cancellation_already_fina0/cancelling/events-69531.jsonl",
+      "bytes": 645,
+      "sha256": "c9a200d71fc95798c76a82a9dbefd6ead69e75b01ed59e6d652fa59b3fe2b189"
+    },
+    {
+      "path": "actual-runtime/test_cancellation_already_fina0/cancelling/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_cancellation_already_fina0/cancelling/result.json",
+      "bytes": 2274,
+      "sha256": "1128096dcadeb3f60ffcd2e78d70ac0b64d5c48ee2f56f1a5272c2b8d622773f"
+    },
+    {
+      "path": "actual-runtime/test_client_control_flow_keeps0/interrupt/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_client_control_flow_keeps0/interrupt/config.toml",
+      "bytes": 622,
+      "sha256": "5db9320c9d53436a30e29fce0ef7a43ff9673e183f07bed1b763bc9056581e1e"
+    },
+    {
+      "path": "actual-runtime/test_client_control_flow_keeps0/interrupt/events-69640.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_client_control_flow_keeps0/interrupt/events-69640.jsonl",
+      "bytes": 724,
+      "sha256": "7c34c5b8a164c4ef8a0a557d944d6a6bb11b5d4c50b96caefa85b60ee66bd6e7"
+    },
+    {
+      "path": "actual-runtime/test_client_control_flow_keeps0/interrupt/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_client_control_flow_keeps0/interrupt/result.json",
+      "bytes": 4475,
+      "sha256": "b2e2390010dafd605b81345f75553ea96f5882ce68bb3dc37d20afd76cc4fb9a"
+    },
+    {
+      "path": "actual-runtime/test_client_control_flow_keeps1/exit/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_client_control_flow_keeps1/exit/config.toml",
+      "bytes": 617,
+      "sha256": "d50f357c073c9f9d63d3361f59f9ded108933c7f0fb8fc801f5642c306b16672"
+    },
+    {
+      "path": "actual-runtime/test_client_control_flow_keeps1/exit/events-69811.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_client_control_flow_keeps1/exit/events-69811.jsonl",
+      "bytes": 718,
+      "sha256": "ada6baf75ee2c1bd4aed791b433580dab12c789ac6f8580386c52710d01d0f25"
+    },
+    {
+      "path": "actual-runtime/test_client_control_flow_keeps1/exit/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_client_control_flow_keeps1/exit/result.json",
+      "bytes": 2354,
+      "sha256": "d06baa449bc4cd4caabe5154d05f2ea7f820505c8641fa7ddba7621fa00be718"
+    },
+    {
+      "path": "actual-runtime/test_closed_current_client_loo0/closed/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_closed_current_client_loo0/closed/config.toml",
+      "bytes": 619,
+      "sha256": "83a26a878b467faf9a96083b47c9131c051042358929b39ab402e89fb7024010"
+    },
+    {
+      "path": "actual-runtime/test_closed_current_client_loo0/closed/events-69380.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_closed_current_client_loo0/closed/events-69380.jsonl",
+      "bytes": 344,
+      "sha256": "79f2bf5699d74ea7f3af90b94d3037394c9206ac761ca0ece2b2e2250bb79c6f"
+    },
+    {
+      "path": "actual-runtime/test_closed_current_client_loo0/closed/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_closed_current_client_loo0/closed/result.json",
+      "bytes": 1362,
+      "sha256": "8197832fc793f6a2819d7863cc9fdb86a4cd15775055c6f3f40737f52ff68f4a"
+    },
+    {
+      "path": "actual-runtime/test_configure_failure_is_pres0/configure/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_configure_failure_is_pres0/configure/config.toml",
+      "bytes": 622,
+      "sha256": "d0bc482de632677dfd5a802cab136e6ec6d6139f50043a8e034102500dccc92c"
+    },
+    {
+      "path": "actual-runtime/test_configure_failure_is_pres0/configure/events-69595.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_configure_failure_is_pres0/configure/events-69595.jsonl",
+      "bytes": 364,
+      "sha256": "dd0592f99b04b9f391687dcea9a03e19b0e1839e4d2895190dd420cd8eb62035"
+    },
+    {
+      "path": "actual-runtime/test_configure_failure_is_pres0/configure/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_configure_failure_is_pres0/configure/result.json",
+      "bytes": 2591,
+      "sha256": "578a6fbddb134a66b18e802c0d2ca7bddbbab6b75ceac43e5e6fea10ab6f2467"
+    },
+    {
+      "path": "actual-runtime/test_delegating_server_consume0/delegated/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_delegating_server_consume0/delegated/config.toml",
+      "bytes": 622,
+      "sha256": "40469f204cf39d9b78a42e0fee19064e1ca9812dfe80557d55d3169df47f3332"
+    },
+    {
+      "path": "actual-runtime/test_delegating_server_consume0/delegated/events-69462.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_delegating_server_consume0/delegated/events-69462.jsonl",
+      "bytes": 597,
+      "sha256": "740e60a11eab4d7fb8b9fc329cf3d489695c849d544c7654ae54a6fb6be20706"
+    },
+    {
+      "path": "actual-runtime/test_delegating_server_consume0/delegated/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_delegating_server_consume0/delegated/result.json",
+      "bytes": 2291,
+      "sha256": "e0676714f9af15e44c7f18b97bea2cb52140fc9fb7479359cb019309731c6438"
+    },
+    {
+      "path": "actual-runtime/test_edge_cancellation_error_k0/edge/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_edge_cancellation_error_k0/edge/config.toml",
+      "bytes": 668,
+      "sha256": "9aafdbc5de9512df752b41c9bcc13294cdd46b8245837bebb05df944de49c1f3"
+    },
+    {
+      "path": "actual-runtime/test_edge_cancellation_error_k0/edge/events-69875.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_edge_cancellation_error_k0/edge/events-69875.jsonl",
+      "bytes": 1008,
+      "sha256": "62c7038e7679228b292db9bd85ff764461942f766ef42161c68724feb77e68ab"
+    },
+    {
+      "path": "actual-runtime/test_edge_cancellation_error_k0/edge/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_edge_cancellation_error_k0/edge/result.json",
+      "bytes": 11649,
+      "sha256": "cac5d4c4596895eb1a4ac694d48163b2bd1398a55fe41d045984100701426c7f"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on0/ordinary/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on0/ordinary/config.toml",
+      "bytes": 621,
+      "sha256": "4abec97f3b82b3f704666d4f03f26fa875e7d0d0f92729da833f6e1fbdc875c1"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on0/ordinary/events-68450.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on0/ordinary/events-68450.jsonl",
+      "bytes": 553,
+      "sha256": "f337fd7db91301f9ee971b234a4bae6556e32e300083aeb573525c4d5f0ea554"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on0/ordinary/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on0/ordinary/result.json",
+      "bytes": 2005,
+      "sha256": "d8a6e4cecb37c3c5f70f78cae9e498b7d5f3ed616c55fef7b06c4c9479f524d2"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on1/central/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on1/central/config.toml",
+      "bytes": 671,
+      "sha256": "d4318cfb2657eb0d64b8286a9982598ab0cfdc6a0184fc8943ed2f7ad0868f58"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on1/central/events-68473.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on1/central/events-68473.jsonl",
+      "bytes": 606,
+      "sha256": "fee5faa4ec7addef14663159d3e30ffe5db6e69c31ab69bcce1adc55ed7754de"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on1/central/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on1/central/result.json",
+      "bytes": 2073,
+      "sha256": "9eca6d46b5a8a6d5395e9c8c2a268a9e12b5bf5be6fd55fa8638e3f1e69fd6a8"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on2/edge_default/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on2/edge_default/config.toml",
+      "bytes": 676,
+      "sha256": "55d4b152d984aee2caa2f3629862c2957c428f58a8845a5cd8abf171091f3c0a"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on2/edge_default/events-68517.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on2/edge_default/events-68517.jsonl",
+      "bytes": 612,
+      "sha256": "270e9d4334e1e9bc1c0ba98e9d02755bfbb5d5bddf9430c0ab223be3b7c388d1"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on2/edge_default/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on2/edge_default/result.json",
+      "bytes": 2153,
+      "sha256": "3b14c74bbae2604e10dc04c8014fb46a7d7de82401fd82d77a10e0671d900c24"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on3/edge_custom/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on3/edge_custom/config.toml",
+      "bytes": 675,
+      "sha256": "3f6854e5207338cd1356ac9a360703064b3ca6322222be9836edd018a8a98b7f"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on3/edge_custom/events-68596.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on3/edge_custom/events-68596.jsonl",
+      "bytes": 625,
+      "sha256": "2ef7b6926f6843730b4de1419a9a45265cdbb53616a415bb8303293d02a0fa3e"
+    },
+    {
+      "path": "actual-runtime/test_explicitly_absent_loop_on3/edge_custom/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_explicitly_absent_loop_on3/edge_custom/result.json",
+      "bytes": 2180,
+      "sha256": "722bc50d4ac38eac6aba949110a67d9c431d566eae4407465c01f11912e520c3"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes0/client_default/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes0/client_default/config.toml",
+      "bytes": 627,
+      "sha256": "3007df63c69d335c74fa6339f03028d8109530d4aa005bbd985a9c2c6dde9da2"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes0/client_default/events-67857.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes0/client_default/events-67857.jsonl",
+      "bytes": 345,
+      "sha256": "ee623acfc09ff110d2fd561766db3fb7f2ad76e91f92467974754c21257ae291"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes0/client_default/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes0/client_default/result.json",
+      "bytes": 1342,
+      "sha256": "080fc2cd5b215936051854fbb1d60650454bcbf5f434cb77591515560d62dd5c"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes1/client_custom/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes1/client_custom/config.toml",
+      "bytes": 626,
+      "sha256": "a9c6260c07755e0fb14ec8068f308804220c6d16618b3cea83da8f83c2e767f6"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes1/client_custom/events-67907.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes1/client_custom/events-67907.jsonl",
+      "bytes": 345,
+      "sha256": "28ea02966782e25bd7033cd1d5656d0b3d9accda2516cd2c0657dde27ec2ee7a"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes1/client_custom/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes1/client_custom/result.json",
+      "bytes": 1342,
+      "sha256": "1d25341e75256b06d39794d3e8ed7ecb50b607370461c3959f07f81e67dad542"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes2/ordinary/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes2/ordinary/config.toml",
+      "bytes": 621,
+      "sha256": "e6a978cb8d60163c16c83638a495db7d212841f019c6e9f599115d45149b408f"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes2/ordinary/events-67926.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes2/ordinary/events-67926.jsonl",
+      "bytes": 554,
+      "sha256": "d07b119ad77d8abd946d62c57f7b5c8a1b145ae869c42724c6d2cc73a18eb6c9"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes2/ordinary/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes2/ordinary/result.json",
+      "bytes": 1985,
+      "sha256": "c2ace6afacc2be14b6f081921a62d932a1ee2640b534afbccf38b989a27d6bc6"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes3/central/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes3/central/config.toml",
+      "bytes": 671,
+      "sha256": "2adc079c41c9046203b47ad94e7d1e0f55ddb59f5be1449aebcfcd5278dd9e69"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes3/central/events-67966.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes3/central/events-67966.jsonl",
+      "bytes": 607,
+      "sha256": "8798f96179f0416ec6e054b68c24f3c8a8a7f0ef1fafb78f5f29f8e1c7b29fdc"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes3/central/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes3/central/result.json",
+      "bytes": 2054,
+      "sha256": "c03d185d230ffb5ed25ee12a78d9e9d3fc7f988eeefef9027bcdfd347a5a1cef"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes4/direct/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes4/direct/config.toml",
+      "bytes": 619,
+      "sha256": "50534f770b2c4584b86f216956d60d89fbd46417a303222635dd83c15ad74027"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes4/direct/events-67984.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes4/direct/events-67984.jsonl",
+      "bytes": 399,
+      "sha256": "8d2cfe17b8578f12f891bfe6f3fdb12c4807043d63ef19311c21921c2c6379bf"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes4/direct/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes4/direct/result.json",
+      "bytes": 1580,
+      "sha256": "05c4b8583af0cf4758f760594dd64340093d4184897bf284796f8ad2ab9863b8"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes5/edge_default/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes5/edge_default/config.toml",
+      "bytes": 676,
+      "sha256": "90558e9ae6c4de694b7413b008cd8528aed7c3b000a62e1ce209d09947160e75"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes5/edge_default/events-68008.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes5/edge_default/events-68008.jsonl",
+      "bytes": 613,
+      "sha256": "ffee7ccc872604cc8d88619a98615254011651475df482002b7b934ac16d5aa6"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes5/edge_default/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes5/edge_default/result.json",
+      "bytes": 2132,
+      "sha256": "0a9de6cee8279aa0d3861e50e18bdbb43c489482e430e2f924cc4a34374250f0"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes6/edge_custom/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes6/edge_custom/config.toml",
+      "bytes": 675,
+      "sha256": "e4d2616100de9d2f3edda750bd1ad7ea288babd04b4c57d2c8f860c9b18c675a"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes6/edge_custom/events-68030.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes6/edge_custom/events-68030.jsonl",
+      "bytes": 626,
+      "sha256": "e16ef0902575c54531faeb70a77bf12ad31b7cc1704307defc62136fb71f2c02"
+    },
+    {
+      "path": "actual-runtime/test_fresh_entrypoint_executes6/edge_custom/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_fresh_entrypoint_executes6/edge_custom/result.json",
+      "bytes": 2160,
+      "sha256": "6db3b5da88727490d698be8c50615519b8916e7772ad3a9e1a9119683d4d7094"
+    },
+    {
+      "path": "actual-runtime/test_independent_runtime_error0/independent/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_independent_runtime_error0/independent/config.toml",
+      "bytes": 624,
+      "sha256": "24348d2c07622d58c6ecfa84c52762ead84c063a38a8760460a1a1701062f7de"
+    },
+    {
+      "path": "actual-runtime/test_independent_runtime_error0/independent/events-69926.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_independent_runtime_error0/independent/events-69926.jsonl",
+      "bytes": 724,
+      "sha256": "91d8bf5045c1ff3badf5d41fc6c0a753e5edf59e3825d58fab5c8947de7bd5fe"
+    },
+    {
+      "path": "actual-runtime/test_independent_runtime_error0/independent/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_independent_runtime_error0/independent/result.json",
+      "bytes": 4448,
+      "sha256": "b3893e94af133623266147f9851bc6a5537f98702c001820675d77b682ae34cb"
+    },
+    {
+      "path": "actual-runtime/test_missing_external_edge_cli0/edge/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_missing_external_edge_cli0/edge/config.toml",
+      "bytes": 668,
+      "sha256": "f85ff6fe1162443f475401dfc1ad8684fd66e6d7778e32f4d86b6741628c9036"
+    },
+    {
+      "path": "actual-runtime/test_missing_external_edge_cli0/edge/events-69620.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_missing_external_edge_cli0/edge/events-69620.jsonl",
+      "bytes": 352,
+      "sha256": "0fd8d0148d187d8f29925d3244930176d3e62c583980cad8feea5cb3ce85bb87"
+    },
+    {
+      "path": "actual-runtime/test_missing_external_edge_cli0/edge/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_missing_external_edge_cli0/edge/result.json",
+      "bytes": 2321,
+      "sha256": "ce20c1d4fab8a143e07bc28aac42e7a37576d49000a25d4ff52cdf1d4947ac51"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i0/task/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i0/task/config.toml",
+      "bytes": 617,
+      "sha256": "485003ed042e63cbeb9ab5c1c733c57b34e6acb47ffbd0f8b593a73fc48c06da"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i0/task/events-70127.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i0/task/events-70127.jsonl",
+      "bytes": 503,
+      "sha256": "db73b1776ad6f470a2e7535caf8ebe4d73ca1f45ca83844eb2de53289300e4a3"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i0/task/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i0/task/result.json",
+      "bytes": 1792,
+      "sha256": "3e904fef13b1f914e47f95cc534563b748244e7c17bcc3dd99dbdcf56afbf854"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i1/generator/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i1/generator/config.toml",
+      "bytes": 622,
+      "sha256": "be83fcc28a68be199d2a91015f6b5a3cb1efa0fbb5c1f57b3133c6a24d6860dd"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i1/generator/events-70341.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i1/generator/events-70341.jsonl",
+      "bytes": 600,
+      "sha256": "fb3c961b0472a402b83149ad310456435927c92e5827d0f2152e93dbe13accd4"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i1/generator/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i1/generator/result.json",
+      "bytes": 2051,
+      "sha256": "a0af7430f9dde37da4b789f7b93940e77f9ddce06fc334f983270f62d5356de9"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i2/executor/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i2/executor/config.toml",
+      "bytes": 621,
+      "sha256": "79b4e3846fd3083d405c386f9b098bb5938ce13e9bbc7a129594e342058b3ed7"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i2/executor/events-70433.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i2/executor/events-70433.jsonl",
+      "bytes": 602,
+      "sha256": "a1bc3094393be527a47fa95d39b033cb0385c9eee721a5276d5a1ab16939a7d6"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i2/executor/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i2/executor/result.json",
+      "bytes": 2054,
+      "sha256": "912cdd35a0c3f3ed037642c3df265d600cfacdbec86f43c79cc689d3779ecdee"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i3/aiohttp_task/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i3/aiohttp_task/config.toml",
+      "bytes": 625,
+      "sha256": "e74081afe9d4ff8001c28051297c2332b29a6c2d265546e5210913984622d918"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i3/aiohttp_task/events-70537.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i3/aiohttp_task/events-70537.jsonl",
+      "bytes": 664,
+      "sha256": "d4a18c56bc3572ec3fe41d738b8f27599ac5a7c01fc6e9732bcd66146c1d03da"
+    },
+    {
+      "path": "actual-runtime/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_noncooperative_teardown_i3/aiohttp_task/result.json",
+      "bytes": 4620,
+      "sha256": "23f60f8ed15b787600e7783a7bff5aab75103ab473fd8c6cade5e22b0ca46b7a"
+    },
+    {
+      "path": "actual-runtime/test_owned_client_finalizes_ta0/client/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_client_finalizes_ta0/client/config.toml",
+      "bytes": 619,
+      "sha256": "6337e5cbc28c1d55ee618df1e900712525ac73a256685d01bb2912f4b9b606c4"
+    },
+    {
+      "path": "actual-runtime/test_owned_client_finalizes_ta0/client/events-68285.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_client_finalizes_ta0/client/events-68285.jsonl",
+      "bytes": 663,
+      "sha256": "fd4d8fc87463b37ececfc37c8f6c1589221caec1a76711214a88ff12e7ee8c36"
+    },
+    {
+      "path": "actual-runtime/test_owned_client_finalizes_ta0/client/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_client_finalizes_ta0/client/result.json",
+      "bytes": 2212,
+      "sha256": "14e63b604956d4310c5c2d4092a64e4291811579377836de5aba927dee4015c3"
+    },
+    {
+      "path": "actual-runtime/test_owned_client_finalizes_ta1/client/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_client_finalizes_ta1/client/config.toml",
+      "bytes": 619,
+      "sha256": "1c46549dd8acdab8baca81e50668c5415104ce70030b547f9329ad6d9a2a3a19"
+    },
+    {
+      "path": "actual-runtime/test_owned_client_finalizes_ta1/client/events-68333.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_client_finalizes_ta1/client/events-68333.jsonl",
+      "bytes": 809,
+      "sha256": "f8cf83de1adfdb9d88137f9ffe6b40dcdb664859f273b46ca69c908b707758e7"
+    },
+    {
+      "path": "actual-runtime/test_owned_client_finalizes_ta1/client/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_client_finalizes_ta1/client/result.json",
+      "bytes": 4252,
+      "sha256": "5366914b4759d249c289953cd13f1fe9c567a83ab364abb1a269d768bbb1e0f6"
+    },
+    {
+      "path": "actual-runtime/test_owned_server_fallback_fin0/fallback/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_server_fallback_fin0/fallback/config.toml",
+      "bytes": 621,
+      "sha256": "4ebb6dabb6a3bb17e0efa099982c6f68634a6f5fc32566f736eba0b16a5be6c3"
+    },
+    {
+      "path": "actual-runtime/test_owned_server_fallback_fin0/fallback/events-69482.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_server_fallback_fin0/fallback/events-69482.jsonl",
+      "bytes": 836,
+      "sha256": "5c13ccc7c695b3b50718f85ce60d6ce79d8fff1427de63ccefb38f7192cf3f79"
+    },
+    {
+      "path": "actual-runtime/test_owned_server_fallback_fin0/fallback/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_server_fallback_fin0/fallback/result.json",
+      "bytes": 2809,
+      "sha256": "ae8ab363fa4ed0bd4799e2f2623d3206ae08bbf9be96e795df86e8cca2188f47"
+    },
+    {
+      "path": "actual-runtime/test_owned_server_fallback_fin1/fallback/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_server_fallback_fin1/fallback/config.toml",
+      "bytes": 621,
+      "sha256": "c6a3a9aaef3f31283004a2b27571a07256af43839f285e136eafd1b6b8631603"
+    },
+    {
+      "path": "actual-runtime/test_owned_server_fallback_fin1/fallback/events-69511.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_server_fallback_fin1/fallback/events-69511.jsonl",
+      "bytes": 907,
+      "sha256": "a44a225f2131967749e4bce93fdd1f58d819761a07a0a5569918a1edd90a6276"
+    },
+    {
+      "path": "actual-runtime/test_owned_server_fallback_fin1/fallback/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_owned_server_fallback_fin1/fallback/result.json",
+      "bytes": 3916,
+      "sha256": "1ebb9090fa2b521cf715b3de75365bc063c5226d5d411ccb74ffce20e220c856"
+    },
+    {
+      "path": "actual-runtime/test_post_launch_failure_keeps0/failure/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_post_launch_failure_keeps0/failure/config.toml",
+      "bytes": 621,
+      "sha256": "c14bb7cb0788849de740556b98176080998c575f901adea70414840e71e06e71"
+    },
+    {
+      "path": "actual-runtime/test_post_launch_failure_keeps0/failure/events-70679.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_post_launch_failure_keeps0/failure/events-70679.jsonl",
+      "bytes": 509,
+      "sha256": "9caf55f3a06023bec572a3a80b482856de0a06e3aa0cda31405c08ac76825c99"
+    },
+    {
+      "path": "actual-runtime/test_post_launch_failure_keeps0/failure/events-70731.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_post_launch_failure_keeps0/failure/events-70731.jsonl",
+      "bytes": 174,
+      "sha256": "86f469d0e31c15d1c0c4eac0c871b4c37ed691f3849b0446145ded3205b8fa29"
+    },
+    {
+      "path": "actual-runtime/test_post_launch_failure_keeps0/failure/events-70732.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_post_launch_failure_keeps0/failure/events-70732.jsonl",
+      "bytes": 174,
+      "sha256": "b3123bc19e5c9cbaf056b7ad8130b0ad73474d30fa191e27a81aac74f4004501"
+    },
+    {
+      "path": "actual-runtime/test_post_launch_failure_keeps0/failure/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_post_launch_failure_keeps0/failure/result.json",
+      "bytes": 12601,
+      "sha256": "a9dcd6ee870497c74e6fad438f41ef65ad98b9e222e5577ff37fbb98bda19787"
+    },
+    {
+      "path": "actual-runtime/test_post_launch_failure_keeps0/failure/results/70679.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_post_launch_failure_keeps0/failure/results/70679.csv",
+      "bytes": 29,
+      "sha256": "3280330750cd48adfbac099d06e047779f7f7a548729874cb26a5e1a0d0c1984"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l0/client_lifecycle/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l0/client_lifecycle/config.toml",
+      "bytes": 629,
+      "sha256": "b23401f4649cf2a021a88dfaa482b02ec757402fb743c5f0298893aac132a9e4"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l0/client_lifecycle/events-68176.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l0/client_lifecycle/events-68176.jsonl",
+      "bytes": 709,
+      "sha256": "291cf747659d5f47093bf93087bf21e320a98b3bbef1b0f8cd4a70a9ec3e942b"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l0/client_lifecycle/result.json",
+      "bytes": 2336,
+      "sha256": "f10a14c4c33bfbc535924073675a58e41f363168b2353bda5dbc3cb48a668437"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l1/client_lifecycle/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l1/client_lifecycle/config.toml",
+      "bytes": 629,
+      "sha256": "cb67a87dc20108b9e6d230d602c8e86658c03c8ae222aa8ac3ae84c0e3ea591c"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l1/client_lifecycle/events-68208.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l1/client_lifecycle/events-68208.jsonl",
+      "bytes": 855,
+      "sha256": "370bcea2c9a9701bcf58ffb9f5342857eaf74998412d8ee04c94c3bf4081bf3d"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l1/client_lifecycle/result.json",
+      "bytes": 4091,
+      "sha256": "56b26b5d48303cbe3f538b65bc0f8e66dda4df711c800e6b43124b37809a396e"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l2/ordinary/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l2/ordinary/config.toml",
+      "bytes": 621,
+      "sha256": "c5499787df26724f3a3f29b107022b0388808f8d36eaf4a2a65512165db33083"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l2/ordinary/events-68226.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l2/ordinary/events-68226.jsonl",
+      "bytes": 599,
+      "sha256": "f4bfa4f8a3bfda50e58923450d5e43d4df09c84b3af402c281399a5dad5bcfc0"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l2/ordinary/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l2/ordinary/result.json",
+      "bytes": 2153,
+      "sha256": "1edd5a06d1686d998e5c3da654fe59fb23cd508a50a4dce398ba22d3317555a9"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l3/ordinary/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l3/ordinary/config.toml",
+      "bytes": 621,
+      "sha256": "9745ebd6d9f4ffcdfe208e269c9d07d014351f30d1b1c0a9a7ac796c1d3101b8"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l3/ordinary/events-68259.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l3/ordinary/events-68259.jsonl",
+      "bytes": 670,
+      "sha256": "422f44d00142b4b3dc753bee3ab20a371b720d13fca7ff9bd016c8cccd4a0f5c"
+    },
+    {
+      "path": "actual-runtime/test_preconstructed_borrowed_l3/ordinary/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_preconstructed_borrowed_l3/ordinary/result.json",
+      "bytes": 3423,
+      "sha256": "0418ce3b805c17dc3a68077945f725ca22849d0e486d774b8cd6619e3a11b1d2"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors",
+      "bytes": 593,
+      "sha256": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/checkpoints/checkpoint_startup_tiny_1.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/checkpoints/current_round.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/checkpoints/current_round.pkl",
+      "bytes": 5,
+      "sha256": "018f5c4626b56e8489da7abb6c8b62331933c42c35d1342037a5242b8ed148f6"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/checkpoints/numpy_prng_state_1.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/checkpoints/numpy_prng_state_1.pkl",
+      "bytes": 2675,
+      "sha256": "a2afaa7ca83aa9edd83b8e46bb17f5bc4085764d0f59f65b92aa6af095491090"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/checkpoints/prng_state_1.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/checkpoints/prng_state_1.pkl",
+      "bytes": 3766,
+      "sha256": "b8fb2b38265545c4423bbaa179c641aeb681dd33922c41bd73189632ec65aafa"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/config.toml",
+      "bytes": 619,
+      "sha256": "6adbd6afc80ae1e20479606eff111d230a4ee13620b569400c4edfb5c1274a31"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/events-70624.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/events-70624.jsonl",
+      "bytes": 1307,
+      "sha256": "a89e2ba033e10c8a548f48a65d388edaf3978d30d03172c04cf1360b7666ddf5"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/events-70649.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/events-70649.jsonl",
+      "bytes": 686,
+      "sha256": "f4012fd0dbb535c103c94027b294af999980a697db996383cdc44388bb4d502e"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/events-70650.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/events-70650.jsonl",
+      "bytes": 853,
+      "sha256": "9cd4dfe86c6c83f5aee9f20ced2c9b55649bd2613f1441ab4c07e98bef2fd5eb"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors",
+      "bytes": 593,
+      "sha256": "a5a3bff8503c83d1f8b64c96494315c337dc682a2cfab1bb0b5c665176ab1632"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_70650.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_70650.safetensors",
+      "bytes": 593,
+      "sha256": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_70650.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_1_70650.safetensors.pkl",
+      "bytes": 151,
+      "sha256": "b865b9da7ce141685fdf5baa8fc85cb49211286c580a811e9bb3b9d7471dcc33"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_70649.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_70649.safetensors",
+      "bytes": 593,
+      "sha256": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_70649.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/models/pretrained/startup_tiny_2_70649.safetensors.pkl",
+      "bytes": 151,
+      "sha256": "d800af8123c9d5c7d25a6a4a4eb8f83062010c349fc8bbd10079ad8b6fedf819"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/result.json",
+      "bytes": 16359,
+      "sha256": "2eb1be2645c109adb1bf7b6ad23b69f3ed3c5f94b44124acb7435beae004953d"
+    },
+    {
+      "path": "actual-runtime/test_real_two_client_cpu_socke0/round/results/70624.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_real_two_client_cpu_socke0/round/results/70624.csv",
+      "bytes": 54,
+      "sha256": "720c2494b89d13c7ee00266eeb5a0254f6b4da4499f19447a12beb5e9b1dd718"
+    },
+    {
+      "path": "actual-runtime/test_repeated_owned_client_ent0/client/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_repeated_owned_client_ent0/client/config.toml",
+      "bytes": 619,
+      "sha256": "11d335fb30c91f1361bd1aa2e01c0b695aea6e2cd8725a6ce1b447289cebd34e"
+    },
+    {
+      "path": "actual-runtime/test_repeated_owned_client_ent0/client/events-68404.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_repeated_owned_client_ent0/client/events-68404.jsonl",
+      "bytes": 1155,
+      "sha256": "1838d91e5e1c964dd33ea6191f70cd8a1f8c61f7931e867115308dbf190441b6"
+    },
+    {
+      "path": "actual-runtime/test_repeated_owned_client_ent0/client/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_repeated_owned_client_ent0/client/result.json",
+      "bytes": 3549,
+      "sha256": "0781f0da0413c019375de1f5b025a678be5c793fa843b8c661574330f3915ae2"
+    },
+    {
+      "path": "actual-runtime/test_runner_cleanup_error_keep0/cleanup/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_runner_cleanup_error_keep0/cleanup/config.toml",
+      "bytes": 620,
+      "sha256": "554057feb7fd369bed44294aa6537715926ca99fdb9ad0acbfda21afec943887"
+    },
+    {
+      "path": "actual-runtime/test_runner_cleanup_error_keep0/cleanup/events-69558.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_runner_cleanup_error_keep0/cleanup/events-69558.jsonl",
+      "bytes": 783,
+      "sha256": "1e198048924462ade49532978f2c7fd070ac0c3ab01bf7643c083edc948d0018"
+    },
+    {
+      "path": "actual-runtime/test_runner_cleanup_error_keep0/cleanup/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_runner_cleanup_error_keep0/cleanup/result.json",
+      "bytes": 6301,
+      "sha256": "7b77f3707ff7a6f88bd33b17590d218a43b9258d36742778afe193180506b9ac"
+    },
+    {
+      "path": "actual-runtime/test_running_loop_rejected_bef0/running/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_running_loop_rejected_bef0/running/config.toml",
+      "bytes": 620,
+      "sha256": "e72ee9f2e02c0ba15c9283c0c9aa313ed9e8aa82491f2b853bc19c52c44c0801"
+    },
+    {
+      "path": "actual-runtime/test_running_loop_rejected_bef0/running/events-69426.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_running_loop_rejected_bef0/running/events-69426.jsonl",
+      "bytes": 385,
+      "sha256": "2dab935b6d9eadf888a9411a5c83036e74183a0cb4c9226687130d70c6291d92"
+    },
+    {
+      "path": "actual-runtime/test_running_loop_rejected_bef0/running/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_running_loop_rejected_bef0/running/result.json",
+      "bytes": 1373,
+      "sha256": "b9fd9cdcccae7fcddc855fa708de7afeedbc18d7bb8c88992aa7f01b5e43558f"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a0/server/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a0/server/config.toml",
+      "bytes": 619,
+      "sha256": "1d1b42739c6a05b9e5c3c76118a1e2dddf28495592b11abfcbff80b679521766"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a0/server/events-69963.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a0/server/events-69963.jsonl",
+      "bytes": 940,
+      "sha256": "4bca6776759bae39de8750b3732230306f7d7754ffc64e22d3c46e9f7bf1c3e3"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a0/server/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a0/server/result.json",
+      "bytes": 11267,
+      "sha256": "7ebd6eec6aeb8fcfcef9c6bf4542ceb303dbb6f4f96809ce5d268d6004803b7b"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a1/server/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a1/server/config.toml",
+      "bytes": 619,
+      "sha256": "0cec65a6c8647cfba9a27aeaed4a5710eb81215cb3ac8862ee7bbf347b063fd2"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a1/server/events-69983.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a1/server/events-69983.jsonl",
+      "bytes": 955,
+      "sha256": "b4089548d7d628cf3834261ca0f838a111aac952a55857f898160b8f79288316"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a1/server/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a1/server/result.json",
+      "bytes": 10252,
+      "sha256": "d9a3108479e90b52f57065a921a8c7c41bd0804ba54148871ff37ed3af096e88"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a2/server/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a2/server/config.toml",
+      "bytes": 619,
+      "sha256": "df793865b115f5bc83e828d23fc4129f595d9316a7aca353a7c5dd75bea39929"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a2/server/events-70003.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a2/server/events-70003.jsonl",
+      "bytes": 627,
+      "sha256": "8d9c33c0eb95a4d43cea554196a3dd24b5729b9d446807d4d9dc8395efd344fa"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a2/server/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a2/server/result.json",
+      "bytes": 5043,
+      "sha256": "4bfa0f0782fdd5b1e64aa3cf6aa5164806ff13e81b070fbbf0db7d0b8f4fc093"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a3/server/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a3/server/config.toml",
+      "bytes": 619,
+      "sha256": "9306e03640597706c212e14b4587662d209df23de28fd6f1942bc79a52c7c4ca"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a3/server/events-70066.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a3/server/events-70066.jsonl",
+      "bytes": 696,
+      "sha256": "7318a78ec1be3ac0b1dcf1ff5f78fdf4c1afbaadd8587157394da84c2253fb5e"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a3/server/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a3/server/result.json",
+      "bytes": 4311,
+      "sha256": "89f43f494ff8ebfe4ea340d9a565d6ed65f5ba753581542c88c8049cd9949cf0"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a4/server/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a4/server/config.toml",
+      "bytes": 619,
+      "sha256": "c17fb8774d3e98664c08f4a4c338cece1494bb3a13f0352040ef12f7bc7bd250"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a4/server/events-70100.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a4/server/events-70100.jsonl",
+      "bytes": 798,
+      "sha256": "24e0ae324f4b81e5940dd0e419ab1132665610df5a6d422307c208c43ce46e3e"
+    },
+    {
+      "path": "actual-runtime/test_server_error_precedence_a4/server/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_server_error_precedence_a4/server/result.json",
+      "bytes": 5930,
+      "sha256": "e630e63d777b7609005f9d2f961e3d24b4f7df39dbf2e84403fffebb116f7548"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/checkpoints/feddyn_lenet5.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/checkpoints/feddyn_lenet5.pth",
+      "bytes": 766467,
+      "sha256": "f9b0a932871bce4e67911bb4eddc4e751753293b5c9387b044621efb12053339"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/committed-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/committed-1.pth",
+      "bytes": 766747,
+      "sha256": "afb5e5581cba1e6bd5544cb34726d8b64e3aec542d8380e8932d7414d0270a5a"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/committed-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/committed-2.pth",
+      "bytes": 766811,
+      "sha256": "6e27fd52f9b0d530f6d4ad3e1b531345b78bd1592c7e62be50cdaf1ff69a55b0"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/committed-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/committed-3.pth",
+      "bytes": 766875,
+      "sha256": "6feb0469c57af1f0186698a177c1052e02a692117ce0ca86f86f27a3b81b48c4"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/config.toml",
+      "bytes": 1042,
+      "sha256": "de38a2a7e512a0b4beb92a9f4875b4fb994f7de8e79332873de26b4df05d19d8"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/events-73126.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/events-73126.jsonl",
+      "bytes": 428,
+      "sha256": "bed34865752eed410d3298573922e7dc2c35ec8478b1d6c0b1d69dde19c48767"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/events-73138.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/events-73138.jsonl",
+      "bytes": 58,
+      "sha256": "2eb41157763fb47920d81df2738e837dddfb9758c2dc54443fea7d529d644d41"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/received-1.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/received-1.pth",
+      "bytes": 999349,
+      "sha256": "5552bc361e3697ac941bddcffad24f16cef6219e8348b80b0ba871c6c7051cf1"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/received-2.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/received-2.pth",
+      "bytes": 999541,
+      "sha256": "7eb910fc21cc145c99ad20d4205248054c3787607f14c69e69c0525d29027bde"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/received-3.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/received-3.pth",
+      "bytes": 999541,
+      "sha256": "2ae30af4bea6a0322d625694e43f196ac02d40f29fa161454a32b793664f57e3"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/result.json",
+      "bytes": 10863,
+      "sha256": "95bd3e57d1bfcab4a16c079173b4d0ac9a6fabde9cfb8dc3605b1d3e11fdeb38"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/lenet-run/start.pth",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/lenet-run/start.pth",
+      "bytes": 20885,
+      "sha256": "9bda029ce9c1e8209ec229e8af96c536188e2c6985a8bd7168866dede323ff9b"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/models/lenet5.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/models/lenet5.safetensors",
+      "bytes": 249021,
+      "sha256": "26c8c26a252ebbb6c46d6b8719eb5d167fecf58a34bbf1caeb1e669ba77f32d2"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/models/lenet5.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/models/lenet5.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_shipped_mnist_shaped_lene0/results/73126.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_shipped_mnist_shaped_lene0/results/73126.csv",
+      "bytes": 107,
+      "sha256": "df662274db24e20800c7dc76115ef18af717c0917742a07b532b30de672605f1"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/config.toml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/config.toml",
+      "bytes": 621,
+      "sha256": "eff8ddc73561199482fca19288eabe5617574eade2e0e2868b21ffff298d2b12"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/events-70825.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/events-70825.jsonl",
+      "bytes": 895,
+      "sha256": "cf7482b1f47aa2d5908b413c1ae60ec9fa0aa9f699e9e8f64edc21651889322a"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/events-70856.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/events-70856.jsonl",
+      "bytes": 620,
+      "sha256": "4c702ae4f2b6692d4acaf1d270992aff90927a1183d65821fd054edea1386248"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/events-70857.jsonl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/events-70857.jsonl",
+      "bytes": 851,
+      "sha256": "49b55e43fd023b39b2d037571761ee857b364e485bf718e50f5929741fb07100"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny.safetensors",
+      "bytes": 593,
+      "sha256": "ac1ccf71c4179844018fcd4331f86c19670330d00c39dd66f7d0639ffa4bd4a9"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny.safetensors.pkl",
+      "bytes": 125,
+      "sha256": "4f5d2931ccf80f595ae21d38c90830ea4f393337d73d2a4ef37e247baa27f1a5"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_1_70856.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_1_70856.safetensors",
+      "bytes": 593,
+      "sha256": "7d1b4e39fe8c20fbc8d5a1bcdaaf68d23955752149ef34cffa2e58f5e8a68961"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_1_70856.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_1_70856.safetensors.pkl",
+      "bytes": 151,
+      "sha256": "d800af8123c9d5c7d25a6a4a4eb8f83062010c349fc8bbd10079ad8b6fedf819"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_2_70857.safetensors",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_2_70857.safetensors",
+      "bytes": 593,
+      "sha256": "c4c686574485435175402208fbefbbdea1fe5aa735b1bca4f93d4836651becd4"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_2_70857.safetensors.pkl",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/models/pretrained/startup_tiny_2_70857.safetensors.pkl",
+      "bytes": 151,
+      "sha256": "b865b9da7ce141685fdf5baa8fc85cb49211286c580a811e9bb3b9d7471dcc33"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/result.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/result.json",
+      "bytes": 14445,
+      "sha256": "c2a3abf9905fdc286280586efea04fca082a52fb47357bc8a79b9c1bb93e64e5"
+    },
+    {
+      "path": "actual-runtime/test_stalled_real_client_is_co0/stalled/results/70825.csv",
+      "source": "/tmp/plato-llm-integration/run-mandatory/pytest-tmp/test_stalled_real_client_is_co0/stalled/results/70825.csv",
+      "bytes": 29,
+      "sha256": "3280330750cd48adfbac099d06e047779f7f7a548729874cb26a5e1a0d0c1984"
+    },
+    {
+      "path": "docs-review/addendum-mkdocs-build.log",
+      "source": "/tmp/plato-llm-docs-review/addendum-mkdocs-build.log",
+      "bytes": 1211,
+      "sha256": "8f1e5e30ee2237a8564f4a0363324100f0217ee12c5a8bf4eb7b976010c1c2fd"
+    },
+    {
+      "path": "docs-review/addendum-review.json",
+      "source": "/tmp/plato-llm-docs-review/addendum-review.json",
+      "bytes": 8613,
+      "sha256": "5868990ab9dffc53119c4a1069b542ffa263b29f3e8483c7cf4ccac4ec783e44"
+    },
+    {
+      "path": "docs-review/addendum-site/search/search_index.json",
+      "source": "/tmp/plato-llm-docs-review/addendum-site/search/search_index.json",
+      "bytes": 278167,
+      "sha256": "40e3d425adc34eabb4ccc51456e72f8c06c56a93a55457ca3fe56423b31cbcc1"
+    },
+    {
+      "path": "docs-review/addendum-site/sitemap.xml",
+      "source": "/tmp/plato-llm-docs-review/addendum-site/sitemap.xml",
+      "bytes": 6490,
+      "sha256": "3c62e6919da2ed01d2bf7cc87575a82f5603ae196013df3b83cec44116d73be2"
+    },
+    {
+      "path": "docs-review/addendum-verification.json",
+      "source": "/tmp/plato-llm-docs-review/addendum-verification.json",
+      "bytes": 2894,
+      "sha256": "86585ca8d47b9ddcae93cfb52650f520991a00c1ff563531ac86f577c05f68d6"
+    },
+    {
+      "path": "docs-review/final-binding-build.log",
+      "source": "/tmp/plato-llm-docs-review/final-binding-build.log",
+      "bytes": 1216,
+      "sha256": "01af8d93a6560a16eb4aa3be15cd485a064f37752240150d64397779b37ccbcb"
+    },
+    {
+      "path": "docs-review/final-binding-review.json",
+      "source": "/tmp/plato-llm-docs-review/final-binding-review.json",
+      "bytes": 6051,
+      "sha256": "78135028efcef99e6f7eba945434b7e770eb6f5da1b40d661e951b1d257c54cb"
+    },
+    {
+      "path": "docs-review/final-binding-site/search/search_index.json",
+      "source": "/tmp/plato-llm-docs-review/final-binding-site/search/search_index.json",
+      "bytes": 278350,
+      "sha256": "d4d138dab080394240e2cee34d8356fec46576d762650f4e608cd06c11923bd5"
+    },
+    {
+      "path": "docs-review/final-binding-site/sitemap.xml",
+      "source": "/tmp/plato-llm-docs-review/final-binding-site/sitemap.xml",
+      "bytes": 6490,
+      "sha256": "3c62e6919da2ed01d2bf7cc87575a82f5603ae196013df3b83cec44116d73be2"
+    },
+    {
+      "path": "docs-review/mkdocs-build.log",
+      "source": "/tmp/plato-llm-docs-review/mkdocs-build.log",
+      "bytes": 1202,
+      "sha256": "a242d46c7259577a64d812a58b99632f40601dc902e696e018358e587701f164"
+    },
+    {
+      "path": "docs-review/review.json",
+      "source": "/tmp/plato-llm-docs-review/review.json",
+      "bytes": 16262,
+      "sha256": "f235a92726404f61dcd57d7c5bb5bf85aa4c82272e1d2832b4f8c157b8c25ddb"
+    },
+    {
+      "path": "docs-review/verification.json",
+      "source": "/tmp/plato-llm-docs-review/verification.json",
+      "bytes": 11738,
+      "sha256": "cfd7996fbe9f353c7f996553760efccd4cd821ae756bfed5503c51567b6aec81"
+    },
+    {
+      "path": "docs-review/verify.py",
+      "source": "/tmp/plato-llm-docs-review/verify.py",
+      "bytes": 11250,
+      "sha256": "85f57f4ea2821d5e96744aa49a2bb839294684256f2631cb9df997fcf5451db7"
+    },
+    {
+      "path": "docs-review/verify_addendum.py",
+      "source": "/tmp/plato-llm-docs-review/verify_addendum.py",
+      "bytes": 6977,
+      "sha256": "819deed86ba2b0923ee0eb6d754e3fb3cb2e064ad3e0f16aabe63632c1705239"
+    },
+    {
+      "path": "docs-review/verify_final_binding.py",
+      "source": "/tmp/plato-llm-docs-review/verify_final_binding.py",
+      "bytes": 10159,
+      "sha256": "0e0e15c9c93a0592ab806c8f1883817c0392ec79018ddd940ee6880444fe8fc5"
+    },
+    {
+      "path": "final-base/collection.log",
+      "source": "/tmp/plato-llm-integration/run-base/collection.log",
+      "bytes": 150207,
+      "sha256": "6b91ee40d230d8cdcf2a1ebaa93f2e4f93b8c1f5322ca457af02f238d1837a29"
+    },
+    {
+      "path": "final-base/receipt.json",
+      "source": "/tmp/plato-llm-integration/run-base/receipt.json",
+      "bytes": 1079,
+      "sha256": "aa1e1900846b2b740e3e1c76745444355af87e65d92dc56c89ba90623e408519"
+    },
+    {
+      "path": "final-base/source-before.json",
+      "source": "/tmp/plato-llm-integration/run-base/source-before.json",
+      "bytes": 152508,
+      "sha256": "16a50d86c348a3b76aaa16c5bab3f1ed21e7586916ec79a9c2beae9275c7f7dd"
+    },
+    {
+      "path": "final-base/suite.log",
+      "source": "/tmp/plato-llm-integration/run-base/suite.log",
+      "bytes": 10936,
+      "sha256": "7991e76e1e2e34760a5102cb29d977c8c5540b1cbc86eb3dcb3a575095138ffb"
+    },
+    {
+      "path": "final-base/tests.xml",
+      "source": "/tmp/plato-llm-integration/run-base/tests.xml",
+      "bytes": 196052,
+      "sha256": "1313af3eaeb7e43e02b9f772e761f347c89a5459ee1e67c8c5f0028dafe7270c"
+    },
+    {
+      "path": "final-mandatory/collection.log",
+      "source": "/tmp/plato-llm-integration/run-mandatory/collection.log",
+      "bytes": 151187,
+      "sha256": "3d7d59144b5e800b2cd776dbf2cba7837d27db718d0fc42d20f314b3a3d79941"
+    },
+    {
+      "path": "final-mandatory/coverage.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/coverage.json",
+      "bytes": 1115410,
+      "sha256": "3dd60a21ef523c1aad2c4a864518d991b65c06e15d454fb3c5fbdd06f2aa0718"
+    },
+    {
+      "path": "final-mandatory/receipt.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/receipt.json",
+      "bytes": 1223,
+      "sha256": "506670070319ac2ff26dcd3c788b50b52b645cf9a46b8392e1f720ab74dfb386"
+    },
+    {
+      "path": "final-mandatory/source-before.json",
+      "source": "/tmp/plato-llm-integration/run-mandatory/source-before.json",
+      "bytes": 152508,
+      "sha256": "16a50d86c348a3b76aaa16c5bab3f1ed21e7586916ec79a9c2beae9275c7f7dd"
+    },
+    {
+      "path": "final-mandatory/suite.log",
+      "source": "/tmp/plato-llm-integration/run-mandatory/suite.log",
+      "bytes": 34883,
+      "sha256": "272c66b9d8cb9ac50ca808f1307a836cecc9d94cb8412a7b73999a99709eca46"
+    },
+    {
+      "path": "final-mandatory/tests.xml",
+      "source": "/tmp/plato-llm-integration/run-mandatory/tests.xml",
+      "bytes": 204497,
+      "sha256": "6e460d56c3f532d3885847cc8ee15f2a98fb2ef4d826020f22ca8dc9ae364e84"
+    },
+    {
+      "path": "integration-checks/active-python-paths.json",
+      "source": "/tmp/plato-llm-integration/checks/active-python-paths.json",
+      "bytes": 1008,
+      "sha256": "93ba298588e552dc9a0678296b17b2afa18b34cb860b452caef7ed621455b9dc"
+    },
+    {
+      "path": "integration-checks/bounded-checks.json",
+      "source": "/tmp/plato-llm-integration/checks/bounded-checks.json",
+      "bytes": 20799,
+      "sha256": "01b3829f1968a5ea0f099ceccf4af9f0b57f3a73e2d2a556bda5b8b5a542659e"
+    },
+    {
+      "path": "integration-checks/bounded-checks.log",
+      "source": "/tmp/plato-llm-integration/checks/bounded-checks.log",
+      "bytes": 1926,
+      "sha256": "f0d38f448b772bb50c5e804b0becbdc643fbc1755d3652402f5277e640020b34"
+    },
+    {
+      "path": "integration-checks/build.log",
+      "source": "/tmp/plato-llm-integration/checks/build.log",
+      "bytes": 226,
+      "sha256": "ebe935aec989bc885302e9a0d358a88f1cbf03f460df4dff4b92c70bfd20b55f"
+    },
+    {
+      "path": "integration-checks/check_typing.py",
+      "source": "/tmp/plato-llm-integration/checks/check_typing.py",
+      "bytes": 7269,
+      "sha256": "87144656e113778178342eb9537cc245dbb56a4d122a4d90e92c3b37367b1bc2"
+    },
+    {
+      "path": "integration-checks/collection-ledger.json",
+      "source": "/tmp/plato-llm-integration/checks/collection-ledger.json",
+      "bytes": 9531,
+      "sha256": "e8706646b8e16a86e17e42f507bb396bb84aead0943c15534642720ed05b6be4"
+    },
+    {
+      "path": "integration-checks/final-integration-checks.json",
+      "source": "/tmp/plato-llm-integration/checks/final-integration-checks.json",
+      "bytes": 31119,
+      "sha256": "29b90778b3f3eb02c281e649249215f6d625610eb940492321bdfbad53971f62"
+    },
+    {
+      "path": "integration-checks/final-report.log",
+      "source": "/tmp/plato-llm-integration/checks/final-report.log",
+      "bytes": 1014,
+      "sha256": "b34f4ec3458d5601c70185e968b9f6754558d25ee96ab06368b6f34839f40147"
+    },
+    {
+      "path": "integration-checks/final-snapshot.log",
+      "source": "/tmp/plato-llm-integration/checks/final-snapshot.log",
+      "bytes": 718,
+      "sha256": "387914be37622c0da77c48bf2bfc8af21e4f602c4a8f1a49cdcd1a3535d25bfe"
+    },
+    {
+      "path": "integration-checks/final/build.log",
+      "source": "/tmp/plato-llm-integration/checks/final/build.log",
+      "bytes": 238,
+      "sha256": "045a9faea22f6dce0f09a449ee1a406aac24eeb4ea597cbc2b56d7cf3b2ae8fb"
+    },
+    {
+      "path": "integration-checks/final/collection-ledger.json",
+      "source": "/tmp/plato-llm-integration/checks/final/collection-ledger.json",
+      "bytes": 10131,
+      "sha256": "306c4b7ff23e38fa5a558ac7bae74ebaa96bfeb80b7fa555c88692e182c4b3d3"
+    },
+    {
+      "path": "integration-checks/final/plato_learn-1.4.3-py3-none-any.whl.contents.json",
+      "source": "/tmp/plato-llm-integration/checks/final/plato_learn-1.4.3-py3-none-any.whl.contents.json",
+      "bytes": 73824,
+      "sha256": "c64d26adf788d05ac9cc873169b48ec090dd4ae0a077030ced32a9dc2feadd2a"
+    },
+    {
+      "path": "integration-checks/final/plato_learn-1.4.3.tar.gz.contents.json",
+      "source": "/tmp/plato-llm-integration/checks/final/plato_learn-1.4.3.tar.gz.contents.json",
+      "bytes": 251735,
+      "sha256": "c34a5c22650aad13f49bf53c611fd0833b7c64437342b01eac59252ebb510df9"
+    },
+    {
+      "path": "integration-checks/final/ruff.log",
+      "source": "/tmp/plato-llm-integration/checks/final/ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "integration-checks/final/snapshot.json",
+      "source": "/tmp/plato-llm-integration/checks/final/snapshot.json",
+      "bytes": 9388,
+      "sha256": "6193e21b8de7f88043a3abe0c7393a5b076cc8122d984821671f109f9b57534e"
+    },
+    {
+      "path": "integration-checks/final/source-before.json",
+      "source": "/tmp/plato-llm-integration/checks/final/source-before.json",
+      "bytes": 321858,
+      "sha256": "eebd6a109665674d7b0b3a29517dbb01e1df57b90f1e22e4e64718706f878478"
+    },
+    {
+      "path": "integration-checks/final/ty-delta.log",
+      "source": "/tmp/plato-llm-integration/checks/final/ty-delta.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "integration-checks/final/ty-full.log",
+      "source": "/tmp/plato-llm-integration/checks/final/ty-full.log",
+      "bytes": 121439,
+      "sha256": "98ab50b6c9564af470858372523719ec276c769e32b8496398627859e9b89d62"
+    },
+    {
+      "path": "integration-checks/final/workflow-type-guard.log",
+      "source": "/tmp/plato-llm-integration/checks/final/workflow-type-guard.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "integration-checks/final_snapshot.py",
+      "source": "/tmp/plato-llm-integration/checks/final_snapshot.py",
+      "bytes": 4536,
+      "sha256": "f213e4e2ca41ee1636e0c06c74a68c9e95b023eb3685a680c19af34c00225a19"
+    },
+    {
+      "path": "integration-checks/lock-check.log",
+      "source": "/tmp/plato-llm-integration/checks/lock-check.log",
+      "bytes": 52,
+      "sha256": "0e18bc0ce7888202abd24439416ff271f47b099b20b686ad39c2bb48ee654282"
+    },
+    {
+      "path": "integration-checks/preliminary-integration-validation.json",
+      "source": "/tmp/plato-llm-integration/checks/preliminary-integration-validation.json",
+      "bytes": 42276,
+      "sha256": "ebea29ef9485b55b2ab49884aa37aaa413edcdcc6ac3c5078ee7749cbad4c3dc"
+    },
+    {
+      "path": "integration-checks/report.log",
+      "source": "/tmp/plato-llm-integration/checks/report.log",
+      "bytes": 501,
+      "sha256": "6a0cd34796bea35a0140619b826a662682f47a493da41497694908a47e53ea07"
+    },
+    {
+      "path": "integration-checks/ruff.log",
+      "source": "/tmp/plato-llm-integration/checks/ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "integration-checks/source-fingerprints.json",
+      "source": "/tmp/plato-llm-integration/checks/source-fingerprints.json",
+      "bytes": 270239,
+      "sha256": "8df3c09d6ca9b2601015af473aa269ed314685297c74eb7952f2b30b716147a1"
+    },
+    {
+      "path": "integration-checks/sync-tooling.log",
+      "source": "/tmp/plato-llm-integration/checks/sync-tooling.log",
+      "bytes": 2493,
+      "sha256": "d686dcd285c740e60e974db7e4cefdbce85a320f426436ec5408ba5cd72515c6"
+    },
+    {
+      "path": "integration-checks/ty-baseline.log",
+      "source": "/tmp/plato-llm-integration/checks/ty-baseline.log",
+      "bytes": 122159,
+      "sha256": "d641972a7254bbae308fe4b75a16e10323ccee4be1040c49b2704c6cf6223a2a"
+    },
+    {
+      "path": "integration-checks/ty-changed-active.log",
+      "source": "/tmp/plato-llm-integration/checks/ty-changed-active.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "integration-checks/ty-full.log",
+      "source": "/tmp/plato-llm-integration/checks/ty-full.log",
+      "bytes": 121439,
+      "sha256": "98ab50b6c9564af470858372523719ec276c769e32b8496398627859e9b89d62"
+    },
+    {
+      "path": "integration-checks/typing-classification.json",
+      "source": "/tmp/plato-llm-integration/checks/typing-classification.json",
+      "bytes": 6524,
+      "sha256": "dccf75fb0947557e0d0f72026afb721c37bf7687473e04e632f2c5f0911ea6b5"
+    },
+    {
+      "path": "integration-checks/typing-classification.log",
+      "source": "/tmp/plato-llm-integration/checks/typing-classification.log",
+      "bytes": 4899,
+      "sha256": "ad5e8304cd80bb8fefab9d8e014ba909243d83f566d5553af84e2c3f10b6d490"
+    },
+    {
+      "path": "integration-checks/verify_integration.py",
+      "source": "/tmp/plato-llm-integration/checks/verify_integration.py",
+      "bytes": 11595,
+      "sha256": "34397db7115c5f12978c735eed2f86273712d6eb25ac69143c2aa7a91fce6659"
+    },
+    {
+      "path": "integration-checks/workflow-type-guard.log",
+      "source": "/tmp/plato-llm-integration/checks/workflow-type-guard.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "integration-checks/workflow-type-guard.py",
+      "source": "/tmp/plato-llm-integration/checks/workflow-type-guard.py",
+      "bytes": 1197,
+      "sha256": "a3900cdad29b0352e5b34dfb623fae569893a807ac7c6216c134fe5a4bb51e2b"
+    },
+    {
+      "path": "integration-checks/write_final_report.py",
+      "source": "/tmp/plato-llm-integration/checks/write_final_report.py",
+      "bytes": 15261,
+      "sha256": "09821940a829b6f036f14d5d7f18f5e42dd4634bcf387ba6b40ff9eb4e62d25c"
+    },
+    {
+      "path": "integration-checks/write_report.py",
+      "source": "/tmp/plato-llm-integration/checks/write_report.py",
+      "bytes": 9364,
+      "sha256": "4808e4d4949f12941922a1d9bc8459e02bed3f75ce943d7ef58aba10916fabc8"
+    },
+    {
+      "path": "interrupted-preliminary-base/collection.log",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-base/collection.log",
+      "bytes": 150091,
+      "sha256": "38f929d5c4d81ea067c060b1400d2a03408822dfb657aa11dc924beb14d2bac6"
+    },
+    {
+      "path": "interrupted-preliminary-base/receipt.json",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-base/receipt.json",
+      "bytes": 1082,
+      "sha256": "3f78215d77546cec45770194dba02c7b92471223fef4fe9cf22e418f80ef0365"
+    },
+    {
+      "path": "interrupted-preliminary-base/source-before.json",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-base/source-before.json",
+      "bytes": 152095,
+      "sha256": "951665e80e217663a2b2f13dfdbdb408ff3bcff9616a179e9967e1e799d4d203"
+    },
+    {
+      "path": "interrupted-preliminary-base/suite.log",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-base/suite.log",
+      "bytes": 3502,
+      "sha256": "f8b119b4ef0a5629a519cd9442988739d790622019b4fdbb59f6f8fd25f644d5"
+    },
+    {
+      "path": "interrupted-preliminary-base/tests.xml",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-base/tests.xml",
+      "bytes": 38341,
+      "sha256": "d218764e628a308a50881375f58fc1fe4bf717b734b8396fcb4466aa695aa358"
+    },
+    {
+      "path": "interrupted-preliminary-mandatory/collection.log",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-mandatory/collection.log",
+      "bytes": 151071,
+      "sha256": "5f93fb441c96026a14031d335acdc42429f1d1a95c54c7fc94a03da1279a7014"
+    },
+    {
+      "path": "interrupted-preliminary-mandatory/receipt.json",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-mandatory/receipt.json",
+      "bytes": 1221,
+      "sha256": "d47abc5662e17f47c1aa0381cf8f21d6447f837a56ce37f5cef264a242fd1b71"
+    },
+    {
+      "path": "interrupted-preliminary-mandatory/source-before.json",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-mandatory/source-before.json",
+      "bytes": 152095,
+      "sha256": "951665e80e217663a2b2f13dfdbdb408ff3bcff9616a179e9967e1e799d4d203"
+    },
+    {
+      "path": "interrupted-preliminary-mandatory/suite.log",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-mandatory/suite.log",
+      "bytes": 3679,
+      "sha256": "c3de811d3516b9b6c55838a5d18d944e82b1fa5e43a6e555b18acb6208786466"
+    },
+    {
+      "path": "interrupted-preliminary-mandatory/tests.xml",
+      "source": "/tmp/plato-llm-integration/preliminary-d3569ec/run-mandatory/tests.xml",
+      "bytes": 39297,
+      "sha256": "e48f2869883cea2a2138e9196f673ecd5e27dc9b88881a8b72976af42aa8d96d"
+    },
+    {
+      "path": "qwen-author/accumulation-red.log",
+      "source": "/tmp/plato-qwen-validation/accumulation-red.log",
+      "bytes": 12278,
+      "sha256": "858d59cf9b9b79358c1970767f57b4d3473e7023765ba901b8c6900f67cabcd5"
+    },
+    {
+      "path": "qwen-author/adapter-alias-green.log",
+      "source": "/tmp/plato-qwen-validation/adapter-alias-green.log",
+      "bytes": 98,
+      "sha256": "3be6ffcaecf85b5bd3eef3693ab214b0e7c9eb4e36d117fcf1825652de5eb298"
+    },
+    {
+      "path": "qwen-author/adapter-alias-red.log",
+      "source": "/tmp/plato-qwen-validation/adapter-alias-red.log",
+      "bytes": 2745,
+      "sha256": "e6f2a88ec9aaf1ba4139c11dadd012b4762bbed19fae7915b60dff8243826965"
+    },
+    {
+      "path": "qwen-author/cli-final-wrapper.log",
+      "source": "/tmp/plato-qwen-validation/cli-final-wrapper.log",
+      "bytes": 709,
+      "sha256": "c1d6c9ecb656f9041d9323a97103252f8509b84ba4a0203a4655ab6988d1e47a"
+    },
+    {
+      "path": "qwen-author/cli-final/cli-result.json",
+      "source": "/tmp/plato-qwen-validation/cli-final/cli-result.json",
+      "bytes": 709,
+      "sha256": "c1d6c9ecb656f9041d9323a97103252f8509b84ba4a0203a4655ab6988d1e47a"
+    },
+    {
+      "path": "qwen-author/cli-final/plato.log",
+      "source": "/tmp/plato-qwen-validation/cli-final/plato.log",
+      "bytes": 9197,
+      "sha256": "aec6f6b166819513969ebffa40cbf06fd3202e8d7682b6049378a9345ac6d25d"
+    },
+    {
+      "path": "qwen-author/cli-transport-wrapper.log",
+      "source": "/tmp/plato-qwen-validation/cli-transport-wrapper.log",
+      "bytes": 717,
+      "sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43"
+    },
+    {
+      "path": "qwen-author/cli-transport/cli-result.json",
+      "source": "/tmp/plato-qwen-validation/cli-transport/cli-result.json",
+      "bytes": 717,
+      "sha256": "aae32de8c790fa785e980479073786567c29aa19e35a613b9cd5ff1975f3bc43"
+    },
+    {
+      "path": "qwen-author/cli-transport/plato.log",
+      "source": "/tmp/plato-qwen-validation/cli-transport/plato.log",
+      "bytes": 16530,
+      "sha256": "e3ce0a1bce746fc131bb97d9ef53c0381fdee94bb6c719f95b7b60e674b13693"
+    },
+    {
+      "path": "qwen-author/cli-wrapper.log",
+      "source": "/tmp/plato-qwen-validation/cli-wrapper.log",
+      "bytes": 1008,
+      "sha256": "cf34ea1267e789cf58351e29efba77c463dbdc76d9c5684d98bd23b417a881ab"
+    },
+    {
+      "path": "qwen-author/cli/cli-result.json",
+      "source": "/tmp/plato-qwen-validation/cli/cli-result.json",
+      "bytes": 1008,
+      "sha256": "cf34ea1267e789cf58351e29efba77c463dbdc76d9c5684d98bd23b417a881ab"
+    },
+    {
+      "path": "qwen-author/cli/plato.log",
+      "source": "/tmp/plato-qwen-validation/cli/plato.log",
+      "bytes": 16317,
+      "sha256": "5fe605cd205530f9a0b9cf7f6eb3296d38bfcac2ca91bc17523b487324ced5fc"
+    },
+    {
+      "path": "qwen-author/download.log",
+      "source": "/tmp/plato-qwen-validation/download.log",
+      "bytes": 709,
+      "sha256": "886129be62849555a23079ea8687706c26e2f108fa25f37b7161cd73aa70076a"
+    },
+    {
+      "path": "qwen-author/focused.log",
+      "source": "/tmp/plato-qwen-validation/focused.log",
+      "bytes": 2153,
+      "sha256": "41ed372459c28e54963bfcd80c9faa9864adc8ac2b2eff33b9e35f0183851670"
+    },
+    {
+      "path": "qwen-author/make_preexpanded_receipt.py",
+      "source": "/tmp/plato-qwen-validation/make_preexpanded_receipt.py",
+      "bytes": 7896,
+      "sha256": "17d46fb87daff15d38d8dba2cc089d2c73f164515ec58362dbaed9beacc76f0d"
+    },
+    {
+      "path": "qwen-author/make_receipt.py",
+      "source": "/tmp/plato-qwen-validation/make_receipt.py",
+      "bytes": 10299,
+      "sha256": "77503f3229b7c8f1f6d69f2d73989e790e275ecb5ac5d7ca777fd86b6db59d53"
+    },
+    {
+      "path": "qwen-author/new-tests-collection.log",
+      "source": "/tmp/plato-qwen-validation/new-tests-collection.log",
+      "bytes": 2689,
+      "sha256": "b9b0eb537f8ffde174e6612bcd3787ed4ed6b90eedfed76cb7346194f67e76fe"
+    },
+    {
+      "path": "qwen-author/offline-final.log",
+      "source": "/tmp/plato-qwen-validation/offline-final.log",
+      "bytes": 1027,
+      "sha256": "d475c7ff19a4c895627889f2a19182b43972be3ba65057413b92e4ce3a544357"
+    },
+    {
+      "path": "qwen-author/offline-initial.log",
+      "source": "/tmp/plato-qwen-validation/offline-initial.log",
+      "bytes": 98,
+      "sha256": "1f87f2c86d2f3957ef586bd86beadd737fe4c2e98b3540452b2d7bfdd4f3b8f7"
+    },
+    {
+      "path": "qwen-author/preexpanded-fix-focused.log",
+      "source": "/tmp/plato-qwen-validation/preexpanded-fix-focused.log",
+      "bytes": 2153,
+      "sha256": "bf82f921e74220a06a657a200142b2a40d599c9b67d2ee8c3ed86b93fdf8ab5f"
+    },
+    {
+      "path": "qwen-author/preexpanded-fix-real.log",
+      "source": "/tmp/plato-qwen-validation/preexpanded-fix-real.log",
+      "bytes": 2874,
+      "sha256": "5e671dead8eab43b39d6d76476b419a0c148a47aab42d3e4ae3784689317d895"
+    },
+    {
+      "path": "qwen-author/preexpanded-fix-real/config.toml",
+      "source": "/tmp/plato-qwen-validation/preexpanded-fix-real/config.toml",
+      "bytes": 1384,
+      "sha256": "aa80ea5b3719e8b29d523534b0f0f5c180e896b27a7b35e2e8eb31a5d48e37a4"
+    },
+    {
+      "path": "qwen-author/preexpanded-fix-real/qualification.json",
+      "source": "/tmp/plato-qwen-validation/preexpanded-fix-real/qualification.json",
+      "bytes": 2186,
+      "sha256": "10c9b5957121bf6ce2fc616df706145786f89b2aef8fb428cb9e296f823e7799"
+    },
+    {
+      "path": "qwen-author/preexpanded-fix-typecheck.log",
+      "source": "/tmp/plato-qwen-validation/preexpanded-fix-typecheck.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "qwen-author/preexpanded-green.log",
+      "source": "/tmp/plato-qwen-validation/preexpanded-green.log",
+      "bytes": 98,
+      "sha256": "0a97b591ab7ce9644866a9aea8e19c37ff6647585418c546d0481e0cb92bfbc7"
+    },
+    {
+      "path": "qwen-author/preexpanded-red.log",
+      "source": "/tmp/plato-qwen-validation/preexpanded-red.log",
+      "bytes": 3674,
+      "sha256": "fb8acc77854a9f8ac12b903da24cc96d9afe390db941efb728bb730b26ec44e3"
+    },
+    {
+      "path": "qwen-author/real-pretrained.log",
+      "source": "/tmp/plato-qwen-validation/real-pretrained.log",
+      "bytes": 2864,
+      "sha256": "9b0f7e24344d1a60b26ded903fbe7c005b5846bf58c89b51354f17a8a2492549"
+    },
+    {
+      "path": "qwen-author/real-pretrained/config.toml",
+      "source": "/tmp/plato-qwen-validation/real-pretrained/config.toml",
+      "bytes": 1382,
+      "sha256": "29d499c159a9790432334b7ecf7f3e104f9bb612b2c05cf32631147a312a0614"
+    },
+    {
+      "path": "qwen-author/real-pretrained/qualification.json",
+      "source": "/tmp/plato-qwen-validation/real-pretrained/qualification.json",
+      "bytes": 2186,
+      "sha256": "e3e335d8b81ac9677fe5cee3e3ac392f2a973933153348e74813a1bce4946a1b"
+    },
+    {
+      "path": "qwen-author/run_cli.py",
+      "source": "/tmp/plato-qwen-validation/run_cli.py",
+      "bytes": 2962,
+      "sha256": "be3705b8b315c0e6ad7b92760f9c4f05e0694d893710162460ec1aed8ece4156"
+    },
+    {
+      "path": "qwen-author/run_cli_final.py",
+      "source": "/tmp/plato-qwen-validation/run_cli_final.py",
+      "bytes": 3222,
+      "sha256": "bc67104981fe04ed48d2b34e7034aa93f27043b508e31164d217dc4086246abc"
+    },
+    {
+      "path": "qwen-author/run_cli_transport.py",
+      "source": "/tmp/plato-qwen-validation/run_cli_transport.py",
+      "bytes": 3226,
+      "sha256": "63066deb5f4e98747f8e374378f5722cefe142400e51ec3765e4415e9b9a1992"
+    },
+    {
+      "path": "qwen-author/typecheck-all.log",
+      "source": "/tmp/plato-qwen-validation/typecheck-all.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "qwen-author/typecheck.log",
+      "source": "/tmp/plato-qwen-validation/typecheck.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "qwen-review1/baseline-probe.json",
+      "source": "/tmp/plato-qwen-review/baseline-probe.json",
+      "bytes": 33385,
+      "sha256": "908c4fba73dcee39a0de585cc602798368cd744e1706985e8a83a18d47011855"
+    },
+    {
+      "path": "qwen-review1/baseline-probe.log",
+      "source": "/tmp/plato-qwen-review/baseline-probe.log",
+      "bytes": 837,
+      "sha256": "31d87a574a77192d41e48319384f98c816ec822631cc401798eca9be535a1533"
+    },
+    {
+      "path": "qwen-review1/edge-cases.log",
+      "source": "/tmp/plato-qwen-review/edge-cases.log",
+      "bytes": 2225,
+      "sha256": "b7e1af505272c47ab2b21417766f0c0e3ac7b2873e50925f81952555da544328"
+    },
+    {
+      "path": "qwen-review1/edge_cases.py",
+      "source": "/tmp/plato-qwen-review/edge_cases.py",
+      "bytes": 3294,
+      "sha256": "74cb923ca887e6fbc1c80a0afc06da36c1e102ff03cf4fca5741b989b1c53df4"
+    },
+    {
+      "path": "qwen-review1/edges/expanded-tokenizer/tokenizer.json",
+      "source": "/tmp/plato-qwen-review/edges/expanded-tokenizer/tokenizer.json",
+      "bytes": 28692,
+      "sha256": "23c9f56b1efa5d2a16d42f29bfc15ead48a270fff45088918930054e6ba70401"
+    },
+    {
+      "path": "qwen-review1/edges/expanded-tokenizer/tokenizer_config.json",
+      "source": "/tmp/plato-qwen-review/edges/expanded-tokenizer/tokenizer_config.json",
+      "bytes": 287,
+      "sha256": "704d98af9358e7937a48aafa68a4692b32c5d271d8822641be5d6880b5119272"
+    },
+    {
+      "path": "qwen-review1/edges/original-model/config.json",
+      "source": "/tmp/plato-qwen-review/edges/original-model/config.json",
+      "bytes": 799,
+      "sha256": "54b152609de85dd8d68a0fd5ed323d8542038ce1d08fdf6a638d93625d5efd92"
+    },
+    {
+      "path": "qwen-review1/edges/original-model/generation_config.json",
+      "source": "/tmp/plato-qwen-review/edges/original-model/generation_config.json",
+      "bytes": 195,
+      "sha256": "eff64494b670e70986494da59f90fb73758b1d7287c5281dccdcc9d6bce4114c"
+    },
+    {
+      "path": "qwen-review1/edges/original-model/tokenizer.json",
+      "source": "/tmp/plato-qwen-review/edges/original-model/tokenizer.json",
+      "bytes": 3714,
+      "sha256": "baf9f844e01ac89f530255db13e0b4e64a37bcb96aed5ce139066f622c4fb432"
+    },
+    {
+      "path": "qwen-review1/edges/original-model/tokenizer_config.json",
+      "source": "/tmp/plato-qwen-review/edges/original-model/tokenizer_config.json",
+      "bytes": 239,
+      "sha256": "4268be7d4b93a1b47bc46a0286d35c6a26d4bdac24ab67da3341f1b62d18c3f2"
+    },
+    {
+      "path": "qwen-review1/edges/receipt.json",
+      "source": "/tmp/plato-qwen-review/edges/receipt.json",
+      "bytes": 1022,
+      "sha256": "52a106e71fe4c61d4ba752e792d33faa1838de1275ab89a88e5b129259a6e898"
+    },
+    {
+      "path": "qwen-review1/final-probe.json",
+      "source": "/tmp/plato-qwen-review/final-probe.json",
+      "bytes": 30441,
+      "sha256": "6372aa467cb7004ded91cf84653cf54935179eff29950a9bab36beb1c3d46d01"
+    },
+    {
+      "path": "qwen-review1/final-probe.log",
+      "source": "/tmp/plato-qwen-review/final-probe.log",
+      "bytes": 268,
+      "sha256": "68e0fccf5490b2ea76535a5fdbca4ce7e41308e077d63364eef4b7735df770d2"
+    },
+    {
+      "path": "qwen-review1/focused-final.log",
+      "source": "/tmp/plato-qwen-review/focused-final.log",
+      "bytes": 2153,
+      "sha256": "cbff0139090f5e73d313eb32332bc071e31aa4602f5c470a71b27bd476c84f9c"
+    },
+    {
+      "path": "qwen-review1/independent_probe.py",
+      "source": "/tmp/plato-qwen-review/independent_probe.py",
+      "bytes": 9116,
+      "sha256": "9a49bc18d846da099174c1fa4e4a75f137ce293d3f656c7c92b7708636d92bc3"
+    },
+    {
+      "path": "qwen-review1/original-base-config/config.json",
+      "source": "/tmp/plato-qwen-review/original-base-config/config.json",
+      "bytes": 727,
+      "sha256": "68671d671edbab8bfbbb8b7474e33a06956377da5772e12a0ecc7d3d8fc4c2be"
+    },
+    {
+      "path": "qwen-review1/preparation.json",
+      "source": "/tmp/plato-qwen-review/preparation.json",
+      "bytes": 4351,
+      "sha256": "f132b3cd724a11e5c18d7a4aced28c34517499f6217a3b592689f880dbc6f062"
+    },
+    {
+      "path": "qwen-review1/qwen-reference-review-d3569ec.json",
+      "source": "/tmp/plato-qwen-review/qwen-reference-review-d3569ec.json",
+      "bytes": 10908,
+      "sha256": "4f8766af24b117f84f48bf63c8500b60ebc7e442351ae8c0993bf7c468e61a11"
+    },
+    {
+      "path": "qwen-review1/write_review.py",
+      "source": "/tmp/plato-qwen-review/write_review.py",
+      "bytes": 10595,
+      "sha256": "2884d112d5669f6bc217b8e540c33ae877c32b6380691c095b676f3ccf10b57d"
+    },
+    {
+      "path": "qwen-review2/edge-cases.log",
+      "source": "/tmp/plato-qwen-review2/edge-cases.log",
+      "bytes": 2382,
+      "sha256": "7af3228253ecec95225415834e24c68f5d2272db6bbd4d688479a93df13fd98d"
+    },
+    {
+      "path": "qwen-review2/edge_cases.py",
+      "source": "/tmp/plato-qwen-review2/edge_cases.py",
+      "bytes": 3295,
+      "sha256": "d667a0b124b428c4dda7968122dc0ea4adf72f02dce743683adcba6038971c80"
+    },
+    {
+      "path": "qwen-review2/edges/expanded-tokenizer/tokenizer.json",
+      "source": "/tmp/plato-qwen-review2/edges/expanded-tokenizer/tokenizer.json",
+      "bytes": 28692,
+      "sha256": "23c9f56b1efa5d2a16d42f29bfc15ead48a270fff45088918930054e6ba70401"
+    },
+    {
+      "path": "qwen-review2/edges/expanded-tokenizer/tokenizer_config.json",
+      "source": "/tmp/plato-qwen-review2/edges/expanded-tokenizer/tokenizer_config.json",
+      "bytes": 287,
+      "sha256": "704d98af9358e7937a48aafa68a4692b32c5d271d8822641be5d6880b5119272"
+    },
+    {
+      "path": "qwen-review2/edges/original-model/config.json",
+      "source": "/tmp/plato-qwen-review2/edges/original-model/config.json",
+      "bytes": 799,
+      "sha256": "54b152609de85dd8d68a0fd5ed323d8542038ce1d08fdf6a638d93625d5efd92"
+    },
+    {
+      "path": "qwen-review2/edges/original-model/generation_config.json",
+      "source": "/tmp/plato-qwen-review2/edges/original-model/generation_config.json",
+      "bytes": 195,
+      "sha256": "eff64494b670e70986494da59f90fb73758b1d7287c5281dccdcc9d6bce4114c"
+    },
+    {
+      "path": "qwen-review2/edges/original-model/tokenizer.json",
+      "source": "/tmp/plato-qwen-review2/edges/original-model/tokenizer.json",
+      "bytes": 3714,
+      "sha256": "baf9f844e01ac89f530255db13e0b4e64a37bcb96aed5ce139066f622c4fb432"
+    },
+    {
+      "path": "qwen-review2/edges/original-model/tokenizer_config.json",
+      "source": "/tmp/plato-qwen-review2/edges/original-model/tokenizer_config.json",
+      "bytes": 239,
+      "sha256": "4268be7d4b93a1b47bc46a0286d35c6a26d4bdac24ab67da3341f1b62d18c3f2"
+    },
+    {
+      "path": "qwen-review2/edges/receipt.json",
+      "source": "/tmp/plato-qwen-review2/edges/receipt.json",
+      "bytes": 1179,
+      "sha256": "ecaba635c0fc61291dcacb3c6e031255b5ff7f1c5b7698bfa9bddae1daf442ed"
+    },
+    {
+      "path": "qwen-review2/evidence-checks.json",
+      "source": "/tmp/plato-qwen-review2/evidence-checks.json",
+      "bytes": 1782,
+      "sha256": "7d42caed1ec4e97212a5af7b6739eda93188148cec2891e8a18036ed9307fb33"
+    },
+    {
+      "path": "qwen-review2/evidence_bindings.py",
+      "source": "/tmp/plato-qwen-review2/evidence_bindings.py",
+      "bytes": 3545,
+      "sha256": "cfd5d6451dfe7259eb30420672266f89d0b037e868d617721ff854dc48e7ecb3"
+    },
+    {
+      "path": "qwen-review2/final-probe.json",
+      "source": "/tmp/plato-qwen-review2/final-probe.json",
+      "bytes": 30516,
+      "sha256": "03145fe2224572a7087d564c1a0c7f5aad31d1d0db9f472b5f09dd0154cf627a"
+    },
+    {
+      "path": "qwen-review2/final-probe.log",
+      "source": "/tmp/plato-qwen-review2/final-probe.log",
+      "bytes": 269,
+      "sha256": "63363fa15f4861a17d9860ea907257679418f02ac5f08858c9a7dce55420c7d9"
+    },
+    {
+      "path": "qwen-review2/focused-tests.log",
+      "source": "/tmp/plato-qwen-review2/focused-tests.log",
+      "bytes": 2153,
+      "sha256": "23819ced3025af227ab3916a041c7a110b87ef59077e5d688657a99640139237"
+    },
+    {
+      "path": "qwen-review2/independent_probe.py",
+      "source": "/tmp/plato-qwen-review2/independent_probe.py",
+      "bytes": 9326,
+      "sha256": "893e4bd35aa4b1c03644487aceef555701f786db7c63488c6d7b4de61f09b22c"
+    },
+    {
+      "path": "qwen-review2/original-base-config/config.json",
+      "source": "/tmp/plato-qwen-review2/original-base-config/config.json",
+      "bytes": 727,
+      "sha256": "68671d671edbab8bfbbb8b7474e33a06956377da5772e12a0ecc7d3d8fc4c2be"
+    },
+    {
+      "path": "qwen-review2/persistence-probe.log",
+      "source": "/tmp/plato-qwen-review2/persistence-probe.log",
+      "bytes": 3970,
+      "sha256": "d845a56e3bc83c7d0d6573e9dd0e7f875ef3d0c348e4661fced67149849c953a"
+    },
+    {
+      "path": "qwen-review2/persistence/base/config.json",
+      "source": "/tmp/plato-qwen-review2/persistence/base/config.json",
+      "bytes": 799,
+      "sha256": "54b152609de85dd8d68a0fd5ed323d8542038ce1d08fdf6a638d93625d5efd92"
+    },
+    {
+      "path": "qwen-review2/persistence/base/generation_config.json",
+      "source": "/tmp/plato-qwen-review2/persistence/base/generation_config.json",
+      "bytes": 195,
+      "sha256": "eff64494b670e70986494da59f90fb73758b1d7287c5281dccdcc9d6bce4114c"
+    },
+    {
+      "path": "qwen-review2/persistence/base/tokenizer.json",
+      "source": "/tmp/plato-qwen-review2/persistence/base/tokenizer.json",
+      "bytes": 3714,
+      "sha256": "baf9f844e01ac89f530255db13e0b4e64a37bcb96aed5ce139066f622c4fb432"
+    },
+    {
+      "path": "qwen-review2/persistence/base/tokenizer_config.json",
+      "source": "/tmp/plato-qwen-review2/persistence/base/tokenizer_config.json",
+      "bytes": 239,
+      "sha256": "4268be7d4b93a1b47bc46a0286d35c6a26d4bdac24ab67da3341f1b62d18c3f2"
+    },
+    {
+      "path": "qwen-review2/persistence/receipt.json",
+      "source": "/tmp/plato-qwen-review2/persistence/receipt.json",
+      "bytes": 3700,
+      "sha256": "16d1b49fbe507ccda47018bf539f549cf5e2e14276bbf7ef74bc335bbf9c92d3"
+    },
+    {
+      "path": "qwen-review2/persistence_probe.py",
+      "source": "/tmp/plato-qwen-review2/persistence_probe.py",
+      "bytes": 5373,
+      "sha256": "aab0ccdebe2e3502cbee598a64ca50fb8f82f5662a2ff2c1a8875c9fd706091a"
+    },
+    {
+      "path": "qwen-review2/qwen-reference-review-bca1f6e.json",
+      "source": "/tmp/plato-qwen-review2/qwen-reference-review-bca1f6e.json",
+      "bytes": 18210,
+      "sha256": "412432d844697795fd2c9198c5d9758971d4c6afaead6760dda29a659aac951a"
+    },
+    {
+      "path": "qwen-review2/write_review.py",
+      "source": "/tmp/plato-qwen-review2/write_review.py",
+      "bytes": 12561,
+      "sha256": "8d91185387c201d3008d956388d47bccdd9cbb5c6615c0d000d812ba3d8fc64b"
+    },
+    {
+      "path": "retirement-author/plato-retirement-after-collection-locked.log",
+      "source": "/tmp/plato-retirement-after-collection-locked.log",
+      "bytes": 148406,
+      "sha256": "b8fbb4bcbc3010499e9828de61ddebc7f2a52f5507ab4ba792ef2ea7a82e36fc"
+    },
+    {
+      "path": "retirement-author/plato-retirement-base-collection.log",
+      "source": "/tmp/plato-retirement-base-collection.log",
+      "bytes": 147431,
+      "sha256": "56cadc0539151f6d98353604af44206517a59eb99e0c041a2392f00532fae8f1"
+    },
+    {
+      "path": "retirement-author/plato-retirement-base-sync.log",
+      "source": "/tmp/plato-retirement-base-sync.log",
+      "bytes": 2113,
+      "sha256": "1f0dc84829e17cc988cccd78c2a2d4c5b45757129b4ea80341cb88e95c6425ed"
+    },
+    {
+      "path": "retirement-author/plato-retirement-before-collection.log",
+      "source": "/tmp/plato-retirement-before-collection.log",
+      "bytes": 147854,
+      "sha256": "c0bfa1f3dd249e58096a54fd58c5c647116af538b4de003456216d5288128ecd"
+    },
+    {
+      "path": "retirement-author/plato-retirement-build.log",
+      "source": "/tmp/plato-retirement-build.log",
+      "bytes": 202,
+      "sha256": "18efc1409578cbd8439880baa2c00389e480fcac59be87e17700238470be03aa"
+    },
+    {
+      "path": "retirement-author/plato-retirement-lock-check.log",
+      "source": "/tmp/plato-retirement-lock-check.log",
+      "bytes": 51,
+      "sha256": "7774956de13430ebbcb0a6c1ce1a37fd5e08185bf227744fff55300108b971b9"
+    },
+    {
+      "path": "retirement-author/plato-retirement-packages.txt",
+      "source": "/tmp/plato-retirement-packages.txt",
+      "bytes": 1698,
+      "sha256": "e36293515dc4c10bfe6b5c4fe8ac4d2a083e2ab6496cbbb8afffb69e8ce9b3fb"
+    },
+    {
+      "path": "retirement-author/plato-retirement-required-locked.log",
+      "source": "/tmp/plato-retirement-required-locked.log",
+      "bytes": 5221,
+      "sha256": "ea4fa38ef91f0dde26c24e2667da26f48077ebdf5337239114ceab695e36bc4d"
+    },
+    {
+      "path": "retirement-author/plato-retirement-ruff.log",
+      "source": "/tmp/plato-retirement-ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "retirement-author/plato-retirement-sync.log",
+      "source": "/tmp/plato-retirement-sync.log",
+      "bytes": 2371,
+      "sha256": "c3bbd00d6beabb32c4c4973d049b7642b3c621553d61125cf1843454462d5760"
+    },
+    {
+      "path": "retirement-author/plato-retirement-targeted-base.log",
+      "source": "/tmp/plato-retirement-targeted-base.log",
+      "bytes": 461,
+      "sha256": "1622ff51017fcd717cbdd9d02632634084df939d7ac91bd248118a2a11c75946"
+    },
+    {
+      "path": "retirement-author/plato-retirement-targeted-locked.log",
+      "source": "/tmp/plato-retirement-targeted-locked.log",
+      "bytes": 474,
+      "sha256": "2df3bf5337d6785e5cdf4d01c0f510222c08434105bbdf8c874c2c277d39fd38"
+    },
+    {
+      "path": "retirement-author/plato-retirement-ty.log",
+      "source": "/tmp/plato-retirement-ty.log",
+      "bytes": 122159,
+      "sha256": "d641972a7254bbae308fe4b75a16e10323ccee4be1040c49b2704c6cf6223a2a"
+    },
+    {
+      "path": "retirement-author/plato-retirement-validate-integrity.py",
+      "source": "/tmp/plato-retirement-validate-integrity.py",
+      "bytes": 2391,
+      "sha256": "e571e1ab60c970d355a0d6a33bf1566aacf30025d6db9e16a80e011965215cac"
+    },
+    {
+      "path": "retirement-review/archive-collection.log",
+      "source": "/tmp/plato-retirement-review/archive-collection.log",
+      "bytes": 29,
+      "sha256": "b77b30fffdaf0df67886db72dd1a6824a7bbcd109fe42552036e1d177951e851"
+    },
+    {
+      "path": "retirement-review/behavior-and-build.json",
+      "source": "/tmp/plato-retirement-review/behavior-and-build.json",
+      "bytes": 3774,
+      "sha256": "f07d158866ffdcd228a3a9c08be28a4041fdd7f02dc8a1cb025b03360d92f491"
+    },
+    {
+      "path": "retirement-review/behavior-probe.log",
+      "source": "/tmp/plato-retirement-review/behavior-probe.log",
+      "bytes": 3988,
+      "sha256": "860cd6bb3ebd8bfe0bdb0381cb18a5b5926cf0d6869d4bddbe60ccd8d2d7e7d5"
+    },
+    {
+      "path": "retirement-review/build.log",
+      "source": "/tmp/plato-retirement-review/build.log",
+      "bytes": 216,
+      "sha256": "5c60e909e1a5671a01b8e69e0d268219facde497d583a35e4a082e46231b7b46"
+    },
+    {
+      "path": "retirement-review/check-behavior.py",
+      "source": "/tmp/plato-retirement-review/check-behavior.py",
+      "bytes": 8578,
+      "sha256": "0a3919e74544390f6c0c285d12656ca0695ec8dba027d575e76a40ad4f8c04aa"
+    },
+    {
+      "path": "retirement-review/check-collection.py",
+      "source": "/tmp/plato-retirement-review/check-collection.py",
+      "bytes": 1910,
+      "sha256": "dc9151ac7831b7584438b1c9dd89755e4571a2893645fbcd543f909c2d583737"
+    },
+    {
+      "path": "retirement-review/check-integrity.py",
+      "source": "/tmp/plato-retirement-review/check-integrity.py",
+      "bytes": 6410,
+      "sha256": "6e99ac3060f3685333184fed6ad61feb9cced8e388647a2ec9cf4798679f7ee2"
+    },
+    {
+      "path": "retirement-review/collection-base.log",
+      "source": "/tmp/plato-retirement-review/collection-base.log",
+      "bytes": 147431,
+      "sha256": "1f62af83a43b338caf00066c6fb547daf65f92d623467bfc757dd5791974c469"
+    },
+    {
+      "path": "retirement-review/collection-ledger.json",
+      "source": "/tmp/plato-retirement-review/collection-ledger.json",
+      "bytes": 5885,
+      "sha256": "0d2fe801cab59c35f4c96ffda6777d1d00a2a1fadc57a6fb9eae4a4d74642b99"
+    },
+    {
+      "path": "retirement-review/collection-mandatory.log",
+      "source": "/tmp/plato-retirement-review/collection-mandatory.log",
+      "bytes": 148406,
+      "sha256": "325bec7ff93280d1e392c35bb99a830599b69df3cccf634f5c5c1bdcb80c5bd1"
+    },
+    {
+      "path": "retirement-review/focused-tests.log",
+      "source": "/tmp/plato-retirement-review/focused-tests.log",
+      "bytes": 394,
+      "sha256": "4b21c6ad2a92d92ee20b7a3fd48f651a3110f1bfad2cfafc3e9f68b2647a7005"
+    },
+    {
+      "path": "retirement-review/integrity-and-lock.json",
+      "source": "/tmp/plato-retirement-review/integrity-and-lock.json",
+      "bytes": 1646,
+      "sha256": "102376436ddb81ff631b90b23bbb16dc7917da232f41bb653aa55b79ea2d49de"
+    },
+    {
+      "path": "retirement-review/integrity-and-lock.log",
+      "source": "/tmp/plato-retirement-review/integrity-and-lock.log",
+      "bytes": 1646,
+      "sha256": "102376436ddb81ff631b90b23bbb16dc7917da232f41bb653aa55b79ea2d49de"
+    },
+    {
+      "path": "retirement-review/lock-check.log",
+      "source": "/tmp/plato-retirement-review/lock-check.log",
+      "bytes": 51,
+      "sha256": "7774956de13430ebbcb0a6c1ce1a37fd5e08185bf227744fff55300108b971b9"
+    },
+    {
+      "path": "retirement-review/probe-runtime/config.toml",
+      "source": "/tmp/plato-retirement-review/probe-runtime/config.toml",
+      "bytes": 582,
+      "sha256": "09dec2260dc6e61356885ad41f6568725998006a09e57e15cc98615bee2808af"
+    },
+    {
+      "path": "retirement-review/review.json",
+      "source": "/tmp/plato-retirement-review/review.json",
+      "bytes": 12348,
+      "sha256": "0cee58d5fc9d804cd066fd8964f4ef7b8717ceef17c1075c90d2b2c40a9d9c20"
+    },
+    {
+      "path": "retirement-review/ruff.log",
+      "source": "/tmp/plato-retirement-review/ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "retirement-review/write-report.py",
+      "source": "/tmp/plato-retirement-review/write-report.py",
+      "bytes": 10030,
+      "sha256": "d6be802f2cdc1b5f29f03f0f3ed8dc2248da5561a8b3cee2d2a40f172c3b9efb"
+    },
+    {
+      "path": "root/audit_runtime.py",
+      "source": "/tmp/plato-llm-integration/audit_runtime.py",
+      "bytes": 5529,
+      "sha256": "77a503128553168a195bf3ea9854a7a4b924a8fbb65fbd306694ad54a8956dcd"
+    },
+    {
+      "path": "root/audit_suites.py",
+      "source": "/tmp/plato-llm-integration/audit_suites.py",
+      "bytes": 3283,
+      "sha256": "3dfb543eda0c85f9554761c63405d11f9fb0663e2a519c6641956a3ba90ccafb"
+    },
+    {
+      "path": "root/base-runner.log",
+      "source": "/tmp/plato-llm-integration/base-runner.log",
+      "bytes": 1079,
+      "sha256": "aa1e1900846b2b740e3e1c76745444355af87e65d92dc56c89ba90623e408519"
+    },
+    {
+      "path": "root/dependency-bytecode-base.log",
+      "source": "/tmp/plato-llm-integration/dependency-bytecode-base.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "root/dependency-bytecode-compilation.json",
+      "source": "/tmp/plato-llm-integration/dependency-bytecode-compilation.json",
+      "bytes": 1516,
+      "sha256": "dd3cb3e8c92ec2b4dba06e85a0bc18c3216a6a00d79a8d72f98534f1fd007527"
+    },
+    {
+      "path": "root/dependency-bytecode-mandatory.log",
+      "source": "/tmp/plato-llm-integration/dependency-bytecode-mandatory.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "root/mandatory-runner.log",
+      "source": "/tmp/plato-llm-integration/mandatory-runner.log",
+      "bytes": 1223,
+      "sha256": "506670070319ac2ff26dcd3c788b50b52b645cf9a46b8392e1f720ab74dfb386"
+    },
+    {
+      "path": "root/pr-body.md",
+      "source": "/tmp/plato-llm-integration/pr-body.md",
+      "bytes": 1472,
+      "sha256": "1b2be3dc46c648c6f5f250ba434c8b713489acce18782bc24d34197a325b37fa"
+    },
+    {
+      "path": "root/pr-title.txt",
+      "source": "/tmp/plato-llm-integration/pr-title.txt",
+      "bytes": 70,
+      "sha256": "745284e79c35155ec1de9fe29c007978c9cad71f5419f05918f0656c3ac6f415"
+    },
+    {
+      "path": "root/retain_evidence.py",
+      "source": "/tmp/plato-llm-integration/retain_evidence.py",
+      "bytes": 4497,
+      "sha256": "3f8664360c7b6dcb60278a7b8d256543153e32156dce3ca9124502d912145b0b"
+    },
+    {
+      "path": "root/run_profile.py",
+      "source": "/tmp/plato-llm-integration/run_profile.py",
+      "bytes": 3078,
+      "sha256": "70d14652601fb7b6aa77bc9eaca26564232f38d929190b39e5c5384c8ce85d84"
+    },
+    {
+      "path": "root/runtime-audit.json",
+      "source": "/tmp/plato-llm-integration/runtime-audit.json",
+      "bytes": 20437,
+      "sha256": "00ed7ecc95f69623ea6beaa31d25c7d73f65b8fc97467e329ea320cb48c2d7e1"
+    },
+    {
+      "path": "root/runtime-audit.log",
+      "source": "/tmp/plato-llm-integration/runtime-audit.log",
+      "bytes": 270,
+      "sha256": "38ccffc777dd7da52b148fa4affab727c10b589c6910a485e5458528861425e7"
+    },
+    {
+      "path": "root/suite-audit.json",
+      "source": "/tmp/plato-llm-integration/suite-audit.json",
+      "bytes": 1047,
+      "sha256": "b49eaf90444b9e8336c9c5c0ae8010d813ff3df01b36419b1f7e527239965a87"
+    },
+    {
+      "path": "root/suite-audit.log",
+      "source": "/tmp/plato-llm-integration/suite-audit.log",
+      "bytes": 1047,
+      "sha256": "b49eaf90444b9e8336c9c5c0ae8010d813ff3df01b36419b1f7e527239965a87"
+    },
+    {
+      "path": "root/sync-base.log",
+      "source": "/tmp/plato-llm-integration/sync-base.log",
+      "bytes": 2103,
+      "sha256": "e086ae775e74a7174bc7ad5934eced3ac217495fb7c0742b4a287eee30ddadef"
+    },
+    {
+      "path": "root/sync-mandatory.log",
+      "source": "/tmp/plato-llm-integration/sync-mandatory.log",
+      "bytes": 2069,
+      "sha256": "2d4d4b481ec4df52cc0839e3e59ed36e2e18ef899642ef944d9089035d47b6a2"
+    }
+  ],
+  "exclusions": "Environments, downloaded model weights/caches, generated docs/distributions, bulk unit binaries and bytecode. Actual core runtime payloads/checkpoints are retained; Qwen model identity, source, commands, logs and numerical receipts reproduce its bounded qualification."
+}

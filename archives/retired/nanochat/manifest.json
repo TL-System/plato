@@ -1,0 +1,857 @@
+{
+  "schema_version": 1,
+  "backend": "nanochat",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "9ee92c52307cd3ecdce0c7416708c504bdb52137",
+  "files": [
+    {
+      "original_path": ".github/workflows/pytorch_tests.yml",
+      "archive_path": "archives/retired/nanochat/original/.github/workflows/pytorch_tests.yml",
+      "disposition": "historical_snapshot",
+      "sha256": "7c0c144730cbb0d38bb00e10c390e2ab60d6df0a6086de75fcd675bcc0fdc683",
+      "bytes": 6944,
+      "git_mode": "100644",
+      "git_blob": "7144aec87c8ed88705ebdff16ac7c973b9c73faf"
+    },
+    {
+      "original_path": ".gitmodules",
+      "archive_path": "archives/retired/nanochat/original/.gitmodules",
+      "disposition": "historical_snapshot",
+      "sha256": "d39136e1bfba768da1b969c651ef669a569df5d128b03c9c705780c21151d721",
+      "bytes": 323,
+      "git_mode": "100644",
+      "git_blob": "1176795af8ca62036025eff935bc61e3ebe66f6c"
+    },
+    {
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/nanochat/original/LICENSE",
+      "disposition": "historical_snapshot",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64"
+    },
+    {
+      "original_path": "configs/Nanochat/parquet_micro.toml",
+      "archive_path": "archives/retired/nanochat/original/configs/Nanochat/parquet_micro.toml",
+      "disposition": "moved",
+      "sha256": "0fdf774ab9d17161bbe2de59c303a24a5d648e1e8db7c99a906c35a9cf514872",
+      "bytes": 881,
+      "git_mode": "100644",
+      "git_blob": "cfe09a921bd1b7697b1e4e90d0a8a023ded9b249"
+    },
+    {
+      "original_path": "configs/Nanochat/synthetic_micro.toml",
+      "archive_path": "archives/retired/nanochat/original/configs/Nanochat/synthetic_micro.toml",
+      "disposition": "moved",
+      "sha256": "c4706d5d1422242a1c7408ad22aadad74d148ef2f33f2f2d01cac3d52fe4c9b0",
+      "bytes": 988,
+      "git_mode": "100644",
+      "git_blob": "abc3a6452eb3114670a38a75462c646e47d7665e"
+    },
+    {
+      "original_path": "docs/docs/configurations/evaluation.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/configurations/evaluation.md",
+      "disposition": "historical_snapshot",
+      "sha256": "eace2f95f3352db4b950a518030e2b4627bde4bb91e28f917b0e143fe8180c45",
+      "bytes": 6861,
+      "git_mode": "100644",
+      "git_blob": "0df98e66b0d77d507ef7a35c45aaedafcb00e0dd"
+    },
+    {
+      "original_path": "docs/docs/configurations/overview.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/configurations/overview.md",
+      "disposition": "historical_snapshot",
+      "sha256": "480ec3ab01fc7d384ef3c6f50ba5183ef0533aaaad7cb090ce9f4348bce6254e",
+      "bytes": 570,
+      "git_mode": "100644",
+      "git_blob": "1080c6410f982688a74cbf85b6d69056a1b5ee15"
+    },
+    {
+      "original_path": "docs/docs/configurations/parameters.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/configurations/parameters.md",
+      "disposition": "historical_snapshot",
+      "sha256": "9ffd51f87319bd2876add84e2ed83a28583e480be2438e1c43037d19674b2e94",
+      "bytes": 4194,
+      "git_mode": "100644",
+      "git_blob": "8a0119defeb25fe94ef1b4bcfed44fca264303ee"
+    },
+    {
+      "original_path": "docs/docs/configurations/server.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/configurations/server.md",
+      "disposition": "historical_snapshot",
+      "sha256": "c846b23e0ed08eb1a4cc9b728145d0fc1d42889bce4acbc7e1efb5f6a1e3535a",
+      "bytes": 9282,
+      "git_mode": "100644",
+      "git_blob": "2bb8002376f052569e1ff8b12cbee9fbab1b4046"
+    },
+    {
+      "original_path": "docs/docs/configurations/trainer.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/configurations/trainer.md",
+      "disposition": "historical_snapshot",
+      "sha256": "e6199390ab2acc69155a6827c0023be3e4cb349c75058bfa7db76dd56ad39e86",
+      "bytes": 7991,
+      "git_mode": "100644",
+      "git_blob": "de9eb715e0b12f893131f5ff1ba8eaea5a12589f"
+    },
+    {
+      "original_path": "docs/docs/development.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/development.md",
+      "disposition": "historical_snapshot",
+      "sha256": "00b48e27a3b9142763c3ea4566044380ae10e9dcda3baedb4b566842dc71e6dd",
+      "bytes": 11208,
+      "git_mode": "100644",
+      "git_blob": "f9489586864fd07248462cd3d232f3cd37c0c6b4"
+    },
+    {
+      "original_path": "docs/docs/examples/Getting Started.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/examples/Getting Started.md",
+      "disposition": "historical_snapshot",
+      "sha256": "05f98d2c9ed43d48b11dd4ffd2b0a6ae321f881e4350487f62126be3d11693d5",
+      "bytes": 2915,
+      "git_mode": "100644",
+      "git_blob": "c8e5a157aacced4ce1cceb49fd00ba4c338cd632"
+    },
+    {
+      "original_path": "docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+      "disposition": "replaced_by_retirement_notice",
+      "sha256": "2ceb580399deebd0ca3491644103b716046604aad3ed01880c130be088fd13db",
+      "bytes": 7091,
+      "git_mode": "100644",
+      "git_blob": "e325ed78f1d9a4568d71def630a7ae0736b8310f"
+    },
+    {
+      "original_path": "docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+      "disposition": "replaced_by_retirement_notice",
+      "sha256": "fdd566296869bb7cda391557636d14690c211cd939b7530138852b5581dda030",
+      "bytes": 8702,
+      "git_mode": "100644",
+      "git_blob": "bb5f5ec04dcfceae190b13e70126be6b46099051"
+    },
+    {
+      "original_path": "docs/docs/index.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/index.md",
+      "disposition": "historical_snapshot",
+      "sha256": "c7e0b74f19b23b43f99e1476125dcaeb1d207cf3fefc20131e00f9cfed24d2e0",
+      "bytes": 4508,
+      "git_mode": "100644",
+      "git_blob": "1a105dbcf16af744cd74072dd916fce216953971"
+    },
+    {
+      "original_path": "docs/docs/install.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/install.md",
+      "disposition": "historical_snapshot",
+      "sha256": "dfcdccaab917a6590a6d9464af9b991e9dd7c6611e7e94e2695f2d965734a505",
+      "bytes": 4934,
+      "git_mode": "100644",
+      "git_blob": "12ac7d3d88f733b9c3139d0e7ed7450887bcee7e"
+    },
+    {
+      "original_path": "docs/docs/quickstart.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/quickstart.md",
+      "disposition": "historical_snapshot",
+      "sha256": "eabcf5510b39f6bf84acfb809bd29537cf16588e4f9e4aed7e8db224c804ac3b",
+      "bytes": 6608,
+      "git_mode": "100644",
+      "git_blob": "b37bda72146b9e0ade5a26bb99cce0a3460df32a"
+    },
+    {
+      "original_path": "docs/docs/references/evaluators.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/references/evaluators.md",
+      "disposition": "historical_snapshot",
+      "sha256": "dd9ad9537bd81ca3231c5972366f8762a37af83817c65108c7dbd967ad2fed17",
+      "bytes": 7345,
+      "git_mode": "100644",
+      "git_blob": "695e50c5c00a33fba1d5e4465c41dde3176bff2e"
+    },
+    {
+      "original_path": "docs/docs/references/trainers.md",
+      "archive_path": "archives/retired/nanochat/original/docs/docs/references/trainers.md",
+      "disposition": "historical_snapshot",
+      "sha256": "a94acea1fcd607b07324ac941d6ac250b4444822019a4ea90370c4d429ebd73f",
+      "bytes": 16529,
+      "git_mode": "100644",
+      "git_blob": "a26b9fa61e9acea7b0e564275e235ce95e6a0e48"
+    },
+    {
+      "original_path": "docs/mkdocs.yml",
+      "archive_path": "archives/retired/nanochat/original/docs/mkdocs.yml",
+      "disposition": "historical_snapshot",
+      "sha256": "a3954634249d84cefd8cab51fd14f48f618c7eddf1439b5f45c501e1c015b056",
+      "bytes": 4189,
+      "git_mode": "100644",
+      "git_blob": "fa5bc99083b2cdb3e9aa1b46bd75ec5937ebf9ba"
+    },
+    {
+      "original_path": "docs/nanochat_integration_checklist.md",
+      "archive_path": "archives/retired/nanochat/original/docs/nanochat_integration_checklist.md",
+      "disposition": "moved",
+      "sha256": "4a1ecb52df41db299f38d9b6dea28e9c5dbe4bede194cf438d8467848e004fd3",
+      "bytes": 3110,
+      "git_mode": "100644",
+      "git_blob": "f0b7bf9b65ac8b01ff9b7db495e79a290d822037"
+    },
+    {
+      "original_path": "docs/third_party.md",
+      "archive_path": "archives/retired/nanochat/original/docs/third_party.md",
+      "disposition": "historical_snapshot",
+      "sha256": "a19c39846c81f1919a891ced33836613f0881e743a82ddd2f30e9c98ecfd2692",
+      "bytes": 1048,
+      "git_mode": "100644",
+      "git_blob": "d481b682929099f57050a00701d5159aafc8fb8b"
+    },
+    {
+      "original_path": "examples/nanochat/README.md",
+      "archive_path": "archives/retired/nanochat/original/examples/nanochat/README.md",
+      "disposition": "moved",
+      "sha256": "c30bc624a7780c7f9f3257c9b1f7fb7f450a31b3d4556e2bb47573e24b17c6d2",
+      "bytes": 1826,
+      "git_mode": "100644",
+      "git_blob": "44679776fb80dea2ebb006cdd92c7741c9c8544e"
+    },
+    {
+      "original_path": "examples/nanochat/pyproject.toml",
+      "archive_path": "archives/retired/nanochat/original/examples/nanochat/pyproject.toml",
+      "disposition": "moved",
+      "sha256": "3931bdaa18658efb828aba8b3d19d5640788ea5bda1eba24fb454207b8bc38b8",
+      "bytes": 275,
+      "git_mode": "100644",
+      "git_blob": "a5c1cfb80b6bdc3b355c637cf3549161e22a90d4"
+    },
+    {
+      "original_path": "plato/datasources/nanochat.py",
+      "archive_path": "archives/retired/nanochat/original/plato/datasources/nanochat.py",
+      "disposition": "moved",
+      "sha256": "b5ab5a5417aee22d426453a59c28ea5878cb430905b348e1dbb7ffb912752c64",
+      "bytes": 9487,
+      "git_mode": "100644",
+      "git_blob": "a00f5fbb914957a42abd49deeb641235e4795d1f"
+    },
+    {
+      "original_path": "plato/datasources/registry.py",
+      "archive_path": "archives/retired/nanochat/original/plato/datasources/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "38a76f407edd6f46ccbdf56e231ac93d18e379971a5dbf007f15c22f5da602b6",
+      "bytes": 3819,
+      "git_mode": "100644",
+      "git_blob": "0a609d5e5442e5400ecf74684962fcae6d06d7cb"
+    },
+    {
+      "original_path": "plato/evaluators/nanochat_core.py",
+      "archive_path": "archives/retired/nanochat/original/plato/evaluators/nanochat_core.py",
+      "disposition": "moved",
+      "sha256": "7d05e824b09521d0d51a9f6481a95c0b3943c6f4f4ed81f144f6eb95739477f1",
+      "bytes": 16874,
+      "git_mode": "100644",
+      "git_blob": "d22292315bafa0b4af9931f5b47abce7d00fe263"
+    },
+    {
+      "original_path": "plato/evaluators/registry.py",
+      "archive_path": "archives/retired/nanochat/original/plato/evaluators/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "e661fc199bd2f84ec23b17eea348493cf903a1d7d34c5b34fb3e623639a1f642",
+      "bytes": 1959,
+      "git_mode": "100644",
+      "git_blob": "00251822ce46685bf0ba005a7636a49dc7d290f5"
+    },
+    {
+      "original_path": "plato/evaluators/runner.py",
+      "archive_path": "archives/retired/nanochat/original/plato/evaluators/runner.py",
+      "disposition": "historical_snapshot",
+      "sha256": "9cb2125f3c03924a8e73f8b62e1e4044a55f9222f38aa01ec8dfaac56588955f",
+      "bytes": 4029,
+      "git_mode": "100644",
+      "git_blob": "e9b284f7db3b0a0171b2f5265f17e73cfa585eb4"
+    },
+    {
+      "original_path": "plato/models/nanochat.py",
+      "archive_path": "archives/retired/nanochat/original/plato/models/nanochat.py",
+      "disposition": "moved",
+      "sha256": "9e2ff36d559b80b3e1feb33c9ba7ac818c5fad337e1b3f77bfd40833bd703e77",
+      "bytes": 6275,
+      "git_mode": "100644",
+      "git_blob": "c42265f1b16760bc1fee5c36d47a1b914c26b5ab"
+    },
+    {
+      "original_path": "plato/models/registry.py",
+      "archive_path": "archives/retired/nanochat/original/plato/models/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "8f499c870ec4a31d0323b8e8cf27c9cea6e9aaedc0d3b98dd397989c26958aa8",
+      "bytes": 4451,
+      "git_mode": "100644",
+      "git_blob": "1dbda56cf4bd851a69a8f5e0362810feeefd7cac"
+    },
+    {
+      "original_path": "plato/processors/nanochat_tokenizer.py",
+      "archive_path": "archives/retired/nanochat/original/plato/processors/nanochat_tokenizer.py",
+      "disposition": "moved",
+      "sha256": "e8961791065027bb7840671e6a8109b3856ddb3f473e482c8d35cce19b1f5e8b",
+      "bytes": 4528,
+      "git_mode": "100644",
+      "git_blob": "6f3334870e2a464c04cefaf902c752c6328e8937"
+    },
+    {
+      "original_path": "plato/servers/fedavg.py",
+      "archive_path": "archives/retired/nanochat/original/plato/servers/fedavg.py",
+      "disposition": "historical_snapshot",
+      "sha256": "f184068a11c5be9e523f08b95e1cce76dff2e20e2fdb4e6426caf95dac0bcee5",
+      "bytes": 15905,
+      "git_mode": "100644",
+      "git_blob": "10cd1a9cd8940ba5f7245824cd6b53a703d60a6c"
+    },
+    {
+      "original_path": "plato/servers/fedavg_cs.py",
+      "archive_path": "archives/retired/nanochat/original/plato/servers/fedavg_cs.py",
+      "disposition": "historical_snapshot",
+      "sha256": "6998754dfc6a07732ab58a3fb398679c47390afeb4ce3859c166acae106515e0",
+      "bytes": 15030,
+      "git_mode": "100644",
+      "git_blob": "a6b576479e8dbccfa100a826621a0f0bab1b8645"
+    },
+    {
+      "original_path": "plato/servers/split_learning.py",
+      "archive_path": "archives/retired/nanochat/original/plato/servers/split_learning.py",
+      "disposition": "historical_snapshot",
+      "sha256": "fa4da694a332ce496b75b753bfb9cd91900ccf80db93f1321cbc3c282cae7abc",
+      "bytes": 5386,
+      "git_mode": "100644",
+      "git_blob": "49fdc2d4c2fb8ab740c4b0e73382962e463774c0"
+    },
+    {
+      "original_path": "plato/trainers/composable.py",
+      "archive_path": "archives/retired/nanochat/original/plato/trainers/composable.py",
+      "disposition": "historical_snapshot",
+      "sha256": "0a4549f08fa1afaec3ab7814930dcfc59cd671bb8b1a608862a4c58a480093a5",
+      "bytes": 43920,
+      "git_mode": "100644",
+      "git_blob": "7bea3d06c1d5b4b23aacc9a98ef37631b39abd83"
+    },
+    {
+      "original_path": "plato/trainers/nanochat.py",
+      "archive_path": "archives/retired/nanochat/original/plato/trainers/nanochat.py",
+      "disposition": "moved",
+      "sha256": "57e2d1167157aea1fe88703c85f4c8fc39daeaa0a53fc4e73f9ed40f99fe78b1",
+      "bytes": 11785,
+      "git_mode": "100644",
+      "git_blob": "22ccb05e5d85693db52d160fc076a00826c17f9d"
+    },
+    {
+      "original_path": "plato/trainers/registry.py",
+      "archive_path": "archives/retired/nanochat/original/plato/trainers/registry.py",
+      "disposition": "historical_snapshot",
+      "sha256": "dc17cf3bd8e1c168213173e7d16e5d4e4f12282c41d33a67f241b294afb64fa1",
+      "bytes": 2420,
+      "git_mode": "100644",
+      "git_blob": "c08c5b46db1eaae48171c195a418450a3bcac794"
+    },
+    {
+      "original_path": "plato/utils/third_party.py",
+      "archive_path": "archives/retired/nanochat/original/plato/utils/third_party.py",
+      "disposition": "moved",
+      "sha256": "fdf0bebe7a33023412b039f963e0acf31429f9ce29c1de20c1b8194521bfeb5c",
+      "bytes": 1128,
+      "git_mode": "100644",
+      "git_blob": "890764e13b809028672ae9b396a670a00756a388"
+    },
+    {
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/nanochat/original/pyproject.toml",
+      "disposition": "historical_snapshot",
+      "sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+      "bytes": 4079,
+      "git_mode": "100644",
+      "git_blob": "28803a3d78188ee508c9e572bd8ac7eff406fedc"
+    },
+    {
+      "original_path": "tests/conftest.py",
+      "archive_path": "archives/retired/nanochat/original/tests/conftest.py",
+      "disposition": "historical_snapshot",
+      "sha256": "3eb55a1fa7c0fd5428c296c1bcd7300b23b0ade3d276f5c687af3b9bd78304c7",
+      "bytes": 14382,
+      "git_mode": "100644",
+      "git_blob": "bfe33dfa0df0fbd679ccda29474a9400d8f6b1d6"
+    },
+    {
+      "original_path": "tests/evaluators/test_registry_runner.py",
+      "archive_path": "archives/retired/nanochat/original/tests/evaluators/test_registry_runner.py",
+      "disposition": "historical_snapshot",
+      "sha256": "55bc828845b057a8f95fd4b4479f4b968cc19be84b6cb3d77022347d3a702007",
+      "bytes": 9860,
+      "git_mode": "100644",
+      "git_blob": "193c0ee6d4f668d5931d63b36d3373a07bf649c7"
+    },
+    {
+      "original_path": "tests/integration/utils.py",
+      "archive_path": "archives/retired/nanochat/original/tests/integration/utils.py",
+      "disposition": "historical_snapshot",
+      "sha256": "7a4af3c5bece78c256f268fb47ee31e384f14cca098d1690ebe2c05f79b21634",
+      "bytes": 5344,
+      "git_mode": "100644",
+      "git_blob": "894dc5aab2da4b5dbe98c0fb2f0a10ec5ed6db9d"
+    },
+    {
+      "original_path": "tests/test_config_loader.py",
+      "archive_path": "archives/retired/nanochat/original/tests/test_config_loader.py",
+      "disposition": "historical_snapshot",
+      "sha256": "b79285e4822273311cc09cbd5bc5160c3026716754dbbf50bef190c8f8613c1d",
+      "bytes": 16348,
+      "git_mode": "100644",
+      "git_blob": "6b3998c33e7028d0ced4150637177112bea4e5d4"
+    },
+    {
+      "original_path": "tests/test_nanochat_integration.py",
+      "archive_path": "archives/retired/nanochat/original/tests/test_nanochat_integration.py",
+      "disposition": "moved",
+      "sha256": "07d59c06105cc5d3767f3899ac0b07f4a3692f679edeef34765e8ac43e04013c",
+      "bytes": 4486,
+      "git_mode": "100644",
+      "git_blob": "53a431426f4ad1eba8460e2caec13f5ca3144abc"
+    },
+    {
+      "original_path": "tests/trainers/test_composable_trainer.py",
+      "archive_path": "archives/retired/nanochat/original/tests/trainers/test_composable_trainer.py",
+      "disposition": "historical_snapshot",
+      "sha256": "491c30fba4858571430430ac52cc63f632c683b10de35c1420fb6a77324ac440",
+      "bytes": 18691,
+      "git_mode": "100644",
+      "git_blob": "ff35f76ecc9474f82dff599d3c2a618ae98aa7a9"
+    },
+    {
+      "original_path": "tests/trainers/test_nanochat_trainer.py",
+      "archive_path": "archives/retired/nanochat/original/tests/trainers/test_nanochat_trainer.py",
+      "disposition": "moved",
+      "sha256": "84a5eb97d6c9c9f35931bc9d02b208905e45bc28bebc985898a2c4321b6e1680",
+      "bytes": 10038,
+      "git_mode": "100644",
+      "git_blob": "3b2b5134ebd09fb069f3f896e75f4597d4949434"
+    },
+    {
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/nanochat/original/uv.lock",
+      "disposition": "historical_snapshot",
+      "sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "bytes": 739161,
+      "git_mode": "100644",
+      "git_blob": "31729888535c7f0eae277b2fe0133ad9814cc4d4"
+    }
+  ],
+  "runtime_support": "Retired; historical environments are unverified on the refreshed stack.",
+  "historical_commands_source": [
+    "archives/retired/nanochat/original/docs/docs/configurations/evaluation.md",
+    "archives/retired/nanochat/original/docs/docs/configurations/overview.md",
+    "archives/retired/nanochat/original/docs/docs/configurations/parameters.md",
+    "archives/retired/nanochat/original/docs/docs/configurations/server.md",
+    "archives/retired/nanochat/original/docs/docs/configurations/trainer.md",
+    "archives/retired/nanochat/original/docs/docs/development.md",
+    "archives/retired/nanochat/original/docs/docs/examples/Getting Started.md",
+    "archives/retired/nanochat/original/docs/docs/examples/case-studies/3. SmolVLA Trainer with LeRobot.md",
+    "archives/retired/nanochat/original/docs/docs/examples/case-studies/5. Nanochat in Plato.md",
+    "archives/retired/nanochat/original/docs/docs/index.md",
+    "archives/retired/nanochat/original/docs/docs/install.md",
+    "archives/retired/nanochat/original/docs/docs/quickstart.md",
+    "archives/retired/nanochat/original/docs/docs/references/evaluators.md",
+    "archives/retired/nanochat/original/docs/docs/references/trainers.md",
+    "archives/retired/nanochat/original/docs/nanochat_integration_checklist.md",
+    "archives/retired/nanochat/original/docs/third_party.md",
+    "archives/retired/nanochat/original/examples/nanochat/README.md"
+  ],
+  "environment": {
+    "requires_python": ">=3.13",
+    "active_qualification_python": "3.13.16",
+    "uv_version": "0.12.22",
+    "pyproject_sha256": "799bd7ba1865b097fdc8ca84a7b70337794e338de4aa9a6a13f6a4c1b9156246",
+    "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d"
+  },
+  "upstream": {
+    "url": "https://github.com/karpathy/nanochat.git",
+    "gitlink_pin": "c75fe54aa7c1fa881701c246f9427bcbe4eee5a4",
+    "archive_path": "archives/retired/nanochat/upstream-c75fe54aa7c1fa881701c246f9427bcbe4eee5a4.tar.gz",
+    "archive_sha256": "6fa7ddcccbe290af3fbf1abddf04478e3589aa5d37a83dc498ffed1e05081a8a",
+    "archive_bytes": 260293,
+    "license": "MIT",
+    "license_path": "archives/retired/nanochat/UPSTREAM_LICENSE",
+    "license_sha256": "42bb09f339a8af8b90d3b4969b6f6e4ba4aff3b5c614103b031fccdf71c8f772",
+    "files": [
+      {
+        "path": ".gitignore",
+        "git_mode": "100644",
+        "git_blob": "4a87b23db5e6312c2e57f7c5532a91f832df7a9b",
+        "sha256": "faa1b148d025f7e35dc38b98804d9843681f0f0994ca7a13d7faaa44aa54354f",
+        "bytes": 76
+      },
+      {
+        "path": ".python-version",
+        "git_mode": "100644",
+        "git_blob": "c8cfe3959183f8e9a50f83f54cd723f2dc9c252d",
+        "sha256": "7a41a41354ab8049091ef1a00253ca00567f5a1d3f9aef5502c0b4b5ce9ae707",
+        "bytes": 5
+      },
+      {
+        "path": "LICENSE",
+        "git_mode": "100644",
+        "git_blob": "72d95c190c0d14341d5b0720e28c88fb58690821",
+        "sha256": "42bb09f339a8af8b90d3b4969b6f6e4ba4aff3b5c614103b031fccdf71c8f772",
+        "bytes": 1072
+      },
+      {
+        "path": "README.md",
+        "git_mode": "100644",
+        "git_blob": "94b982b855eb31cc75678c20da8bab3e5a38fcdf",
+        "sha256": "9ebb2413c883500dcfcd151c596d82763a785f8eb33574ddf7eaf693001ef064",
+        "bytes": 15881
+      },
+      {
+        "path": "dev/gen_synthetic_data.py",
+        "git_mode": "100644",
+        "git_blob": "17b84244a1584e0cc71f15fa76febb157d0a01b5",
+        "sha256": "fa8df0666191b59abafb2cf09c6b75f70dc0bf505487dbfdcec0693d67197066",
+        "bytes": 10296
+      },
+      {
+        "path": "dev/generate_logo.html",
+        "git_mode": "100644",
+        "git_blob": "edfa99e296f7cdbf2a53c861ab18c084cf7e5d18",
+        "sha256": "8aad8ae8e3cb12bc28ffcaccc3ec70a74eecf0b5c781b56436c85ff281747675",
+        "bytes": 1127
+      },
+      {
+        "path": "dev/nanochat.png",
+        "git_mode": "100644",
+        "git_blob": "84e1b5fc9fda7b2739f3db39f23ee19dd58234cb",
+        "sha256": "7e1be1060125e15a6f2f77f51f8e426b3e93c7a33e3f78f66f0504c605d22b74",
+        "bytes": 19811
+      },
+      {
+        "path": "dev/repackage_data_reference.py",
+        "git_mode": "100644",
+        "git_blob": "32980a84e9a3e0a22c1df48a309635c98cd820ff",
+        "sha256": "7b46df190578374f1ed0bfda2cc1517777963ab7574d997174386fb289d90ae3",
+        "bytes": 3310
+      },
+      {
+        "path": "dev/runcpu.sh",
+        "git_mode": "100644",
+        "git_blob": "6290fd9b780256510ab8ffa4019f74eb6c1cc839",
+        "sha256": "2cb21a2beb0d697efc4d2f5e5982b04e1ecdf44684aca4b4c0675f87c6c2f3d3",
+        "bytes": 2702
+      },
+      {
+        "path": "nanochat/__init__.py",
+        "git_mode": "100644",
+        "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      {
+        "path": "nanochat/adamw.py",
+        "git_mode": "100644",
+        "git_blob": "db591de8da25a12b108bfbcc46e4cd5f8b68b8ec",
+        "sha256": "244aef1508ed51a8655d49a5f4fc226d548d257760aaa86b06f9038daf85f227",
+        "bytes": 3388
+      },
+      {
+        "path": "nanochat/checkpoint_manager.py",
+        "git_mode": "100644",
+        "git_blob": "f400d47a5c2fe901abee470a245e1f69d2134d34",
+        "sha256": "211e483bb86ee0ecb10fa30fe6bbe43d5a676e9da67a251df6af8703fbe5f6e7",
+        "bytes": 6183
+      },
+      {
+        "path": "nanochat/common.py",
+        "git_mode": "100644",
+        "git_blob": "a5a6d2ecc57220ebadef1be5432bfcca4000b8a2",
+        "sha256": "9d41cf99c7830f284a9af1898e3beb0e5ac1e2266728a276fdfe16d5c0f5a955",
+        "bytes": 7552
+      },
+      {
+        "path": "nanochat/configurator.py",
+        "git_mode": "100644",
+        "git_blob": "ec1b76d1b0e9ea8555aa7a171e10ba85e060bfaa",
+        "sha256": "b7dcfeb66b012284d9414235a5e256eafe7fd19b73e78c5854fc456d02b8e8b5",
+        "bytes": 2081
+      },
+      {
+        "path": "nanochat/core_eval.py",
+        "git_mode": "100644",
+        "git_blob": "f3c9a9f1f0f7e99abbe83d380913d07a3c0429ad",
+        "sha256": "9303997ff17fa48ad5e5730f33b7e79a687cc2a1fdad928666bb63dc3514c51d",
+        "bytes": 11572
+      },
+      {
+        "path": "nanochat/dataloader.py",
+        "git_mode": "100644",
+        "git_blob": "6c864d3d3da545690019b038ceafff2596d00a30",
+        "sha256": "8d6849be976cfc4fe5150c76095464942719b5e58a62c2b4a5164b7f5000ea98",
+        "bytes": 2534
+      },
+      {
+        "path": "nanochat/dataset.py",
+        "git_mode": "100644",
+        "git_blob": "602daedc5fd183fd15ec41c6d657399074dea159",
+        "sha256": "31ed858acbf9881ab92366a9f516e2423188ba2ae9ee7295eeead3767fa62fce",
+        "bytes": 5390
+      },
+      {
+        "path": "nanochat/engine.py",
+        "git_mode": "100644",
+        "git_blob": "fee06a1beb1f1947b2aa97c3bcfb0175c048312d",
+        "sha256": "29e06bd52bf4f1387c014fbefcc48003df81afa889c24c25dc61ec0d14c6688d",
+        "bytes": 16447
+      },
+      {
+        "path": "nanochat/execution.py",
+        "git_mode": "100644",
+        "git_blob": "d5ce38837bce907df4cef0090bf05ac4377dafd6",
+        "sha256": "27bedc05cf6c81c457e72b2078d5c24c1f1c03099e10815961196351ca68bdbc",
+        "bytes": 10358
+      },
+      {
+        "path": "nanochat/gpt.py",
+        "git_mode": "100644",
+        "git_blob": "b640f1ec55a8a6d36d6599da82405df18fb28d3f",
+        "sha256": "9f45da255c4a17f90e04b5b12c2549f4fc502ca00f90b0741f80f956b272a075",
+        "bytes": 14760
+      },
+      {
+        "path": "nanochat/logo.svg",
+        "git_mode": "100644",
+        "git_blob": "f0f0571b7837f06cf3be95d5bbe5493313052996",
+        "sha256": "513eeb7bf11f152f4edb466d6ff40fc3f7fae7adb90ac965996d216f5e2e5e1a",
+        "bytes": 1418
+      },
+      {
+        "path": "nanochat/loss_eval.py",
+        "git_mode": "100644",
+        "git_blob": "0100ec3d0e3d317dd2a4c0f4a903b42c28796164",
+        "sha256": "7c05781633d1d35671105268da73ed3b7bb353493254ebff349d61cd58acc954",
+        "bytes": 3072
+      },
+      {
+        "path": "nanochat/muon.py",
+        "git_mode": "100644",
+        "git_blob": "d916103467c8ccfa9a0f87d174faf21879b41d23",
+        "sha256": "f0b36cb16b331be4c13cba75b6f9f0cc68709d863124948288005886c040fa80",
+        "bytes": 9618
+      },
+      {
+        "path": "nanochat/report.py",
+        "git_mode": "100644",
+        "git_blob": "d0a65e0722216a66233e5253bd9cc64aa2e6623f",
+        "sha256": "7b29de2b89f6e717f758cf3e2b615e8fd1e458be44996da6b4250789af67ebb8",
+        "bytes": 15156
+      },
+      {
+        "path": "nanochat/tokenizer.py",
+        "git_mode": "100644",
+        "git_blob": "880f8542945226f2032b83b656b7bd3e0e1d7a01",
+        "sha256": "da2841dc55964ee7f4a0bb619ce12e3d75d9224aeec31bae9eb4b9e5a4d5a786",
+        "bytes": 17758
+      },
+      {
+        "path": "nanochat/ui.html",
+        "git_mode": "100644",
+        "git_blob": "0f625d91f80738c1569c9ff0dd40dda46411cc4e",
+        "sha256": "88956168cf9bea9ca6d38d91a3f46227d44c953642d22185a5a663c0a37e2d52",
+        "bytes": 19065
+      },
+      {
+        "path": "pyproject.toml",
+        "git_mode": "100644",
+        "git_blob": "da674f4f933652ed6477e0881d4f49e0608a041e",
+        "sha256": "4a9c6c4a6550ff5e58627b70ce3fe5e714589ffc763c827d3e9ecff0c0041ae0",
+        "bytes": 1530
+      },
+      {
+        "path": "run1000.sh",
+        "git_mode": "100644",
+        "git_blob": "6f454e0a8393fdee500cf237dcef0651894faaf3",
+        "sha256": "7d90b1e68e94c0bc5617ea45bdc2fc7635aab39e99e5441c15d35cf37e1b61ac",
+        "bytes": 5006
+      },
+      {
+        "path": "rustbpe/Cargo.lock",
+        "git_mode": "100644",
+        "git_blob": "69f8754cae9fb2a83dd26a10ffa63bb2e03535d9",
+        "sha256": "f3f4ad3ee939212cb1570db925b8d0b646c989980e5f8fe8dec538a42b7c41ea",
+        "bytes": 12052
+      },
+      {
+        "path": "rustbpe/Cargo.toml",
+        "git_mode": "100644",
+        "git_blob": "392a82832bd4475ae3d67d8831881df4453e9cd4",
+        "sha256": "16b4eb17aafdc81e5b828ecb523f2916ceb12bb5f393c316c6dd172b628c3602",
+        "bytes": 290
+      },
+      {
+        "path": "rustbpe/README.md",
+        "git_mode": "100644",
+        "git_blob": "c88636c7b0eeeaf6fc82291d28b2f0c61ad349ac",
+        "sha256": "f10fd69cced399a55e67f122485b379481f5a127260758655b28d17e8a44487a",
+        "bytes": 1154
+      },
+      {
+        "path": "rustbpe/src/lib.rs",
+        "git_mode": "100644",
+        "git_blob": "273d7f250476ea909fb4eaf5f34d4a9e02b1c0b0",
+        "sha256": "87ff1c528f2aabdaabbac066a533cda69b9152bed7be2e3060a86ab6e5f743f0",
+        "bytes": 16627
+      },
+      {
+        "path": "scripts/base_eval.py",
+        "git_mode": "100644",
+        "git_blob": "fc021209f6a93932f0bf41d2006f9ff2db927b16",
+        "sha256": "73d6b516248e4da167ee710c43f3de75e21ae69d6c6c1c80dfa89b4ae54fe8f4",
+        "bytes": 7221
+      },
+      {
+        "path": "scripts/base_loss.py",
+        "git_mode": "100644",
+        "git_blob": "abcde5f96b2a8a380c72d1378dc57397710b5d28",
+        "sha256": "89136fb6b4f1ab8ad3b3178caad911d1c4c2f4fe3f1021e89cfcaecd1caa19a5",
+        "bytes": 3153
+      },
+      {
+        "path": "scripts/base_train.py",
+        "git_mode": "100644",
+        "git_blob": "372580573e4d91c018fa07f734f0c891129e7e77",
+        "sha256": "5320ac56407c5eb1942e6d0a6c1d84f828242b47d3e2c3b67d98eb2a1708c2c5",
+        "bytes": 16858
+      },
+      {
+        "path": "scripts/chat_cli.py",
+        "git_mode": "100644",
+        "git_blob": "b14843a87cd423dc6c9fbfa3afab7e8cafef2d89",
+        "sha256": "45da2566846a0907d6c2126fb4916ff37a1b5c69e030e8bfe272a4db0ed31c3a",
+        "bytes": 4296
+      },
+      {
+        "path": "scripts/chat_eval.py",
+        "git_mode": "100644",
+        "git_blob": "c77a89e30d51d5b88c2e9368562d416ab435abf7",
+        "sha256": "e048f4453f08e6fbc9660f7fb1136e983d02bf1ac013c0d176281fb267dbf42d",
+        "bytes": 12389
+      },
+      {
+        "path": "scripts/chat_rl.py",
+        "git_mode": "100644",
+        "git_blob": "af70bda6ecc07e5a88dd7b7eb1f2d07f582c9869",
+        "sha256": "fec75ae1eb0e2be511c66721acdd23341b888129982da0818e6a268289f2ad1e",
+        "bytes": 15833
+      },
+      {
+        "path": "scripts/chat_sft.py",
+        "git_mode": "100644",
+        "git_blob": "e6e4565b0580a170a9744e68e53e0b28d9865e63",
+        "sha256": "6ca07224f7d1947457d9c90ee6359da2acc13b075df2842f8601936023a76170",
+        "bytes": 12007
+      },
+      {
+        "path": "scripts/chat_web.py",
+        "git_mode": "100644",
+        "git_blob": "d7479c7d4948a3cc39223bb6ca54b576181bc18c",
+        "sha256": "c48fd89f995326e82793e393e925e67a3967346ed08be6ebf4001cdcde336617",
+        "bytes": 16049
+      },
+      {
+        "path": "scripts/mid_train.py",
+        "git_mode": "100644",
+        "git_blob": "eedb2620244905a3c87a2e6b039703bd863ed6d0",
+        "sha256": "121843df6a434a655fdf46803c040f1e31fa70a42ea0b7dc128a2e87be412ded",
+        "bytes": 14840
+      },
+      {
+        "path": "scripts/tok_eval.py",
+        "git_mode": "100644",
+        "git_blob": "9233d717d4d8a895c7031c6af99eaef9bdd02d10",
+        "sha256": "bfb8814f24cb3bbedaabfc4391a9c45fe938493796a54886c30c12c213d28671",
+        "bytes": 12283
+      },
+      {
+        "path": "scripts/tok_train.py",
+        "git_mode": "100644",
+        "git_blob": "c2faf17e05128d2f4dd2c77b43d5b65dd1b2bdff",
+        "sha256": "f0e4b0f3ec1f80058826171257cff8b6f6c84b48f639d7e96b02babf6d9c008c",
+        "bytes": 4321
+      },
+      {
+        "path": "speedrun.sh",
+        "git_mode": "100644",
+        "git_blob": "35dd39ec263968e2def001208c44b26b6fab3145",
+        "sha256": "29d90cf21d8f77bcc4c2df599441d060ccbd19f602ebb8100bd7a6918900f6c4",
+        "bytes": 6369
+      },
+      {
+        "path": "tasks/arc.py",
+        "git_mode": "100644",
+        "git_blob": "862cca9ce6978d18372929ce79b85bc03aa7b285",
+        "sha256": "6a51bbd8a6c7d9df918fb5ed1e69c86021ed421ac943810b53ddb7e1a82b7f66",
+        "bytes": 2171
+      },
+      {
+        "path": "tasks/common.py",
+        "git_mode": "100644",
+        "git_blob": "dcd2e91017b44d93b16cc422f693822f204e7319",
+        "sha256": "5510cc1dd861b9674047fa1a64cd18b6d364499653351ac7580f9669de70170f",
+        "bytes": 5535
+      },
+      {
+        "path": "tasks/customjson.py",
+        "git_mode": "100644",
+        "git_blob": "f4683c8a08787bd9d44f93f55aa50fe95aa95b42",
+        "sha256": "167fd059180e7f3b9cb0a121e3d5057c79650be54641289a18fb33fd248cc10f",
+        "bytes": 2920
+      },
+      {
+        "path": "tasks/gsm8k.py",
+        "git_mode": "100644",
+        "git_blob": "c05e21cdc294007bea1cea380b855dc5d0d727d8",
+        "sha256": "3a9d0ad6d1dd165d287cb3002eb3b6467d4e805e0516b453fa9948d8b66199a0",
+        "bytes": 4872
+      },
+      {
+        "path": "tasks/humaneval.py",
+        "git_mode": "100644",
+        "git_blob": "e9dd489584ac998a9458c53a5de66ba7af4762eb",
+        "sha256": "706f2c95ace1ce8e5f0c833a97089e0dd6cb3f9d6f964985105bb63ecaee1d11",
+        "bytes": 3419
+      },
+      {
+        "path": "tasks/mmlu.py",
+        "git_mode": "100644",
+        "git_blob": "3ba22544ec72db1f07b6f7b349542412dac912b3",
+        "sha256": "45eda3c63f9d5c2337e76facb7b4d1611457205203ba451f7735b3b553f20a7a",
+        "bytes": 3934
+      },
+      {
+        "path": "tasks/smoltalk.py",
+        "git_mode": "100644",
+        "git_blob": "b4d4f5f8db592d41391a8c548ff59d81c9baf95b",
+        "sha256": "952904d62f72f096ddcad11e0a236d0af040d480796c0ae600a124cda60d87b1",
+        "bytes": 2077
+      },
+      {
+        "path": "tasks/spellingbee.py",
+        "git_mode": "100644",
+        "git_blob": "c051fe7226f4d7dc14dc336ced838cc5e334759b",
+        "sha256": "50a80f8a9a8a696df054d850fde3e3c1f08f4336ce7d0a2f1a0ec218a59123b0",
+        "bytes": 12437
+      },
+      {
+        "path": "tests/test_rustbpe.py",
+        "git_mode": "100644",
+        "git_blob": "5f95721d8973f4275dcbc5624c44aa616d839e16",
+        "sha256": "73b5522147537d3cbb5627fcab1bf4fde17b618680ba7fc889987c56ff1a49b0",
+        "bytes": 26459
+      },
+      {
+        "path": "uv.lock",
+        "git_mode": "100644",
+        "git_blob": "f01bba33f70d27254d870df95d0394e811862fce",
+        "sha256": "0b91831f8bdcdaa7815c95cfb05c80d21330bbe0e443f540a9f757cb4868cf27",
+        "bytes": 422540
+      }
+    ]
+  }
+}

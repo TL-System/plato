@@ -7,11 +7,16 @@ HuggingFace data handling through strategy objects instead of overriding
 
 """
 
+import copy
+import json
 import logging
 import math
 import os
+import pickle
+import tempfile
 from collections.abc import Iterable, Mapping, Sequence
-from typing import Any, Dict, Optional, Tuple, Union, cast
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, TypeGuard, Union, cast
 
 import torch
 import torch.nn.functional as F
@@ -31,6 +36,7 @@ from transformers.trainer_callback import TrainerControl, TrainerState
 from plato.callbacks.trainer import TrainerCallback as PlatoTrainerCallback
 from plato.config import Config
 from plato.datasources import registry as datasources_registry
+from plato.serialization.safetensor import deserialize_tree, serialize_tree
 from plato.trainers.composable import ComposableTrainer
 from plato.trainers.strategies import CustomCollateFnDataLoaderStrategy
 from plato.trainers.strategies.base import (
@@ -38,6 +44,20 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    checkpoint_sidecar,
+    snapshot_details,
+)
+from plato.utils.huggingface import (
+    adapter_save_embeddings,
+    artifact_identity,
+    pretrained_kwargs,
+)
+
+if TYPE_CHECKING:
+    from peft import PeftModel
 
 
 class HuggingFaceBatch(dict):
@@ -124,7 +144,10 @@ class HuggingFaceCollateWrapper:
         if not example_list:
             raise ValueError("HuggingFace collator received an empty batch.")
 
-        feature_rows = [{k: v for k, v in example.items() if k != "labels"} for example in example_list]
+        feature_rows = [
+            {k: v for k, v in example.items() if k != "labels"}
+            for example in example_list
+        ]
 
         padding_side = getattr(self.tokenizer, "padding_side", "right")
         batch = self.tokenizer.pad(
@@ -262,6 +285,21 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
             steps = 1
         return max(steps, 1)
 
+    def optimizer_steps_per_epoch(self, batches: int) -> int:
+        """Account for accumulation, including a partial final window."""
+        return math.ceil(batches / max(self.gradient_accumulation_steps, 1))
+
+    def _normalize_partial_window(self, optimizer, context: TrainingContext) -> None:
+        """Average a tail window over its actual number of microbatches."""
+        counter = int(context.state.get("grad_accum_counter", 0))
+        accumulation_steps = self.get_accumulation_steps(context)
+        if 0 < counter < accumulation_steps:
+            correction = accumulation_steps / counter
+            for group in optimizer.param_groups:
+                for parameter in group["params"]:
+                    if parameter.grad is not None:
+                        parameter.grad.mul_(correction)
+
     def training_step(
         self,
         model,
@@ -306,6 +344,7 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
         trainer = context.state.get("hf_trainer")
 
         if should_step:
+            self._normalize_partial_window(optimizer, context)
             if trainer is not None:
                 trainer._hf_on_pre_optimizer_step()
 
@@ -340,8 +379,10 @@ class HuggingFaceTrainingStepStrategy(TrainingStepStrategy):
         """
         counter = int(context.state.get("grad_accum_counter", 0))
         if counter == 0:
+            context.state["optimizer_step_completed"] = False
             return None
 
+        self._normalize_partial_window(optimizer, context)
         trainer = context.state.get("hf_trainer")
         if trainer is not None:
             trainer._hf_on_pre_optimizer_step()
@@ -519,42 +560,29 @@ class Trainer(ComposableTrainer):
         )
         self.training_args = cast(TrainingArguments, training_args)
 
-        model_name = Config().trainer.model_name
-        tokenizer_name = getattr(Config().trainer, "tokenizer_name", model_name)
-        if not isinstance(tokenizer_name, str) or not tokenizer_name:
-            tokenizer_name = model_name
-
-        config_kwargs = {
-            "cache_dir": None,
-            "revision": "main",
-            "use_auth_token": None,
-        }
-        self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
-
-        cache_dir = Config().params["data_path"]
-        use_fast_tokenizer = True
-        revision = "main"
-        auth_token = getattr(
-            getattr(Config(), "parameters", None), "huggingface_token", None
+        identity = artifact_identity()
+        model_name = identity["model_name"]
+        tokenizer_name = identity["tokenizer_name"]
+        config_kwargs = pretrained_kwargs(
+            revision=identity["model_revision"],
+            cache_dir=Config().params["model_path"] + "/huggingface",
         )
+        self.config = AutoConfig.from_pretrained(model_name, **config_kwargs)
 
         tokenizer_loader: Any = (
             LlamaTokenizer if "llama" in tokenizer_name else AutoTokenizer
         )
-        tokenizer_kwargs: dict[str, Any] = {
-            "config": self.config,
-            "cache_dir": cache_dir,
-            "use_fast": use_fast_tokenizer,
-            "revision": revision,
-        }
-        if isinstance(auth_token, str) and auth_token:
-            tokenizer_kwargs["use_auth_token"] = auth_token
+        tokenizer_kwargs = pretrained_kwargs(
+            revision=identity["tokenizer_revision"],
+            cache_dir=Config().params["data_path"] + "/huggingface",
+        )
+        tokenizer_kwargs.update(config=self.config, use_fast=True)
         self.tokenizer: Any = tokenizer_loader.from_pretrained(
             tokenizer_name,
             **tokenizer_kwargs,
         )
 
-        tokenizer = cast(Any, self.tokenizer)
+        tokenizer = self.tokenizer
         if getattr(tokenizer, "pad_token_id", None) is None:
             eos_token = getattr(tokenizer, "eos_token", None)
             if eos_token is not None:
@@ -611,15 +639,26 @@ class Trainer(ComposableTrainer):
                 tokenizer_vocab_size = None
         embedding_getter = getattr(model_instance, "get_input_embeddings", None)
         embedding_resizer = getattr(model_instance, "resize_token_embeddings", None)
-        if (
-            tokenizer_vocab_size is not None
-            and callable(embedding_getter)
-            and callable(embedding_resizer)
-        ):
+        if callable(embedding_getter):
             embeddings = embedding_getter()
             embedding_size = getattr(embeddings, "num_embeddings", None)
-            if embedding_size is not None and embedding_size != tokenizer_vocab_size:
+            original_vocab_size = getattr(self.config, "vocab_size", None)
+            if (
+                isinstance(embedding_size, int)
+                and isinstance(original_vocab_size, int)
+                and embedding_size != original_vocab_size
+            ):
+                # A supplied PEFT model may already have been resized. Its own
+                # config then holds the new size; use the pinned original config.
+                setattr(model_instance, "plato_save_embedding_layers", True)
+            if (
+                tokenizer_vocab_size is not None
+                and callable(embedding_resizer)
+                and embedding_size is not None
+                and embedding_size < tokenizer_vocab_size
+            ):
                 embedding_resizer(tokenizer_vocab_size)
+                setattr(model_instance, "plato_save_embedding_layers", True)
 
         if self.training_args.gradient_checkpointing:
             model_config = getattr(model_instance, "config", None)
@@ -702,6 +741,10 @@ class Trainer(ComposableTrainer):
 
     def train_model(self, config, trainset, sampler, **kwargs):
         """Update HuggingFace training arguments before delegating to strategies."""
+        seed = config.get("random_seed")
+        if seed is not None:
+            self.training_args.seed = int(seed)
+            torch.manual_seed(int(seed) + self.client_id)
         self.training_args.num_train_epochs = config["epochs"]
         self.training_args.per_device_train_batch_size = config["batch_size"]
         accum_steps = config.get(
@@ -747,11 +790,114 @@ class Trainer(ComposableTrainer):
         return result
 
     def save_model(self, filename=None, location=None):
-        """Save checkpoint and inform HuggingFace callbacks."""
-        super().save_model(filename=filename, location=location)
+        """Save PEFT adapters or a full model using Plato's checkpoint contract."""
+        model = self._require_model()
+        if self._is_peft_model(model):
+            from safetensors.torch import load_file
+
+            root, path = self._adapter_checkpoint_path(filename, location)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            identity = artifact_identity()
+            # Export with PEFT's native API; retain Plato's single-file tree and
+            # history format for worker handoff and asynchronous snapshots.
+            with tempfile.TemporaryDirectory() as export_dir:
+                model.save_pretrained(
+                    export_dir, save_embedding_layers=adapter_save_embeddings(model)
+                )
+                state = load_file(os.path.join(export_dir, "adapter_model.safetensors"))
+                adapter_config = json.loads(
+                    Path(export_dir, "adapter_config.json").read_text()
+                )
+            adapter_config["base_model_name_or_path"] = identity["model_name"]
+            adapter_config["revision"] = identity["model_revision"]
+            with open(path, "wb") as checkpoint:
+                checkpoint.write(serialize_tree(state))
+            metadata_path = checkpoint_sidecar(root, path, ".hf")
+            Path(metadata_path).write_text(
+                json.dumps(
+                    {"artifacts": identity, "adapter_config": adapter_config}, indent=2
+                )
+                + "\n"
+            )
+            with open(checkpoint_sidecar(root, path), "wb") as history:
+                pickle.dump(self.run_history, history)
+        else:
+            super().save_model(filename=filename, location=location)
         if self._hf_callbacks:
             self._hf_call_callbacks("on_save", model=self._require_model())
             self._hf_handle_control_flags()
+
+    @staticmethod
+    def _is_peft_model(model) -> TypeGuard["PeftModel"]:
+        from peft import PeftModel
+
+        return isinstance(model, PeftModel)
+
+    @staticmethod
+    def _adapter_checkpoint_path(filename, location):
+        root = Config().params["model_path"] if location is None else location
+        name = (
+            filename
+            if filename is not None
+            else checkpoint_name(Config().trainer.model_name, suffix=".safetensors")
+        )
+        path = checkpoint_path(root, name)
+        if not path.endswith(".safetensors"):
+            raise ValueError("HuggingFace adapter checkpoints require .safetensors.")
+        return root, path
+
+    @staticmethod
+    def _load_adapter(model, root, path):
+        from peft import get_peft_model_state_dict, set_peft_model_state_dict
+
+        metadata = json.loads(Path(checkpoint_sidecar(root, path, ".hf")).read_text())
+        if metadata["artifacts"] != artifact_identity():
+            raise ValueError("Adapter checkpoint model/tokenizer identity mismatch.")
+        with open(path, "rb") as checkpoint:
+            state = deserialize_tree(checkpoint.read())
+        expected = get_peft_model_state_dict(
+            model, save_embedding_layers=adapter_save_embeddings(model)
+        )
+        if not isinstance(state, dict) or state.keys() != expected.keys():
+            raise ValueError("Adapter checkpoint keys do not match the PEFT model.")
+        for key, tensor in state.items():
+            if tensor.shape != expected[key].shape:
+                raise ValueError(f"Adapter checkpoint shape mismatch: {key}")
+        set_peft_model_state_dict(model, state)
+
+    def load_model(self, filename=None, location=None):
+        """Restore adapters in place, retaining the frozen pretrained base."""
+        model = self._require_model()
+        if not self._is_peft_model(model):
+            return super().load_model(filename=filename, location=location)
+        root, path = self._adapter_checkpoint_path(filename, location)
+        self._load_adapter(model, root, path)
+        history_path = checkpoint_sidecar(root, path)
+        if os.path.exists(history_path):
+            with open(history_path, "rb") as history:
+                self.run_history = pickle.load(history)
+
+    def obtain_model_at_time(self, client_id, requested_time):
+        """Restore an adapter snapshot without altering the active base/model."""
+        if not self._is_peft_model(self._require_model()):
+            return super().obtain_model_at_time(client_id, requested_time)
+        root = Config().params["model_path"]
+        candidates = []
+        for filename in os.listdir(root):
+            details = snapshot_details(filename)
+            if (
+                details is not None
+                and details[0] == client_id
+                and details[2] < requested_time
+                and filename.endswith(".safetensors")
+            ):
+                candidates.append((details[2], details[1], filename))
+        if not candidates:
+            raise ValueError(f"Cannot find an adapter snapshot for client {client_id}.")
+        _, _, filename = max(candidates)
+        model = copy.deepcopy(self._require_model())
+        self._load_adapter(model, root, checkpoint_path(root, filename))
+        return model
 
     # --- HuggingFace callback integration helpers ---
 

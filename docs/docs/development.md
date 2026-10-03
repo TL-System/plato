@@ -61,7 +61,7 @@ If the model type is not supplied by the configuration file, the model name is u
 
 Plato also supports optional **structured evaluators** under `plato/evaluators/`.
 These run after the trainer's normal testing strategy and are intended for
-benchmark-style outputs such as Lighteval or Nanochat CORE.
+benchmark-style outputs such as Lighteval.
 
 The key pieces are:
 
