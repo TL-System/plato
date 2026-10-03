@@ -6,7 +6,7 @@
   "branch": "maintenance/2026-phase2-payloads",
   "commit_identity": {
     "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
-    "final_tested_implementation_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+    "final_tested_implementation_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
     "implementation_commits": [
       "af695c0f0dea3032116522b0c7131393e724f30d",
       "264b422d8b96420ff3c361e69f888a656fe8f512",
@@ -16,17 +16,19 @@
       "639ca69bf4eaeff868462d0b30a5fcc72218f061",
       "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
       "926346bf342f11e85b6258adc4cb407b449669b7",
-      "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a"
+      "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+      "65e71329da1b4e1aa4f445991f4aaa38db119d3e"
     ],
     "evidence_carrier": "A following documentation-only commit updates this sole evidence file. Its exact identity is reported in the root handoff, avoiding a self-hash; runtime and test source are unchanged from the tested implementation commit above.",
-    "source_status_before_evidence": "Clean tracked tree at 53aa72c3. Actual combined S3 cases, client lifecycle overlap, mandatory affected libraries, clean base collection and the full base non-runtime suite ran on both interpreters at this exact source. All B/D production blobs are preserved from their owning candidates. Historical initial full, production-correction and base-correction results retain their original source identities; no combined full startup rerun is claimed.",
+    "source_status_before_evidence": "Clean tracked tree at 65e71329. Both locked profiles execute all 13 existing affected cases plus eight effective-profile regressions on both interpreters, and clean base collection passes. Only the two owned test modules change; production/S3/lifecycle sources remain identical. Prior 60-case combined and 557-case base results remain at 53aa72c3, not reattributed or mechanically rerun.",
     "previous_reviewed_candidate_commit": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
     "retained_full_matrix_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
-    "final_tested_implementation_tree": "ee4edd25a6b762591c6bd1680dfb818d0e5c4e7a",
+    "final_tested_implementation_tree": "046c05979e92a07e72f7bd4231cca1c81abcb773",
     "root_base_probe_candidate_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
     "premerge_d_candidate": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
     "accepted_b_dependency": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
-    "provisional_combined_merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397"
+    "provisional_combined_merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397",
+    "review2_candidate": "09b9b941bc4a816b62d8ed33ad993455f6f05da5"
   },
   "scope": {
     "owned": [
@@ -1034,7 +1036,8 @@
       "FEI scratch runtime",
       "Task-owned base314 locked test-base environment and provisioning log",
       "Source-attributed base red/green collection, full base non-runtime and mandatory affected logs/run records/JUnit artifacts; profile runner and evidence updater",
-      "combined/ contains merge/prod-preservation manifests and messages, test promotion/evidence scripts, bounded pytest trees; combined-* raw source-attributed run JSON/log/XML artifacts retained in the owned scratch root."
+      "combined/ contains merge/prod-preservation manifests and messages, test promotion/evidence scripts, bounded pytest trees; combined-* raw source-attributed run JSON/log/XML artifacts retained in the owned scratch root.",
+      "profile-review/ contains unchanged-fixture red AST identity/snapshots, correction/evidence scripts and messages, scoped pytest trees and Ruff log; profile-* source-attributed red/green/collection JSON/log/XML retained in owned scratch."
     ],
     "worktree_resources": [
       "Pinned external/nanochat checkout initialized",
@@ -2154,6 +2157,491 @@
       "Actual botocore/Requests/aiohttp work against a localhost S3-compatible service, using explicit fake credentials and no live cloud. The minimal adapter retains the real botocore presigner and supported fields only.",
       "Payloads remain trusted-writer pickles; these correctness/resource tests do not claim arbitrary untrusted-input safety. Kazoo qualification remains a fake service with real exception class; no live ZooKeeper or full FEI deployment.",
       "C checkpoint, metadata/lock/CI, shared conftest and root reports remain untouched. Root-owned original scratch and all task-owned resources are retained."
+    ]
+  },
+  "review2_test_policy_correction": {
+    "id": "2D-R05",
+    "recorded_at_utc": "2026-10-03T05:00:18.702342+00:00",
+    "review": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2d-review-2.json",
+      "sha256": "3870a624db39120121f601d915e29361cb57e67a18eb41ae01517ddfbe7c4243"
+    },
+    "reviewer_probe": {
+      "path": "/tmp/plato-phase2d-review-2/probe_default_profile.py",
+      "sha256": "706ebf3e37daf17a867cc55d99aed1f54e4e85f0df5d3c78d0e0712992ec10ce"
+    },
+    "references_handling": "Root report, reviewer probe/logs and reviewer scratch remain read-only; no reviewer environments used or mutated.",
+    "reviewed_candidate": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+    "implementation_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+    "status": "Corrected with actual configured policy and both-profile red/green on 3.13/3.14; fresh independent review3 pending.",
+    "finding": "Raw --test-profile is None for plain unfiltered pytest tests, but the existing registered policy treats that entrypoint as mandatory. Original fixture branches returned optional stand-ins, silently losing actual-library qualification.",
+    "correction": "Both fixtures read the registered plato-profile-checks plugin and select real libraries when its qualify state is true and base is false. The existing hook computes scope/selection policy; no raw-option policy is copied, no shared conftest or prerequisite changed.",
+    "scoped_optional_behavior": "Unprofiled scoped configurations remain unqualified and use the existing independent contracts, whether extras are installed or absent. Explicit base also stays independent.",
+    "regressions": {
+      "source_test_files": [
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/utils/test_rl_payload_utilities.py"
+      ],
+      "new_cases": "Eight: implicit full mandatory, explicit mandatory, explicit base and unprofiled scoped for each fixture.",
+      "method": "Real pytest.Config.fromdictargs configurations plus the existing tests.conftest.pytest_configure registration hook; actual fixture bodies run with each parsed config. No full implicit suite or startup cases are collected/executed by the focused probe.",
+      "mandatory_assertions": "Actual Kazoo LockTimeout identity and Gymnasium Box type when present. In clean base environments, either implicit or explicit mandatory fixture selection raises ModuleNotFoundError for the required library, with no fallback.",
+      "optional_assertions": "TimeoutError and SimpleNamespace contracts, independent float32 bounds/shape checks; all original 13 behavioral tests retained unchanged.",
+      "config_lifetime": "Parsed configurations are unconfigured in finally using the same pinned-pytest cleanup mechanism as the reviewer probe."
+    },
+    "red_source": {
+      "path": "/tmp/plato-phase2d.G3jkGH/profile-review/red-source-identity.json",
+      "sha256": "d6614b8cf2e2bc74fdcabb05c056a85d9d97c01d229ffc95cac3418cf53390a7"
+    },
+    "red_source_note": "At exact reviewed candidate HEAD, eight regression cases were added uncommitted before changing either fixture. AST identity with both original fixture bodies verified and exact red source snapshots retained; those snapshots differ from final source only by the later selection/docstring fix and formatting.",
+    "red": [
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-red-clean313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-red-clean313.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 8.36,
+        "result": "2 failed, 19 passed in 0.37s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.log",
+          "sha256": "281bb92754bc78da0157cadc62af44bc26327e8255b567a25c62cd93ccc6776d"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.json",
+          "sha256": "a6ef240d0a5a35e1d1808eaf958982a3226eb5b22ac715c734c445e7e61691f8"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean313.xml",
+          "sha256": "620c71a5bcf0a7b41a01e72d8a46406a101ea14374c69bda16cbf2c940a48c3e"
+        }
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-red-clean314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-red-clean314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 8.78,
+        "result": "2 failed, 19 passed in 0.37s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.log",
+          "sha256": "b4abdb69112c95bd3c95e6439141113a3f6debc74279dd8d1a4a5b77a4515e6c"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.json",
+          "sha256": "a289e5baca351fadf0ad07bf366bf95866cdd22cb01b84776f0402720caad86c"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-red-clean314.xml",
+          "sha256": "ec5a2dec5ac7ea08015882e1218437e4c43231c9d0d1a2763974802c7175fffa"
+        }
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-base-red-clean313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 6.21,
+        "result": "2 failed, 19 passed in 0.37s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.log",
+          "sha256": "4e04f8358ba030e2ace8a1e2dac58ae22adbd006f7a6d5cc78c76b31ea16227d"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.json",
+          "sha256": "cdc95dd516eb5dc176607459ab30ad958ba67fb9acb0b3eeb9397c7271b224f0"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean313.xml",
+          "sha256": "93b9e5d40190420628fca2cc993509a14b3343f61e07554ef2f12ee2391a5f78"
+        }
+      },
+      {
+        "source_commit": "09b9b941bc4a816b62d8ed33ad993455f6f05da5",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-base-red-clean314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.xml"
+        ],
+        "exit_code": 1,
+        "elapsed_seconds": 14.63,
+        "result": "2 failed, 19 passed in 0.35s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.log",
+          "sha256": "80dca246eb538d6d03713ccfbd5b7f4219efdba122ebc0b0f0804f454182f72e"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.json",
+          "sha256": "769192ed8972572a6b09d52e8c61b4ad5d08b4080ac25473c16870c4e7ba5c6d"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 2,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 19
+        },
+        "failures": [
+          "tests.mpc.test_round_store_contracts::test_lock_timeout_follows_effective_pytest_profile[implicit-mandatory]",
+          "tests.utils.test_rl_payload_utilities::test_action_space_follows_effective_pytest_profile[implicit-mandatory]"
+        ],
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-base-red-clean314.xml",
+          "sha256": "7084eb07c69182fee2967d1146ee64eb082c0b3e2d7d56b3214ccd4182be68b9"
+        }
+      }
+    ],
+    "green_affected_with_new_regressions": [
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-mandatory313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 7.01,
+        "result": "21 passed in 0.29s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.log",
+          "sha256": "de5ec4364a16eb4ddb788788ac7adbb564d3d85586292341d986c31a21c94b86"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.json",
+          "sha256": "0b554d187f65691234fcb2f9ef6d1b614839e6c7344ddbe13667fccca58adde3"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory313.xml",
+          "sha256": "c722cf8f0558d22e2ffd4ee85a1229c3efbc4819c1186468f547d7ccc256d5db"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-mandatory314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 7.49,
+        "result": "21 passed in 0.30s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.log",
+          "sha256": "67485aefd50a75e8c2153d8d24dc87cfae1b3f08f7e7c4d00aa226834dc9e447"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.json",
+          "sha256": "0be1192c74bd2ef5a2fc5b1f85955a4e917743c097f030303bba7c1f164e4203"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-mandatory314.xml",
+          "sha256": "a96d2d0232770325fc82f5854606f956a38b695e76387e0f26694b3ec5b46cc9"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-base313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-base313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.87,
+        "result": "21 passed in 0.26s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.log",
+          "sha256": "bdea51565d9356e22eb3ca38d329eef64b8b15db85f746a6ab6594456f14a415"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.json",
+          "sha256": "d5589142f1fe9483ad043ea9d3398033adc40252066d33f09ade95924c6a1f72"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base313.xml",
+          "sha256": "5617dbacee92592094eec10122509d0ba0fdd1b0fb38b1a04ef23e38160368d2"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=base",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/profile-review/pytest-profile-green-base314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/profile-green-base314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.59,
+        "result": "21 passed in 0.24s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.log",
+          "sha256": "5b659ff4aec67a30b01248b8729fe2d4d43bafdf7e75345eba783dab5a173ac0"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.json",
+          "sha256": "040ce9b5b9d4363c75a1bbc222e92f6ada49bd6e5a6c11ae2be192ab23d3e5fc"
+        },
+        "junit": {
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 21
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-base314.xml",
+          "sha256": "6fc68c5b1f7eefaeb9b50a08e2642ecaad3486b2c50b76067bd29fa03808c52d"
+        }
+      }
+    ],
+    "green_clean_base_collection": [
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.56,
+        "result": "568/616 tests collected (48 deselected) in 0.36s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection313.log",
+          "sha256": "04831d445936680e7a6809138ef58c6e18263848253308cb4e8848aac9f39ca5"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection313.json",
+          "sha256": "f0607a1c8db36c0fa4a737b33654e97fc7f5dca6becfca69c91298a7d85a3f84"
+        }
+      },
+      {
+        "source_commit": "65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.27,
+        "result": "568/616 tests collected (48 deselected) in 0.40s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection314.log",
+          "sha256": "f6c840bfb824a86713de39b57f214eed391c28db57ee3cea4cab54a27e6a7cc1"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-green-collection314.json",
+          "sha256": "8cb19f41e409065872ed128bdb2947f4881e0437be8be1a2a88e6f37f25f70a3"
+        }
+      }
+    ],
+    "source_identity_manifest": [
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "aecae718d67bd62f3cebce4c02a92a3e830bb889",
+        "sha256": "3f443669807fd3ebe6e6d6224ae7d6d1ccf0b7d8696cc29b6c5e496ae5eb23cb"
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "git_blob": "6979685f775e806fda50e401459116f3eddf7cf0",
+        "sha256": "c7542d050edcb30ea370241b13b4efb676988530677d16c192451bbcef415388"
+      }
+    ],
+    "retained_combined_validation": {
+      "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+      "result_each_interpreter": "60 explicit mandatory combined cases and 557 full base non-runtime cases/four allowed skips passed; historical source/results/artifacts remain unchanged in combined_b_d_validation.",
+      "basis": "All production, actual S3 regression/helper and merged client lifecycle code is byte-identical. Current targeted 21-case mandatory/base runs requalify the changed fixture selection and all 13 previous affected behaviors. User explicitly authorizes source identity plus targeted checks instead of mechanically repeating the expensive combined cases.",
+      "historical_attribution": "Initial full412 stays at e7c0d595; production-correction95 at 639ca69b; base-correction383 at 15c79d0c; combined60/base557 at 53aa72c3. Current21 checks/collection are solely at 65e71329."
+    },
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check tests/mpc/test_round_store_contracts.py tests/utils/test_rl_payload_utilities.py --select I",
+        "result": "All checks passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/profile-review/ruff.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check 09b9b941bc4a816b62d8ed33ad993455f6f05da5 65e71329da1b4e1aa4f445991f4aaa38db119d3e",
+        "result": "Passed; new lines at most88 characters."
+      },
+      {
+        "command": "git diff --exit-code 09b9b941bc4a816b62d8ed33ad993455f6f05da5 65e71329da1b4e1aa4f445991f4aaa38db119d3e -- plato examples cleanup.py tests/servers/test_runtime_s3_contract.py tests/clients/test_client_lifecycle_variants.py tests/conftest.py pyproject.toml uv.lock",
+        "result": "Passed; production, accepted S3/lifecycle tests, shared fixture policy and metadata unchanged."
+      }
+    ],
+    "environment": {
+      "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+      "shell": "zsh -lc for every shell invocation.",
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "fingerprints": "Same locked dev/base Python3.13.16 and3.14.8 environments and installed-distribution digests recorded above. Root base313 reused read-only; own other environments reused without sync.",
+      "optional_presence": "Kazoo/Gymnasium/opacus/tiktoken all present in both mandatory environments and all absent in both base environments; runner records verify each.",
+      "thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "additional_environment": "PYTHONDONTWRITEBYTECODE=1, HF_HUB_OFFLINE=1, HF_DATASETS_OFFLINE=1, TOKENIZERS_PARALLELISM=false; UserWarning treated as error in all clean affected runs.",
+      "runner": {
+        "path": "/tmp/plato-phase2d.G3jkGH/run_profile_validation.py",
+        "sha256": "7dfdd44095448a9c5544924ef483eb729ef17021ee7bbedc7fcd4f71eb4af7b5"
+      }
+    },
+    "primary_documentation": [
+      {
+        "url": "https://docs.pytest.org/en/latest/how-to/writing_plugins.html#accessing-another-plugin-by-name",
+        "use": "Retrieve the authoritative registered plugin through config.pluginmanager.get_plugin."
+      },
+      {
+        "url": "https://docs.pytest.org/en/latest/reference/reference.html",
+        "use": "Current Config.fromdictargs and plugin registration API; locked pytest9.1.1 also exercised directly."
+      },
+      {
+        "url": "https://pluggy.readthedocs.io/en/latest/api_reference.html",
+        "use": "get_plugin returns the registered plugin object by its name."
+      }
+    ],
+    "limitations": [
+      "Implicit mandatory selection is verified through real parsed/registered configuration and actual fixture bodies, not a repeated complete default suite or 48-startup matrix.",
+      "Only the two affected modules and clean base collection were newly run. Prior full base557, combined60, full412, production95 and platform/service limits retain exact historical attribution; no full/type/coverage rerun claimed.",
+      "Initial exploratory red invocations used -k with explicit profiles, causing existing deselection-policy violations. These raw profile-red/profile-base-red logs remain in scratch but are not used as the accepted red evidence; four clean unfiltered module invocations above prove only the implicit selection failures.",
+      "Root owns fresh review3 and final whole-phase qualification. No production/S3, checkpoint, security, shared fixture policy, metadata or dependency redesign."
     ]
   }
 }
