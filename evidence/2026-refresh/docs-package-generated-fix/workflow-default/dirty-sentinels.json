@@ -1,0 +1,10 @@
+{
+  "docs/site/p2-stale-output.json": {
+    "sha256": "0074264c85d2123de436905a6d004906fb437b66ea2561f1eb5a7c713004d48e",
+    "contents": "{\"generated_sentinel\": \"P2-M1-dirty-output\"}\n"
+  },
+  "ci-artifacts/stale-run/probe.json": {
+    "sha256": "0074264c85d2123de436905a6d004906fb437b66ea2561f1eb5a7c713004d48e",
+    "contents": "{\"generated_sentinel\": \"P2-M1-dirty-output\"}\n"
+  }
+}

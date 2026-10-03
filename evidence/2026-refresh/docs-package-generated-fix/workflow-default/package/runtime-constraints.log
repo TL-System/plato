@@ -1,0 +1,327 @@
+cwd: /private/tmp/plato-refresh-worktrees/docs-package-fix-workflow
+command: ["uv", "export", "--locked", "--python", "3.13", "--no-emit-project", "--no-header", "--no-hashes", "--no-default-groups", "--output-file", "/private/tmp/plato-refresh-worktrees/docs-package-fix-workflow/ci-artifacts/docs-package/runtime-constraints.txt"]
+Using CPython 3.13.16
+Resolved 264 packages in 15ms
+accelerate==1.15.0
+    # via
+    #   peft
+    #   plato-learn
+aiohappyeyeballs==2.7.1
+    # via aiohttp
+aiohttp==3.14.3
+    # via
+    #   fsspec
+    #   plato-learn
+aiosignal==1.4.0
+    # via aiohttp
+annotated-doc==0.0.5
+    # via typer
+anyio==4.15.1
+    # via httpx
+attrs==26.1.0
+    # via aiohttp
+beautifulsoup4==4.15.0
+    # via gdown
+bidict==0.24.1
+    # via python-socketio
+boto3==1.43.106
+    # via plato-learn
+botocore==1.43.106
+    # via
+    #   boto3
+    #   s3transfer
+certifi==2026.7.22
+    # via
+    #   httpcore
+    #   httpx
+    #   requests
+charset-normalizer==3.5.2
+    # via requests
+click==8.5.0
+    # via huggingface-hub
+colorama==0.4.6 ; sys_platform == 'win32'
+    # via
+    #   tqdm
+    #   typer
+cuda-bindings==13.4.3 ; sys_platform == 'linux'
+    # via torch
+cuda-pathfinder==1.8.3 ; sys_platform == 'linux'
+    # via cuda-bindings
+cuda-toolkit==13.0.3.0 ; sys_platform == 'linux'
+    # via torch
+datasets==5.0.1
+    # via
+    #   evaluate
+    #   plato-learn
+dill==0.4.1
+    # via
+    #   datasets
+    #   evaluate
+    #   multiprocess
+evaluate==0.4.6
+    # via plato-learn
+filelock==4.0.9
+    # via
+    #   datasets
+    #   gdown
+    #   huggingface-hub
+    #   torch
+frozenlist==1.8.0
+    # via
+    #   aiohttp
+    #   aiosignal
+fsspec==2026.6.0
+    # via
+    #   datasets
+    #   evaluate
+    #   huggingface-hub
+    #   torch
+gdown==6.4.1
+    # via plato-learn
+h11==0.16.0
+    # via
+    #   httpcore
+    #   wsproto
+hf-xet==1.6.0 ; platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'
+    # via huggingface-hub
+httpcore==1.0.9
+    # via httpx
+httpx==0.28.1
+    # via
+    #   datasets
+    #   huggingface-hub
+huggingface-hub==1.33.0
+    # via
+    #   accelerate
+    #   datasets
+    #   evaluate
+    #   peft
+    #   timm
+    #   tokenizers
+    #   transformers
+idna==3.20
+    # via
+    #   anyio
+    #   httpx
+    #   requests
+    #   yarl
+jinja2==3.1.6
+    # via torch
+jmespath==1.1.0
+    # via
+    #   boto3
+    #   botocore
+markdown-it-py==4.2.0
+    # via rich
+markupsafe==3.0.3
+    # via jinja2
+mdurl==0.1.2
+    # via markdown-it-py
+mpmath==1.3.0
+    # via sympy
+multidict==6.9.1
+    # via
+    #   aiohttp
+    #   yarl
+multiprocess==0.70.19
+    # via
+    #   datasets
+    #   evaluate
+munch==4.0.0
+    # via plato-learn
+networkx==3.7
+    # via torch
+numpy==2.5.3
+    # via
+    #   accelerate
+    #   datasets
+    #   evaluate
+    #   pandas
+    #   peft
+    #   plato-learn
+    #   scipy
+    #   tenseal
+    #   torchvision
+    #   transformers
+nvidia-cublas==13.1.1.3 ; sys_platform == 'linux'
+    # via
+    #   cuda-toolkit
+    #   nvidia-cudnn-cu13
+    #   nvidia-cusolver
+nvidia-cuda-cupti==13.0.85 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+nvidia-cuda-nvrtc==13.0.88 ; sys_platform == 'linux'
+    # via
+    #   cuda-toolkit
+    #   nvidia-cublas
+nvidia-cuda-runtime==13.0.96 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+nvidia-cudnn-cu13==9.24.0.43 ; sys_platform == 'linux'
+    # via torch
+nvidia-cufft==12.0.0.61 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+nvidia-cufile==1.15.1.6 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+nvidia-curand==10.4.0.35 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+nvidia-cusolver==12.0.4.66 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+nvidia-cusparse==12.6.3.3 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via
+    #   cuda-toolkit
+    #   nvidia-cusolver
+nvidia-cusparselt-cu13==0.8.1 ; sys_platform == 'linux'
+    # via torch
+nvidia-nccl-cu13==2.30.7 ; sys_platform == 'linux'
+    # via torch
+nvidia-nvjitlink==13.4.92 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via
+    #   cuda-toolkit
+    #   nvidia-cufft
+    #   nvidia-cusolver
+    #   nvidia-cusparse
+nvidia-nvshmem-cu13==3.4.5 ; sys_platform == 'linux'
+    # via torch
+nvidia-nvtx==13.0.85 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
+    # via cuda-toolkit
+packaging==26.3
+    # via
+    #   accelerate
+    #   datasets
+    #   evaluate
+    #   huggingface-hub
+    #   peft
+    #   transformers
+pandas==3.0.6
+    # via
+    #   datasets
+    #   evaluate
+peft==0.21.2
+    # via plato-learn
+pillow==12.3.0
+    # via torchvision
+propcache==0.5.4
+    # via
+    #   aiohttp
+    #   yarl
+psutil==7.2.2
+    # via
+    #   accelerate
+    #   peft
+pyarrow==25.0.1
+    # via datasets
+pygments==2.21.0
+    # via rich
+pysocks==1.7.1
+    # via requests
+python-dateutil==2.9.0.post0
+    # via
+    #   botocore
+    #   pandas
+python-engineio==4.14.0
+    # via python-socketio
+python-socketio==5.17.0
+    # via plato-learn
+pytorch-ranger==0.1.1
+    # via torch-optimizer
+pyyaml==6.0.3
+    # via
+    #   accelerate
+    #   datasets
+    #   huggingface-hub
+    #   peft
+    #   timm
+    #   transformers
+regex==2026.9.29
+    # via transformers
+requests==2.34.2
+    # via
+    #   datasets
+    #   evaluate
+    #   gdown
+    #   plato-learn
+rich==15.0.0
+    # via typer
+s3transfer==0.19.2
+    # via boto3
+safetensors==0.8.0
+    # via
+    #   accelerate
+    #   peft
+    #   plato-learn
+    #   timm
+    #   transformers
+scipy==1.18.1
+    # via plato-learn
+setuptools==84.0.0
+    # via torch
+shellingham==1.5.4
+    # via typer
+simple-websocket==1.1.0
+    # via python-engineio
+six==1.17.0
+    # via python-dateutil
+soupsieve==2.10
+    # via beautifulsoup4
+sympy==1.14.0
+    # via torch
+tenseal==0.3.18
+    # via plato-learn
+timm==1.0.30
+    # via plato-learn
+tokenizers==0.23.2
+    # via transformers
+torch==2.14.1
+    # via
+    #   accelerate
+    #   peft
+    #   plato-learn
+    #   pytorch-ranger
+    #   timm
+    #   torch-optimizer
+    #   torchvision
+torch-optimizer==0.3.0
+    # via plato-learn
+torchvision==0.29.1
+    # via
+    #   plato-learn
+    #   timm
+tqdm==4.70.1
+    # via
+    #   datasets
+    #   evaluate
+    #   gdown
+    #   huggingface-hub
+    #   peft
+    #   transformers
+transformers==5.18.0
+    # via
+    #   peft
+    #   plato-learn
+triton==3.8.0 ; sys_platform == 'linux'
+    # via torch
+typer==0.27.2
+    # via transformers
+typing-extensions==4.16.0
+    # via
+    #   anyio
+    #   beautifulsoup4
+    #   huggingface-hub
+    #   torch
+tzdata==2026.4 ; sys_platform == 'emscripten' or sys_platform == 'win32'
+    # via pandas
+urllib3==2.8.0
+    # via
+    #   botocore
+    #   gdown
+    #   requests
+wsproto==1.3.2
+    # via simple-websocket
+xxhash==4.0.1
+    # via
+    #   datasets
+    #   evaluate
+yarl==1.25.1
+    # via aiohttp
+zstd==1.5.7.2
+    # via plato-learn

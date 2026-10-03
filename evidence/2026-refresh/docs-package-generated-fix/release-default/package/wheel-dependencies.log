@@ -1,0 +1,5 @@
+cwd: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-lbte2a8o
+command: ["uv", "pip", "check", "--python", "/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-lbte2a8o/environment/bin/python"]
+Using Python 3.13.16 environment at: /var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/plato-package-lbte2a8o/environment
+Checked 80 packages in 1ms
+All installed packages are compatible
