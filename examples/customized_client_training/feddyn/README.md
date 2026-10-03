@@ -91,7 +91,8 @@ client histories and sends the assigned history with each model.
 
 The example supports synchronous full or partial participation in a fixed
 population. Every selected client must return a valid result before the round
-can commit. It requires ordinary PyTorch training with finite, dense float32
+can commit. Qualification covers CPU float32/float64 execution.
+The implementation requires ordinary PyTorch training with finite, dense float32
 or float64 trainable parameters and plain `torch.optim.SGD`: a fixed positive
 finite learning rate, zero momentum, dampening, and weight decay, and no
 Nesterov or maximization. Each trainable parameter must belong to the optimizer
