@@ -12,6 +12,7 @@ import sys
 import tarfile
 import time
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlparse
@@ -54,8 +55,8 @@ class DataSource:
                 fcntl.flock(lock, fcntl.LOCK_UN)
 
     @staticmethod
-    def download(url, data_path):
-        """Download a dataset from a URL if it is not already available."""
+    def download(url, data_path, *, ready: Callable[[], bool] | None = None):
+        """Download a dataset; readiness checks can validate extracted artifacts."""
         url_parse = urlparse(url)
         file_name = os.path.join(data_path, url_parse.path.split("/")[-1])
         name, suffix = os.path.splitext(file_name)
@@ -77,12 +78,17 @@ class DataSource:
                     f"Unsafe download artifact symlink: {artifact}"
                 )
 
-        if sentinel.exists():
+        if sentinel.exists() and (ready is None or ready()):
             return
 
         with DataSource._download_guard(data_path):
             if sentinel.exists():
-                return
+                if ready is None or ready():
+                    return
+                # The caller found missing extracted artifacts. Invalidate only
+                # under the same lock used by download/extraction and recheck
+                # after acquiring it so a competing recovery can finish first.
+                sentinel.unlink()
 
             max_attempts = 3
             for attempt in range(1, max_attempts + 1):
@@ -163,6 +169,10 @@ class DataSource:
                     time.sleep(1)
                     continue
 
+                if ready is not None and not ready():
+                    raise RuntimeError(
+                        f"Archive {url} lacks required extracted dataset artifacts."
+                    )
                 sentinel.touch()
                 break
 

@@ -14,7 +14,36 @@ from torchvision import datasets, transforms
 from torchvision.datasets.folder import default_loader
 
 from plato.config import Config
-from plato.datasources import base
+from plato.datasources import _image_folder, base
+
+
+def _locate_layout(root: Path) -> tuple[Path, bool] | None:
+    """Return the complete native or class-compatible prepared dataset layout."""
+    for candidate in (root, root / "tiny-imagenet-200"):
+        if not (candidate / "train").is_dir():
+            continue
+        annotation = candidate / "val/val_annotations.txt"
+        if annotation.is_file() and (candidate / "val/images").is_dir():
+            return candidate, False
+        if not (candidate / "test").is_dir():
+            continue
+        training_classes = {
+            folder.name for folder in (candidate / "train").iterdir() if folder.is_dir()
+        }
+        testing_classes = {
+            folder.name for folder in (candidate / "test").iterdir() if folder.is_dir()
+        }
+        # Official test/images is unlabeled, even if validation was interrupted.
+        if annotation.exists() or (
+            "images" in testing_classes and "images" not in training_classes
+        ):
+            continue
+        unknown = testing_classes - training_classes
+        if unknown:
+            raise ValueError(f"Unknown evaluation classes: {sorted(unknown)}")
+        if testing_classes:
+            return candidate, True
+    return None
 
 
 class ValidationDataset(Dataset):
@@ -60,15 +89,29 @@ class DataSource(base.DataSource):
         _path = Config().params["data_path"]
 
         root = Path(_path)
-        native = (root / "val/val_annotations.txt").is_file()
-        prepared = (
-            (root / "train").is_dir() and (root / "test").is_dir() and not native
-        )
-        canonical = root if native else root / "tiny-imagenet-200"
-        if not prepared and not (
-            (canonical / "train").is_dir()
-            and (canonical / "val/val_annotations.txt").is_file()
-        ):
+        layout = _locate_layout(root)
+        if layout is None:
+            incomplete_native = any(
+                (candidate / "train").is_dir()
+                and (
+                    (candidate / "val").is_dir()
+                    or (candidate / "test/images").is_dir()
+                )
+                for candidate in (root, root / "tiny-imagenet-200")
+            )
+            completed_default_download = (
+                root / "tiny-imagenet-200.zip.complete"
+            ).is_file()
+            if (
+                incomplete_native
+                and not hasattr(Config().data, "download_url")
+                and not completed_default_download
+            ):
+                raise ValueError(
+                    "Incomplete native Tiny ImageNet validation data: need "
+                    "val/val_annotations.txt and val/images. Official test/images "
+                    "is unlabeled; provide a download_url to recover the dataset."
+                )
             logging.info(
                 "Downloading the Tiny ImageNet 200 dataset. This may take a while."
             )
@@ -77,12 +120,14 @@ class DataSource(base.DataSource):
                 if hasattr(Config().data, "download_url")
                 else "https://cs231n.stanford.edu/tiny-imagenet-200.zip"
             )
-            DataSource.download(url, _path)
-            native = (root / "val/val_annotations.txt").is_file()
-            prepared = (
-                (root / "train").is_dir() and (root / "test").is_dir() and not native
+            DataSource.download(
+                url, _path, ready=lambda: _locate_layout(root) is not None
             )
-            canonical = root if native else root / "tiny-imagenet-200"
+            layout = _locate_layout(root)
+            if layout is None:
+                raise ValueError("Incomplete Tiny ImageNet dataset after download.")
+
+        root, prepared = layout
 
         train_transform = (
             kwargs["train_transform"]
@@ -100,15 +145,23 @@ class DataSource(base.DataSource):
                 )
             )
         )
-        test_transform = train_transform
-        if not prepared:
-            root = canonical
+        test_transform = kwargs.get(
+            "test_transform",
+            transforms.Compose(
+                [
+                    transforms.Resize(299),
+                    transforms.CenterCrop(299),
+                    transforms.ToTensor(),
+                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+                ]
+            ),
+        )
         self.trainset = datasets.ImageFolder(
             root=str(root / "train"), transform=train_transform
         )
         if prepared:
-            self.testset = datasets.ImageFolder(
-                root=str(root / "test"), transform=test_transform
+            self.testset = _image_folder.evaluation_folder(
+                root / "test", self.trainset, transform=test_transform
             )
         else:
             # The official test images have no public labels; evaluate on the

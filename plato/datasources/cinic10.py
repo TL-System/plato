@@ -12,7 +12,7 @@ import os
 from torchvision import datasets, transforms
 
 from plato.config import Config
-from plato.datasources import base
+from plato.datasources import _image_folder, base
 
 
 class DataSource(base.DataSource):
@@ -22,16 +22,19 @@ class DataSource(base.DataSource):
         super().__init__()
         _path = Config().params["data_path"]
 
-        if not all(
-            os.path.isdir(os.path.join(_path, split)) for split in ("train", "test")
-        ):
+        def ready():
+            return all(
+                os.path.isdir(os.path.join(_path, split)) for split in ("train", "test")
+            )
+
+        if not ready():
             logging.info("Downloading the CINIC-10 dataset. This may take a while.")
             url = (
                 Config().data.download_url
                 if hasattr(Config().data, "download_url")
                 else "http://iqua.ece.toronto.edu/baochun/CINIC-10.tar.gz"
             )
-            DataSource.download(url, _path)
+            DataSource.download(url, _path, ready=ready)
 
         train_transform = (
             kwargs["train_transform"]
@@ -48,11 +51,11 @@ class DataSource(base.DataSource):
                 )
             )
         )
-        test_transform = train_transform
+        test_transform = kwargs.get("test_transform", train_transform)
 
         self.trainset = datasets.ImageFolder(
             root=os.path.join(_path, "train"), transform=train_transform
         )
-        self.testset = datasets.ImageFolder(
-            root=os.path.join(_path, "test"), transform=test_transform
+        self.testset = _image_folder.evaluation_folder(
+            os.path.join(_path, "test"), self.trainset, transform=test_transform
         )

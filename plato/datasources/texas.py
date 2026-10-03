@@ -12,7 +12,7 @@ import torch
 from torch.utils import data
 
 from plato.config import Config
-from plato.datasources import base
+from plato.datasources import _vector_cache, base
 from plato.utils.archive import UnsafeArchiveError, extract_archive
 
 
@@ -24,13 +24,11 @@ class DataSource(base.DataSource):
         root_path = Config().params["data_path"]
         feat_path = os.path.join(root_path, "texas/100/feats")
         label_path = os.path.join(root_path, "texas/100/labels")
-        if not os.path.isfile(os.path.join(root_path, "texas_numpy.npz")):
-            self.download_dataset(root_path, feat_path, label_path)
-
-        self.trainset, self.testset = self.extract_data(root_path)
+        dataset = self.download_dataset(root_path, feat_path, label_path)
+        self.trainset, self.testset = self.extract_data(root_path, dataset)
 
     def download_dataset(self, root_path, feat_path, label_path):
-        """Download the Texas100 dataset."""
+        """Prepare and validate the Texas100 cache under the download lock."""
         with self._download_guard(root_path):
             cache_path = os.path.join(root_path, "texas_numpy.npz")
             archive_path = os.path.join(root_path, "tmp_texas.tgz")
@@ -39,8 +37,13 @@ class DataSource(base.DataSource):
                     raise UnsafeArchiveError(
                         f"Unsafe dataset artifact symlink: {artifact}"
                     )
+            _vector_cache.discard_abandoned_writes(cache_path)
             if os.path.isfile(cache_path):
-                return
+                try:
+                    return _vector_cache.load_cache(cache_path)
+                except _vector_cache.InvalidVectorCacheError as exc:
+                    logging.warning("Rebuilding incomplete Texas cache: %s", exc)
+                    os.remove(cache_path)
             if not (os.path.isfile(feat_path) and os.path.isfile(label_path)):
                 logging.info("Downloading the Texas100 dataset...")
                 filename = "https://www.comp.nus.edu.sg/~reza/files/dataset_texas.tgz"
@@ -50,12 +53,17 @@ class DataSource(base.DataSource):
             logging.info("Processing the dataset...")
             X = np.genfromtxt(feat_path, delimiter=",", ndmin=2).astype(np.float64)
             Y = np.genfromtxt(label_path, delimiter=",", ndmin=1).astype(np.int32) - 1
-            np.savez(cache_path, X=X, Y=Y)
+            _vector_cache.publish_cache(cache_path, X, Y)
+            return X, Y
 
-    def extract_data(self, root_path):
+    def extract_data(self, root_path, dataset=None):
         """Extract data."""
-        with np.load(os.path.join(root_path, "texas_numpy.npz")) as dataset:
-            X, Y = dataset["X"], dataset["Y"]
+        if dataset is None:
+            with self._download_guard(root_path):
+                dataset = _vector_cache.load_cache(
+                    os.path.join(root_path, "texas_numpy.npz")
+                )
+        X, Y = dataset
         ## randomly shuffle the data without changing the caller's RNG
         indices = np.random.RandomState(0).permutation(len(X))
         X, Y = X[indices], Y[indices]

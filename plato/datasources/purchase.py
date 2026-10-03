@@ -12,7 +12,7 @@ import torch
 from torch.utils import data
 
 from plato.config import Config
-from plato.datasources import base
+from plato.datasources import _vector_cache, base
 from plato.utils.archive import UnsafeArchiveError, extract_archive
 
 
@@ -23,13 +23,11 @@ class DataSource(base.DataSource):
         super().__init__()
         root_path = Config().params["data_path"]
         dataset_path = os.path.join(root_path, "dataset_purchase")
-        if not os.path.isfile(os.path.join(root_path, "purchase_numpy.npz")):
-            self.download_dataset(root_path, dataset_path)
-
-        self.trainset, self.testset = self.extract_data(root_path)
+        dataset = self.download_dataset(root_path, dataset_path)
+        self.trainset, self.testset = self.extract_data(root_path, dataset)
 
     def download_dataset(self, root_path, dataset_path):
-        """Download the Purchase100 dataset."""
+        """Prepare and validate the Purchase100 cache under the download lock."""
         with self._download_guard(root_path):
             cache_path = os.path.join(root_path, "purchase_numpy.npz")
             archive_path = os.path.join(root_path, "tmp_purchase.tgz")
@@ -38,8 +36,13 @@ class DataSource(base.DataSource):
                     raise UnsafeArchiveError(
                         f"Unsafe dataset artifact symlink: {artifact}"
                     )
+            _vector_cache.discard_abandoned_writes(cache_path)
             if os.path.isfile(cache_path):
-                return
+                try:
+                    return _vector_cache.load_cache(cache_path)
+                except _vector_cache.InvalidVectorCacheError as exc:
+                    logging.warning("Rebuilding incomplete Purchase cache: %s", exc)
+                    os.remove(cache_path)
             if not os.path.isfile(dataset_path):
                 logging.info("Downloading the Purchase100 dataset...")
                 filename = (
@@ -52,12 +55,17 @@ class DataSource(base.DataSource):
             data_set = np.genfromtxt(dataset_path, delimiter=",", ndmin=2)
             X = data_set[:, 1:].astype(np.float64)
             Y = (data_set[:, 0]).astype(np.int32) - 1
-            np.savez(cache_path, X=X, Y=Y)
+            _vector_cache.publish_cache(cache_path, X, Y)
+            return X, Y
 
-    def extract_data(self, root_path):
+    def extract_data(self, root_path, dataset=None):
         """Extract data."""
-        with np.load(os.path.join(root_path, "purchase_numpy.npz")) as dataset:
-            X, Y = dataset["X"], dataset["Y"]
+        if dataset is None:
+            with self._download_guard(root_path):
+                dataset = _vector_cache.load_cache(
+                    os.path.join(root_path, "purchase_numpy.npz")
+                )
+        X, Y = dataset
         ## randomly shuffle the data without changing the caller's RNG
         indices = np.random.RandomState(0).permutation(len(X))
         X, Y = X[indices], Y[indices]

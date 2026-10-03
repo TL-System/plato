@@ -91,7 +91,7 @@ def test_cinic_existing_empty_root_recovers_download(
     Config.data.download_url = "https://fixture.invalid/cinic.tar.gz"
     calls = []
 
-    def download(url, data_path):
+    def download(url, data_path, **kwargs):
         calls.append(url)
         for split in ("train", "test"):
             image_file(tmp_path / split / "class0/image.png")
@@ -110,7 +110,7 @@ def test_tiny_imagenet_canonical_validation_labels(
     Config.params["data_path"] = str(tmp_path)
     Config.data.download_url = "https://fixture.invalid/tiny.zip"
 
-    def download(url, data_path):
+    def download(url, data_path, **kwargs):
         root = tmp_path if preexisting_native else tmp_path / "tiny-imagenet-200"
         image_file(root / "train/n001/images/train.png")
         image_file(root / "train/n002/images/train.png")
