@@ -375,16 +375,10 @@ def test_mpc_client_round_store_configuration(temp_config, tmp_path):
             Config.params["mpc_data_path"] = original_mpc_path
 
 
-def test_mpc_training_strategy_records_samples(temp_config, monkeypatch):
-    class DummyRoundStore:
-        def __init__(self):
-            self.calls: list[tuple[int, int]] = []
-
-        def record_client_samples(self, client_id: int, num_samples: int) -> None:
-            self.calls.append((client_id, num_samples))
-
-    round_store = DummyRoundStore()
-    strategy = MPCTrainingStrategy(cast(RoundInfoStore, round_store))
+def test_mpc_training_strategy_records_samples(temp_config, monkeypatch, tmp_path):
+    round_store = RoundInfoStore(storage_dir=tmp_path)
+    round_store.initialise_round(1, [7])
+    strategy = MPCTrainingStrategy(round_store)
     context = SimpleNamespace(client_id=7)
 
     async_mock = AsyncMock(
@@ -394,5 +388,5 @@ def test_mpc_training_strategy_records_samples(temp_config, monkeypatch):
 
     report, payload = asyncio.run(strategy.train(context))
     assert report.num_samples == 11
-    assert round_store.calls == [(7, 11)]
+    assert round_store.load_state().client_samples == {7: 11}
     assert payload == {"weights": torch.ones(1)}
