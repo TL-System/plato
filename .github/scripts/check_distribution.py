@@ -149,10 +149,14 @@ def inspect_distribution(
     else:
         with tarfile.open(path, "r:gz") as archive:
             for member in archive.getmembers():
-                if not member.isfile():
+                if member.isdir():
                     continue
+                if not member.isfile():
+                    raise ValueError(f"Non-regular sdist source member: {member.name}")
                 name = PurePosixPath(member.name)
                 relative = PurePosixPath(*name.parts[1:]).as_posix()
+                if relative in files:
+                    raise ValueError(f"Duplicate sdist source member: {relative}")
                 payload = archive.extractfile(member).read()
                 files[relative] = hashlib.sha256(payload).hexdigest()
                 if relative == "PKG-INFO":
@@ -183,6 +187,72 @@ def inspect_distribution(
         "bytes": path.stat().st_size,
         "metadata": check_metadata(metadata_payloads[0], project),
         "files": dict(sorted(files.items())),
+    }
+
+
+def bind_sdist_source(
+    repository: Path,
+    source_commit: str,
+    sdist: dict[str, object],
+    wheel: dict[str, object],
+) -> dict[str, object]:
+    """Require each sdist source file to match its frozen Git blob bytes."""
+    files = sdist["files"]
+    metadata = [name for name in wheel["files"] if name.endswith(".dist-info/METADATA")]
+    if len(metadata) != 1 or files.get("PKG-INFO") != wheel["files"][metadata[0]]:
+        raise ValueError(
+            "Generated PKG-INFO must match the built wheel METADATA bytes."
+        )
+    entries = subprocess.check_output(
+        ["git", "ls-tree", "-rz", source_commit], cwd=repository
+    )
+    blobs = {}
+    for entry in entries.split(b"\0"):
+        if entry:
+            header, name = entry.split(b"\t", 1)
+            _, kind, object_id = header.split()
+            if kind == b"blob":
+                blobs[name.decode()] = object_id.decode()
+    source_members = files.keys() - {"PKG-INFO"}
+    unknown = sorted(source_members - blobs.keys())
+    if unknown:
+        raise ValueError(f"Sdist source members absent from frozen Git tree: {unknown}")
+    object_ids = sorted({blobs[name] for name in source_members})
+    contents = subprocess.check_output(
+        ["git", "cat-file", "--batch"],
+        cwd=repository,
+        input="".join(name + "\n" for name in object_ids).encode(),
+    )
+    blob_hashes = {}
+    offset = 0
+    for expected_id in object_ids:
+        end = contents.index(b"\n", offset)
+        object_id, kind, size = contents[offset:end].split()
+        if object_id.decode() != expected_id or kind != b"blob":
+            raise ValueError("Unexpected frozen Git blob response.")
+        offset = end + 1
+        payload = contents[offset : offset + int(size)]
+        if (
+            len(payload) != int(size)
+            or contents[offset + int(size) : offset + int(size) + 1] != b"\n"
+        ):
+            raise ValueError("Incomplete frozen Git blob response.")
+        blob_hashes[expected_id] = hashlib.sha256(payload).hexdigest()
+        offset += int(size) + 1
+    mismatches = sorted(
+        name for name in source_members if files[name] != blob_hashes[blobs[name]]
+    )
+    if mismatches:
+        raise ValueError(f"Sdist bytes differ from frozen Git tree: {mismatches}")
+    return {
+        "source_commit": source_commit,
+        "git_tree_bound_members": len(source_members),
+        "generated_metadata": {"PKG-INFO": files["PKG-INFO"]},
+        "generated_metadata_matches_wheel": True,
+        "files": {
+            name: {"git_blob": blobs[name], "sha256": blob_hashes[blobs[name]]}
+            for name in sorted(source_members)
+        },
     }
 
 
@@ -220,6 +290,18 @@ def validate_package(repository: Path, output: Path) -> dict[str, object]:
             "Output within the checkout must be under the excluded ci-artifacts path."
         )
     output.mkdir(parents=True, exist_ok=False)
+    try:
+        return build_package(repository, output, uv_version)
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        # Only this freshly created, validated directory belongs to this invocation.
+        (output / "acceptance.json").write_text(
+            json.dumps({"accepted": False, "error": str(error)}, indent=2) + "\n"
+        )
+        raise
+
+
+def build_package(repository: Path, output: Path, uv_version: str) -> dict[str, object]:
+    """Validate distributions using an output already owned by this invocation."""
     project = tomllib.loads((repository / "pyproject.toml").read_text())["project"]
     sources = set(
         subprocess.check_output(
@@ -237,6 +319,7 @@ def validate_package(repository: Path, output: Path) -> dict[str, object]:
             cwd=repository,
             text=True,
         ),
+        "source_status_scope": "Tracked files only; sdist bytes must match Git blobs.",
         "source_files": {name: sha256(repository / name) for name in SOURCE_FILES},
         "python": sys.version,
         "platform": platform.platform(),
@@ -286,6 +369,11 @@ def validate_package(repository: Path, output: Path) -> dict[str, object]:
     wheel_manifest = output / "wheel-manifest.json"
     wheel_manifest.write_text(json.dumps(wheel, indent=2) + "\n")
     (output / "sdist-manifest.json").write_text(json.dumps(sdist, indent=2) + "\n")
+    source_binding = bind_sdist_source(
+        repository, provenance["source_commit"], sdist, wheel
+    )
+    binding_path = output / "sdist-source-binding.json"
+    binding_path.write_text(json.dumps(source_binding, indent=2) + "\n")
     with tempfile.TemporaryDirectory(prefix="plato-package-") as temporary:
         temporary = Path(temporary)
         with tarfile.open(sdists[0], "r:gz") as archive:
@@ -369,6 +457,8 @@ def validate_package(repository: Path, output: Path) -> dict[str, object]:
         "source_commit": provenance["source_commit"],
         "wheel_sha256": wheel["sha256"],
         "sdist_sha256": sdist["sha256"],
+        "sdist_source_tree_bound": True,
+        "sdist_source_binding_sha256": sha256(binding_path),
         "rebuilt_wheel_payload_matches": True,
         "installed_wheel_provenance_and_imports": True,
         "build_constraints_sha256": sha256(build_constraints),
@@ -389,10 +479,6 @@ def main() -> int:
         receipt = validate_package(repository, output)
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         print(str(error), file=sys.stderr)
-        if output.is_dir() and not (output / "acceptance.json").exists():
-            (output / "acceptance.json").write_text(
-                json.dumps({"accepted": False, "error": str(error)}, indent=2) + "\n"
-            )
         return 1
     (output / "acceptance.json").write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(receipt, indent=2))
