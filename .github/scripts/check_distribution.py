@@ -94,7 +94,7 @@ def sha256(path: Path) -> str:
 
 
 def forbidden_payload(name: str) -> bool:
-    """Identify archived, reproduction, cache and environment payloads."""
+    """Identify generated, archived, cache and environment payloads."""
     parts = PurePosixPath(name).parts
     excluded = {
         "archives",
@@ -106,8 +106,11 @@ def forbidden_payload(name: str) -> bool:
         ".ruff_cache",
         "source-cache",
         "source-caches",
+        "ci-artifacts",
     }
-    return any(part in excluded or part.startswith(".venv") for part in parts)
+    return parts[:2] == ("docs", "site") or any(
+        part in excluded or part.startswith(".venv") for part in parts
+    )
 
 
 def check_metadata(payload: bytes, project: dict) -> dict[str, object]:
@@ -210,6 +213,12 @@ def validate_package(repository: Path, output: Path) -> dict[str, object]:
     uv_version = subprocess.check_output(["uv", "--version"], text=True).strip()
     if uv_version.split()[1] != UV_VERSION:
         raise ValueError(f"uv {UV_VERSION} is required: {uv_version}")
+    if output.is_relative_to(repository) and not output.is_relative_to(
+        repository / "ci-artifacts"
+    ):
+        raise ValueError(
+            "Output within the checkout must be under the excluded ci-artifacts path."
+        )
     output.mkdir(parents=True, exist_ok=False)
     project = tomllib.loads((repository / "pyproject.toml").read_text())["project"]
     sources = set(
