@@ -1,0 +1,58 @@
+plato/servers/fedavg.py:165:17: error[unresolved-attribute] Attribute `extract_weights` is not defined on `None` in union `None | Algorithm | Unknown`
+tests/conftest.py:109:31: error[invalid-argument-type] Argument to constructor `float.__new__` is incorrect: Expected `str | Buffer | SupportsFloat | SupportsIndex`, found `complex`
+tests/mlx_native/benchmark.py:90:17: error[too-many-positional-arguments] Too many positional arguments to bound method `MLXTrainingStepStrategy.training_step`: expected 7, got 9
+tests/mlx_native/seed_probe.py:56:13: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`
+tests/mlx_native/seed_probe.py:57:47: error[unresolved-attribute] Attribute `item` is not defined on `None` in union `Unknown | None`
+tests/mlx_native/socket_harness.py:83:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["outbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:84:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["inbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:85:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["outbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:86:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["inbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:95:36: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `dict[str, str | int] | dict[str, float]`, found `Literal[True]`
+tests/mlx_native/socket_harness.py:95:36: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[True]`
+tests/mlx_native/socket_harness.py:95:53: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `dict[str, str | int] | dict[str, float]`, found `Literal[1]`
+tests/mlx_native/socket_harness.py:95:53: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[1]`
+tests/mlx_native/socket_harness.py:95:68: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `dict[str, str | int] | dict[str, float]`, found `Literal[1]`
+tests/mlx_native/socket_harness.py:95:68: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[1]`
+tests/mlx_native/socket_probe.py:62:1: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["mlx_native_fixture"]` and value of type `<class 'NativePartition'>` on object of type `OrderedDict[str, <class 'plato.samplers.iid.Sampler'> | <class 'plato.samplers.dirichlet.Sampler'> | <class 'plato.samplers.mixed.Sampler'> | ... omitted 8 union elements]`
+tests/mlx_native/socket_probe.py:138:5: error[invalid-assignment] Object of type `def observe_start(process) -> Unknown` is not assignable to attribute `start` of type `(self) -> None`
+tests/mlx_native/socket_probe.py:139:5: error[invalid-assignment] Object of type `def observed_client_run(*args) -> Unknown` is not assignable to attribute `run` of type `def run(client_id: int, port: int | None, client: Any = None, edge_server: ((...) -> Any) | None = None, edge_client: ((...) -> Any) | None = None, trainer: (() -> Any) | None = None, client_kwargs: dict[str, Any] | None = None) -> None`
+tests/mlx_native/test_phase3_controls.py:75:9: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:78:16: error[unresolved-attribute] Attribute `observed` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:79:16: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:80:20: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:174:50: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:229:13: error[unresolved-attribute] Attribute `eval` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:263:29: error[unresolved-attribute] Object of type `MLXLossCriterionStrategy` has no attribute `loss_fn`
+tests/mlx_native/test_phase3_controls.py:269:13: error[unresolved-attribute] Unresolved attribute `loss_fn` on type `MLXLossCriterionStrategy`
+tests/mlx_native/test_phase3_controls.py:272:13: error[unresolved-attribute] Unresolved attribute `loss_fn` on type `MLXLossCriterionStrategy`
+tests/mlx_native/test_phase3_controls.py:295:35: error[not-subscriptable] Cannot subscript object of type `object` with no `__getitem__` method
+tests/mlx_native/test_phase3_controls.py:315:54: error[not-subscriptable] Cannot subscript object of type `object` with no `__getitem__` method
+tests/mlx_native/test_phase3_controls.py:346:9: error[unresolved-attribute] Attribute `eval` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:348:16: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:349:26: error[unresolved-attribute] Attribute `batchnorm` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:350:9: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:357:24: error[unresolved-attribute] Attribute `batchnorm` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:359:16: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:359:43: error[unresolved-attribute] Attribute `batchnorm` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:360:20: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_rng.py:77:27: error[not-subscriptable] Cannot subscript object of type `object` with no `__getitem__` method
+tests/mlx_native/test_phase3_rng.py:104:50: error[not-subscriptable] Cannot subscript object of type `object` with no `__getitem__` method
+tests/mlx_native/test_phase3_rng.py:115:27: error[not-subscriptable] Cannot subscript object of type `object` with no `__getitem__` method
+tests/mlx_native/test_phase3_rng.py:119:46: error[not-subscriptable] Cannot subscript object of type `object` with no `__getitem__` method
+tests/mlx_native/test_phase3_runtime.py:32:15: error[invalid-method-override] Invalid override of method `aggregate_weights`: Definition is incompatible with `FedAvgAggregationStrategy.aggregate_weights`
+tests/mlx_native/test_phase3_runtime.py:57:5: error[invalid-assignment] Object of type `() -> None` is not assignable to attribute `clients_processed` of type `def clients_processed(self) -> None`
+tests/mlx_native/test_phase3_runtime.py:235:31: error[call-non-callable] Object of type `None` is not callable
+tests/mlx_native/test_phase3_runtime.py:240:50: error[call-non-callable] Object of type `None` is not callable
+tests/mlx_native/test_phase3_tree_contract.py:56:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mlx_native/test_phase3_tree_contract.py:66:32: error[unresolved-attribute] Attribute `conv1` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_tree_contract.py:70:50: error[unresolved-attribute] Attribute `conv1` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_tree_contract.py:74:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mlx_native/test_phase3_tree_contract.py:80:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mlx_native/test_phase3_tree_contract.py:102:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/test_mlx_profile_contract.py:44:16: error[unresolved-attribute] Attribute `split` is not defined on `None` in union `str | None`
+tests/test_mlx_profile_contract.py:165:5: error[unresolved-attribute] Unresolved attribute `output` on type `CompletedProcess[str]`
+tests/test_mlx_profile_contract.py:559:16: error[unresolved-attribute] Attribute `qualify` is not defined on `None` in union `Any | None`
+tests/test_mlx_profile_contract.py:559:39: error[unresolved-attribute] Attribute `base` is not defined on `None` in union `Any | None`
+tests/test_mlx_profile_contract.py:559:55: error[unresolved-attribute] Attribute `native_requested` is not defined on `None` in union `Any | None`
+tests/test_mlx_profile_contract.py:560:20: error[unresolved-attribute] Attribute `native_prerequisite_passed` is not defined on `None` in union `Any | None`
+Found 57 diagnostics

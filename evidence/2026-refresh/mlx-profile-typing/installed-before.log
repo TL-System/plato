@@ -1,0 +1,8 @@
+tests/conftest.py:109:31: error[invalid-argument-type] Argument to constructor `float.__new__` is incorrect: Expected `str | Buffer | SupportsFloat | SupportsIndex`, found `complex`
+tests/test_mlx_profile_contract.py:44:16: error[unresolved-attribute] Attribute `split` is not defined on `None` in union `str | None`
+tests/test_mlx_profile_contract.py:165:5: error[unresolved-attribute] Unresolved attribute `output` on type `CompletedProcess[str]`
+tests/test_mlx_profile_contract.py:559:16: error[unresolved-attribute] Attribute `qualify` is not defined on `None` in union `Any | None`
+tests/test_mlx_profile_contract.py:559:39: error[unresolved-attribute] Attribute `base` is not defined on `None` in union `Any | None`
+tests/test_mlx_profile_contract.py:559:55: error[unresolved-attribute] Attribute `native_requested` is not defined on `None` in union `Any | None`
+tests/test_mlx_profile_contract.py:560:20: error[unresolved-attribute] Attribute `native_prerequisite_passed` is not defined on `None` in union `Any | None`
+Found 7 diagnostics

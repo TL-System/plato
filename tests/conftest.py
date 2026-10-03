@@ -106,7 +106,10 @@ def _native_prerequisites() -> None:
                 result = mx.sum(mx.array([1.0, 2.0], dtype=mx.float32))
                 mx.eval(result)
                 mx.synchronize(device)
-                value = float(result.item())
+                scalar = result.item()
+                if isinstance(scalar, complex):
+                    raise TypeError(f"{device} arithmetic returned complex {scalar}")
+                value = float(scalar)
                 if not math.isfinite(value) or value != 3.0:
                     raise RuntimeError(f"{device} arithmetic returned {value}")
     except Exception as exc:

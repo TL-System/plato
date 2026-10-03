@@ -6,10 +6,19 @@ import os
 import subprocess
 import sys
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+
+@dataclass(frozen=True)
+class _PytestResult:
+    """Keep the bounded subprocess status and combined diagnostic output."""
+
+    returncode: int
+    output: str
 
 
 @pytest.fixture(scope="module")
@@ -41,7 +50,7 @@ def profile_source():
             ):
                 continue
         elif isinstance(node, ast.ImportFrom):
-            if node.module.split(".")[0] not in allowed_imports:
+            if node.module is None or node.module.split(".")[0] not in allowed_imports:
                 continue
         elif not isinstance(
             node, (ast.Assign, ast.AnnAssign, ast.FunctionDef, ast.ClassDef)
@@ -145,7 +154,7 @@ def project(tmp_path, profile_source, policy):
     )
 
 
-def run_pytest(project, *arguments, cwd=None, addopts=None):
+def run_pytest(project, *arguments, cwd=None, addopts=None) -> _PytestResult:
     """Limit every subprocess and keep its import search inside the tiny project."""
     environment = os.environ.copy()
     environment.pop("PYTEST_ADDOPTS", None)
@@ -162,8 +171,7 @@ def run_pytest(project, *arguments, cwd=None, addopts=None):
         timeout=30,
         check=False,
     )
-    result.output = result.stdout + result.stderr
-    return result
+    return _PytestResult(result.returncode, result.stdout + result.stderr)
 
 
 def events(project):
@@ -556,6 +564,7 @@ def test_native_manual_configure_does_not_probe(policy, tmp_path, monkeypatch):
     try:
         policy.pytest_configure(config)
         checks = config.pluginmanager.get_plugin("plato-profile-checks")
+        assert checks is not None
         assert checks.qualify and not checks.base and checks.native_requested
         assert not checks.native_prerequisite_passed
     finally:

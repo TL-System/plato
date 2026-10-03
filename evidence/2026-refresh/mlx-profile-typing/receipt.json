@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "purpose": "Root-requested profile typing correction, exact CI owned-path expansion, and reproduction-only distribution exclusion.",
+  "parent_commit": "cadd427138b2c9fb1ca80a90d2a7976aea6481c3",
+  "root_frozen_integration_commit": "0929b5a527c766be59bfff7fb2ea2749c02f3f2e",
+  "source_sha256": {
+    "tests/conftest.py": "dcc25c17cbd872fc21b66bbc2d3f5951bf791b9f2474a71af6d9b8ac28e4356c",
+    "tests/test_mlx_profile_contract.py": "c26c766a599d235f6841aafe82f178b7fd8a3ae02d8362420d0d4f7e95dd8088",
+    ".github/workflows/pytorch_tests.yml": "1ae4bf9d5be394b77a105ab294527a27ec8f2c123e46ac179e97fc148f843b75",
+    "pyproject.toml": "0e62fd238c359027fae6c1b9e45c10a8f913fb8421d9300ee0a781af091f80e4"
+  },
+  "unchanged_sha256": {
+    "tests/mlx_native/cases.json": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+    "uv.lock": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+    "tests/mlx_import_audit_runner.py": "62a6509de2b389d1ab143cc06a526745a132f035f978b18f8b78d183ec80d296",
+    "tests/test_mlx_import_contract.py": "6c9eb81ab656a8695f34579fd590a02d51480c85a3353fcc57a33597f972be77"
+  },
+  "ownership": {
+    "profile": [
+      "tests/conftest.py",
+      "tests/test_mlx_profile_contract.py"
+    ],
+    "explicit_narrow_root_handoffs": {
+      ".github/workflows/pytorch_tests.yml": "Only owned typing path-set additions for the 24 changed active MLX Python paths; the classifier and two existing datasource allowances remain unchanged.",
+      "pyproject.toml": "Only tool.hatch.build.exclude gains evidence/2026-refresh/reproductions/**; existing retired archive exclusion remains.",
+      "tests/mlx_native/cases.json": "Exclusive ledger ownership retained; this correction leaves all383 node IDs, criteria, and bytes unchanged."
+    },
+    "unmodified_native_owner_scope": "Native/server/helper source remains owned by the native correction author; no copying or editing of those modules here.",
+    "pending_serialized_handoff": "Archive runtime partition guard remains deferred and unimplemented."
+  },
+  "changes": [
+    "Reject a complex item before converting the real CPU/Metal prerequisite result to float; preserve cause-bearing scoped failure and finite/equal arithmetic checks.",
+    "Narrow the optional AST import module name before split.",
+    "Replace an undeclared CompletedProcess.output mutation with a frozen typed subprocess result containing the same status and combined output.",
+    "Assert that the configured profile plugin exists before accessing its properties.",
+    "Add the exact changed active MLX Python paths to the existing CI owned-path set without new typing allowances.",
+    "Exclude only reproduction evidence from built distributions while retaining those files in Git."
+  ],
+  "verification": {
+    "installed_scoped_ty": {
+      "before_diagnostics": 7,
+      "after_diagnostics": 0,
+      "exit_status_after": 0,
+      "scope": "The two corrected profile files before; all seven profile-owned Python files after."
+    },
+    "base_linux_scoped_ty": {
+      "after_diagnostics": 0,
+      "exit_status_after": 0,
+      "scope": "All seven profile-owned Python files; readonly absent-MLX base interpreter, Linux target."
+    },
+    "full_base_linux_ty": {
+      "before_diagnostics": 711,
+      "after_diagnostics": 705,
+      "after_profile_owned_diagnostics": 0,
+      "other_changed_owner_diagnostics": 44,
+      "full_exit_status": 1,
+      "limitation": "Existing repository typing debt remains; native/server modules in this worktree predate the separately owned correction. This is a classified full check, not a claim of full-repository type cleanliness."
+    },
+    "installed_policy_import_helpers": {
+      "passed": 128,
+      "skipped": 0,
+      "exit_status": 0
+    },
+    "actual_absence_policy_import_helpers": {
+      "passed": 128,
+      "skipped": 0,
+      "exit_status": 0
+    },
+    "policy_assertions_and_case_decorators": "All prior assertion ASTs retained; one plugin-presence assertion added. Test function names and decorators unchanged.",
+    "native_ledger": {
+      "nodes": 383,
+      "sha256": "c168dc33a4d4e7ed70079e09c3de70f5b318d543c035ec13de2826b48e1175bb",
+      "byte_identical": true,
+      "latest_native_typing_handoff_sha256": "26da4791e33fc4ea14a46cfa061bfcd228609caa988a35f255209dd9f3e46d82",
+      "latest_handoff_ids_and_criteria_match_exactly": true,
+      "source_module_hashes_refreshed_by_native_owner": true
+    },
+    "ci_guard": "All24 changed active Python paths are covered; exact original owned-set union verified; classifier AST unchanged outside owned-set value; original two datasource allowances unchanged.",
+    "package_author": {
+      "before": {
+        "path": "/tmp/plato-mlx-profile-typing/package-before/plato_learn-1.4.3.tar.gz",
+        "bytes": 40449290,
+        "sha256": "375b0cc3eb42c06714d4203dc9182940cb72ef256e6a877ee99faac76eb887d6"
+      },
+      "after": {
+        "path": "/tmp/plato-mlx-profile-typing/package-after/plato_learn-1.4.3.tar.gz",
+        "bytes": 11155752,
+        "sha256": "ab1134e9113b857d9974bd8f187cd27e13831b332082edf19dad22f3596818f8"
+      },
+      "before_members": 1452,
+      "after_members": 1376,
+      "removed_reproduction_members": 76,
+      "removed_reproduction_bytes": 31416617,
+      "changed_remaining_paths": [
+        "pyproject.toml"
+      ],
+      "active_files_retained_unchanged": 666,
+      "other_evidence_retained_unchanged": 201,
+      "retired_archive_and_reproductions_excluded": true,
+      "wheel": {
+        "before": {
+          "path": "/tmp/plato-mlx-profile-typing/package-before/plato_learn-1.4.3-py3-none-any.whl",
+          "bytes": 8679415,
+          "sha256": "666bbe0fadde3f4f93e0dec2069b816a8ba484a08645cdcb32d6e4a9aa5ace6e"
+        },
+        "after": {
+          "path": "/tmp/plato-mlx-profile-typing/package-after/plato_learn-1.4.3-py3-none-any.whl",
+          "bytes": 8679415,
+          "sha256": "666bbe0fadde3f4f93e0dec2069b816a8ba484a08645cdcb32d6e4a9aa5ace6e"
+        },
+        "members": 427,
+        "member_names_and_bytes_identical": true
+      }
+    },
+    "package_root_retained_sdist": {
+      "before": {
+        "path": "/tmp/plato-mlx-integration/package-audit/plato_learn-1.4.3.tar.gz",
+        "bytes": 102900650,
+        "sha256": "396f16e0ee033b5ddfac771d9ebc8d72bd56f7b3a4cae585630fa3b7628fb339"
+      },
+      "after": {
+        "path": "/tmp/plato-mlx-profile-typing/root-package-after/plato_learn-1.4.3.tar.gz",
+        "bytes": 11178831,
+        "sha256": "c6366a9308314e12612a05e2490d394ca4eb1f2fc7393f87c5ec84c7573352d8"
+      },
+      "before_members": 1466,
+      "after_members": 1386,
+      "removed_reproduction_members": 80,
+      "removed_reproduction_bytes": 94457294,
+      "changed_remaining_paths": [
+        "pyproject.toml"
+      ],
+      "active_files_retained_unchanged": 668,
+      "other_evidence_retained_unchanged": 209,
+      "retired_archive_and_reproductions_excluded": true,
+      "wheel": {
+        "before": {
+          "path": "/tmp/plato-mlx-profile-typing/root-package-before-wheel/plato_learn-1.4.3-py3-none-any.whl",
+          "bytes": 8679653,
+          "sha256": "49f542edee7865ee77ca849dfbd7733e9b023812a4deed7a33497b8b75afc46e"
+        },
+        "after": {
+          "path": "/tmp/plato-mlx-profile-typing/root-package-after/plato_learn-1.4.3-py3-none-any.whl",
+          "bytes": 8679653,
+          "sha256": "49f542edee7865ee77ca849dfbd7733e9b023812a4deed7a33497b8b75afc46e"
+        },
+        "members": 427,
+        "member_names_and_bytes_identical": true
+      }
+    },
+    "package_limits": "Root package after is rebuilt in an isolated extraction of the retained root0929 sdist, with only the exact authorized manifest exclusion applied. Author package before/after shares the final corrected Python/workflow sources; the delta isolates the single manifest exclusion.",
+    "manifest_delta": "Parsed TOML equality confirmed after replacing only the hatch exclusion list; no lock, dependency, group, workspace, Python, or pytest settings changed.",
+    "lock_check": {
+      "command": "uv lock --check --offline",
+      "exit_status": 0,
+      "lock_byte_identical": true
+    },
+    "ruff_imports_all": "passed",
+    "ruff_format_corrected_python": "passed",
+    "git_diff_check": "passed"
+  },
+  "environments": {
+    "installed": {
+      "python": "3.13.16",
+      "mlx": "0.32.3",
+      "pytest": "9.1.1"
+    },
+    "tools": {
+      "ty": "ty 0.0.84 (8dd9a7f7f 2026-09-24)",
+      "ruff": "ruff 0.16.10",
+      "uv": "uv 0.12.22 (70fe1196a 2026-10-01 aarch64-apple-darwin)"
+    },
+    "base": {
+      "python": "3.13.16",
+      "pytest": "9.1.1",
+      "mlx": null
+    }
+  },
+  "execution_boundaries": "Read-only use of existing Python3.13 environments; builds use isolated uv environments/offline cache. No environment installs or mutations, no worktree edits in active root integration, no full suite repetition, no Python3.14, no E8/E9 work.",
+  "remaining_gates": [
+    "Root combines this correction with separately owned native typing fixes, then reruns the exact CI classified full typing guard.",
+    "Fresh independent review of the final combined correction.",
+    "Root-owned final integrated qualification/publication."
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/before-sources.json",
+      "sha256": "5c47f397f24ac90ef9e88caf8fcdf0531fb5e4e6433e5fba5f9a1b76db53427d"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/installed-before.log",
+      "sha256": "152ad7e8b9e91a8fd30a991650557ac2fe987a2a34ef964ec0c802932f50e1ca"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/installed-after.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/base-profile-after.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/base-full-before.log",
+      "sha256": "162e0eed6b913ea27168120687c97289f9aee84c0ce20f5f9ac8ef3851c46d2b"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/base-full-after.log",
+      "sha256": "fa38c1f4abf377ab65d4b7348bdf5ae6ebe8d974f9d16ddf50e84d57c9507268"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/installed-pytest.log",
+      "sha256": "e35d7ac78d010a81ac0dcbc61a148f4fa6c6f745b1a8666503965f800ff23904"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/absent-pytest.log",
+      "sha256": "8c031758d37957473dc48ee53e3181480ad3699b06a5ca6b2e9cecbd24c195ed"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/ruff-imports.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/ruff-format.log",
+      "sha256": "3bc53bf3e981a98a34a852e175bf9b77af841edea74fca595d9aedcbaf9a4938"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/lock-check.log",
+      "sha256": "7774956de13430ebbcb0a6c1ce1a37fd5e08185bf227744fff55300108b971b9"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/environments.json",
+      "sha256": "b5b4872e78ea8613b9809c6330337bfb70d4b99778b63cb2ae3e747a1e6766a8"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/ci-scope-and-base-classification.json",
+      "sha256": "e8d93e24ff4103adf5b7c3c41404daed437e7ff0b66e6f0d3446287914aa8af6"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/package-before-build.log",
+      "sha256": "887eb850ced4a24e8f11a64d797d1226aaae3a12345245930b14e2276f35e2e1"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/package-after-build.log",
+      "sha256": "527724ddb74902d2c060596b05c2c1bc2f31f87b44ee63844edf8f05d7c7bbe1"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/root-package-before.json",
+      "sha256": "ee340ecbdd893802a960125763921710cb96b2ec003d736664facf38df63f54a"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/root-package-after-build.log",
+      "sha256": "78f3c08b76ea0566e9e10d6be61c035d31d1071ec44c85a7a6a6eb8d9c6057d4"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/root-package-before-wheel-build.log",
+      "sha256": "b844e2d52a1ecb488c2af92c827c49459ec484afde00251d7b7049646b0febbf"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/package-member-audit.json",
+      "sha256": "20f77e6bae4f0e43fe75e0a9c75a8ea4c23419b70443a4ca4f514a4e443b3300"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/root-scoped-typing-before.log",
+      "sha256": "352cfcd66f50eb80aec9d2d0b902f0e9fe79a4e3c539534135e7bf49080de831",
+      "upstream_path": "/tmp/plato-mlx-integration/checks/scoped-typing.log"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/changed-active-python.json",
+      "sha256": "e2cedec97b9d760224ce68583134c076c9fd01eac1e3fba72828f4595ffd505f",
+      "upstream_path": "/tmp/plato-mlx-integration/checks/changed-active-python.json"
+    },
+    {
+      "path": "evidence/2026-refresh/mlx-profile-typing/native-typing-node-handoff.json",
+      "sha256": "26da4791e33fc4ea14a46cfa061bfcd228609caa988a35f255209dd9f3e46d82",
+      "upstream_path": "/tmp/plato-phase3-mlx/typing-correction/node-handoff.json"
+    }
+  ]
+}

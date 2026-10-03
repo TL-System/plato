@@ -1,0 +1,706 @@
+archives/legacy_datalib/audio_extraction_tools.py:47:8: warning[deprecated] The function `popen` is deprecated: Soft deprecated. Use the subprocess module instead.
+archives/legacy_datalib/audio_extraction_tools.py:52:12: warning[deprecated] The function `popen` is deprecated: Soft deprecated. Use the subprocess module instead.
+archives/legacy_datalib/frames_extraction_tools.py:116:8: warning[deprecated] The function `system` is deprecated: Soft deprecated. Use the subprocess module instead.
+archives/legacy_datalib/frames_extraction_tools.py:149:8: warning[deprecated] The function `system` is deprecated: Soft deprecated. Use the subprocess module instead.
+archives/legacy_datalib/refer_utils/referitgame_utils.py:85:18: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:86:23: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["image_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:86:56: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["image_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:88:13: error[invalid-assignment] Cannot assign to a subscript on an object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:88:32: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["file_name"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:89:18: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:91:18: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:91:31: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["name"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:98:22: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["ref_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:99:22: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["ann_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:100:27: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["category_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:101:24: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["image_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:111:25: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["sentences"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:144:48: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["category_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:146:48: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["ref_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:151:69: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["split"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:155:48: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["split"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:158:62: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["split"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:160:52: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["split"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:164:20: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["ref_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:173:24: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:185:48: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["category_id"]` on object of type `str`
+archives/legacy_datalib/refer_utils/referitgame_utils.py:186:24: error[invalid-argument-type] Method `__getitem__` of type `bound method str.__getitem__(key: SupportsIndex | slice[SupportsIndex | None, SupportsIndex | None, SupportsIndex | None], /) -> str` cannot be called with key of type `Literal["id"]` on object of type `str`
+evidence/2026-refresh/mlx-profile-correction/frontdoor-probe.py:27:5: error[invalid-assignment] Object of type `() -> SimpleNamespace` is not assignable to attribute `Config` of type `<class 'Config'>`
+evidence/2026-refresh/mlx-profile-correction/frontdoor-probe.py:36:5: error[invalid-assignment] Object of type `() -> SimpleNamespace` is not assignable to attribute `Config` of type `<class 'Config'>`
+evidence/2026-refresh/mlx-profile-policy/real-preflight.py:20:14: error[invalid-argument-type] Argument to function `compile` is incorrect: Expected `str | Buffer | Module | Expression | Interactive`, found `str | None`
+evidence/2026-refresh/mlx-profile-policy/real-preflight.py:25:1: error[call-non-callable] Object of type `<module 'platform'> | <module 'importlib'> | <module 'math'> | <module 'pytest'>` is not callable
+evidence/2026-refresh/reproductions/phase2-final-integration/run_integration_profile.py:65:9: error[unresolved-attribute] Attribute `append` is not defined on `dict[str, int]`, `str` in union `dict[str, int] | list[dict[str, dict[str, str] | str | None]] | str | Unknown | list[Unknown]`
+evidence/2026-refresh/reproductions/phase2-final-integration/run_integration_profile.py:65:36: error[invalid-argument-type] Argument to bound method `list.append` is incorrect: Expected `dict[str, dict[str, str] | str | None]`, found `dict[str, float | Unknown | str]`
+evidence/2026-refresh/reproductions/phase2-integration/run_integration_profile.py:65:9: error[unresolved-attribute] Attribute `append` is not defined on `dict[str, int]`, `str` in union `dict[str, int] | list[dict[str, dict[str, str] | str | None]] | str | Unknown | list[Unknown]`
+evidence/2026-refresh/reproductions/phase2-integration/run_integration_profile.py:65:36: error[invalid-argument-type] Argument to bound method `list.append` is incorrect: Expected `dict[str, dict[str, str] | str | None]`, found `dict[str, float | Unknown | str]`
+evidence/2026-refresh/reproductions/phase2-root/apfl_identity_probe.py:32:13: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/apfl_identity_probe.py:33:13: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/control_identity_probe.py:35:17: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/control_identity_probe.py:36:17: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/dp_checkpoint_probe.py:18:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/dp_checkpoint_probe.py:19:9: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/dp_checkpoint_probe.py:30:129: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+evidence/2026-refresh/reproductions/phase2-root/dp_probe.py:18:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/dp_probe.py:19:9: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/dp_probe.py:30:129: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+evidence/2026-refresh/reproductions/phase2-root/dp_steps_probe.py:26:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/dp_steps_probe.py:27:9: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/dp_steps_probe.py:31:101: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`
+evidence/2026-refresh/reproductions/phase2-root/scaffold_numerical_probe.py:23:9: error[invalid-assignment] Object of type `dict[str, Tensor]` is not assignable to attribute `client_control_variate` of type `OrderedDict[str, Tensor] | None`
+evidence/2026-refresh/reproductions/phase2-root/scaffold_numerical_probe.py:31:156: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+evidence/2026-refresh/reproductions/phase2-root/split_evaluation_probe.py:18:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/split_evaluation_probe.py:19:9: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:29:131: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:43:13: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:44:13: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:46:25: error[invalid-argument-type] Argument to constructor `Path.__new__` is incorrect: Expected `str | PathLike[str]`, found `str | None`
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:51:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:52:9: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/trainer_lifecycle_probe.py:54:30: error[unresolved-attribute] Attribute `parameters` is not defined on `None` in union `Any | None`
+evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py:16:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py:17:9: error[invalid-assignment] Object of type `str` is not assignable to attribute `device` of type `device | None`
+evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py:20:34: error[unresolved-attribute] Attribute `parameters` is not defined on `None` in union `Any | None`
+evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py:29:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["attempted_reads"]` and value of type `list[str]` on object of type `dict[str, float]`
+evidence/2026-refresh/reproductions/phase2-root/urgent_checkpoint_probe.py:29:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["attempted_reads"]` and value of type `list[str]` on object of type `dict[str, str]`
+examples/model_search/fedrlnas/fedrlnas_server.py:127:34: error[call-non-callable] Object of type `object` is not callable
+examples/model_search/fedtp/hypernetworks.py:87:32: warning[redundant-cast] Value is already of type `Module`
+examples/model_search/pfedrlnas/DARTS/fednas_server.py:164:34: error[call-non-callable] Object of type `object` is not callable
+examples/model_search/pfedrlnas/VIT/fednas_server.py:148:34: error[call-non-callable] Object of type `object` is not callable
+examples/server_aggregation/feddf/feddf_algorithm.py:78:16: error[invalid-argument-type] Argument to function `len` is incorrect: Expected `Sized`, found `Dataset[Unknown]`
+examples/server_aggregation/feddf/feddf_server.py:45:25: error[unresolved-attribute] Attribute `_resolve_proxy_dataset` is not defined on `FedAvgAggregationStrategy` in union `Unknown | FedAvgAggregationStrategy`
+examples/server_aggregation/feddf/feddf_utils.py:32:26: error[invalid-argument-type] Argument to function `len` is incorrect: Expected `Sized`, found `Dataset[Unknown]`
+examples/unlearning/knot/knot_server.py:403:17: error[invalid-argument-type] Method `__getitem__` of type `bound method dict[int, bool].__getitem__(key: int, /) -> bool` cannot be called with key of type `ndarray[_AnyShape, dtype[signedinteger[_NBitIntP]]]` on object of type `dict[int, bool]`
+examples/unlearning/knot/knot_server.py:403:17: error[invalid-argument-type] Method `__getitem__` of type `bound method dict[int, bool].__getitem__(key: int, /) -> bool` cannot be called with key of type `signedinteger[_NBitIntP]` on object of type `dict[int, bool]`
+examples/unlearning/knot/knot_server.py:776:17: error[invalid-argument-type] Argument to function `max` is incorrect: Argument type `Unknown | None` does not satisfy upper bound `SupportsDunderLT[Any] | SupportsDunderGT[Any]` of type variable `SupportsRichComparisonT`
+examples/unlearning/knot/knot_server.py:776:40: error[invalid-argument-type] Argument to function `min` is incorrect: Argument type `Unknown | None` does not satisfy upper bound `SupportsDunderLT[Any] | SupportsDunderGT[Any]` of type variable `SupportsRichComparisonT`
+examples/unlearning/knot/knot_server.py:802:31: error[invalid-argument-type] Argument to function `min` is incorrect: Argument type `Unknown | None` does not satisfy upper bound `SupportsDunderLT[Any] | SupportsDunderGT[Any]` of type variable `SupportsRichComparisonT`
+plato/models/dvit/hubconf.py:4:18: error[unresolved-attribute] Module `timm.models.registry` has no member `_model_entrypoints`
+plato/models/dvit/lib_deit/main.py:267:23: error[unresolved-attribute] Attribute `num_patches` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/dvit/lib_deit/main.py:268:28: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/lib_deit/main.py:268:28: error[unsupported-operator] Operator `-` is not supported between objects of type `int | Tensor | Unknown` and `Tensor | Module`
+plato/models/dvit/lib_deit/main.py:272:24: error[unsupported-operator] Operator `**` is not supported between objects of type `Tensor | Module` and `float*`
+plato/models/dvit/lib_deit/main.py:343:20: error[invalid-argument-type] Argument to `DistillationLoss.__init__` is incorrect: Expected `Module`, found `None | Module`
+plato/models/dvit/lib_deit/main.py:373:13: error[unresolved-attribute] Object of type `Iterable[Unknown]` has no attribute `set_epoch`
+plato/models/dvit/lib_deit/models.py:32:9: error[invalid-method-override] Invalid override of method `forward_features`: Definition is incompatible with `VisionTransformer.forward_features`
+plato/models/dvit/lib_deit/models.py:38:22: error[unresolved-attribute] Attribute `expand` is not defined on `None` in union `Parameter | None`
+plato/models/dvit/lib_deit/models.py:42:13: error[unsupported-operator] Operator `+` is not supported between objects of type `Tensor` and `Parameter | None`
+plato/models/dvit/lib_deit/models.py:51:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `VisionTransformer.forward`
+plato/models/dvit/lib_deit/models.py:67:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:82:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:97:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:112:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:127:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:142:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:157:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `VisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/models.py:172:25: error[invalid-assignment] Cannot assign object of type `dict[str, Any]` to attribute `default_cfg` on type `DistilledVisionTransformer`: Expected `Tensor | Module`, found `dict[str, Any]`
+plato/models/dvit/lib_deit/utils.py:184:5: error[invalid-assignment] Object of type `def print(...) -> Unknown` is not assignable to attribute `print` of type `Overload[(*values: object, sep: str | None = " ", end: str | None = "\n", file: SupportsWrite[str] | None = None, flush: Literal[False] = False) -> None, (*values: object, sep: str | None = " ", end: str | None = "\n", file: _SupportsWriteAndFlush[str] | None = None, flush: bool) -> None]`
+plato/models/dvit/lib_deit/utils.py:222:5: error[invalid-assignment] Object of type `def print(...) -> Unknown` is not assignable to attribute `print` of type `Overload[(*values: object, sep: str | None = " ", end: str | None = "\n", file: SupportsWrite[str] | None = None, flush: Literal[False] = False) -> None, (*values: object, sep: str | None = " ", end: str | None = "\n", file: _SupportsWriteAndFlush[str] | None = None, flush: bool) -> None]`
+plato/models/dvit/loss/cross_entropy.py:19:36: error[unresolved-attribute] Attribute `mean` is not defined on `Literal[0]` in union `Literal[0] | Any`
+plato/models/dvit/models/deep_vision_transformer.py:87:38: error[not-subscriptable] Cannot subscript object of type `Literal[12]` with no `__getitem__` method
+plato/models/dvit/models/deep_vision_transformer.py:89:52: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+plato/models/dvit/models/deep_vision_transformer.py:90:32: error[invalid-argument-type] Argument to function `len` is incorrect: Expected `Sized`, found `Unknown | Literal[12]`
+plato/models/dvit/models/deep_vision_transformer.py:163:97: error[unresolved-reference] Name `_conv_filter` used when not defined
+plato/models/dvit/models/deep_vision_transformer.py:176:97: error[unresolved-reference] Name `_conv_filter` used when not defined
+plato/models/dvit/models/deep_vision_transformer.py:189:97: error[unresolved-reference] Name `_conv_filter` used when not defined
+plato/models/dvit/models/deep_vision_transformer.py:201:97: error[unresolved-reference] Name `_conv_filter` used when not defined
+plato/models/dvit/models/deep_vision_transformer.py:213:97: error[unresolved-reference] Name `_conv_filter` used when not defined
+plato/models/dvit/models/deep_vision_transformer.py:226:97: error[unresolved-reference] Name `_conv_filter` used when not defined
+plato/models/dvit/setup.py:4:20: warning[deprecated] The function `open` is deprecated: Deprecated. Use `open()` instead.
+plato/models/dvit/setup.py:10:6: warning[deprecated] The function `open` is deprecated: Deprecated. Use `open()` instead.
+plato/models/dvit/setup.py:13:6: warning[deprecated] The function `open` is deprecated: Deprecated. Use `open()` instead.
+plato/models/dvit/setup.py:16:13: error[unresolved-reference] Name `__version__` used when not defined
+plato/models/dvit/tests/test_models.py:34:18: error[invalid-argument-type] Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal["input_size"]` on object of type `Tensor`
+plato/models/dvit/tests/test_models.py:34:18: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/tests/test_models.py:54:18: error[invalid-argument-type] Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal["input_size"]` on object of type `Tensor`
+plato/models/dvit/tests/test_models.py:54:18: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/tests/test_models.py:80:18: error[invalid-argument-type] Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal["classifier"]` on object of type `Tensor`
+plato/models/dvit/tests/test_models.py:80:18: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/tests/test_models.py:81:18: error[invalid-argument-type] Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal["first_conv"]` on object of type `Tensor`
+plato/models/dvit/tests/test_models.py:81:18: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/tests/test_models.py:82:17: error[invalid-argument-type] Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal["pool_size"]` on object of type `Tensor`
+plato/models/dvit/tests/test_models.py:82:17: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/tests/test_models.py:83:18: error[invalid-argument-type] Method `__getitem__` of type `bound method Tensor.__getitem__(indices: SupportsIndex | slice[Any, Any, Any] | EllipsisType | ... omitted 3 union elements, /) -> Tensor` cannot be called with key of type `Literal["input_size"]` on object of type `Tensor`
+plato/models/dvit/tests/test_models.py:83:18: error[not-subscriptable] Cannot subscript object of type `Module` with no `__getitem__` method
+plato/models/dvit/tests/test_models.py:92:19: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/tests/test_models.py:96:9: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/tests/test_models.py:102:9: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/tests/test_models.py:110:12: error[unsupported-operator] Operator `+` is not supported between objects of type `Tensor | Unknown` and `Literal[".weight"]`
+plato/models/dvit/tests/test_models.py:111:12: error[unsupported-operator] Operator `+` is not supported between objects of type `Tensor | Unknown` and `Literal[".weight"]`
+plato/models/dvit/tests/test_models.py:167:25: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/tests/test_models.py:167:25: error[unresolved-attribute] Attribute `channels` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/dvit/timm/data/auto_augment.py:41:26: error[unresolved-attribute] Module `PIL.Image` has no member `BILINEAR`
+plato/models/dvit/timm/data/auto_augment.py:41:42: error[unresolved-attribute] Module `PIL.Image` has no member `BICUBIC`
+plato/models/dvit/timm/data/auto_augment.py:45:44: error[unresolved-attribute] Module `PIL.Image` has no member `BILINEAR`
+plato/models/dvit/timm/data/auto_augment.py:60:36: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:65:36: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:71:36: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:77:36: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:82:36: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:87:36: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:117:40: error[unresolved-attribute] Module `PIL.Image` has no member `AFFINE`
+plato/models/dvit/timm/data/auto_augment.py:341:35: error[unsupported-operator] Operator `>` is not supported between objects of type `(Unknown & ~AlwaysFalsy) | (int & ~AlwaysFalsy) | tuple[int, int, int]` and `Literal[0]`
+plato/models/dvit/timm/data/auto_augment.py:342:49: error[invalid-argument-type] Argument to bound method `Random.gauss` is incorrect: Expected `float`, found `(Unknown & ~AlwaysFalsy) | (int & ~AlwaysFalsy) | tuple[int, int, int]`
+plato/models/dvit/timm/data/auto_augment.py:605:5: error[unsupported-operator] Operator `/=` is not supported between objects of type `list[float]` and `float64`
+plato/models/dvit/timm/data/dataset.py:157:15: error[unresolved-attribute] Attribute `read` is not defined on `None` in union `IO[bytes] | None`
+plato/models/dvit/timm/data/dataset.py:157:61: error[invalid-argument-type] Argument to function `open` is incorrect: Expected `str | bytes | PathLike[str] | PathLike[bytes] | IO[bytes]`, found `IO[bytes] | None`
+plato/models/dvit/timm/data/dataset.py:206:9: error[invalid-method-override] Invalid override of method `__getitem__`: Definition is incompatible with `Dataset.__getitem__`
+plato/models/dvit/timm/data/dataset.py:211:43: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/data/lmdb_dataset.py:36:27: error[unresolved-attribute] Module `pyarrow` has no member `deserialize`
+plato/models/dvit/timm/data/lmdb_dataset.py:37:25: error[unresolved-attribute] Module `pyarrow` has no member `deserialize`
+plato/models/dvit/timm/data/lmdb_dataset.py:49:20: error[unresolved-attribute] Module `pyarrow` has no member `deserialize`
+plato/models/dvit/timm/data/lmdb_dataset.py:88:12: error[unresolved-attribute] Module `pyarrow` has no member `serialize`
+plato/models/dvit/timm/data/loader.py:247:20: error[invalid-argument-type] Argument to function `len` is incorrect: Expected `Sized`, found `Unknown | Iterable[int]`
+plato/models/dvit/timm/data/loader.py:247:20: error[unresolved-attribute] Attribute `sampler` is not defined on `Iterable[list[Unknown]]`, `None` in union `_RepeatSampler | Iterable[list[Unknown]] | None | BatchSampler`
+plato/models/dvit/timm/data/mixup.py:299:9: error[invalid-method-override] Invalid override of method `__call__`: Definition is incompatible with `Mixup.__call__`
+plato/models/dvit/timm/data/random_erasing.py:90:47: error[too-many-positional-arguments] Too many positional arguments to bound method `RandomErasing._erase`: expected 6, got 7
+plato/models/dvit/timm/data/tf_preprocessing.py:25:1: error[invalid-syntax] __future__ imports must be at the top of the file
+plato/models/dvit/timm/data/tf_preprocessing.py:26:1: error[invalid-syntax] __future__ imports must be at the top of the file
+plato/models/dvit/timm/data/tf_preprocessing.py:27:1: error[invalid-syntax] __future__ imports must be at the top of the file
+plato/models/dvit/timm/data/tf_preprocessing.py:111:17: error[missing-argument] No argument provided for required parameter `resize_method` of function `_decode_and_center_crop`
+plato/models/dvit/timm/data/transforms.py:34:5: error[unresolved-attribute] Module `PIL.Image` has no member `NEAREST`
+plato/models/dvit/timm/data/transforms.py:35:5: error[unresolved-attribute] Module `PIL.Image` has no member `BILINEAR`
+plato/models/dvit/timm/data/transforms.py:36:5: error[unresolved-attribute] Module `PIL.Image` has no member `BICUBIC`
+plato/models/dvit/timm/data/transforms.py:37:5: error[unresolved-attribute] Module `PIL.Image` has no member `LANCZOS`
+plato/models/dvit/timm/data/transforms.py:38:5: error[unresolved-attribute] Module `PIL.Image` has no member `HAMMING`
+plato/models/dvit/timm/data/transforms.py:39:5: error[unresolved-attribute] Module `PIL.Image` has no member `BOX`
+plato/models/dvit/timm/data/transforms.py:45:16: error[unresolved-attribute] Module `PIL.Image` has no member `BICUBIC`
+plato/models/dvit/timm/data/transforms.py:47:16: error[unresolved-attribute] Module `PIL.Image` has no member `LANCZOS`
+plato/models/dvit/timm/data/transforms.py:49:16: error[unresolved-attribute] Module `PIL.Image` has no member `HAMMING`
+plato/models/dvit/timm/data/transforms.py:52:16: error[unresolved-attribute] Module `PIL.Image` has no member `BILINEAR`
+plato/models/dvit/timm/data/transforms.py:55:26: error[unresolved-attribute] Module `PIL.Image` has no member `BILINEAR`
+plato/models/dvit/timm/data/transforms.py:55:42: error[unresolved-attribute] Module `PIL.Image` has no member `BICUBIC`
+plato/models/dvit/timm/data/transforms.py:145:48: error[invalid-argument-type] Argument to function `resized_crop` is incorrect: Expected `list[int]`, found `(Unknown & tuple[Unknown, ...]) | tuple[Unknown, Unknown]`
+plato/models/dvit/timm/data/transforms_factory.py:33:9: error[unsupported-operator] Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToNumpy]`
+plato/models/dvit/timm/data/transforms_factory.py:35:9: error[unsupported-operator] Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToTensor | Normalize]`
+plato/models/dvit/timm/data/transforms_factory.py:74:9: error[unsupported-operator] Operator `+=` is not supported between objects of type `list[RandomResizedCropAndInterpolation]` and `list[RandomHorizontalFlip]`
+plato/models/dvit/timm/data/transforms_factory.py:76:9: error[unsupported-operator] Operator `+=` is not supported between objects of type `list[RandomResizedCropAndInterpolation]` and `list[RandomVerticalFlip]`
+plato/models/dvit/timm/data/transforms_factory.py:94:13: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["translate_pct"]` and value of type `float*` on object of type `dict[str, int | tuple[int, ...]]`
+plato/models/dvit/timm/data/transforms_factory.py:155:9: error[unsupported-operator] Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToNumpy]`
+plato/models/dvit/timm/data/transforms_factory.py:157:9: error[unsupported-operator] Operator `+=` is not supported between objects of type `list[Resize | CenterCrop]` and `list[ToTensor | Normalize]`
+plato/models/dvit/timm/loss/asymmetric_loss.py:40:17: error[unresolved-attribute] Module `torch._C` has no member `set_grad_enabled`
+plato/models/dvit/timm/loss/asymmetric_loss.py:47:17: error[unresolved-attribute] Module `torch._C` has no member `set_grad_enabled`
+plato/models/dvit/timm/loss/cross_entropy.py:52:36: error[unresolved-attribute] Attribute `mean` is not defined on `Literal[0]` in union `Literal[0] | Any`
+plato/models/dvit/timm/loss/jsd.py:36:36: error[no-matching-overload] No overload of bound method `TensorBase.mean` matches arguments
+plato/models/dvit/timm/models/cspnet.py:388:21: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/densenet.py:63:29: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/densenet.py:63:40: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/densenet.py:107:24: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/densenet.py:107:35: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/dpn.py:153:23: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/dpn.py:162:20: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/efficientnet.py:425:59: error[invalid-argument-type] Argument to `FeatureInfo.__init__` is incorrect: Expected `tuple[int]`, found `Unknown | tuple[Literal[0], Literal[1], Literal[2], Literal[3], Literal[4]]`
+plato/models/dvit/timm/models/efficientnet.py:426:68: error[invalid-argument-type] Argument to constructor `enumerate.__new__` is incorrect: Expected `Iterable[Unknown]`, found `FeatureInfo`
+plato/models/dvit/timm/models/efficientnet_builder.py:361:46: error[no-matching-overload] No overload of bound method `str.join` matches arguments
+plato/models/dvit/timm/models/features.py:115:47: error[invalid-type-form] Function `tensor` is not valid in a return type annotation
+plato/models/dvit/timm/models/features.py:231:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `FeatureDictNet.forward`
+plato/models/dvit/timm/models/gluon_xception.py:57:19: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/gluon_xception.py:83:41: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/gluon_xception.py:93:37: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/helpers.py:30:12: warning[redundant-condition] Nonempty string `state_dict_key` is always truthy (has type `Literal["state_dict", "state_dict_ema"]`)
+plato/models/dvit/timm/models/helpers.py:268:9: error[invalid-parameter-default] Default value of type `None` is not assignable to annotated parameter type `dict[Unknown, Unknown]`
+plato/models/dvit/timm/models/helpers.py:269:9: error[invalid-parameter-default] Default value of type `None` is not assignable to annotated parameter type `dict[Unknown, Unknown]`
+plato/models/dvit/timm/models/helpers.py:271:9: error[invalid-parameter-default] Default value of type `None` is not assignable to annotated parameter type `(...) -> Unknown`
+plato/models/dvit/timm/models/hrnet.py:568:53: warning[redundant-condition] `None` is always falsy
+plato/models/dvit/timm/models/hrnet.py:570:26: warning[redundant-condition] `None` is always falsy
+plato/models/dvit/timm/models/hrnet.py:717:13: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+plato/models/dvit/timm/models/hrnet.py:719:17: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+plato/models/dvit/timm/models/hrnet.py:749:41: error[invalid-argument-type] Argument to `FeatureInfo.__init__` is incorrect: Expected `list[dict[Unknown, Unknown]]`, found `FeatureInfo | list[dict[str, int | str]]`
+plato/models/dvit/timm/models/hrnet.py:749:60: error[invalid-argument-type] Argument to `FeatureInfo.__init__` is incorrect: Expected `tuple[int]`, found `Unknown | tuple[Literal[0], Literal[1], Literal[2], Literal[3], Literal[4]]`
+plato/models/dvit/timm/models/hrnet.py:755:34: error[invalid-type-form] Function `tensor` is not valid in a return type annotation
+plato/models/dvit/timm/models/inception_v3.py:252:9: error[invalid-assignment] Object of type `float*` is not assignable to attribute `stddev` on type `Unknown | BasicConv2d`
+plato/models/dvit/timm/models/inception_v3.py:254:26: error[invalid-assignment] Cannot assign object of type `float*` to attribute `stddev` on type `Linear`: Expected `Tensor | Module`, found `float*`
+plato/models/dvit/timm/models/inception_v3.py:413:15: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/layers/activations_me.py:40:9: error[invalid-method-override] Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`
+plato/models/dvit/timm/models/layers/activations_me.py:79:9: error[invalid-method-override] Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`
+plato/models/dvit/timm/models/layers/activations_me.py:114:9: error[invalid-method-override] Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`
+plato/models/dvit/timm/models/layers/activations_me.py:151:9: error[invalid-method-override] Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`
+plato/models/dvit/timm/models/layers/activations_me.py:191:9: error[invalid-method-override] Invalid override of method `backward`: Definition is incompatible with `_SingleLevelFunction.backward`
+plato/models/dvit/timm/models/layers/anti_aliasing.py:56:38: error[no-matching-overload] No overload of bound method `TensorBase.repeat` matches arguments
+plato/models/dvit/timm/models/layers/anti_aliasing.py:60:16: error[no-matching-overload] No overload of function `conv2d` matches arguments
+plato/models/dvit/timm/models/layers/blur_pool.py:41:43: error[invalid-argument-type] Argument to `ReflectionPad2d.__init__` is incorrect: Expected `int | tuple[int, int, int, int]`, found `list[int]`
+plato/models/dvit/timm/models/layers/blur_pool.py:49:9: error[invalid-method-override] Invalid override of method `_apply`: Definition is incompatible with `Module._apply`
+plato/models/dvit/timm/models/layers/conv2d_same.py:16:21: error[invalid-argument-type] Argument to function `pad_same` is incorrect: Expected `list[int]`, found `tuple[int, ...]`
+plato/models/dvit/timm/models/layers/conv2d_same.py:16:40: error[invalid-argument-type] Argument to function `pad_same` is incorrect: Expected `list[int]`, found `tuple[int, int]`
+plato/models/dvit/timm/models/layers/conv2d_same.py:16:48: error[invalid-argument-type] Argument to function `pad_same` is incorrect: Expected `list[int]`, found `tuple[int, int]`
+plato/models/dvit/timm/models/layers/conv2d_same.py:29:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `Conv2d.forward`
+plato/models/dvit/timm/models/layers/conv2d_same.py:30:55: error[invalid-argument-type] Argument to function `conv2d_same` is incorrect: Expected `tuple[int, int]`, found `tuple[int, ...]`
+plato/models/dvit/timm/models/layers/conv2d_same.py:30:68: error[invalid-argument-type] Argument to function `conv2d_same` is incorrect: Expected `tuple[int, int]`, found `str | tuple[int, ...]`
+plato/models/dvit/timm/models/layers/conv2d_same.py:30:82: error[invalid-argument-type] Argument to function `conv2d_same` is incorrect: Expected `tuple[int, int]`, found `tuple[int, ...]`
+plato/models/dvit/timm/models/layers/drop.py:189:29: error[invalid-argument-type] Argument to function `drop_path` is incorrect: Expected `float`, found `Unknown | None`
+plato/models/dvit/timm/models/layers/drop.py:199:33: error[invalid-argument-type] Argument to function `drop_path_mix` is incorrect: Expected `float`, found `Unknown | None`
+plato/models/dvit/timm/models/layers/evo_norm.py:42:13: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/layers/evo_norm.py:43:64: error[unsupported-operator] Operator `*` is not supported between objects of type `Tensor | Module` and `Unknown | float`
+plato/models/dvit/timm/models/layers/evo_norm.py:50:24: error[unsupported-operator] Operator `+` is not supported between objects of type `Unknown | Tensor | Module` and `Unknown | float`
+plato/models/dvit/timm/models/layers/inplace_abn.py:75:27: error[invalid-argument-type] Argument to function `constant_` is incorrect: Expected `Tensor`, found `Tensor | Module`
+plato/models/dvit/timm/models/layers/inplace_abn.py:76:27: error[invalid-argument-type] Argument to function `constant_` is incorrect: Expected `Tensor`, found `Tensor | Module`
+plato/models/dvit/timm/models/layers/norm_act.py:59:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `_BatchNorm.forward`
+plato/models/dvit/timm/models/layers/norm_act.py:82:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `GroupNorm.forward`
+plato/models/dvit/timm/models/layers/padding.py:28:45: error[invalid-parameter-default] Default value of type `tuple[Literal[1], Literal[1]]` is not assignable to annotated parameter type `list[int]`
+plato/models/dvit/timm/models/layers/padding.py:56:12: error[invalid-return-type] Return type does not match returned value: expected `tuple[tuple[Unknown, ...], bool]`, found `tuple[(Unknown & ~str) | int, bool]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:14:67: error[invalid-parameter-default] Default value of type `tuple[Literal[0], Literal[0]]` is not assignable to annotated parameter type `list[int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:29:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `AvgPool2d.forward`
+plato/models/dvit/timm/models/layers/pool2d_same.py:31:16: error[invalid-argument-type] Argument to function `avg_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:31:34: error[invalid-argument-type] Argument to function `avg_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:31:47: error[invalid-argument-type] Argument to function `avg_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:35:55: error[invalid-parameter-default] Default value of type `tuple[Literal[0], Literal[0]]` is not assignable to annotated parameter type `list[int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:36:9: error[invalid-parameter-default] Default value of type `tuple[Literal[1], Literal[1]]` is not assignable to annotated parameter type `list[int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:50:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `MaxPool2d.forward`
+plato/models/dvit/timm/models/layers/pool2d_same.py:51:35: error[invalid-argument-type] Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:51:53: error[invalid-argument-type] Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:51:66: error[invalid-argument-type] Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/pool2d_same.py:51:80: error[invalid-argument-type] Argument to function `max_pool2d_same` is incorrect: Expected `list[int]`, found `int | tuple[int, int]`
+plato/models/dvit/timm/models/layers/test_time_pool.py:28:13: error[unresolved-attribute] Attribute `data` is not defined on `None` in union `Tensor | None`
+plato/models/dvit/timm/models/layers/test_time_pool.py:28:60: error[unresolved-attribute] Attribute `size` is not defined on `None` in union `Tensor | None`
+plato/models/dvit/timm/models/mobilenetv3.py:92:44: error[invalid-argument-type] Argument expression after ** must be a mapping type: Found `Unknown | None`
+plato/models/dvit/timm/models/mobilenetv3.py:173:59: error[invalid-argument-type] Argument to `FeatureInfo.__init__` is incorrect: Expected `tuple[int]`, found `Unknown | tuple[Literal[0], Literal[1], Literal[2], Literal[3], Literal[4]]`
+plato/models/dvit/timm/models/mobilenetv3.py:174:68: error[invalid-argument-type] Argument to constructor `enumerate.__new__` is incorrect: Expected `Iterable[Unknown]`, found `FeatureInfo`
+plato/models/dvit/timm/models/pnasnet.py:119:30: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:120:31: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:123:30: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:124:31: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:127:30: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:128:31: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:131:30: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:132:31: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:135:30: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/pnasnet.py:137:35: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/regnet.py:277:21: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/res2net.py:66:20: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/res2net.py:74:24: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/res2net.py:84:20: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/resnest.py:124:19: error[call-non-callable] Object of type `None` is not callable
+plato/models/dvit/timm/models/resnet.py:595:21: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/resnet.py:610:13: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/resnet.py:611:13: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/resnet.py:612:13: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/resnet.py:613:13: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/rexnet.py:160:22: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/rexnet.py:212:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["feature_cls"]` and value of type `Literal["hook"]` on object of type `dict[str, bool]`
+plato/models/dvit/timm/models/selecsls.py:71:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `Sequential.forward`
+plato/models/dvit/timm/models/senet.py:97:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:98:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:99:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:101:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:102:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:103:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:105:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:106:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:109:24: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:111:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/senet.py:112:15: error[call-non-callable] Object of type `Tensor` is not callable
+plato/models/dvit/timm/models/vision_transformer.py:117:24: error[unresolved-reference] Name `WSLinear_fast` used when not defined
+plato/models/dvit/timm/models/vision_transformer.py:118:24: error[unresolved-reference] Name `WSLinear_fast` used when not defined
+plato/models/dvit/timm/models/vovnet.py:169:9: error[invalid-method-override] Invalid override of method `forward`: Definition is incompatible with `Sequential.forward`
+plato/models/dvit/timm/models/xception.py:215:13: error[call-non-callable] Object of type `str` is not callable
+plato/models/dvit/timm/optim/optim_factory.py:67:82: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:67:82: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:67:82: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:67:82: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:70:83: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:70:83: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:70:83: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:70:83: error[invalid-argument-type] Argument to `SGD.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:72:44: error[invalid-argument-type] Argument to `Adam.__init__` is incorrect: Expected `tuple[float | Tensor, float | Tensor]`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:74:45: error[invalid-argument-type] Argument to `AdamW.__init__` is incorrect: Expected `tuple[float | Tensor, float | Tensor]`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:84:48: error[invalid-argument-type] Argument to `Adadelta.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:84:48: error[invalid-argument-type] Argument to `Adadelta.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:84:48: error[invalid-argument-type] Argument to `Adadelta.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:84:48: error[invalid-argument-type] Argument to `Adadelta.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:92:82: error[invalid-argument-type] Argument to `RMSprop.__init__` is incorrect: Expected `bool | None`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:92:82: error[invalid-argument-type] Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:92:82: error[invalid-argument-type] Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:92:82: error[invalid-argument-type] Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/optim_factory.py:92:82: error[invalid-argument-type] Argument to `RMSprop.__init__` is incorrect: Expected `bool`, found `Unknown | float`
+plato/models/dvit/timm/optim/radam.py:77:20: error[unsupported-operator] Operator `>=` is not supported between objects of type `None | Unknown` and `Literal[5]`
+plato/models/dvit/timm/optim/radam.py:79:42: error[unsupported-operator] Unary operator `-` is not supported for object of type `None | Unknown`
+plato/models/dvit/timm/optim/radam.py:81:38: error[unsupported-operator] Unary operator `-` is not supported for object of type `None | Unknown`
+plato/models/dvit/timm/scheduler/plateau_lr.py:39:13: error[unknown-argument] Argument `verbose` does not match any known parameter of `ReduceLROnPlateau.__init__`
+plato/models/dvit/timm/scheduler/plateau_lr.py:83:36: error[invalid-argument-type] Argument to bound method `ReduceLROnPlateau.step` is incorrect: Expected `SupportsFloat`, found `Unknown | None`
+plato/models/dvit/timm/scheduler/scheduler.py:67:32: error[invalid-parameter-default] Default value of type `None` is not assignable to annotated parameter type `float`
+plato/models/dvit/timm/scheduler/scheduler.py:74:45: error[invalid-parameter-default] Default value of type `None` is not assignable to annotated parameter type `float`
+plato/models/dvit/timm/utils/checkpoint_saver.py:73:55: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+plato/models/dvit/timm/utils/cuda.py:19:14: error[unresolved-attribute] Attribute `scale_loss` is not defined on `None` in union `Unknown | None`
+plato/models/dvit/timm/utils/cuda.py:22:44: error[unresolved-attribute] Attribute `master_params` is not defined on `None` in union `Unknown | None`
+plato/models/dvit/timm/utils/cuda.py:27:20: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Unknown | None`
+plato/models/dvit/timm/utils/cuda.py:31:13: error[unresolved-attribute] Attribute `load_state_dict` is not defined on `None` in union `Unknown | None`
+plato/models/dvit/timm/utils/cuda.py:38:24: warning[deprecated] The function `__init__` is deprecated: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+plato/models/dvit/train.py:377:39: warning[deprecated] The class `autocast` is deprecated: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+plato/models/dvit/train.py:470:25: error[unresolved-reference] Name `AugMixDataset` used when not defined
+plato/models/dvit/train.py:502:9: error[unknown-argument] Argument `repeated_aug` does not match any known parameter of function `create_loader`
+plato/models/dvit/train.py:503:9: error[unknown-argument] Argument `world_size` does not match any known parameter of function `create_loader`
+plato/models/dvit/train.py:504:9: error[unknown-argument] Argument `rank` does not match any known parameter of function `create_loader`
+plato/models/dvit/train.py:548:9: error[unknown-argument] Argument `repeated_aug` does not match any known parameter of function `create_loader`
+plato/models/dvit/train.py:549:9: error[unknown-argument] Argument `world_size` does not match any known parameter of function `create_loader`
+plato/models/dvit/train.py:550:9: error[unknown-argument] Argument `rank` does not match any known parameter of function `create_loader`
+plato/models/dvit/utils/grid.py:54:32: error[invalid-argument-type] Argument to function `fromarray` is incorrect: Expected `SupportsArrayInterface`, found `unsignedinteger[_8Bit]`
+plato/models/dvit/utils/logger.py:54:13: error[unresolved-attribute] Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:55:13: error[unresolved-attribute] Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:57:9: error[unresolved-attribute] Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:58:9: error[unresolved-attribute] Attribute `flush` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:64:13: error[unresolved-attribute] Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:65:13: error[unresolved-attribute] Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:67:9: error[unresolved-attribute] Attribute `write` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/logger.py:68:9: error[unresolved-attribute] Attribute `flush` is not defined on `None` in union `None | TextIOWrapper[_WrappedBuffer]`
+plato/models/dvit/utils/ltutil.py:21:30: error[invalid-argument-type] Argument to function `isinstance` is incorrect: Expected `_ClassInfo`, found `tuple[<class 'list'>, Overload[[ArrayT](object: ArrayT, dtype: None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = "K", subok: Literal[True], ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> ArrayT, [ArrayT](object: _SupportsArray[ArrayT], dtype: None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = "K", subok: Literal[True], ndmin: Literal[0] = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> ArrayT, [ScalarT](object: _ArrayLike[ScalarT], dtype: None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = "K", subok: bool = False, ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> NDArray[ScalarT], [ScalarT](object: Any, dtype: _DTypeLike[ScalarT], *, copy: bool | _CopyMode | None = True, order: _OrderKACF = "K", subok: bool = False, ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> NDArray[ScalarT], (object: Any, dtype: DTypeLike | None = None, *, copy: bool | _CopyMode | None = True, order: _OrderKACF = "K", subok: bool = False, ndmin: int = 0, ndmax: int = 0, like: _SupportsArrayFunc | None = None) -> NDArray[Any]]]`
+plato/models/dvit/utils/ltutil.py:33:45: error[invalid-argument-type] Argument to function `linear` is incorrect: Expected `Tensor | None`, found `Tensor | Module`
+plato/models/dvit/utils/progress/progress/helpers.py:31:12: error[unresolved-attribute] Object of type `Self@__init__` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:33:49: error[unresolved-attribute] Object of type `Self@__init__` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:34:46: error[unresolved-attribute] Object of type `Self@__init__` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:35:13: error[unresolved-attribute] Object of type `Self@__init__` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:38:12: error[unresolved-attribute] Object of type `Self@write` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:41:39: error[unresolved-attribute] Object of type `Self@write` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:43:13: error[unresolved-attribute] Object of type `Self@write` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:46:12: error[unresolved-attribute] Object of type `Self@finish` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:47:45: error[unresolved-attribute] Object of type `Self@finish` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:58:12: error[unresolved-attribute] Object of type `Self@__init__` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:59:45: error[unresolved-attribute] Object of type `Self@__init__` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:62:12: error[unresolved-attribute] Object of type `Self@clearln` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:63:44: error[unresolved-attribute] Object of type `Self@clearln` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:66:12: error[unresolved-attribute] Object of type `Self@writeln` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:68:38: error[unresolved-attribute] Object of type `Self@writeln` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:69:13: error[unresolved-attribute] Object of type `Self@writeln` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:72:12: error[unresolved-attribute] Object of type `Self@finish` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:73:24: error[unresolved-attribute] Object of type `Self@finish` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:75:49: error[unresolved-attribute] Object of type `Self@finish` has no attribute `file`
+plato/models/dvit/utils/progress/progress/helpers.py:90:9: error[unresolved-attribute] Object of type `Self@_sigint_handler` has no attribute `finish`
+plato/models/dvit/utils/visualize.py:24:31: error[unknown-argument] Argument `out` does not match any known parameter of function `unsqueeze`
+plato/models/dvit/utils/visualize.py:61:13: error[unresolved-reference] Name `upsampling` used when not defined
+plato/models/dvit/utils/visualize.py:92:17: error[unresolved-reference] Name `upsampling` used when not defined
+plato/models/dvit/validate.py:121:39: warning[deprecated] The class `autocast` is deprecated: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+plato/models/t2tvit/main.py:372:39: warning[deprecated] The class `autocast` is deprecated: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+plato/models/t2tvit/main.py:464:9: error[invalid-argument-type] Argument to function `create_loader` is incorrect: Expected `ImageDataset | IterableImageDataset`, found `Unknown | AugMixDataset`
+plato/models/t2tvit/models/token_transformer.py:21:35: error[unsupported-operator] Operator `*` is not supported between objects of type `Unknown | None` and `Literal[3]`
+plato/models/t2tvit/models/token_transformer.py:23:31: error[invalid-argument-type] Argument to `Linear.__init__` is incorrect: Expected `int`, found `Unknown | None`
+plato/models/t2tvit/models/token_transformer.py:23:39: error[invalid-argument-type] Argument to `Linear.__init__` is incorrect: Expected `int`, found `Unknown | None`
+plato/models/t2tvit/transfer_learning.py:155:30: error[unresolved-attribute] Attribute `parameters` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/t2tvit/transfer_learning.py:155:30: error[unresolved-attribute] Attribute `tokens_to_token` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/t2tvit/transfer_learning.py:156:30: error[unresolved-attribute] Attribute `blocks` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/t2tvit/transfer_learning.py:156:30: error[unresolved-attribute] Attribute `parameters` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/t2tvit/transfer_learning.py:157:29: error[unresolved-attribute] Attribute `head` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/t2tvit/transfer_learning.py:157:29: error[unresolved-attribute] Attribute `parameters` is not defined on `Tensor` in union `Tensor | Module`
+plato/models/t2tvit/utils.py:36:18: error[unresolved-reference] Name `math` used when not defined
+plato/models/t2tvit/utils.py:37:18: error[unresolved-reference] Name `math` used when not defined
+plato/models/t2tvit/utils.py:40:19: error[unresolved-reference] Name `F` used when not defined
+plato/models/t2tvit/utils.py:52:12: warning[redundant-condition] Nonempty string `state_dict_key` is always truthy (has type `Literal["state_dict", "state_dict_ema"]`)
+plato/models/t2tvit/utils.py:117:20: warning[deprecated] The function `popen` is deprecated: Soft deprecated. Use the subprocess module instead.
+plato/models/t2tvit/utils.py:152:20: error[unsupported-operator] Operator `-` is not supported between objects of type `str | int` and `int`
+plato/models/t2tvit/utils.py:156:20: error[unsupported-operator] Operator `-` is not supported between objects of type `str | int` and `int`
+plato/servers/fedavg.py:165:17: error[unresolved-attribute] Attribute `extract_weights` is not defined on `None` in union `None | Algorithm | Unknown`
+tests/clients/test_checkpoint_cleanup.py:17:14: error[call-non-callable] Cannot instantiate `Client` with 6 unimplemented abstract methods, including `_train`, `configure` and `_load_data`
+tests/clients/test_checkpoint_cleanup.py:38:42: error[invalid-argument-type] Argument to `ComposableClientEvents.__init__` is incorrect: Expected `ComposableClient`, found `SimpleNamespace`
+tests/datasources/test_download_contracts.py:29:13: error[invalid-method-override] Invalid override of method `log_message`: Definition is incompatible with `BaseHTTPRequestHandler.log_message`
+tests/datasources/test_download_contracts.py:79:13: error[missing-argument] No argument provided for required parameter `label_path` of bound method `DataSource.download_dataset`
+tests/datasources/test_download_contracts.py:84:17: error[too-many-positional-arguments] Too many positional arguments to bound method `DataSource.download_dataset`: expected 3, got 4
+tests/datasources/test_download_contracts.py:326:35: error[invalid-argument-type] Argument to bound method `_BaseSelectorImpl.register` is incorrect: Expected `int | HasFileno`, found `IO[bytes] | None`
+tests/datasources/test_download_contracts.py:328:24: error[unresolved-attribute] Attribute `readline` is not defined on `None` in union `IO[bytes] | None`
+tests/datasources/test_huggingface_datasource.py:99:5: error[invalid-assignment] Object of type `(split) -> Literal["corpus-result"]` is not assignable to attribute `preprocess_corpus_lm` of type `def preprocess_corpus_lm(self, dataset_split) -> Unknown`
+tests/datasources/test_huggingface_datasource.py:100:5: error[invalid-assignment] Object of type `(split) -> Literal["chat-result"]` is not assignable to attribute `preprocess_chat_sft` of type `def preprocess_chat_sft(self, dataset_split) -> Unknown`
+tests/datasources/test_local_datasets.py:136:12: error[unresolved-attribute] Attribute `targets` is not defined on `None` in union `Any | None`
+tests/datasources/test_local_datasets.py:137:35: error[not-iterable] Object of type `Any | None` may not be iterable
+tests/datasources/test_local_datasets.py:138:12: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_local_datasets.py:148:12: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_local_datasets.py:163:16: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review2_regressions.py:138:13: error[invalid-method-override] Invalid override of method `log_message`: Definition is incompatible with `BaseHTTPRequestHandler.log_message`
+tests/datasources/test_review3_regressions.py:57:13: error[unresolved-attribute] Attribute `append` is not defined on `bool`, `Event` in union `Unknown | list[Unknown] | bool | Event`
+tests/datasources/test_review3_regressions.py:59:56: error[invalid-argument-type] Argument to function `len` is incorrect: Expected `Sized`, found `Unknown | list[Unknown] | bool | Event`
+tests/datasources/test_review3_regressions.py:62:17: error[unresolved-attribute] Attribute `set` is not defined on `list[Unknown]`, `bool` in union `Unknown | list[Unknown] | bool | Event`
+tests/datasources/test_review3_regressions.py:63:24: error[unresolved-attribute] Attribute `wait` is not defined on `list[Unknown]`, `bool` in union `Unknown | list[Unknown] | bool | Event`
+tests/datasources/test_review3_regressions.py:65:30: error[invalid-argument-type] Argument to bound method `_BufferedIOBase.write` is incorrect: Expected `Buffer`, found `Unknown | list[Unknown] | bool | Event`
+tests/datasources/test_review3_regressions.py:67:13: error[invalid-method-override] Invalid override of method `log_message`: Definition is incompatible with `BaseHTTPRequestHandler.log_message`
+tests/datasources/test_review4_regressions.py:26:13: error[unresolved-attribute] Attribute `append` is not defined on `int` in union `Unknown | int | list[Unknown]`
+tests/datasources/test_review4_regressions.py:27:32: error[invalid-argument-type] Argument to bound method `BaseHTTPRequestHandler.send_response` is incorrect: Expected `int`, found `Unknown | int | list[Unknown]`
+tests/datasources/test_review4_regressions.py:29:43: error[invalid-argument-type] Argument to function `len` is incorrect: Expected `Sized`, found `Unknown | int | list[Unknown]`
+tests/datasources/test_review4_regressions.py:32:30: error[invalid-argument-type] Argument to bound method `_BufferedIOBase.write` is incorrect: Expected `Buffer`, found `Unknown | int | list[Unknown]`
+tests/datasources/test_review4_regressions.py:34:13: error[invalid-method-override] Invalid override of method `log_message`: Definition is incompatible with `BaseHTTPRequestHandler.log_message`
+tests/datasources/test_review_regressions.py:249:21: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review_regressions.py:249:43: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review_regressions.py:253:28: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review_regressions.py:253:51: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review_regressions.py:263:14: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review_regressions.py:284:12: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_review_regressions.py:285:12: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/datasources/test_torchvision_datasource.py:241:12: error[unresolved-attribute] Attribute `indices` is not defined on `None` in union `Any | None`
+tests/datasources/test_torchvision_datasource.py:243:16: error[unresolved-attribute] Attribute `indices` is not defined on `None` in union `Any | None`
+tests/integration/feddyn_entrypoint.py:95:1: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["feddyn_fixture"]` and value of type `<class 'Partition'>` on object of type `OrderedDict[str, <class 'plato.samplers.iid.Sampler'> | <class 'plato.samplers.dirichlet.Sampler'> | <class 'plato.samplers.mixed.Sampler'> | ... omitted 8 union elements]`
+tests/integration/feddyn_entrypoint.py:99:9: error[invalid-method-override] Invalid override of method `on_weights_received`: Definition is incompatible with `ServerCallback.on_weights_received`
+tests/integration/feddyn_entrypoint.py:119:9: error[invalid-method-override] Invalid override of method `on_clients_processed`: Definition is incompatible with `ServerCallback.on_clients_processed`
+tests/integration/feddyn_entrypoint.py:191:31: error[invalid-assignment] Object of type `def observe_client_run(*args) -> Unknown` is not assignable to attribute `run` of type `def run(client_id: int, port: int | None, client: Any = None, edge_server: ((...) -> Any) | None = None, edge_client: ((...) -> Any) | None = None, trainer: (() -> Any) | None = None, client_kwargs: dict[str, Any] | None = None) -> None`
+tests/integration/feddyn_entrypoint.py:191:48: error[invalid-assignment] Object of type `def process_start(process) -> Unknown` is not assignable to attribute `start` of type `(self) -> None`
+tests/integration/startup_harness.py:78:36: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[True]`
+tests/integration/startup_harness.py:78:53: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[1]`
+tests/integration/startup_harness.py:78:68: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[1]`
+tests/integration/startup_probe.py:85:17: error[invalid-assignment] Object of type `def shutdown_failure() -> CoroutineType[Any, Any, Unknown]` is not assignable to attribute `shutdown_asyncgens` of type `def shutdown_asyncgens(self) -> CoroutineType[Any, Any, None]`
+tests/integration/startup_probe.py:231:19: error[invalid-method-override] Invalid override of method `_periodic`: Definition is incompatible with `Server._periodic`
+tests/integration/startup_probe.py:237:40: error[unresolved-attribute] Attribute `cancel` is not defined on `None` in union `Task[Any] | None`
+tests/integration/startup_probe.py:275:13: error[invalid-method-override] Invalid override of method `start`: Definition is incompatible with `ProbeServer.start`
+tests/integration/startup_probe.py:307:9: error[invalid-assignment] Object of type `def app_factory() -> Unknown` is not assignable to attribute `Application` of type `<class 'Application'>`
+tests/integration/startup_probe.py:317:9: error[invalid-assignment] Object of type `(**kwargs) -> ProbeClient` is not assignable to attribute `get` of type `def get(model=None, datasource=None, algorithm=None, trainer=None, callbacks=None, trainer_callbacks=None, **kwargs) -> Client`
+tests/integration/startup_probe.py:320:9: error[invalid-assignment] Object of type `staticmethod[(**kwargs) -> Unknown]` is not assignable to attribute `_start_clients` of type `def _start_clients(client=None, as_server=False, edge_server=None, edge_client=None, trainer=None, client_kwargs=None) -> Unknown`
+tests/integration/startup_probe.py:323:18: error[call-non-callable] Cannot instantiate `BorrowedServer` with unimplemented abstract method `_process_reports`
+tests/integration/startup_probe.py:323:67: error[call-non-callable] Cannot instantiate `ProbeServer` with unimplemented abstract method `_process_reports`
+tests/integration/startup_probe.py:341:9: error[call-non-callable] Cannot instantiate `ProbeServer` with unimplemented abstract method `_process_reports`
+tests/integration/startup_probe.py:347:13: error[invalid-assignment] Object of type `<class 'ProbeClient'>` is not assignable to attribute `Client` of type `<class 'Client'>`
+tests/integration/startup_probe.py:348:13: error[invalid-assignment] Object of type `<class 'ProbeServer'>` is not assignable to attribute `Server` of type `<class 'Server'>`
+tests/integration/startup_probe.py:373:9: error[invalid-assignment] Object of type `def unexpected_factory(**kwargs) -> Unknown` is not assignable to attribute `get` of type `def get(model=None, datasource=None, algorithm=None, trainer=None, callbacks=None, trainer_callbacks=None, **kwargs) -> Client`
+tests/integration/startup_probe.py:375:9: error[invalid-assignment] Object of type `() -> Unknown` is not assignable to attribute `configure` of type `def configure(self) -> None`
+tests/integration/startup_socket.py:103:15: error[invalid-method-override] Invalid override of method `_periodic`: Definition is incompatible with `Server._periodic`
+tests/integration/startup_socket.py:146:5: error[invalid-assignment] Object of type `def observe_start(process) -> Unknown` is not assignable to attribute `start` of type `(self) -> None`
+tests/integration/startup_socket.py:147:5: error[invalid-assignment] Object of type `def observe_client_run(*args) -> Unknown` is not assignable to attribute `run` of type `def run(client_id: int, port: int | None, client: Any = None, edge_server: ((...) -> Any) | None = None, edge_client: ((...) -> Any) | None = None, trainer: (() -> Any) | None = None, client_kwargs: dict[str, Any] | None = None) -> None`
+tests/integration/test_checkpoint_runtime_agreement.py:39:5: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/integration/test_checkpoint_runtime_agreement.py:44:5: error[invalid-assignment] Object of type `SimpleNamespace` is not assignable to attribute `sio` of type `None | AsyncServer`
+tests/integration/test_checkpoint_runtime_agreement.py:104:18: error[call-non-callable] Cannot instantiate `Client` with 6 unimplemented abstract methods, including `_train`, `configure` and `_load_data`
+tests/integration/test_checkpoint_runtime_agreement.py:113:27: error[unresolved-attribute] Attribute `items` is not defined on `None` in union `None | Unknown`
+tests/integration/test_checkpoint_runtime_agreement.py:134:26: error[call-non-callable] Cannot instantiate `Client` with 6 unimplemented abstract methods, including `_train`, `configure` and `_load_data`
+tests/integration/test_checkpoint_runtime_agreement.py:174:9: error[unresolved-attribute] Attribute `bias` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:187:32: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:190:26: error[unresolved-attribute] Attribute `bias` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:191:26: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:197:54: error[unresolved-attribute] Attribute `bias` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:206:13: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:210:20: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/integration/test_checkpoint_runtime_agreement.py:214:18: error[call-non-callable] Cannot instantiate `Client` with 6 unimplemented abstract methods, including `_train`, `configure` and `_load_data`
+tests/integration/test_feddyn_round_flow.py:35:46: error[invalid-argument-type] Argument to function `module_from_spec` is incorrect: Expected `ModuleSpec`, found `ModuleSpec | None`
+tests/integration/test_feddyn_round_flow.py:37:5: error[unresolved-attribute] Attribute `exec_module` is not defined on `None` in union `Loader | None`
+tests/integration/test_feddyn_round_flow.py:37:5: error[unresolved-attribute] Attribute `loader` is not defined on `None` in union `ModuleSpec | None`
+tests/integration/test_feddyn_round_flow.py:488:9: error[invalid-method-override] Invalid override of method `on_weights_received`: Definition is incompatible with `ServerCallback.on_weights_received`
+tests/integration/test_feddyn_round_flow.py:502:9: error[invalid-method-override] Invalid override of method `on_weights_aggregated`: Definition is incompatible with `ServerCallback.on_weights_aggregated`
+tests/integration/test_feddyn_round_flow.py:510:9: error[invalid-method-override] Invalid override of method `on_clients_processed`: Definition is incompatible with `ServerCallback.on_clients_processed`
+tests/integration/test_feddyn_round_flow.py:586:9: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`
+tests/integration/test_feddyn_round_flow.py:729:17: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`
+tests/integration/test_scaffold_callback_lifecycle.py:34:9: error[invalid-method-override] Invalid override of method `on_weights_received`: Definition is incompatible with `ServerCallback.on_weights_received`
+tests/integration/test_scaffold_callback_lifecycle.py:56:9: error[invalid-method-override] Invalid override of method `on_clients_processed`: Definition is incompatible with `ServerCallback.on_clients_processed`
+tests/integration/test_scaffold_round_flow.py:44:46: error[invalid-argument-type] Argument to function `module_from_spec` is incorrect: Expected `ModuleSpec`, found `ModuleSpec | None`
+tests/integration/test_scaffold_round_flow.py:46:5: error[unresolved-attribute] Attribute `exec_module` is not defined on `None` in union `Loader | None`
+tests/integration/test_scaffold_round_flow.py:46:5: error[unresolved-attribute] Attribute `loader` is not defined on `None` in union `ModuleSpec | None`
+tests/integration/test_smoke_configs.py:115:9: error[invalid-assignment] Object of type `None` is not assignable to attribute `cut_layer_grad` of type `list[Unknown]`
+tests/mlx_native/benchmark.py:90:17: error[too-many-positional-arguments] Too many positional arguments to bound method `MLXTrainingStepStrategy.training_step`: expected 7, got 9
+tests/mlx_native/seed_probe.py:56:13: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`
+tests/mlx_native/seed_probe.py:57:47: error[unresolved-attribute] Attribute `item` is not defined on `None` in union `Unknown | None`
+tests/mlx_native/socket_harness.py:83:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["outbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:84:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["inbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:85:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["outbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:86:9: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["inbound_processors"]` and value of type `list[str]` on object of type `dict[str, str | int]`
+tests/mlx_native/socket_harness.py:95:36: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `dict[str, str | int] | dict[str, float]`, found `Literal[True]`
+tests/mlx_native/socket_harness.py:95:36: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[True]`
+tests/mlx_native/socket_harness.py:95:53: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `dict[str, str | int] | dict[str, float]`, found `Literal[1]`
+tests/mlx_native/socket_harness.py:95:53: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[1]`
+tests/mlx_native/socket_harness.py:95:68: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `dict[str, str | int] | dict[str, float]`, found `Literal[1]`
+tests/mlx_native/socket_harness.py:95:68: error[invalid-argument-type] Argument to bound method `MutableMapping.update` is incorrect: Expected `str`, found `Literal[1]`
+tests/mlx_native/socket_probe.py:62:1: error[invalid-assignment] Invalid subscript assignment with key of type `Literal["mlx_native_fixture"]` and value of type `<class 'NativePartition'>` on object of type `OrderedDict[str, <class 'plato.samplers.iid.Sampler'> | <class 'plato.samplers.dirichlet.Sampler'> | <class 'plato.samplers.mixed.Sampler'> | ... omitted 8 union elements]`
+tests/mlx_native/socket_probe.py:138:5: error[invalid-assignment] Object of type `def observe_start(process) -> Unknown` is not assignable to attribute `start` of type `(self) -> None`
+tests/mlx_native/socket_probe.py:139:5: error[invalid-assignment] Object of type `def observed_client_run(*args) -> Unknown` is not assignable to attribute `run` of type `def run(client_id: int, port: int | None, client: Any = None, edge_server: ((...) -> Any) | None = None, edge_client: ((...) -> Any) | None = None, trainer: (() -> Any) | None = None, client_kwargs: dict[str, Any] | None = None) -> None`
+tests/mlx_native/test_phase3_controls.py:75:9: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:78:16: error[unresolved-attribute] Attribute `observed` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:79:16: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:80:20: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:174:50: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:229:13: error[unresolved-attribute] Attribute `eval` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:263:29: error[unresolved-attribute] Object of type `MLXLossCriterionStrategy` has no attribute `loss_fn`
+tests/mlx_native/test_phase3_controls.py:269:13: error[unresolved-attribute] Unresolved attribute `loss_fn` on type `MLXLossCriterionStrategy`
+tests/mlx_native/test_phase3_controls.py:272:13: error[unresolved-attribute] Unresolved attribute `loss_fn` on type `MLXLossCriterionStrategy`
+tests/mlx_native/test_phase3_controls.py:346:9: error[unresolved-attribute] Attribute `eval` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:348:16: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:349:26: error[unresolved-attribute] Attribute `batchnorm` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:350:9: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:357:24: error[unresolved-attribute] Attribute `batchnorm` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:359:16: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:359:43: error[unresolved-attribute] Attribute `batchnorm` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_controls.py:360:20: error[unresolved-attribute] Attribute `dropout` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_runtime.py:32:15: error[invalid-method-override] Invalid override of method `aggregate_weights`: Definition is incompatible with `FedAvgAggregationStrategy.aggregate_weights`
+tests/mlx_native/test_phase3_runtime.py:57:5: error[invalid-assignment] Object of type `() -> None` is not assignable to attribute `clients_processed` of type `def clients_processed(self) -> None`
+tests/mlx_native/test_phase3_runtime.py:235:31: error[call-non-callable] Object of type `None` is not callable
+tests/mlx_native/test_phase3_runtime.py:240:50: error[call-non-callable] Object of type `None` is not callable
+tests/mlx_native/test_phase3_tree_contract.py:56:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mlx_native/test_phase3_tree_contract.py:66:32: error[unresolved-attribute] Attribute `conv1` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_tree_contract.py:70:50: error[unresolved-attribute] Attribute `conv1` is not defined on `None` in union `Any | None`
+tests/mlx_native/test_phase3_tree_contract.py:74:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mlx_native/test_phase3_tree_contract.py:80:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mlx_native/test_phase3_tree_contract.py:102:27: error[invalid-argument-type] Argument to `Algorithm.__init__` is incorrect: Expected `Trainer | None`, found `SimpleNamespace`
+tests/mpc/test_mpc_regressions.py:52:39: error[invalid-argument-type] Argument to `MPCBaseAggregationStrategy.__init__` is incorrect: Expected `bool`, found `Unknown | None`
+tests/mpc/test_mpc_regressions.py:52:39: error[invalid-argument-type] Argument to `MPCShamirAggregationStrategy.__init__` is incorrect: Expected `bool`, found `Unknown | None`
+tests/mpc/test_mpc_regressions.py:264:54: error[invalid-argument-type] Argument to bound method `FedAvgAggregationStrategy.aggregate_weights` is incorrect: Expected `ServerContext`, found `SimpleNamespace`
+tests/mpc/test_mpc_regressions.py:269:16: error[unresolved-attribute] Attribute `threshold` is not defined on `FedAvgAggregationStrategy` in union `FedAvgAggregationStrategy | Unknown`
+tests/mpc/test_round_store_contracts.py:54:17: error[unresolved-attribute] Object of type `FixtureFunctionDefinition` has no attribute `__wrapped__`
+tests/mpc/test_round_store_contracts.py:58:20: error[unresolved-attribute] Object of type `FixtureFunctionDefinition` has no attribute `__wrapped__`
+tests/mpc/test_round_store_contracts.py:60:20: error[unresolved-attribute] Object of type `FixtureFunctionDefinition` has no attribute `__wrapped__`
+tests/samplers/test_partition_contracts.py:87:36: error[invalid-argument-type] Argument to `DataLoader.__init__` is incorrect: Expected `torch.utils.data.dataset.Dataset[Unknown]`, found `tests.samplers.test_partition_contracts.Dataset`
+tests/samplers/test_partition_contracts.py:398:12: error[unresolved-attribute] Attribute `num_samples` is not defined on `None` in union `Unknown | Sampler | None`
+tests/samplers/test_partition_contracts.py:399:20: error[unresolved-attribute] Attribute `get` is not defined on `None` in union `Unknown | Sampler | None`
+tests/servers/test_fedavg_strategy.py:249:13: error[unresolved-attribute] Unresolved attribute `legacy_calls` on type `Self@aggregate_weights`
+tests/servers/test_fedavg_strategy.py:262:5: error[unresolved-attribute] Unresolved attribute `legacy_calls` on type `Server`
+tests/servers/test_fedavg_strategy.py:266:5: error[invalid-assignment] Object of type `() -> None` is not assignable to attribute `clients_processed` of type `def clients_processed(self) -> None`
+tests/servers/test_fedavg_strategy.py:363:12: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/servers/test_he_payload_regressions.py:61:9: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/servers/test_lifecycle_contracts.py:38:46: error[invalid-argument-type] Argument to function `module_from_spec` is incorrect: Expected `ModuleSpec`, found `ModuleSpec | None`
+tests/servers/test_lifecycle_contracts.py:39:5: error[unresolved-attribute] Attribute `exec_module` is not defined on `None` in union `Loader | None`
+tests/servers/test_lifecycle_contracts.py:39:5: error[unresolved-attribute] Attribute `loader` is not defined on `None` in union `ModuleSpec | None`
+tests/servers/test_lifecycle_contracts.py:76:9: error[invalid-assignment] Object of type `def aggregate() -> CoroutineType[Any, Any, Unknown]` is not assignable to attribute `_process_reports` of type `def _process_reports(self) -> CoroutineType[Any, Any, Unknown]`
+tests/servers/test_lifecycle_contracts.py:77:9: error[invalid-assignment] Object of type `def wrap() -> CoroutineType[Any, Any, Unknown]` is not assignable to attribute `wrap_up` of type `def wrap_up(self) -> CoroutineType[Any, Any, None]`
+tests/servers/test_lifecycle_contracts.py:78:9: error[invalid-assignment] Object of type `def select() -> CoroutineType[Any, Any, Unknown]` is not assignable to attribute `_select_clients` of type `def _select_clients(self, for_next_batch=False) -> CoroutineType[Any, Any, Unknown]`
+tests/servers/test_lifecycle_contracts.py:96:9: error[invalid-assignment] Object of type `Unknown` is not assignable to attribute `client_id` on type `None | Unknown`
+tests/servers/test_lifecycle_contracts.py:102:5: error[invalid-assignment] Object of type `(weights) -> list[Unknown]` is not assignable to attribute `weights_received` of type `def weights_received(self, weights_received) -> Unknown`
+tests/servers/test_lifecycle_contracts.py:141:9: error[invalid-assignment] Object of type `SimpleNamespace` is not assignable to attribute `sio` of type `None | AsyncServer`
+tests/servers/test_port_checkpoint_flow.py:24:51: error[invalid-argument-type] Argument to function `module_from_spec` is incorrect: Expected `ModuleSpec`, found `ModuleSpec | None`
+tests/servers/test_port_checkpoint_flow.py:25:5: error[unresolved-attribute] Attribute `exec_module` is not defined on `None` in union `Loader | None`
+tests/servers/test_port_checkpoint_flow.py:25:5: error[unresolved-attribute] Attribute `loader` is not defined on `None` in union `ModuleSpec | None`
+tests/servers/test_runtime_s3_contract.py:74:13: error[invalid-method-override] Invalid override of method `log_message`: Definition is incompatible with `BaseHTTPRequestHandler.log_message`
+tests/servers/test_runtime_transport.py:513:16: error[unresolved-attribute] Object of type `AbstractServer | None` has no attribute `sockets`
+tests/trainers/strategies/test_base.py:153:13: error[call-non-callable] Cannot instantiate `LossCriterionStrategy` with unimplemented abstract method `compute_loss`
+tests/trainers/strategies/test_base.py:184:13: error[call-non-callable] Cannot instantiate `OptimizerStrategy` with unimplemented abstract method `create_optimizer`
+tests/trainers/strategies/test_base.py:240:13: error[call-non-callable] Cannot instantiate `TrainingStepStrategy` with unimplemented abstract method `training_step`
+tests/trainers/strategies/test_base.py:279:13: error[call-non-callable] Cannot instantiate `LRSchedulerStrategy` with unimplemented abstract method `create_scheduler`
+tests/trainers/strategies/test_base.py:448:13: error[call-non-callable] Cannot instantiate `DataLoaderStrategy` with unimplemented abstract method `create_train_loader`
+tests/trainers/test_checkpoint_path_contract.py:25:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_checkpoint_path_contract.py:28:34: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:30:9: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:32:27: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:76:34: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:78:9: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:80:36: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:111:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_checkpoint_path_contract.py:112:9: error[unresolved-attribute] Attribute `train` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:118:13: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:120:33: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:125:43: error[unresolved-attribute] Attribute `training` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:126:48: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:127:27: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:143:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_checkpoint_path_contract.py:144:32: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:149:31: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:184:9: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_checkpoint_path_contract.py:187:26: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_feddyn_strategy.py:148:17: error[unresolved-attribute] Attribute `flip` is not defined on `None` in union `Tensor | None`
+tests/trainers/test_gan_runtime.py:183:16: error[invalid-assignment] Cannot assign object of type `Literal[2]` to attribute `nz` on type `Module`: Expected `Tensor | Module`, found `Literal[2]`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `DataLoaderStrategy | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `LRSchedulerStrategy | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `LossCriterionStrategy | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `OptimizerStrategy | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `TestingStrategy | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `TrainingStepStrategy | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:78:13: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `list[Any] | None`, found `Unknown | APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:80:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_personalized_state_ownership.py:90:17: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_personalized_state_ownership.py:92:20: error[unresolved-attribute] Attribute `weights` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:93:20: error[unresolved-attribute] Attribute `start_phase` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:102:29: error[unresolved-attribute] Attribute `personalized_model` is not defined on `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:102:29: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Module | None`
+tests/trainers/test_personalized_state_ownership.py:105:34: error[unresolved-attribute] Attribute `alpha_path` is not defined on `DittoUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:108:42: error[unresolved-attribute] Attribute `cumulative_grad_vector` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:108:42: error[unresolved-attribute] Attribute `items` is not defined on `None` in union `None | Unknown`
+tests/trainers/test_personalized_state_ownership.py:112:42: error[unresolved-attribute] Attribute `client_control_variate` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:112:42: error[unresolved-attribute] Attribute `items` is not defined on `None` in union `OrderedDict[str, Tensor] | None`
+tests/trainers/test_personalized_state_ownership.py:115:53: error[unresolved-attribute] Attribute `items` is not defined on `None` in union `dict[str, Tensor] | None`
+tests/trainers/test_personalized_state_ownership.py:115:53: error[unresolved-attribute] Attribute `local_model_state` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:122:17: error[unresolved-attribute] Attribute `personalized_model` is not defined on `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:122:17: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Module | None`
+tests/trainers/test_personalized_state_ownership.py:125:17: error[invalid-argument-type] Argument to function `equal` is incorrect: Expected `Tensor`, found `Tensor | Module`
+tests/trainers/test_personalized_state_ownership.py:125:17: error[unresolved-attribute] Attribute `personalized_model` is not defined on `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:125:17: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Module | None`
+tests/trainers/test_personalized_state_ownership.py:128:24: error[unresolved-attribute] Attribute `alpha` is not defined on `DittoUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:131:20: error[unresolved-attribute] Attribute `cumulative_grad_vector` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:132:20: error[unresolved-attribute] Object of type `LossCriterionStrategy` has no attribute `cumulative_grad_vector`
+tests/trainers/test_personalized_state_ownership.py:134:20: error[unresolved-attribute] Attribute `client_control_variate` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:136:20: error[unresolved-attribute] Attribute `local_model_state` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:137:20: error[unresolved-attribute] Attribute `weights` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:138:20: error[unresolved-attribute] Attribute `start_phase` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:145:28: error[unresolved-attribute] Attribute `personalized_model` is not defined on `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:145:28: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Module | None`
+tests/trainers/test_personalized_state_ownership.py:147:24: error[unresolved-attribute] Attribute `alpha` is not defined on `DittoUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:156:28: error[unresolved-attribute] Attribute `cumulative_grad_vector` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `SCAFFOLDUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:158:20: error[unresolved-attribute] Object of type `LossCriterionStrategy` has no attribute `cumulative_grad_vector`
+tests/trainers/test_personalized_state_ownership.py:160:28: error[unresolved-attribute] Attribute `client_control_variate` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `FedALAUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:162:28: error[unresolved-attribute] Attribute `local_model_state` is not defined on `DittoUpdateStrategy`, `APFLUpdateStrategy`, `FedDynUpdateStrategy`, `SCAFFOLDUpdateStrategy` in union `DittoUpdateStrategy | APFLUpdateStrategy | FedDynUpdateStrategy | SCAFFOLDUpdateStrategy | FedALAUpdateStrategy`
+tests/trainers/test_personalized_state_ownership.py:163:27: error[unresolved-attribute] Attribute `items` is not defined on `None` in union `dict[str, Any] | Unknown | dict[str, Tensor] | None`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `DataLoaderStrategy | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `LRSchedulerStrategy | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `LossCriterionStrategy | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `OptimizerStrategy | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `TestingStrategy | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `TrainingStepStrategy | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_personalized_state_ownership.py:247:86: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `list[Any] | None`, found `APFLStepStrategy | FedDynLossStrategy`
+tests/trainers/test_review_training_boundaries.py:33:9: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`
+tests/trainers/test_review_training_boundaries.py:68:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_review_training_boundaries.py:93:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_review_training_boundaries.py:188:13: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_scaffold_strategy.py:110:9: error[unresolved-attribute] Unresolved attribute `_criterion` on type `LossCriterionStrategy`
+tests/trainers/test_scaffold_strategy.py:130:16: error[unresolved-attribute] Attribute `theta` is not defined on `None` in union `Any | None`
+tests/trainers/test_scaffold_strategy.py:160:16: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/trainers/test_scaffold_strategy.py:176:25: error[invalid-argument-type] Argument to constructor `Path.__new__` is incorrect: Expected `str | PathLike[str]`, found `str | None`
+tests/trainers/test_scaffold_strategy.py:205:9: error[unresolved-attribute] Unresolved attribute `_criterion` on type `LossCriterionStrategy`
+tests/trainers/test_scaffold_strategy.py:212:16: error[unresolved-attribute] Attribute `theta` is not defined on `None` in union `Any | None`
+tests/trainers/test_scaffold_strategy.py:214:25: error[invalid-argument-type] Argument to constructor `Path.__new__` is incorrect: Expected `str | PathLike[str]`, found `str | None`
+tests/trainers/test_scaffold_strategy.py:216:20: error[unresolved-attribute] Attribute `_optimizer_step_pre_hooks` is not defined on `None` in union `None | Optimizer`
+tests/trainers/test_scaffold_strategy.py:238:9: error[unresolved-attribute] Unresolved attribute `_criterion` on type `LossCriterionStrategy`
+tests/trainers/test_scaffold_strategy.py:241:16: error[unresolved-attribute] Attribute `theta` is not defined on `None` in union `Any | None`
+tests/trainers/test_scaffold_strategy.py:242:16: error[unresolved-attribute] Attribute `param_groups` is not defined on `None` in union `None | Optimizer`
+tests/trainers/test_scaffold_strategy.py:298:16: error[call-non-callable] Object of type `Tensor` is not callable
+tests/trainers/test_scaffold_strategy.py:298:49: error[call-non-callable] Object of type `Tensor` is not callable
+tests/trainers/test_scaffold_strategy.py:410:16: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/trainers/test_scaffold_strategy.py:415:16: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/trainers/test_scaffold_strategy.py:420:16: error[not-subscriptable] Cannot subscript object of type `None` with no `__getitem__` method
+tests/trainers/test_scaffold_strategy.py:421:21: error[invalid-argument-type] Argument to constructor `Path.__new__` is incorrect: Expected `str | PathLike[str]`, found `str | None`
+tests/trainers/test_scaffold_strategy.py:465:9: error[invalid-assignment] Object of type `(outputs, labels, context) -> Unknown` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_scaffold_strategy.py:469:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_scaffold_strategy.py:472:26: error[invalid-argument-type] Argument to constructor `Path.__new__` is incorrect: Expected `str | PathLike[str]`, found `str | None`
+tests/trainers/test_split_learning_testing_strategy.py:57:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_ssl_personalized_state.py:48:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_ssl_personalized_state.py:50:33: error[unresolved-attribute] Attribute `encoder` is not defined on `None` in union `Any | None`
+tests/trainers/test_ssl_personalized_state.py:54:24: error[unresolved-attribute] Attribute `encoder` is not defined on `None` in union `Any | None`
+tests/trainers/test_ssl_personalized_state.py:67:32: error[unresolved-attribute] Attribute `encoder` is not defined on `None` in union `Any | None`
+tests/trainers/test_ssl_personalized_state.py:94:9: error[invalid-assignment] Object of type `Sequential` is not assignable to attribute `encoder` of type `Linear`
+tests/trainers/test_ssl_personalized_state.py:99:38: error[invalid-assignment] Cannot assign object of type `Literal[2]` to attribute `encoding_dim` on type `Linear`: Expected `Tensor | Module`, found `Literal[2]`
+tests/trainers/test_ssl_personalized_state.py:103:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_ssl_personalized_state.py:117:13: error[invalid-assignment] Object of type `def fail(*_) -> Unknown` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_ssl_training_contract.py:18:37: error[invalid-assignment] Cannot assign object of type `Literal[2]` to attribute `encoding_dim` on type `Linear`: Expected `Tensor | Module`, found `Literal[2]`
+tests/trainers/test_ssl_training_contract.py:45:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_ssl_training_contract.py:51:16: error[unresolved-attribute] Attribute `batch_size` is not defined on `None` in union `None | DataLoader[Unknown]`
+tests/trainers/test_ssl_training_contract.py:70:9: error[invalid-assignment] Object of type `Identity` is not assignable to attribute `encoder` of type `Linear`
+tests/trainers/test_training_update_contract.py:52:9: error[unresolved-attribute] Attribute `backward` is not defined on `int`, `float*` in union `Tensor | float`
+tests/trainers/test_training_update_contract.py:91:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_training_update_contract.py:107:9: error[invalid-assignment] Object of type `def interrupt(outputs, labels, context) -> Unknown` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_training_update_contract.py:113:22: error[unresolved-attribute] Attribute `parameters` is not defined on `None` in union `Any | None`
+tests/trainers/test_training_update_contract.py:115:9: error[invalid-assignment] Object of type `bound method LossCriterionStrategy.compute_loss(outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_training_update_contract.py:177:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_training_update_contract.py:181:17: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_training_update_contract.py:187:35: error[unresolved-attribute] Attribute `weight` is not defined on `None` in union `Any | None`
+tests/trainers/test_training_update_contract.py:221:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`
+tests/trainers/test_training_update_contract.py:312:5: error[unresolved-attribute] Attribute `fill_` is not defined on `None` in union `Tensor | None`
+tests/trainers/test_training_update_contract.py:386:12: error[unresolved-attribute] Attribute `item` is not defined on `None` in union `Tensor | None`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `DataLoaderStrategy | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `LRSchedulerStrategy | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `ModelUpdateStrategy | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `OptimizerStrategy | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `TestingStrategy | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `TrainingStepStrategy | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:420:59: error[invalid-argument-type] Argument to `ComposableTrainer.__init__` is incorrect: Expected `list[Any] | None`, found `FedPerUpdateStrategy | FedRepUpdateStrategy | LGFedAvgStepStrategy`
+tests/trainers/test_training_update_contract.py:428:9: error[invalid-assignment] Object of type `def interrupt(*args) -> Unknown` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_training_update_contract.py:437:9: error[invalid-assignment] Object of type `bound method LossCriterionStrategy.compute_loss(outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_training_update_contract.py:445:32: error[invalid-argument-type] Argument to function `equal` is incorrect: Expected `Tensor`, found `Tensor | Module`
+tests/trainers/test_training_update_contract.py:532:9: error[invalid-assignment] Object of type `(output, labels, context) -> Tensor` is not assignable to attribute `compute_loss` of type `def compute_loss(self, outputs: Tensor, labels: Tensor, context: TrainingContext) -> Tensor`
+tests/trainers/test_training_update_contract.py:547:20: error[unresolved-attribute] Attribute `isnan` is not defined on `None` in union `Tensor | None`
+tests/trainers/test_training_update_contract.py:567:16: error[unresolved-attribute] Attribute `item` is not defined on `None` in union `Tensor | None`
+tests/utils/test_cleanup.py:11:43: error[invalid-argument-type] Argument to function `module_from_spec` is incorrect: Expected `ModuleSpec`, found `ModuleSpec | None`
+tests/utils/test_cleanup.py:12:1: error[unresolved-attribute] Attribute `exec_module` is not defined on `None` in union `Loader | None`
+tests/utils/test_cleanup.py:12:1: error[unresolved-attribute] Attribute `loader` is not defined on `None` in union `ModuleSpec | None`
+tests/utils/test_rl_payload_utilities.py:57:17: error[unresolved-attribute] Object of type `FixtureFunctionDefinition` has no attribute `__wrapped__`
+tests/utils/test_rl_payload_utilities.py:59:17: error[unresolved-attribute] Object of type `FixtureFunctionDefinition` has no attribute `__wrapped__`
+tests/utils/test_rl_payload_utilities.py:124:20: error[unresolved-attribute] Attribute `get_initial_states` is not defined on `plato.utils.reinforcement_learning.policies.sac.Policy`, `plato.utils.reinforcement_learning.policies.ddpg.Policy` in union `plato.utils.reinforcement_learning.policies.sac.Policy | plato.utils.reinforcement_learning.policies.ddpg.Policy | plato.utils.reinforcement_learning.policies.td3.Policy`
+tests/utils/test_rl_payload_utilities.py:135:16: error[unresolved-attribute] Attribute `alpha` is not defined on `plato.utils.reinforcement_learning.policies.ddpg.Policy`, `plato.utils.reinforcement_learning.policies.td3.Policy` in union `plato.utils.reinforcement_learning.policies.sac.Policy | plato.utils.reinforcement_learning.policies.ddpg.Policy | plato.utils.reinforcement_learning.policies.td3.Policy`
+tests/utils/test_s3.py:30:13: error[invalid-method-override] Invalid override of method `log_message`: Definition is incompatible with `BaseHTTPRequestHandler.log_message`
+tests/utils/test_s3.py:187:21: error[call-non-callable] Object of type `None` is not callable
+tests/utils/test_shared_payload_utilities.py:107:38: error[invalid-argument-type] Argument to function `dumps` is incorrect: Expected `Mapping[tuple[str, ...], list[str]] | None`, found `dict[tuple[()], list[str]]`
+tests/utils/test_shared_payload_utilities.py:110:36: error[invalid-argument-type] Argument to function `dump` is incorrect: Expected `Mapping[tuple[str, ...], list[str]] | None`, found `dict[tuple[()], list[str]]`
+Found 705 diagnostics
