@@ -973,6 +973,8 @@ class Server:
 
     def _assign_client(self, sid: str, client_id: int) -> None:
         """Bind a worker to the logical client in a server-issued request."""
+        if not any(client["sid"] == sid for client in self.clients.values()):
+            raise ValueError("Cannot assign an unregistered session.")
         self._clear_inbound_transfer(sid)
         self._session_assignments[sid] = client_id
 
@@ -1274,7 +1276,12 @@ class Server:
                         sid = client["sid"]
                         # Retain other reports from this worker until its current
                         # urgent response completes. Distinct workers remain concurrent.
-                        if sid in self.training_sids:
+                        # Keep disconnected workers' completed reports for
+                        # chronological aggregation; they cannot be refreshed.
+                        if sid in self.training_sids or not any(
+                            registered["sid"] == sid
+                            for registered in self.clients.values()
+                        ):
                             continue
 
                         logging.info(
@@ -1535,6 +1542,17 @@ class Server:
                             self.current_reported_clients
                         ) >= len(self.trained_clients):
                             await self._select_clients(for_next_batch=True)
+                    # Loss of the last outstanding urgent worker has no later
+                    # completion event to resume a ready simulated-time round.
+                    if (
+                        self.asynchronous_mode
+                        and self.simulate_wall_time
+                        and self.clients
+                        and self.reported_clients
+                        and len(self.current_reported_clients)
+                        >= len(self.selected_clients)
+                    ):
+                        await self._process_clients(self.reported_clients[0])
                 else:
                     # Debug is either turned on or not specified, stop the training to avoid blocking.
                     logging.warning(
