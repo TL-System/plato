@@ -1,0 +1,39 @@
+{
+  "base": "a8bdf23d775ce159ad44f6737309057acb1ff0a4",
+  "old_lock_sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+  "new_lock_sha256": "6d0c35d74f9d275ac3d7952c14d62838179bcaac1bec08e6eda699771ab7d7ca",
+  "new_package": [
+    "xxhash",
+    "3.8.1"
+  ],
+  "removed_packages": [],
+  "changed_package_records": [
+    [
+      "datasets",
+      "5.0.1"
+    ],
+    [
+      "evaluate",
+      "0.4.6"
+    ],
+    [
+      "plato-learn",
+      "1.4.3"
+    ],
+    [
+      "xxhash",
+      "4.0.1"
+    ]
+  ],
+  "all_existing_versions_sources_sdists_wheels_preserved": true,
+  "default_xxhash": "4.0.1",
+  "llm_eval_xxhash": "3.8.1",
+  "resolution": "Existing mutually exclusive SSL/llm_eval fork retains xxhash 4.0.1 outside llm_eval.",
+  "reason": "Real Lighteval 0.13.0 DetailsLogger hashes Doc.query as str; xxhash 4 rejects text.",
+  "upstream_sources": [
+    "https://github.com/ifduyue/python-xxhash/blob/master/CHANGELOG.rst",
+    "https://pypi.org/project/xxhash/3.8.1/"
+  ],
+  "runtime_green": "Pending original evaluator author qualification; lock validation alone is not runtime proof.",
+  "runtime_red_log_sha256": "f70467d8d50f6f33a3adad632bb57189a336b3174c2b0f3c26ffbbe582278a99"
+}
