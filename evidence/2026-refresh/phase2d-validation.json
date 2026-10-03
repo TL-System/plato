@@ -6,7 +6,7 @@
   "branch": "maintenance/2026-phase2-payloads",
   "commit_identity": {
     "baseline": "fda60becedfa6236c11d415b87a868b52789a41e",
-    "final_tested_implementation_commit": "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+    "final_tested_implementation_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
     "implementation_commits": [
       "af695c0f0dea3032116522b0c7131393e724f30d",
       "264b422d8b96420ff3c361e69f888a656fe8f512",
@@ -14,14 +14,19 @@
       "dba6f85b8140d0159d593ad14b371ecb2caa9ee2",
       "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
       "639ca69bf4eaeff868462d0b30a5fcc72218f061",
-      "15c79d0c81ffd0e5e4873db869a2863f97fe8279"
+      "15c79d0c81ffd0e5e4873db869a2863f97fe8279",
+      "926346bf342f11e85b6258adc4cb407b449669b7",
+      "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a"
     ],
     "evidence_carrier": "A following documentation-only commit updates this sole evidence file. Its exact identity is reported in the root handoff, avoiding a self-hash; runtime and test source are unchanged from the tested implementation commit above.",
-    "source_status_before_evidence": "Clean tracked tree at 15c79d0c. Clean locked base collection and the entire base non-runtime suite ran on both Python versions at this exact source; the two corrected test modules also ran in mandatory with actual Kazoo/Gymnasium. Prior 95-case correction suites remain attributed to 639ca69b and original full mandatory suites to e7c0d595; no unchanged startup rerun is claimed.",
+    "source_status_before_evidence": "Clean tracked tree at 53aa72c3. Actual combined S3 cases, client lifecycle overlap, mandatory affected libraries, clean base collection and the full base non-runtime suite ran on both interpreters at this exact source. All B/D production blobs are preserved from their owning candidates. Historical initial full, production-correction and base-correction results retain their original source identities; no combined full startup rerun is claimed.",
     "previous_reviewed_candidate_commit": "a4a4733e96cf248a73db76e6b2182536b9f592ea",
     "retained_full_matrix_commit": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395",
-    "final_tested_implementation_tree": "de021dd747ab5b29b78f2dc34ebfff9b9e8fb262",
-    "root_base_probe_candidate_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605"
+    "final_tested_implementation_tree": "ee4edd25a6b762591c6bd1680dfb818d0e5c4e7a",
+    "root_base_probe_candidate_commit": "aa232791f04d93eb9de09ed6c596ac714db5b605",
+    "premerge_d_candidate": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+    "accepted_b_dependency": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+    "provisional_combined_merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397"
   },
   "scope": {
     "owned": [
@@ -290,10 +295,10 @@
     },
     {
       "id": "2D-17",
-      "status": "handoff_root_integration",
+      "status": "corrected_by_accepted_b_and_tracked_combined_regression",
       "location": "2B candidate plato/clients/transport.py::receive_s3_payload",
       "finding": "Combining fixed S3 with exact 2B candidate succeeds for nonempty/nested/trailing-slash prefixes; with empty prefix, utility writes client_payload_7_ABC123 but bounded reader requests /client_payload_7_ABC123 and gets 404.",
-      "outcome": "Concrete actual local HTTP integration reproduced on both interpreters. Root must align bounded reader object-key composition with S3._object_key(key) after 2B acceptance; candidate under review remains unchanged."
+      "outcome": "Historical empty-prefix 404 reproduction retained. Accepted B 00eeb9dc normalizes the supported namespace consistently with unchanged D S3. Tracked current actual writer/presigner-to-reader cases pass for all four prefixes on both interpreters at 53aa72c3; final root phase qualification remains separate."
     }
   ],
   "audit_inventory": [
@@ -1000,9 +1005,9 @@
   "root_followups": [
     {
       "id": "2D-17 / T2B-S3-PREFIX",
-      "owner": "root after 2B acceptance",
-      "action": "2D canonical key_prefix strips leading/trailing slashes; logical key K maps to P/K when P is nonempty and K when empty, and already-qualified P/K stays unchanged. Replace 2B receive_s3_payload object_key = storage.key_prefix + \"/\" + key with equivalent exactly-once normalization (reuse storage._object_key(key)). Current actual 2B/2D integration works for configured s3://bucket/prefix and nested/trailing slash variants but empty prefix fails with 404. Verify the combined actual bounded reader, fixed send/put and prefixed/unprefixed roundtrips; preserve B deadlines/byte caps. Historical malformed double-prefixed objects are not migrated.",
-      "coordination_update": "B original author concurrently fixes this known interface handoff using the unchanged 2D S3 utility as provisional reference. Historical combined probe remains explicitly at b3b038e/e7c0d595. Root revalidates the accepted final combination; no B-owned runtime edits by 2D."
+      "owner": "root final phase integration",
+      "action": "The accepted B fix and unchanged D utility now pass tracked actual localhost combined regressions at 53aa72c3 on both interpreters, including empty prefix and minimal adapters. Preparation obligation is fulfilled; root still qualifies the final phase merge. Historical malformed double-prefixed objects are not migrated.",
+      "coordination_update": "Exact accepted B dependency 00eeb9dc merged at ccb31017 from clean D f8aa0e98. No B/D production edits; all identities and outcomes are in combined_b_d_validation. Root owns fresh D review and final integration."
     },
     {
       "id": "2D-15",
@@ -1028,7 +1033,8 @@
       "exact baseline module snapshots and bounded probe/validation/evidence builder scripts",
       "FEI scratch runtime",
       "Task-owned base314 locked test-base environment and provisioning log",
-      "Source-attributed base red/green collection, full base non-runtime and mandatory affected logs/run records/JUnit artifacts; profile runner and evidence updater"
+      "Source-attributed base red/green collection, full base non-runtime and mandatory affected logs/run records/JUnit artifacts; profile runner and evidence updater",
+      "combined/ contains merge/prod-preservation manifests and messages, test promotion/evidence scripts, bounded pytest trees; combined-* raw source-attributed run JSON/log/XML artifacts retained in the owned scratch root."
     ],
     "worktree_resources": [
       "Pinned external/nanochat checkout initialized",
@@ -1716,6 +1722,438 @@
       "Mandatory execution here covers the two corrected modules only; prior 95-case review-correction checks remain attributed to 639ca69b. No new full mandatory or type-check rerun is claimed.",
       "Kazoo behavior remains a realistic fake backend plus the real exception type, with no live ZooKeeper deployment. Gymnasium qualification uses real Box, with no complete Gym/FEI example deployment.",
       "B-owned S3 transport normalization is untouched. Root still verifies the accepted combined utility/runtime candidate and orchestrates fresh independent review."
+    ]
+  },
+  "combined_b_d_validation": {
+    "recorded_at_utc": "2026-10-03T04:20:01.987731+00:00",
+    "status": "Tracked actual B+D regressions and both profile matrices pass at exact provisional combined source. Fresh independent D review and final root phase integration remain pending.",
+    "authority": "Root explicitly authorized merging exact accepted B into the clean D branch and narrow integration-only ownership of the existing S3 test module/helper. No production resolution or checkpoint changes authorized or performed.",
+    "identities": {
+      "premerge_d_candidate": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "accepted_b_candidate": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "merge_commit": "ccb310177273f5cfa2ce7f1c0203f55ddaa68397",
+      "merge_parents": [
+        "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+        "00eeb9dcdd2b513e64db9408969356037e09bb8e"
+      ],
+      "tracked_promotion_commit": "926346bf342f11e85b6258adc4cb407b449669b7",
+      "client_cleanup_commit_and_tested_source": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a"
+    },
+    "accepted_b_reports": [
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-acceptance.json",
+        "sha256": "3be220078302a05189c07c32220a86e966ff919bc4ef11e5d342a6c39135396d"
+      },
+      {
+        "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2b-review-3.json",
+        "sha256": "83eaf2c44ffb1316e9d6643e23c3ea9b977d5b083bf4427e86a75dcac7720fd6"
+      }
+    ],
+    "merge_resolution": {
+      "d_premerge": "f8aa0e9815b702f9d414ebe85a85eb48f9a982a1",
+      "b_accepted": "00eeb9dcdd2b513e64db9408969356037e09bb8e",
+      "only_overlap": "tests/clients/test_client_lifecycle_variants.py",
+      "resolution": "Automatic three-way merge; every function/class AST matches its owning candidate. B oversized simulated payload regression and D real MPC sample persistence both preserved.",
+      "merged_blob": "30b79b9cb59e679ae460e4ea345fdb508179d750",
+      "functions_and_classes_verified": 12,
+      "production_blobs_verified": {
+        "d_premerge": 29,
+        "b_accepted": 11
+      }
+    },
+    "production_preservation": {
+      "result": "Every 29 changed D and 11 changed B production blobs matches its owning exact candidate; entire D processors/serialization/mpc/utils Git trees also match premerge D. No production differences after the provisional merge. B validation file remains byte-identical.",
+      "premerge_manifest": {
+        "path": "/tmp/plato-phase2d.G3jkGH/combined/premerge-production-blobs.json",
+        "sha256": "8bf2b92be5f72093a870f8999ec230af12dffd9b6de93e70ce46fa89d2f626fe"
+      },
+      "verification": {
+        "path": "/tmp/plato-phase2d.G3jkGH/combined/final-production-preservation.json",
+        "sha256": "cdce2d8a7e339c4f4d6b96333fddaabb89bab14f706d9309a1365bf2d0a4d885"
+      }
+    },
+    "tracked_regression": {
+      "path": "tests/servers/test_runtime_s3_contract.py",
+      "provenance": {
+        "path": "/tmp/plato-phase2b-runtime/review-fixes/test_s3_combined.py",
+        "sha256": "f11bc92cc5c013146962d68e3eb8d45100be9aaf7b7072ec7a88b4103d711222"
+      },
+      "provenance_handling": "Read-only original author reference. No immutable production copies, scratch module imports, temporary paths or substituted writer appear in the tracked test.",
+      "actual_dependencies": [
+        "plato.utils.s3.S3",
+        "plato.clients.transport.receive_s3_payload",
+        "plato.clients.strategies.defaults.DefaultPayloadStrategy"
+      ],
+      "direct_cases": "24: four prefixes (empty, ordinary, nested, trailing) x native S3/minimal adapter x valid/oversize/total deadline.",
+      "owner_cleanup_cases": "Four: native/minimal adapter x oversize/deadline through the real client strategy. State/timer/buffer cleanup asserted before test teardown.",
+      "preserved_cases": "All ten original B S3 tests and all nine automatically merged client lifecycle tests execute unchanged. S3 fixture adds controlled trickling and handler completion while preserving ordinary contracts.",
+      "observations": "Actual constructor HEAD, unused-key HEAD, HTTP PUT and presigned GET use the same recorded physical key. Valid decoding equals the input payload and counts every stored byte. Oversize rejects advertised length with zero reserved bytes. Deadline expires with multiple bytes already received; transfer timers, buffers and isolated event-loop tasks are released, and local GET handlers complete.",
+      "timing": "Total payload deadline one second, continuing response bytes every 50 ms, five-second independent outer watchdog (expiry fails); deadline must finish within two seconds. Handler completion and server-thread joins have separate two-second bounds. No 40 ms deadline margin retained.",
+      "red_scope": "This is promotion/strengthening of coverage for already corrected B+D behavior, with no newly discovered production defect or new red claim. Historical 2D-17/B S3 reproductions retain their original sources below."
+    },
+    "source_identity_manifest": [
+      {
+        "path": "tests/servers/test_runtime_s3_contract.py",
+        "git_blob": "3be64f9ed0e20a00b9cba83cb65a2b7a830b1520",
+        "sha256": "e09c7ed694713815463b3be34939b9f4873b2b1b5930600f9c8f47b85d84c3e0"
+      },
+      {
+        "path": "tests/clients/test_client_lifecycle_variants.py",
+        "git_blob": "30b79b9cb59e679ae460e4ea345fdb508179d750",
+        "sha256": "3562b5d448de387536462321b3157db7e701947147e961ea942f36418f5f6cf2"
+      },
+      {
+        "path": "tests/mpc/test_round_store_contracts.py",
+        "git_blob": "04822893530c7338c0c0e868313b609e6fec961c",
+        "sha256": "ea4bd59d56c388ad4bf71a6af86d1d26bf2f187788c41a3e447e486b4c364878"
+      },
+      {
+        "path": "tests/utils/test_rl_payload_utilities.py",
+        "git_blob": "de5e5f3614e028d03d3cc1d7396b9ee79d7949ec",
+        "sha256": "d79abc30a10ae515a6c3231f9356cf8427c2c8de74371ac3021e8b21ee28a6df"
+      },
+      {
+        "path": "plato/utils/s3.py",
+        "git_blob": "926ce3af7973d0f93f2442886e457d36d7612414",
+        "sha256": "a26d306daa6a4accd4d67c9f26dea9f9ad153e74353fe8698643987cb6f25c03"
+      },
+      {
+        "path": "plato/clients/transport.py",
+        "git_blob": "9685239d6dfd5e7ca881e4c863496dd01fc9155a",
+        "sha256": "c6c482ae5557641f03fb9419253c92b6c8c6dc5e028a6a6ea1525e061799df57"
+      }
+    ],
+    "green_clean_base_collection": [
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 4.79,
+        "result": "560/608 tests collected (48 deselected) in 0.32s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection313.log",
+          "sha256": "9bd91f86266510e894aa6b84b4badf98c9e6ae483fae23543db74eb532a0356a"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection313.json",
+          "sha256": "b7dc22e2514b23d188bf1ce3ac66b7ae568fc48cd4595e067e090a937a40be88"
+        }
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--collect-only",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.51,
+        "result": "560/608 tests collected (48 deselected) in 0.38s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection314.log",
+          "sha256": "41d99d8fe7fdec6eb80cd28ae91983eecb99f7d33123ba836ac369b2e7306d6d"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-collection314.json",
+          "sha256": "e2e4e3cc51e285b6a33476fff71c0c430c76a1d92b1515d76762e08c2d0fe515"
+        }
+      }
+    ],
+    "green_full_base_non_runtime": [
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/tmp/plato-phase2-root/base-313/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-base313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-base313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 50.98,
+        "result": "557 passed, 4 skipped, 48 deselected in 46.74s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.log",
+          "sha256": "b9880f625d3d5b3282ca4617caf0d6f2a2ffdae4439b8d2f6269ab9245f86276"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.json",
+          "sha256": "83d5e8b6787d5fd69057360e240e055cfb933c5d6910ff666a5cb66be962a854"
+        },
+        "junit": {
+          "tests": 561,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 557
+        },
+        "affected_module_pass_counts": {
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base313.xml",
+          "sha256": "2e31d83e7c7d8cc56fcec29f6becb76d8b41223f942d5c39e37fc1a3db287ea4"
+        }
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/base314/bin/python",
+          "-m",
+          "pytest",
+          "tests",
+          "--test-profile=base",
+          "-m",
+          "not runtime",
+          "-q",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-base314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-base314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 93.17,
+        "result": "557 passed, 4 skipped, 48 deselected in 82.04s (0:01:22)",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.log",
+          "sha256": "02e3f3bd02ee1869ab7db731d9dc1f442979a5afc16005928b50caa582cb8b32"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.json",
+          "sha256": "cd7e7325dda9382bb602f24528cd86eeee99d5ca31c68e49a4d185be095878a2"
+        },
+        "junit": {
+          "tests": 561,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4,
+          "passed": 557
+        },
+        "affected_module_pass_counts": {
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-base314.xml",
+          "sha256": "3603b612659eb0a93cf270c7d12f3cf54c8b43b4080d47fcb6783ec6fe8f9124"
+        }
+      }
+    ],
+    "green_mandatory_affected": [
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/tmp/plato-phase2d.G3jkGH/venv313/bin/python",
+          "-m",
+          "pytest",
+          "tests/servers/test_runtime_s3_contract.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-mandatory313",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 36.54,
+        "result": "60 passed in 30.24s",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.log",
+          "sha256": "d9e5edbc40c834ee1428ee2b15e16745389ad6c66a68562146fe3f07678a1b75"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.json",
+          "sha256": "99682c6963ae421d583b66d3fbe579ea531454535af4c475c26b9774e3764558"
+        },
+        "junit": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 60
+        },
+        "affected_module_pass_counts": {
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory313.xml",
+          "sha256": "421345f25e5a791b0392a642a64b840f173f011243310d57e3683628fe2ffb15"
+        }
+      },
+      {
+        "source_commit": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "command": [
+          "/private/tmp/plato-phase2d.G3jkGH/venv314/bin/python",
+          "-m",
+          "pytest",
+          "tests/servers/test_runtime_s3_contract.py",
+          "tests/clients/test_client_lifecycle_variants.py",
+          "tests/mpc/test_round_store_contracts.py",
+          "tests/utils/test_rl_payload_utilities.py",
+          "--test-profile=mandatory",
+          "-q",
+          "-W",
+          "error::UserWarning",
+          "-W",
+          "error::ResourceWarning",
+          "--basetemp=/tmp/plato-phase2d.G3jkGH/combined/pytest-final-mandatory314",
+          "--junitxml=/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.xml"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 71.53,
+        "result": "60 passed in 64.68s (0:01:04)",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.log",
+          "sha256": "db162fc05ee5f31b6ada842563bcc04a4a817c2617c6c97d6e0aa048dcb16a16"
+        },
+        "run_record": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.json",
+          "sha256": "f38705b2a2c93ebe06fd60109ecd17a3bc8b98ef3c72285418c6f9d3be7e8326"
+        },
+        "junit": {
+          "tests": 60,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "passed": 60
+        },
+        "affected_module_pass_counts": {
+          "tests.servers.test_runtime_s3_contract": 38,
+          "tests.clients.test_client_lifecycle_variants": 9,
+          "tests.mpc.test_round_store_contracts": 3,
+          "tests.utils.test_rl_payload_utilities": 10
+        },
+        "junit_artifact": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-final-mandatory314.xml",
+          "sha256": "b8686951eeaf0b90cce609ec25eb1e0b28ea3f109da2cf4d02093fdbcec906ec"
+        }
+      }
+    ],
+    "source_tests_ran": {
+      "base_both": "Entire tests tree selected with --test-profile=base -m \"not runtime\" at 53aa72c3. 560/608 nodes collected, 48 startup cases deselected; JUnit adds the allowed DP module collection skip. Exactly 557 passed/four existing allowed skips; includes all original D correction regressions and merged B non-runtime cases.",
+      "mandatory_both": [
+        "tests/servers/test_runtime_s3_contract.py",
+        "tests/clients/test_client_lifecycle_variants.py",
+        "tests/mpc/test_round_store_contracts.py",
+        "tests/utils/test_rl_payload_utilities.py"
+      ],
+      "mandatory_counts_each": {
+        "s3_contract": 38,
+        "merged_client_lifecycle": 9,
+        "actual_kazoo_round_store": 3,
+        "active_rl_actual_gymnasium": 10
+      },
+      "exact_case_ids": "Hashed JUnit artifacts enumerate each executed case; the same case selections and outcomes hold on both interpreters.",
+      "existing_base_omissions": "Unchanged opacus-absent DP module plus the three specifically allowed base Nanochat cases. No new skips or profile prerequisites."
+    },
+    "initial_combined_runs": {
+      "source_commit": "926346bf342f11e85b6258adc4cb407b449669b7",
+      "result": "Before adding the four actual-owner cleanup cases, all 56 mandatory affected cases and clean base collection (556/604 nodes, 48 deselected) passed on both interpreters.",
+      "run_records": [
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-mandatory313.json",
+          "sha256": "86856d3b373f7722de411ec4704176646364b603d3b799c1bced799f0dc1bea3"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-mandatory314.json",
+          "sha256": "4cda23383d8a15d317c01e5eccbd7091276f55e5d8adf0b7a7565d671cf8c193"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-base-collection313.json",
+          "sha256": "9a696d48d4d5e36294c1a49f30aeef165df0c710795a12c19c9acad1b124e985"
+        },
+        {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined-base-collection314.json",
+          "sha256": "a7f7739a157d2b3df9b2b0cc5e1f054b6e96b1001981185b55f1e4e4b4b47cec"
+        }
+      ]
+    },
+    "environment": {
+      "cwd": "/private/tmp/plato-refresh-worktrees/payloads",
+      "shell": "zsh -lc for every shell command.",
+      "uv_lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "VECLIB_MAXIMUM_THREADS": "1"
+      },
+      "additional_environment": {
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "TOKENIZERS_PARALLELISM": "false"
+      },
+      "base": "Unchanged fingerprints and confirmed Kazoo/Gymnasium/opacus/tiktoken absence in both locked base environments recorded above. Root-owned base313 reused read-only; own base314 reused without sync.",
+      "mandatory": "Unchanged own locked dev venv313/venv314 fingerprints; actual Kazoo 2.11.0/Gymnasium 1.3.0 tests rerun in this combination. UserWarning and ResourceWarning treated as errors.",
+      "runner": {
+        "path": "/tmp/plato-phase2d.G3jkGH/run_profile_validation.py",
+        "sha256": "7dfdd44095448a9c5544924ef483eb729ef17021ee7bbedc7fcd4f71eb4af7b5"
+      }
+    },
+    "static_checks": [
+      {
+        "command": "/tmp/plato-phase2d.G3jkGH/venv313/bin/ruff check tests/servers/test_runtime_s3_contract.py tests/clients/test_client_lifecycle_variants.py --select I",
+        "result": "All checks passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined/ruff-final.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        }
+      },
+      {
+        "command": "git diff --check fda60becedfa6236c11d415b87a868b52789a41e 53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a",
+        "result": "Passed.",
+        "log": {
+          "path": "/tmp/plato-phase2d.G3jkGH/combined/diff-check-final.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    ],
+    "validation_lineage": {
+      "initial_full_mandatory": "e7c0d59571d88efd7eb1fdbf4fc63ac2a7b81395: 412 passed/one allowed native-tokenizer skip each; historical D full suite.",
+      "four_production_review_corrections": "639ca69bf4eaeff868462d0b30a5fcc72218f061: 95 scoped cases passed each; retained red/green and numerical references.",
+      "base_profile_correction": "15c79d0c81ffd0e5e4873db869a2863f97fe8279: 383 base passed/four existing skips each, 13 actual-library mandatory cases each.",
+      "new_combined_source": "53aa72c3c578b1a32d8f83d64a98d6a543cdfb9a: 557 base passed/four existing skips each, 60 mandatory affected passed each; clean base collection both.",
+      "accepted_b_runtime": "00eeb9dcdd2b513e64db9408969356037e09bb8e: root accepted fresh review3 PASS, current full 48 startup evidence remains attributed to exact B; not rerun or reattributed here."
+    },
+    "limitations": [
+      "This local provisional B+D candidate is not final root phase integration. Root repeats final merged qualification and owns publication/gate decisions.",
+      "The unchanged 48 startup cases were explicitly deselected in both base runs; no combined full mandatory/startup or new type-check/coverage run claimed.",
+      "Actual botocore/Requests/aiohttp work against a localhost S3-compatible service, using explicit fake credentials and no live cloud. The minimal adapter retains the real botocore presigner and supported fields only.",
+      "Payloads remain trusted-writer pickles; these correctness/resource tests do not claim arbitrary untrusted-input safety. Kazoo qualification remains a fake service with real exception class; no live ZooKeeper or full FEI deployment.",
+      "C checkpoint, metadata/lock/CI, shared conftest and root reports remain untouched. Root-owned original scratch and all task-owned resources are retained."
     ]
   }
 }
