@@ -42,7 +42,7 @@ class CallbackHandler:
         self.callbacks.append(_callback)
 
     def __iter__(self):
-        return self.callbacks
+        return iter(self.callbacks)
 
     def clear_callbacks(self):
         """
@@ -68,11 +68,9 @@ class CallbackHandler:
         """
         for callback in self.callbacks:
             try:
-                getattr(callback, event)(
-                    *args,
-                    **kwargs,
-                )
+                method = getattr(callback, event)
             except AttributeError as exc:
                 raise ValueError(
                     "The callback method has not been implemented"
                 ) from exc
+            method(*args, **kwargs)

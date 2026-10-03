@@ -36,6 +36,6 @@ class Server(fedavg.Server):
         Method called at the end of aggregating received weights.
         """
         # Save the current model for later retrieval when cosine similarity needs to be computed
-        filename = f"model_{self.current_round}.pth"
+        filename = f"model_{self.current_round}.safetensors"
         trainer = self.require_trainer()
         trainer.save_model(filename)

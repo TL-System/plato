@@ -9,6 +9,7 @@ import multiprocessing as mp
 import os
 import pickle
 import random
+import re
 import sys
 import time
 from abc import abstractmethod
@@ -26,6 +27,12 @@ from plato.client import (
     _startup_loop,
     _startup_task,
     run,
+)
+from plato.clients.transport import (
+    InboundTransfer,
+    TransportLimits,
+    load_pickle,
+    receive_s3_payload,
 )
 from plato.config import Config
 from plato.servers.strategies.base import ServerContext
@@ -104,6 +111,11 @@ class Server:
         self.updates = []
         self.client_payload = {}
         self.client_chunks = {}
+        self.transport_limits = TransportLimits.from_config()
+        self._session_assignments: dict[str, int] = {}
+        self._inbound_transfers: dict[str, InboundTransfer] = {}
+        self._queued_payload_bytes: dict[object, int] = {}
+        self._completed_payload_bytes: dict[str, tuple[object, int]] = {}
         self.s3_client = None
         self.outbound_processor = None
         self.inbound_processor = None
@@ -395,9 +407,12 @@ class Server:
                 port,
             )
 
+            limits = getattr(self, "transport_limits", None)
+            if limits is None:
+                limits = TransportLimits.from_config()
             self.sio = socketio.AsyncServer(
                 ping_interval=self.ping_interval,
-                max_http_buffer_size=2**31,
+                max_http_buffer_size=limits.max_message_bytes,
                 ping_timeout=self.ping_timeout,
             )
             self.sio.register_namespace(ServerEvents(namespace="/", plato_server=self))
@@ -417,6 +432,14 @@ class Server:
 
     async def register_client(self, sid, client_process_id, client_id):
         """Adds a newly arrived client to the list of clients."""
+        existing = self.clients.get(client_process_id)
+        if existing is not None and existing["sid"] != sid:
+            raise ValueError("Client process is already registered to another session.")
+        for process_id, client in self.clients.items():
+            if client["sid"] == sid:
+                if process_id != client_process_id or client["client_id"] != client_id:
+                    raise ValueError("Session is already registered to another client.")
+                return
         self.clients[client_process_id] = {
             "sid": sid,
             "client_id": client_id,
@@ -526,6 +549,13 @@ class Server:
 
     async def _close_connections(self):
         """Closes all socket.io connections after training completes."""
+        completed_sids = self._completed_payload_bytes.keys()
+        for sid in list(self._inbound_transfers.keys() | completed_sids):
+            self._clear_inbound_transfer(sid)
+        self._session_assignments.clear()
+        self._queued_payload_bytes.clear()
+        self.reported_clients.clear()
+        self.updates.clear()
         for client_id, client in dict(self.clients).items():
             logging.info("Closing the connection to client #%d.", client_id)
             await self._require_sio().emit("disconnect", room=client["sid"])
@@ -559,6 +589,19 @@ class Server:
             # When simulating the wall clock time, if len(self.reported_clients) is 0, the
             # server has aggregated all reporting clients already
             if (
+                self.asynchronous_mode
+                and not self.simulate_wall_time
+                and self.training_clients
+            ):
+                selectable_clients = [
+                    client for client in self.clients_pool
+                    if client not in self.training_clients
+                ]
+                self.selected_clients = self.choose_clients(
+                    selectable_clients,
+                    max(0, self.clients_per_round - len(self.training_clients)),
+                )
+            elif (
                 self.asynchronous_mode
                 and self.selected_clients
                 and len(self.reported_clients) > 0
@@ -624,8 +667,12 @@ class Server:
                 hasattr(Config().trainer, "max_concurrency")
                 and not Config().is_central_server()
             ):
+                available_processes = sum(
+                    client["sid"] not in self.training_sids
+                    for client in self.clients.values()
+                )
                 selected_clients = []
-                if Config().gpu_count() > 1:
+                if Config().gpu_count() > 1 and available_processes:
                     untrained_clients = list(
                         set(self.selected_clients).difference(self.trained_clients)
                     )
@@ -635,18 +682,18 @@ class Server:
                             if client_id % available_gpus == cuda_id:
                                 selected_clients.append(client_id)
                             if len(selected_clients) >= min(
-                                len(self.clients),
+                                available_processes,
                                 (cuda_id + 1) * Config().trainer.max_concurrency,
                                 self.clients_per_round,
                             ):
                                 break
                         # There is no enough alive clients, break the selection
-                        if len(selected_clients) >= len(self.clients):
+                        if len(selected_clients) >= available_processes:
                             break
                 else:
                     selected_clients = self.selected_clients[
                         len(self.trained_clients) : min(
-                            len(self.trained_clients) + len(self.clients),
+                            len(self.trained_clients) + available_processes,
                             len(self.selected_clients),
                         )
                     ]
@@ -683,6 +730,7 @@ class Server:
 
                 # Assign the client id to the client process
                 self.clients[client_process_id]["client_id"] = self.selected_client_id
+                self._assign_client(sid, self.selected_client_id)
 
                 self.training_clients[self.selected_client_id] = {
                     "id": self.selected_client_id,
@@ -850,6 +898,7 @@ class Server:
                     len(self.updates),
                 )
                 await self._process_reports()
+                self._release_processed_payloads()
                 await self.wrap_up()
                 await self._select_clients()
             else:
@@ -907,11 +956,98 @@ class Server:
 
         self.comm_overhead += data_size / 1024**2
 
+    def _clear_inbound_transfer(self, sid: str) -> None:
+        transfer = self._inbound_transfers.pop(sid, None)
+        if transfer is not None:
+            transfer.close()
+        self.reports.pop(sid, None)
+        self.client_chunks.pop(sid, None)
+        self.client_payload.pop(sid, None)
+        self._completed_payload_bytes.pop(sid, None)
+
+    def _complete_inbound_transfer(self, sid: str, transfer_id: object) -> None:
+        """Keep completed values available to legacy completion hooks, within budget."""
+        transfer = self._inbound_transfers.pop(sid)
+        self._completed_payload_bytes[sid] = (transfer_id, transfer.buffered_bytes)
+        transfer.close()
+
+    def _assign_client(self, sid: str, client_id: int) -> None:
+        """Bind a worker to the logical client in a server-issued request."""
+        if not any(client["sid"] == sid for client in self.clients.values()):
+            raise ValueError("Cannot assign an unregistered session.")
+        self._clear_inbound_transfer(sid)
+        self._session_assignments[sid] = client_id
+
+    def _check_session(self, sid: str, client_id: int | None = None) -> int:
+        assigned = self._session_assignments.get(sid)
+        if (
+            assigned is None
+            or not any(client["sid"] == sid for client in self.clients.values())
+            or assigned not in self.training_clients
+            or (client_id is not None and assigned != client_id)
+        ):
+            raise ValueError("Session does not match a current logical client assignment.")
+        return assigned
+
+    def _require_transfer(
+        self, sid: str, client_id: int | None = None
+    ) -> InboundTransfer:
+        self._check_session(sid, client_id)
+        transfer = self._inbound_transfers.get(sid)
+        if transfer is None:
+            raise ValueError("Session has no active report/payload transfer.")
+        try:
+            transfer.check_active()
+        except ValueError:
+            self._clear_inbound_transfer(sid)
+            raise
+        return transfer
+
+    def _reserve_inbound_bytes(self, sid: str, count: int) -> None:
+        buffered = self._buffered_inbound_bytes()
+        if buffered + count > self.transport_limits.max_buffered_bytes:
+            raise ValueError("Server buffered payload byte limit exceeded.")
+        self._require_transfer(sid).reserve(count)
+
+    def _buffered_inbound_bytes(self) -> int:
+        return (
+            sum(t.buffered_bytes for t in self._inbound_transfers.values())
+            + sum(self._queued_payload_bytes.values())
+            + sum(
+                count
+                for transfer_id, count in self._completed_payload_bytes.values()
+                if transfer_id not in self._queued_payload_bytes
+            )
+        )
+
+    def _release_processed_payloads(self) -> None:
+        for update in self.updates:
+            self._queued_payload_bytes.pop(getattr(update, "transfer_id", None), None)
+
     async def _client_report_arrived(self, sid, client_id, report):
         """Upon receiving a report from a client."""
-        self.reports[sid] = pickle.loads(report)
+        self._check_session(sid, client_id)
+        if sid in self._inbound_transfers:
+            raise ValueError("Session already has an incomplete report/payload transfer.")
+        if (
+            not isinstance(report, bytes)
+            or len(report) > self.transport_limits.max_report_bytes
+        ):
+            raise ValueError("Client report exceeds byte limit or is not bytes.")
+        buffered = self._buffered_inbound_bytes()
+        if buffered + len(report) > self.transport_limits.max_buffered_bytes:
+            raise ValueError("Server buffered payload byte limit exceeded.")
+        parsed_report = load_pickle(report)
+        if getattr(parsed_report, "client_id", None) != client_id:
+            raise ValueError("Report client identity does not match its assignment.")
+        transfer = InboundTransfer(
+            self.transport_limits, lambda: self._clear_inbound_transfer(sid)
+        )
+        transfer.report_bytes = len(report)
+        self._inbound_transfers[sid] = transfer
+        self.reports[sid] = parsed_report
         self.client_payload[sid] = None
-        self.client_chunks[sid] = []
+        self.client_chunks[sid] = transfer.chunks
 
         if self.comm_simulation:
             model_name = (
@@ -923,8 +1059,17 @@ class Server:
                 model_name = model_name.replace("/", "_")
             checkpoint_path = Config().params["checkpoint_path"]
             payload_filename = f"{checkpoint_path}/{model_name}_client_{client_id}.pkl"
-            with open(payload_filename, "rb") as payload_file:
-                self.client_payload[sid] = pickle.load(payload_file)
+            try:
+                size = os.path.getsize(payload_filename)
+                self._reserve_inbound_bytes(sid, size)
+                with open(payload_filename, "rb") as payload_file:
+                    raw = payload_file.read(size + 1)
+                if len(raw) != size:
+                    raise ValueError("Simulated payload changed during transfer.")
+                self.client_payload[sid] = load_pickle(raw)
+            except Exception:
+                self._clear_inbound_transfer(sid)
+                raise
 
             payload_size = (
                 sys.getsizeof(pickle.dumps(self.client_payload[sid])) / 1024**2
@@ -947,47 +1092,56 @@ class Server:
 
     async def _client_chunk_arrived(self, sid, data) -> None:
         """Upon receiving a chunk of data from a client."""
-        self.client_chunks[sid].append(data)
+        transfer = self._require_transfer(sid)
+        try:
+            buffered = self._buffered_inbound_bytes()
+            if (
+                isinstance(data, bytes)
+                and buffered + len(data) > self.transport_limits.max_buffered_bytes
+            ):
+                raise ValueError("Server buffered payload byte limit exceeded.")
+            transfer.append(data)
+        except Exception:
+            self._clear_inbound_transfer(sid)
+            raise
 
     async def _client_payload_arrived(self, sid, client_id):
         """Upon receiving a portion of the payload from a client."""
-        assert len(self.client_chunks[sid]) > 0 and client_id in self.training_clients
-
-        payload = b"".join(self.client_chunks[sid])
-        _data = pickle.loads(payload)
-        self.client_chunks[sid] = []
-
-        if self.client_payload[sid] is None:
-            self.client_payload[sid] = _data
-        elif isinstance(self.client_payload[sid], list):
-            self.client_payload[sid].append(_data)
-        else:
-            self.client_payload[sid] = [self.client_payload[sid]]
-            self.client_payload[sid].append(_data)
+        transfer = self._require_transfer(sid, client_id)
+        try:
+            self.client_payload[sid] = transfer.commit()
+        except Exception:
+            self._clear_inbound_transfer(sid)
+            raise
 
     async def _client_payload_done(self, sid, client_id, s3_key=None):
         """Upon receiving all the payload from a client, either via S3 or socket.io."""
-        if s3_key is None:
-            assert self.client_payload[sid] is not None
-
-            payload_size = 0
-            if isinstance(self.client_payload[sid], list):
-                for _data in self.client_payload[sid]:
-                    payload_size += sys.getsizeof(pickle.dumps(_data))
+        transfer = self._require_transfer(sid, client_id)
+        try:
+            if s3_key is None:
+                self.client_payload[sid] = transfer.finish()
             else:
-                payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
-        else:
-            if self.s3_client is None:
-                raise RuntimeError(
-                    "S3 client is not configured but an S3 payload key was received."
+                if (
+                    not isinstance(s3_key, str)
+                    or re.fullmatch(
+                        rf"client_payload_{client_id}_[A-F0-9]{{6}}", s3_key
+                    ) is None
+                ):
+                    raise ValueError("S3 payload key does not match the client assignment.")
+                if transfer.chunk_count or transfer.part_count:
+                    raise ValueError("S3 payload cannot replace an active socket payload.")
+                if self.s3_client is None:
+                    raise RuntimeError("S3 client is not configured for this payload.")
+                self.client_payload[sid] = await receive_s3_payload(
+                    self.s3_client,
+                    s3_key,
+                    transfer,
+                    lambda count: self._reserve_inbound_bytes(sid, count),
                 )
-            receive_from_s3 = getattr(self.s3_client, "receive_from_s3", None)
-            if not callable(receive_from_s3):
-                raise RuntimeError(
-                    "Configured S3 client does not support receive_from_s3()."
-                )
-            self.client_payload[sid] = receive_from_s3(s3_key)
-            payload_size = sys.getsizeof(pickle.dumps(self.client_payload[sid]))
+            payload_size = transfer.byte_count
+        except BaseException:
+            self._clear_inbound_transfer(sid)
+            raise
 
         logging.info(
             "[%s] Received %.2f MB of payload data from client #%d.",
@@ -1002,6 +1156,7 @@ class Server:
 
     async def process_client_info(self, client_id, sid):
         """Processes the received metadata information from a reporting client."""
+        self._check_session(sid, client_id)
         # First pass through the inbound_processor(s), if any
         if self.inbound_processor is not None:
             self.client_payload[sid] = self.inbound_processor.process(
@@ -1024,7 +1179,8 @@ class Server:
 
         # When the client is responding to an urgent request for an update, it will
         # store its (possibly different) client ID in its report
-        client_id = self.reports[sid].client_id
+        if self.reports[sid].client_id != client_id:
+            raise ValueError("Report client identity no longer matches its assignment.")
 
         start_time = self.training_clients[client_id]["start_time"]
         finish_time = (
@@ -1038,6 +1194,7 @@ class Server:
         if Config().is_central_server():
             self.comm_overhead += self.reports[sid].edge_server_comm_overhead
 
+        transfer_id = object()
         client_info = (
             finish_time,  # sorted by the client's finish time
             client_id,  # in case two or more clients have the same finish time
@@ -1048,6 +1205,7 @@ class Server:
                 "start_time": start_time,
                 "report": self.reports[sid],
                 "payload": self.client_payload[sid],
+                "transfer_id": transfer_id,
             },
         )
 
@@ -1057,6 +1215,11 @@ class Server:
         del self.training_clients[client_id]
 
         self.training_sids.remove(client_info[2]["sid"])
+        self._queued_payload_bytes[transfer_id] = self._inbound_transfers[
+            sid
+        ].buffered_bytes
+        self._session_assignments.pop(sid, None)
+        self._complete_inbound_transfer(sid, transfer_id)
 
         await self._process_clients(client_info)
 
@@ -1092,8 +1255,8 @@ class Server:
                     if client_data["update_requested"]:
                         return
 
-                request_sent = False
-                for i, client_info in enumerate(self.reported_clients):
+                requests = []
+                for client_info in list(self.reported_clients):
                     client = client_info[2]
                     client_staleness = self.current_round - client["starting_round"]
 
@@ -1110,6 +1273,16 @@ class Server:
                         # Sending an urgent request to the client for a model update at the
                         # currently simulated wall clock time
                         client_id = client["client_id"]
+                        sid = client["sid"]
+                        # Retain other reports from this worker until its current
+                        # urgent response completes. Distinct workers remain concurrent.
+                        # Keep disconnected workers' completed reports for
+                        # chronological aggregation; they cannot be refreshed.
+                        if sid in self.training_sids or not any(
+                            registered["sid"] == sid
+                            for registered in self.clients.values()
+                        ):
+                            continue
 
                         logging.info(
                             "[Server #%s] Requesting urgent model update from client #%s.",
@@ -1120,7 +1293,9 @@ class Server:
                         # Remove the client information from the list of reporting clients since
                         # this client will report again soon with another model update upon
                         # receiving the request from the server
-                        del self.reported_clients[i]
+                        self.reported_clients.remove(client_info)
+                        heapq.heapify(self.reported_clients)
+                        self._queued_payload_bytes.pop(client.get("transfer_id"), None)
 
                         self.training_clients[client_id] = {
                             "id": client_id,
@@ -1129,23 +1304,27 @@ class Server:
                             "update_requested": True,
                         }
 
-                        sid = client["sid"]
+                        self._assign_client(sid, client_id)
 
                         self.training_sids.append(sid)
 
-                        await self._require_sio().emit(
-                            "request_update",
-                            {
-                                "client_id": client_id,
-                                "time": self.wall_time - client["start_time"],
-                            },
-                            room=sid,
-                        )
-                        request_sent = True
+                        requests.append((sid, client_id, client["start_time"]))
+
+                # Establish all distinct-worker assignments before yielding to any
+                # response. Each deferred same-worker report stays in the valid heap.
+                for sid, client_id, start_time in requests:
+                    await self._require_sio().emit(
+                        "request_update",
+                        {
+                            "client_id": client_id,
+                            "time": self.wall_time - start_time,
+                        },
+                        room=sid,
+                    )
 
                 # If an urgent request was sent, we will wait until the client gets back to proceed
                 # with aggregation.
-                if request_sent:
+                if requests:
                     return
 
             # Step 2: Processing clients in chronological order of finish times in wall clock time
@@ -1160,7 +1339,7 @@ class Server:
                 self.current_processed_clients[client["client_id"]] = True
 
                 # Update the simulated wall clock time to be the finish time of this client
-                self.wall_time = client_info[0]
+                self.wall_time = max(self.wall_time, client_info[0])
 
                 # Add the report and payload of the extracted reporting client into updates
                 logging.info(
@@ -1175,6 +1354,7 @@ class Server:
                         client_id=client["client_id"],
                         report=client["report"],
                         payload=client["payload"],
+                        transfer_id=client.get("transfer_id"),
                         staleness=client_staleness,
                     )
                 )
@@ -1202,7 +1382,7 @@ class Server:
                     for __ in range(0, len(possibly_stale_clients)):
                         stale_client_info = heapq.heappop(possibly_stale_clients)
                         # Update the simulated wall clock time to be the finish time of this client
-                        self.wall_time = stale_client_info[0]
+                        self.wall_time = max(self.wall_time, stale_client_info[0])
                         client = stale_client_info[2]
 
                         # Add the report and payload of the extracted reporting client into updates
@@ -1219,6 +1399,7 @@ class Server:
                                 client_id=client["client_id"],
                                 report=client["report"],
                                 payload=client["payload"],
+                                transfer_id=client.get("transfer_id"),
                                 staleness=client_staleness,
                             )
                         )
@@ -1231,6 +1412,7 @@ class Server:
             )
 
             await self._process_reports()
+            self._release_processed_payloads()
             await self.wrap_up()
             await self._select_clients()
             return
@@ -1247,6 +1429,7 @@ class Server:
                     client_id=client["client_id"],
                     report=client["report"],
                     payload=client["payload"],
+                    transfer_id=client.get("transfer_id"),
                     staleness=client_staleness,
                 )
             )
@@ -1280,6 +1463,7 @@ class Server:
                 len(self.updates),
             )
             await self._process_reports()
+            self._release_processed_payloads()
             await self.wrap_up()
             await self._select_clients()
 
@@ -1296,10 +1480,15 @@ class Server:
 
     async def _client_disconnected(self, sid):
         """When a client process disconnected it should be removed from its internal states."""
+        assigned_id = self._session_assignments.pop(sid, None)
+        self._clear_inbound_transfer(sid)
+        self.training_sids = [
+            training_sid for training_sid in self.training_sids if training_sid != sid
+        ]
         for client_process_id, client in dict(self.clients).items():
             if client["sid"] == sid:
                 # Obtain the client id before deleting
-                client_id = self.clients[client_process_id]["client_id"]
+                client_id = assigned_id
 
                 # Remove the physical client from server list
                 del self.clients[client_process_id]
@@ -1333,7 +1522,9 @@ class Server:
                 ):
                     # Recover from the failed client and proceed with training
                     if (
-                        client_id in self.selected_clients
+                        client_id is not None
+                        and hasattr(self, "trained_clients")
+                        and client_id in self.selected_clients
                         and client_id in self.trained_clients
                     ):
                         self.trained_clients.remove(client_id)
@@ -1351,6 +1542,17 @@ class Server:
                             self.current_reported_clients
                         ) >= len(self.trained_clients):
                             await self._select_clients(for_next_batch=True)
+                    # Loss of the last outstanding urgent worker has no later
+                    # completion event to resume a ready simulated-time round.
+                    if (
+                        self.asynchronous_mode
+                        and self.simulate_wall_time
+                        and self.clients
+                        and self.reported_clients
+                        and len(self.current_reported_clients)
+                        >= len(self.selected_clients)
+                    ):
+                        await self._process_clients(self.reported_clients[0])
                 else:
                     # Debug is either turned on or not specified, stop the training to avoid blocking.
                     logging.warning(

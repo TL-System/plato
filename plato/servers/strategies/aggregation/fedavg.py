@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import math
 import numbers
 from collections.abc import Callable, Mapping
 from types import SimpleNamespace
@@ -22,6 +23,23 @@ try:  # pragma: no cover - optional dependency
     import torch
 except ImportError:  # pragma: no cover
     torch = cast(Any, None)
+
+
+def validate_aggregation_inputs(updates: list, payloads: list) -> None:
+    """Reject unaligned reports and invalid weights before aggregation dispatch."""
+    if len(updates) != len(payloads):
+        raise ValueError("Report and payload counts must match for aggregation.")
+    for update in updates:
+        count = getattr(update.report, "num_samples", None)
+        if not isinstance(count, numbers.Real) or not math.isfinite(count) or count < 0:
+            raise ValueError("Client sample weights must be finite and nonnegative.")
+    total = sum(
+        update.report.num_samples
+        for update in updates
+        if getattr(update.report, "type", "weights") != "features"
+    )
+    if not math.isfinite(total):
+        raise ValueError("Total sample weight must be finite.")
 
 
 class FedAvgAggregationStrategy(AggregationStrategy):
@@ -39,6 +57,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         context: ServerContext,
     ) -> dict:
         """Aggregate using weighted average by sample count."""
+        validate_aggregation_inputs(updates, deltas_received)
         eligible = [
             (update, deltas_received[idx])
             for idx, update in enumerate(updates)
@@ -83,6 +102,7 @@ class FedAvgAggregationStrategy(AggregationStrategy):
         context: ServerContext,
     ) -> dict | None:
         """Aggregate weights directly when possible."""
+        validate_aggregation_inputs(updates, weights_received)
         if not weights_received:
             return copy.deepcopy(baseline_weights)
 
