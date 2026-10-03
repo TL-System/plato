@@ -93,6 +93,7 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
             model_parallel=None,
             dtype=None,
             device=None,
+            cache_dir=None,
         ):
             calls["model_name"] = model_name
             calls["tokenizer"] = tokenizer
@@ -101,6 +102,7 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
             calls["model_parallel"] = model_parallel
             calls["dtype"] = dtype
             calls["device"] = device
+            calls["cache_dir"] = cache_dir
 
     class FakePipeline:
         def __init__(
@@ -192,6 +194,8 @@ def test_lighteval_pipeline_matches_supported_api_contract(monkeypatch, temp_con
     assert calls["model_parallel"] is False
     assert calls["dtype"] is None
     assert calls["device"] == "cuda:0"
+    assert calls["cache_dir"] == str(Path(calls["tracker_output_dir"], "sample-cache"))
+    assert not Path(calls["cache_dir"]).exists()
     assert calls["save_details"] is False
     assert calls["custom_tasks_directory"] == "plato.evaluators.lighteval_tasks"
     assert calls["max_samples"] is None
@@ -306,6 +310,7 @@ def test_lighteval_pipeline_forwards_runtime_overrides(monkeypatch, temp_config)
         },
     )
 
+    assert not Path(calls.pop("cache_dir")).exists()
     assert calls == {
         "batch_size": 2,
         "max_length": 1024,

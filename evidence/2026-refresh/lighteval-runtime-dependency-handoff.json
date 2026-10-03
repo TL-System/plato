@@ -74,7 +74,13 @@
   "normalization_red": {
     "command": ".venv/bin/python -m pytest tests/evaluators/test_lighteval.py::test_lighteval_normalizes_current_fewshot_task_keys -q",
     "log": "F                                                                        [100%]\n=================================== FAILURES ===================================\n_____________ test_lighteval_normalizes_current_fewshot_task_keys ______________\n\ntemp_config = <plato.config.Config object at 0x124f586e0>\n\n    def test_lighteval_normalizes_current_fewshot_task_keys(temp_config):\n        from plato.evaluators.lighteval import _normalize_metrics\n    \n>       assert _normalize_metrics(\n            {\n                \"ifeval|0\": {\n                    \"prompt_level_strict_acc\": 0.30,\n                    \"prompt_level_loose_acc\": 0.50,\n                    \"inst_level_strict_acc\": 0.99,\n                },\n                \"hellaswag|0\": {\"exact_match\": 0.44},\n                \"arc:easy|0\": {\"loglikelihood_acc\": 0.35},\n                \"arc:challenge|0\": {\"loglikelihood_acc\": 0.25},\n                \"piqa_hf|0\": {\"exact_match\": 0.61},\n                \"all\": {\"exact_match\": 0.99},\n            }\n        ) == {\n            \"ifeval_avg\": 0.40,\n            \"hellaswag\": 0.44,\n            \"arc_easy\": 0.35,\n            \"arc_challenge\": 0.25,\n            \"arc_avg\": 0.30,\n            \"piqa\": 0.61,\n        }\nE       AssertionError: assert {} == {'ifeval_avg'...e': 0.25, ...}\nE         \nE         Right contains 6 more items:\nE         {'arc_avg': 0.3,\nE          'arc_challenge': 0.25,\nE          'arc_easy': 0.35,\nE          'hellaswag': 0.44,\nE          'ifeval_avg': 0.4,\nE          'piqa': 0.61}\nE         Use -v to get more diff\n\ntests/evaluators/test_lighteval.py:580: AssertionError\ntest profile: core scope (native excluded)\n=========================== short test summary info ============================\nFAILED tests/evaluators/test_lighteval.py::test_lighteval_normalizes_current_fewshot_task_keys\n1 failed in 0.07s\n",
-    "result": "Existing normalizer returns no metrics for real0.13.0 task|fewshot result keys."
+    "result": "Compatibility helper probe: current internal tracker task|fewshot dictionaries return no metrics with the original helper. This is not a public Pipeline failure: EvaluationTracker.generate_final_dict replaces | with :, and original Plato normalization already handles final task:0 keys.",
+    "scope_correction": {
+      "source": ".venv/lib/python3.13/site-packages/lighteval/logging/evaluation_tracker.py:382",
+      "public_pipeline_keys": "task:0",
+      "internal_cache_and_tracker_keys": "task|0",
+      "classification": "Compatibility improvement only, not a public Pipeline defect."
+    }
   },
   "limits": [
     "Synthetic controlled rows establish installed API integration only, not public benchmark accuracy or performance.",
