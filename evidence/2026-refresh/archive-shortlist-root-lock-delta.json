@@ -1,0 +1,814 @@
+{
+  "status": "PASS_SCOPED_ARCHIVE_LOCK_DELTA",
+  "before_sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+  "after_sha256": "e2a53aaae9a0dd49f5446b490bb3071e86aa3a9a20d6271c9dd30b4ae2dcbff9",
+  "removed": [
+    {
+      "name": "einops",
+      "version": "0.8.2",
+      "source": {
+        "registry": "https://pypi.org/simple"
+      }
+    },
+    {
+      "name": "mobilenetv3",
+      "version": "0.1.0",
+      "source": {
+        "virtual": "examples/model_search/pfedrlnas/MobileNetV3"
+      }
+    },
+    {
+      "name": "vit",
+      "version": "0.1.0",
+      "source": {
+        "virtual": "examples/model_search/pfedrlnas/VIT"
+      }
+    },
+    {
+      "name": "yacs",
+      "version": "0.1.8",
+      "source": {
+        "registry": "https://pypi.org/simple"
+      }
+    }
+  ],
+  "added": [],
+  "retained_package_changes": {
+    "plato-learn": {
+      "metadata": {
+        "before": {
+          "requires-dist": [
+            {
+              "name": "accelerate",
+              "specifier": ">=1.15.0"
+            },
+            {
+              "name": "aiohttp",
+              "specifier": ">=3.14.3"
+            },
+            {
+              "name": "boto3",
+              "specifier": ">=1.43.106"
+            },
+            {
+              "name": "datasets",
+              "specifier": ">=5.0.1"
+            },
+            {
+              "name": "evaluate",
+              "specifier": ">=0.4.6"
+            },
+            {
+              "name": "gdown",
+              "specifier": ">=6.4.1"
+            },
+            {
+              "name": "gymnasium",
+              "marker": "extra == 'rl'",
+              "specifier": ">=1.3.0"
+            },
+            {
+              "name": "hydra-core",
+              "marker": "extra == 'ssl'",
+              "specifier": ">=1.3.7"
+            },
+            {
+              "name": "kazoo",
+              "marker": "extra == 'mpc'",
+              "specifier": ">=2.11.0"
+            },
+            {
+              "name": "langdetect",
+              "marker": "extra == 'llm-eval'",
+              "specifier": ">=1.0.9,<2"
+            },
+            {
+              "name": "lighteval",
+              "marker": "extra == 'llm-eval'",
+              "specifier": "==0.13.0"
+            },
+            {
+              "name": "lightly",
+              "marker": "extra == 'ssl'",
+              "specifier": ">=1.5.26"
+            },
+            {
+              "name": "mlx",
+              "marker": "extra == 'mlx'",
+              "specifier": ">=0.32.3"
+            },
+            {
+              "name": "munch",
+              "specifier": ">=4.0.0"
+            },
+            {
+              "name": "numpy",
+              "specifier": ">=2.5.3"
+            },
+            {
+              "name": "omegaconf",
+              "marker": "extra == 'ssl'",
+              "specifier": ">=2.3.1"
+            },
+            {
+              "name": "opacus",
+              "marker": "extra == 'dp'",
+              "specifier": ">=1.6.0"
+            },
+            {
+              "name": "peft",
+              "specifier": ">=0.21.2"
+            },
+            {
+              "name": "python-socketio",
+              "specifier": ">=5.17.0"
+            },
+            {
+              "name": "requests",
+              "specifier": ">=2.34.2"
+            },
+            {
+              "name": "safetensors",
+              "specifier": ">=0.8.0"
+            },
+            {
+              "name": "scipy",
+              "specifier": ">=1.18.1"
+            },
+            {
+              "name": "tenseal",
+              "specifier": ">=0.3.18"
+            },
+            {
+              "name": "timm",
+              "specifier": ">=1.0.30"
+            },
+            {
+              "name": "torch",
+              "specifier": ">=2.14.1"
+            },
+            {
+              "name": "torch-optimizer",
+              "specifier": ">=0.3.0"
+            },
+            {
+              "name": "torchvision",
+              "specifier": ">=0.29.1"
+            },
+            {
+              "name": "transformers",
+              "specifier": ">=5.18.0"
+            },
+            {
+              "name": "zstd",
+              "specifier": ">=1.5.7.2"
+            }
+          ],
+          "provides-extras": [
+            "mpc",
+            "rl",
+            "dp",
+            "mlx",
+            "ssl",
+            "llm-eval"
+          ],
+          "requires-dev": {
+            "audit": [
+              {
+                "name": "pip-audit",
+                "specifier": ">=2.10.1"
+              }
+            ],
+            "build": [
+              {
+                "name": "hatchling",
+                "specifier": ">=1.32.4"
+              }
+            ],
+            "dev": [
+              {
+                "name": "plato-learn",
+                "extras": [
+                  "dp",
+                  "mpc",
+                  "rl"
+                ],
+                "editable": "."
+              },
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              },
+              {
+                "name": "ruff",
+                "specifier": ">=0.16.10"
+              },
+              {
+                "name": "ty",
+                "specifier": ">=0.0.84"
+              }
+            ],
+            "docs": [
+              {
+                "name": "mkdocs",
+                "specifier": ">=1.6.1"
+              },
+              {
+                "name": "mkdocs-material",
+                "specifier": ">=9.7.7"
+              }
+            ],
+            "test": [
+              {
+                "name": "plato-learn",
+                "extras": [
+                  "dp",
+                  "mpc",
+                  "rl"
+                ],
+                "editable": "."
+              },
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              }
+            ],
+            "test-base": [
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              }
+            ]
+          }
+        },
+        "after": {
+          "requires-dist": [
+            {
+              "name": "accelerate",
+              "specifier": ">=1.15.0"
+            },
+            {
+              "name": "aiohttp",
+              "specifier": ">=3.14.3"
+            },
+            {
+              "name": "boto3",
+              "specifier": ">=1.43.106"
+            },
+            {
+              "name": "datasets",
+              "specifier": ">=5.0.1"
+            },
+            {
+              "name": "evaluate",
+              "specifier": ">=0.4.6"
+            },
+            {
+              "name": "gdown",
+              "specifier": ">=6.4.1"
+            },
+            {
+              "name": "gymnasium",
+              "marker": "extra == 'rl'",
+              "specifier": ">=1.3.0"
+            },
+            {
+              "name": "hydra-core",
+              "marker": "extra == 'ssl'",
+              "specifier": ">=1.3.7"
+            },
+            {
+              "name": "kazoo",
+              "marker": "extra == 'mpc'",
+              "specifier": ">=2.11.0"
+            },
+            {
+              "name": "langdetect",
+              "marker": "extra == 'llm-eval'",
+              "specifier": ">=1.0.9,<2"
+            },
+            {
+              "name": "lighteval",
+              "marker": "extra == 'llm-eval'",
+              "specifier": "==0.13.0"
+            },
+            {
+              "name": "lightly",
+              "marker": "extra == 'ssl'",
+              "specifier": ">=1.5.26"
+            },
+            {
+              "name": "mlx",
+              "marker": "extra == 'mlx'",
+              "specifier": ">=0.32.3"
+            },
+            {
+              "name": "munch",
+              "specifier": ">=4.0.0"
+            },
+            {
+              "name": "numpy",
+              "specifier": ">=2.5.3"
+            },
+            {
+              "name": "omegaconf",
+              "marker": "extra == 'ssl'",
+              "specifier": ">=2.3.1"
+            },
+            {
+              "name": "opacus",
+              "marker": "extra == 'dp'",
+              "specifier": ">=1.6.0"
+            },
+            {
+              "name": "peft",
+              "specifier": ">=0.21.2"
+            },
+            {
+              "name": "python-socketio",
+              "specifier": ">=5.17.0"
+            },
+            {
+              "name": "requests",
+              "specifier": ">=2.34.2"
+            },
+            {
+              "name": "safetensors",
+              "specifier": ">=0.8.0"
+            },
+            {
+              "name": "scipy",
+              "specifier": ">=1.18.1"
+            },
+            {
+              "name": "tenseal",
+              "specifier": ">=0.3.18"
+            },
+            {
+              "name": "timm",
+              "specifier": ">=1.0.30"
+            },
+            {
+              "name": "torch",
+              "specifier": ">=2.14.1"
+            },
+            {
+              "name": "torch-optimizer",
+              "specifier": ">=0.3.0"
+            },
+            {
+              "name": "torchvision",
+              "specifier": ">=0.29.1"
+            },
+            {
+              "name": "transformers",
+              "specifier": ">=5.18.0"
+            },
+            {
+              "name": "zstd",
+              "specifier": ">=1.5.7.2"
+            }
+          ],
+          "provides-extras": [
+            "mpc",
+            "rl",
+            "dp",
+            "mlx",
+            "ssl",
+            "llm-eval"
+          ],
+          "requires-dev": {
+            "audit": [
+              {
+                "name": "pip-audit",
+                "specifier": ">=2.10.1"
+              }
+            ],
+            "build": [
+              {
+                "name": "hatchling",
+                "specifier": ">=1.32.4"
+              }
+            ],
+            "dev": [
+              {
+                "name": "plato-learn",
+                "extras": [
+                  "dp",
+                  "mpc",
+                  "rl"
+                ],
+                "editable": "."
+              },
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              },
+              {
+                "name": "ruff",
+                "specifier": ">=0.16.10"
+              },
+              {
+                "name": "ty",
+                "specifier": ">=0.0.84"
+              }
+            ],
+            "docs": [
+              {
+                "name": "mkdocs",
+                "specifier": ">=1.6.1"
+              },
+              {
+                "name": "mkdocs-material",
+                "specifier": ">=9.7.7"
+              }
+            ],
+            "test": [
+              {
+                "name": "plato-learn",
+                "extras": [
+                  "dp",
+                  "mpc",
+                  "rl"
+                ],
+                "editable": "."
+              },
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              }
+            ],
+            "test-base": [
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              }
+            ],
+            "test-model-search": [
+              {
+                "name": "plato-learn",
+                "extras": [
+                  "dp",
+                  "mpc",
+                  "rl"
+                ],
+                "editable": "."
+              },
+              {
+                "name": "ptflops",
+                "specifier": ">=0.7.5"
+              },
+              {
+                "name": "pytest",
+                "specifier": ">=9.1.1"
+              },
+              {
+                "name": "pytest-cov",
+                "specifier": ">=7.1.0"
+              }
+            ]
+          }
+        }
+      },
+      "dev-dependencies": {
+        "before": {
+          "audit": [
+            {
+              "name": "pip-audit"
+            }
+          ],
+          "build": [
+            {
+              "name": "hatchling"
+            }
+          ],
+          "dev": [
+            {
+              "name": "plato-learn",
+              "extra": [
+                "dp",
+                "mpc",
+                "rl"
+              ]
+            },
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            },
+            {
+              "name": "ruff"
+            },
+            {
+              "name": "ty"
+            }
+          ],
+          "docs": [
+            {
+              "name": "mkdocs"
+            },
+            {
+              "name": "mkdocs-material"
+            }
+          ],
+          "test": [
+            {
+              "name": "plato-learn",
+              "extra": [
+                "dp",
+                "mpc",
+                "rl"
+              ]
+            },
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            }
+          ],
+          "test-base": [
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            }
+          ]
+        },
+        "after": {
+          "audit": [
+            {
+              "name": "pip-audit"
+            }
+          ],
+          "build": [
+            {
+              "name": "hatchling"
+            }
+          ],
+          "dev": [
+            {
+              "name": "plato-learn",
+              "extra": [
+                "dp",
+                "mpc",
+                "rl"
+              ]
+            },
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            },
+            {
+              "name": "ruff"
+            },
+            {
+              "name": "ty"
+            }
+          ],
+          "docs": [
+            {
+              "name": "mkdocs"
+            },
+            {
+              "name": "mkdocs-material"
+            }
+          ],
+          "test": [
+            {
+              "name": "plato-learn",
+              "extra": [
+                "dp",
+                "mpc",
+                "rl"
+              ]
+            },
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            }
+          ],
+          "test-base": [
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            }
+          ],
+          "test-model-search": [
+            {
+              "name": "plato-learn",
+              "extra": [
+                "dp",
+                "mpc",
+                "rl"
+              ]
+            },
+            {
+              "name": "ptflops"
+            },
+            {
+              "name": "pytest"
+            },
+            {
+              "name": "pytest-cov"
+            }
+          ]
+        }
+      }
+    },
+    "anycostfl": {
+      "dependencies": {
+        "before": [
+          {
+            "name": "einops"
+          },
+          {
+            "name": "plato-learn"
+          },
+          {
+            "name": "ptflops"
+          }
+        ],
+        "after": [
+          {
+            "name": "plato-learn"
+          },
+          {
+            "name": "ptflops"
+          }
+        ]
+      },
+      "metadata": {
+        "before": {
+          "requires-dist": [
+            {
+              "name": "einops",
+              "specifier": ">=0.8.2"
+            },
+            {
+              "name": "plato-learn",
+              "editable": "."
+            },
+            {
+              "name": "ptflops",
+              "specifier": ">=0.7.5"
+            }
+          ]
+        },
+        "after": {
+          "requires-dist": [
+            {
+              "name": "plato-learn",
+              "editable": "."
+            },
+            {
+              "name": "ptflops",
+              "specifier": ">=0.7.5"
+            }
+          ]
+        }
+      }
+    },
+    "fedrolex": {
+      "dependencies": {
+        "before": [
+          {
+            "name": "einops"
+          },
+          {
+            "name": "plato-learn"
+          },
+          {
+            "name": "ptflops"
+          }
+        ],
+        "after": [
+          {
+            "name": "plato-learn"
+          },
+          {
+            "name": "ptflops"
+          }
+        ]
+      },
+      "metadata": {
+        "before": {
+          "requires-dist": [
+            {
+              "name": "einops",
+              "specifier": ">=0.8.2"
+            },
+            {
+              "name": "plato-learn",
+              "editable": "."
+            },
+            {
+              "name": "ptflops",
+              "specifier": ">=0.7.5"
+            }
+          ]
+        },
+        "after": {
+          "requires-dist": [
+            {
+              "name": "plato-learn",
+              "editable": "."
+            },
+            {
+              "name": "ptflops",
+              "specifier": ">=0.7.5"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "top_level_changes": {
+    "manifest": {
+      "before": {
+        "members": [
+          "anycostfl",
+          "calibre",
+          "detector",
+          "fedrolex",
+          "fedunlearning",
+          "gradient-leakage-attacks",
+          "heterofl",
+          "knot",
+          "llm-split-learning",
+          "mobilenetv3",
+          "pisces",
+          "plato-learn",
+          "polaris",
+          "smog",
+          "vit"
+        ],
+        "overrides": [
+          {
+            "name": "nltk",
+            "specifier": "==3.10.3"
+          }
+        ]
+      },
+      "after": {
+        "members": [
+          "anycostfl",
+          "calibre",
+          "detector",
+          "fedrolex",
+          "fedunlearning",
+          "gradient-leakage-attacks",
+          "heterofl",
+          "knot",
+          "llm-split-learning",
+          "pisces",
+          "plato-learn",
+          "polaris",
+          "smog"
+        ],
+        "overrides": [
+          {
+            "name": "nltk",
+            "specifier": "==3.10.3"
+          }
+        ]
+      }
+    }
+  },
+  "retained_versions_sources_wheels_unchanged": true,
+  "shared_profile_integration": "Pending corrected MLX native/profile acceptance; this is provisional archival branch.",
+  "deep_exact_delta_verified": true,
+  "remaining_gitlinks": 0
+}

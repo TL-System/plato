@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "backend": "heterofl-mobilenetv3",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "files": [
+    {
+      "git_mode": "100644",
+      "git_blob": "87bf96a2d590ef14537a7ea3ece63cc445f587f8",
+      "sha256": "416bdd4eb3e53909c226fdf481eeecc9886315b9c5b70d1aadd5d047cbff168d",
+      "bytes": 18282,
+      "original_path": "examples/model_search/heterofl/mobilenetv3.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/mobilenetv3.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071,
+      "original_path": "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d145361b8d65799eba22243ed1eb1d343edf798b",
+      "sha256": "79e16d102ff139c27b28c88b2f6aeae26b3eedc40495d24ec0f2bc95ca049a96",
+      "bytes": 1002,
+      "original_path": "examples/model_search/heterofl/heterofl.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/heterofl.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "f2ae61e32d4562708048ce311832b65e3a652897",
+      "sha256": "0658d268eba1e803568fecd3639ed606f5da7d657416a0c3608a719984655c80",
+      "bytes": 7423,
+      "original_path": "examples/model_search/heterofl/heterofl_algorithm.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/heterofl_algorithm.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "671675cc6fc55f8e7472bf8a0a1f0ee5d7b78021",
+      "sha256": "5ef46e51812fcfcf5bcbb20d55f7b2fd5c59141b4a1243e2795cb74604576f1b",
+      "bytes": 2566,
+      "original_path": "examples/model_search/heterofl/heterofl_client.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/heterofl_client.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "3839a9143dbc31bf6c884010fda3f50115cc9d6c",
+      "sha256": "361563886ce2a5eca689d8d1702fb8778874614c9c5bc77d6f2775eb01fd42aa",
+      "bytes": 1662,
+      "original_path": "examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/heterofl_resnet18_dynamic.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d1c88fb863ec8b64ee85a94542529688d9164b18",
+      "sha256": "c188af3df4029e6530660aced59656f02bf48b870f15526a318ffaf3e0b147ec",
+      "bytes": 4309,
+      "original_path": "examples/model_search/heterofl/heterofl_server.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/heterofl_server.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "9cee02d6f4937b00ec12b5ceec70cc3070437fdd",
+      "sha256": "78e73ea1124766931c01595cdf2ef8c6041090b4d7e6f639778f9e38b616e4d2",
+      "bytes": 2126,
+      "original_path": "examples/model_search/heterofl/heterofl_trainer.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/heterofl_trainer.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "16f5b1c3c7a4c0092e2e43f9587461bac2b2dfd6",
+      "sha256": "c7d3bd0135626082d4ed2b22b2aba1651330baab984a7d81fbee402dcfbfc0c5",
+      "bytes": 236,
+      "original_path": "examples/model_search/heterofl/pyproject.toml",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "6479be875b671c4c7c24f5bace2234df01047d2e",
+      "sha256": "fc8bfa63c4bc849d196164f1119cc714f4041ad3cbcb51c0620175c06ea63657",
+      "bytes": 7830,
+      "original_path": "examples/model_search/heterofl/resnet.py",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/examples/model_search/heterofl/resnet.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006,
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368,
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/original/uv.lock",
+      "disposition": "copied_context"
+    }
+  ],
+  "vendored_upstream_revision": "unknown",
+  "supplemental_licenses": [
+    {
+      "component": "mobilenetv3-d-li14",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/licenses/mobilenetv3-d-li14-LICENSE",
+      "source_url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/3e6938cedcbbc5ee5bc50780ea18e644702d85fc/LICENSE",
+      "observed_upstream_revision": "3e6938cedcbbc5ee5bc50780ea18e644702d85fc",
+      "retrieved_at": "2026-10-03",
+      "sha256": "00670ad9a7f73fafd65cd3bb02c26b0cdcaffa69218cbdbf4bcb6fb143a6b595",
+      "bytes": 1063,
+      "original_vendored_revision": "unknown",
+      "provenance_caveat": "This supplemental notice receipt does not identify the original vendored source revision."
+    },
+    {
+      "component": "mobilenetv3-kuan-wang",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/licenses/mobilenetv3-kuan-wang-LICENSE",
+      "source_url": "https://raw.githubusercontent.com/kuan-wang/pytorch-mobilenet-v3/8873a233b84ecfa4137e9658f4232f00b0744c77/LICENSE",
+      "observed_upstream_revision": "8873a233b84ecfa4137e9658f4232f00b0744c77",
+      "retrieved_at": "2026-10-03",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_vendored_revision": "unknown",
+      "provenance_caveat": "This supplemental notice receipt does not identify the original vendored source revision."
+    },
+    {
+      "component": "senet",
+      "archive_path": "archives/retired/heterofl-mobilenetv3/licenses/senet-LICENSE",
+      "source_url": "https://raw.githubusercontent.com/moskomule/senet.pytorch/8cb2669fec6fa344481726f9199aa611f08c3fbd/LICENSE",
+      "observed_upstream_revision": "8cb2669fec6fa344481726f9199aa611f08c3fbd",
+      "retrieved_at": "2026-10-03",
+      "sha256": "5e51f5b080237bfcbb8c292a67208c7364e97a77de02c2acda29966f9e084dc5",
+      "bytes": 1073,
+      "original_vendored_revision": "unknown",
+      "provenance_caveat": "This supplemental notice receipt does not identify the original vendored source revision."
+    }
+  ]
+}

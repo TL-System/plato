@@ -18,7 +18,6 @@ from plato.models import (
     resnet,
     torch_hub,
     vgg,
-    vit,
 )
 from plato.utils.retired_backends import raise_if_retired
 
@@ -40,7 +39,6 @@ registered_factories = {
     "general_multilayer": general_multilayer.Model,
     "torch_hub": torch_hub.Model,
     "huggingface": huggingface.Model,
-    "vit": vit.Model,
 }
 
 registered_mlx_models = {}

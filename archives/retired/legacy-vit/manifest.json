@@ -1,0 +1,2844 @@
+{
+  "schema_version": 1,
+  "backend": "legacy-vit",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "files": [
+    {
+      "git_mode": "100644",
+      "git_blob": "958090f3fae6f9d8693ab9333349a0d0eb1d04b3",
+      "sha256": "644ff56989e45f04923090ce2f8a027d40397fcbc513e36c35ea8846e90c7d54",
+      "bytes": 1316,
+      "original_path": "configs/ViT/fedavg_cifar10_dvit.toml",
+      "archive_path": "archives/retired/legacy-vit/original/configs/ViT/fedavg_cifar10_dvit.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "190011572ab10b267956c11117c61580782a5a09",
+      "sha256": "a692ffc392a8bf87ac71ad85cedcc88d92f8472cea39744c974ec85a4b0990b6",
+      "bytes": 1330,
+      "original_path": "configs/ViT/fedavg_cifar10_swinv2.toml",
+      "archive_path": "archives/retired/legacy-vit/original/configs/ViT/fedavg_cifar10_swinv2.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "e44246661832aa6819bf9a07692833b1bf7e6aa5",
+      "sha256": "968fe1e47efa22a64cded98500ef71a60dc61ffc666610fe9e3fdd1b455a9a8f",
+      "bytes": 1317,
+      "original_path": "configs/ViT/fedavg_cifar10_t2tvit14.toml",
+      "archive_path": "archives/retired/legacy-vit/original/configs/ViT/fedavg_cifar10_t2tvit14.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "c865459187c69ee08f460901a466541453b53c61",
+      "sha256": "c5e3a4a8d12209a0dfd70ac6f1abeeb9a5fc3dcfb435911acf8bb90be1990978",
+      "bytes": 1457,
+      "original_path": "configs/ViT/fedavg_tinyimagenet_levit.toml",
+      "archive_path": "archives/retired/legacy-vit/original/configs/ViT/fedavg_tinyimagenet_levit.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "827f67463419971dfa0647dc6ee80104208df184",
+      "sha256": "7c04e14e975df515bc72519e5a6e3da68524f5732179b31492328bee241cacca",
+      "bytes": 6009,
+      "original_path": "plato/models/vit.py",
+      "archive_path": "archives/retired/legacy-vit/original/plato/models/vit.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "50213eaf852cd5c4204597ff37c162301685f716",
+      "sha256": "9901a1766341a9b9369a31ede1a5f8d94429eaf2e74c66f7a77c2520324e703b",
+      "bytes": 7345,
+      "original_path": ".github/workflows/pytorch_tests.yml",
+      "archive_path": "archives/retired/legacy-vit/original/.github/workflows/pytorch_tests.yml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "377fc17b78afdc7d45a3e72528632feb984b1575",
+      "sha256": "df62d800fe0b6c27c924cdba64e6bcdd9fae3957d1efe613b01e1f51752e3428",
+      "bytes": 217,
+      "original_path": ".gitmodules",
+      "archive_path": "archives/retired/legacy-vit/original/.gitmodules",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/legacy-vit/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "071a765746266fbb8f3016fcb44cdd78f8a060c2",
+      "sha256": "50c552db89dc0c3983b84c297e6efc8589f4514199b3d5bb9e87872f4d49f3ec",
+      "bytes": 8549,
+      "original_path": "docs/docs/configurations/trainer.md",
+      "archive_path": "archives/retired/legacy-vit/original/docs/docs/configurations/trainer.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071,
+      "original_path": "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "archive_path": "archives/retired/legacy-vit/original/docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "92f5317cffdbbd0b83d7eedfc1f4d2b7930a2295",
+      "sha256": "bd618da35cb92c4077cc0f1d3c026b977b8f3acece025c8a84d3c3a626364aec",
+      "bytes": 6018,
+      "original_path": "docs/docs/examples/algorithms/14. Gradient Leakage Attacks and Defences.md",
+      "archive_path": "archives/retired/legacy-vit/original/docs/docs/examples/algorithms/14. Gradient Leakage Attacks and Defences.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "f0bd22dfac98b615983a0c0dda51f008d7fceea6",
+      "sha256": "d3c8fceb58d4d0fad63422bb8ce07b73d46e03d51bb7d5459b019c1ebeb5641c",
+      "bytes": 1056,
+      "original_path": "evidence/2026-refresh/vit-initialization-probe.json",
+      "archive_path": "archives/retired/legacy-vit/original/evidence/2026-refresh/vit-initialization-probe.json",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "41ab01f8a113a76e17c6e333c6a5af3d671d2253",
+      "sha256": "9e90c649a0be820e8674ec2f6501bbf2ff30f4559e4d8fafff6c573741f673e5",
+      "bytes": 888,
+      "original_path": "examples/gradient_leakage_attacks/dlg_model.py",
+      "archive_path": "archives/retired/legacy-vit/original/examples/gradient_leakage_attacks/dlg_model.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "29d98c8a7968b4d6555401a6129bc1035a57a3aa",
+      "sha256": "56a16880680d64f6da5d2f3020aaf183228710c7946541c8604e67b2cd6482da",
+      "bytes": 4472,
+      "original_path": "plato/models/registry.py",
+      "archive_path": "archives/retired/legacy-vit/original/plato/models/registry.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "8967a1f9026781c39a0ee7afe281db14d70d7002",
+      "sha256": "8f5638edaf1636734d1ae293748f6518addbf05568ffd77d24faa7f88e554d40",
+      "bytes": 782,
+      "original_path": "plato/utils/retired_backends.py",
+      "archive_path": "archives/retired/legacy-vit/original/plato/utils/retired_backends.py",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006,
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/legacy-vit/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368,
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/legacy-vit/original/uv.lock",
+      "disposition": "copied_context"
+    }
+  ],
+  "supplemental_licenses": [],
+  "upstreams": [
+    {
+      "original_path": "plato/models/dvit",
+      "git_mode": "160000",
+      "gitlink_pin": "1ccb152cea43fcbc3cd517a45c12c65734f8ace3",
+      "url": "https://github.com/zhoudaquan/dvit_repo",
+      "archive_path": "archives/retired/legacy-vit/dvit-upstream-1ccb152cea43fcbc3cd517a45c12c65734f8ace3.tar.gz",
+      "nested_gitlinks": [],
+      "files": [
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "aad570ccdfd1b096d2fa78a0bd6338d3948c74a3",
+          "sha256": "a8479fb992512f85a3226f59d27cf27860b35848f7f3dfb12f8a4e2242f3809a",
+          "bytes": 1067
+        },
+        {
+          "path": "MANIFEST.in",
+          "git_mode": "100644",
+          "git_blob": "4f2d15846513429725906870ff23b04370a41e86",
+          "sha256": "cf647b221a6f5eead7247b77b310cb88d73c2f8a546c4590471417849d165b2e",
+          "bytes": 34
+        },
+        {
+          "path": "README.md",
+          "git_mode": "100644",
+          "git_blob": "ee1badbbbf288e0c3f5ce6e781b1d497c071918e",
+          "sha256": "e5e5f85b79fff2c096159f1ad802196365ee1944f32aeccd841a00cbdd4d2c07",
+          "bytes": 4518
+        },
+        {
+          "path": "attn_visualize.py",
+          "git_mode": "100644",
+          "git_blob": "dde3642ec29b2a36125004473a0514165b9e2ff8",
+          "sha256": "c7dc5bb8cd6072e173f6edc4e11690a390330cae8e2a4c510f7aea374138dfd6",
+          "bytes": 848
+        },
+        {
+          "path": "avg_checkpoints.py",
+          "git_mode": "100644",
+          "git_blob": "a692122481bc29f2216ea3ef7685760b7fa096db",
+          "sha256": "f2f7af09ee729213f364b7c7526e49edcd35442c04343ba9add230e19d00496d",
+          "bytes": 4590
+        },
+        {
+          "path": "clean_checkpoint.py",
+          "git_mode": "100644",
+          "git_blob": "94f184d1b6eee26a2564a96b3d2452f24d9f2c7a",
+          "sha256": "812e2ddef0eb167117818d44d530a46b2695a4b217b2fa358f47d6aa5b87c8f9",
+          "bytes": 3333
+        },
+        {
+          "path": "convert/convert_from_mxnet.py",
+          "git_mode": "100644",
+          "git_blob": "f2c64c2560377b89dbd787280f343e6259409708",
+          "sha256": "6b20e2536a4fa4fc2c95ad31bd6ebff0f184fd5f22175422f263d0b5a43ae8f1",
+          "bytes": 4033
+        },
+        {
+          "path": "dist_utils/setup.sh",
+          "git_mode": "100644",
+          "git_blob": "841f7abb95a9f2ae9211d7efe4d02aa201636a1c",
+          "sha256": "ed5e70df40f1812b6bf7e8cf36e0d9ec9cb16689ec2f749dbe52e6769eab28c9",
+          "bytes": 665
+        },
+        {
+          "path": "dist_utils/setup_network.sh",
+          "git_mode": "100644",
+          "git_blob": "5f1ac5e692d6324a9dcfd631b53dbd7f4896552a",
+          "sha256": "3c3dd24e498ac7014d0e036fe2fb6fe06c1b2fc4452b8577029b9d4fe69ba5ef",
+          "bytes": 354
+        },
+        {
+          "path": "distributed_train.sh",
+          "git_mode": "100755",
+          "git_blob": "1985669e25b858964ce04b9796865b78d9870663",
+          "sha256": "e18479573ec02a8c58dc390aeae2697ec6daccaf4ef6496673447616a460326e",
+          "bytes": 108
+        },
+        {
+          "path": "docs/archived_changes.md",
+          "git_mode": "100644",
+          "git_blob": "baad8e01603af57a40dd1b567b204703140dd3f0",
+          "sha256": "b63ecbc7ded2b2214210df46648f3b0329962b494a6e85d8bfe511864947cc36",
+          "bytes": 6582
+        },
+        {
+          "path": "docs/changes.md",
+          "git_mode": "100644",
+          "git_blob": "5e696a1179bd080f44e701f4f58a55fad4ab696c",
+          "sha256": "8c1180c2a56e4554fd18902359e1eb8c900b528635fe7eea1245bcfd3224d4b3",
+          "bytes": 5554
+        },
+        {
+          "path": "docs/feature_extraction.md",
+          "git_mode": "100644",
+          "git_blob": "8c1d50d73b0d815585ea97608c67f2302ce00236",
+          "sha256": "7bbb8eacef04f695cb8ed41086f80cd0a1698f241cad2ecdc2ee2814cb63aa2f",
+          "bytes": 6149
+        },
+        {
+          "path": "docs/index.md",
+          "git_mode": "100644",
+          "git_blob": "d3d5be038516c836af9f356bc77ed5e259632061",
+          "sha256": "b0c6df92a172807625d642520fd28cddd56cb1df2e30dfa5b4cd86e74e8e22ec",
+          "bytes": 1664
+        },
+        {
+          "path": "docs/javascripts/tables.js",
+          "git_mode": "100644",
+          "git_blob": "5f21b4d22c7c022fcb6b2fbadcc0148f240798b8",
+          "sha256": "c5eda2f74b43554a4510f4d8dfae4ff56c859acd512562fa99966ae85558ce55",
+          "bytes": 162
+        },
+        {
+          "path": "docs/models.md",
+          "git_mode": "100644",
+          "git_blob": "f62cdf5f46ca97e226fa2fedbac44952a1f7bd8d",
+          "sha256": "affc97c15d0c2132c2d9f8687e12b9dd96f9d890199ceec526bc29f39f6f8984",
+          "bytes": 10731
+        },
+        {
+          "path": "docs/results.md",
+          "git_mode": "100644",
+          "git_blob": "84410b05135d8a267b9bcc4ef8d2c7b0b8247cee",
+          "sha256": "909fa7a32dcc429ae74e95f5736b3ee1089e4778ac4a7ea241ee0996c714c1b3",
+          "bytes": 4819
+        },
+        {
+          "path": "docs/scripts.md",
+          "git_mode": "100644",
+          "git_blob": "48f123af61cd1266671a24577db19c5e0b68d70e",
+          "sha256": "4cc870fd15f881ad057d9ed26401085aa6208e51d967b25b7e5233ca4044d16c",
+          "bytes": 1768
+        },
+        {
+          "path": "docs/training_hparam_examples.md",
+          "git_mode": "100644",
+          "git_blob": "c2afc2b1081079523138432771316f270b3cb065",
+          "sha256": "e61ce4723f2855e0e17673f2dfc55abf946caecf53aafc958dc58e64ec39374b",
+          "bytes": 4937
+        },
+        {
+          "path": "eval.sh",
+          "git_mode": "100644",
+          "git_blob": "bd25934cda904b8a21fce166a37c0cb4f031c066",
+          "sha256": "097ea78bdee158f21f01727c53cbabaea79c8f40b61e6cfa4d2bd3ea4c3618da",
+          "bytes": 90
+        },
+        {
+          "path": "figures/attention_map_visualization.png",
+          "git_mode": "100644",
+          "git_blob": "6d76f32a2e53a282b45711c080e084e7ef09e1a2",
+          "sha256": "f5ad968669ef1768ebaff5190d4ec6b4b2ebd374ff478d97bd29d63d2bc579e8",
+          "bytes": 3743399
+        },
+        {
+          "path": "figures/performance_comparison.png",
+          "git_mode": "100644",
+          "git_blob": "e9aa1430a82f442d5dc0bffa5142aff9c3da2750",
+          "sha256": "6d3ceefd80a06fe78e54399d6e424f27bd257c36ea178a7b2cc1c8cbcd5fb83b",
+          "bytes": 44112
+        },
+        {
+          "path": "hubconf.py",
+          "git_mode": "100644",
+          "git_blob": "70fed79a27a254dbe5fc32a6ffb41f2fded08ef2",
+          "sha256": "6fe06857bbad00696f2ab174ebce6f1219e84a58531153873ff1cef55dbdfd5d",
+          "bytes": 105
+        },
+        {
+          "path": "inference.py",
+          "git_mode": "100644",
+          "git_blob": "16d199443e0707b8967970ecc6fbf5f5b670bc9b",
+          "sha256": "2eb2c11541207c8a09ab62efde2f2ccb0d1e0857e1d4b0b910375ef624a687d9",
+          "bytes": 5057
+        },
+        {
+          "path": "lib_deit/.circleci/config.yml",
+          "git_mode": "100644",
+          "git_blob": "4c236222ba9fdffbe5873a1e98e48e0da9681d6b",
+          "sha256": "83fc15cf579c5710bd3e12bec9f9426c338cfdc183a8df2b07bfa9f058336253",
+          "bytes": 605
+        },
+        {
+          "path": "lib_deit/.github/CODE_OF_CONDUCT.md",
+          "git_mode": "100644",
+          "git_blob": "0f7ad8bfc173eac554f0b6ef7c684861e8014bbe",
+          "sha256": "1ce27940af665ed0b061c37de87b728100f1f548d9dccd4fd78158d2cf8f51f0",
+          "bytes": 244
+        },
+        {
+          "path": "lib_deit/.github/CONTRIBUTING.md",
+          "git_mode": "100644",
+          "git_blob": "2726aa08beefd303b654db2af1ddaf7b7d68b4ae",
+          "sha256": "85968c66fc4f8932c800eb94f9e7ff1cd5d3e68cf2c28437c778e8fd2f8c0cf2",
+          "bytes": 1609
+        },
+        {
+          "path": "lib_deit/.github/deit.png",
+          "git_mode": "100644",
+          "git_blob": "e2d13de21ecb3b5381b1125fca223bd809908330",
+          "sha256": "e4a8ca1c695da38b2c07c5795d5bc38e040dc81414acea8caf748e608c3bcf9e",
+          "bytes": 157538
+        },
+        {
+          "path": "lib_deit/.gitignore",
+          "git_mode": "100644",
+          "git_blob": "071fa33d6c3306daaabaeb0f13ad917b44d12a87",
+          "sha256": "22126314aa1a135939a820704a48c86eae3751e2fc99d50488b579e86c961e9d",
+          "bytes": 83
+        },
+        {
+          "path": "lib_deit/LICENSE",
+          "git_mode": "100644",
+          "git_blob": "b1395e94b016dd1b95b4c7e3ed493e1d0b342917",
+          "sha256": "b208c52b00a2df2c8f4c3298c34407bf2bfe409968213372251c91fcc737a1a5",
+          "bytes": 11354
+        },
+        {
+          "path": "lib_deit/README.md",
+          "git_mode": "100644",
+          "git_blob": "a884759de9f440478076389f294713d18a6aa40a",
+          "sha256": "ea57e00ae48551dd689d9019f6bc8628fbd5899ec11ec88e008ef87714cdd8de",
+          "bytes": 8629
+        },
+        {
+          "path": "lib_deit/datasets.py",
+          "git_mode": "100644",
+          "git_blob": "83241a524c8609109d082807c98c0b3be1b584bb",
+          "sha256": "675e7bfb9795819d2da71b3dd95a36efb46490a341d4428c6a9cbbfb8d3b2822",
+          "bytes": 4241
+        },
+        {
+          "path": "lib_deit/engine.py",
+          "git_mode": "100644",
+          "git_blob": "857052ce1fa07b11266fc80bde8a0be1a32c9abb",
+          "sha256": "2c51c230ad4aaf0a1a6ecabb946cd26cde7f7eb3907f621181277d871c729cdf",
+          "bytes": 3630
+        },
+        {
+          "path": "lib_deit/hubconf.py",
+          "git_mode": "100644",
+          "git_blob": "eed6283dd7ee80c338d351b0a27ee0e71b9b5030",
+          "sha256": "60757cdf5688575d93e709a8c0b5793f090a61c0d649ae729e9943186535e4ed",
+          "bytes": 138
+        },
+        {
+          "path": "lib_deit/losses.py",
+          "git_mode": "100644",
+          "git_blob": "ff7748fb8473207e5e94065532e9330329e9bd7f",
+          "sha256": "77c2993fc1207842aa13674a66d1cd64b406e0ce65209c6ca9b1d0f8c21ebfa3",
+          "bytes": 2771
+        },
+        {
+          "path": "lib_deit/main.py",
+          "git_mode": "100644",
+          "git_blob": "06679f6cfd6a9b34f9b8c80f57ddc34a9009db69",
+          "sha256": "f5e7f331d3e96494cbba8f6af0ad2d4fd2ef7f133bbdda6bd0afd3391fdcbef5",
+          "bytes": 20346
+        },
+        {
+          "path": "lib_deit/models.py",
+          "git_mode": "100644",
+          "git_blob": "5b22ef36bb5bc3bebf294fca407cd4d781bf19ce",
+          "sha256": "28d2d573aece3dfe67780b58548a766c978c23b276df45f08589a77da45ff5fb",
+          "bytes": 6932
+        },
+        {
+          "path": "lib_deit/requirements.txt",
+          "git_mode": "100644",
+          "git_blob": "b7bd9bd1b805bbc65652845a0bb8e91de6c18414",
+          "sha256": "7047d421ea8fcd53ae07d8fadcba3f700bcb38bf5932c8d2b4b24cce2bb1cdc4",
+          "bytes": 44
+        },
+        {
+          "path": "lib_deit/run_with_submitit.py",
+          "git_mode": "100644",
+          "git_blob": "a0da744ea4eb9421b0108b8f0560b165b323e122",
+          "sha256": "8ce2100e75730bd7524ecf50e3cf1a4991a23167fa8a0cf6e6d25a671a7d991b",
+          "bytes": 4075
+        },
+        {
+          "path": "lib_deit/samplers.py",
+          "git_mode": "100644",
+          "git_blob": "e67dc6ddd2048a0032c1892540f3289bba4465ea",
+          "sha256": "e53c1e8ba3bcce9a62cc60efa40b6b52d6c1cee8b08b88d4265eeda44c5e52f5",
+          "bytes": 2292
+        },
+        {
+          "path": "lib_deit/tox.ini",
+          "git_mode": "100644",
+          "git_blob": "5554a882ac345a2c795b66d7419f9ef8ea2c5397",
+          "sha256": "79e92ff3485fcd1036c52e4dac69f2f29afb29f15e4920f9de65fd5f15e57f10",
+          "bytes": 65
+        },
+        {
+          "path": "lib_deit/utils.py",
+          "git_mode": "100644",
+          "git_blob": "06aa7050428781fe5e6b80ba26a5cf4e0f2ca0f7",
+          "sha256": "58f4585a2635c425ee47316f91946b5241ae47c9d4b8fade95ee9fe9b0dc7a5b",
+          "bytes": 7341
+        },
+        {
+          "path": "loss/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "c6fbca8f853491b2f5f297125a78c67b71c66702",
+          "sha256": "973d5d95f23bac350f47780b3815450c80a23953a6bb8c45c4c031075b495ec6",
+          "bytes": 55
+        },
+        {
+          "path": "loss/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "c235e9fc0f7bc145d79da336947b940af45b5b2d",
+          "sha256": "25124fb31d0f0424d6d2d851603860265d7a13545b069810220dae8f572b0e89",
+          "bytes": 205
+        },
+        {
+          "path": "loss/__pycache__/cross_entropy.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "dc7af3e60f8a7423d4748e0cce0ea8a58e2ccec8",
+          "sha256": "6fb0c229ceba8674b0376e90ece5288edc1d4cd1ee5dfc165cbde94b06c98d2c",
+          "bytes": 1100
+        },
+        {
+          "path": "loss/cross_entropy.py",
+          "git_mode": "100644",
+          "git_blob": "3f95e5f5e973b0c0643cdcc9dcb52a65f4a1ca53",
+          "sha256": "98fcd5668248786c0da5f6578f2dbfe941ad704cce549e5d06b0b19e3f19c844",
+          "bytes": 665
+        },
+        {
+          "path": "models/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "0b41b36d727aa0712a1a240108f5b99de278b6f8",
+          "sha256": "f153aeb1eadb759475329a8650a18a6f27a3e94aae4ca6bc1cbcedd96f862567",
+          "bytes": 39
+        },
+        {
+          "path": "models/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "44d2878aac67ad1cb12c4279378576ea3ed606df",
+          "sha256": "0f54c2c30169f50899db8e5695552b716539ffa3aef5baf6660e627b9a586044",
+          "bytes": 181
+        },
+        {
+          "path": "models/__pycache__/deep_vision_transformer.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e8b355bb7602930e9b49c98289a57daf4f7e6d33",
+          "sha256": "483aed5001b3116c64121c8b038093be3921ca347a188405a59a516c806acc36",
+          "bytes": 7936
+        },
+        {
+          "path": "models/__pycache__/layers.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "13bd9b90bb7bf4479b0a037af3f2b9885ce9b57f",
+          "sha256": "b4a68eda6ffbc924d0301bf3b7c73040b1f908a91466b4438870d9f20321ffbc",
+          "bytes": 8005
+        },
+        {
+          "path": "models/deep_vision_transformer.py",
+          "git_mode": "100644",
+          "git_blob": "f3f6136bb30797a249756476ad4cf624e70aad33",
+          "sha256": "2938dd1e82ce3487b327472e3536b49c2a13afe87d8e4522a3eb35075d2934e1",
+          "bytes": 9632
+        },
+        {
+          "path": "models/layers.py",
+          "git_mode": "100644",
+          "git_blob": "c7e63504b7d75265383bdd7683216cfb747d2295",
+          "sha256": "828f1ace729fe7097e5e1a6f5be8bb66b4e1c3250f9176937432144fd30cbc8a",
+          "bytes": 9194
+        },
+        {
+          "path": "results/README.md",
+          "git_mode": "100644",
+          "git_blob": "b3fcec07088bf26a5b42860e2fbff9f40e1f296e",
+          "sha256": "9182280029d3dd04b9450dd79f0c13253b511457cf43ed8a009b18f26269cf39",
+          "bytes": 3658
+        },
+        {
+          "path": "results/generate_csv_results.py",
+          "git_mode": "100644",
+          "git_blob": "04cf710ad77162e32904ed11053bf29b9bb8fcbf",
+          "sha256": "3fd062651fafeed9189a780295042dc09612559038cda24e3a4547fd5008005b",
+          "bytes": 2472
+        },
+        {
+          "path": "results/imagenet_a_indices.txt",
+          "git_mode": "100644",
+          "git_blob": "8e373bc707cb853e1b41ed35c6b21d078553a206",
+          "sha256": "e81223a35add6e78f9afe6f215652c1926ebefe1d8efc26c6e923d7ac9143937",
+          "bytes": 774
+        },
+        {
+          "path": "results/imagenet_a_synsets.txt",
+          "git_mode": "100644",
+          "git_blob": "6eeaaf66f3f471b7f622a608607a0c4e8409df33",
+          "sha256": "9826a24166e74ce62fb87b27889874ca26917542c745712309d6e25855d63bc2",
+          "bytes": 2000
+        },
+        {
+          "path": "results/imagenet_r_indices.txt",
+          "git_mode": "100644",
+          "git_blob": "e4ff6ffbbbf9ad310932b3df08863feaecdadeba",
+          "sha256": "91e09d2ff0a002104bc0d37a892a7e75ffc2cc0db47b2b506047a3493b9116d2",
+          "bytes": 769
+        },
+        {
+          "path": "results/imagenet_r_synsets.txt",
+          "git_mode": "100644",
+          "git_blob": "33723baf489f210b1b79a8e9e033311fc016630b",
+          "sha256": "a6a0729f7a99230280639cab6e51e01485a3b41a676ea35621a501c9d6e83ca4",
+          "bytes": 2000
+        },
+        {
+          "path": "results/imagenet_real_labels.json",
+          "git_mode": "100644",
+          "git_blob": "2818c1f2f6113756498b40de12de3fafd05b7c05",
+          "sha256": "d83e9bff374c631aae8439eb064c7019acc56e1b3bc3f56b8380c2a710b0220b",
+          "bytes": 388478
+        },
+        {
+          "path": "results/imagenet_synsets.txt",
+          "git_mode": "100644",
+          "git_blob": "88aa58f966b3c4b7264a52bb71dcb25e856f6c1f",
+          "sha256": "70002b0ff5de60a3a17a82dbfcff291931f96225ddf941ad2e182fc39e183d15",
+          "bytes": 10000
+        },
+        {
+          "path": "results/results-imagenet-a-clean.csv",
+          "git_mode": "100644",
+          "git_blob": "9bf44c92cf3423f44172808947b5d0a36733fced",
+          "sha256": "1c705d5e5a3326653897023889537c49ac4fcbbd368996145da5d1e3e468ce1e",
+          "bytes": 17452
+        },
+        {
+          "path": "results/results-imagenet-a.csv",
+          "git_mode": "100644",
+          "git_blob": "ef1f15a0217ecd4c318dadb1b799194b1379c802",
+          "sha256": "3264be43abd3fcbdd2fbf5d7204a257fc7faea415b465bf11ad7ad1ef943e69a",
+          "bytes": 22942
+        },
+        {
+          "path": "results/results-imagenet-r-clean.csv",
+          "git_mode": "100644",
+          "git_blob": "6231f9f4a5015ac79bd7bba084a8805de23f13be",
+          "sha256": "40ecf2202b530902b4678a7202a494069176a39921c90221d335e17c49136d95",
+          "bytes": 17449
+        },
+        {
+          "path": "results/results-imagenet-r.csv",
+          "git_mode": "100644",
+          "git_blob": "e5de127353e834aabd71ec22b355d6ab8ae6c730",
+          "sha256": "ff20861490dc19598485658f6fe85ce17c70c8dbe1f3ee4c98afb2e20ef2b1df",
+          "bytes": 23123
+        },
+        {
+          "path": "results/results-imagenet-real.csv",
+          "git_mode": "100644",
+          "git_blob": "6bc2c66e8583538372c1b554bcf639c98936de8f",
+          "sha256": "3ec2897616810346f3327dd299b0e3ce2b9ff060d31e4e1c8eabd113c9193a5c",
+          "bytes": 22196
+        },
+        {
+          "path": "results/results-imagenet.csv",
+          "git_mode": "100644",
+          "git_blob": "9d199d1ed92b67f3cc90e5b692896545e411b94a",
+          "sha256": "8be57255f8d4eb29094bc727ea758c3c1420198fdbda857f1e632a6ef1dd8ceb",
+          "bytes": 17705
+        },
+        {
+          "path": "results/results-imagenetv2-matched-frequency.csv",
+          "git_mode": "100644",
+          "git_blob": "0ac76fa36eac296275b738ed471fc1c7989e60cd",
+          "sha256": "2988ab85eb68146103723368babbc0d324003c0bafb84c6b4b658be4a926d910",
+          "bytes": 22689
+        },
+        {
+          "path": "results/results-sketch.csv",
+          "git_mode": "100644",
+          "git_blob": "fa38a264797e8680da2882820a1490ad96d87622",
+          "sha256": "45e1f08e9b63ac8fc365d8d75a45c7dd9e62f0168aff5007e7c8b2e325c87472",
+          "bytes": 23131
+        },
+        {
+          "path": "run.sh",
+          "git_mode": "100644",
+          "git_blob": "9dc36cba13e51fd2d8b3c2c07e2e64bb5ef764c5",
+          "sha256": "53f3bcf8f5563daebfa0275f0eca8a3002814650b89dfe983ab755f71e166593",
+          "bytes": 77
+        },
+        {
+          "path": "scripts/DeepViT_24B_pure_transformer.yaml",
+          "git_mode": "100644",
+          "git_blob": "d4bcd6c96410de55b301bb22fd5b2d1e823340a8",
+          "sha256": "ec2448179b0f680b6e26d9801b6c0f82cdf1a08def8f0810eb4c16b42b601d95",
+          "bytes": 1622
+        },
+        {
+          "path": "scripts/DeepViT_32B_pure_transformer.yaml",
+          "git_mode": "100644",
+          "git_blob": "f4ce98b76c16752f8d0807cce66e5c537a92fe62",
+          "sha256": "bf3ddcd9dd5ee4e1e9ac4bbbb3e514262a9348a832460dc8178f7a90a3eb15d6",
+          "bytes": 1620
+        },
+        {
+          "path": "scripts/DeepViT_L_CNN_patch.yaml",
+          "git_mode": "100644",
+          "git_blob": "d5ef85c81294974b4f7a386252a246c37dc51245",
+          "sha256": "6aee4d812e3da49083ac5beec2ed92c71a41b1995c9f6d08269bf1faf1d19ef3",
+          "bytes": 1593
+        },
+        {
+          "path": "scripts/DeepViT_S_CNN_patch.yaml",
+          "git_mode": "100644",
+          "git_blob": "dc0e875619b6f5635daaaaa4f5066df0a4da7b79",
+          "sha256": "cb0a0060fb8032c62389bbddbd660574b950be586ce2cc85eb3c12d407227683",
+          "bytes": 1582
+        },
+        {
+          "path": "setup.py",
+          "git_mode": "100644",
+          "git_blob": "3eea9d29c5e45c29fe7b5a8174418a7b302fdde6",
+          "sha256": "e11cc2a814ee7d95bbcf2ca0461fa160a1e453e363ae01afc7df3677d3866c21",
+          "bytes": 1723
+        },
+        {
+          "path": "tests/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "tests/test_layers.py",
+          "git_mode": "100644",
+          "git_blob": "714cb444720d99842122ea830a8435b41348f43d",
+          "sha256": "2496448a59f029e544eeb8618f18023e812a93dd10bc3f1b96a96811d0b64957",
+          "bytes": 1579
+        },
+        {
+          "path": "tests/test_models.py",
+          "git_mode": "100644",
+          "git_blob": "a62625d949f9ecfedb198df6e36df51e0db904bf",
+          "sha256": "37484302c3ec918fb7d79aaf1d05e2d186a089a5e043ef53fdd7b173d7e2528a",
+          "bytes": 7842
+        },
+        {
+          "path": "timm/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "db3d3f22f4defb0f2f6ee7ef53a7e88fe3a7d380",
+          "sha256": "d6903bb4594ce284a4a08646a2b65c47485c89daa3c960fe4d913c6762fabbce",
+          "bytes": 189
+        },
+        {
+          "path": "timm/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "b41fd602ef5348f107eb2e91c78b8b06941bef02",
+          "sha256": "9c97912511fd8a77335a1727a1e39d5aacfcea7b6f870e717aa2fd611f43e2ef",
+          "bytes": 414
+        },
+        {
+          "path": "timm/__pycache__/version.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e236142f7979b3c6d3b931c1008af8cfaa529049",
+          "sha256": "4b37d733024918d85010f66ca0b26c317e78e12d37c2acce2ecb9f545c3d97a1",
+          "bytes": 159
+        },
+        {
+          "path": "timm/data/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "027de95a80681fcba308739f5c6531e6ee348c5a",
+          "sha256": "10dc1e54ef8c0874a47a1745110068a02c2a89d30bb1e87f7fc59160d0185b18",
+          "bytes": 502
+        },
+        {
+          "path": "timm/data/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "abee9720a03c5abbd34f73538c0151fd1884264e",
+          "sha256": "f38f46561e868582a0488bb0be38e15b261df3b37cdd74813d7a2083bc477035",
+          "bytes": 790
+        },
+        {
+          "path": "timm/data/__pycache__/auto_augment.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d3504713e96f862678066d19ebbd79722a7880b2",
+          "sha256": "8ec8c33ab71235df607be3b2262438d6b53afdf5935376ed69d00062ab32ce3a",
+          "bytes": 25136
+        },
+        {
+          "path": "timm/data/__pycache__/config.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "fe54b9d8ad4f71ef895ea2b35b2641cb160b6b40",
+          "sha256": "b4702384f8b04ec9ec140c2ae0956a2ef264a07d6bad25ebb8bd9657ab1de1d2",
+          "bytes": 1536
+        },
+        {
+          "path": "timm/data/__pycache__/constants.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "549813b6927e8c90d522b1db45be8597aa22f644",
+          "sha256": "612d13f4d2512c7861ce6501220192b5f99ba6d7583d8ad97294f5a5321ad091",
+          "bytes": 487
+        },
+        {
+          "path": "timm/data/__pycache__/dataset.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "81520dbbfaf31a3348e5e13de6f25ca8769a4aa3",
+          "sha256": "1a443c4d28ab67792000c7a4e5e2337810c9346e4fbf1e10657ed33d51e86753",
+          "bytes": 8847
+        },
+        {
+          "path": "timm/data/__pycache__/distributed_sampler.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "8a5f45470017e93e9228145bd5072e248a9d691f",
+          "sha256": "b875181876285582bddfb04386a3f6ccbd2ea20114c0f2066305cad56a70bcd3",
+          "bytes": 2059
+        },
+        {
+          "path": "timm/data/__pycache__/lmdb_dataset.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d2ec6ebf198d37aca2db8a13d44ef4d5ebfcf20a",
+          "sha256": "bef8ca50762033bd5e7fe91782fa7c0cb9027e086775003a97bda792b579f9d7",
+          "bytes": 4381
+        },
+        {
+          "path": "timm/data/__pycache__/loader.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "8b730b3e4d9d106de84eb1f14b356b18b74b4d65",
+          "sha256": "571ed42071517e15a25ca5e6c3a710c006ee9671647070543db1405ead0ac877",
+          "bytes": 7028
+        },
+        {
+          "path": "timm/data/__pycache__/mixup.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "b21695349dc68d25cb30038e023fdd7d2c58070b",
+          "sha256": "23f6af47ffb846f52f6ab5bd21cf1a8e1919458b0a75395cdea64fde9c0b7918",
+          "bytes": 11539
+        },
+        {
+          "path": "timm/data/__pycache__/random_erasing.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "3c4a9262c11570e1b1688dd92196ec9b0700245d",
+          "sha256": "331b5e0a98a7803c2685016a37fe41f7c590badd982cbd7a64e204058d95ad34",
+          "bytes": 3661
+        },
+        {
+          "path": "timm/data/__pycache__/real_labels.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e6a50916ad9d63d0db739bf03b2f267aece51580",
+          "sha256": "fd58221e3d97204db5b8d3168f0e5b427e90aca82d93e27b81b328b87e4e69f0",
+          "bytes": 2371
+        },
+        {
+          "path": "timm/data/__pycache__/transforms.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "cc3028cd804fc329cee92a8287ecea39b2b674ba",
+          "sha256": "5a2c981c10d75900ac2e4b54123ed82848eeb48659d2ec99b8fe00931f510bad",
+          "bytes": 5655
+        },
+        {
+          "path": "timm/data/__pycache__/transforms_factory.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d13d14ace7f93ae58bebbad2cfab837901e6b4a0",
+          "sha256": "c2a0854dadb21944d5f94279386600eac807f37a9683ae6fb10d2bbfa5699643",
+          "bytes": 4990
+        },
+        {
+          "path": "timm/data/auto_augment.py",
+          "git_mode": "100644",
+          "git_blob": "cbf5464dc12b4ac7058ea2219ea3f6665ec6c012",
+          "sha256": "7f9b0314dd882820def96ad6b3294beebdbaa1ba5d09a65a87af85e6e0138560",
+          "bytes": 29504
+        },
+        {
+          "path": "timm/data/config.py",
+          "git_mode": "100644",
+          "git_blob": "9cb4bda84ae573d7a2a18ae791ca514f36b4dd9d",
+          "sha256": "db6056f0d0bfd57e40a3d9b5f5f2a766122a80430f0ec89db0705ab53b3754ad",
+          "bytes": 2756
+        },
+        {
+          "path": "timm/data/constants.py",
+          "git_mode": "100644",
+          "git_blob": "d6d4a01b0316989a3f5142167f1e384b098bc930",
+          "sha256": "c5cfc0d6856aa93492afd7cd3e28ccdde64f9bc6e06e1f0e121c1db12f97c254",
+          "bytes": 303
+        },
+        {
+          "path": "timm/data/dataset.py",
+          "git_mode": "100644",
+          "git_blob": "99d99917b282c60be78d6b2f6faa313eaadd9225",
+          "sha256": "4e0f201542cfeb970bfbbeabedcdbc56d2157bffc4068d16e99c83fb03b31fa9",
+          "bytes": 7693
+        },
+        {
+          "path": "timm/data/distributed_sampler.py",
+          "git_mode": "100644",
+          "git_blob": "9506a8805dc3cec25498cd32d7c7476b1b372f8a",
+          "sha256": "546e8fb0667919a46235f8b6fbac709dbe1b97da6f5eff7dbaa9a5e0c7f6d036",
+          "bytes": 1955
+        },
+        {
+          "path": "timm/data/lmdb_dataset.py",
+          "git_mode": "100644",
+          "git_blob": "3c07389e45e1df9b3539f4d31856a2ad8e378998",
+          "sha256": "0bb2b6c240784964864a60df38bee092d9e8e20bb6f590d88cdb928d0b0ee3c1",
+          "bytes": 4421
+        },
+        {
+          "path": "timm/data/loader.py",
+          "git_mode": "100644",
+          "git_blob": "639599fd0cdd8302fa9fc3e183853fcdbd546507",
+          "sha256": "ad150ebe01f1a0a85e83e8a60e5aa0705692832876a11781f11b06ba8a8f690e",
+          "bytes": 8627
+        },
+        {
+          "path": "timm/data/mixup.py",
+          "git_mode": "100644",
+          "git_blob": "38477548a070a1a338ed18ddc74cdaf5050f84be",
+          "sha256": "ecabdae098dceceaba66170ab5cdc5d30d64c71b3045b0c4c3ce2a6d3f3f7b7e",
+          "bytes": 14711
+        },
+        {
+          "path": "timm/data/random_erasing.py",
+          "git_mode": "100644",
+          "git_blob": "78967d105dd77b56a3ccefb6ff1838a8058c0384",
+          "sha256": "4fc68a610784279d04402352f0406d96e5007fb2f83176f51cf6c1eebd3ac44e",
+          "bytes": 4512
+        },
+        {
+          "path": "timm/data/real_labels.py",
+          "git_mode": "100644",
+          "git_blob": "939c34867e7915ce3e4cc7da04a5bc1653ec4f2c",
+          "sha256": "0fda6036bb3288f2194c355846a166908632262f83a65aa5e1138d67734d1533",
+          "bytes": 1590
+        },
+        {
+          "path": "timm/data/tf_preprocessing.py",
+          "git_mode": "100644",
+          "git_blob": "899cf36477ff31863d19659842728d45159837e9",
+          "sha256": "7173b663ad055e3780df91d57130e3506bbad85af817d40676dff88456d90ab3",
+          "bytes": 9230
+        },
+        {
+          "path": "timm/data/transforms.py",
+          "git_mode": "100644",
+          "git_blob": "b3b08e309957c31026f77cab1c8c121b198ec5ac",
+          "sha256": "8183e6a502bf8a925dacf38948072938ecd3fe9466103153e81baf92fa02b1ed",
+          "bytes": 5328
+        },
+        {
+          "path": "timm/data/transforms_factory.py",
+          "git_mode": "100644",
+          "git_blob": "01c9fcf238ec7f856053683348cc9edde1640370",
+          "sha256": "1846c6900dae5854ef2ac83d38f8407218fa6fe4030243c5514333bd1fa66247",
+          "bytes": 8262
+        },
+        {
+          "path": "timm/loss/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "c02048790bdcc79c365d23bbf2b8933b8ef39f8a",
+          "sha256": "bd4e626b1f4dc6d361e95789b00f9a850cc8dce4dc2f0278e1d92014d84c9b40",
+          "bytes": 221
+        },
+        {
+          "path": "timm/loss/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "1cf1975f0ad06015c467b119fbb4ca3499172978",
+          "sha256": "3c4dab2cae9ae40c3fe2d852cfec49c4d964c1d0233c90fd5527ab56e4904e08",
+          "bytes": 423
+        },
+        {
+          "path": "timm/loss/__pycache__/asymmetric_loss.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e3dcaafeb2627c7b0ec9a2d4f5fda608c61e77b4",
+          "sha256": "63352e99a6d0bd7f4a1bd2a71528ea512605196c31fe40f0060c2812f5168b6f",
+          "bytes": 2794
+        },
+        {
+          "path": "timm/loss/__pycache__/cross_entropy.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "5b6d5880bd322789f2f7b892a04e042b002ef189",
+          "sha256": "df163a0b383fa844720f9ad6bdb7c9ace06a05792fab8e0ff983cea438b902b9",
+          "bytes": 2579
+        },
+        {
+          "path": "timm/loss/__pycache__/jsd.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "60c2d7fac1859556298d2304130de5d7f69e7af7",
+          "sha256": "a3aa1e7e8cfa3e1d978df469752b4884c801cc53c5ce78e27ec91cf081b07d5b",
+          "bytes": 2000
+        },
+        {
+          "path": "timm/loss/asymmetric_loss.py",
+          "git_mode": "100644",
+          "git_blob": "96a977882b9fa534990bfb1c8321e4c822c602ca",
+          "sha256": "624324b73c625e770a2bf185e720460ce34e504352769cdbec5265b82c6e4a5c",
+          "bytes": 3322
+        },
+        {
+          "path": "timm/loss/cross_entropy.py",
+          "git_mode": "100644",
+          "git_blob": "fc8a24e202669d6c7a082feac71a37c415499c8b",
+          "sha256": "349580ba87e59b8747e89c8a5e3fc82960b18d36d034a6dfa4c9b5abc771b63b",
+          "bytes": 1728
+        },
+        {
+          "path": "timm/loss/jsd.py",
+          "git_mode": "100644",
+          "git_blob": "dd64e156c23d27aa03817a587ae367e8175fc126",
+          "sha256": "3057bc1ff242d6cac513f14a8a717b8cc54841880d5a0793ee464bf567885c62",
+          "bytes": 1595
+        },
+        {
+          "path": "timm/models/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "53765fc86c89c4ba2ad74a064528b8e68d956065",
+          "sha256": "7f0445d153e7aecc4491a74a3411d2c78c8c499cd3c26606ea2fd14d54352c3c",
+          "bytes": 987
+        },
+        {
+          "path": "timm/models/__pycache__/WSConv_utils.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "33289b571195373be038c2974bf1ecb966f400e1",
+          "sha256": "31e443d30b4d798d8cf55962f87f4e5e4cd334822d7e298ee5f911da09c8371e",
+          "bytes": 19268
+        },
+        {
+          "path": "timm/models/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d58bf8eb5ba99adb9de4d5e74d8ba68ac8be1f10",
+          "sha256": "d6ef1721c06dd17c2b5d499d93c92db699ac52f3cdd2cbb46a107e273213aa18",
+          "bytes": 1122
+        },
+        {
+          "path": "timm/models/__pycache__/cspnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "b627e35b650b7f6104ffbbb049709b59cf5832a1",
+          "sha256": "434e27d86f348861649c6ce5f0eb3b696d8f43847d74737483622c8822d94a3b",
+          "bytes": 13891
+        },
+        {
+          "path": "timm/models/__pycache__/densenet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "81e034d8cfa726855d063b1662ed76390d807151",
+          "sha256": "c9c45766ef879d46ff5ccf1fde90bed6eaac2ee5ab7f6ce8025a3b091959624e",
+          "bytes": 12886
+        },
+        {
+          "path": "timm/models/__pycache__/dla.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "6085e5e5c01cb0bc33de1be4b515311892166c6e",
+          "sha256": "972421b3979a5872942ec28f7825414c62b64943d250414f7c35e100d5f5a0a9",
+          "bytes": 14357
+        },
+        {
+          "path": "timm/models/__pycache__/dpn.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "f8a5fdbf8e86d9542e713765bd6b05797d2fe3aa",
+          "sha256": "96dc3b28870dffcb49e7a335663bf642e74dc4667175f3e7628632298daef8eb",
+          "bytes": 10479
+        },
+        {
+          "path": "timm/models/__pycache__/efficientnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "be7c182a775ff1c76f9c13460c3c6818b5f0b5c3",
+          "sha256": "4af71e7e7cb9560242427bbce1ff281795e43d95a6f70c4b39b2a6a88e047746",
+          "bytes": 52370
+        },
+        {
+          "path": "timm/models/__pycache__/efficientnet_blocks.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "b208957396e147a0625abda3afc0eb6e0a710e49",
+          "sha256": "8768a6d347f7691c4acbfc164fb0c49b5fa3dce8041a780923624f9d305f7528",
+          "bytes": 10858
+        },
+        {
+          "path": "timm/models/__pycache__/efficientnet_builder.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "cf5bf2cffbe61ee1770a43f3e20a8a14f74731a4",
+          "sha256": "0672bac7abaa6d7b8820729da0932d63ed1b3eff8cb5460686ef94f6f6d61d4e",
+          "bytes": 11441
+        },
+        {
+          "path": "timm/models/__pycache__/factory.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "4b30a31a1a86a4f5d30d584d4b1ba17232f889ae",
+          "sha256": "5017973142e2a4b601868bd2bb7c0b6043fd2ac91e169727db4e075677723eca",
+          "bytes": 2352
+        },
+        {
+          "path": "timm/models/__pycache__/features.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "c127422e606d6b2d532ef4563f3d1d35ac3e71b5",
+          "sha256": "d37d6aede93fe73391121083eebe876cc90ac04c49d6ae7df05016b2123db916",
+          "bytes": 12450
+        },
+        {
+          "path": "timm/models/__pycache__/gluon_resnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "07da52bcef6448b8276d5ae400c06ae177e3bb82",
+          "sha256": "858a1b3e0540ce4fa9e91a076236e446f0a452242d02ed3a841a9c47f818edeb",
+          "bytes": 10105
+        },
+        {
+          "path": "timm/models/__pycache__/gluon_xception.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "cd2299eed84e7fd0c00fc16f3ceb01b3a55d62f4",
+          "sha256": "a9d4d5a45f21224773db742329014dfd6f385b41b6bff9f5d206f5b334d4a57b",
+          "bytes": 7088
+        },
+        {
+          "path": "timm/models/__pycache__/helpers.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "19c5b98bd30e8619ced496ff51e69dea6b119311",
+          "sha256": "01eb2b9bf89c027fb12b2bc3f791e257e77ba99e025af810cca948af96e1e422",
+          "bytes": 7605
+        },
+        {
+          "path": "timm/models/__pycache__/hrnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "030b4874db1be4df2bebe7a320d43a0f7ebec9c2",
+          "sha256": "ac440b931ab58532014d55f09fb0e5b2ab83a7b9c4b1b41b7f11d788fe12483d",
+          "bytes": 18387
+        },
+        {
+          "path": "timm/models/__pycache__/inception_resnet_v2.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "12bcb0d583d0011bba0da0c5d8c0dfa0b7a72022",
+          "sha256": "d65f0b3bec51d9989b276e8c4ebd162af25e888de46ff9333742f82ee5264a34",
+          "bytes": 10622
+        },
+        {
+          "path": "timm/models/__pycache__/inception_v3.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "27e0cb90ee8b832821a54392081081b7645f8c41",
+          "sha256": "9677762b404601439bbe8f8e3a42bd65fa2d5613cd65e3d5012a47d1443d6ced",
+          "bytes": 13907
+        },
+        {
+          "path": "timm/models/__pycache__/inception_v4.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "739f4dd8c514ebddb63ba4dcfec1911724bd52a9",
+          "sha256": "bccc9e5d6771e8d9d3608423385a491fde7710ff8e1769ff5386aa08bdfea390",
+          "bytes": 10427
+        },
+        {
+          "path": "timm/models/__pycache__/mobilenetv3.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "52edf9d6afb26c692fe6c3e97aff525591aebb4b",
+          "sha256": "0b77389069d915f2c8b209b7d59dd77c72dab6a9279e302b70999c448ef7af8e",
+          "bytes": 12830
+        },
+        {
+          "path": "timm/models/__pycache__/nasnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e436f9111f6c4f0cf1d7224f2e22e59180769826",
+          "sha256": "8c556a1f1c95eca3158fcfe733f0ba391e0d2544f1f1cb5ed3acdaced266ebc7",
+          "bytes": 15568
+        },
+        {
+          "path": "timm/models/__pycache__/pnasnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "90518ccdf3bbc8a8cefc399aa2e16bdb1ce3dd11",
+          "sha256": "ee50bf6ae7a034a918793bd025827df75d605fdd4f2dde19721946901fd565b0",
+          "bytes": 10755
+        },
+        {
+          "path": "timm/models/__pycache__/registry.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d8156242b4163b7c208e384aeb3aeaba6c17db9e",
+          "sha256": "74eafb84a461c83bddee48fc0fbefd97506078b7bcd44b63c34fa5305204ed38",
+          "bytes": 3469
+        },
+        {
+          "path": "timm/models/__pycache__/regnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "58b59cea945251f469a3d667fd613f94ad3b004d",
+          "sha256": "af30ec257010fc913cd1ec503ea11abb7ddb07d2746c0394545412131726b655",
+          "bytes": 18163
+        },
+        {
+          "path": "timm/models/__pycache__/res2net.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "4c97b415f8a2d86dbff03b6a2d054d90ac3ede58",
+          "sha256": "96ce120b214529b0c837bba46c5652f0d1b57632afb96abe21668e15031821ce",
+          "bytes": 6949
+        },
+        {
+          "path": "timm/models/__pycache__/resnest.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "7e7cb479ca1c354928efede98b1d8932502d2453",
+          "sha256": "260815cc66bd541e2b6beefcd82495b1405914504fa06c98a5b25a5d9b94b03c",
+          "bytes": 8383
+        },
+        {
+          "path": "timm/models/__pycache__/resnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "c3bd0dd4d4696ee115b92af32b3813f920b7c342",
+          "sha256": "f58ee4680895235eadc5a081d982ddfe8bd793c77d3c45a2668cc5504e60e38a",
+          "bytes": 45040
+        },
+        {
+          "path": "timm/models/__pycache__/rexnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "78697dba1ffe9714d0e701399e4795da1210e9d3",
+          "sha256": "28d378d30aaadc78f7ac87ec4f8cd07c12d587b62a6bbdd01785e88d3e33d332",
+          "bytes": 9668
+        },
+        {
+          "path": "timm/models/__pycache__/selecsls.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "6ae55eaa0d789da82090502b756336b633a1718f",
+          "sha256": "d572efb4df521901bf99046e50eca0c90ac9035e09235c1f5f10de0048974e3c",
+          "bytes": 10401
+        },
+        {
+          "path": "timm/models/__pycache__/senet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "96ab12e9cffc06f8cd947055c9e8b5e3c8abb4af",
+          "sha256": "881f40d4dd95ae9492223602ee8f82d3ca11dcfb47317dd2f622fa61839781f4",
+          "bytes": 15124
+        },
+        {
+          "path": "timm/models/__pycache__/sknet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "b4a05c98c4e628144581e9eb1c1aa08e007a3bb8",
+          "sha256": "309e9387eb1ef83725e63f58fd7b902be7acd5d3899363bde012dee4e76880a5",
+          "bytes": 7642
+        },
+        {
+          "path": "timm/models/__pycache__/tresnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "877999cc7c2e137983f4ccfdc8e5743cbb5dadd2",
+          "sha256": "64c41c94a52ccb7053421cc505b7ae34646ed3919834fd009a4dc4fe86c99d4b",
+          "bytes": 9383
+        },
+        {
+          "path": "timm/models/__pycache__/vision_transformer.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "2de1ab36820372d24650423a57f5ee9a6ab5ae1d",
+          "sha256": "e37be07a6a998ba3fff867ed7f65444598a055f162cdeebcfaa20feba24c0930",
+          "bytes": 17580
+        },
+        {
+          "path": "timm/models/__pycache__/vovnet.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "ce03441dd0104a0e66421537145c577dd850701c",
+          "sha256": "ce840eb5d9db9408b27cd8401c516c8265a6b13eb33da4cbb00418bb02bc1675",
+          "bytes": 10449
+        },
+        {
+          "path": "timm/models/__pycache__/xception.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "00a09597edff2c514e98b1433f81bb64787c5400",
+          "sha256": "e0ac6a2c828855a1d97868619868f4e238e5e5a492bece6f813a6cd53ccf360f",
+          "bytes": 6584
+        },
+        {
+          "path": "timm/models/__pycache__/xception_aligned.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "ab597b2fcfddf64669b9595046c9e193ba0d59cf",
+          "sha256": "17429754d088363b25303c53b49c2c8376fb5e937a31ac7b396dd69da0195ef4",
+          "bytes": 7650
+        },
+        {
+          "path": "timm/models/cspnet.py",
+          "git_mode": "100644",
+          "git_blob": "ca9eaf160e21f2f9e69029787d99de2d41f21d54",
+          "sha256": "e3ec0d0947a82dad90ef198e2add0382bd18abdd57e9143a9d2d369a4e2c1ab4",
+          "bytes": 17904
+        },
+        {
+          "path": "timm/models/densenet.py",
+          "git_mode": "100644",
+          "git_blob": "e4e2056458959d0f1117ed27afac456253ce9061",
+          "sha256": "69b5409a9be8822b547c1de0a921d1c8019ffc39f124cc84a5fb4b34dfa2411a",
+          "bytes": 15595
+        },
+        {
+          "path": "timm/models/dla.py",
+          "git_mode": "100644",
+          "git_blob": "a41ec3260b9aacf01e2f9fb953b31649c374fd55",
+          "sha256": "d5229ab097541c4724dc4a61150ae6c1ef01dcc03011f44b9487183f3bf3c0c1",
+          "bytes": 17155
+        },
+        {
+          "path": "timm/models/dpn.py",
+          "git_mode": "100644",
+          "git_blob": "61ce6a0e016184e0cc60e4586a6b38364017efe4",
+          "sha256": "785163c55f6e52b79e63f1c89be4138d9825a7a5eb19d67ed4fe445e4c5d5db6",
+          "bytes": 12438
+        },
+        {
+          "path": "timm/models/efficientnet.py",
+          "git_mode": "100644",
+          "git_blob": "4a89590b5bf78f20f2cf4469700eb493eab668b4",
+          "sha256": "fce3dd562e7dc7890b6e70e6f018b39cb6a30d65c7804d1e5eae99ef3d96f245",
+          "bytes": 71184
+        },
+        {
+          "path": "timm/models/efficientnet_blocks.py",
+          "git_mode": "100644",
+          "git_blob": "d7421ff4f07b230ef50268ea65f7f7aa2c0da8cf",
+          "sha256": "cc674f44ccd1e3cec7bc8767c8851b3761edf6d7542d9283d37fc05f4b6537c8",
+          "bytes": 14680
+        },
+        {
+          "path": "timm/models/efficientnet_builder.py",
+          "git_mode": "100644",
+          "git_blob": "f670aa6cc08847bc24a4774ae039539682e1c7da",
+          "sha256": "6b9b21d41b0ecf00a9791859a8bde4a8b8cc1d90fb1de0844fd513836710f1fa",
+          "bytes": 17482
+        },
+        {
+          "path": "timm/models/factory.py",
+          "git_mode": "100644",
+          "git_blob": "8602800b1f6207d277fe3656f8f175592fa5feea",
+          "sha256": "8817339408d6cef1010d48acdc54126d76a054f2bdcae74d5d43ab5caed64f2e",
+          "bytes": 3025
+        },
+        {
+          "path": "timm/models/features.py",
+          "git_mode": "100644",
+          "git_blob": "b1d6890f3ed07311c5484b4a397c3b1da555880a",
+          "sha256": "0e73bce178b69af3162332b893237648278fb0c3f17a148b58564419cfcc22d7",
+          "bytes": 12155
+        },
+        {
+          "path": "timm/models/gluon_resnet.py",
+          "git_mode": "100644",
+          "git_blob": "9bd99d04ecf6851d1d70ea0fd87ed8103063978e",
+          "sha256": "a71fb7ed9e8b369554fefd7cdda614149ee93e1209dc7cae112e99e510b492ab",
+          "bytes": 11348
+        },
+        {
+          "path": "timm/models/gluon_xception.py",
+          "git_mode": "100644",
+          "git_blob": "3782c50018e6c9ba82b51e31a191ff950b5d2e65",
+          "sha256": "061b6b58906bcf09852316ce8802f2afa3e3a4acd6a2fb4ff11951702c3cdbda",
+          "bytes": 9530
+        },
+        {
+          "path": "timm/models/helpers.py",
+          "git_mode": "100644",
+          "git_blob": "77b98dc6b487c3eaacdaf0fd3032ad616412faf4",
+          "sha256": "f3582eabdbbb003e5a7791f8baa63c7a29bfc4b6f03003961e12c2f835529d3b",
+          "bytes": 12571
+        },
+        {
+          "path": "timm/models/hrnet.py",
+          "git_mode": "100644",
+          "git_blob": "1c0bc9f0dc3f972b6b663be73184e8a2a4c1fe77",
+          "sha256": "055af0318f80bca4f6fc48c1b8355fddb0a6deffc31f7c13f839ac94bf6fdc40",
+          "bytes": 29301
+        },
+        {
+          "path": "timm/models/inception_resnet_v2.py",
+          "git_mode": "100644",
+          "git_blob": "a5efa33057cb5a81932e7a65083f4668c98f7edd",
+          "sha256": "440738b65f2044653ce28f5d1dd7ecbb0c51da2471b97c84c1d47742bd41b2a9",
+          "bytes": 12318
+        },
+        {
+          "path": "timm/models/inception_v3.py",
+          "git_mode": "100644",
+          "git_blob": "9ae7105feeb107cf74978e917cfdc15f1bea733e",
+          "sha256": "4e8af367fd31e02d08d311ede44dcad7a1ec689c1868368ef9545667f860eba1",
+          "bytes": 17431
+        },
+        {
+          "path": "timm/models/inception_v4.py",
+          "git_mode": "100644",
+          "git_blob": "40a0f2911e090d7be5a47d5658d48f9fe3485417",
+          "sha256": "a508fc2915dfe130b83c42f6b5fc967f4a99eff81b0227f4a330310518770128",
+          "bytes": 10723
+        },
+        {
+          "path": "timm/models/layers/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "f410f4c16860eb13750731ae5f3cc4de80bd81c6",
+          "sha256": "fbefab39d1e386242018bc83c2ccd9bc9b88552743af0990b4b0061e9efb249e",
+          "bytes": 1650
+        },
+        {
+          "path": "timm/models/layers/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d2395c98cca4161047d75ded6da6176269b2cc3f",
+          "sha256": "c98c9b4243ca28161789015fcb2b022a6a6d1aab1fb7c34167514035c0da75a6",
+          "bytes": 2300
+        },
+        {
+          "path": "timm/models/layers/__pycache__/activations.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e7fec1fe044b5bc749fa0a47530fe35f596e548a",
+          "sha256": "64599cf9a5ecd98bb162dc780c68842e570b2563ffcb0aada8e0d1120fc4640e",
+          "bytes": 6822
+        },
+        {
+          "path": "timm/models/layers/__pycache__/activations_jit.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "5b5405a681c62f69ca5fd8de76ec7b68a8448970",
+          "sha256": "ecc64a43405dd0d13291e25790f714f2997b2d6097ac2a23a1d301a3823e2a08",
+          "bytes": 4294
+        },
+        {
+          "path": "timm/models/layers/__pycache__/activations_me.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "3fd21c4d389088902a83b03a5dd57fafa2be3f6b",
+          "sha256": "6b61730f23dbf38b47d134336f13f2c7dd7db9ebe950e1a869d20898ca4fd208",
+          "bytes": 8587
+        },
+        {
+          "path": "timm/models/layers/__pycache__/adaptive_avgmax_pool.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "7f9a72d773528313c9d76a8e4313584cf05e2d2c",
+          "sha256": "7ea4e389e8bb86852b45d9a090b3579def978adf34484dd61018f32bd49bedf3",
+          "bytes": 4786
+        },
+        {
+          "path": "timm/models/layers/__pycache__/anti_aliasing.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "599adac724c382bfc4b99bf78a51a832e936513b",
+          "sha256": "da408aae475a795d43eaf47e1c9f5013a12d6479b580911c650e39fb1609bdc5",
+          "bytes": 2965
+        },
+        {
+          "path": "timm/models/layers/__pycache__/blur_pool.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "afbdf17e33643ae350523b57c1eb52b1f1c0198e",
+          "sha256": "723068315d95291624b9ab2eb6336f1e0a373d68dfbb1cca89f42e41299eb81f",
+          "bytes": 2626
+        },
+        {
+          "path": "timm/models/layers/__pycache__/cbam.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "4e5c6433767e52b4da0478723b50d91d0c53a5ac",
+          "sha256": "456519b538bd86c0f6d4fe5ca648fd2cec8759d34717b5fc5fd94fd9534f1add",
+          "bytes": 4750
+        },
+        {
+          "path": "timm/models/layers/__pycache__/classifier.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "865785ff3c833705bf92c6eaa6eced0679331827",
+          "sha256": "c4ad1e6d622d25beaed3d3060379131ab08e73f5b0b2994216ba40ba624852b3",
+          "bytes": 1747
+        },
+        {
+          "path": "timm/models/layers/__pycache__/cond_conv2d.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "f1c788ddce3927a5a85dab0fbfb3538152342c99",
+          "sha256": "7cebf1856049f00db59409f76057cbf687df8b66e5d632076da05d9a2d8ec401",
+          "bytes": 3752
+        },
+        {
+          "path": "timm/models/layers/__pycache__/config.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "92f1b1b25098c6355ca23ed232ae504b14da0f85",
+          "sha256": "26bfddefb7484bd57bfed16d0416e7b0f572e9773b5d6d8f5ef12b285d0ece08",
+          "bytes": 3448
+        },
+        {
+          "path": "timm/models/layers/__pycache__/conv2d_same.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d5769cce45bc83f0027b0f126a74ca65323d6702",
+          "sha256": "0230c3771ba5fa6dee0e1e290ef43bb1ea29cd5805040b77a14fce2f35fab54a",
+          "bytes": 1876
+        },
+        {
+          "path": "timm/models/layers/__pycache__/conv_bn_act.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "86a5012d40cb52952f9c25170888826a5285ecf3",
+          "sha256": "b30510c1de6633a7bbd8243b1a1d6c4a5beb5d74d3f7182ac3a70c72264267a3",
+          "bytes": 1621
+        },
+        {
+          "path": "timm/models/layers/__pycache__/create_act.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "33e092add804bcff95e4ee06e99dcaa0b19256a0",
+          "sha256": "3f3c09563996b0f4e5f47580bafbe169408890c141e0fb93a6e3ef5f57c44d39",
+          "bytes": 2824
+        },
+        {
+          "path": "timm/models/layers/__pycache__/create_attn.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "06fbee1d121f60054323460287cbbf235ce0e636",
+          "sha256": "754672f1e8ea8d64576a5ac2345f39e2d8589f7c117bbef9fdd2e723b31d54fd",
+          "bytes": 959
+        },
+        {
+          "path": "timm/models/layers/__pycache__/create_conv2d.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "1fa312bcc224997d5b0c1a4ce361a4ce049d1b32",
+          "sha256": "a440a2ea526d56a686567fe991e7ab149f1f9eb1a10b217c151c712079404e93",
+          "bytes": 1056
+        },
+        {
+          "path": "timm/models/layers/__pycache__/create_norm_act.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d83dc404e8d3addfa553bd5407755d38e63a38e3",
+          "sha256": "51bbe5cb3c41fbf92a18653359ab781283a0986443bae449e2c430cf4a60ea4e",
+          "bytes": 2268
+        },
+        {
+          "path": "timm/models/layers/__pycache__/drop.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "40275c6f6807607384c4eec6d77c00d118f8e3de",
+          "sha256": "98a4cf62563969499b09ba12667c70c45122c64e0a105b65f6ea1fa546023617",
+          "bytes": 7360
+        },
+        {
+          "path": "timm/models/layers/__pycache__/eca.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "c66bc75c349a6383ffe9c4bface600cb052c74e5",
+          "sha256": "0cfcd8bd0196372c206ab726098004d868dde70a634a4a5c48e94d078812863b",
+          "bytes": 5063
+        },
+        {
+          "path": "timm/models/layers/__pycache__/evo_norm.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "7040437fbb6da3eecd431a18618e9ef74873c7b7",
+          "sha256": "0bd595e5a0f7765bc06969c76378ae330f0d679fe58745b1d7e5e70388b9205e",
+          "bytes": 3436
+        },
+        {
+          "path": "timm/models/layers/__pycache__/helpers.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "1ec75ab9519bd9c35dd6571ebdbe8a374c7ee4ee",
+          "sha256": "37af1c5274fe7a86ddf48a0431d9a01b92c07cd5ae7c50f67662774f6713aed6",
+          "bytes": 739
+        },
+        {
+          "path": "timm/models/layers/__pycache__/inplace_abn.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "11bcdd806feda8cc467dbf9522773ab69ee6724a",
+          "sha256": "34e59f726600a49a389089dca8208ab7977ec46c26f1ff4f31256a7918f907cc",
+          "bytes": 3110
+        },
+        {
+          "path": "timm/models/layers/__pycache__/linear.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "5247171e76648fcb7968e56342bae5675796111f",
+          "sha256": "5dd823e6f4b2280f15f8be092951382db1f2468d6f4937fba170384b5d274062",
+          "bytes": 1047
+        },
+        {
+          "path": "timm/models/layers/__pycache__/mixed_conv2d.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "f7c83b745b5b4da98a0f6883db4cbe67162da2cb",
+          "sha256": "cdd1fbfaa8ce111ad822533005c72ff11025ef062adc84a9e58a41bfc13dc674",
+          "bytes": 2217
+        },
+        {
+          "path": "timm/models/layers/__pycache__/norm_act.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "67faa2a432e1938f5e45f1fa637b40b9c9873c92",
+          "sha256": "f8c5e993561806e5159c93df601b74ea0da74e06154dc835c33ac9e912ac034c",
+          "bytes": 2954
+        },
+        {
+          "path": "timm/models/layers/__pycache__/padding.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "23bc9319aac3a93bf6b2036c95a6e114b5905ca8",
+          "sha256": "5d54ec7529811e95ef092ece45ac22d286397cee9bf025e76a8d407e45383313",
+          "bytes": 1764
+        },
+        {
+          "path": "timm/models/layers/__pycache__/pool2d_same.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "159c5a99e1de83fce8bb9c6ef9c4e75d8bc82bfa",
+          "sha256": "542f8714c98f2399adaf52eab6fadf65645f854c570c66123f6368035044ba04",
+          "bytes": 3047
+        },
+        {
+          "path": "timm/models/layers/__pycache__/se.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "fa2483b8a6b5f28aa479de5241420f92d9d2945e",
+          "sha256": "bcbfe6f183af50a4a1f04a8e900594d8c981c198418303fd05c497722df55dd6",
+          "bytes": 1884
+        },
+        {
+          "path": "timm/models/layers/__pycache__/selective_kernel.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "602b0d0356d366fd6ea3a5b876359aa87a80150c",
+          "sha256": "83c377a6112a46056f02e916ba2f2f2e4acd844dec5185b55f681a43d89e4901",
+          "bytes": 5477
+        },
+        {
+          "path": "timm/models/layers/__pycache__/separable_conv.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "392be4a32a220aa1934057f878a9290714c436aa",
+          "sha256": "38ee707c8ea427b4692c9b1f1bcd751e4fd369a0603976fa441c8ba95e1e815c",
+          "bytes": 2960
+        },
+        {
+          "path": "timm/models/layers/__pycache__/space_to_depth.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "8de1f96e002553d81b655a60e77c66e269bcaa0f",
+          "sha256": "8e62b61a481353ffa58b020a19e799594c5cebb7e45819b94be48bd786036062",
+          "bytes": 2525
+        },
+        {
+          "path": "timm/models/layers/__pycache__/split_attn.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "8dabd420d6d3ac54e16259debc802835e12f128f",
+          "sha256": "5572e855a6e7a3be010cd496d207de4d8ad521fa16502b80240081d67216839d",
+          "bytes": 3072
+        },
+        {
+          "path": "timm/models/layers/__pycache__/split_batchnorm.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "8892fbc88f0aa38a226d90414d9f08c17aaf717e",
+          "sha256": "e1ccfab841a888c96a7f7c537da0c747e6fbb205d64e3ab6f178f484e9558db3",
+          "bytes": 3349
+        },
+        {
+          "path": "timm/models/layers/__pycache__/test_time_pool.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "23df5d53bea56ade32c4d93469d1932843064ea5",
+          "sha256": "ab2f605a744f655be09cfda5289da0f8f94328a31b74f2304b782f4c529ca8bd",
+          "bytes": 1979
+        },
+        {
+          "path": "timm/models/layers/__pycache__/weight_init.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "97b281c72af0d799e671e865f51719951d6674db",
+          "sha256": "f7543290408045688caa5adb47b8a2d6644299e1d60e53ef96a12925a2af00e6",
+          "bytes": 1886
+        },
+        {
+          "path": "timm/models/layers/activations.py",
+          "git_mode": "100644",
+          "git_blob": "e16b3bd3a1898365530c1ffc5154a0a4746a136e",
+          "sha256": "893fd64b078ad41d787c06a67c9385720a90e43a0123a16fb7e5f87d1b98b123",
+          "bytes": 4040
+        },
+        {
+          "path": "timm/models/layers/activations_jit.py",
+          "git_mode": "100644",
+          "git_blob": "b4a516530ad0abf41f720ac83d02791179bb7b67",
+          "sha256": "05023c3188d9849c74c3ac93529b25ff1fed83e5c575b603918cb91040506084",
+          "bytes": 2529
+        },
+        {
+          "path": "timm/models/layers/activations_me.py",
+          "git_mode": "100644",
+          "git_blob": "0441f7c41fa41eabee70ca9f7857c6cc49e4bf47",
+          "sha256": "5cf06c9fcf54072193218477c31996b61d7195647a136909d3b7dc9e2a6c58f4",
+          "bytes": 5339
+        },
+        {
+          "path": "timm/models/layers/adaptive_avgmax_pool.py",
+          "git_mode": "100644",
+          "git_blob": "d2bb9f7216a01209ef1e205c4e127f1b6f593a74",
+          "sha256": "49227e8ab9d82dfd6bef282d96bcf8bd1ff5ea198f27b3a58d9c8f37611c8988",
+          "bytes": 3903
+        },
+        {
+          "path": "timm/models/layers/anti_aliasing.py",
+          "git_mode": "100644",
+          "git_blob": "9d3837e8c6d89169659afb88385a8c1fac49c213",
+          "sha256": "b8e2f3fc17af54d1d6d61a91f2743e0f21a91c006412a84ddc7849ebbe8b1f6a",
+          "bytes": 2293
+        },
+        {
+          "path": "timm/models/layers/blur_pool.py",
+          "git_mode": "100644",
+          "git_blob": "399cbe355359c087fafd847f383808ce60c0977c",
+          "sha256": "1d9413d855144d9b120756ed72132162e83032dd99547f3b0925ffc550ceabd7",
+          "bytes": 2180
+        },
+        {
+          "path": "timm/models/layers/cbam.py",
+          "git_mode": "100644",
+          "git_blob": "44e2fe6da23aae0b884fcb4e6b95c59b19c17fef",
+          "sha256": "f9418af55bd9bffd61ab613272b99b5a9d7eaec6c047e10117ed02feb8eb38d3",
+          "bytes": 3337
+        },
+        {
+          "path": "timm/models/layers/classifier.py",
+          "git_mode": "100644",
+          "git_blob": "89fe545819dd19f9aee6fbc12ba59c38e0ca1079",
+          "sha256": "926d84e1b3ca3a701ecfc0db5a64159f94ace91887a7b036880040419e72972d",
+          "bytes": 1723
+        },
+        {
+          "path": "timm/models/layers/cond_conv2d.py",
+          "git_mode": "100644",
+          "git_blob": "8b4bbca84d6f12e0fb875b4edb435b976fc649d6",
+          "sha256": "60c9df67d312432aaa3d0d55c59b19b16446d4502058d5a5f4c1f35d66759961",
+          "bytes": 5129
+        },
+        {
+          "path": "timm/models/layers/config.py",
+          "git_mode": "100644",
+          "git_blob": "f07b9d782ba0597c174dee81097c28280335fdba",
+          "sha256": "3676b6ecffc1d5ccb8a1bb3831ae7fb1de559577bfb021188eff6db7234005c1",
+          "bytes": 3069
+        },
+        {
+          "path": "timm/models/layers/conv2d_same.py",
+          "git_mode": "100644",
+          "git_blob": "75f0f98d4ec1e3f4a0dc004b977815afaa25e7fc",
+          "sha256": "d9fbf5ccd6992598052753f9aae33da6291057e3dfeb6d0744b5fcca04051c65",
+          "bytes": 1490
+        },
+        {
+          "path": "timm/models/layers/conv_bn_act.py",
+          "git_mode": "100644",
+          "git_blob": "907353574339f43e6c2a80c862b59f0ecf025b44",
+          "sha256": "3221d07fa78eca943c09ed8599e9a0229d62fc974dcc446949c829f31b99a903",
+          "bytes": 1466
+        },
+        {
+          "path": "timm/models/layers/create_act.py",
+          "git_mode": "100644",
+          "git_blob": "426c36810f3134728ae9e4eddaaaded561fa2c5d",
+          "sha256": "a652617d6228e9f06cdbca6514f6deb7953a628e80a0a132955c89d2bb8aeace",
+          "bytes": 3904
+        },
+        {
+          "path": "timm/models/layers/create_attn.py",
+          "git_mode": "100644",
+          "git_blob": "59ecd858e0da49bea53bb114900596bba1d6c1a5",
+          "sha256": "c40a00643db383aa8216ed8a0fde14b33d08f9c0b5764de4e01fade774461f17",
+          "bytes": 1222
+        },
+        {
+          "path": "timm/models/layers/create_conv2d.py",
+          "git_mode": "100644",
+          "git_blob": "0134b05c2717ebaeed3dba32d69f7cf983928e86",
+          "sha256": "89fa619b30ebbf9411c0d09512ea88c9eeacb9ae946d2a4f288a1a09f751a1d6",
+          "bytes": 1399
+        },
+        {
+          "path": "timm/models/layers/create_norm_act.py",
+          "git_mode": "100644",
+          "git_blob": "9e7e529e19642128646090aa2b2b862f92dc9686",
+          "sha256": "dd70cf992b582bd013c598ad4b93babf93c979aa3fc05190c271107a7e069c6a",
+          "bytes": 3327
+        },
+        {
+          "path": "timm/models/layers/drop.py",
+          "git_mode": "100644",
+          "git_blob": "8e1b183ff882346f71d670ed9609751b3a3ed25b",
+          "sha256": "c2edb5bd10e018b2c4be2983f1c8cf147f66eb9a86ea244d77d8f2fafc566ce5",
+          "bytes": 8505
+        },
+        {
+          "path": "timm/models/layers/eca.py",
+          "git_mode": "100644",
+          "git_blob": "3a7f8b8241333c29dbd61dffea561a426e01497f",
+          "sha256": "8093c490a3bfb7ea56b9f021816bdbb39e288ca9d356f325a4da9d8790ddc8b8",
+          "bytes": 4701
+        },
+        {
+          "path": "timm/models/layers/evo_norm.py",
+          "git_mode": "100644",
+          "git_blob": "9023afd0e81dc8a76871d03141866217d59f4770",
+          "sha256": "77d7e037c4c8c80c280b46343b97c1a20c7290cfe3795e66acab7749a92f7106",
+          "bytes": 3328
+        },
+        {
+          "path": "timm/models/layers/helpers.py",
+          "git_mode": "100644",
+          "git_blob": "8d7b559b12702329dc061a146fbb0427ce0aaa70",
+          "sha256": "3d399384df0d8c86f7aefa6e07c3912b85dc044856d91dc7400e88af455fd263",
+          "bytes": 451
+        },
+        {
+          "path": "timm/models/layers/inplace_abn.py",
+          "git_mode": "100644",
+          "git_blob": "c7edac6256fbce2cd47a0c63f2492032553fc5f5",
+          "sha256": "6baa5c1e903b558941730a596218858a350b8693c87b6a63d442d1ceb9d5ba71",
+          "bytes": 3353
+        },
+        {
+          "path": "timm/models/layers/linear.py",
+          "git_mode": "100644",
+          "git_blob": "38fe3380b067ea0b275c45ffd689afdeb4598f3c",
+          "sha256": "6da4b65a9974bd810b9ef86743a2f0eb98d5a2d689cf98866eba0927d2662113",
+          "bytes": 743
+        },
+        {
+          "path": "timm/models/layers/median_pool.py",
+          "git_mode": "100644",
+          "git_blob": "40bd71a7a3840aaebefd2af0a99605b845054cd7",
+          "sha256": "6f4dafdfa546becfe0098f4d855c14efe9a095c5c91f3ac9573704a4452e1c12",
+          "bytes": 1737
+        },
+        {
+          "path": "timm/models/layers/mixed_conv2d.py",
+          "git_mode": "100644",
+          "git_blob": "53d650cdd00c20397928817f48f08dd750d45284",
+          "sha256": "135a50f640fa92f1dffb4d4a4e98f41e202d4ee358542a8d41767ab42b147a91",
+          "bytes": 1844
+        },
+        {
+          "path": "timm/models/layers/norm_act.py",
+          "git_mode": "100644",
+          "git_blob": "bddf9b26d48d92108d6b2831e801bc08598d2bf0",
+          "sha256": "0b764227b427f49eb59750897a1809a302cbab43575d5baab1a4899b83bc7e1f",
+          "bytes": 3444
+        },
+        {
+          "path": "timm/models/layers/padding.py",
+          "git_mode": "100644",
+          "git_blob": "34afc37c6c59c8782ad29c7a779f58177011f891",
+          "sha256": "0636edc499ae8be0f27aba19a2160c751023e66478a3aa56816d388a68b78432",
+          "bytes": 2167
+        },
+        {
+          "path": "timm/models/layers/pool2d_same.py",
+          "git_mode": "100644",
+          "git_blob": "5fcd0f1f75c2502816cb931d507d4fbf418002f0",
+          "sha256": "0b4b777bb51fb0e4ed4c526ce3f1b29eacdedd73e0262b42c5ad676a3036474d",
+          "bytes": 2969
+        },
+        {
+          "path": "timm/models/layers/se.py",
+          "git_mode": "100644",
+          "git_blob": "a896fb71ba09092f77fd6dd8bf36d015f4aa2463",
+          "sha256": "fbc71acb4f5a4ff686f67086840e6b85bd1b171439e6739ac14217040e8fea63",
+          "bytes": 1406
+        },
+        {
+          "path": "timm/models/layers/selective_kernel.py",
+          "git_mode": "100644",
+          "git_blob": "10bfd0e0d4e1c6e4dce1e69305ff990ddf85cb6f",
+          "sha256": "1e1d59268709c071008a07e954fc97667118ab2dbad4a0b89b27238d5beb2473",
+          "bytes": 5282
+        },
+        {
+          "path": "timm/models/layers/separable_conv.py",
+          "git_mode": "100644",
+          "git_blob": "e949ea437191dc1ab7e321664226b3212d0b9099",
+          "sha256": "417a0de0096bb8321ea36ae78d6de5120438601e07785df3c43f1af988741d6b",
+          "bytes": 2641
+        },
+        {
+          "path": "timm/models/layers/space_to_depth.py",
+          "git_mode": "100644",
+          "git_blob": "a7e8e0b2a486d51fe3e4ab0472d89b7f1b92e1dc",
+          "sha256": "3fef5ccc162f6db3d1ec98be7c1d1d54503fc800494283bd0b7200e2c2fdb6d2",
+          "bytes": 1750
+        },
+        {
+          "path": "timm/models/layers/split_attn.py",
+          "git_mode": "100644",
+          "git_blob": "5615aa0b391653f2a93b591820deca7d5b17f115",
+          "sha256": "44e1775d11783a3f356aac1f1ad68dc2bc84cc8f20691bd7a08539d49559b3c3",
+          "bytes": 3013
+        },
+        {
+          "path": "timm/models/layers/split_batchnorm.py",
+          "git_mode": "100644",
+          "git_blob": "830781b335161f8d6dd74c9458070bb1fa88a918",
+          "sha256": "e20846b6588ae73d199f3476f73241feb37d0493e21aecb53d296d995c85e56c",
+          "bytes": 3441
+        },
+        {
+          "path": "timm/models/layers/test_time_pool.py",
+          "git_mode": "100644",
+          "git_blob": "93ece264f5d60d4ebfdb160ae38b06c88fd789bf",
+          "sha256": "4e4616b3109e092ba7609b46bb55f219f023ff631fac223e4b5c6c3ff3764300",
+          "bytes": 1851
+        },
+        {
+          "path": "timm/models/layers/weight_init.py",
+          "git_mode": "100644",
+          "git_blob": "d731029ff1708776758d9af60e5b205818940a6d",
+          "sha256": "e08c35bdbae687c268f5754544cdeb22c566608fc5115655e531fe21db33e90a",
+          "bytes": 2359
+        },
+        {
+          "path": "timm/models/mobilenetv3.py",
+          "git_mode": "100644",
+          "git_blob": "8a48ce728b065033470b297f83378d456554c4f4",
+          "sha256": "0cfc25297079248c18226fa72e974495ce223f24561e84663ea0e604333b15ca",
+          "bytes": 17607
+        },
+        {
+          "path": "timm/models/nasnet.py",
+          "git_mode": "100644",
+          "git_blob": "18b3725fc2bd9f879213854dc2a2e6e751ac87f5",
+          "sha256": "3570d47e1d41b19dc0be2157272fd1f71b5308312d7bbbf074b2d2016490a223",
+          "bytes": 25683
+        },
+        {
+          "path": "timm/models/pnasnet.py",
+          "git_mode": "100644",
+          "git_blob": "5f1e177f5a8e31981b681c0293bba274f861fb6f",
+          "sha256": "acb025388adad35f69e30deeb516b9787a3a2be14927aa23b894e58dfbdc6b03",
+          "bytes": 14839
+        },
+        {
+          "path": "timm/models/pruned/ecaresnet101d_pruned.txt",
+          "git_mode": "100644",
+          "git_blob": "2589b2f9dd3f0d1e02e1d5ddc1fbcd5c143e02c6",
+          "sha256": "d7303b5dac6c4e7149c59f4f31b7cc5524fbc0f49070057e5334a07457c68186",
+          "bytes": 8734
+        },
+        {
+          "path": "timm/models/pruned/ecaresnet50d_pruned.txt",
+          "git_mode": "100644",
+          "git_blob": "9a8b2bf50e0631dce74d66a1a98e26cae10572a7",
+          "sha256": "2780254f069b69207af97ac83423c20d632233f16b74d8ee24dfc92516fcf561",
+          "bytes": 4520
+        },
+        {
+          "path": "timm/models/pruned/efficientnet_b1_pruned.txt",
+          "git_mode": "100644",
+          "git_blob": "0972b527612b283fd242cc5eaeb6e767ea106c66",
+          "sha256": "a4d0e6d4410d258313f3e1a35d9de45d60970032c3ba7fb88df8a087be1110b1",
+          "bytes": 18596
+        },
+        {
+          "path": "timm/models/pruned/efficientnet_b2_pruned.txt",
+          "git_mode": "100644",
+          "git_blob": "6e3fadee3e9f92eaade96afd8691a5e4437551ee",
+          "sha256": "7bfa1a49533e531dcd315011ca727be18c23cf1b81017ff0ee4ccec3d325de03",
+          "bytes": 18676
+        },
+        {
+          "path": "timm/models/pruned/efficientnet_b3_pruned.txt",
+          "git_mode": "100644",
+          "git_blob": "489781736de08e5cf40bf76528a735fff4a3f61c",
+          "sha256": "0350c91308c49ab83ca14af4430cf0064740255ddd55e5058e73bda4d0bfd0f8",
+          "bytes": 21133
+        },
+        {
+          "path": "timm/models/registry.py",
+          "git_mode": "100644",
+          "git_blob": "3317eecee3a00312207cdf398f636faf566736dc",
+          "sha256": "71c1b143ffade9f3305e70fc44840443a06110c10b9b779f1bf677fe00c02436",
+          "bytes": 3970
+        },
+        {
+          "path": "timm/models/regnet.py",
+          "git_mode": "100644",
+          "git_blob": "68bb817cbff2487cff9172c78c8de6af62d3bc53",
+          "sha256": "c99ad5e03a403327b329d011f29b6c089d663f9e21f1a084fce4da370acaf5bb",
+          "bytes": 20529
+        },
+        {
+          "path": "timm/models/res2net.py",
+          "git_mode": "100644",
+          "git_blob": "6e51d49129af867774c51f6642460b45490ac903",
+          "sha256": "e8966bcb548de017acf9169861d30a59f33d1602de1c3ecaacf31808bbfd00ea",
+          "bytes": 7849
+        },
+        {
+          "path": "timm/models/resnest.py",
+          "git_mode": "100644",
+          "git_blob": "5a8bb348302956a1578facdef39368c04a376641",
+          "sha256": "548b47173918cafb2d8bcea887a1ab661069207bede0d2d81b373604b6eba38c",
+          "bytes": 10194
+        },
+        {
+          "path": "timm/models/resnet.py",
+          "git_mode": "100644",
+          "git_blob": "43a7f32ad0587422415360d96b0bd4fce0b314de",
+          "sha256": "536e383e087c55a9901c6bb83af7903ff66bacb1d841d3c78b94cc474861fc81",
+          "bytes": 54833
+        },
+        {
+          "path": "timm/models/rexnet.py",
+          "git_mode": "100644",
+          "git_blob": "6444b3c8c415f31ef67d7864c7906be9c3b3d154",
+          "sha256": "b50c035759a96965152490891be5d257ea1bc2d504ba29c0e86a552716dd7743",
+          "bytes": 10132
+        },
+        {
+          "path": "timm/models/selecsls.py",
+          "git_mode": "100644",
+          "git_blob": "73bc7732833c1d373f7f32ab5da695852be63c5f",
+          "sha256": "e4834107fc0f81fdec6146aa248be485fea618f81ae91b48af1730e2cae60f8c",
+          "bytes": 13100
+        },
+        {
+          "path": "timm/models/senet.py",
+          "git_mode": "100644",
+          "git_blob": "8073229a721930e279f07a46590eda71d5756904",
+          "sha256": "c88c652ab0e91afac40b9c4ae20209e837a863ae62151b4bf28229cebb16808d",
+          "bytes": 17637
+        },
+        {
+          "path": "timm/models/sknet.py",
+          "git_mode": "100644",
+          "git_blob": "6c654922e109658c04de78e2d433d4ebc16645cc",
+          "sha256": "a08d311590f076d93d11ffc0de8a7fb86e9d0ef864fefbb58486a31a2c70941f",
+          "bytes": 8709
+        },
+        {
+          "path": "timm/models/tresnet.py",
+          "git_mode": "100644",
+          "git_blob": "e371292f7ded9af1a18c0ff91b6b2aff886ce77f",
+          "sha256": "e69f57916ac50c3fc9cea44af21e6e04ca42e3443092047fc9bfaab830f77829",
+          "bytes": 11433
+        },
+        {
+          "path": "timm/models/vision_transformer.py",
+          "git_mode": "100644",
+          "git_blob": "393e9857208e41380117b704151f6f53e900607a",
+          "sha256": "714f5c3a3090c3aa06a3c2ce0e09e64205582d069848af4747b1a234217c6c91",
+          "bytes": 21441
+        },
+        {
+          "path": "timm/models/vovnet.py",
+          "git_mode": "100644",
+          "git_blob": "f544433c4596b0d593b0633bebae965d4aa0094a",
+          "sha256": "973367d9fa55d282bbb68988f332d28858e7fb28d6d795c96e38c52481f4810c",
+          "bytes": 13821
+        },
+        {
+          "path": "timm/models/xception.py",
+          "git_mode": "100644",
+          "git_blob": "a61548dc5f8ddba37cb183aaa3345960ef7b5a24",
+          "sha256": "446a69118817be88b45c7783a7b10729ff486fb4087d927019af87ee56af2e1b",
+          "bytes": 7372
+        },
+        {
+          "path": "timm/models/xception_aligned.py",
+          "git_mode": "100644",
+          "git_blob": "e6b21576288153d1a8494f1f389bf2469b820a76",
+          "sha256": "7e2f225327ef8dceafb445e66b6900b371e4f9485b924d09b65e9e2873841195",
+          "bytes": 9266
+        },
+        {
+          "path": "timm/optim/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "33e4907f99a74bebdaadb0cd5435d734e2fed684",
+          "sha256": "5abc4ca1bbf4d76844bd009af5d81b1e80268a1e6ce7ad088b45ed36c4b267e8",
+          "bytes": 368
+        },
+        {
+          "path": "timm/optim/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e3fe60772fa14da7179074b1c44ab8fffff5d3b2",
+          "sha256": "c620b6ad21772ed6a889322d7b8794a490f55acc9efd3c699267b1ea005624a2",
+          "bytes": 633
+        },
+        {
+          "path": "timm/optim/__pycache__/adafactor.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "a36e6ccc75724eadbc0c30102ff824354d1b34a2",
+          "sha256": "886e17bac2b5f91296ad84e62f54054383310a4a9e9cd0a3c05ca604169f5cc2",
+          "bytes": 5460
+        },
+        {
+          "path": "timm/optim/__pycache__/adahessian.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "140fe79d51d9ea034768537cab758dbf5ebabec7",
+          "sha256": "4398fffe6d7845efcfe1d0cae31565217745fc2eae131a22a8c2136619baf389",
+          "bytes": 5874
+        },
+        {
+          "path": "timm/optim/__pycache__/adamp.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "fe24463cd1299a39a0284bd674dac5e0061a3e7a",
+          "sha256": "13f9fafe44565e035e3a26860d9c248e947a82e634a3eef5ddf2b220673f3a8c",
+          "bytes": 3191
+        },
+        {
+          "path": "timm/optim/__pycache__/adamw.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "efdf1192389877d8bd0c7c8b75f3712b30ba762a",
+          "sha256": "5e7fdafd2a747d550434406e95b820257930cc7a5b1e8daa065f372ad1864fc0",
+          "bytes": 3823
+        },
+        {
+          "path": "timm/optim/__pycache__/lookahead.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "5dc32e9b32229eb4fe702234285a83fbd54154ab",
+          "sha256": "93d834e10a2a6df809351aa13c7458f4ede8ef622305ddca0f08a340ee397166",
+          "bytes": 3114
+        },
+        {
+          "path": "timm/optim/__pycache__/nadam.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "3e2561d891112ed5ca6d9005f1914ca9b3022727",
+          "sha256": "99fbf4452df69348bf896a3e4047047b0a8cebbc86e58f001531f1f78b874499",
+          "bytes": 3020
+        },
+        {
+          "path": "timm/optim/__pycache__/novograd.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "398726bb445da7802169a75334444bc93f3632cd",
+          "sha256": "621b137d8314f24714878ee840a30dcd3452099446036ce7c20feb255c98cee8",
+          "bytes": 2259
+        },
+        {
+          "path": "timm/optim/__pycache__/nvnovograd.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "7c64cbec3625c6572bb1a1b60c5650b45f57cbb2",
+          "sha256": "e0d62eb9ca73ad5567b9b7be15ecb8c6b0b35f01d20dbd73a51bdfa470376d16",
+          "bytes": 3704
+        },
+        {
+          "path": "timm/optim/__pycache__/optim_factory.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "cd68a9c1e470c97ec494ad3686d24b2105b363a8",
+          "sha256": "4ac00d72ee8f087c17454e17d32d294ac87d20ce5e0978c5828cc95ad10ca201",
+          "bytes": 3404
+        },
+        {
+          "path": "timm/optim/__pycache__/radam.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "b296c068eedff430cee4e9119d9bafdf566706a5",
+          "sha256": "681ba9fd540ae5f2918aec387ab6b52a3029ba47b2c75a1b4b1fd0b6ea1ee017",
+          "bytes": 4152
+        },
+        {
+          "path": "timm/optim/__pycache__/rmsprop_tf.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "105fdd91a2d94c52cf8480e31667ed313c097926",
+          "sha256": "7da3790935d50ab0db7c7f81230629f12aa3471ddef5ec27f4b4f13f537f44ba",
+          "bytes": 4619
+        },
+        {
+          "path": "timm/optim/__pycache__/sgdp.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "1f238fc46e5dbc06019487a99c74b9c4c07c3158",
+          "sha256": "e1bef86282c6a7f6891318c97db2e36c4a76fe3ef27b7d6071963af22a817436",
+          "bytes": 2900
+        },
+        {
+          "path": "timm/optim/adafactor.py",
+          "git_mode": "100644",
+          "git_blob": "088ce3acd82e2be1b393afafa05f48435e538a1a",
+          "sha256": "33519b74a769488d34d8e4b91790848b89998cc96fc3df7910a991cf8a9a5914",
+          "bytes": 8126
+        },
+        {
+          "path": "timm/optim/adahessian.py",
+          "git_mode": "100644",
+          "git_blob": "985c67ca686a65f61f5c5b1a7db3e5bba815a19b",
+          "sha256": "bc9b50f1b65318bae4318b863ce25d80efb957c86356f336225f874aa839f40a",
+          "bytes": 6535
+        },
+        {
+          "path": "timm/optim/adamp.py",
+          "git_mode": "100644",
+          "git_blob": "468c3e865e0ceb6fb2bf22f9388237a783314f07",
+          "sha256": "311a1b886c8f02041705a09dabe02900731845c37bb9d455c87b9c7773b356a5",
+          "bytes": 3689
+        },
+        {
+          "path": "timm/optim/adamw.py",
+          "git_mode": "100644",
+          "git_blob": "66f9a959de586356a29ace2f9c57d3fee8d1057a",
+          "sha256": "32331eeca262241f1907194b623b82c40717ee2bfbb72fc998c56d9a0df02029",
+          "bytes": 4965
+        },
+        {
+          "path": "timm/optim/lookahead.py",
+          "git_mode": "100644",
+          "git_blob": "6b5b7f38ec8cb6594e3986b66223fa2881daeca3",
+          "sha256": "7bfed9e0a55a005924bb55424d8617a97f4767027fb0af0b23711aaaf36fcb5a",
+          "bytes": 3815
+        },
+        {
+          "path": "timm/optim/nadam.py",
+          "git_mode": "100644",
+          "git_blob": "d994d1b83485c9b068de73f5f3cf2efb1e5bec39",
+          "sha256": "b288c8645ac8eb4f2c8e2a5c0264069bc65823a6a7df0102fe7e194d0d3a2987",
+          "bytes": 3758
+        },
+        {
+          "path": "timm/optim/novograd.py",
+          "git_mode": "100644",
+          "git_blob": "4137c6aa9406360d29f5f7234ebbdef294404d0e",
+          "sha256": "85caf09387410397d6f7cba87c1a0db40c86fa578a05e518b9a803d4f6a34570",
+          "bytes": 2925
+        },
+        {
+          "path": "timm/optim/nvnovograd.py",
+          "git_mode": "100644",
+          "git_blob": "323312d2fc36d028124f7a7ec604d248e71503cd",
+          "sha256": "88cd66af428b64a3b283f124f34ddc017884777ec7b56d594597a96807bd8e5f",
+          "bytes": 4795
+        },
+        {
+          "path": "timm/optim/optim_factory.py",
+          "git_mode": "100644",
+          "git_blob": "4c0aaca0e415f934e0046bdbb5418817b60ff4dd",
+          "sha256": "ec969315eb7f1fa45dd71796e24931ee7311eff2cfe0a16a174120ea76bf66fc",
+          "bytes": 4764
+        },
+        {
+          "path": "timm/optim/radam.py",
+          "git_mode": "100644",
+          "git_blob": "9987a334460286b1a6c8ec6d57ee023596a74219",
+          "sha256": "7c947f26ca01f1af09aa936e35527847221b2d409c23a73d8bcdf42ecd230faf",
+          "bytes": 5924
+        },
+        {
+          "path": "timm/optim/rmsprop_tf.py",
+          "git_mode": "100644",
+          "git_blob": "5115555cd26040e3af297a6e79e7bd5e4d202623",
+          "sha256": "30708c92097bb654085083c70355f2437f424fd8f4693f175e32908f891c0df1",
+          "bytes": 6127
+        },
+        {
+          "path": "timm/optim/sgdp.py",
+          "git_mode": "100644",
+          "git_blob": "f4a94aa332d7030a70e888342eb6cc4623d69836",
+          "sha256": "20de1e18ad152964ee123bffe20ba9fd4574fa4fcfa85c6bcd66c84f88996e10",
+          "bytes": 3231
+        },
+        {
+          "path": "timm/scheduler/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "6a7789826229f66e1220cb6149902ba9c411b537",
+          "sha256": "ebe28574439380008037c670e4fdfe3f8ef742bfd63f87687e47fd1314e9c479",
+          "bytes": 206
+        },
+        {
+          "path": "timm/scheduler/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "db15e412884ac6f9ad817fbc8b273cf9ddce14d3",
+          "sha256": "e85869e6b3be538d23546f759885b63a694c2c5b7e450bceba75b4722be755ce",
+          "bytes": 405
+        },
+        {
+          "path": "timm/scheduler/__pycache__/cosine_lr.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "4c17a4679db155c1467eab46fa367e494423a04c",
+          "sha256": "ee6f4fd16bb9d27565640a8a814f5b35ff1b9508ed978d3b9e25ed9b7942f713",
+          "bytes": 4002
+        },
+        {
+          "path": "timm/scheduler/__pycache__/plateau_lr.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d74f5029d13dff1fcab6f87d72a1ceaff790fc1b",
+          "sha256": "3d81d2b863aca909ab3323b211dcc25f9c33140c7b6cd301411b791bed89ab1f",
+          "bytes": 3416
+        },
+        {
+          "path": "timm/scheduler/__pycache__/scheduler.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "6a4d9ccc9d3987c386eb8639bdadbd2ea6af34e3",
+          "sha256": "8724af20fc23e164ee3fdcd18b8e60acb4cca4fea32f1b7946ea51f401d78921",
+          "bytes": 4633
+        },
+        {
+          "path": "timm/scheduler/__pycache__/scheduler_factory.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "75ac2698f2fa6f46d3d75bb191e5af5d1d8d728c",
+          "sha256": "c7fd63f72fe4b67cbed0c2e9f606bf1b49fc68fc0b203056134528f4de52da00",
+          "bytes": 2046
+        },
+        {
+          "path": "timm/scheduler/__pycache__/step_lr.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d633f453b14edd0caca5e78ef2957ec20b4e5b48",
+          "sha256": "f15d072e118c2111fd1415b0a236bcce53169fb5c4bdf446048cd4a41d9b4044",
+          "bytes": 2394
+        },
+        {
+          "path": "timm/scheduler/__pycache__/tanh_lr.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "4ceeaed983b529343f2701af20f233305f74f6de",
+          "sha256": "02f33c736a0c0d61e7fd709d3f47bdf2e5fd81f40807a9272e038e3e1e3ac039",
+          "bytes": 3928
+        },
+        {
+          "path": "timm/scheduler/cosine_lr.py",
+          "git_mode": "100644",
+          "git_blob": "1532f092b5cc8c0af5125967cfb84b32ce03ca4a",
+          "sha256": "c4832f3345a15f28fa85e61a73887450a58aabaa8b3589ea80ebdc2b81b8521e",
+          "bytes": 3977
+        },
+        {
+          "path": "timm/scheduler/plateau_lr.py",
+          "git_mode": "100644",
+          "git_blob": "4f2cacb65a1bf23d10aa6fd296f74579571043cf",
+          "sha256": "f37d4b07c5c4da71824a65d279685237c6c3aff4b8ad2f66011d5364d97eb6d0",
+          "bytes": 4140
+        },
+        {
+          "path": "timm/scheduler/scheduler.py",
+          "git_mode": "100644",
+          "git_blob": "21d51509c87a0783c6b61986c574a3ed5366e165",
+          "sha256": "b7517bb0f79a3334e2a3ac5ecb14bdcf69cb28c62dd3c734c4e3d212d0955228",
+          "bytes": 4750
+        },
+        {
+          "path": "timm/scheduler/scheduler_factory.py",
+          "git_mode": "100644",
+          "git_blob": "9f7748f42280b846ab159fb18d7cda09d1890123",
+          "sha256": "ccb1d1ae562d45621d3c4d05df81969c9c32fc7355d54a2d8cd97d1c103470d2",
+          "bytes": 3268
+        },
+        {
+          "path": "timm/scheduler/step_lr.py",
+          "git_mode": "100644",
+          "git_blob": "f797e1a8cf35999531dd5f1ccbbe09a9d0cf30a9",
+          "sha256": "d8bf2e03f9aae7fdb98cbd16012367690dc8917f6ae5c66013bf3d3c1357af28",
+          "bytes": 1902
+        },
+        {
+          "path": "timm/scheduler/tanh_lr.py",
+          "git_mode": "100644",
+          "git_blob": "8cc338bb1df7a564d9207b32ab0f59cdf1ef4c59",
+          "sha256": "24aa0c5bdfd0518df0a259348fc9612d2ed3743a3065f22218fb68c528336cd0",
+          "bytes": 4045
+        },
+        {
+          "path": "timm/utils/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "0f7c4b055537e2d7d0aeb22e2abd9fb09c141099",
+          "sha256": "6b8909cfedf75472e606232b7da521f7fb1e7c72d8e48a9451478b73e8672341",
+          "bytes": 459
+        },
+        {
+          "path": "timm/utils/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "54c74d3895590aab488651cd9606f63fec29e448",
+          "sha256": "de1de8fc4202a796a31710a154537b775d52fcc3fadbe2a0dd2dc48200b036cb",
+          "bytes": 776
+        },
+        {
+          "path": "timm/utils/__pycache__/checkpoint_saver.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "c5022e448cc8e72b76c45efadfffdceb84d15466",
+          "sha256": "6d77edc4968c81be32c7af8ced5103ab482792552c9447051e41e75b07aa90a5",
+          "bytes": 4430
+        },
+        {
+          "path": "timm/utils/__pycache__/cuda.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "f568b6539cbb30f7dcae386b51fc73efab9c0dfe",
+          "sha256": "d600c1c1f224ee5f80d36177ce1fc810b6400c74b14b3baa5c258baa498fc97d",
+          "bytes": 2150
+        },
+        {
+          "path": "timm/utils/__pycache__/distributed.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "83f7201cc224ac34aa3d6333dd7d9f1ba250e08e",
+          "sha256": "7e50f622324f712f91e0bc2f2e8b1f11781bd37e7bf63b760caf8c1fe1397514",
+          "bytes": 930
+        },
+        {
+          "path": "timm/utils/__pycache__/jit.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d5358add7feee8acccf88895ce57850f07bacdba",
+          "sha256": "b3d87db5e9802d224c654351b6eb553ee27b5a96320190672a4608b5df5a60ed",
+          "bytes": 801
+        },
+        {
+          "path": "timm/utils/__pycache__/log.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "a3c38fe99c73d43668cd9ba5297e21f3ff60df6d",
+          "sha256": "0be613839988f20ab36cdcb714503ed235006990ad1daba2419cbf0cd622350c",
+          "bytes": 1345
+        },
+        {
+          "path": "timm/utils/__pycache__/metrics.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "e7b7ca2b440af0ea74b3e908a2b1306a0c224226",
+          "sha256": "b0afd5775c4e5f48985c30b8f934ab71d25ecc1154146b4b8a2d4da58c541588",
+          "bytes": 1554
+        },
+        {
+          "path": "timm/utils/__pycache__/misc.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d5b3292b61d8e53656f4b07d0f6cb2d781f6ad74",
+          "sha256": "dd99c6254224bddd571c9d057a394358a335813347f18ae299378668c4681af4",
+          "bytes": 997
+        },
+        {
+          "path": "timm/utils/__pycache__/model.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "728df5c12100aa019458d17fa75b5d5ae8709ec9",
+          "sha256": "b3af49081546c0dcb20c30d6d688f1e210268d5d281969d0ed2ebb7e0256eb8a",
+          "bytes": 614
+        },
+        {
+          "path": "timm/utils/__pycache__/model_ema.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "52d525ee0d9a2a56aa24bcd1bda08777058d39d0",
+          "sha256": "87419314156eb99cd22f753d6e3b93ebb449d8fcb606398708fc38e6db56e769",
+          "bytes": 5794
+        },
+        {
+          "path": "timm/utils/__pycache__/summary.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "41cca8b521ed789e162ac89c041491b63f4b387e",
+          "sha256": "db38688937562a8f9f4fe8af780f57d3f1491c49f581a4638fd41846cda911f1",
+          "bytes": 1376
+        },
+        {
+          "path": "timm/utils/checkpoint_saver.py",
+          "git_mode": "100644",
+          "git_blob": "51896e782dc9c2c1263c2fe5f9901c9bd54a0e54",
+          "sha256": "6e05906359410f096a85f91615e36146747e7ab7eefabef521e99611eb2527e9",
+          "bytes": 6174
+        },
+        {
+          "path": "timm/utils/cuda.py",
+          "git_mode": "100644",
+          "git_blob": "bcd29f5801864472e0e91a803bccf531d55aac8b",
+          "sha256": "2b4bd6f1b5a52ebd6edc20c0a332610fac57f884d1d671c584b11fe7424aa8bf",
+          "bytes": 1616
+        },
+        {
+          "path": "timm/utils/distributed.py",
+          "git_mode": "100644",
+          "git_blob": "3c5dba8c1de5a6ff53638207521377fdfbc4f239",
+          "sha256": "303d716b5ec628fc8fa14278948931b9c983eb7e466ca36e56f72c54242586c7",
+          "bytes": 896
+        },
+        {
+          "path": "timm/utils/jit.py",
+          "git_mode": "100644",
+          "git_blob": "185ab7a0d852b9a1c469cfbfff108dbafbb02466",
+          "sha256": "3a911bb40dd38094cd0df2965f6a0eb1dd69e129b9450a999d9cf937bf2dda59",
+          "bytes": 648
+        },
+        {
+          "path": "timm/utils/log.py",
+          "git_mode": "100644",
+          "git_blob": "c99469e0884f3e45905ef7c7f0d1e491092697ad",
+          "sha256": "05d6763aa5a8deff1def0b03449fae00272878d5214bc4c94b0237098beadd2b",
+          "bytes": 1015
+        },
+        {
+          "path": "timm/utils/metrics.py",
+          "git_mode": "100644",
+          "git_blob": "8e0b1f9989a9dc95708a0dbb42e747f9a8565378",
+          "sha256": "3dc6e6ae0848c40457c1c49f5bd1b748b0377be83788d2cf4df69b21f1db7ed1",
+          "bytes": 867
+        },
+        {
+          "path": "timm/utils/misc.py",
+          "git_mode": "100644",
+          "git_blob": "39c0097c60ed602547f832f1f8dafbe37f156064",
+          "sha256": "a3a65bbd9241f8ce8d5fbdc4dd914ace92a96e75766d4f99123f910e5cfe3f9f",
+          "bytes": 644
+        },
+        {
+          "path": "timm/utils/model.py",
+          "git_mode": "100644",
+          "git_blob": "cfd42806c37e62bd1c8741c5a0cb934e813b2682",
+          "sha256": "0467c9358d2744f48c55deceae0c841adff257f13203eadafbea4546976368fe",
+          "bytes": 389
+        },
+        {
+          "path": "timm/utils/model_ema.py",
+          "git_mode": "100644",
+          "git_blob": "bedcbd99fa155389b7ad606432ebbe5d2c579f81",
+          "sha256": "6bc40d88455659b91f1784bf182aba6f8b275735574e02f0ba6fdcf1306814da",
+          "bytes": 5715
+        },
+        {
+          "path": "timm/utils/summary.py",
+          "git_mode": "100644",
+          "git_blob": "a0801eaace9098851a38345162d0636d7447bb9f",
+          "sha256": "f2856dcdcafc167401d83add150c7319a4bbab430caf192fe106e4cb478e3a5b",
+          "bytes": 1074
+        },
+        {
+          "path": "timm/version.py",
+          "git_mode": "100644",
+          "git_blob": "73e3bb4f38bada34ca9359469effd05bb6767ac7",
+          "sha256": "6eabb81bb22cfbc59eadefa1322f92b6111a94bed05be3c06ca58667da5507a5",
+          "bytes": 22
+        },
+        {
+          "path": "train.py",
+          "git_mode": "100644",
+          "git_blob": "92a343f1dd95f54ca732d25082c7cdb104e5eee6",
+          "sha256": "8a56b604cba309425b817d2d204197ec1fbadc7c66b61e2027c890f754330e92",
+          "bytes": 38033
+        },
+        {
+          "path": "utils/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "e26f74f97cd6eab932e666a34808f72940f61a2a",
+          "sha256": "b630c91b3556c069396f038dbd28dae8315213f4fa2d2015726547c31aabc3a2",
+          "bytes": 272
+        },
+        {
+          "path": "utils/__pycache__/__init__.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "9b043e7a8b770ec0cf2e3f170d2298a4ccad6088",
+          "sha256": "69d714c78fa6b6079f8d809e42f301d084807c8997cc030eefe3b1f349a91f12",
+          "bytes": 424
+        },
+        {
+          "path": "utils/__pycache__/eval.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "a75615cd677f9aa85a35a0837ee671085e267a9f",
+          "sha256": "a8a4e16619f3448ee7fd3be167bd786ef42a724f4d7ac36464674906020b7e5b",
+          "bytes": 715
+        },
+        {
+          "path": "utils/__pycache__/flops_counter.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "d4bcd3450dd20d9a36a4296121f37ab380cc1798",
+          "sha256": "d558051d5621ffcee64387ec6297ce687526bac6a2fbfb988ae267649f992d47",
+          "bytes": 12871
+        },
+        {
+          "path": "utils/__pycache__/logger.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "6ccdcba4e5f5bf48f33184a72a450f946fc4185a",
+          "sha256": "bff5dd63722a42cc716013495311d0b8906468965615251d7deb317d01208a6f",
+          "bytes": 4197
+        },
+        {
+          "path": "utils/__pycache__/misc.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "7300cfc858cedd62fabe5b189de6a93859165fa5",
+          "sha256": "def020f5aef416aedf0d7f8f694864ac0dcd422368740129630de023c57b68b1",
+          "bytes": 3215
+        },
+        {
+          "path": "utils/__pycache__/visualize.cpython-37.pyc",
+          "git_mode": "100644",
+          "git_blob": "598903b7afa47f5f3ba7af00ae7de0fe70e8a0cb",
+          "sha256": "b04a1e719e95b2b3f020868dd315202c8985436abb58c596cecd442581782f58",
+          "bytes": 2983
+        },
+        {
+          "path": "utils/eval.py",
+          "git_mode": "100644",
+          "git_blob": "50513501463f44201a4838bc62826b4c6640ba65",
+          "sha256": "632148a26454328efd95652fdebcd68e2ae3e538d6b9e18da8dd97a9ca254367",
+          "bytes": 523
+        },
+        {
+          "path": "utils/flops_counter.py",
+          "git_mode": "100644",
+          "git_blob": "900d66fe16031f24ef9d7dfa4e737a48063e262a",
+          "sha256": "06cdd33c07b7e9507d3f683c63d5fda7e53b1d1c5f173aeb2cdd19bc5ee1c8d4",
+          "bytes": 17800
+        },
+        {
+          "path": "utils/grid.py",
+          "git_mode": "100644",
+          "git_blob": "38773251f88770db34280282bb8d60d9f9dff34c",
+          "sha256": "4d7aece180e4eb6647441d8e865444e4b80804396721520c1101b4ea5790a1f5",
+          "bytes": 2786
+        },
+        {
+          "path": "utils/labelsmooth.py",
+          "git_mode": "100644",
+          "git_blob": "2fabbb7c0ef75da88ecf38b223621cbf0e8fff06",
+          "sha256": "3e983fc3194fd54c2bd9e12cf748e439481af43ab9623ddb4327234d3f0f2a83",
+          "bytes": 1711
+        },
+        {
+          "path": "utils/logger.py",
+          "git_mode": "100644",
+          "git_blob": "7eb5c67cf671bb86966b2f7afce2468c7aa82b25",
+          "sha256": "55b5e593428afa6de480175a734bb16ee0f7d5ee4e8ab822c2ba295167e6edf6",
+          "bytes": 4398
+        },
+        {
+          "path": "utils/ltutil.py",
+          "git_mode": "100644",
+          "git_blob": "ade89c1e09063def87e8ab9a1afad8d985085bd9",
+          "sha256": "da274549b81ae458b9f241e9e748a6216a9933e61b9b0978d5a1684c6661751a",
+          "bytes": 5002
+        },
+        {
+          "path": "utils/misc.py",
+          "git_mode": "100644",
+          "git_blob": "3613cc7ae155f8d2893b9b9c0216ed187a3576fc",
+          "sha256": "54e7cf5ef433cd52ff7e41c7b753283346d1ba7be0a85184a2ff455a907a8d98",
+          "bytes": 2661
+        },
+        {
+          "path": "utils/progress/.gitignore",
+          "git_mode": "100644",
+          "git_blob": "488ddd592a9484d87532959bc0cb970aac801d91",
+          "sha256": "a1d3b72f92570d4e89caa58bdc0e59214f0d2d884a7d14390aa53f625e762c43",
+          "bytes": 30
+        },
+        {
+          "path": "utils/progress/LICENSE",
+          "git_mode": "100644",
+          "git_blob": "059cc056616a97c569a2839042e8f0e1260c9a68",
+          "sha256": "71a13496c621f01b454f9aa54fa608a712f58eb253e6dd2c91027fe78340c773",
+          "bytes": 776
+        },
+        {
+          "path": "utils/progress/MANIFEST.in",
+          "git_mode": "100644",
+          "git_blob": "0c738421d6a41dc32ab049a68f3d3f781a67b3d2",
+          "sha256": "2c8bcb001cf85195f3a1521c58d1c63f53da3fc7f29bc752551e0e754c32fa31",
+          "bytes": 27
+        },
+        {
+          "path": "utils/progress/README.rst",
+          "git_mode": "100644",
+          "git_blob": "3f3be76ace8c0a727b4599e306ab614f7da025a3",
+          "sha256": "61b515d8a5236d7e1a4fcc8aac2d47a6c67d9b01be7ca087856f01d8f29a8175",
+          "bytes": 2944
+        },
+        {
+          "path": "utils/progress/demo.gif",
+          "git_mode": "100644",
+          "git_blob": "64b1e95d17d4e53de4ee7374718fada91bca94f0",
+          "sha256": "e7ae3ca9c3d23d155e440c0f0971a32a1c6825b656de773d993b92152c4f6fc2",
+          "bytes": 924334
+        },
+        {
+          "path": "utils/progress/progress/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "09dfc1ebe62afa3fbd1d253e05f252be55ad3448",
+          "sha256": "b448fb141a2978de2cdcfbdc8eec0eb8653d4d58a5fc4c61919901eb7bdc468d",
+          "bytes": 3188
+        },
+        {
+          "path": "utils/progress/progress/bar.py",
+          "git_mode": "100644",
+          "git_blob": "5ee968f0ce1c5bb1909aa9c69ddfe43f16e45f58",
+          "sha256": "a3a47e0b63eba2cae4eb6b712fd0a725f209a229f1c5f2d19bd557fca3fb5062",
+          "bytes": 2836
+        },
+        {
+          "path": "utils/progress/progress/counter.py",
+          "git_mode": "100644",
+          "git_blob": "6b45a1ec6072cb02b9c2ad6a728665d8fdf37e42",
+          "sha256": "5ed06e658e32626af9d04d80fdf0338d6866d08930695c3136c35560313b9ecc",
+          "bytes": 1528
+        },
+        {
+          "path": "utils/progress/progress/helpers.py",
+          "git_mode": "100644",
+          "git_blob": "9ed90b2bc4c90c506a0e9bc2452e3765c323fe66",
+          "sha256": "15e85fc194effb97027ec6dc325be55249b7c59d1c461b1ebfa5d5a667931787",
+          "bytes": 2854
+        },
+        {
+          "path": "utils/progress/progress/spinner.py",
+          "git_mode": "100644",
+          "git_blob": "464c7b275093c9b6532d015a0f6a9f22cc25252e",
+          "sha256": "9bb6c0488d8651b2c51be3db01e7dd1edaeb5969492c58614816f0ef4829d936",
+          "bytes": 1439
+        },
+        {
+          "path": "utils/progress/setup.py",
+          "git_mode": "100644",
+          "git_blob": "c877781d681cc5a6215964f4313e3b29a7d6c517",
+          "sha256": "3f117ae47c842adcb486cb2031e145b6719fb3f6fdac435a0c1e0d6ba6113de6",
+          "bytes": 843
+        },
+        {
+          "path": "utils/progress/test_progress.py",
+          "git_mode": "100644",
+          "git_blob": "0f68b01c3b8064e21a36ff6d777f43d0013927c0",
+          "sha256": "0130236516a28b0c0b77f86fb9c8ea448e5baa79d95542b150f90655a2e7362b",
+          "bytes": 1461
+        },
+        {
+          "path": "utils/visualize.py",
+          "git_mode": "100644",
+          "git_blob": "51abeed9a7b1a44f54f76a29d82b33bd5d0337ad",
+          "sha256": "b738cce634cbadf87e544cb1aace240c0559fad44fc42a11c30748e235120ac0",
+          "bytes": 3795
+        },
+        {
+          "path": "validate.py",
+          "git_mode": "100644",
+          "git_blob": "5a0d388c15b3c8e4b52237f69ca45876f66009b3",
+          "sha256": "8c8df2270af1d091cfca5b578c4016ac6bb5196e62f7665e09315d3be8b96e3e",
+          "bytes": 14277
+        }
+      ],
+      "license_paths": [
+        "LICENSE",
+        "lib_deit/LICENSE",
+        "utils/progress/LICENSE"
+      ],
+      "archive_sha256": "00e3a0cdbcb2e43955127f7b79c905668e98f0d635b411e030e1e3b7ac3236ca",
+      "archive_bytes": 5234525,
+      "notices": [
+        {
+          "original_path": "LICENSE",
+          "archive_path": "archives/retired/legacy-vit/licenses/dvit/LICENSE",
+          "sha256": "a8479fb992512f85a3226f59d27cf27860b35848f7f3dfb12f8a4e2242f3809a",
+          "bytes": 1067
+        },
+        {
+          "original_path": "lib_deit/LICENSE",
+          "archive_path": "archives/retired/legacy-vit/licenses/dvit/lib_deit/LICENSE",
+          "sha256": "b208c52b00a2df2c8f4c3298c34407bf2bfe409968213372251c91fcc737a1a5",
+          "bytes": 11354
+        },
+        {
+          "original_path": "utils/progress/LICENSE",
+          "archive_path": "archives/retired/legacy-vit/licenses/dvit/utils/progress/LICENSE",
+          "sha256": "71a13496c621f01b454f9aa54fa608a712f58eb253e6dd2c91027fe78340c773",
+          "bytes": 776
+        }
+      ]
+    },
+    {
+      "original_path": "plato/models/t2tvit",
+      "git_mode": "160000",
+      "gitlink_pin": "0f63dc9558f4d192de926504dbddfa1b3f5db6ca",
+      "url": "https://github.com/yitu-opensource/T2T-ViT",
+      "archive_path": "archives/retired/legacy-vit/t2tvit-upstream-0f63dc9558f4d192de926504dbddfa1b3f5db6ca.tar.gz",
+      "nested_gitlinks": [],
+      "files": [
+        {
+          "path": "LICENSE",
+          "git_mode": "100644",
+          "git_blob": "ec803e30ebe3769786ce79047f58ae818bb04c95",
+          "sha256": "aa9ef78719c4db82567d6c9ef8fb8f97df550de3a71b65ae4bdd0953a2d0197b",
+          "bytes": 1714
+        },
+        {
+          "path": "README.md",
+          "git_mode": "100644",
+          "git_blob": "0e0630e10b9b55a76fb9f7dcac888d258892d63c",
+          "sha256": "2f89ef5995a3dea1f8af1ff80ff0053bc560130daa1bd475d217f1357a5de97b",
+          "bytes": 10253
+        },
+        {
+          "path": "distributed_train.sh",
+          "git_mode": "100644",
+          "git_blob": "d5e3d7e4aee993cacdd599d182a3fa6b4f8a98b4",
+          "sha256": "a6c96d3a6dcb07f15726b376ea95491ba4683cea495c21f51e6cf44c73c23a3d",
+          "bytes": 305
+        },
+        {
+          "path": "images/attention_visualization.png",
+          "git_mode": "100644",
+          "git_blob": "90356a3fc9ee90f8de6135e698a5cb0c582f9d17",
+          "sha256": "eacba5208985f67cf4eaaa00ceeef60c8a8753ef0d0dab25165c0823796e0b01",
+          "bytes": 642198
+        },
+        {
+          "path": "images/dog.png",
+          "git_mode": "100644",
+          "git_blob": "8676c4b52b4905902223f2db743ca4fabaa0f4f2",
+          "sha256": "529ab43e1fec3a22008d31b98d15c6837abb905d2637eaf46aa124347156e00d",
+          "bytes": 445623
+        },
+        {
+          "path": "images/f1.png",
+          "git_mode": "100644",
+          "git_blob": "5885cb1bdc4ae2de2d65e0f7d89e3678e8f9c40c",
+          "sha256": "28ac31cc13f7eeeb726cd7515190cd480b902d4d22df0463c8b6b176d77d328a",
+          "bytes": 2362201
+        },
+        {
+          "path": "images/resnet_conv1.png",
+          "git_mode": "100644",
+          "git_blob": "39765d381aa5c1a51da63c4256c1a590e78063ce",
+          "sha256": "ee447ac787d8218413814512e529c7cf9db1f3d31dc97adad1f594291f6aa186",
+          "bytes": 83762
+        },
+        {
+          "path": "images/vit_block1.png",
+          "git_mode": "100644",
+          "git_blob": "e809f2cfb0c70b77a924c30e89f251f5f6bf6bf2",
+          "sha256": "f579f0924c210450ee00b6150e78775c5f404b8f1e2980373bba064ffbae4245",
+          "bytes": 81496
+        },
+        {
+          "path": "main.py",
+          "git_mode": "100644",
+          "git_blob": "a428830a5dc4da69cd12dfee26687309f9e0cd0c",
+          "sha256": "b71da561d241bfcc29b80ca7b0ba9e40ebcdd61d85e77de8f11d85ed4169eb3a",
+          "bytes": 36259
+        },
+        {
+          "path": "models/__init__.py",
+          "git_mode": "100644",
+          "git_blob": "fa1dfc41e8c58a550b6c871d1709743f010a7772",
+          "sha256": "47f30acf7bfc85ed1541907a15503229ab0243d68669ee46dc9f445ef374b35d",
+          "bytes": 306
+        },
+        {
+          "path": "models/t2t_vit.py",
+          "git_mode": "100644",
+          "git_blob": "31940a6ef681dacd9c0e40db9de0e01659541d73",
+          "sha256": "58cbd8f600acd20319f693197ca8982884784525c3c3c8a6e2c2396dabd0e59c",
+          "bytes": 12499
+        },
+        {
+          "path": "models/t2t_vit_dense.py",
+          "git_mode": "100644",
+          "git_blob": "226e58d8723d6ee024ba90efa5ffd0167f7c294a",
+          "sha256": "d3fff129614558b52c87491a17a8cd062ba0d9d09b90063daf2540dc59e5d6f5",
+          "bytes": 6736
+        },
+        {
+          "path": "models/t2t_vit_ghost.py",
+          "git_mode": "100644",
+          "git_blob": "70ed6ad0b319be13d3f8f486b12d95c0ef6b08ed",
+          "sha256": "0ed9e34e5d565d451c1ec6f9ca08b7f5a453ad5e51f310116f4e8599fbd86b20",
+          "bytes": 7737
+        },
+        {
+          "path": "models/t2t_vit_se.py",
+          "git_mode": "100644",
+          "git_blob": "c20b933f5a9b1c97ef30b59d735fc07b56e5196e",
+          "sha256": "bc7a527d8bc22ba4310fa7c7743bc6c6cd1685bd3df989791e03f08ea9a1d323",
+          "bytes": 6305
+        },
+        {
+          "path": "models/token_performer.py",
+          "git_mode": "100644",
+          "git_blob": "e2e0f90a35856fcdf3c85ec4d3df685a230d3c2a",
+          "sha256": "3e3dfa33523e3d090d9e639d8b442a7883860a650e1af241786d1e4561f136d3",
+          "bytes": 2370
+        },
+        {
+          "path": "models/token_transformer.py",
+          "git_mode": "100644",
+          "git_blob": "e842d41d4d2179ae6868ddc36d3df31405640f53",
+          "sha256": "6dc55462e5ff1138a2b19883aec86d43591494efdb65bce383152dcdc0fdfc6a",
+          "bytes": 2326
+        },
+        {
+          "path": "models/transformer_block.py",
+          "git_mode": "100644",
+          "git_blob": "6b285261bd88b4203ebda6f71f26df013b6000c7",
+          "sha256": "7d4da490e811af278eafb7fe768622a68de6ab8fcc78adce36c59db307ca96a4",
+          "bytes": 3286
+        },
+        {
+          "path": "models/vit.py",
+          "git_mode": "100644",
+          "git_blob": "733fc274c42d336995862288f528242f7928dfc6",
+          "sha256": "124e1ff05c66115bc3cc1f7c4fc75f249722a4d25bd5ac27ec6c1cfda999108e",
+          "bytes": 31446
+        },
+        {
+          "path": "transfer_learning.py",
+          "git_mode": "100644",
+          "git_blob": "07dfeae6b1a45701b5d1eb2f4832ff4ed23718ed",
+          "sha256": "43c4cab8686515674238fcdfea9d7320c7bfd515471f99da45d7961277d6c64f",
+          "bytes": 9120
+        },
+        {
+          "path": "utils.py",
+          "git_mode": "100644",
+          "git_blob": "3981ce01a37cc89dd408001fb0f3a4c351de2ef4",
+          "sha256": "4556cec67ff8ec4e5bc2e6c1b852fff81d98b5d3673616b6050c9acf37cf9232",
+          "bytes": 6891
+        },
+        {
+          "path": "visualization_resnet.ipynb",
+          "git_mode": "100644",
+          "git_blob": "8c5765fea90913e740889e85206c2e3e4540a598",
+          "sha256": "73c181152eaf5d2c428005a4fe8b7326025819e080fd96350d60e46c69fdd23c",
+          "bytes": 230751
+        },
+        {
+          "path": "visualization_vit.ipynb",
+          "git_mode": "100644",
+          "git_blob": "688666854a982678e6a703e75a27c2ac15348820",
+          "sha256": "6c34f15d7b6d09a48b8fa0107b917c86fe805ddea8c4b399df4d9323ce6aad69",
+          "bytes": 192509
+        }
+      ],
+      "license_paths": [
+        "LICENSE"
+      ],
+      "archive_sha256": "7f9bfbc25c8d4e555580c46fbeeb4507d13ea71c0c0144bedf4751954c350aa8",
+      "archive_bytes": 3417465,
+      "notices": [
+        {
+          "original_path": "LICENSE",
+          "archive_path": "archives/retired/legacy-vit/licenses/t2tvit/LICENSE",
+          "sha256": "aa9ef78719c4db82567d6c9ef8fb8f97df550de3a71b65ae4bdd0953a2d0197b",
+          "bytes": 1714
+        }
+      ]
+    }
+  ]
+}

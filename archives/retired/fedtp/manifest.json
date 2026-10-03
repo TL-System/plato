@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "backend": "fedtp",
+  "retired_at": "2026-10-03",
+  "pre_retirement_plato_commit": "477f2f1bb52a1b5a58c1f9f2d30f640039f83a8e",
+  "pre_retirement_plato_tree": "82af1367f106218d0de98f46775c011e0afd930c",
+  "plan_sha256": "c66577eac31a2eeaba68f29e2fee53760def2477184521bd1f2536e76507573f",
+  "files": [
+    {
+      "git_mode": "100644",
+      "git_blob": "d56e023cc9162d1a0315be455ef5f214b0695ea1",
+      "sha256": "51140db5014bbef35d4aac2ac492861c33a073d39ecdf84648f8b655386865a4",
+      "bytes": 5001,
+      "original_path": "examples/model_search/fedtp/FedTP_CIFAR10_T2TVIT14_NonIID03_scratch.toml",
+      "archive_path": "archives/retired/fedtp/original/examples/model_search/fedtp/FedTP_CIFAR10_T2TVIT14_NonIID03_scratch.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "b5b7c86a330de7fcd4cb58ec92516c6510475c63",
+      "sha256": "4fb88435995c043479203fe045af8e85b2e77f8cded28c5f504804ed3aeff535",
+      "bytes": 5225,
+      "original_path": "examples/model_search/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.toml",
+      "archive_path": "archives/retired/fedtp/original/examples/model_search/fedtp/FedTP_CIFAR10_ViT_NonIID03_scratch.toml",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "54a0f62940bbba6f33825c2518ec52e4f202c0c4",
+      "sha256": "365c82663d0ea97e30840ca70da7618ec2c2e27a9a7c2386a33ea2f436076314",
+      "bytes": 846,
+      "original_path": "examples/model_search/fedtp/fedtp.py",
+      "archive_path": "archives/retired/fedtp/original/examples/model_search/fedtp/fedtp.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "b20558ae14d804125629a921078fc35d5ae26e43",
+      "sha256": "23cfb9ac5e967e51bba6503531efad770176c0a7c114001a226dfcc974c73f1c",
+      "bytes": 2180,
+      "original_path": "examples/model_search/fedtp/fedtp_algorithm.py",
+      "archive_path": "archives/retired/fedtp/original/examples/model_search/fedtp/fedtp_algorithm.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "185bd9b5f1bdcad62e467ef57305e6160eb56123",
+      "sha256": "5cfdcebf2ce2f4c89813f6a449b3f268a34ed297310a62d1ea56c39f7983862a",
+      "bytes": 5935,
+      "original_path": "examples/model_search/fedtp/fedtp_server.py",
+      "archive_path": "archives/retired/fedtp/original/examples/model_search/fedtp/fedtp_server.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "0555e4ecf8f0d3388390a150772fbaf411cbaaec",
+      "sha256": "83391dce478424c081ee5cf2fd85d88c3cdc36f93ac01179a6cde07da4826b7b",
+      "bytes": 8304,
+      "original_path": "examples/model_search/fedtp/hypernetworks.py",
+      "archive_path": "archives/retired/fedtp/original/examples/model_search/fedtp/hypernetworks.py",
+      "disposition": "moved"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "original_path": "LICENSE",
+      "archive_path": "archives/retired/fedtp/original/LICENSE",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "37dcea737de93d4ac5374c9e4b0c51359ad15a4a",
+      "sha256": "0d959a944fe18823b855820069073cc0291d2c142a662b279e7992df5c6dc3d7",
+      "bytes": 6071,
+      "original_path": "docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "archive_path": "archives/retired/fedtp/original/docs/docs/examples/algorithms/10. Algorithms based on Neural Architecture Search and Model Search.md",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "d7b5b7b7ada56eefd4e54c4bc9684dbbf972f036",
+      "sha256": "2c194cf625de70ceea14b737c2b2f4c64ea68dbde23039464f97015216752edf",
+      "bytes": 4006,
+      "original_path": "pyproject.toml",
+      "archive_path": "archives/retired/fedtp/original/pyproject.toml",
+      "disposition": "copied_context"
+    },
+    {
+      "git_mode": "100644",
+      "git_blob": "1aef3c127d77d3ef96e6757ed791646a0c057557",
+      "sha256": "46236f61039c07a844bbddaa185c32582b6f4436203bd719aa8e7dcfdbd26e89",
+      "bytes": 727368,
+      "original_path": "uv.lock",
+      "archive_path": "archives/retired/fedtp/original/uv.lock",
+      "disposition": "copied_context"
+    }
+  ],
+  "vendored_upstream_revision": "unknown",
+  "supplemental_licenses": [
+    {
+      "component": "fedtp",
+      "archive_path": "archives/retired/fedtp/licenses/fedtp-LICENSE",
+      "source_url": "https://raw.githubusercontent.com/zhyczy/FedTP/3cca0d7f57c09800faab85ff443459bd2df37589/LICENSE",
+      "observed_upstream_revision": "3cca0d7f57c09800faab85ff443459bd2df37589",
+      "retrieved_at": "2026-10-03",
+      "sha256": "7cdc60e2be263127be2595e6a42d19a8b3d116c3c9fd2b685dc9931f0e42f80c",
+      "bytes": 1130,
+      "original_vendored_revision": "unknown",
+      "provenance_caveat": "This supplemental notice receipt does not identify the original vendored source revision."
+    }
+  ]
+}
