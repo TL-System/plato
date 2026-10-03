@@ -115,11 +115,9 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         self._local_model_path: str | None = None
         self._ala_state_path: str | None = None
         self._cached_client_id: int | None = None
+        self._client_states: dict[int, dict[str, Any]] = {}
 
     def on_client_id_changed(self, context: TrainingContext) -> None:
-        self.weights = None
-        self.start_phase = True
-        self.local_model_state = None
         self._ala_applied = False
         self._resolve_state_paths(context)
 
@@ -170,9 +168,19 @@ class FedALAUpdateStrategy(ModelUpdateStrategy):
         if self._cached_client_id == context.client_id and self._local_model_path:
             return
         if self._cached_client_id is not None and self._cached_client_id != context.client_id:
+            self._client_states[self._cached_client_id] = self.get_worker_state(context)
+
+        saved = self._client_states.get(context.client_id)
+        if saved is None:
             self.weights = None
             self.start_phase = True
             self.local_model_state = None
+            self._rng = random.Random()
+        else:
+            self.local_model_state = copy.deepcopy(saved["local_model"])
+            self.weights = copy.deepcopy(saved["weights"])
+            self.start_phase = saved["start_phase"]
+            self._rng.setstate(saved["rng"])
 
         model_name = (
             Config().trainer.model_name

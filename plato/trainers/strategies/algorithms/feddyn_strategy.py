@@ -394,7 +394,7 @@ class FedDynUpdateStrategy(ModelUpdateStrategy):
             raise RuntimeError("FedDyn gradient vector path has not been initialised.")
         if not os.path.exists(grad_vector_path) and context.client_id != 0:
             root = self.save_path if self.save_path is not None else Config().params["model_path"]
-            legacy_path = f"{root}feddyn_grad_{context.client_id}.pth"
+            legacy_path = f"{root}_feddyn_grad_{context.client_id}.pth"
             # Exact same-client read-only migration; new writes stay contained.
             if os.path.isfile(legacy_path):
                 grad_vector_path = legacy_path
