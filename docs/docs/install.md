@@ -26,25 +26,32 @@ You can run Plato using `uv run`, using one of its configuration files:
 uv run plato.py -c configs/MNIST/fedavg_lenet5.toml
 ```
 
-In order to run any of the examples, first run the following command to include all global Python packages in a local Python environment:
+Provision the project environment from its manifest and lockfile using Python
+3.13, the default qualification and CI interpreter:
 
 ```bash
-uv sync
+uv sync --locked --python 3.13
 ```
 
-In case you need optional dependency groups, you can install them with:
+`uv sync` installs the selected project dependencies into `.venv`; it does not
+copy all globally installed Python packages. Optional **extras** select runtime
+features with `--extra`, while **dependency groups** select tooling or test
+requirements with `--group` (for example, `--group docs`). Select only the extras
+needed by a workload:
 
 ```bash
-uv sync --all-extras
+uv sync --locked --python 3.13 --extra mlx
 ```
 
-or:
+The `ssl` and `llm_eval` extras are declared incompatible. `uv sync --all-extras`
+fails for this project; use separate environments for self-supervised workloads
+and Lighteval. For example, provision SSL separately with:
 
 ```bash
-uv sync --extra mlx
+UV_PROJECT_ENVIRONMENT=.venv-ssl uv sync --locked --python 3.13 --extra ssl
 ```
 
-where `mlx` is the name of the dependency group.
+Use the same environment selection and extra when running that workload.
 
 Useful extras in the current root package include:
 
@@ -76,13 +83,22 @@ The normal Linux core CI suite does not qualify this backend.
 
 ### Optional: Server-side LLM Evaluation with Lighteval
 
-To enable `evaluation.type = "lighteval"`, install the evaluator stack:
+To enable `evaluation.type = "lighteval"`, install the locked evaluator stack
+and provision the two NLTK tokenizer resources used by its task registry:
 
 ```bash
-uv sync --extra llm_eval
+uv sync --locked --python 3.13 --extra llm_eval
+uv run --locked --extra llm_eval python -m nltk.downloader punkt punkt_tab
 ```
 
-This installs `lighteval` together with the runtime dependencies used by Plato's built-in Lighteval adapter.
+Provision `punkt` and `punkt_tab` before offline use; they are data resources,
+not Python packages. The evaluator extra includes `langdetect` and Lighteval.
+Keep `--extra llm_eval` on **every syncing `uv run` command** for evaluation.
+A later plain `uv run` can select the default shared dependencies, including
+an incompatible xxhash major version, even when Lighteval remains installed.
+The extra constrains xxhash to the compatible 3.x line. Use a direct environment
+interpreter or `uv run --no-sync` only after that environment has been provisioned
+with the compatible locked extra; neither command repairs a changed environment.
 
 See:
 

@@ -85,6 +85,12 @@ Evaluator implementations should return a compact set of summary metrics in
 `EvaluationResult.metadata`. The server logger automatically exports summary
 metrics to the runtime CSV under the `evaluation_` prefix.
 
+For optional Lighteval development, keep `--extra llm_eval` on syncing runtime
+commands and provision NLTK `punkt` and `punkt_tab` explicitly. Core evaluator
+unit tests do not replace real Pipeline checks. See the
+[optional runtime qualification contract](references/evaluators.md#optional-runtime-qualification)
+for the strict profile, focused commands, and validation scope.
+
 For a worked example, see [Evaluators](references/evaluators.md) and the
 [Server-side Lighteval for SmolLM2](examples/case-studies/4. Server-side Lighteval for SmolLM2.md)
 case study.
