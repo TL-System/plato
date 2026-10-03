@@ -2,7 +2,7 @@
   "schema_version": 1,
   "task": "2A: configuration, active non-adapter datasources and samplers",
   "date": "2026-10-03",
-  "status": "Both second-review medium findings corrected with both-version red/green and clean base profiles; all prior corrections preserved. Fresh review3 and root integration pending.",
+  "status": "R2A3-01 corrected with both-version red/green, untouched reviewer reproduction and clean base checks; prior contracts preserved. Fresh review4 and root integration pending.",
   "identity": {
     "worktree": "/private/tmp/plato-refresh-worktrees/data",
     "branch": "maintenance/2026-phase2-data",
@@ -31,23 +31,27 @@
       {
         "sha": "49fe01e4787d3cb30ffaf82b59bacae932470453",
         "subject": "Validated datasource cache values and required image artifacts."
+      },
+      {
+        "sha": "5f4749d74bd70ff808e7bf52f2a8142ffed737d3",
+        "subject": "Preserved default Tiny ImageNet recovery eligibility under its guard."
       }
     ],
-    "final_implementation_commit": "49fe01e4787d3cb30ffaf82b59bacae932470453",
-    "final_implementation_tree": "b080840cd38aeeb45e37b6cfe2151f209a017ad4",
-    "baseline_to_final_binary_diff_sha256": "30e86684023a0d74c64260c6c403e3a5922d23771e6caaa48639f9cd04172fdf",
-    "evidence_commit_contract": "Previous evidence-only commits a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb and b728a5b71d0945828dcf288a39b796b1e0fb4ec7 are preserved in history. This JSON is committed in an evidence-only child of 49fe01e4787d3cb30ffaf82b59bacae932470453. The containing child cannot embed its own hash; its exact terminal SHA is supplied in the final root handoff. Validated runtime/test/archive content identifies the exact implementation parent above; no self-hash circularity.",
+    "final_implementation_commit": "5f4749d74bd70ff808e7bf52f2a8142ffed737d3",
+    "final_implementation_tree": "760789001a60345c5f3079607ae667c98bfad9b3",
+    "baseline_to_final_binary_diff_sha256": "a92fb1719323796a48defb991b27e7ab3f2975626fcf4d557b21d17ce004478f",
+    "evidence_commit_contract": "Prior exact implementation/evidence commits and immutable review inputs remain in history. This JSON is committed in an evidence-only child of 5f4749d74bd70ff808e7bf52f2a8142ffed737d3. The containing child cannot embed its own hash; its exact terminal SHA is supplied in the final root handoff. Validated runtime/test/archive content identifies the exact implementation parent above.",
     "tracked_tree_before_evidence": "clean",
     "shared_metadata": "pyproject.toml, uv.lock, CI and shared conftest unchanged; no push, merge, PR edit, submodule update or other worktree/environment mutation.",
     "previous_candidate": {
-      "commit": "b728a5b71d0945828dcf288a39b796b1e0fb4ec7",
-      "tree": "b0879eb78803b379d6888d4cc208fd8f914eb610",
-      "implementation": "f2c77a071b67cef9b2ee954f94d565c4eddaf0d9",
-      "evidence_commit": "b728a5b71d0945828dcf288a39b796b1e0fb4ec7",
-      "evidence_file_sha256": "03515ac7b4e51f75fa74b4e872b0b98e42e68ddf1f4f06e858407511a974877f",
-      "verdict": "CHANGES_REQUESTED; two remaining medium findings. Immutable second review source is attributed below."
+      "commit": "150a48860b556eab1575178891577dd07dc6f06d",
+      "tree": "f9a191f004077f32f01bf0a4ae651c173a914b2c",
+      "implementation": "49fe01e4787d3cb30ffaf82b59bacae932470453",
+      "evidence_commit": "150a48860b556eab1575178891577dd07dc6f06d",
+      "evidence_file_sha256": "88dbc7a7684e4b2b2e6748f2b6c0bc9a3f0c9ebb644c2db3d6bb2dd33597e677",
+      "verdict": "CHANGES_REQUESTED; one remaining medium default-recovery finding, source-attributed in review3_corrections."
     },
-    "previous_candidate_to_final_binary_diff_sha256": "a915d433b5102585a6d442a4e9bc6f5d0936c504cad09a2f05a2e17747919188",
+    "previous_candidate_to_final_binary_diff_sha256": "5499be50f7e2097effbd53d9fb96dd0c00235a28bb818aba38f373d1abf02544",
     "earlier_candidates": [
       {
         "commit": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
@@ -55,6 +59,14 @@
         "evidence_commit": "a7bfd3dcdf7aaf3ec3ca466a1b5f27efa58054eb",
         "evidence_file_sha256": "b3b83408a9bca12209cc4ead3b936b078e0cb1d7dd71f6cd47fd8c828e5fa628",
         "verdict": "CHANGES_REQUESTED; immutable independent review remains unchanged."
+      },
+      {
+        "commit": "b728a5b71d0945828dcf288a39b796b1e0fb4ec7",
+        "tree": "b0879eb78803b379d6888d4cc208fd8f914eb610",
+        "implementation": "f2c77a071b67cef9b2ee954f94d565c4eddaf0d9",
+        "evidence_commit": "b728a5b71d0945828dcf288a39b796b1e0fb4ec7",
+        "evidence_file_sha256": "03515ac7b4e51f75fa74b4e872b0b98e42e68ddf1f4f06e858407511a974877f",
+        "verdict": "CHANGES_REQUESTED; two remaining medium findings. Immutable second review source is attributed below."
       }
     ]
   },
@@ -169,6 +181,10 @@
     {
       "inventory": "Second-review cache value and required-image readiness contracts in _vector_cache.py, _image_folder.py, cinic10.py and tiny_imagenet.py.",
       "outcome": "26 actual-constructor invalid-cache cases recover correct offline raw values and labels twice; eight compatible numeric cache-only cases preserve original file bytes. Eight real localhost HTTP/extraction cases restore missing train/evaluation images and readable labeled samples, including configured/default native Tiny and prepared Tiny. Original 184 plus 42 new cases pass on both interpreters; clean base profiles pass 429 with four allowed skips and 48 authorized runtime deselections. No external-corpus or training claim."
+    },
+    {
+      "inventory": "Tiny default-source failed/readiness recovery and concurrent initialization eligibility; no other production paths changed.",
+      "outcome": "Actual default/configured HTTP/ZIP/native/sample regressions cover failed readiness followed by a restored source, plus a contender during paused recovery with absent completion. All seven new tests and original 226 pass on each interpreter; clean base passes 436/4 allowed skips, 48 authorized runtime deselections. Original reviewer four-case script passes unchanged against owned source. Generic lock/unrelated ZIP cannot authorize incomplete manual native roots."
     }
   ],
   "confirmed_findings": [
@@ -307,7 +323,7 @@
       "id": "2A-10",
       "status": "fixed",
       "observed": "CINIC treated an empty root as downloaded; official Tiny ImageNet nested/native layout failed or classified unlabeled test/images as one class; both used hardcoded counts.",
-      "resolution": "Check concrete split readiness, use labeled Tiny validation annotations and training class IDs, preserve prepared labeled layouts and report actual lengths. R2A-03/R2A-04 and root corrections enforce labeled prepared compatibility, shared training IDs, deterministic Tiny evaluation and stale-marker recovery. R2A2-02 additionally requires usable per-class images and existing native validation references before trusting completion.",
+      "resolution": "Check concrete split readiness, use labeled Tiny validation annotations and training class IDs, preserve prepared labeled layouts and report actual lengths. R2A-03/R2A-04 and root corrections enforce labeled prepared compatibility, shared training IDs, deterministic Tiny evaluation and stale-marker recovery. R2A2-02 additionally requires usable per-class images and existing native validation references before trusting completion. R2A3-01 recognizes retained canonical default ZIP evidence and rechecks layout/eligibility under the existing guard, preserving retry after failed readiness and waiting contenders without recursive flock.",
       "red": [
         "red-local-3.13.log",
         "red-native-layout-3.13.log"
@@ -466,24 +482,24 @@
       ]
     },
     "green": {
-      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision2/focused-fixtures-{python}",
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/focused-fixtures-{python}",
       "3.13": {
-        "log": "revision2/green-focused-3.13.log",
-        "passed": 226,
+        "log": "revision3/green-focused-3.13.log",
+        "passed": 233,
         "failed": 0,
         "skipped": 0,
         "warnings": 0,
-        "seconds": 10.38
+        "seconds": 9.75
       },
       "3.14": {
-        "log": "revision2/green-focused-3.14.log",
-        "passed": 226,
+        "log": "revision3/green-focused-3.14.log",
+        "passed": 233,
         "failed": 0,
         "skipped": 0,
         "warnings": 0,
-        "seconds": 46.3
+        "seconds": 45.48
       },
-      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion. Also actual constructor rebuilding of incompatible, nonfinite, fractional and out-of-class-range caches; required train/evaluation image removal while directories, annotations and completion markers remain.",
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion. Also actual constructor rebuilding of incompatible, nonfinite, fractional and out-of-class-range caches; required train/evaluation image removal while directories, annotations and completion markers remain. Also default/configured failed-readiness retry, live recovery contenders, and incomplete manually prepared native roots with absent/generic/unrelated recovery artifacts.",
       "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
     },
     "ssl_transform_smoke": {
@@ -508,14 +524,14 @@
     },
     "static_checks": [
       {
-        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
+        "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ruff check plato/config.py plato/datasources plato/samplers tests/test_config_loader.py tests/samplers/test_partition_contracts.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/datasources/test_review3_regressions.py plato/utils/archive.py tests/utils/test_archive.py --select I",
         "result": "All checks passed",
-        "log": "revision2/ruff.log"
+        "log": "revision3/ruff.log"
       },
       {
         "command": "/tmp/plato-phase2a-lZqbqj/venv-3.13/bin/ty check plato/config.py plato/datasources/base.py plato/datasources/cinic10.py plato/datasources/purchase.py plato/datasources/texas.py plato/datasources/tiny_imagenet.py plato/datasources/_vector_cache.py plato/datasources/_image_folder.py plato/datasources/feature.py plato/datasources/feature_dataset.py plato/datasources/femnist.py plato/datasources/registry.py plato/datasources/self_supervised_learning.py plato/datasources/torchvision.py plato/samplers plato/utils/archive.py --output-format concise",
         "result": "All checks passed; no suppressions",
-        "log": "revision2/typing.log"
+        "log": "revision3/typing.log"
       },
       {
         "command": "git diff --check",
@@ -566,6 +582,50 @@
       "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
     },
     "clean_base_profile": {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/base-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision3/base-{python}.xml",
+      "3.13": {
+        "log": "revision3/green-base-3.13.log",
+        "passed": 436,
+        "failed": 0,
+        "skipped": 4,
+        "warnings": 0,
+        "deselected": 48,
+        "seconds": 20.8
+      },
+      "3.14": {
+        "log": "revision3/green-base-3.14.log",
+        "passed": 436,
+        "failed": 0,
+        "skipped": 4,
+        "warnings": 0,
+        "deselected": 48,
+        "seconds": 58.18
+      },
+      "allowed_skips": "One DP loader node: opacus absent. Three Nanochat integration nodes: base profile omits this optional integration. No other skips or warnings.",
+      "runtime_scope": "The unchanged 48 socket/runtime cases were explicitly deselected as authorized; no shared runtime changes justify repeating that matrix."
+    },
+    "previous_review2_candidate_green": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/test_config_loader.py tests/samplers tests/datasources/test_registry.py tests/datasources/test_torchvision_datasource.py tests/datasources/test_feature_dataset.py tests/datasources/test_feature_datasource.py tests/datasources/test_data_loaders.py tests/datasources/test_download_contracts.py tests/datasources/test_local_datasets.py tests/datasources/test_review_regressions.py tests/datasources/test_review2_regressions.py tests/utils/test_archive.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision2/focused-fixtures-{python}",
+      "3.13": {
+        "log": "revision2/green-focused-3.13.log",
+        "passed": 226,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 10.38
+      },
+      "3.14": {
+        "log": "revision2/green-focused-3.14.log",
+        "passed": 226,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 46.3
+      },
+      "negative_paths": "Five-second IID/empty-padding/class-pool/minimum subprocess guards; dead-lock three-second retry guard; live-lock contender must emit ready before waiting; inert local HTTP/archive failures and no-outside-write/no-completion assertions. Plus six invalid edge-role/training cases, real killed NPZ writers, corrupt/missing-key/mismatched-shape caches, unknown evaluation classes, incomplete unlabeled native trees and readiness rejection without completion. Also actual constructor rebuilding of incompatible, nonfinite, fractional and out-of-class-range caches; required train/evaluation image removal while directories, annotations and completion markers remain.",
+      "no_weakened_checks": "No broad suppressions, blanket API modernization, mirror-only tests, changed shared fixtures or dropped existing assertions."
+    },
+    "previous_review2_clean_base_profile": {
       "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest tests --test-profile=base -m 'not runtime' -ra --basetemp=/tmp/plato-phase2a-lZqbqj/revision2/base-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision2/base-{python}.xml",
       "3.13": {
         "log": "revision2/green-base-3.13.log",
@@ -641,6 +701,10 @@
     {
       "url": "https://docs.pytorch.org/docs/2.14/generated/torch.tensor.html",
       "use": "Documented ndarray input and explicit dtype construction; actual VectorDataset regressions establish numeric, endian and narrowing behavior."
+    },
+    {
+      "url": "https://docs.python.org/3.13/library/sys.html#sys.setprofile",
+      "use": "Thread-local C-call event observes the unmodified flock attempt in the concurrent test. Existing fcntl.flock primary documentation rechecked; no profiling of context-switch timing."
     }
   ],
   "root_handoffs": [
@@ -668,7 +732,7 @@
     "Archive helper assumes no concurrent external writer mutates destination during preflight/extraction; no rollback guarantee for corrupt-data or filesystem failures. Safe TAR links point inside the root; ZIP symlink entries are intentionally rejected.",
     "Archived multimedia helpers need external historical tools/data and remain unqualified; observed REFER defects are preserved, not repaired.",
     "SSL validation covers constructor and tensor transform behavior, not training, accelerator execution or full external dataset downloads.",
-    "Review corrections are validated original-author implementation changes pending fresh independent review3 of the exact terminal candidate. All prior CHANGES_REQUESTED reports remain immutable; root integration/Ubuntu qualification and cross-owner archival/package/docs handoffs remain outstanding. Unchanged socket/runtime tests were not repeated."
+    "Current original-author correction awaits fresh independent review4 of the exact terminal candidate. All prior CHANGES_REQUESTED reports remain immutable. Root integration/Ubuntu and cross-owner archival/package/docs handoffs remain outstanding; unchanged socket/runtime tests were not repeated."
   ],
   "owned_temporary_resources": {
     "scratch_root": "/tmp/plato-phase2a-lZqbqj",
@@ -680,7 +744,9 @@
     "revision_scratch": "/tmp/plato-phase2a-lZqbqj/revision",
     "revision_contents": "Retained pre-fix/corrected-edge/default-marker/final logs, per-version fixture roots, source-of-evidence update script, previous JSON snapshot and commit bodies; existing isolated environments reused. All launched writer/reader children and HTTP workers completed or were joined/killed by test finally blocks.",
     "revision2_scratch": "/tmp/plato-phase2a-lZqbqj/revision2",
-    "revision2_contents": "Owned dev-env red/new/focused logs, two newly provisioned clean base environments, base logs/JUnit, isolated per-run fixture roots, environment/preservation JSONs, previous b728 evidence snapshot and update/commit files. Test HTTP workers and subprocesses joined or terminated; no intentionally retained processes."
+    "revision2_contents": "Owned dev-env red/new/focused logs, two newly provisioned clean base environments, base logs/JUnit, isolated per-run fixture roots, environment/preservation JSONs, previous b728 evidence snapshot and update/commit files. Test HTTP workers and subprocesses joined or terminated; no intentionally retained processes.",
+    "revision3_scratch": "/tmp/plato-phase2a-lZqbqj/revision3",
+    "revision3_contents": "Retained original-candidate red, new/focused/base green, untouched reviewer-script rerun logs, JUnit/physical observations, environment/preservation manifests, own fixture roots, previous evidence snapshot and preparation files. Existing six environments retained; all launched subprocess/HTTP/constructor workers finished or were joined."
   },
   "unresolved_conflicts": [],
   "review_corrections": {
@@ -878,7 +944,7 @@
         "seconds": 35.41
       }
     },
-    "final_green": "See red_green.green (226 per interpreter) and red_green.clean_base_profile (429 per interpreter). Each declared command ran once per version; broader prescribed suites followed the new-case regressions.",
+    "final_green": "Historical reviewed 150a candidate: see red_green.previous_review2_candidate_green (226 each) and previous_review2_clean_base_profile (429 each). Current results are attributed in review3_corrections.",
     "clean_base_environments": {
       "provision_command": "UV_PROJECT_ENVIRONMENT=/tmp/plato-phase2a-lZqbqj/revision2/base-{python} uv sync --locked --no-default-groups --group test-base --python {python}",
       "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
@@ -929,6 +995,141 @@
       "environment-base-3.13.json": "586849fcfa6573131f67780bfbc4cc667b58ca710f9ddbe5bc2e8b577fb17ebc",
       "environment-base-3.14.json": "368147a2788646487b2c3e59f0b8bdbd4e899b8eea1dd704ab5e09b49c56d5e2",
       "preservation.json": "e05706fdd64ab3ba5460a2fda8fa1f1e5f8583a670bbedc442a13297be409e4c"
+    }
+  },
+  "review3_corrections": {
+    "independent_input": {
+      "path": "/Users/bli/Playground/plato/evidence/2026-refresh/phase2a-review-3.json",
+      "sha256": "dbf8aad9fc371c7b001a7f04240abfab338b2682a922761f900e7eb0cb3d521d",
+      "candidate": "150a48860b556eab1575178891577dd07dc6f06d",
+      "verdict": "CHANGES_REQUESTED",
+      "findings": [
+        "R2A3-01"
+      ]
+    },
+    "read_only_probe_sources_sha256": {
+      "/tmp/plato-phase2a-review-3/test_default_recovery_negative.py": "aa6396e775236e7d6a693245e3294056ae840a95bea60b2e203fc114e3d1a3a8",
+      "/tmp/plato-phase2a-review-3/test_independent_contracts.py": "be22218bc200e4a8ab94ede85df40097c83cba5685d776373db4ed4568936fd4"
+    },
+    "attribution": "Review3 independently reports prior numeric/readiness/contracts and 226 focused/429 base results passing on exact 150a, with both default recovery negatives failing and configured controls passing. New results below were run by the original author against the recorded implementation content; rerunning the original reviewer script is author verification, not independent approval. All reviewer reports, sources, candidates, environments and verdicts remain unchanged.",
+    "disposition": {
+      "id": "R2A3-01",
+      "status": "corrected; fresh independent review4 pending",
+      "change": "Tiny default recovery rechecks layout and native eligibility under the existing download guard. The canonical retained ZIP or completion artifact identifies an existing default download; generic lock/unrelated files do not. After waiting, complete data returns directly. Incomplete recognized recovery leaves the guard before calling the downloader, whose own guard/recheck remains unchanged; no recursive flock, new manifest, format or sidecar.",
+      "verification": "Successful actual canonical default download loses one of two annotated PNGs. Incomplete recovery raises required-artifact RuntimeError, leaves no completion and retains ZIP. Restored source yields request three, restored bytes, correct training-space label 1 and readable finite samples. Concurrent owner pauses its HTTP body after marker invalidation; contender reaches the real flock instead of failing, waits, and both constructors succeed with two total requests. Identical configured controls and completed-root offline reuse pass. Three manual-native cases reject even with generic lock or unrelated ZIP."
+    },
+    "red": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_review3_regressions.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/red-fixtures-{python}",
+      "source_state": "Exact 150a48860b556eab1575178891577dd07dc6f06d production content plus new durable tests before source edits.",
+      "3.13": {
+        "log": "revision3/red-3.13.log",
+        "passed": 5,
+        "failed": 2,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 0.28
+      },
+      "3.14": {
+        "log": "revision3/red-3.14.log",
+        "passed": 5,
+        "failed": 2,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 35.3
+      },
+      "failure_disposition": "Both default-source negatives reproduce actual pre-guard ValueError; configured controls and three manual-root controls pass. No harness correction or suppression changes these product red results."
+    },
+    "green_new_cases": {
+      "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2a-lZqbqj/venv-{python}/bin/python -m pytest tests/datasources/test_review3_regressions.py -q --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/green-new-fixtures-{python}",
+      "3.13": {
+        "log": "revision3/green-new-3.13.log",
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 0.2
+      },
+      "3.14": {
+        "log": "revision3/green-new-3.14.log",
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 35.23
+      }
+    },
+    "original_reviewer_script_author_rerun": {
+      "command": "HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false PYTHONPATH=/private/tmp/plato-refresh-worktrees/data /tmp/plato-phase2a-lZqbqj/revision2/base-{python}/bin/python -m pytest /tmp/plato-phase2a-review-3/test_default_recovery_negative.py -q -p no:cacheprovider --basetemp=/tmp/plato-phase2a-lZqbqj/revision3/independent-fixtures-{python} --junitxml=/tmp/plato-phase2a-lZqbqj/revision3/independent-{python}.xml",
+      "3.13": {
+        "log": "revision3/independent-3.13.log",
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 4.82
+      },
+      "3.14": {
+        "log": "revision3/independent-3.14.log",
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 0,
+        "seconds": 40.49
+      },
+      "observation_summary": "Each interpreter has four verified observed.json files pointing to this worktree, no errors, three sequential retry requests or two concurrent requests, valid completion and one/two successful constructors. Sources read only, bytecode/cache writes disabled; fixtures/logs/JUnit live exclusively in owned revision3 scratch.",
+      "observations": "revision3/independent-observations.json"
+    },
+    "final_green": "Current commands/counts in red_green.green (233 each) and clean_base_profile (436 each, four allowed skips, 48 unchanged runtime deselections). Each suite ran once per version; no socket/runtime rerun.",
+    "environment": {
+      "reuse": "Existing owned locked dev environments and revision2 clean test-base environments reused without dependency mutations or sync; original provision commands retained in environment.provision_commands.",
+      "lock_sha256": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d",
+      "base_interpreters": {
+        "3.13": {
+          "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+          "prefix": "/tmp/plato-phase2a-lZqbqj/revision2/base-3.13",
+          "source": "/private/tmp/plato-refresh-worktrees/data/plato/__init__.py"
+        },
+        "3.14": {
+          "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+          "prefix": "/private/tmp/plato-phase2a-lZqbqj/revision2/base-3.14",
+          "source": "/private/tmp/plato-refresh-worktrees/data/plato/__init__.py"
+        }
+      },
+      "optional_absence": "opacus, kazoo, gymnasium, tiktoken, lightly independently still absent in both base environments. Python default/minimum remains 3.13."
+    },
+    "static_and_preservation": {
+      "checks": "Scoped Ruff/ty both pass, diff clean; see current red_green.static_checks. No suppressions.",
+      "manifest": "revision3/preservation.json",
+      "archive_originals": 14,
+      "archive_LICENSE_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "active_archive_reference_matches": 0,
+      "source_preservation": "Config, samplers, numeric cache helpers/consumers, CINIC, EMNIST, base downloader, extraction helper, archives, shared runtime and metadata unchanged from previous candidate.",
+      "shared_metadata": "All four metadata/conftest hashes rechecked and identical to environment.metadata_sha256; exact hashes also in retained preservation manifest."
+    },
+    "test_synchronization": "HTTP body events hold the real owner flock with completion absent. Thread-local sys.setprofile only observes the contender C flock call; finally signals rejected/completed constructors. Outcome gating uses events, not sleeps or patched download/readiness/guard functions. All HTTP/constructor workers joined.",
+    "harness_note": "Post-test observation assembly initially counted pytest current-directory symlink aliases as additional observed.json files. Excluding aliases verified exactly four physical observations per interpreter. This assembly assertion was not a product or pytest failure; no tests were rerun or red results reclassified.",
+    "limits": "Default-recovery recognition uses existing canonical ZIP/complete artifacts, not a provenance manifest; a generic lock alone cannot establish eligibility. Readiness remains filesystem image existence/extensions/native annotation references, not decoding checksums or arbitrary prepared-inventory reconstruction. macOS ARM64 CPython CPU only; fresh review4, Ubuntu and root integration remain pending. All prior archive/concurrency/platform limits still apply.",
+    "retained_raw_artifacts_sha256": {
+      "red-3.13.log": "9797bcbeee458c532bd734aacfd4d16a1c5b8487384703f96b8ac455e1f9695d",
+      "red-3.14.log": "547f7480a5f9058f4f51243cdb94d60dd532dc232b71365ff03b48ebe3f88f4a",
+      "green-new-3.13.log": "22dda2ca00ae6324a6f97b96c400ce0c3cb8bf22b31857fc022eeba879e7e569",
+      "green-new-3.14.log": "d47a130fc7bd5bc30d20d5c78106e950ddfb07de24c0f36ff722ed9ef1c626a6",
+      "green-focused-3.13.log": "1747f71d06931f44faaa06a24ecc4c4960e764327dca1263a8f140919c283bc6",
+      "green-focused-3.14.log": "12e18785bb15340001c08617af2d7bd0e81063d0fae087734ab8be5250077f76",
+      "green-base-3.13.log": "8feec7eab761d5970175f175f73c03ef40385950fdf5bd137f0f6fbe0ca665ed",
+      "green-base-3.14.log": "30bb5cd0caa87611dc7e00b53225a3a9e61ed9bfa94f4aa8754eb54e8ab14e40",
+      "independent-3.13.log": "d07adc9c61b334cc33f3125b4ea06095f40a39993f88420c6a0f59782d16e1d6",
+      "independent-3.14.log": "672d3f90dd796e4c0bd1c5934c1542366c398950fb97dcaccff9311b8c30fa79",
+      "base-3.13.xml": "f4214dafaa1925abb7a3ac67d13910eab442a071170b923155bc53026daede85",
+      "base-3.14.xml": "b80f1e8c30f52416946a16db80ba1376ff5836d30c13d65a462f7da29b3b5d4d",
+      "independent-3.13.xml": "42735085e499a49ee3fcba69fcf7f8eb9941d2a56f747c96d546cb9b76372e40",
+      "independent-3.14.xml": "770d23f6bc1dd1ac4bb5ecbc91aa90d1b7d7a3343f28fc2803e977b85a94463d",
+      "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "typing.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "environment-base-3.13.json": "a94b24f9b8e50213c7d13b65fd703fc6325db1b9fc1db4aa419e2a07699f37cd",
+      "environment-base-3.14.json": "3c851aa10927764783f27f0b734ec9dfd05fe4150bbd0f11125e98db3c58530e",
+      "preservation.json": "54ac458b3d23bdf4862fd22db34cba60c4b6d92f8eac6ef6f128580c8c31ddc8",
+      "independent-observations.json": "677a15be39398b028a2a0fe4a06b95f0190a7357a429ac3935e151349252a133"
     }
   }
 }
