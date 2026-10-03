@@ -11,6 +11,40 @@ from plato.trainers.diff_privacy import DPDataLoaderStrategy
 from plato.trainers.strategies.base import TrainingContext
 
 
+def test_dp_actual_time_snapshot_writer_to_plain_urgent_reader(tmp_path):
+    """Epoch snapshots retain plain keys while both private epochs update."""
+    from pathlib import Path
+
+    from plato.config import Config
+    from plato.serialization.safetensor import deserialize_tree
+    from plato.trainers.diff_privacy import Trainer
+    from tests.integration.utils import build_minimal_config, configure_environment
+
+    config = build_minimal_config(trainer_type="diff_privacy", model_name="org/model")
+    config["trainer"].update(batch_size=4, epochs=2, max_physical_batch_size=2)
+    config["server"]["request_update"] = True
+    with configure_environment(config, runtime_root=tmp_path):
+        torch.manual_seed(21)
+        trainer = Trainer(model=torch.nn.Linear(2, 2))
+        trainer.set_client_id(7)
+        trainer.device = trainer.context.device = torch.device("cpu")
+        data = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)
+        trainer.train_model(
+            {**config["trainer"], "run_id": "dp-snapshot"}, data, list(range(16))
+        )
+        snapshots = list(Path(Config.params["model_path"]).glob("7_*.safetensors"))
+        assert len(snapshots) == 2
+        for path in snapshots:
+            assert set(deserialize_tree(path.read_bytes())) == {"weight", "bias"}
+        historical = trainer.obtain_model_at_time(7, float("inf"))
+        for name, value in historical.state_dict().items():
+            torch.testing.assert_close(value, trainer.model.state_dict()[name])
+        assert trainer.model_state_dict is None
+        assert not hasattr(trainer.model, "autograd_grad_sample_hooks")
+        history = trainer.optimizer_strategy.privacy_engine.accountant.history
+        assert sum(item[2] for item in history) == 8
+
+
 def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path):
     from plato.trainers.diff_privacy import Trainer
     from tests.integration.utils import build_minimal_config, configure_environment

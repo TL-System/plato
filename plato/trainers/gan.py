@@ -29,7 +29,11 @@ from plato.trainers.strategies.base import (
     TrainingContext,
     TrainingStepStrategy,
 )
-from plato.utils.checkpoint_paths import checkpoint_name, checkpoint_path
+from plato.utils.checkpoint_paths import (
+    checkpoint_name,
+    checkpoint_path,
+    checkpoint_sidecar,
+)
 
 
 class GANOptimizerStrategy(OptimizerStrategy):
@@ -473,6 +477,12 @@ class Trainer(ComposableTrainer):
             pass
 
         if filename is not None:
+            # Resolve the explicit anchor before adding companion prefixes.
+            # Otherwise 'nested/../pair.pth' aliases both networks to one file,
+            # and an escaping anchor fails only after writing the pair.
+            filename = os.path.relpath(
+                checkpoint_path(model_path, filename), os.path.realpath(model_path)
+            )
             net_gen_path = checkpoint_path(model_path, f"Generator_{filename}")
             net_disc_path = checkpoint_path(model_path, f"Discriminator_{filename}")
         else:
@@ -483,12 +493,16 @@ class Trainer(ComposableTrainer):
                 model_path, checkpoint_name("Discriminator", model_name, suffix=".pth")
             )
 
+        history_name = filename if filename is not None else checkpoint_name(
+            model_name, suffix=".pth"
+        )
+        history_path = checkpoint_sidecar(
+            model_path, checkpoint_path(model_path, history_name)
+        )
         os.makedirs(os.path.dirname(net_gen_path), exist_ok=True)
         os.makedirs(os.path.dirname(net_disc_path), exist_ok=True)
         torch.save(self.generator.state_dict(), net_gen_path)
         torch.save(self.discriminator.state_dict(), net_disc_path)
-        history_name = filename if filename is not None else checkpoint_name(model_name, suffix=".pth")
-        history_path = checkpoint_path(model_path, history_name + ".pkl")
         os.makedirs(os.path.dirname(history_path), exist_ok=True)
         with open(history_path, "wb") as history_file:
             pickle.dump(self.run_history, history_file)
@@ -529,6 +543,9 @@ class Trainer(ComposableTrainer):
             return super().load_model(filename, location)
 
         if filename is not None:
+            filename = os.path.relpath(
+                checkpoint_path(model_path, filename), os.path.realpath(model_path)
+            )
             net_gen_path = checkpoint_path(model_path, f"Generator_{filename}")
             net_disc_path = checkpoint_path(model_path, f"Discriminator_{filename}")
         else:
@@ -562,6 +579,12 @@ class Trainer(ComposableTrainer):
                 net_disc_path,
             )
 
+        history_name = filename if filename is not None else checkpoint_name(
+            model_name, suffix=".pth"
+        )
+        history_path = checkpoint_sidecar(
+            model_path, checkpoint_path(model_path, history_name)
+        )
         # GAN checkpoints historically contain torch.save data, including
         # worker files whose supplied name ends in .safetensors. File handles
         # avoid torch.load's suffix-based Safetensors dispatch for these files.
@@ -575,8 +598,6 @@ class Trainer(ComposableTrainer):
             )
         self.generator.load_state_dict(generator_state)
         self.discriminator.load_state_dict(discriminator_state)
-        history_name = filename if filename is not None else checkpoint_name(model_name, suffix=".pth")
-        history_path = checkpoint_path(model_path, history_name + ".pkl")
         if os.path.isfile(history_path):
             with open(history_path, "rb") as history_file:
                 self.run_history = pickle.load(history_file)

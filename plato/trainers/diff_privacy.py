@@ -408,6 +408,19 @@ class Trainer(ComposableTrainer):
             assert len(errors) == 0
             logging.info("Model validated and fixed for differential privacy.")
 
+    def save_model(self, filename=None, location=None):
+        """Snapshot plain model keys without removing live Opacus hooks."""
+        model = self._require_model()
+        if not isinstance(model, GradSampleModule) or self.model_state_dict is not None:
+            return super().save_model(filename, location)
+
+        previous_state = self.model_state_dict
+        try:
+            self.model_state_dict = model.get_submodule("_module").state_dict()
+            return super().save_model(filename, location)
+        finally:
+            self.model_state_dict = previous_state
+
     def train_model(self, config, trainset, sampler, **kwargs):
         """Train with reusable Opacus hooks and exception-safe unwrapping.
 

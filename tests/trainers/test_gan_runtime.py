@@ -196,3 +196,38 @@ def test_gan_fid_actual_partition_tail_padding_and_scalar_covariance_reference()
     for partition in ([], [0]):
         with pytest.raises(ValueError, match="at least two"):
             strategy.test_model(model, {"batch_size": 2}, data, partition, context)
+
+
+def test_gan_explicit_normalized_paths_keep_networks_distinct_and_validate_first(
+    tmp_path,
+):
+    config = build_minimal_config(trainer_type="gan")
+    with configure_environment(config, runtime_root=tmp_path):
+        trainer = Trainer(model=dcgan.Model())
+        expected = (
+            copy.deepcopy(trainer.generator.state_dict()),
+            copy.deepcopy(trainer.discriminator.state_dict()),
+        )
+        custom = tmp_path / "pairs"
+        for filename in ("nested/pair.pth", "nested/../normalized.pth"):
+            trainer.run_history.update_metric("marker", 7)
+            trainer.save_model(filename, custom)
+            next(trainer.generator.parameters()).data.zero_()
+            next(trainer.discriminator.parameters()).data.zero_()
+            trainer.run_history.reset()
+            trainer.load_model(filename, custom)
+            for network, state in zip(
+                (trainer.generator, trainer.discriminator), expected
+            ):
+                for name, value in network.state_dict().items():
+                    torch.testing.assert_close(value, state[name])
+            assert trainer.run_history.get_latest_metric("marker") == 7
+        assert (custom / "Generator_nested/pair.pth").is_file()
+        assert (custom / "Discriminator_nested/pair.pth").is_file()
+        assert (custom / "Generator_normalized.pth").is_file()
+        assert (custom / "Discriminator_normalized.pth").is_file()
+        for filename in ("../outside.pth", str(tmp_path / "absolute.pth")):
+            before = {path for path in custom.rglob("*") if path.is_file()}
+            with pytest.raises(ValueError):
+                trainer.save_model(filename, custom)
+            assert {path for path in custom.rglob("*") if path.is_file()} == before

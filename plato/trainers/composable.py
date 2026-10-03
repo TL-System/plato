@@ -64,6 +64,7 @@ from plato.trainers.strategies.training_step import DefaultTrainingStepStrategy
 from plato.utils.checkpoint_paths import (
     checkpoint_name,
     checkpoint_path,
+    checkpoint_sidecar,
     snapshot_details,
 )
 
@@ -291,6 +292,7 @@ class ComposableTrainer(base.Trainer):
     def save_model(self, filename=None, location=None):
         """Save the model to a file."""
         model_path = Config().params["model_path"] if location is None else location
+        model_root = model_path
         model_name = Config().trainer.model_name
 
         try:
@@ -305,6 +307,7 @@ class ComposableTrainer(base.Trainer):
                 model_name, suffix=".safetensors"
             ),
         )
+        history_path = checkpoint_sidecar(model_root, model_path)
 
         model = self._require_model()
         state_dict = (
@@ -325,7 +328,7 @@ class ComposableTrainer(base.Trainer):
         with open(model_path, "wb") as model_file:
             model_file.write(serialized)
 
-        with open(model_path + ".pkl", "wb") as history_file:
+        with open(history_path, "wb") as history_file:
             history_file.write(history_payload)
 
         if self.client_id == 0:
@@ -336,6 +339,7 @@ class ComposableTrainer(base.Trainer):
     def load_model(self, filename=None, location=None):
         """Load pre-trained model weights from a file."""
         model_path = Config().params["model_path"] if location is None else location
+        model_root = model_path
         model_name = Config().trainer.model_name
 
         model_path = checkpoint_path(
@@ -344,6 +348,7 @@ class ComposableTrainer(base.Trainer):
                 model_name, suffix=".safetensors"
             ),
         )
+        history_path = checkpoint_sidecar(model_root, model_path)
 
         if not model_path.endswith(".safetensors"):
             raise ValueError(
@@ -364,7 +369,6 @@ class ComposableTrainer(base.Trainer):
 
         logging.info("[Client #%d] Model loaded from %s.", self.client_id, model_path)
 
-        history_path = model_path + ".pkl"
         if os.path.exists(history_path):
             with open(history_path, "rb") as history_file:
                 self.run_history = pickle.load(history_file)

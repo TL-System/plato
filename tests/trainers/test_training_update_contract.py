@@ -508,11 +508,13 @@ def test_lgfedavg_two_real_updates_dispatch_timm_between_passes(tmp_path, monkey
         assert "complete_optimizer_step" not in trainer.context.state
 
 
-def test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update(tmp_path):
+@pytest.mark.parametrize("fused", [False, True])
+def test_real_grad_scaler_overflow_does_not_dispatch_optimizer_update(tmp_path, fused):
     """Qualify real CPU scaler completion; CUDA execution needs GPU hardware."""
     from plato.trainers.strategies.training_step import MixedPrecisionStepStrategy
 
     config = build_minimal_config()
+    config["parameters"]["optimizer"]["fused"] = fused
     config["trainer"].update(batch_size=1, epochs=1)
     with configure_environment(config, runtime_root=tmp_path):
         model = torch.nn.Linear(1, 1, bias=False)

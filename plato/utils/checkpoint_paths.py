@@ -72,3 +72,20 @@ def snapshot_details(filename: str) -> tuple[int, int, float] | None:
     if match is None:
         return None
     return int(match["client"]), int(match["epoch"]), float(match["time"])
+
+
+def checkpoint_sidecar(
+    root: str | PathLike, primary: str | PathLike, suffix: str = ".pkl"
+) -> str:
+    """Attach a suffix to a resolved checkpoint, checking sidecar containment.
+
+    A safe primary path does not imply its separately named sidecar is safe:
+    an existing history symlink must also remain within the selected root.
+    """
+    if not re.fullmatch(r"(?:\.[A-Za-z0-9]+)+", suffix):
+        raise ValueError("Checkpoint sidecars require a file suffix")
+    base = Path(root).resolve()
+    path = Path(primary)
+    if not path.is_absolute():
+        path = Path(checkpoint_path(base, path))
+    return checkpoint_path(base, str(path.relative_to(base)) + suffix)

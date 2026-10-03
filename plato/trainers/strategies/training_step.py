@@ -241,17 +241,21 @@ class MixedPrecisionStepStrategy(TrainingStepStrategy):
 
             # Unscale gradients and step
             # GradScaler can suppress optimizer.step on overflow. Observe the
-            # actual public step hook, rather than counting scaler attempts or
-            # inferring completion from a change to its dynamic scale.
+            # actual public step hook, rather than counting scaler attempts.
+            # AMP-aware fused optimizers can skip inside step itself, so the
+            # scaler's public overflow/backoff signal is checked as well.
             def completed(*_):
                 context.state["optimizer_step_completed"] = True
 
             handle = optimizer.register_step_post_hook(completed)
+            scale_before = self.scaler.get_scale()
             try:
                 self.scaler.step(optimizer)
             finally:
                 handle.remove()
             self.scaler.update()
+            if self.scaler.get_scale() < scale_before:
+                context.state["optimizer_step_completed"] = False
         else:
             # Standard precision training
             outputs = model(examples)

@@ -162,3 +162,26 @@ def test_split_gradient_auxiliary_writer_reader_uses_same_name(tmp_path):
         trainer.save_gradients(config["trainer"])
         restored = trainer.get_gradients()
         torch.testing.assert_close(restored[0], trainer.cut_layer_grad[0])
+
+
+def test_history_sidecar_symlinks_are_checked_before_weight_write_or_load(tmp_path):
+    with configure_environment(build_minimal_config(), runtime_root=tmp_path):
+        trainer = ComposableTrainer(model=torch.nn.Linear(2, 2))
+        custom = tmp_path / "custom"
+        custom.mkdir()
+        outside = tmp_path / "outside.pkl"
+        outside.write_bytes(b"retained outside data")
+        history = custom / "weights.safetensors.pkl"
+        history.symlink_to(outside)
+        with pytest.raises(ValueError, match="within"):
+            trainer.save_model("weights.safetensors", custom)
+        assert outside.read_bytes() == b"retained outside data"
+        assert not (custom / "weights.safetensors").exists()
+        history.unlink()
+        trainer.save_model("weights.safetensors", custom)
+        history.unlink()
+        history.symlink_to(outside)
+        trainer.model.weight.data.zero_()
+        with pytest.raises(ValueError, match="within"):
+            trainer.load_model("weights.safetensors", custom)
+        assert torch.all(trainer.model.weight == 0)

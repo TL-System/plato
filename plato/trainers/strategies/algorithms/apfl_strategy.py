@@ -121,6 +121,8 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         self.save_path = save_path
         self.personalized_model: nn.Module | None = None
         self.personalized_optimizer: torch.optim.Optimizer | None = None
+        self._optimizer_client_id = 0
+        self._client_optimizer_states: dict[int, Any] = {}
 
     def setup(self, context: TrainingContext) -> None:
         """
@@ -129,6 +131,7 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         Args:
             context: Training context with model and device
         """
+        self._optimizer_client_id = context.client_id
         # Create personalized model
         if self.model_fn is None:
             self.personalized_model = models_registry.get()
@@ -158,6 +161,11 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         os.makedirs(base_path, exist_ok=True)
 
     def on_client_id_changed(self, context: TrainingContext) -> None:
+        old_optimizer = context.state.get("apfl_personalized_optimizer")
+        if isinstance(old_optimizer, torch.optim.Optimizer):
+            self._client_optimizer_states[self._optimizer_client_id] = (
+                copy.deepcopy(old_optimizer.state_dict())
+            )
         self.alpha = self._initial_alpha
         self.personalized_optimizer = None
         for key in ("apfl_personalized_optimizer", "apfl_personalized_model",
@@ -228,6 +236,18 @@ class APFLUpdateStrategy(ModelUpdateStrategy):
         # A spawned result is loaded on the parent CPU model. Recast retained
         # optimizer tensors after moving its parameters to this run's device.
         personal_optimizer = context.state.get("apfl_personalized_optimizer")
+        if (
+            personal_optimizer is None
+            and context.client_id in self._client_optimizer_states
+        ):
+            # Returning clients retain the same private momentum as a dedicated
+            # trainer. Rebind copied state to this client's new model object.
+            personal_optimizer = optimizer_registry.get(personalized_model)
+            personal_optimizer.load_state_dict(
+                self._client_optimizer_states[context.client_id]
+            )
+            self.personalized_optimizer = personal_optimizer
+            context.state["apfl_personalized_optimizer"] = personal_optimizer
         if isinstance(personal_optimizer, torch.optim.Optimizer):
             personal_optimizer.load_state_dict(personal_optimizer.state_dict())
 
