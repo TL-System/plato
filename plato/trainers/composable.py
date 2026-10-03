@@ -442,18 +442,28 @@ class ComposableTrainer(base.Trainer):
         self.context.current_round = self.current_round
         self.context.state.pop("optimizer", None)
         successful = False
+        end_hook_attempted = False
         try:
             self.training_step_strategy.on_train_start(self.context)
             result = self._train_model(config, trainset, sampler, **kwargs)
+            # End hooks are fallible public lifecycle operations. Accept a
+            # direct result only after they succeed, exactly once per run.
+            end_hook_attempted = True
+            self.training_step_strategy.on_train_end(self.context)
             if not config.get("_defer_strategy_commit"):
                 self.model_update_strategy.on_train_result_accepted(self.context)
             successful = True
             return result
         finally:
-            self.training_step_strategy.on_train_end(self.context)
-            self.model_update_strategy.on_train_cleanup(self.context, successful)
-            self.context.state.pop("complete_optimizer_step", None)
-            self.context.state.pop("optimizer_step_hooks_handled", None)
+            try:
+                if not end_hook_attempted:
+                    self.training_step_strategy.on_train_end(self.context)
+            finally:
+                try:
+                    self.model_update_strategy.on_train_cleanup(self.context, successful)
+                finally:
+                    self.context.state.pop("complete_optimizer_step", None)
+                    self.context.state.pop("optimizer_step_hooks_handled", None)
 
     def _train_model(self, config, trainset, sampler, **kwargs):
         """The main training loop using strategies."""
