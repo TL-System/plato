@@ -9,7 +9,7 @@ import logging
 import math
 import os
 from collections.abc import MutableMapping
-from random import randint
+from random import sample
 from typing import Any
 
 import torch
@@ -68,13 +68,10 @@ class Processor(model.Processor):
     ) -> torch.Tensor:
         """Generate Shamir shares for a single scalar secret."""
         scaled_secret = round(secret.item() * 1_000_000)
-        coefficients = [scaled_secret]
-
-        for idx in range(1, threshold):
-            value = randint(1, 999)
-            while value in coefficients:
-                value = randint(1, 999)
-            coefficients.append(value)
+        pool = [value for value in range(1, 1000) if value != scaled_secret]
+        if threshold - 1 > len(pool):
+            raise ValueError("Shamir threshold exceeds the distinct coefficient pool.")
+        coefficients = [scaled_secret, *sample(pool, threshold - 1)]
 
         points = torch.zeros([num_clients, 2], dtype=torch.float64)
         for j in range(1, num_clients + 1):

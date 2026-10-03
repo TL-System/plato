@@ -56,6 +56,28 @@ def test_qsgd_has_bounded_error_and_respects_random_seed():
     assert torch.max(torch.abs(restored - tensor)) <= 3.2 / 15 + 1e-6
 
 
+@pytest.mark.parametrize("level", [2, 16, 64, 128])
+@pytest.mark.parametrize("scale", [3.75, 1e38, 3e38])
+def test_qsgd_finite_endpoints_and_error_bound_at_large_scales(level, scale):
+    tensor = torch.tensor([scale, -scale, 0, 0.2 * scale], dtype=torch.float32)
+    encoder = model_quantize_qsgd.Processor(client_id=1, quantization_level=level)
+    decoder = model_dequantize_qsgd.Processor(client_id=1, quantization_level=level)
+    random.seed(17)
+    restored = decoder.process(encoder.process({"w": tensor}))["w"]
+    assert restored.dtype == torch.float32
+    assert torch.isfinite(restored).all()
+    # Endpoints have no rounding uncertainty. Compare in float64 so the
+    # independent error calculation cannot overflow at these valid scales.
+    torch.testing.assert_close(
+        restored[:3].double(), tensor[:3].double(), atol=0, rtol=1e-7
+    )
+    scale64 = tensor.abs().max().double()
+    tolerance = scale64 * torch.finfo(torch.float32).eps * 2
+    assert (restored.double() - tensor.double()).abs().max() <= (
+        scale64 / (level - 1) + tolerance
+    )
+
+
 @pytest.mark.parametrize("level", [0, 1, 129])
 def test_qsgd_invalid_levels_fail_explicitly(level):
     with pytest.raises(ValueError, match="level"):

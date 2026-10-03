@@ -126,7 +126,14 @@ def _needs_quotes(key: str) -> bool:
 
 
 def _format_key(key: str) -> str:
-    return json.dumps(key) if _needs_quotes(key) else key
+    return _quote_string(key) if _needs_quotes(key) else key
+
+
+def _quote_string(value: str) -> str:
+    # TOML escapes require scalar values, so supplementary characters must
+    # stay intact rather than become JSON surrogate pairs. DEL still needs
+    # an escape even though JSON's non-ASCII mode leaves it literal.
+    return json.dumps(value, ensure_ascii=False).replace("\x7f", "\\u007f")
 
 
 def _format_value(value: Any) -> str:
@@ -144,7 +151,7 @@ def _format_value(value: Any) -> str:
     if isinstance(value, (int, float)):
         return repr(value)
     if isinstance(value, str):
-        return json.dumps(value)
+        return _quote_string(value)
     raise TypeError(f"Unsupported value type for TOML serialization: {type(value)!r}")
 
 

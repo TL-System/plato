@@ -76,6 +76,8 @@ class Processor(model.Processor):
         zeta = torch.tensor(zeta).reshape(size)
 
         # Step 3: dequantize the content
-        zeta = zeta * max_v / tuning_param
+        # Normalize first: the bounded ratio cannot overflow when multiplied
+        # by a finite float32 scale, unlike the unnormalized integer code.
+        zeta = zeta / tuning_param * max_v
 
         return zeta

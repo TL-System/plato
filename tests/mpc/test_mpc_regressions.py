@@ -1,6 +1,11 @@
 """Numerical and negative-path checks of real MPC processors and strategies."""
 
 import asyncio
+import random
+import subprocess
+import sys
+import textwrap
+import threading
 from types import SimpleNamespace
 
 import pytest
@@ -195,3 +200,124 @@ def test_training_records_zero_samples_and_rejects_round_change(tmp_path, monkey
     with pytest.raises(RuntimeError, match="round"):
         asyncio.run(MPCTrainingStrategy(store).train(context))
     assert store.load_state().client_samples == {1: None}
+
+
+@pytest.mark.parametrize(
+    "configured_threshold,processor_override",
+    [(1, None), (2, None), (None, None), (1, 4), (None, 1)],
+)
+def test_configured_shamir_client_lifecycle_matches_server_reconstruction(
+    tmp_path, monkeypatch, configured_threshold, processor_override
+):
+    from tests.integration.utils import build_minimal_config, configure_environment
+
+    config = build_minimal_config(clients_per_round=5, total_clients=5)
+    config["clients"]["outbound_processors"] = [
+        "mpc_model_encrypt_shamir", "safetensor_encode"
+    ]
+    if configured_threshold is not None:
+        config["server"]["mpc_shamir_threshold"] = configured_threshold
+
+    # Isolate only general server startup. Execute the actual MPC wrapper,
+    # configured store, client lifecycle/registry and weighted server strategy.
+    def parent_init(server, *_args, **_kwargs):
+        server._mpc_round_lock = threading.Lock()
+
+    with configure_environment(config, runtime_root=tmp_path):
+        from plato.clients.strategies.mpc import MPCLifecycleStrategy
+        from plato.servers import fedavg, fedavg_mpc_shamir
+
+        monkeypatch.setattr(fedavg.Server, "__init__", parent_init)
+        server = fedavg_mpc_shamir.Server()
+        store = server.round_store
+        clients, counts = [9, 2, 5, 8, 4], [0.5, 0, 2.5, 1, 3]
+        store.initialise_round(9, clients)
+        weights = [
+            {"w": torch.tensor([0.125 * (idx + 1), -0.2 * idx], dtype=torch.float64)}
+            for idx in range(len(clients))
+        ]
+        expected = sum(w["w"] * n for w, n in zip(weights, counts)) / sum(counts)
+        payloads, updates, contexts = [], [], []
+        random.seed(23)
+        for client_id, count, weight in zip(clients, counts, weights):
+            store.record_client_samples(client_id, count, round_number=9)
+            kwargs = {"model_deepcopy": {"client_id": 99}}
+            if processor_override is not None:
+                kwargs["mpc_model_encrypt_shamir"] = {"threshold": processor_override}
+            context = SimpleNamespace(
+                client_id=client_id, round_store=store, debug_artifacts=False,
+                processor_kwargs=kwargs, model=None, datasource=None,
+                trainer=SimpleNamespace(set_client_id=lambda _id: None),
+                algorithm=SimpleNamespace(set_client_id=lambda _id: None),
+            )
+            MPCLifecycleStrategy().configure(context)
+            encoded = context.outbound_processor.process(weight)
+            assert isinstance(encoded, bytes)
+            payloads.append(context.inbound_processor.process(encoded))
+            updates.append(SimpleNamespace(
+                client_id=client_id, report=SimpleNamespace(num_samples=count)
+            ))
+            contexts.append(context)
+
+        baseline = {"w": torch.zeros(2, dtype=torch.float64)}
+        actual = asyncio.run(server.aggregation_strategy.aggregate_weights(
+            updates[::-1], baseline, payloads[::-1], SimpleNamespace(current_round=9)
+        ))
+        torch.testing.assert_close(actual["w"], expected, atol=2e-6, rtol=0)
+        # Protocol parameters from server config take precedence over local
+        # processor kwargs; unrelated processor overrides remain intact.
+        assert server.aggregation_strategy.threshold == configured_threshold
+        for context in contexts:
+            assert context.processor_kwargs["mpc_model_encrypt_shamir"].get(
+                "threshold"
+            ) == configured_threshold
+            assert context.processor_kwargs["model_deepcopy"] == {"client_id": 99}
+
+
+def test_impossible_shamir_coefficient_pool_is_bounded_before_persistence(tmp_path):
+    code = textwrap.dedent("""
+        import pathlib
+        import random
+        import sys
+        import time
+        import torch
+        from plato.mpc import RoundInfoStore
+        from plato.processors.mpc_model_encrypt_shamir import Processor
+
+        root = pathlib.Path(sys.argv[1])
+        store = RoundInfoStore(storage_dir=root)
+        store.initialise_round(1, range(1000))
+        store.record_client_samples(0, 1, round_number=1)
+        before = (root / "round_info").read_bytes()
+        processor = Processor(client_id=0, round_store=store, threshold=1000,
+                              debug_artifacts=False)
+        random.seed(23)
+        print("Entering Shamir process", flush=True)
+        started = time.monotonic()
+        try:
+            processor.process({"w": torch.tensor(0.000010, dtype=torch.float64)})
+        except ValueError as error:
+            assert "coefficient pool" in str(error), str(error)
+        else:
+            raise AssertionError("Impossible coefficient request succeeded")
+        elapsed = time.monotonic() - started
+        assert elapsed < 2, elapsed
+        assert (root / "round_info").read_bytes() == before
+        assert sorted(path.name for path in root.iterdir()) == ["round_info"]
+        print(f"Rejected before persistence in {elapsed:.3f}s", flush=True)
+    """)
+    # subprocess.run contains the historical infinite loop without leaking
+    # CPU workers into the rest of the suite. The public path uses a real store.
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", code, str(tmp_path)],
+            capture_output=True, text=True, timeout=12, check=False,
+        )
+    except subprocess.TimeoutExpired as error:
+        output = error.stdout or b""
+        if isinstance(output, bytes):
+            output = output.decode()
+        assert "Entering Shamir process" in output, output
+        pytest.fail("Public Shamir process entered but exceeded 12-second deadline")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Rejected before persistence" in result.stdout

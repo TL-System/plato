@@ -85,3 +85,28 @@ def test_toml_nested_array_tables_and_literal_keys_keep_structure():
     # Mixed-type arrays retain the writer's established wrapper convention.
     expected = {**config, "mixed": [{"value": 1}, {"value": "two"}]}
     assert tomllib.loads(toml_writer.dumps(config)) == expected
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        {"🚀": 1},
+        {"title": "experiment 🚀"},
+        {
+            "tables": [
+                {"𠮷": {"literal.dot": [1, 2], "title": "💡"}},
+                {"𠮷": {"literal.dot": [3]}},
+            ]
+        },
+        {"delete\x7f": "has\x7f and 🚀"},
+        {"delete\x7f": "has\x7f"},
+    ],
+)
+def test_toml_supplementary_unicode_and_control_escapes_roundtrip(config, tmp_path):
+    comments = {(): ["UTF-8 🚀"]}
+    wire = toml_writer.dumps(config, comments=comments)
+    assert tomllib.loads(wire) == config
+    path = tmp_path / "unicode.toml"
+    toml_writer.dump(config, path, comments=comments)
+    with path.open("rb") as handle:
+        assert tomllib.load(handle) == config
