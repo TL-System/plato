@@ -1,0 +1,696 @@
+{
+  "date_utc": "2026-10-03",
+  "decision": "PASS",
+  "pull_request": "https://github.com/TL-System/plato/pull/417",
+  "workflow": {
+    "conclusion": "success",
+    "createdAt": "2026-10-03T00:39:40Z",
+    "headSha": "beee985b9690b7a14d7a01801d5d9bc2e4e63f5e",
+    "jobs": [
+      {
+        "completedAt": "2026-10-03T00:50:14Z",
+        "conclusion": "success",
+        "databaseId": 111087341656,
+        "name": "Python 3.13 / supported-default",
+        "startedAt": "2026-10-03T00:39:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-03T00:39:47Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-03T00:39:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:39:52Z",
+            "conclusion": "success",
+            "name": "Checkout pinned submodules",
+            "number": 2,
+            "startedAt": "2026-10-03T00:39:47Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:02Z",
+            "conclusion": "success",
+            "name": "Provision zsh",
+            "number": 3,
+            "startedAt": "2026-10-03T00:39:52Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:02Z",
+            "conclusion": "success",
+            "name": "Set up Python",
+            "number": 4,
+            "startedAt": "2026-10-03T00:40:02Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:04Z",
+            "conclusion": "success",
+            "name": "Set up uv",
+            "number": 5,
+            "startedAt": "2026-10-03T00:40:02Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:04Z",
+            "conclusion": "success",
+            "name": "Record provenance and check lock",
+            "number": 6,
+            "startedAt": "2026-10-03T00:40:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:32Z",
+            "conclusion": "success",
+            "name": "Sync fresh base profile",
+            "number": 7,
+            "startedAt": "2026-10-03T00:40:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:41:01Z",
+            "conclusion": "success",
+            "name": "Base collection, suite and missing-extra probe",
+            "number": 8,
+            "startedAt": "2026-10-03T00:40:32Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:41:02Z",
+            "conclusion": "success",
+            "name": "Sync fresh mandatory profile",
+            "number": 9,
+            "startedAt": "2026-10-03T00:41:01Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:41:41Z",
+            "conclusion": "success",
+            "name": "Mandatory initialized core suite",
+            "number": 10,
+            "startedAt": "2026-10-03T00:41:02Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:49:51Z",
+            "conclusion": "success",
+            "name": "Fresh startup, real CPU socket round and failure containment",
+            "number": 11,
+            "startedAt": "2026-10-03T00:41:41Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:49:53Z",
+            "conclusion": "success",
+            "name": "Ruff and classified typing baseline",
+            "number": 12,
+            "startedAt": "2026-10-03T00:49:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:49:55Z",
+            "conclusion": "success",
+            "name": "Upload qualification outputs",
+            "number": 13,
+            "startedAt": "2026-10-03T00:49:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:50:11Z",
+            "conclusion": "success",
+            "name": "Post Set up uv",
+            "number": 24,
+            "startedAt": "2026-10-03T00:49:55Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:50:12Z",
+            "conclusion": "success",
+            "name": "Post Set up Python",
+            "number": 25,
+            "startedAt": "2026-10-03T00:50:11Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:50:12Z",
+            "conclusion": "success",
+            "name": "Post Checkout pinned submodules",
+            "number": 26,
+            "startedAt": "2026-10-03T00:50:12Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:50:12Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 27,
+            "startedAt": "2026-10-03T00:50:12Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/TL-System/plato/actions/runs/37082986642/job/111087341656"
+      },
+      {
+        "completedAt": "2026-10-03T00:52:07Z",
+        "conclusion": "success",
+        "databaseId": 111087341910,
+        "name": "Python 3.14 / core-forward-compatibility",
+        "startedAt": "2026-10-03T00:39:44Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-03T00:39:45Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-03T00:39:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:39:48Z",
+            "conclusion": "success",
+            "name": "Checkout pinned submodules",
+            "number": 2,
+            "startedAt": "2026-10-03T00:39:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:05Z",
+            "conclusion": "success",
+            "name": "Provision zsh",
+            "number": 3,
+            "startedAt": "2026-10-03T00:39:48Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:05Z",
+            "conclusion": "success",
+            "name": "Set up Python",
+            "number": 4,
+            "startedAt": "2026-10-03T00:40:05Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:07Z",
+            "conclusion": "success",
+            "name": "Set up uv",
+            "number": 5,
+            "startedAt": "2026-10-03T00:40:05Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:09Z",
+            "conclusion": "success",
+            "name": "Record provenance and check lock",
+            "number": 6,
+            "startedAt": "2026-10-03T00:40:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:40:23Z",
+            "conclusion": "success",
+            "name": "Sync fresh base profile",
+            "number": 7,
+            "startedAt": "2026-10-03T00:40:09Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:41:06Z",
+            "conclusion": "success",
+            "name": "Base collection, suite and missing-extra probe",
+            "number": 8,
+            "startedAt": "2026-10-03T00:40:23Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:41:07Z",
+            "conclusion": "success",
+            "name": "Sync fresh mandatory profile",
+            "number": 9,
+            "startedAt": "2026-10-03T00:41:06Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:42:03Z",
+            "conclusion": "success",
+            "name": "Mandatory initialized core suite",
+            "number": 10,
+            "startedAt": "2026-10-03T00:41:07Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:51:38Z",
+            "conclusion": "success",
+            "name": "Fresh startup, real CPU socket round and failure containment",
+            "number": 11,
+            "startedAt": "2026-10-03T00:42:03Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:51:42Z",
+            "conclusion": "success",
+            "name": "Ruff and classified typing baseline",
+            "number": 12,
+            "startedAt": "2026-10-03T00:51:38Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:51:44Z",
+            "conclusion": "success",
+            "name": "Upload qualification outputs",
+            "number": 13,
+            "startedAt": "2026-10-03T00:51:42Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:52:03Z",
+            "conclusion": "success",
+            "name": "Post Set up uv",
+            "number": 24,
+            "startedAt": "2026-10-03T00:51:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:52:04Z",
+            "conclusion": "success",
+            "name": "Post Set up Python",
+            "number": 25,
+            "startedAt": "2026-10-03T00:52:03Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:52:04Z",
+            "conclusion": "success",
+            "name": "Post Checkout pinned submodules",
+            "number": 26,
+            "startedAt": "2026-10-03T00:52:04Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-03T00:52:04Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 27,
+            "startedAt": "2026-10-03T00:52:04Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/TL-System/plato/actions/runs/37082986642/job/111087341910"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-10-03T00:52:07Z",
+    "url": "https://github.com/TL-System/plato/actions/runs/37082986642"
+  },
+  "checkout_commit": "37cc87138c1f06aa111ec8e14b5527d1ae152a46",
+  "checkout_tree": "838b4c8af2ec819542c6f2447fb8db973d437482",
+  "head_commit": "beee985b9690b7a14d7a01801d5d9bc2e4e63f5e",
+  "head_tree_matches_merge": true,
+  "job_log_sha256": "f9b16ac7bacc5d5bd0ff6cae2faafa866849ac47b1cca2356d46d051ef196514",
+  "profiles": [
+    {
+      "python": "Python 3.13.15",
+      "uv": "uv 0.12.22 (x86_64-unknown-linux-gnu)",
+      "lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d  uv.lock",
+      "suites": [
+        {
+          "name": "base",
+          "passed": 246,
+          "skipped": 4,
+          "seconds": 1.221,
+          "junit_sha256": "f966d681c459f0ac3d8528e494025e1ef69517ac8aa783385820eb26c99e9f7f",
+          "summary": "================ 246 passed, 4 skipped, 48 deselected in 1.23s ================="
+        },
+        {
+          "name": "mandatory",
+          "passed": 250,
+          "skipped": 1,
+          "seconds": 22.787,
+          "junit_sha256": "9f6f766c01a348f94ee0491bf7972249eccf2c0e7280c931f6992efb241fc34e",
+          "summary": "================ 250 passed, 1 skipped, 48 deselected in 19.57s ================"
+        },
+        {
+          "name": "runtime",
+          "passed": 48,
+          "skipped": 0,
+          "seconds": 482.976,
+          "junit_sha256": "88d75e495e530bf4440e749919d3afc47ca152618d96c37bc8d55946b9431e73",
+          "summary": "================ 48 passed, 251 deselected in 482.03s (0:08:02) ================"
+        }
+      ],
+      "runtime": {
+        "cases": 48,
+        "uploaded_result_files": 71,
+        "deduplication": "Upload follows pytest current aliases; byte-identical result hashes deduplicated.",
+        "result_sha256": [
+          "03304a8ad181a538d24a085f96c1f12c8e2b3cee04e9ae905d8d76d85890c36d",
+          "095b715c807e6b9761d0315c9c7456d2999210ce506c37a9b8fa06dea43864f6",
+          "0e0233686a0a565d28f4b239038f9c11477534e04a47f3c1a1230d369d3ae961",
+          "1115eab114bd6001190f5da407c53fb0bca0b0f6a2d58b4fb91c353f40123a60",
+          "117f6c070ae1806f76558a8f5cd1134c842ac43edf4b6728626b9b733c273994",
+          "162d98ee690be6eacca060d1493b7b683a9af7304e6ca20ceed7a32f48e43a28",
+          "1aca552ba8d453bb4f4e1fe6cd7c0ed01512363654298750514628281af27ba2",
+          "2e021745d5b29d4c48dbd2a3f6cb9608bae86fb9dc945410a2f4da6a2a5fe2d1",
+          "3820ffa4757f3a812c4f212aa707a48ce9eb49b5b7488b4dbb76d67f001c6666",
+          "3b820cb7fa9d6c2124a15efac423a26c368512c1ef8b1ec0ae1ec7996a25fc10",
+          "429175c29457b6484ee42468abfed5bd14e320b903bf0b5fb9606b28fa04dc0c",
+          "453f1cc58f6ecc0b8750c1afeb5ffa05999655739c0c6a4769e5c39cb857d3cd",
+          "4b753237aaedc4fb02dd47922d544923283a5211dbfd338d67bcbb92325b6fb4",
+          "599d147479f111292a5df119e0bc8f35072cf2cde438e4127e24ab480c4b3377",
+          "5ba5176412aa01f1375489d6522918cf1154e7a96eda12e1473c4a316beabef8",
+          "5fd5edb83e7d2ab72f27928173d50eeee41669b341914f3f4ca741727c86ee76",
+          "622b5b05e29af1f27b7bf225779509d6c50bb16fa2556e7216d06738d126396a",
+          "633196618b53992687da792d188b33b3b5adc2a80fcda653d1a3df9da7e79924",
+          "6371a16b7637ba4a23f6c2f78bca27202099c61066083f24a472335506078732",
+          "674121aca9883764756a32b29d21c3b853cb56eaf85132f2e1a2c3bd5709d998",
+          "67b87a59067343096ce8a6edaa674b8cc66d4f4e5fc2713a22bb6ede5fb8b8d7",
+          "6a211dbb5072993e138ecd067a7e9030e941cf86654bea136f88c1394fdcc723",
+          "6a2f47cbd0e780be315f0b1356e810cb8cdd83f691da11cd89d3c7fc16dc830f",
+          "70eb4333cdf0496edb3cf31475b7523065c67e7b855d27636aa0038c1d5b8dff",
+          "71d641414f63d2b73e6935a3db931eb71a16d1d1e71d666748363045d29ea24b",
+          "7a7c29c80b24f50d1f58fd7f743af37a20c6e7aba3d6f6a41786664ceacd554f",
+          "7f78f431482b525d27401ed493caec1258c396be14bb2d83ce3ad9d83206d48d",
+          "80a51720ecb6456912549d3d9a79006ab73cffa4ad9384987687fd86f1e04c81",
+          "852e7b237bceda79e6516960f1a28a116702f8eba691dbd6949b168a9861a347",
+          "89c5c4f2e28321c69c294f0889a01d44eabfdabea2c57c95d683622bdfb70eac",
+          "9636c3d93111d873985d688496656b4880d67d88797759552a8901b0fb45d45c",
+          "9caa3e322c53a51fd0cfb6d2ee1205d8659cd94d27999f98c47c5a245973d813",
+          "a38669d96c815a1899ec7d497df8033e4c01eaae669e01359eff90733364d616",
+          "a84da554e0c3bf9bcddc683caf45232a8e5e6321928fdd2e0bbaea108b96a50d",
+          "b1fe787164a10f1f1ec7cf2d2465f0e3fcdea56202bb7e1df266856c54c6eca9",
+          "b340e8a3172ef37225737e264041357ad57c97fed8217b7fb6b00641a0fb0dd3",
+          "b73d048ef1d8da6103d6c0f0aaad8052bb38008232c6c4bbc19aba62d9863cb4",
+          "b84319cdeba4d30b4f3617d32ddc8e687649492c47336ad771531af64314fb87",
+          "c0bf134d5291dd0ed6e1a3adac1861fa76d0caff9a6c856026419c8bdea60d7e",
+          "c4d4396f2c01a3482df160322c529a9981d277966e9b939a04b816d7e93e642b",
+          "ce8c744f45e078d65e2d4adbb9ba1dca14daec889ebab22d1b35884ab7c9ddad",
+          "d56606849ee5de2be871d23e31faec5cd1b10e95cc7ac8ef760bdef3d003cd63",
+          "da4d2dc44671c7541f7cf3b7f87d5a1206b67547f9243d88bac9a0795ecfe52e",
+          "dc821b396a52e05dd3d465177433676fda4489df9fb51ffb66a0c5d0a5d0aa69",
+          "ede1f45056f834efce22f4d5767d544847526a877530bc1310d194eec7095909",
+          "edf366742c01840524be1f24e7256d3f047a4a6fd836b7b1c618db482fe8aacf",
+          "f48925dbf3c236935d6498261bf40303fa2844544794d8ead1a0e655e270098e",
+          "f6ecaca664a41546bfcf86b7fed013ea8fb1b53c88114fb988733b67982a20aa"
+        ],
+        "expected_watchdog_timeouts": 5,
+        "survivors": 0,
+        "socket_natural_client_returns": 2,
+        "socket_seconds": 15.857602586000041,
+        "received": [
+          {
+            "event": "server_received",
+            "pid": 3564,
+            "client_id": 2,
+            "samples": 2,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          },
+          {
+            "event": "server_received",
+            "pid": 3564,
+            "client_id": 1,
+            "samples": 6,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          }
+        ],
+        "aggregate": {
+          "linear.weight": [
+            [
+              0.18379171192646027,
+              -0.0930701196193695
+            ],
+            [
+              -0.283791720867157,
+              0.39307013154029846
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066117495298,
+            0.005870074965059757
+          ]
+        },
+        "independent_reference": {
+          "linear.weight": [
+            [
+              0.18379170820116997,
+              -0.0930701196193695
+            ],
+            [
+              -0.2837917059659958,
+              0.39307013899087906
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066175702959,
+            0.005870075256098062
+          ]
+        },
+        "lifecycle_boundary": "Watchdog containment is distinct from cooperative finalization; production normal server exit retains os._exit."
+      },
+      "artifact_hashes": {
+        "base-collection.log": "3d0f89c831862e3f454facabd1627bb35524266e5eceedc1a013e9efc64fad71",
+        "base-packages.txt": "7f8e5cf120560cd100de0029a60a90b8dcf6e547f9c29c902cf4f9c50761dd97",
+        "base.log": "dfecba5c8f02cc7039d18b9db3a793093e7d481d29ed51badfb9b634a5c10b6b",
+        "base.xml": "f966d681c459f0ac3d8528e494025e1ef69517ac8aa783385820eb26c99e9f7f",
+        "commit.txt": "fe4e8e628672430eb5a8a10a17efa78b1965490ae372fbb3dd430f1eeb994cf6",
+        "coverage.json": "ef3491a09656440e8e0b01f4ada3e19dd007d184a17cec0e4dc336148b5fe379",
+        "lock.txt": "af74bfc11c69ac76f73dcf31f5bdc51a4cb1b522b3ba212948b4bd828b3688b7",
+        "mandatory-packages.txt": "a6560c7117d68f7c216fcf6ca11120e792e715a18f1792c2eb4fbf4e8ed5056f",
+        "mandatory.log": "d1d6f9b9949b098238c16a888e20eac5ec2d82cbaf74d36b73efe4ee3e6dbe00",
+        "mandatory.xml": "9f6f766c01a348f94ee0491bf7972249eccf2c0e7280c931f6992efb241fc34e",
+        "missing-extra.log": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "python.txt": "322f765b04793d55160c8788550761630087e4847a77ed7a1090d79791f73c3b",
+        "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "runtime.log": "35644e39f6e1746e556b861bd51be9a2ca314d1b86f79c5cd4c6d49ce0777866",
+        "runtime.xml": "88d75e495e530bf4440e749919d3afc47ca152618d96c37bc8d55946b9431e73",
+        "submodules.txt": "e935eea9ba4a9421e2a96f609cf033e12c4725b820493d08489c8092a356ed8d",
+        "ty.log": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4",
+        "uv.txt": "dcccc14d410dab345544375b730933845d90c3222a4a8a0c08ed6c412ca336a4"
+      },
+      "typing_summary": "Found 404 diagnostics"
+    },
+    {
+      "python": "Python 3.14.7",
+      "uv": "uv 0.12.22 (x86_64-unknown-linux-gnu)",
+      "lock": "573b10c2ba1a2317e02f9e40c6181359cafab6f6e0a0f9be12bb256cb276fe1d  uv.lock",
+      "suites": [
+        {
+          "name": "base",
+          "passed": 246,
+          "skipped": 4,
+          "seconds": 1.855,
+          "junit_sha256": "60c58d9475e19d6c46cf34d15ae9bdbe64fcc833addda3d975b9bfcbc0d4bd70",
+          "summary": "================ 246 passed, 4 skipped, 48 deselected in 1.86s ================="
+        },
+        {
+          "name": "mandatory",
+          "passed": 250,
+          "skipped": 1,
+          "seconds": 29.783,
+          "junit_sha256": "a099a4810c0ee6ba43300af8e3e06249d444e3e766a83c6f59332e548936d549",
+          "summary": "================ 250 passed, 1 skipped, 48 deselected in 24.10s ================"
+        },
+        {
+          "name": "runtime",
+          "passed": 48,
+          "skipped": 0,
+          "seconds": 566.476,
+          "junit_sha256": "5a4c092a582906953d46bf96bd5a215cad1895094ea923440bf412c4485b4ba5",
+          "summary": "================ 48 passed, 251 deselected in 564.64s (0:09:24) ================"
+        }
+      ],
+      "runtime": {
+        "cases": 48,
+        "uploaded_result_files": 71,
+        "deduplication": "Upload follows pytest current aliases; byte-identical result hashes deduplicated.",
+        "result_sha256": [
+          "017d707934ef6da6ee18aa9e113c3695bce6d9cf49a7c7d205db65cf518af564",
+          "033ef78b9d9e0574af7de7744d8694b57c2bc682b3da1297a5ef6bc127add83e",
+          "045e0cf523c818e56cc953d81e8004ab286eeb3db662749191985b787071d6ff",
+          "0466017a00f70a48f4ffd0cd3655eeb330f51694d5926e47fdbfacb3cecec2b7",
+          "054ecabda1bc01d300cb95ab750a39f12a1a1a79f5afbcb1aedb4abc31f9dcda",
+          "09b076d7eb6476c81be98203764fcea51b30b7d272cb3be6c638b60aad17ff0d",
+          "1c26840d90c86e2a9fd9fb1e871b523a3c7683849f6cb2022f4c390d882d5ae7",
+          "2123b9e9ce1c62f7aa06a9a94cf541c3ba5a6b96981db965446752d75f54c6e9",
+          "22a778d0b93b5fe9e5a4ea1d6abba9701e68856b1bdd9b21f10c316df2fc6e84",
+          "22e605ab8547063ff1f56fa7eab96fb3d08402b5a0631f688d21423e0596020d",
+          "26c6298afacce4bce8af6d1131cf309b25aafe8c8e649b0d69391e21c464499b",
+          "284ed1d65d13b6ba96e9c4f3714d9761979c1189458f01c06b9b179e168621af",
+          "384eb36d0443b7f867c8e16ad233091be0123f72ce86a8e8256d80f41ba34234",
+          "3aee7c7d4632e45c480d2f4a4a87fa6f08c17c5a7356dbf8eb02444ce91648a9",
+          "41113383947fcfbc8e29157c9ee9b2f8cb384405a2e5005d8175478ef61adef1",
+          "438a9d4f39e244e372821a6e4c41ba03ea61977201c45b2f09cd9bd9cc9cab09",
+          "50390ad35088f5fbcd592d95cbdc9df0256378d4c18c9a68932ac4ac3e106092",
+          "50b85fd0df1d406bb9334d399fde45df95dd833a55587fc4d0011eceb21bc308",
+          "5995a1e82e9884f027562cadf3a90d5bb40e3cfb98fb8f175e6cc11dd6fa8e76",
+          "5f37e755c78b08ad8444bd1e73d3d5511340cf69865430a2bc2a836773517cf7",
+          "60aeba3d13f2018eb7a01cff1d7af5523c155a2b0c62e34149d84df7e78c7444",
+          "61bf26a40d88571cb9f0441072dd134adf285238f843e9d19bc908e9866cc7bf",
+          "69ec21adc917e5e64f410ec0fb053997d9afd63c3a657b3012f84c855f96b9b4",
+          "7055718d0246a7d6eb57075327d180ac47f4e313c383577cc0760bf8514330c8",
+          "7843441d8b9392f0e9d1e30a46c12ee97a05f6cc919e7f89fed5ad50b598969a",
+          "7ee1ec6faa86aee8a3fe3c9dedbd8444d6bb5125e6c86542d08bf47b955dce35",
+          "908a9c3f0a8e09059e2af8bbd513942a4d0a9eaf3be02fcfb6ae9ca0d84efb14",
+          "999522ced62e15f4dff5d2f84843451552026c837e3bf1cf172719a3e1393b7d",
+          "9b6c24436ebdb53258a0ebea542b149b3ba05480b27900502acd9b58518cfba6",
+          "9fc8bdb0585eadb3a24b1c85995b9a1c80896b13fb67e469a893da786fb7d89b",
+          "a2042dcac0a73fe2b1f5cb2b824aa538fe69daf670a302f35b2b16ef56ff904b",
+          "b281ed223a76ba9c3fa0f754f150eb8dd4907b6f8d3e496ca0c5c7adfee5e0e2",
+          "b407dabfd2643b815f1ea6ffe1efbdaa6392df3720ee201d1d9d018d01b877fc",
+          "b429848a91bd0bc3e212a1f5e6348ccf3d9aa2c2356b9a4df8b03c9d361776ac",
+          "b54f6c196af20d22718c159def60d76dbd3cfe7fc889af099d9af285c95e12a3",
+          "bb949d1bf9776e992513f229250e12f87534b77cad03d8c15c98eadd9663892d",
+          "bdc4d84b85680ae9b5368dafd01d70110ffdffeeeeecba2cf9b6f63932ecf378",
+          "bde743802508de8821f00eff20ae769a01950298bca54d27e93614838bc99966",
+          "c2edaa3452aec744617adbcc22e1cbbda3cca7798924e1740c75332c70b63cd5",
+          "cfb507a361239691f5515c249301c78be5afd82b5386fe6ebbf6d5e24e11d8c4",
+          "d1e0dc2e60d4012162829d3d07d3ede31c417fd79f3c722d180ce997d6a840ea",
+          "d442f3b4cb9edcfd3c5258bcd6dc2efd17fba450a30fe2acda180d0c5998e84b",
+          "d4fa246fcfd9ed611f1e57d241f59b12f8bb6983b485a24f21e68d874bd052b2",
+          "dc91a10b5807d843ef543286a82aec6b284bdc5928ae6c1a411246b7bcc18e04",
+          "eb6a7a13354dd74f94b87912c55cda48f174e2fe91dc3ff638a1aaaf1ffee0cd",
+          "f0eb98c877321ac715ff97c0b839d9c72a840d39c7c55da3b67cb0d46274e505",
+          "f2afba51af628ab4c0e4f588ea2e639652e23129ea9ac7332f0b729662d0d20a",
+          "f4f323c7b55e2fb4713a1ec018167d1574f9b09caf06644e119abaf05806735a"
+        ],
+        "expected_watchdog_timeouts": 5,
+        "survivors": 0,
+        "socket_natural_client_returns": 2,
+        "socket_seconds": 20.42643448900003,
+        "received": [
+          {
+            "event": "server_received",
+            "pid": 3752,
+            "client_id": 2,
+            "samples": 6,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.1755179464817047,
+                  -0.08649551123380661
+                ],
+                [
+                  -0.27551794052124023,
+                  0.38649553060531616
+                ]
+              ],
+              "linear.bias": [
+                -0.0070069595240056515,
+                0.007006970699876547
+              ]
+            }
+          },
+          {
+            "event": "server_received",
+            "pid": 3752,
+            "client_id": 1,
+            "samples": 2,
+            "weights": {
+              "linear.weight": [
+                [
+                  0.20861299335956573,
+                  -0.1127939447760582
+                ],
+                [
+                  -0.30861300230026245,
+                  0.41279396414756775
+                ]
+              ],
+              "linear.bias": [
+                -0.0024593861307948828,
+                0.0024593889247626066
+              ]
+            }
+          }
+        ],
+        "aggregate": {
+          "linear.weight": [
+            [
+              0.18379171192646027,
+              -0.0930701196193695
+            ],
+            [
+              -0.283791720867157,
+              0.39307013154029846
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066117495298,
+            0.005870074965059757
+          ]
+        },
+        "independent_reference": {
+          "linear.weight": [
+            [
+              0.18379170820116997,
+              -0.0930701196193695
+            ],
+            [
+              -0.2837917059659958,
+              0.39307013899087906
+            ]
+          ],
+          "linear.bias": [
+            -0.005870066175702959,
+            0.005870075256098062
+          ]
+        },
+        "lifecycle_boundary": "Watchdog containment is distinct from cooperative finalization; production normal server exit retains os._exit."
+      },
+      "artifact_hashes": {
+        "base-collection.log": "ba14da27a1e929566c36f7fd03cc5ad10aca87859d4497e87bb660e557ed5c2a",
+        "base-packages.txt": "7f8e5cf120560cd100de0029a60a90b8dcf6e547f9c29c902cf4f9c50761dd97",
+        "base.log": "c3f6b72d622301151c13541ccf2e948bf8f2a45b119be1f2357c4ce063cc70d2",
+        "base.xml": "60c58d9475e19d6c46cf34d15ae9bdbe64fcc833addda3d975b9bfcbc0d4bd70",
+        "commit.txt": "fe4e8e628672430eb5a8a10a17efa78b1965490ae372fbb3dd430f1eeb994cf6",
+        "coverage.json": "4d0c1fabd22c453e002fa0b293520465ea377d974c6d11c67a6ee844d4a742a6",
+        "lock.txt": "af74bfc11c69ac76f73dcf31f5bdc51a4cb1b522b3ba212948b4bd828b3688b7",
+        "mandatory-packages.txt": "a6560c7117d68f7c216fcf6ca11120e792e715a18f1792c2eb4fbf4e8ed5056f",
+        "mandatory.log": "159ec67cc9b435f1f7f3169398d9c4c6ce00b0c7c8daad35bc48de31fce49733",
+        "mandatory.xml": "a099a4810c0ee6ba43300af8e3e06249d444e3e766a83c6f59332e548936d549",
+        "missing-extra.log": "faa6bbe6f535ed8dc7eff6f1f581fb33f9be69a0d20218c379ea0e6f6f88be74",
+        "python.txt": "0366d77cc1f1ac88ea458231ba4f639323d5caf34de0d50b7618277fd4395f1f",
+        "ruff.log": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "runtime.log": "f6fbee6799b46c73d9790ecbca7569ba6b61a68dd18985cf70b076223a54e5e6",
+        "runtime.xml": "5a4c092a582906953d46bf96bd5a215cad1895094ea923440bf412c4485b4ba5",
+        "submodules.txt": "e935eea9ba4a9421e2a96f609cf033e12c4725b820493d08489c8092a356ed8d",
+        "ty.log": "18c075ab4df70317eac5977ebd0106c2d9eb1f4a3b21fa927d1158239446d1b4",
+        "uv.txt": "dcccc14d410dab345544375b730933845d90c3222a4a8a0c08ed6c412ca336a4"
+      },
+      "typing_summary": "Found 404 diagnostics"
+    }
+  ]
+}
