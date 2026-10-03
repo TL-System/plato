@@ -205,6 +205,612 @@
       ]
     },
     {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-weighted-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[broadcast-zero-weight-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-weighted-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[missing-zero-weight-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-weighted-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_malformed_tree_before_arithmetic[none-zero-weight-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[updates-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[reports-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_rejects_observable_report_reassociation[client-ids-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[short-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[long-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[negative-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[nan-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[infinite-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client1-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_revalidates_report_counts_before_arithmetic[total-overflow-client2-first-legacy]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-direct]",
+      "criteria": [
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-delta]",
+      "criteria": [
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client1-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-direct]",
+      "criteria": [
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-delta]",
+      "criteria": [
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_positional_copy_replacements[client2-first-legacy]",
+      "criteria": [
+        "E1",
+        "E2"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client1-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-direct]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
+      "nodeid": "tests/mlx_native/test_phase3_dispatch.py::test_late_selector_preserves_valid_zero_total_weights[client2-first-delta]",
+      "criteria": [
+        "E1"
+      ]
+    },
+    {
       "nodeid": "tests/mlx_native/test_phase3_rng.py::test_fresh_and_reassigned_workers_replay_same_logical_streams",
       "criteria": [
         "E7"

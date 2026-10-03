@@ -22,10 +22,34 @@ from plato.models import (
 )
 from plato.utils.retired_backends import raise_if_retired
 
-try:  # pragma: no cover - optional MLX models
-    from plato.models.mlx import lenet5 as mlx_lenet5
-except ImportError:  # pragma: no cover
-    mlx_lenet5 = cast(Any, None)
+_MLX_UNLOADED = object()
+mlx_lenet5 = cast(Any, _MLX_UNLOADED)
+
+
+def _load_mlx_lenet5() -> Any:
+    """Load the native model only after an explicit MLX selection."""
+    global mlx_lenet5
+    if mlx_lenet5 is _MLX_UNLOADED:
+        try:
+            from plato.models.mlx import lenet5 as native_lenet5
+        except ImportError as exc:
+            raise ImportError(
+                "MLX models require the optional mlx dependency on Apple Silicon."
+            ) from exc
+        mlx_lenet5 = native_lenet5
+        if registered_mlx_models.get("mlx_lenet5") is _mlx_lenet5_model:
+            registered_mlx_models["mlx_lenet5"] = native_lenet5.Model
+    if mlx_lenet5 is None:
+        raise ImportError(
+            "MLX models require the optional mlx dependency on Apple Silicon."
+        )
+    return mlx_lenet5
+
+
+def _mlx_lenet5_model(**kwargs: Any) -> Any:
+    """Keep the built-in factory callable before its native module is loaded."""
+    return _load_mlx_lenet5().Model(**kwargs)
+
 
 registered_models = {
     "lenet5": lenet5.Model,
@@ -43,9 +67,7 @@ registered_factories = {
     "vit": vit.Model,
 }
 
-registered_mlx_models = {}
-if mlx_lenet5 is not None:
-    registered_mlx_models["mlx_lenet5"] = mlx_lenet5.Model
+registered_mlx_models = {"mlx_lenet5": _mlx_lenet5_model}
 
 
 class ModelKwargs(TypedDict, total=False):
@@ -122,10 +144,7 @@ def get(**kwargs: Any) -> Any:
             raise ValueError(
                 "MLX model selection conflicts with parameters.model.framework."
             )
-        if mlx_lenet5 is None:
-            raise ImportError(
-                "MLX models require the optional mlx dependency on Apple Silicon."
-            )
+        _load_mlx_lenet5()
         candidate_keys = []
         if model_type:
             candidate_keys.append(f"mlx_{model_type}")

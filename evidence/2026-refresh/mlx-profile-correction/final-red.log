@@ -1,0 +1,137 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_____________ test_real_conftest_survives_backend_import_sentinel ______________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-224/test_real_conftest_survives_ba0')
+
+    def test_real_conftest_survives_backend_import_sentinel(tmp_path):
+>       record, output = _audit(
+            tmp_path, ["tests", "--test-profile=base", "--collect-only"], mode="block"
+        )
+
+tests/test_mlx_import_contract.py:64:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-224/test_real_conftest_survives_ba0')
+arguments = ['tests', '--test-profile=base', '--collect-only'], mode = 'block'
+directory = ''
+
+    def _audit(tmp_path, arguments, *, mode="observe", directory=""):
+        root = Path(__file__).resolve().parents[1]
+        receipt = tmp_path / "imports.json"
+        environment = os.environ.copy()
+        environment.pop("PYTEST_ADDOPTS", None)
+        environment["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+        environment["PYTHONPATH"] = str(root)
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(root / "tests/mlx_import_audit_runner.py"),
+                str(receipt),
+                mode,
+                *arguments,
+            ],
+            cwd=root / directory,
+            env=environment,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=60,
+        )
+        output = result.stdout + result.stderr
+        assert receipt.exists(), output
+        record = json.loads(receipt.read_text())
+>       assert record["production_conftest_loaded"], output
+E       AssertionError: ImportError while loading conftest '/private/tmp/plato-mlx-profile-correction-red-source/tests/conftest.py'.
+E         tests/conftest.py:24: in <module>
+E             from tests.test_utils.fakes import (
+E         tests/test_utils/fakes.py:18: in <module>
+E             from plato.clients.strategies.base import (
+E         plato/clients/strategies/__init__.py:17: in <module>
+E             from plato.clients.strategies.defaults import (
+E         plato/clients/strategies/defaults.py:21: in <module>
+E             from plato.algorithms import registry as algorithms_registry
+E         plato/algorithms/registry.py:13: in <module>
+E             from plato.algorithms import (
+E         plato/algorithms/fedavg_personalized.py:11: in <module>
+E             from plato.serialization.safetensor import deserialize_tree, serialize_tree
+E         plato/serialization/safetensor.py:14: in <module>
+E             from plato.utils.tree import TreeMetadata, flatten_tree, unflatten_tree
+E         plato/utils/tree.py:29: in <module>
+E             mx = cast(ModuleType, importlib.import_module("mlx.core"))
+E                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         tests/mlx_import_audit_runner.py:47: in find_spec
+E             raise RuntimeError(
+E         E   RuntimeError: MLX import sentinel reached outside native scope
+E
+E       assert False
+
+tests/test_mlx_import_contract.py:37: AssertionError
+__ test_real_unsupported_native_routing_never_initializes_backend[canonical] ___
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-224/test_real_unsupported_native_r0')
+selector = 'tests.mlx_native.test_phase3_controls', directory = ''
+
+    @pytest.mark.parametrize(
+        "selector,directory",
+        [
+            ("tests.mlx_native.test_phase3_controls", ""),
+            ("mlx_native.test_phase3_controls", "tests"),
+            ("test_phase3_controls", "tests/mlx_native"),
+        ],
+        ids=["canonical", "dotted-alias", "bare-alias"],
+    )
+    def test_real_unsupported_native_routing_never_initializes_backend(
+        tmp_path, selector, directory
+    ):
+        record, output = _audit(tmp_path, ["--pyargs", selector], directory=directory)
+        assert record["exit_status"] != 0
+        assert "mlx-native selector unsupported" in output
+>       _assert_no_backend_resolution(record)
+
+tests/test_mlx_import_contract.py:86:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+record = {'exit_status': 4, 'mlx_distribution_version': '0.32.3', 'platform': ['Darwin', 'arm64'], 'backend_spec_lookups': [{'m...ence_query': False}, {'module': 'mlx.nn.init', 'inside_preflight': False, 'upstream_presence_query': False}, ...], ...}
+
+    def _assert_no_backend_resolution(record):
+        # Transformers checks package presence without importing MLX or its backend.
+        # Every backend lookup, including a non-Transformers top-level import, fails.
+>       assert all(
+            lookup["module"] == "mlx" and lookup["upstream_presence_query"]
+            for lookup in record["backend_spec_lookups"]
+        )
+E       assert False
+E        +  where False = all(<generator object _assert_no_backend_resolution.<locals>.<genexpr> at 0x1260c13c0>)
+
+tests/test_mlx_import_contract.py:45: AssertionError
+_________ test_real_focused_native_backend_import_starts_in_preflight __________
+
+tmp_path = PosixPath('/private/var/folders/0r/lfhfy6314g5frp1hpbdzx0nc0000gp/T/pytest-of-bli/pytest-224/test_real_focused_native_backe0')
+
+    def test_real_focused_native_backend_import_starts_in_preflight(tmp_path):
+        record, output = _audit(
+            tmp_path,
+            [
+                "tests/mlx_native/test_phase3_tree_contract.py::"
+                "test_extracted_host_weights_own_snapshots",
+                "--collect-only",
+            ],
+        )
+        if record["platform"] == ["Darwin", "arm64"]:
+            backend_lookups = [
+                lookup
+                for lookup in record["backend_spec_lookups"]
+                if not lookup["upstream_presence_query"]
+            ]
+            assert backend_lookups, output
+>           assert backend_lookups[0]["inside_preflight"]
+E           assert False
+
+tests/test_mlx_import_contract.py:114: AssertionError
+test profile: core scope (native excluded)
+=========================== short test summary info ============================
+FAILED tests/test_mlx_import_contract.py::test_real_conftest_survives_backend_import_sentinel
+FAILED tests/test_mlx_import_contract.py::test_real_unsupported_native_routing_never_initializes_backend[canonical]
+FAILED tests/test_mlx_import_contract.py::test_real_focused_native_backend_import_starts_in_preflight
+3 failed, 6 deselected in 10.22s

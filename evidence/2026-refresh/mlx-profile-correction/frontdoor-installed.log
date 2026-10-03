@@ -1,0 +1,11 @@
+[INFO][15:38:39]: Algorithm: mlx_fedavg
+{
+  "mlx_distribution_version": "0.32.3",
+  "backend_modules_before_explicit_selection": [],
+  "builtin_native_registry_keys_preserved": true,
+  "tree_loaded_before_mlx_detects_native_array": true,
+  "mixed_tree_serialization_preserved": true,
+  "registry_constructors_resolve_to_exact_native_objects": true,
+  "device_streams_rng_preserved": true,
+  "real_native_trainer_type_guard_preserved": true
+}

@@ -8,6 +8,7 @@ based on a configuration at run-time.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from typing import Any
 
 from plato.algorithms import (
@@ -15,19 +16,28 @@ from plato.algorithms import (
     fedavg_gan,
     fedavg_personalized,
     lora,
-    mlx_fedavg,
     pfedgraph,
     split_learning,
 )
 from plato.algorithms.base import Algorithm as AlgorithmBase
 from plato.config import Config
 
-registered_algorithms: dict[str, type[AlgorithmBase]] = {
+
+def _mlx_fedavg(trainer: Any) -> AlgorithmBase:
+    """Resolve the native constructor only when its registry entry is called."""
+    from plato.algorithms.mlx_fedavg import Algorithm
+
+    if registered_algorithms.get("mlx_fedavg") is _mlx_fedavg:
+        registered_algorithms["mlx_fedavg"] = Algorithm
+    return Algorithm(trainer)
+
+
+registered_algorithms: dict[str, Callable[[Any], AlgorithmBase]] = {
     "fedavg": fedavg.Algorithm,
     "fedavg_gan": fedavg_gan.Algorithm,
     "fedavg_personalized": fedavg_personalized.Algorithm,
     "fedavg_lora": lora.Algorithm,
-    "mlx_fedavg": mlx_fedavg.Algorithm,
+    "mlx_fedavg": _mlx_fedavg,
     "pfedgraph": pfedgraph.Algorithm,
     "split_learning": split_learning.Algorithm,
 }
@@ -61,8 +71,9 @@ def get(trainer: Any | None = None) -> AlgorithmBase:
     algorithm_config = Config().algorithm
     algorithm_type = _resolve_algorithm_type(algorithm_config)
     if algorithm_type == "mlx_fedavg":
-        from plato.trainers.mlx import ComposableMLXTrainer
+        from plato.trainers.mlx import ComposableMLXTrainer, _ensure_mlx_available
 
+        _ensure_mlx_available()
         if not isinstance(trainer, ComposableMLXTrainer):
             raise TypeError("MLX FedAvg requires a native MLX trainer.")
 

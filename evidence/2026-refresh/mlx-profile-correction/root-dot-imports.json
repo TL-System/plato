@@ -1,0 +1,19 @@
+{
+  "exit_status": 2,
+  "mlx_distribution_version": "0.32.3",
+  "platform": [
+    "Darwin",
+    "arm64"
+  ],
+  "backend_spec_lookups": [
+    {
+      "module": "mlx",
+      "inside_preflight": false,
+      "upstream_presence_query": true
+    }
+  ],
+  "backend_modules": [],
+  "native_test_modules": [],
+  "native_frontdoor_modules": [],
+  "production_conftest_loaded": true
+}
