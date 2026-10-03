@@ -1,5 +1,8 @@
 """Native clipping, optimizer aliases, model modes and device regressions."""
 
+from collections.abc import Sequence
+from typing import cast
+
 import mlx.core as mx
 import mlx.nn as nn
 import mlx.optimizers as optim
@@ -8,6 +11,7 @@ import pytest
 
 from plato.trainers.mlx import (
     ComposableMLXTrainer,
+    DefaultMLXLossStrategy,
     DefaultMLXOptimizerStrategy,
     DefaultMLXTrainingStepStrategy,
     MLXLossCriterionStrategy,
@@ -72,12 +76,13 @@ def test_evaluation_restores_submodule_modes_on_error(tmp_path):
 
     with native_config(tmp_path):
         trainer = ComposableMLXTrainer(model=Stochastic)
-        trainer.model.dropout.eval()
+        model = cast(Stochastic, trainer.model)
+        model.dropout.eval()
         with pytest.raises(RuntimeError, match="evaluation failure"):
             trainer.test_model({"batch_size": 1}, [(np.ones(2), 0)])
-        assert trainer.model.observed == [False]
-        assert trainer.model.training
-        assert not trainer.model.dropout.training
+        assert model.observed == [False]
+        assert model.training
+        assert not model.dropout.training
 
 
 @pytest.mark.parametrize(
@@ -171,7 +176,8 @@ def test_custom_training_strategy_retains_clipping_control(tmp_path):
         )
         data = [(np.array([3.0, 4.0], dtype=np.float32), 0)]
         trainer.train_model({"epochs": 1, "batch_size": 1}, data, None)
-        np.testing.assert_array_equal(np.asarray(trainer.model.weight), [-3.0, -4.0])
+        model = cast(Vector, trainer.model)
+        np.testing.assert_array_equal(np.asarray(model.weight), [-3.0, -4.0])
         assert "grad_norm" not in trainer.context.state
 
 
@@ -222,11 +228,12 @@ def test_native_device_stream_scopes_factory_train_eval_load(
             target = mx.cpu if flags[0] else mx.gpu if flags[1] else caller_device
             expected_stream = mx.default_stream(target)
             trainer = ComposableMLXTrainer(model=Observed)
+            model = cast(Observed, trainer.model)
             data = [
                 (np.ones(2, dtype=np.float32), 0),
                 (np.zeros(2, dtype=np.float32), 1),
             ]
-            trainer.model.eval()
+            model.eval()
             trainer.train_model({"epochs": 1, "batch_size": 2}, data, None)
             trainer.test_model({"batch_size": 2}, data)
             monkeypatch.setattr(runtime, "_to_mx_array", converting)
@@ -260,16 +267,17 @@ def test_native_device_stream_scopes_factory_train_eval_load(
                 mx.default_stream(mx.gpu),
             ) == before_streams
             monkeypatch.setattr(runtime, "_to_mx_array", _to_mx_array)
-            original_loss = trainer.loss_strategy.loss_fn
+            loss_strategy = cast(DefaultMLXLossStrategy, trainer.loss_strategy)
+            original_loss = loss_strategy.loss_fn
 
             def fail_loss(*args):
                 observe("train")
                 raise RuntimeError("training failure")
 
-            trainer.loss_strategy.loss_fn = fail_loss
+            loss_strategy.loss_fn = fail_loss
             with pytest.raises(RuntimeError, match="training failure"):
                 trainer.train_model({"epochs": 1, "batch_size": 2}, data, None)
-            trainer.loss_strategy.loss_fn = original_loss
+            loss_strategy.loss_fn = original_loss
             assert mx.default_device() == before_device
             assert (
                 mx.default_stream(mx.cpu),
@@ -292,7 +300,7 @@ def test_factory_failure_restores_device_streams_and_rngs(tmp_path):
             before_random = random.getstate()
             before_numpy = np.random.get_state()
             before_torch = torch.get_rng_state().clone()
-            before_mlx = np.array(mx.random.state[0], copy=True)
+            before_mlx = np.array(cast(Sequence[mx.array], mx.random.state)[0], copy=True)
 
             def fail_factory():
                 assert mx.default_device() == mx.cpu
@@ -312,7 +320,9 @@ def test_factory_failure_restores_device_streams_and_rngs(tmp_path):
             assert random.getstate() == before_random
             np.testing.assert_array_equal(np.random.get_state()[1], before_numpy[1])
             assert torch.equal(torch.get_rng_state(), before_torch)
-            np.testing.assert_array_equal(np.asarray(mx.random.state[0]), before_mlx)
+            np.testing.assert_array_equal(
+                np.asarray(cast(Sequence[mx.array], mx.random.state)[0]), before_mlx
+            )
 
 
 def test_unavailable_explicit_metal_is_clear(tmp_path, monkeypatch):
@@ -342,19 +352,20 @@ def test_repeated_evaluation_is_deterministic_and_preserves_statistics(tmp_path)
 
     with native_config(tmp_path, model_seed=17):
         trainer = ComposableMLXTrainer(model=Stochastic)
+        model = cast(Stochastic, trainer.model)
         data = [(np.array([i, i + 1], dtype=np.float32), i % 2) for i in range(8)]
-        trainer.model.eval()
+        model.eval()
         trainer.train_model({"epochs": 1, "batch_size": 8}, data, None)
-        assert trainer.model.training
-        stats = np.array(trainer.model.batchnorm.running_mean, copy=True)
-        trainer.model.dropout.eval()
+        assert model.training
+        stats = np.array(model.batchnorm.running_mean, copy=True)
+        model.dropout.eval()
         observed.clear()
         first = trainer.test_model({"batch_size": 8}, data)
         second = trainer.test_model({"batch_size": 8}, data)
         assert first == second
         np.testing.assert_array_equal(observed[0], observed[1])
         np.testing.assert_array_equal(
-            np.asarray(trainer.model.batchnorm.running_mean), stats
+            np.asarray(model.batchnorm.running_mean), stats
         )
-        assert trainer.model.training and trainer.model.batchnorm.training
-        assert not trainer.model.dropout.training
+        assert model.training and model.batchnorm.training
+        assert not model.dropout.training

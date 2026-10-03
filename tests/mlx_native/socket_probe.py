@@ -4,7 +4,10 @@ import json
 import multiprocessing as mp
 import os
 import time
+from collections.abc import Callable, MutableMapping
+from multiprocessing.process import BaseProcess
 from pathlib import Path
+from typing import Any, cast
 
 import psutil
 
@@ -59,7 +62,9 @@ class NativePartition:
 
 
 # Spawned workers import this module without executing the server's main.
-samplers.registered_samplers["mlx_native_fixture"] = NativePartition
+cast(MutableMapping[str, type[object]], samplers.registered_samplers)[
+    "mlx_native_fixture"
+] = NativePartition
 
 
 class ObserveClient(ClientCallback):
@@ -113,11 +118,19 @@ class ObserveServer(ServerCallback):
         emit("server_close_started", round=server.current_round)
 
 
-def observed_client_run(*args):
+def observed_client_run(
+    client_id: int,
+    port: int | None,
+    client: Any = None,
+    edge_server: Callable[..., Any] | None = None,
+    edge_client: Callable[..., Any] | None = None,
+    trainer: Callable[[], Any] | None = None,
+    client_kwargs: dict[str, Any] | None = None,
+) -> None:
     from plato.client import run
 
     try:
-        run(*args)
+        run(client_id, port, client, edge_server, edge_client, trainer, client_kwargs)
     except BaseException as error:
         emit("child_error", type=type(error).__name__, message=str(error))
         raise
@@ -127,16 +140,17 @@ def observed_client_run(*args):
 def main():
     original_start = mp.Process.start
 
-    def observe_start(process):
-        original_start(process)
+    def observe_start(self: BaseProcess) -> None:
+        original_start(self)
         emit(
             "child_started",
-            child_pid=process.pid,
-            created=psutil.Process(process.pid).create_time(),
+            child_pid=self.pid,
+            created=psutil.Process(self.pid).create_time(),
         )
 
     mp.Process.start = observe_start
-    server_base.run = observed_client_run
+    # Replace an imported module binding with the matching observer signature.
+    setattr(server_base, "run", observed_client_run)
     if CASE == "socket_native":
         client = simple.Client(
             model=LeNet5, datasource=NativeData, callbacks=[ObserveClient]

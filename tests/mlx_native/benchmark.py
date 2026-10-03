@@ -68,7 +68,7 @@ def worker(root: Path, batch_size: int, number: int, repetition: int):
         baseline = algorithm.extract_weights()
         config = Config().trainer._asdict()
         timed("cold_local_train", lambda: trainer.train_model(config, samples, None))
-        converted = timed(
+        converted: tuple[mx.array, mx.array] = timed(
             "data_conversion",
             lambda: (
                 mx.array(np.stack([x for x, _ in samples[:batch_size]])),
