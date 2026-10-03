@@ -356,7 +356,7 @@ class Server(fedavg.Server):
             if event == "on_weights_received":
                 if (
                     set(self.histories) != set(before[0])
-                    or self.observed_counts != before[1]
+                    or not same_state(self.observed_counts, before[1])
                     or self.committed_round != before[2]
                     or self.accepted_tokens != before[3]
                     or self.run_id != before_run
@@ -437,7 +437,7 @@ class Server(fedavg.Server):
                     if any(not torch.equal(v, expected[k]) for k, v in actual.items()):
                         raise ValueError("FedDyn callback changed staged history.")
                 if (
-                    self.observed_counts != pending["counts"]
+                    not same_state(self.observed_counts, pending["counts"])
                     or self.committed_round != pending["round"]
                     or self.accepted_tokens != before[3] | pending["tokens"]
                 ):
@@ -628,6 +628,11 @@ class Server(fedavg.Server):
                 raise ValueError(
                     "FedDyn checkpoint counts differ from population vector."
                 )
+        if any(
+            i not in counts and any(torch.count_nonzero(v) for v in history.values())
+            for i, history in h.items()
+        ):
+            raise ValueError("FedDyn checkpoint nonzero history requires its count.")
         tokens = bundle["accepted_tokens"]
         if not isinstance(tokens, list) or len(set(tokens)) != len(tokens):
             raise ValueError("FedDyn checkpoint token ledger is malformed.")

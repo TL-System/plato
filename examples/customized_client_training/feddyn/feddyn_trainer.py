@@ -10,6 +10,7 @@ Source code: https://github.com/alpemreacar/FedDyn
 """
 
 import copy
+from collections.abc import Sized
 
 import torch
 
@@ -29,6 +30,28 @@ from plato.trainers.strategies.training_step import (
     DefaultTrainingStepStrategy,
     GradientAccumulationStepStrategy,
 )
+
+
+def realized_partition(sampler):
+    """Resolve this attempt's sampler once, without drawing a new partition."""
+    if sampler is None:
+        raise ValueError("FedDyn requires an explicit realized partition sampler.")
+    if isinstance(sampler, torch.utils.data.Sampler):
+        realized = sampler
+    elif isinstance(sampler, (list, range)):
+        realized = torch.utils.data.SubsetRandomSampler(sampler)
+    elif hasattr(sampler, "get"):
+        realized = sampler.get()
+    else:
+        realized = sampler
+    if not isinstance(realized, Sized):
+        raise ValueError("FedDyn requires a finite realized sampler cardinality.")
+    count = positive_integer(len(realized), "realized sampler count")
+    if hasattr(sampler, "num_samples"):
+        declared = positive_integer(sampler.num_samples(), "declared sample count")
+        if declared != count:
+            raise ValueError("FedDyn declared count differs from realized sampler.")
+    return realized, count
 
 
 class StablePartitionLoader:
@@ -64,21 +87,19 @@ class CountedLoader(DefaultDataLoaderStrategy):
     """Bind the realized sampled partition before creating an optimizer."""
 
     def create_train_loader(self, trainset, sampler, batch_size, context):
-        if sampler is None or (hasattr(sampler, "get") and sampler.get() is None):
-            raise ValueError("FedDyn requires an explicit realized partition sampler.")
-        loader = super().create_train_loader(trainset, sampler, batch_size, context)
-        try:
-            count = positive_integer(len(loader.sampler), "realized sampler count")
-        except TypeError as exc:
+        realized, count = realized_partition(sampler)
+        loader = super().create_train_loader(trainset, realized, batch_size, context)
+        if not isinstance(loader.sampler, Sized):
             raise ValueError(
                 "FedDyn requires a finite realized sampler cardinality."
-            ) from exc
+            )
+        if (
+            len(loader.sampler) != count
+            or count != context.state.get("feddyn_attempt_count")
+        ):
+            raise ValueError("FedDyn loader differs from current attempt partition.")
         if loader.drop_last or len(loader) == 0:
             raise ValueError("FedDyn requires a nonempty loader with drop_last=false.")
-        if hasattr(sampler, "num_samples"):
-            declared = positive_integer(sampler.num_samples(), "declared sample count")
-            if declared != count:
-                raise ValueError("FedDyn declared count differs from realized sampler.")
         expected = context.state["feddyn_dispatch"]["metadata"][
             "expected_count_or_null"
         ]
@@ -201,13 +222,29 @@ class Trainer(ComposableTrainer):
         settings_from_config()
 
         def attempt():
-            result = super(Trainer, self).train(trainset, sampler, **kwargs)
+            realized = self._bind_attempt_partition(sampler)
+            result = super(Trainer, self).train(trainset, realized, **kwargs)
             strategy = self.model_update_strategy
             if not isinstance(strategy, FedDynUpdateStrategy) or not strategy.accepted:
                 raise ValueError("FedDyn local training produced no accepted result.")
             return result
 
         return self._transaction(attempt)
+
+    def _bind_attempt_partition(self, sampler):
+        realized, count = realized_partition(sampler)
+        dispatch = self.context.state.get("feddyn_dispatch")
+        if dispatch is None:
+            raise ValueError(
+                "FedDyn training needs a versioned server dispatch; use the dedicated example or explicitly warm-start a new run."
+            )
+        expected = dispatch["metadata"]["expected_count_or_null"]
+        if expected is not None and count != expected:
+            raise ValueError("FedDyn realized count differs from dispatched count.")
+        # The parent binds this before spawn and passes the same sampler.
+        # Worker state may never overwrite this independently observed count.
+        self.context.state["feddyn_attempt_count"] = count
+        return realized
 
     def train_model(self, config, trainset, sampler, **kwargs):
         """Apply the same bounded rollback to direct local training failures."""
@@ -221,8 +258,11 @@ class Trainer(ComposableTrainer):
             raise ValueError(
                 "FedDyn supports ordinary/accumulated SGD without AMP, clipping, scheduler or custom multi-update strategies."
             )
-        return self._transaction(
-            lambda: super(Trainer, self).train_model(
-                config, trainset, sampler, **kwargs
+
+        def attempt():
+            realized = self._bind_attempt_partition(sampler)
+            return super(Trainer, self).train_model(
+                config, trainset, realized, **kwargs
             )
-        )
+
+        return self._transaction(attempt)
