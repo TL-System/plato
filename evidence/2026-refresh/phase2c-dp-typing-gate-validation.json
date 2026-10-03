@@ -1,0 +1,623 @@
+{
+  "schema_version": 1,
+  "finding": "ROOT-2C-TYPING-01",
+  "status": "FIXED_DUAL_VERSION_QUALIFIED_FRESH_REVIEW_PENDING",
+  "starting_commit": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+  "root_integration_candidate": "2633f8394c142ec04db13743b54a427e04c2aed7",
+  "root_file_identical_to_author_base": true,
+  "implementation_commit": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+  "implementation_tree": "8ec9a04915d334f94186f10090fad5a1ae6ce2df",
+  "implementation_parent": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+  "evidence_commit_identity_note": "Exact final evidence commit/tree are provided in clean delivery and own scratch final-candidate.json, avoiding a self-referential hash.",
+  "source": {
+    "path": "tests/trainers/test_dp_data_loader_strategy.py",
+    "bytes": 13727,
+    "sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+    "git_blob": "73eed9161913f7edaa271e7271007448231ad4c7"
+  },
+  "root_original_failure": {
+    "receipt": {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/root-typing-owned-gate-failure.json",
+      "bytes": 4669,
+      "sha256": "5ff780b0469021554828be80b3a5929b173e4ce245293df679774bb416d7c587"
+    },
+    "full_log": {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/root-ty-full.log",
+      "bytes": 125401,
+      "sha256": "7a70ffedf89d7805216e8e4c3767248ccfc7226a628e85f18197fc8826ebb8d2"
+    },
+    "owned_file_diagnostics": [
+      "tests/trainers/test_dp_data_loader_strategy.py:30:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+      "tests/trainers/test_dp_data_loader_strategy.py:41:47: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+      "tests/trainers/test_dp_data_loader_strategy.py:44:19: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+      "tests/trainers/test_dp_data_loader_strategy.py:59:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+      "tests/trainers/test_dp_data_loader_strategy.py:64:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+      "tests/trainers/test_dp_data_loader_strategy.py:70:54: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+      "tests/trainers/test_dp_data_loader_strategy.py:77:35: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `(Any & ~<Protocol with members 'autograd_grad_sample_hooks'>) | None`",
+      "tests/trainers/test_dp_data_loader_strategy.py:81:24: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `(Any & ~<Protocol with members 'autograd_grad_sample_hooks'>) | None`",
+      "tests/trainers/test_dp_data_loader_strategy.py:83:16: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+      "tests/trainers/test_dp_data_loader_strategy.py:145:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+      "tests/trainers/test_dp_data_loader_strategy.py:148:45: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+      "tests/trainers/test_dp_data_loader_strategy.py:151:48: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+      "tests/trainers/test_dp_data_loader_strategy.py:155:23: error[unresolved-attribute] Object of type `None` has no attribute `state_dict`",
+      "tests/trainers/test_dp_data_loader_strategy.py:158:29: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+      "tests/trainers/test_dp_data_loader_strategy.py:167:17: error[unresolved-attribute] Object of type `None` has no attribute `weight`",
+      "tests/trainers/test_dp_data_loader_strategy.py:169:31: error[unresolved-attribute] Object of type `None` has no attribute `state_dict`",
+      "tests/trainers/test_dp_data_loader_strategy.py:200:13: error[invalid-method-override] Invalid override of method `on_train_step_start`: Definition is incompatible with `TrainerCallback.on_train_step_start`",
+      "tests/trainers/test_dp_data_loader_strategy.py:203:13: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`",
+      "tests/trainers/test_dp_data_loader_strategy.py:216:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+      "tests/trainers/test_dp_data_loader_strategy.py:220:19: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+      "tests/trainers/test_dp_data_loader_strategy.py:254:9: error[invalid-assignment] Too many values to unpack: Expected 3",
+      "tests/trainers/test_dp_data_loader_strategy.py:265:21: error[invalid-argument-type] Argument to bound method `DPTrainingStepStrategy.training_step` is incorrect: Expected `Module`, found `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+      "tests/trainers/test_dp_data_loader_strategy.py:273:9: error[unresolved-attribute] Attribute `to_standard_module` is not defined on `GradSampleHooks` in union `AbstractGradSampleModule | GradSampleHooks | Unknown`"
+    ],
+    "policy": "Existing Phase1 CI owned-file typing gate. No new global zero-typing rule; unrelated classified diagnostics are not fixed or claimed clean."
+  },
+  "changes": [
+    "Use string cpu for the trainer string-typed device field while retaining torch.device(cpu) in the training context.",
+    "Validate actual Linear model/context and DPOptimizerStrategy before optional/base-typed attribute access; validate non-None active privacy engines. No casts or ignores.",
+    "Match public callback batch/loss parameters with optional defaults; callback bodies/counters/assertions unchanged.",
+    "Validate default Opacus make_private result has exactly3 fields and actual GradSampleModule wrapper before unpacking/training/cleanup; default private API arguments unchanged."
+  ],
+  "preservation": {
+    "base": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+    "implementation_commit": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+    "implementation_tree": "8ec9a04915d334f94186f10090fad5a1ae6ce2df",
+    "changed_tracked_files": [
+      "tests/trainers/test_dp_data_loader_strategy.py"
+    ],
+    "all_production_CI_manifest_skip_policy_files_unchanged_by_git_tree": true,
+    "original_assertions": 35,
+    "retained_exact_assertion_ast": 35,
+    "new_runtime_narrowing_assertions": 19,
+    "unchanged_call_ast_counts": {
+      "torch_testing_assert_close": 3,
+      "pytest_raises": 1,
+      "make_private_actual_arguments": 1,
+      "batch_memory_manager_actual_arguments": 1,
+      "public_training_testing_checkpoint_calls": 13
+    },
+    "callback_bodies_unchanged": true,
+    "opacus_absence_skip_guard_ast_unchanged": true,
+    "existing_tests_unchanged": [
+      "test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+      "test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+      "test_dp_strategy_handles_plato_sampler_get",
+      "test_dp_strategy_handles_torch_sampler_directly",
+      "test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+      "test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+      "test_dp_memory_splitting_matches_logical_batch_parameter_reference"
+    ],
+    "original_file_sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+    "corrected_file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+    "diff_sha256": "d34ef449d25ec6c468a0924e6dfd5d18b9794cc89ea172844d10721b2fbe4450"
+  },
+  "full_diff": "diff --git a/tests/trainers/test_dp_data_loader_strategy.py b/tests/trainers/test_dp_data_loader_strategy.py\nindex 4e58a733..73eed916 100644\n--- a/tests/trainers/test_dp_data_loader_strategy.py\n+++ b/tests/trainers/test_dp_data_loader_strategy.py\n@@ -7,7 +7,7 @@ from torch.utils.data import SubsetRandomSampler, TensorDataset\n if importlib.util.find_spec(\"opacus\") is None:\n     pytest.skip(\"base profile optional dp: opacus not installed\", allow_module_level=True)\n \n-from plato.trainers.diff_privacy import DPDataLoaderStrategy\n+from plato.trainers.diff_privacy import DPDataLoaderStrategy, DPOptimizerStrategy\n from plato.trainers.strategies.base import TrainingContext\n \n \n@@ -26,8 +26,11 @@ def test_dp_actual_time_snapshot_writer_to_plain_urgent_reader(tmp_path):\n     with configure_environment(config, runtime_root=tmp_path):\n         torch.manual_seed(21)\n         trainer = Trainer(model=torch.nn.Linear(2, 2))\n+        assert isinstance(trainer.model, torch.nn.Linear)\n+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)\n         trainer.set_client_id(7)\n-        trainer.device = trainer.context.device = torch.device(\"cpu\")\n+        trainer.device = \"cpu\"\n+        trainer.context.device = torch.device(\"cpu\")\n         data = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)\n         trainer.train_model(\n             {**config[\"trainer\"], \"run_id\": \"dp-snapshot\"}, data, list(range(16))\n@@ -36,11 +39,13 @@ def test_dp_actual_time_snapshot_writer_to_plain_urgent_reader(tmp_path):\n         assert len(snapshots) == 2\n         for path in snapshots:\n             assert set(deserialize_tree(path.read_bytes())) == {\"weight\", \"bias\"}\n+        assert isinstance(trainer.model, torch.nn.Linear)\n         historical = trainer.obtain_model_at_time(7, float(\"inf\"))\n         for name, value in historical.state_dict().items():\n             torch.testing.assert_close(value, trainer.model.state_dict()[name])\n         assert trainer.model_state_dict is None\n         assert not hasattr(trainer.model, \"autograd_grad_sample_hooks\")\n+        assert trainer.optimizer_strategy.privacy_engine is not None\n         history = trainer.optimizer_strategy.privacy_engine.accountant.history\n         assert sum(item[2] for item in history) == 8\n \n@@ -56,11 +61,15 @@ def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path\n     with configure_environment(config, runtime_root=tmp_path):\n         torch.manual_seed(7)\n         trainer = Trainer(model=torch.nn.Linear(2, 2))\n-        trainer.device = trainer.context.device = torch.device(\"cpu\")\n+        assert isinstance(trainer.model, torch.nn.Linear)\n+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)\n+        trainer.device = \"cpu\"\n+        trainer.context.device = torch.device(\"cpu\")\n         trainer.set_client_id(1)\n         dataset = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)\n \n         def steps():\n+            assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)\n             engine = trainer.optimizer_strategy.privacy_engine\n             assert engine is not None\n             return sum(entry[2] for entry in engine.accountant.history)\n@@ -70,6 +79,7 @@ def test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients(tmp_path\n                 key: value.clone() for key, value in trainer.model.state_dict().items()\n             }\n             trainer.train(dataset, list(range(16)))\n+            assert isinstance(trainer.model, torch.nn.Linear)\n             assert steps() == expected_steps\n             assert not hasattr(trainer.model, \"autograd_grad_sample_hooks\")\n             assert any(\n@@ -142,7 +152,10 @@ def test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting(tmp_p\n     with configure_environment(config, runtime_root=tmp_path):\n         torch.manual_seed(17)\n         trainer = Trainer(model=torch.nn.Linear(2, 2))\n-        trainer.device = trainer.context.device = torch.device(\"cpu\")\n+        assert isinstance(trainer.model, torch.nn.Linear)\n+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)\n+        trainer.device = \"cpu\"\n+        trainer.context.device = torch.device(\"cpu\")\n         dataset = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)\n         run = {**config[\"trainer\"], \"run_id\": \"dp\"}\n         initial = {k: v.clone() for k, v in trainer.model.state_dict().items()}\n@@ -150,12 +163,15 @@ def test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting(tmp_p\n         for round_id in (1, 2):\n             before = {k: v.clone() for k, v in trainer.model.state_dict().items()}\n             trainer.train_model(run, dataset, list(range(16)))\n+            assert isinstance(trainer.model, torch.nn.Linear)\n+            assert isinstance(trainer.context.model, torch.nn.Linear)\n             assert trainer.context.model is trainer.model\n             assert not hasattr(trainer.model, \"autograd_grad_sample_hooks\")\n             current = trainer.model.state_dict()\n             assert set(current) == set(initial)\n             assert any(not torch.equal(before[k], current[k]) for k in current)\n             actual_engine = trainer.optimizer_strategy.privacy_engine\n+            assert actual_engine is not None\n             if engine is not None:\n                 assert actual_engine is engine\n             engine = actual_engine\n@@ -197,10 +213,10 @@ def test_actual_dp_physical_batches_only_report_real_updates_and_cleanup(tmp_pat\n \n             base_optimizer.step = observed_step\n \n-        def on_train_step_start(self, trainer, config, **kwargs):\n+        def on_train_step_start(self, trainer, config, batch=None, **kwargs):\n             self.physical_batches += 1\n \n-        def on_train_step_end(self, trainer, config, **kwargs):\n+        def on_train_step_end(self, trainer, config, batch=None, loss=None, **kwargs):\n             assert trainer.context.state[\"optimizer_step_completed\"] is True\n             assert trainer.optimizer._is_last_step_skipped is False\n             self.reported_updates += 1\n@@ -213,10 +229,13 @@ def test_actual_dp_physical_batches_only_report_real_updates_and_cleanup(tmp_pat\n         torch.manual_seed(17)\n         observer = Observe()\n         trainer = Trainer(model=torch.nn.Linear(2, 2), callbacks=[observer])\n-        trainer.device = trainer.context.device = torch.device(\"cpu\")\n+        assert isinstance(trainer.optimizer_strategy, DPOptimizerStrategy)\n+        trainer.device = \"cpu\"\n+        trainer.context.device = torch.device(\"cpu\")\n         data = TensorDataset(torch.randn(16, 2), torch.arange(16) % 2)\n         run = {**config[\"trainer\"], \"run_id\": \"dp-count\"}\n         trainer.train_model(run, data, list(range(16)))\n+        assert trainer.optimizer_strategy.privacy_engine is not None\n         history = trainer.optimizer_strategy.privacy_engine.accountant.history\n         assert observer.physical_batches > 4\n         assert observer.actual_updates == observer.reported_updates == 4\n@@ -225,6 +244,8 @@ def test_actual_dp_physical_batches_only_report_real_updates_and_cleanup(tmp_pat\n         with pytest.raises(RuntimeError, match=\"interrupt DP\"):\n             trainer.train_model(run, data, list(range(16)))\n         assert not hasattr(trainer.model, \"autograd_grad_sample_hooks\")\n+        assert isinstance(trainer.model, torch.nn.Linear)\n+        assert isinstance(trainer.context.model, torch.nn.Linear)\n         assert trainer.context.model is trainer.model\n         assert sum(entry[2] for entry in history) == 5\n         observer.interrupt = False\n@@ -236,7 +257,7 @@ def test_dp_memory_splitting_matches_logical_batch_parameter_reference():\n     \"\"\"All fixed samples contribute once, with real clipping and accountant steps.\"\"\"\n     import copy\n \n-    from opacus import PrivacyEngine\n+    from opacus import GradSampleModule, PrivacyEngine\n     from opacus.utils.batch_memory_manager import BatchMemoryManager\n     from torch.utils.data import DataLoader\n \n@@ -251,11 +272,14 @@ def test_dp_memory_splitting_matches_logical_batch_parameter_reference():\n     results = []\n     for model, physical_size in ((reference, 4), (split_model, 2)):\n         engine = PrivacyEngine(accountant=\"rdp\", secure_mode=False)\n-        private_model, optimizer, loader = engine.make_private(\n+        private_result = engine.make_private(\n             module=model, optimizer=torch.optim.SGD(model.parameters(), lr=0.1),\n             data_loader=DataLoader(dataset, batch_size=4), noise_multiplier=0.,\n             max_grad_norm=1., poisson_sampling=False,\n         )\n+        assert len(private_result) == 3\n+        private_model, optimizer, loader = private_result\n+        assert isinstance(private_model, GradSampleModule)\n         flags = []\n         observed_samples = 0\n         with BatchMemoryManager(data_loader=loader, max_physical_batch_size=physical_size,\n",
+  "diff_receipt": {
+    "path": "/tmp/plato-phase2c-dp-typing-fix/full-correction.diff",
+    "bytes": 8895,
+    "sha256": "d34ef449d25ec6c468a0924e6dfd5d18b9794cc89ea172844d10721b2fbe4450"
+  },
+  "environments": {
+    "313": {
+      "python": "3.13.16 (main, Oct  1 2026, 20:54:04) [Clang 22.1.3 ]",
+      "executable": "/tmp/plato-phase2c-313/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "ty": "0.0.84",
+        "ruff": "0.16.10"
+      },
+      "environment": "/tmp/plato-phase2c-313",
+      "provisioning": "Existing owned locked group-dev environment; no borrowed/root environment or re-provisioning."
+    },
+    "314": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/private/tmp/plato-phase2c-314/bin/python",
+      "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "torch": "2.14.1",
+        "opacus": "1.6.0",
+        "pytest": "9.1.1",
+        "ty": "0.0.84",
+        "ruff": "0.16.10"
+      },
+      "environment": "/tmp/plato-phase2c-314",
+      "provisioning": "Existing owned locked group-dev environment; no borrowed/root environment or re-provisioning."
+    }
+  },
+  "executions": {
+    "red-ty-313": {
+      "name": "red-ty-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/ty check --python /tmp/plato-phase2c-313/bin/python --output-format concise tests/trainers/test_dp_data_loader_strategy.py",
+      "shell": "zsh -lc",
+      "head": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+      "file_sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 1,
+      "seconds": 0.2692676249425858,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/red-ty-313.log",
+      "log_sha256": "d0b8bbc5fe84bbc98268fe02a7d9f6cc22cee0ea8e00e2adebef3bca6d9b6878",
+      "diagnostics": [
+        "tests/trainers/test_dp_data_loader_strategy.py:30:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:41:47: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:44:19: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:59:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:64:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:70:54: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:77:35: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `(Any & ~<Protocol with members 'autograd_grad_sample_hooks'>) | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:81:24: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `(Any & ~<Protocol with members 'autograd_grad_sample_hooks'>) | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:83:16: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:145:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:148:45: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:151:48: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:155:23: error[unresolved-attribute] Object of type `None` has no attribute `state_dict`",
+        "tests/trainers/test_dp_data_loader_strategy.py:158:29: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:167:17: error[unresolved-attribute] Object of type `None` has no attribute `weight`",
+        "tests/trainers/test_dp_data_loader_strategy.py:169:31: error[unresolved-attribute] Object of type `None` has no attribute `state_dict`",
+        "tests/trainers/test_dp_data_loader_strategy.py:200:13: error[invalid-method-override] Invalid override of method `on_train_step_start`: Definition is incompatible with `TrainerCallback.on_train_step_start`",
+        "tests/trainers/test_dp_data_loader_strategy.py:203:13: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`",
+        "tests/trainers/test_dp_data_loader_strategy.py:216:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:220:19: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:254:9: error[invalid-assignment] Too many values to unpack: Expected 3",
+        "tests/trainers/test_dp_data_loader_strategy.py:265:21: error[invalid-argument-type] Argument to bound method `DPTrainingStepStrategy.training_step` is incorrect: Expected `Module`, found `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+        "tests/trainers/test_dp_data_loader_strategy.py:273:9: error[unresolved-attribute] Attribute `to_standard_module` is not defined on `GradSampleHooks` in union `AbstractGradSampleModule | GradSampleHooks | Unknown`"
+      ],
+      "log_tail": [
+        "tests/trainers/test_dp_data_loader_strategy.py:254:9: error[invalid-assignment] Too many values to unpack: Expected 3",
+        "tests/trainers/test_dp_data_loader_strategy.py:265:21: error[invalid-argument-type] Argument to bound method `DPTrainingStepStrategy.training_step` is incorrect: Expected `Module`, found `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+        "tests/trainers/test_dp_data_loader_strategy.py:273:9: error[unresolved-attribute] Attribute `to_standard_module` is not defined on `GradSampleHooks` in union `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+        "Found 23 diagnostics"
+      ]
+    },
+    "red-ty-314": {
+      "name": "red-ty-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/ty check --python /tmp/plato-phase2c-314/bin/python --output-format concise tests/trainers/test_dp_data_loader_strategy.py",
+      "shell": "zsh -lc",
+      "head": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+      "file_sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 1,
+      "seconds": 0.19805195811204612,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/red-ty-314.log",
+      "log_sha256": "d0b8bbc5fe84bbc98268fe02a7d9f6cc22cee0ea8e00e2adebef3bca6d9b6878",
+      "diagnostics": [
+        "tests/trainers/test_dp_data_loader_strategy.py:30:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:41:47: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:44:19: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:59:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:64:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:70:54: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:77:35: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `(Any & ~<Protocol with members 'autograd_grad_sample_hooks'>) | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:81:24: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `(Any & ~<Protocol with members 'autograd_grad_sample_hooks'>) | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:83:16: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:145:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:148:45: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:151:48: error[unresolved-attribute] Attribute `state_dict` is not defined on `None` in union `Any | None`",
+        "tests/trainers/test_dp_data_loader_strategy.py:155:23: error[unresolved-attribute] Object of type `None` has no attribute `state_dict`",
+        "tests/trainers/test_dp_data_loader_strategy.py:158:29: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:167:17: error[unresolved-attribute] Object of type `None` has no attribute `weight`",
+        "tests/trainers/test_dp_data_loader_strategy.py:169:31: error[unresolved-attribute] Object of type `None` has no attribute `state_dict`",
+        "tests/trainers/test_dp_data_loader_strategy.py:200:13: error[invalid-method-override] Invalid override of method `on_train_step_start`: Definition is incompatible with `TrainerCallback.on_train_step_start`",
+        "tests/trainers/test_dp_data_loader_strategy.py:203:13: error[invalid-method-override] Invalid override of method `on_train_step_end`: Definition is incompatible with `TrainerCallback.on_train_step_end`",
+        "tests/trainers/test_dp_data_loader_strategy.py:216:9: error[invalid-assignment] Object of type `device` is not assignable to attribute `device` of type `str`",
+        "tests/trainers/test_dp_data_loader_strategy.py:220:19: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "tests/trainers/test_dp_data_loader_strategy.py:254:9: error[invalid-assignment] Too many values to unpack: Expected 3",
+        "tests/trainers/test_dp_data_loader_strategy.py:265:21: error[invalid-argument-type] Argument to bound method `DPTrainingStepStrategy.training_step` is incorrect: Expected `Module`, found `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+        "tests/trainers/test_dp_data_loader_strategy.py:273:9: error[unresolved-attribute] Attribute `to_standard_module` is not defined on `GradSampleHooks` in union `AbstractGradSampleModule | GradSampleHooks | Unknown`"
+      ],
+      "log_tail": [
+        "tests/trainers/test_dp_data_loader_strategy.py:254:9: error[invalid-assignment] Too many values to unpack: Expected 3",
+        "tests/trainers/test_dp_data_loader_strategy.py:265:21: error[invalid-argument-type] Argument to bound method `DPTrainingStepStrategy.training_step` is incorrect: Expected `Module`, found `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+        "tests/trainers/test_dp_data_loader_strategy.py:273:9: error[unresolved-attribute] Attribute `to_standard_module` is not defined on `GradSampleHooks` in union `AbstractGradSampleModule | GradSampleHooks | Unknown`",
+        "Found 23 diagnostics"
+      ]
+    },
+    "draft-ty-313": {
+      "name": "draft-ty-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/ty check --python /tmp/plato-phase2c-313/bin/python --output-format concise tests/trainers/test_dp_data_loader_strategy.py",
+      "shell": "zsh -lc",
+      "head": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+      "file_sha256": "1cc2562056c880a977e4c4165a1548728e077d326dfc91bead2d76e53c8b1d4e",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 1,
+      "seconds": 0.18835712503641844,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-313.log",
+      "log_sha256": "ed3a05464565bbc8b37def1bda9c5cbba2623bf7b5291f5516a88f8d9951369d",
+      "diagnostics": [
+        "tests/trainers/test_dp_data_loader_strategy.py:72:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`"
+      ],
+      "log_tail": [
+        "tests/trainers/test_dp_data_loader_strategy.py:72:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "Found 1 diagnostic"
+      ]
+    },
+    "draft-ty-314": {
+      "name": "draft-ty-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/ty check --python /tmp/plato-phase2c-314/bin/python --output-format concise tests/trainers/test_dp_data_loader_strategy.py",
+      "shell": "zsh -lc",
+      "head": "8b01bf47ca8bdf9232bffeb4e50f78d4f00c9e3b",
+      "file_sha256": "1cc2562056c880a977e4c4165a1548728e077d326dfc91bead2d76e53c8b1d4e",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 1,
+      "seconds": 0.18924766592681408,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-314.log",
+      "log_sha256": "ed3a05464565bbc8b37def1bda9c5cbba2623bf7b5291f5516a88f8d9951369d",
+      "diagnostics": [
+        "tests/trainers/test_dp_data_loader_strategy.py:72:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`"
+      ],
+      "log_tail": [
+        "tests/trainers/test_dp_data_loader_strategy.py:72:22: error[unresolved-attribute] Object of type `OptimizerStrategy` has no attribute `privacy_engine`",
+        "Found 1 diagnostic"
+      ]
+    },
+    "committed-ty-313": {
+      "name": "committed-ty-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/ty check --python /tmp/plato-phase2c-313/bin/python --output-format concise tests/trainers/test_dp_data_loader_strategy.py",
+      "shell": "zsh -lc",
+      "head": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+      "file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 0.1922593330964446,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-313.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_tail": [
+        "All checks passed!"
+      ]
+    },
+    "committed-ty-314": {
+      "name": "committed-ty-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/ty check --python /tmp/plato-phase2c-314/bin/python --output-format concise tests/trainers/test_dp_data_loader_strategy.py",
+      "shell": "zsh -lc",
+      "head": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+      "file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 0.19271949981339276,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-314.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_tail": [
+        "All checks passed!"
+      ]
+    },
+    "committed-ruff-313": {
+      "name": "committed-ruff-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/ruff check tests/trainers/test_dp_data_loader_strategy.py --select I",
+      "shell": "zsh -lc",
+      "head": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+      "file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 0.018350499914959073,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-313.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_tail": [
+        "All checks passed!"
+      ]
+    },
+    "committed-ruff-314": {
+      "name": "committed-ruff-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/ruff check tests/trainers/test_dp_data_loader_strategy.py --select I",
+      "shell": "zsh -lc",
+      "head": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+      "file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 0.017784874886274338,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-314.log",
+      "log_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "log_tail": [
+        "All checks passed!"
+      ]
+    },
+    "dp-tests-313": {
+      "name": "dp-tests-313",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-313/bin/python -m pytest tests/trainers/test_dp_data_loader_strategy.py -q --basetemp /tmp/plato-phase2c-dp-typing-fix/dp-tests-313 --junitxml /tmp/plato-phase2c-dp-typing-fix/dp-tests-313.xml",
+      "shell": "zsh -lc",
+      "head": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+      "file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+      "python_environment": "/tmp/plato-phase2c-313",
+      "exit_code": 0,
+      "seconds": 28.02176208398305,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.log",
+      "log_sha256": "b5d459241dfb8bd86c14f51af0ae90ff652b3601d529bdebe36a761e9c3dbed2",
+      "junit": {
+        "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.xml",
+        "bytes": 1300,
+        "sha256": "97c675cf8bfe7444e7017784d90ad1422ec793a6ebd5fdc1f6e558328a3d6f61"
+      },
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 17
+      },
+      "test_ids": [
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+        "tests.trainers.test_dp_data_loader_strategy::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_strategy_handles_plato_sampler_get",
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_strategy_handles_torch_sampler_directly",
+        "tests.trainers.test_dp_data_loader_strategy::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+        "tests.trainers.test_dp_data_loader_strategy::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_memory_splitting_matches_logical_batch_parameter_reference"
+      ],
+      "log_tail": [
+        "    warnings.warn(",
+        "",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "7 passed, 17 warnings in 22.51s"
+      ]
+    },
+    "dp-tests-314": {
+      "name": "dp-tests-314",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 /tmp/plato-phase2c-314/bin/python -m pytest tests/trainers/test_dp_data_loader_strategy.py -q --basetemp /tmp/plato-phase2c-dp-typing-fix/dp-tests-314 --junitxml /tmp/plato-phase2c-dp-typing-fix/dp-tests-314.xml",
+      "shell": "zsh -lc",
+      "head": "9b083c0e923e760c7003c66fdf4da3db86f8758b",
+      "file_sha256": "3f95d8d7942f173290852ab6c3f803b41c01831f4e008b285b473d7962df93bc",
+      "python_environment": "/tmp/plato-phase2c-314",
+      "exit_code": 0,
+      "seconds": 29.791404040995985,
+      "log": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.log",
+      "log_sha256": "4b183f32f854ea40f30b652b64379d8978f2c08e441c7579917b7c22839b1cf7",
+      "junit": {
+        "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.xml",
+        "bytes": 1300,
+        "sha256": "5fbd3e202dc3b984a59116effc33908ef5bf0b9831518c836ae4ba0b6346522b"
+      },
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0,
+        "warnings": 17
+      },
+      "test_ids": [
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_actual_time_snapshot_writer_to_plain_urgent_reader",
+        "tests.trainers.test_dp_data_loader_strategy::test_actual_spawned_dp_rounds_return_accounting_and_isolate_clients",
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_strategy_handles_plato_sampler_get",
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_strategy_handles_torch_sampler_directly",
+        "tests.trainers.test_dp_data_loader_strategy::test_actual_dp_consecutive_training_exchange_checkpoint_and_accounting",
+        "tests.trainers.test_dp_data_loader_strategy::test_actual_dp_physical_batches_only_report_real_updates_and_cleanup",
+        "tests.trainers.test_dp_data_loader_strategy::test_dp_memory_splitting_matches_logical_batch_parameter_reference"
+      ],
+      "log_tail": [
+        "    warnings.warn(",
+        "",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "7 passed, 17 warnings in 23.38s"
+      ]
+    }
+  },
+  "red_green": "Both scoped explicit --python concise checks reproduce exactly the same23 root-owned-file diagnostics on8b before edits. One intermediate diagnostic in a captured closure was resolved with an in-function real strategy narrowing. Final exact9b committed-source checks pass both actual environments; no source skipping or diagnostic suppression.",
+  "dp_qualification": "All7 existing real Opacus tests passed both versions, including actual spawned consecutive/client-reassigned accounting, urgent snapshot reader/plain keys, consecutive private updates, checkpoint exchange, interruption cleanup and deterministic physical/logical batch parameter reference. No tests added or omitted.",
+  "warnings": {
+    "visible_each_version": 17,
+    "classified": {
+      "opacus_secure_rng_disabled": 5,
+      "rdp_order_boundary": 3,
+      "torch_full_backward_hook_on_outputs": 4,
+      "epsilon_calibration_after_spent_budget": 2,
+      "new_Subset_object_for_same_logical_dataset": 3
+    },
+    "handling": "All visible and retained; no blanket suppression/global filter. Counts match previous retained DP qualification. No global privacy accounting guarantee inferred."
+  },
+  "scope": {
+    "only_behavioral_source_changed": "tests/trainers/test_dp_data_loader_strategy.py",
+    "production_CI_manifests_and_other_test_files_changed": [],
+    "original_assertions_retained_exact_ast": 35,
+    "new_runtime_validation_assertions": 19,
+    "test_functions": 7,
+    "optional_absence_policy_guard_unchanged": true,
+    "no_duplicate_mirror_tests": true
+  },
+  "resource_inventory": {
+    "own_scratch": "/tmp/plato-phase2c-dp-typing-fix",
+    "own_environments": [
+      "/tmp/plato-phase2c-313",
+      "/tmp/plato-phase2c-314"
+    ],
+    "root_resources": "Only provided report/log were read and copied; no use/mutation of root checkout or validation environment.",
+    "cleanup": "None"
+  },
+  "raw_inventory": [
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/assertion-preservation.json",
+      "bytes": 1581,
+      "sha256": "573278471e915d7618dafa614fafd74a129cc9445ebf501b5f5b7997c8300d28"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-313.json",
+      "bytes": 669,
+      "sha256": "5b9c9747433cc2e5e63a9616d1050d7e9ecc304ba25d01dca1f54214802de27b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-314.json",
+      "bytes": 669,
+      "sha256": "7521eef7a90dd8f3a94e6a5bd0e9e6f64cf23b24672e4f822b293cbf68a6ef8d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ruff-314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-313.json",
+      "bytes": 717,
+      "sha256": "6a498c49574dce49d3bbc730fd1e5ce8ff06abb56c2d33c9e3b96f97ae67b571"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-314.json",
+      "bytes": 718,
+      "sha256": "bc956b8ea4e69fac0080c0061293d0f4e1c7e81c3fa2c4ddc902e0cfc2549e19"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/committed-ty-314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.json",
+      "bytes": 770,
+      "sha256": "0ca8a8b27301b3bbd8c43ff95b5338b763c70ad02c824f51dc582bd2d15976e5"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.log",
+      "bytes": 4917,
+      "sha256": "b5d459241dfb8bd86c14f51af0ae90ff652b3601d529bdebe36a761e9c3dbed2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-313.xml",
+      "bytes": 1300,
+      "sha256": "97c675cf8bfe7444e7017784d90ad1422ec793a6ebd5fdc1f6e558328a3d6f61"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.json",
+      "bytes": 771,
+      "sha256": "6fa505e9465e2541a078274990955948e5f1ae97d09767eda5a04fb667062029"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.log",
+      "bytes": 4965,
+      "sha256": "4b183f32f854ea40f30b652b64379d8978f2c08e441c7579917b7c22839b1cf7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/dp-tests-314.xml",
+      "bytes": 1300,
+      "sha256": "5fbd3e202dc3b984a59116effc33908ef5bf0b9831518c836ae4ba0b6346522b"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-313.json",
+      "bytes": 710,
+      "sha256": "b2b1d54d6b7891f16601501906085802735d440d7f8e290fc13d226edaa5c21a"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-313.log",
+      "bytes": 170,
+      "sha256": "ed3a05464565bbc8b37def1bda9c5cbba2623bf7b5291f5516a88f8d9951369d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-314.json",
+      "bytes": 710,
+      "sha256": "3bb69e18d8748e4c8fab086eba35bcb43172c2ffc42a80ed2b0a0dfe6bf944a7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/draft-ty-314.log",
+      "bytes": 170,
+      "sha256": "ed3a05464565bbc8b37def1bda9c5cbba2623bf7b5291f5516a88f8d9951369d"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/environment-313.json",
+      "bytes": 466,
+      "sha256": "7512354ee53d15a556024f2318eff3cae435c1a855d3bba9bc8d16ad7d3fc413"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/environment-314.json",
+      "bytes": 492,
+      "sha256": "1bf27b2b6f7edcdbb3690a868a6fd8f6301e6047016c8ce93f32e3446d0424f4"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/full-correction.diff",
+      "bytes": 8895,
+      "sha256": "d34ef449d25ec6c468a0924e6dfd5d18b9794cc89ea172844d10721b2fbe4450"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-313.json",
+      "bytes": 660,
+      "sha256": "14ec02f128536b8f340745da7e6ec1fc7cae82d2f67b1ff3c9f2c93421e43b31"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-314.json",
+      "bytes": 660,
+      "sha256": "7ce7b0cf86643be2d1b30a88254536270206d6300d5c86a76eed90b381eda248"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ruff-314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ty-313.json",
+      "bytes": 710,
+      "sha256": "7214fab3c4f92ce40e08ed01382d683477729d17c3a98b63530cb5bdec041be7"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ty-313.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ty-314.json",
+      "bytes": 709,
+      "sha256": "f37a8f28430a5e4e78d9703f1bb524ece3d5efe97dfba610cab7c28abcb01b93"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/green-ty-314.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/original-test_dp_data_loader_strategy.py",
+      "bytes": 12346,
+      "sha256": "97245aa7f8318d7875cafcc3c7c93e2e30047d61684a836efc1ea5e6c47e3c42"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/red-ty-313.json",
+      "bytes": 705,
+      "sha256": "a4b6b0eca40c01ec4ebebdced66336426275363870ff7d3345250c946040e557"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/red-ty-313.log",
+      "bytes": 3820,
+      "sha256": "d0b8bbc5fe84bbc98268fe02a7d9f6cc22cee0ea8e00e2adebef3bca6d9b6878"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/red-ty-314.json",
+      "bytes": 706,
+      "sha256": "24b3ab9068653016eb7f05205422b997118604eafeda2f402558c6cbef74c8a1"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/red-ty-314.log",
+      "bytes": 3820,
+      "sha256": "d0b8bbc5fe84bbc98268fe02a7d9f6cc22cee0ea8e00e2adebef3bca6d9b6878"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/root-ty-full.log",
+      "bytes": 125401,
+      "sha256": "7a70ffedf89d7805216e8e4c3767248ccfc7226a628e85f18197fc8826ebb8d2"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/root-typing-owned-gate-failure.json",
+      "bytes": 4669,
+      "sha256": "5ff780b0469021554828be80b3a5929b173e4ce245293df679774bb416d7c587"
+    },
+    {
+      "path": "/tmp/plato-phase2c-dp-typing-fix/run_checks.py",
+      "bytes": 1407,
+      "sha256": "7d6f79468f323a21c824530cce6cae3cca99ccaa015c769ffa313fa3fbaf7111"
+    }
+  ],
+  "limitations": [
+    "Scope is the existing protected DP test file, not full repository typing.",
+    "CPU/macOS arm64 qualification; no CUDA or native GPU claim.",
+    "Root broad integration run remains independent and untouched; no unrelated full-suite rerun.",
+    "Fresh independent review and root integration acceptance pending."
+  ],
+  "whole_phase_acceptance_claimed": false
+}
